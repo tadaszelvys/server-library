@@ -9,10 +9,10 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
+use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use OAuth2\Exception\BaseExceptionInterface;
 use Util\RequestBody;
 
 class RevocationEndpoint implements RevocationEndpointInterface
@@ -28,9 +28,9 @@ class RevocationEndpoint implements RevocationEndpointInterface
      */
     protected function getRevocationMethods()
     {
-        $managers = array(
+        $managers = [
             'access_token' => 'tryRevokeAccessToken',
-        );
+        ];
         if (!is_null($this->getRefreshTokenManager())) {
             $managers['refresh_token'] = 'tryRevokeRefreshToken';
         }
@@ -83,7 +83,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
      */
     protected function getParameters(Request $request, &$token, &$token_type_hint, &$callback)
     {
-        foreach (array('token', 'token_type_hint', 'callback') as $key) {
+        foreach (['token', 'token_type_hint', 'callback'] as $key) {
             $$key = $request->query->has($key) ? $request->query->get($key) : RequestBody::getParameter($request, $key);
         }
     }

@@ -3,8 +3,8 @@
 namespace OAuth2\Client;
 
 use OAuth2\Behaviour\HasExceptionManager;
-use Symfony\Component\HttpFoundation\Request;
 use OAuth2\Exception\ExceptionManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class ClientManagerSupervisor implements ClientManagerSupervisorInterface
 {
@@ -13,7 +13,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     /**
      * @var \OAuth2\Client\ClientManagerInterface[]
      */
-    private $client_managers = array();
+    private $client_managers = [];
 
     /**
      * {@inheritdoc}
@@ -88,6 +88,6 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
             return $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Unknown client');
         }
 
-        return $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Unknown client', array('scheme' => $auth_scheme));
+        return $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Unknown client', ['scheme' => $auth_scheme]);
     }
 }

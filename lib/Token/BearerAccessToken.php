@@ -20,11 +20,11 @@ class BearerAccessToken implements AccessTokenTypeInterface
      */
     protected function getTokenFromMethods()
     {
-        return array(
+        return [
             'getTokenFromHeaders',
             'getTokenFromRequestBody',
             'getTokenFromQuery',
-        );
+        ];
     }
 
     /**
@@ -86,9 +86,9 @@ class BearerAccessToken implements AccessTokenTypeInterface
     {
         $data = $token->jsonSerialize();
 
-        return array_merge($data, array(
+        return array_merge($data, [
             'token_type' => 'Bearer',
-        ));
+        ]);
     }
 
     /**
@@ -96,7 +96,7 @@ class BearerAccessToken implements AccessTokenTypeInterface
      */
     public function findAccessToken(Request $request)
     {
-        $tokens = array();
+        $tokens = [];
         $methods = $this->getTokenFromMethods();
 
         foreach ($methods as $method) {

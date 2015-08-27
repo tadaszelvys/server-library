@@ -4,14 +4,14 @@ namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
+use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Endpoint\AuthorizationEndpoint;
+use OAuth2\Endpoint\AuthorizationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
-use Util\RequestBody;
-use OAuth2\Client\ConfidentialClientInterface;
-use OAuth2\Endpoint\AuthorizationInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Util\RequestBody;
 
 class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
 {
@@ -63,9 +63,9 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
     public function grantAuthorization(AuthorizationInterface $authorization)
     {
         $code = $this->getAuthCodeManager()->createAuthCode($authorization->getClient(), $authorization->getRedirectUri(), $authorization->getScope(), $authorization->getResourceOwner(), $authorization->getIssueRefreshToken());
-        $params = array(
+        $params = [
             'code' => $code->getCode(),
-        );
+        ];
         if (!is_null($authorization->getState())) {
             $params['state'] = $authorization->getState();
         }
@@ -116,9 +116,9 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
-     * @return null|\OAuth2\Token\AuthCodeInterface
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return null|\OAuth2\Token\AuthCodeInterface
      */
     protected function getAuthCode(Request $request)
     {

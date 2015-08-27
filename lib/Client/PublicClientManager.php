@@ -3,8 +3,8 @@
 namespace OAuth2\Client;
 
 use OAuth2\Behaviour\HasExceptionManager;
-use Symfony\Component\HttpFoundation\Request;
 use OAuth2\Exception\ExceptionManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 abstract class PublicClientManager implements ClientManagerInterface
 {
@@ -21,7 +21,7 @@ abstract class PublicClientManager implements ClientManagerInterface
     public function findClient(Request $request)
     {
         $methods = $this->findClientMethods();
-        $result = array();
+        $result = [];
 
         foreach ($methods as $method) {
             $data = $this->$method($request);
@@ -45,9 +45,9 @@ abstract class PublicClientManager implements ClientManagerInterface
     /**
      * @param array $result
      *
-     * @return null|\OAuth2\Client\ClientInterface|string
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return null|\OAuth2\Client\ClientInterface|string
      */
     private function checkResult(array $result)
     {

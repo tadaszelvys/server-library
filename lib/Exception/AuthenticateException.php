@@ -12,7 +12,7 @@ class AuthenticateException extends BaseException implements AuthenticateExcepti
      * @param string $error_uri         Uri of the error (optional)
      * @param array  $data              Additional data sent to the exception (optional)
      */
-    public function __construct($error, $error_description = null, $error_uri = null, array $data = array())
+    public function __construct($error, $error_description = null, $error_uri = null, array $data = [])
     {
         parent::__construct(401, $error, $error_description, $error_uri);
 
@@ -22,13 +22,13 @@ class AuthenticateException extends BaseException implements AuthenticateExcepti
 
         $headers = $data['scheme'].' ';
         unset($data['scheme']);
-        $params = array();
+        $params = [];
         foreach ($data as $key => $value) {
             $params[] = sprintf('%s=%s', $key, $this->quote($value));
         }
         $headers .= implode(',', $params);
 
-        $this->header = array('WWW-Authenticate' => $headers);
+        $this->header = ['WWW-Authenticate' => $headers];
     }
 
     public function getResponseHeaders()

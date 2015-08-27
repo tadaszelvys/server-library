@@ -2,16 +2,16 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Token\AuthCode;
-use OAuth2\Token\AuthCodeManager as Base;
 use OAuth2\Client\ClientInterface;
-use Security\DefuseGenerator;
-use OAuth2\Token\AuthCodeInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use OAuth2\Token\AuthCode;
+use OAuth2\Token\AuthCodeInterface;
+use OAuth2\Token\AuthCodeManager as Base;
+use Security\DefuseGenerator;
 
 class AuthCodeManager extends Base
 {
-    private $auth_codes = array();
+    private $auth_codes = [];
 
     public function __construct()
     {
@@ -26,10 +26,10 @@ class AuthCodeManager extends Base
                   ->setRedirectUri('http://example.com/redirect_uri/')
                   ->setResourceOwnerPublicId(null)
                   ->setExipresAt(time() + 3000)
-                  ->setScope(array(
+                  ->setScope([
                       $scope1,
                       $scope2,
-                  ))
+                  ])
                   ->setCode('VALID_AUTH_CODE');
 
         $expired_auth_code = new AuthCode();
@@ -38,10 +38,10 @@ class AuthCodeManager extends Base
                   ->setRedirectUri('http://example.com/redirect_uri/')
                   ->setResourceOwnerPublicId(null)
                   ->setExipresAt(time() - 1)
-                  ->setScope(array(
+                  ->setScope([
                       $scope1,
                       $scope2,
-                  ))
+                  ])
                   ->setCode('VALID_AUTH_CODE');
 
         $this->auth_codes['VALID_AUTH_CODE'] = $valid_auth_code;
@@ -53,7 +53,7 @@ class AuthCodeManager extends Base
         return new DefuseGenerator();
     }
 
-    protected function addAuthCode($code, $expiresAt, ClientInterface $client, $redirectUri, array $scope = array(), ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false)
+    protected function addAuthCode($code, $expiresAt, ClientInterface $client, $redirectUri, array $scope = [], ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false)
     {
         $auth_code = new AuthCode();
         $auth_code->setExipresAt($expiresAt)

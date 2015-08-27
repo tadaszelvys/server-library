@@ -6,9 +6,9 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Util\RequestBody;
 use OAuth2\Token\RefreshTokenInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Util\RequestBody;
 
 class RefreshTokenGrantType implements GrantTypeSupportInterface
 {

@@ -10,27 +10,24 @@ class PublicClientManager extends Base
     /**
      * @var \OAuth2\Test\Stub\PublicClient[]
      */
-    private $clients = array();
+    private $clients = [];
 
     public function __construct()
     {
         $foo = new PublicClient();
         $foo->setPublicId('foo')
-            ->setAllowedGrantTypes(array('client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'))
-            ->setRedirectUris(array('http://example.com/test?good=false', 'https://another.uri/callback'))
-            ;
+            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
+            ->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback']);
 
         $oof = new PublicClient();
         $oof->setPublicId('oof')
-            ->setAllowedGrantTypes(array())
-            ->setRedirectUris(array())
-            ;
+            ->setAllowedGrantTypes([])
+            ->setRedirectUris([]);
 
         $fii = new PublicClient();
         $fii->setPublicId('fii')
-            ->setAllowedGrantTypes(array())
-            ->setRedirectUris(array('http://example.com/test?good=false'))
-            ;
+            ->setAllowedGrantTypes([])
+            ->setRedirectUris(['http://example.com/test?good=false']);
         $this->clients['foo'] = $foo;
         $this->clients['oof'] = $oof;
         $this->clients['fii'] = $fii;
@@ -49,9 +46,9 @@ class PublicClientManager extends Base
      */
     protected function findClientMethods()
     {
-        return array(
+        return [
             'findClientUsingHeader',
-        );
+        ];
     }
 
     /**
