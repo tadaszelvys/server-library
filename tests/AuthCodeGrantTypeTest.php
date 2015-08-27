@@ -2,8 +2,8 @@
 
 namespace OAuth2\Test;
 
-use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Endpoint\Authorization;
+use OAuth2\Exception\BaseExceptionInterface;
 
 /**
  * @group AuthorizationCodeGrantType
@@ -237,7 +237,7 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testPublicClientWithoutPublicId()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on'), array('X-OAuth2-Public-Client-ID' => 'foo'), http_build_query(array('grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -250,7 +250,7 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testParameterCodeIsMissing()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on'), array('X-OAuth2-Public-Client-ID' => 'foo'), http_build_query(array('grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/redirect_uri/')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -263,7 +263,7 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testParameterCodeIsMissing2()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -276,7 +276,7 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testExpiredAuthcode()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'authorization_code', 'code' => 'EXPIRED_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'EXPIRED_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -289,7 +289,7 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testRedirectUriMismatch()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -302,7 +302,7 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthCodeDoesNotExists()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'authorization_code', 'code' => 'DO_NOT_EXIST', 'redirect_uri' => 'http://example.com/redirect_uri/bad/')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'DO_NOT_EXIST', 'redirect_uri' => 'http://example.com/redirect_uri/bad/']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -315,7 +315,7 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthCodeNotForTheClient()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -328,7 +328,7 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testClientGranted()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
         $response = $this->getTokenEndpoint()->getAccessToken($request);
 

@@ -10,18 +10,18 @@ use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\RefreshTokenGrantType;
+use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\Configuration;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\PasswordClientManager;
 use OAuth2\Test\Stub\PublicClientManager;
+use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Token\BearerAccessToken;
 use Symfony\Component\HttpFoundation\Request;
-use OAuth2\Test\Stub\RefreshTokenManager;
-use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 
 class Base extends \PHPUnit_Framework_TestCase
 {
@@ -41,9 +41,9 @@ class Base extends \PHPUnit_Framework_TestCase
      *
      * @return \Symfony\Component\HttpFoundation\Request
      */
-    protected function createRequest($uri = '/', $method = 'GET', array $parameters = array(), array $server = array(), array $headers = array(), $content = null)
+    protected function createRequest($uri = '/', $method = 'GET', array $parameters = [], array $server = [], array $headers = [], $content = null)
     {
-        $request = Request::create($uri, $method, $parameters, array(), array(), $server, $content);
+        $request = Request::create($uri, $method, $parameters, [], [], $server, $content);
         foreach ($headers as $key => $value) {
             $request->headers->set($key, $value);
         }

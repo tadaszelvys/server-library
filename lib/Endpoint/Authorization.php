@@ -30,7 +30,7 @@ class Authorization implements AuthorizationInterface
     /**
      * @var \OAuth2\Scope\ScopeInterface[]
      */
-    protected $scope = array();
+    protected $scope = [];
 
     /**
      * @var null|string

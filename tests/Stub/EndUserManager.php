@@ -10,7 +10,7 @@ class EndUserManager implements EndUserManagerInterface
     /**
      * @var \OAuth2\EndUser\EndUserInterface[]
      */
-    private $users = array();
+    private $users = [];
 
     public function __construct()
     {

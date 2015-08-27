@@ -38,7 +38,7 @@ abstract class ScopeManager implements ScopeManagerInterface
 
     protected static function supportedPolicies()
     {
-        return array(null, self::POLICY_MODE_DEFAULT, self::POLICY_MODE_ERROR);
+        return [null, self::POLICY_MODE_DEFAULT, self::POLICY_MODE_ERROR];
     }
 
     /**
@@ -99,13 +99,13 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * @param array $scopes
      *
-     * @return array
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return array
      */
     private function convertArrayToScope(array $scopes)
     {
-        $result = array();
+        $result = [];
         foreach ($scopes as $scope) {
             if ($scope instanceof ScopeInterface) {
                 $result[] = $scope;
@@ -125,7 +125,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     public function convertToScope($scopes)
     {
         if (empty($scopes)) {
-            return array();
+            return [];
         }
         if (is_array($scopes)) {
             return $this->convertArrayToScope($scopes);
@@ -135,7 +135,7 @@ abstract class ScopeManager implements ScopeManagerInterface
         }
         $scopes = explode(' ', $scopes);
 
-        $result = array();
+        $result = [];
         foreach ($scopes as $scope) {
             if (1 !== preg_match('/^[\x21\x23-\x5B\x5D-\x7E]+$/', $scope)) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_SCOPE, 'Scope contains illegal characters.');

@@ -6,11 +6,11 @@ use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
-use Util\RequestBody;
-use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
-use Symfony\Component\HttpFoundation\Request;
 use OAuth2\EndUser\EndUserInterface;
+use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Util\RequestBody;
 
 class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInterface
 {

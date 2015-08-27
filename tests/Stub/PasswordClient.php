@@ -19,12 +19,12 @@ class PasswordClient implements PasswordClientInterface
     /**
      * @var string[]
      */
-    private $grant_types = array();
+    private $grant_types = [];
 
     /**
      * @var string[]
      */
-    private $redirect_uris = array();
+    private $redirect_uris = [];
 
     /**
      * {@inheritdoc}

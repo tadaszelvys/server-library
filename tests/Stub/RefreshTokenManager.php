@@ -4,16 +4,16 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
-use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManager as Base;
+use OAuth2\Token\RefreshTokenManagerInterface;
 
 class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
 {
     /**
      * @var \OAuth2\Test\Stub\RefreshToken[]
      */
-    private $refresh_tokens = array();
+    private $refresh_tokens = [];
 
     public function __construct()
     {
@@ -27,34 +27,32 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
         $bar = new PasswordClient();
         $bar->setPublicId('bar')
             ->setSecret('secret')
-            ->setAllowedGrantTypes(array('client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'))
-            ->setRedirectUris(array('http://example.com/test?good=false'))
-        ;
+            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
+            ->setRedirectUris(['http://example.com/test?good=false']);
 
         $foo = new PublicClient();
         $foo->setPublicId('foo')
-            ->setAllowedGrantTypes(array('client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'))
-            ->setRedirectUris(array('http://example.com/test?good=false', 'https://another.uri/callback'))
-        ;
+            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
+            ->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback']);
 
         $this->addRefreshToken(
             'VALID_REFRESH_TOKEN',
             time() + 10000,
             $bar,
-            array($scope1, $scope2, $scope3)
+            [$scope1, $scope2, $scope3]
         );
         $this->addRefreshToken(
             'EXPIRED_REFRESH_TOKEN',
             time() - 1,
             $foo,
-            array($scope1, $scope2, $scope3)
+            [$scope1, $scope2, $scope3]
         );
 
         $this->addRefreshToken(
             'REFRESH_EFGH',
             time() + 36000,
             $foo,
-            array()
+            []
         );
     }
 
@@ -63,7 +61,7 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
         return array_keys($this->refresh_tokens);
     }
 
-    protected function addRefreshToken($token, $expiresAt, ClientInterface $client, array $scope = array(), ResourceOwnerInterface $resourceOwner = null)
+    protected function addRefreshToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null)
     {
         $refresh_token = new RefreshToken();
         $refresh_token->setExipresAt($expiresAt)

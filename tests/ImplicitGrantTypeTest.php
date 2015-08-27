@@ -2,9 +2,8 @@
 
 namespace OAuth2\Test;
 
-use OAuth2\Exception\BaseExceptionInterface;
-use OAuth2\Test\Stub\PublicClient;
 use OAuth2\Endpoint\Authorization;
+use OAuth2\Exception\BaseExceptionInterface;
 
 /**
  * @group ImplicitGrantType

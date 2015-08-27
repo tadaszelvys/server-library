@@ -14,14 +14,14 @@ class ExceptionManager implements ExceptionManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getUri($type, $error, $error_description = null, array $data = array())
+    public function getUri($type, $error, $error_description = null, array $data = [])
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getException($type, $error, $error_description = null, array $data = array())
+    public function getException($type, $error, $error_description = null, array $data = [])
     {
         if ($type === self::AUTHENTICATE && !isset($data['realm'])) {
             $data['realm'] = $this->getConfiguration()->get('realm', 'Service');
@@ -29,13 +29,13 @@ class ExceptionManager implements ExceptionManagerInterface
 
         $error_uri = $this->getUri($type, $error, $error_description, $data);
 
-        $supported_types = array(
+        $supported_types = [
             self::AUTHENTICATE,
             self::BAD_REQUEST,
             self::NOT_IMPLEMENTED,
             self::REDIRECT,
             self::INTERNAL_SERVER_ERROR,
-        );
+        ];
 
         if (in_array($type, $supported_types)) {
             $exception = sprintf('OAuth2\Exception\%sException', $type);

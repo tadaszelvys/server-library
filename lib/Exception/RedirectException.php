@@ -17,7 +17,7 @@ class RedirectException extends BaseException implements RedirectExceptionInterf
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($error, $error_description = null, $error_uri = null, array $data = array())
+    public function __construct($error, $error_description = null, $error_uri = null, array $data = [])
     {
         parent::__construct(302, $error, $error_description, $error_uri);
 
@@ -25,7 +25,7 @@ class RedirectException extends BaseException implements RedirectExceptionInterf
             throw new \InvalidArgumentException('redirect_uri_not_defined');
         }
 
-        if (!array_key_exists('transport_mode', $data) || !in_array($data['transport_mode'], array('query', 'fragment'))) {
+        if (!array_key_exists('transport_mode', $data) || !in_array($data['transport_mode'], ['query', 'fragment'])) {
             throw new \InvalidArgumentException('invalid_transport_mode');
         }
         $this->transport_mode = $data['transport_mode'];
@@ -47,10 +47,10 @@ class RedirectException extends BaseException implements RedirectExceptionInterf
         if (array_key_exists('error_uri', $data)) {
             $data['error_uri'] = urldecode($data['error_uri']);
         }
-        $params = array($this->transport_mode => $data);
+        $params = [$this->transport_mode => $data];
 
-        return array(
+        return [
             'Location' => Uri::buildURI($this->redirect_uri, $params),
-        );
+        ];
     }
 }

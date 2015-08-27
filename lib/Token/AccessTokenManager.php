@@ -18,7 +18,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     protected function getLifetime(ClientInterface $client)
     {
         $lifetime = $this->getConfiguration()->get('access_token_lifetime', 3600);
-        if ($client instanceof TokenLifetimeExtensionInterface && is_integer($_lifetime = $client->getTokenLifetime('access_token'))) {
+        if ($client instanceof TokenLifetimeExtensionInterface && is_int($_lifetime = $client->getTokenLifetime('access_token'))) {
             return $_lifetime;
         }
 

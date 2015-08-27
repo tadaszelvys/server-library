@@ -28,12 +28,12 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
      *
      * @return \OAuth2\Token\AuthCodeInterface
      */
-    abstract protected function addAuthCode($code, $expiresAt, ClientInterface $client, $redirectUri, array $scope = array(), ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false);
+    abstract protected function addAuthCode($code, $expiresAt, ClientInterface $client, $redirectUri, array $scope = [], ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false);
 
     /**
      * {@inheritdoc}
      */
-    public function createAuthCode(ClientInterface $client, $redirectUri, array $scope = array(), ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false)
+    public function createAuthCode(ClientInterface $client, $redirectUri, array $scope = [], ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false)
     {
         $length = $this->getConfiguration()->get('auth_code_length', 20);
         $charset = $this->getConfiguration()->get('auth_code_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
@@ -46,7 +46,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
             throw $this->createException('An error has occurred during the creation of the authorization code.');
         }
 
-        $authcode = $this->addAuthCode($code,  time() + $this->getLifetime($client), $client, $redirectUri, $scope, $resourceOwner, $issueRefreshToken);
+        $authcode = $this->addAuthCode($code, time() + $this->getLifetime($client), $client, $redirectUri, $scope, $resourceOwner, $issueRefreshToken);
 
         return $authcode;
     }

@@ -24,14 +24,14 @@ abstract class SimpleStringAccessTokenManager extends AccessTokenManager
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    abstract protected function addAccessToken($token, $expiresAt, ClientInterface $client, array $scope = array(), ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null);
+    abstract protected function addAccessToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null);
 
     /**
      * {@inheritdoc}
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function createAccessToken(ClientInterface $client, array $scope = array(), ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null)
+    public function createAccessToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null)
     {
         $length = $this->getConfiguration()->get('simple_string_access_token_length', 20);
         $charset = $this->getConfiguration()->get('simple_string_access_token_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');

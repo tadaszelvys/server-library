@@ -6,8 +6,8 @@ use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use Security\DefuseGenerator;
 
 abstract class RefreshTokenManager implements RefreshTokenManagerInterface
@@ -26,12 +26,12 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
      *
      * @return \OAuth2\Token\RefreshTokenInterface
      */
-    abstract protected function addRefreshToken($token, $expiresAt, ClientInterface $client, array $scope = array(), ResourceOwnerInterface $resourceOwner = null);
+    abstract protected function addRefreshToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null);
 
     /**
      * {@inheritdoc}
      */
-    public function createRefreshToken(ClientInterface $client, array $scope = array(), ResourceOwnerInterface $resourceOwner = null)
+    public function createRefreshToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null)
     {
         $length = $this->getConfiguration()->get('refresh_token_length', 20);
         $charset = $this->getConfiguration()->get('refresh_token_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');

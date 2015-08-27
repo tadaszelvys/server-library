@@ -9,12 +9,12 @@ class Configuration implements ConfigurationInterface
     /**
      * @var array
      */
-    private $config = array();
+    private $config = [];
 
     /**
      * @param array $values
      */
-    public function __construct(array $values = array())
+    public function __construct(array $values = [])
     {
         $this->config = $values;
     }

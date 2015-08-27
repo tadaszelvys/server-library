@@ -2,25 +2,25 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Token\SimpleStringAccessTokenManager as Base;
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
-use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Token\RefreshTokenInterface;
+use OAuth2\Token\SimpleStringAccessTokenManager as Base;
 
 class SimpleStringAccessTokenManager extends Base
 {
     /**
      * @var \OAuth2\Token\AccessTokenInterface[]
      */
-    private $access_tokens = array();
+    private $access_tokens = [];
 
     public function __construct()
     {
         $abcd = new SimpleStringAccessToken();
         $abcd->setExipresAt(time() + 3600)
              ->setResourceOwnerPublicId(null)
-             ->setScope(array())
+             ->setScope([])
              ->setClientPublicId('bar')
              ->setRefreshToken(null)
              ->setToken('ABCD');
@@ -28,7 +28,7 @@ class SimpleStringAccessTokenManager extends Base
         $efgh = new SimpleStringAccessToken();
         $efgh->setExipresAt(time() + 3600)
              ->setResourceOwnerPublicId(null)
-             ->setScope(array())
+             ->setScope([])
              ->setClientPublicId('foo')
              ->setRefreshToken('REFRESH_EFGH')
              ->setToken('EFGH');
@@ -39,7 +39,7 @@ class SimpleStringAccessTokenManager extends Base
     /**
      * {@inheritdoc}
      */
-    protected function addAccessToken($token, $expiresAt, ClientInterface $client, array $scope = array(), ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null)
+    protected function addAccessToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null)
     {
         $access_token = new SimpleStringAccessToken();
         $access_token->setExipresAt($expiresAt)

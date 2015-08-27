@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class BaseException extends \Exception implements BaseExceptionInterface
 {
-    protected $errorData = array();
+    protected $errorData = [];
 
     /**
      * @param string $code              HTTP error code
@@ -55,11 +55,11 @@ abstract class BaseException extends \Exception implements BaseExceptionInterfac
 
     public function getResponseHeaders()
     {
-        return array(
-            'Content-Type' => 'application/json',
+        return [
+            'Content-Type'  => 'application/json',
             'Cache-Control' => 'no-store',
-            'Pragma' => 'no-cache',
-        );
+            'Pragma'        => 'no-cache',
+        ];
     }
 
     public function getResponseBody()

@@ -11,11 +11,11 @@ use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Util\RequestBody;
-use OAuth2\Grant\GrantTypeSupportInterface;
 
 class TokenEndpoint implements TokenEndpointInterface
 {
@@ -30,7 +30,7 @@ class TokenEndpoint implements TokenEndpointInterface
     /**
      * @var \OAuth2\Grant\GrantTypeSupportInterface[]
      */
-    protected $grant_types = array();
+    protected $grant_types = [];
 
     /**
      * @param \OAuth2\Grant\GrantTypeSupportInterface $grant_type
@@ -79,18 +79,18 @@ class TokenEndpoint implements TokenEndpointInterface
         $this->checkGrantType($client, $grant_type);
         $grant_type_response = $type->grantAccessToken($request, $client);
 
-        $result = array(
-            'requested_scope' => $grant_type_response->getRequestedScope() ?: $this->getScopeManager()->getDefaultScopes($client),
-            'available_scope' => $grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopes($client),
+        $result = [
+            'requested_scope'          => $grant_type_response->getRequestedScope() ?: $this->getScopeManager()->getDefaultScopes($client),
+            'available_scope'          => $grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopes($client),
             'resource_owner_public_id' => $grant_type_response->getResourceOwnerPublicid(),
-            'refresh_token' => array(
+            'refresh_token'            => [
                 'issued' => $grant_type_response->isRefreshTokenIssued(),
-                'scope' => $grant_type_response->getRefreshTokenScope(),
-                'used' => $grant_type_response->getRefreshTokenRevoked(),
-            ),
-        );
+                'scope'  => $grant_type_response->getRefreshTokenScope(),
+                'used'   => $grant_type_response->getRefreshTokenRevoked(),
+            ],
+        ];
 
-        foreach (array('requested_scope', 'available_scope') as $key) {
+        foreach (['requested_scope', 'available_scope'] as $key) {
             $result[$key] = $this->getScopeManager()->convertToScope($result[$key]);
         }
 
@@ -107,11 +107,11 @@ class TokenEndpoint implements TokenEndpointInterface
 
         $prepared = $this->getAccessTokenType()->prepareAccessToken($token);
 
-        return new Response(json_encode($prepared), 200, array(
-            'Content-Type' => 'application/json',
+        return new Response(json_encode($prepared), 200, [
+            'Content-Type'  => 'application/json',
             'Cache-Control' => 'no-store',
-            'Pragma' => 'no-cache',
-        ));
+            'Pragma'        => 'no-cache',
+        ]);
     }
 
     protected function createAccessToken(ClientInterface $client, array $values)
@@ -136,9 +136,9 @@ class TokenEndpoint implements TokenEndpointInterface
     /**
      * @param $grant_type
      *
-     * @return \OAuth2\Grant\GrantTypeSupportInterface
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\Grant\GrantTypeSupportInterface
      */
     protected function getGrantType($grant_type)
     {

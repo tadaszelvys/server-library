@@ -25,7 +25,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testNotPostMethod()
     {
-        $request = $this->createRequest('/', 'GET', array(), array('HTTPS' => 'on'));
+        $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -39,7 +39,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeIsMissing()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on'));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -53,7 +53,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testUnknownClient()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'plic', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'refresh_token')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'plic', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -67,7 +67,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testUnsupportedGrantType()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'bar')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'bar']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -81,7 +81,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeUnauthorizedForClient()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'refresh_token')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -95,7 +95,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForClient()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN']));
 
         $response = $this->getTokenEndpoint()->getAccessToken($request);
 
@@ -108,7 +108,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testRefreshTokenParameterIsMissing()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'refresh_token')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -122,7 +122,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testRefreshTokenExpired()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on'), array('X-OAuth2-Public-Client-ID' => 'foo'), http_build_query(array('grant_type' => 'refresh_token', 'refresh_token' => 'EXPIRED_REFRESH_TOKEN')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'EXPIRED_REFRESH_TOKEN']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -136,7 +136,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testWrongClient()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on'), array('X-OAuth2-Public-Client-ID' => 'foo'), http_build_query(array('grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -150,7 +150,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForClientAndRefreshTokenIsMarkedAsUsed()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN']));
 
         $response = $this->getTokenEndpoint()->getAccessToken($request);
 
@@ -172,7 +172,7 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForClientWithReducedScope()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN', 'scope' => 'scope2')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN', 'scope' => 'scope2']));
 
         $response = $this->getTokenEndpoint()->getAccessToken($request);
 

@@ -5,13 +5,13 @@ namespace OAuth2\Endpoint;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasScopeManager;
-use OAuth2\Exception\ExceptionManagerInterface;
-use Util\Uri;
-use OAuth2\Client\RegisteredClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
+use OAuth2\Client\RegisteredClientInterface;
 use OAuth2\Exception\BaseExceptionInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\ResponseTypeSupportInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Util\Uri;
 
 class AuthorizationEndpoint implements AuthorizationEndpointInterface
 {
@@ -25,7 +25,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * @var \OAuth2\Grant\ResponseTypeSupportInterface[]
      */
-    protected $response_types = array();
+    protected $response_types = [];
 
     public function addResponseType(ResponseTypeSupportInterface $response_type)
     {
@@ -59,7 +59,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $response_mode = $type->getResponseMode();
 
         if ($authorization->isAuthorized() === false) {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', array('transport_mode' => $response_mode, 'redirect_uri' => $authorization->getRedirectUri(), 'state' => $authorization->getState()));
+            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', ['transport_mode' => $response_mode, 'redirect_uri' => $authorization->getRedirectUri(), 'state' => $authorization->getState()]);
 
             return $exception->getHttpResponse();
         }
@@ -69,23 +69,23 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         switch ($response_mode) {
             case self::RESPONSE_MODE_QUERY:
             case self::RESPONSE_MODE_FRAGMENT:
-                $result = array($response_mode => $result);
+                $result = [$response_mode => $result];
                 break;
             default:
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_response_mode', sprintf('The response mode "%s" is not supported.', $response_mode));
         }
 
-        return new Response('', 302, array(
+        return new Response('', 302, [
             'Location' => Uri::buildUri($redirect_uri, $result),
-        ));
+        ]);
     }
 
     /**
      * @param \OAuth2\Endpoint\AuthorizationInterface $authorization An array with mixed values
      *
-     * @return string
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     protected function checkRedirectUri(AuthorizationInterface $authorization)
     {
@@ -148,15 +148,15 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @param \OAuth2\Endpoint\AuthorizationInterface $authorization An array with mixed values
      *
-     * @return array
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return array
      */
     protected function getClientRedirectUris(AuthorizationInterface $authorization)
     {
         $client = $authorization->getClient();
         if (!$client instanceof RegisteredClientInterface) {
-            return array();
+            return [];
         }
 
         $redirect_uris = $client->getRedirectUris();
@@ -179,7 +179,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients must register at least one redirect URI when using "token" response type');
         }
 
-        return array();
+        return [];
     }
 
     /**

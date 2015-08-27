@@ -23,16 +23,16 @@ class ScopeManager extends Base
 
     public function __construct()
     {
-        $this->available_scopes = array(
+        $this->available_scopes = [
             $this->createScope('scope1'),
             $this->createScope('scope2'),
             $this->createScope('scope3'),
             $this->createScope('scope4'),
-        );
-        $this->default_scopes = array(
+        ];
+        $this->default_scopes = [
             $this->createScope('scope1'),
             $this->createScope('scope2'),
-        );
+        ];
         $this->policy = 'default';
     }
 

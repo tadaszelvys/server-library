@@ -33,7 +33,7 @@ interface AuthCodeManagerInterface
      *
      * @return null|AuthCodeInterface
      */
-    public function createAuthCode(ClientInterface $client, $redirectUri, array $scope = array(), ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false);
+    public function createAuthCode(ClientInterface $client, $redirectUri, array $scope = [], ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false);
 
     /**
      * Marks auth code as expired.

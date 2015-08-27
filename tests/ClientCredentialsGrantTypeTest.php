@@ -26,7 +26,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testNotPostMethod()
     {
-        $request = $this->createRequest('/', 'GET', array(), array('HTTPS' => 'on'));
+        $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -40,7 +40,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testGrantTypeIsMissing()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on'));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -54,7 +54,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testUnknownClient()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'plic', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'client_credentials')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'plic', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -68,7 +68,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testUnsupportedGrantType()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'bar')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'bar']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -82,7 +82,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testGrantTypeUnauthorizedForClient()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'client_credentials')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
@@ -96,7 +96,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForClient()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'), array(), http_build_query(array('grant_type' => 'client_credentials')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
 
         $response = $this->getTokenEndpoint()->getAccessToken($request);
 
@@ -109,7 +109,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testClientNotConfidential()
     {
-        $request = $this->createRequest('/', 'POST', array(), array('HTTPS' => 'on'), array('X-OAuth2-Public-Client-ID' => 'foo'), http_build_query(array('grant_type' => 'client_credentials')));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'client_credentials']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request);
