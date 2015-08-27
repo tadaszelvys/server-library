@@ -1,0 +1,39 @@
+{
+    "name": "spomky-labs/oauth2-server-library",
+    "type": "library",
+    "description": "OAuth2 Server Library",
+    "license": "MIT",
+    "keywords": ["oauth2", "server", "library"],
+    "homepage": "https://github.com/Spomky-Labs/oauth2-server-library",
+    "authors": [
+        {
+            "name": "Florent Morselli",
+            "homepage": "https://github.com/Spomky-Labs/oauth2-server-library/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "symfony/http-foundation": "~2.1",
+        "spomky-labs/oauth2-interface": "~5.0.0",
+        "spomky-labs/uri-util": "~1.0.0",
+        "spomky-labs/defuse-generator": "~1.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "OAuth2\\": "lib/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OAuth2\\Test\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
