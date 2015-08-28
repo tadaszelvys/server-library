@@ -25,7 +25,7 @@ class AuthCode implements AuthCodeInterface
     private $expires_at;
 
     /**
-     * @var null|\OAuth2\ResourceOwner\ResourceOwnerInterface
+     * @var null|string
      */
     private $resource_owner_public_id;
 
