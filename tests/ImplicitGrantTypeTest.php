@@ -40,6 +40,10 @@ class ImplicitGrantTypeTest extends Base
     public function testRedirectUriParameterIsNotValid()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=true')
                       ->setClient($client);
@@ -56,6 +60,10 @@ class ImplicitGrantTypeTest extends Base
     public function testResponseTypeParameterIsMissing()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client);
@@ -72,6 +80,10 @@ class ImplicitGrantTypeTest extends Base
     public function testResponseTypeParameterIsNotSupported()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
@@ -123,6 +135,10 @@ class ImplicitGrantTypeTest extends Base
     public function testResourceOwnerDeniedAccess()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
@@ -136,6 +152,10 @@ class ImplicitGrantTypeTest extends Base
     public function testAccessTokenSuccess()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
@@ -149,6 +169,10 @@ class ImplicitGrantTypeTest extends Base
     public function testAccessTokenSuccessWithState()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)

@@ -40,6 +40,14 @@ class AuthCodeGrantTypeTest extends Base
     public function testRedirectUriParameterIsNotValid()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
+        if (is_null($client)) {
+            $this->fail('Should throw an Exception');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/bade.redirect?URI')
                       ->setClient($client);
@@ -56,6 +64,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testResponseTypeParameterIsMissing()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client);
@@ -72,6 +84,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testResponseTypeParameterIsNotSupported()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
@@ -173,6 +189,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testResourceOwnerDeniedAccess()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
@@ -186,6 +206,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthcodeSuccess()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
@@ -199,6 +223,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthcodeSuccessWithoutRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setClient($client)
                       ->setResponseType('code')
@@ -211,6 +239,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthcodeSuccessUsingAnotherRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('https://another.uri/callback')
                       ->setClient($client)
@@ -224,6 +256,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthcodeSuccessWithState()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
