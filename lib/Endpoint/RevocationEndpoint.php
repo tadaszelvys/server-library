@@ -63,8 +63,9 @@ class RevocationEndpoint implements RevocationEndpointInterface
     }
 
     /**
-     * @param $content
-     * @param $callback
+     * @param string      $content
+     * @param string|null $callback
+     * @param int         $code
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

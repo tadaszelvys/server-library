@@ -71,6 +71,12 @@ class TokenEndpoint implements TokenEndpointInterface
         return $this->handleRequest($request);
     }
 
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
     protected function handleRequest(Request $request)
     {
         $client = $this->getClientManagerSupervisor()->findClient($request);
@@ -114,6 +120,12 @@ class TokenEndpoint implements TokenEndpointInterface
         ]);
     }
 
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param array                          $values
+     *
+     * @return \OAuth2\Token\AccessTokenInterface
+     */
     protected function createAccessToken(ClientInterface $client, array $values)
     {
         $refresh_token = null;
@@ -134,7 +146,7 @@ class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param $grant_type
+     * @param string $grant_type
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
@@ -150,7 +162,7 @@ class TokenEndpoint implements TokenEndpointInterface
 
     /**
      * @param \OAuth2\Client\ClientInterface $client
-     * @param                                $grant_type
+     * @param  string                        $grant_type
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
