@@ -27,7 +27,7 @@ interface AuthCodeManagerInterface
      *
      * @param ClientInterface                $client            The client associated with this authorization code.
      * @param string                         $redirectUri       Redirect URI to be stored.
-     * @param \OAuth2\Scope\ScopeInterface[] $scope             (optional) Scopes to be stored.
+     * @param string[] $scope             (optional) Scopes to be stored.
      * @param ResourceOwnerInterface         $resourceOwner     (optional) Application data to associate with this authorization code, such as a User object.
      * @param bool                           $issueRefreshToken (optional) Issue a refresh token with the access token.
      *

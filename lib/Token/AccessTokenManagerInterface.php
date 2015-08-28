@@ -14,7 +14,7 @@ interface AccessTokenManagerInterface
      * We need to store access token data as we create and verify tokens.
      *
      * @param \OAuth2\Client\ClientInterface                    $client        The client associated with this access token.
-     * @param \OAuth2\Scope\ScopeInterface[]                    $scope         (optional) Scopes of the access token.
+     * @param string[]                    $scope         (optional) Scopes of the access token.
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface|null $resourceOwner (optional) Resource owner associated with the access token.
      * @param \OAuth2\Token\RefreshTokenInterface|null          $refresh_token (optional) Refresh token associated with the access token.
      *

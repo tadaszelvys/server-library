@@ -13,9 +13,9 @@ class Authorization implements AuthorizationInterface
     protected $client = null;
 
     /**
-     * @var null|string
+     * @var string[]
      */
-    protected $response_type = null;
+    protected $response_types = [];
 
     /**
      * @var null|string
@@ -28,7 +28,7 @@ class Authorization implements AuthorizationInterface
     protected $resource_owner = null;
 
     /**
-     * @var \OAuth2\Scope\ScopeInterface[]
+     * @var string[]
      */
     protected $scope = [];
 
@@ -70,19 +70,22 @@ class Authorization implements AuthorizationInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponseType()
+    public function getResponseTypes()
     {
-        return $this->response_type;
+        return $this->response_types;
     }
 
     /**
-     * @param string $response_type
+     * @param string|string[] $response_types
      *
      * @return $this
      */
-    public function setResponseType($response_type)
+    public function setResponseTypes($response_types)
     {
-        $this->response_type = $response_type;
+        if (is_string($response_types)) {
+            $response_types = explode(' ', $response_types);
+        }
+        $this->response_types = $response_types;
 
         return $this;
     }

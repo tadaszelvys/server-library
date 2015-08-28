@@ -5,6 +5,7 @@ namespace OAuth2\Endpoint;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasScopeManager;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Client\RegisteredClientInterface;
 use OAuth2\Exception\BaseExceptionInterface;
@@ -55,25 +56,34 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
         //Open ID Connect introduce the possibility of combination of response type (id_token+code...)
         //This library must handle these combinations or must be designed to support Open ID Connect in the future
-        $type = $this->getResponseType($authorization);
-        $response_mode = $type->getResponseMode();
+        $types = $this->getResponseTypes($authorization);
 
-        if ($authorization->isAuthorized() === false) {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', ['transport_mode' => $response_mode, 'redirect_uri' => $authorization->getRedirectUri(), 'state' => $authorization->getState()]);
-
-            return $exception->getHttpResponse();
+        $result = [
+            self::RESPONSE_MODE_QUERY => [],
+            self::RESPONSE_MODE_FRAGMENT => [],
+        ];
+        foreach ($types as $type) {
+            $values = $type->grantAuthorization($authorization);
+            if ($authorization->isAuthorized() === false) {
+                $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', ['transport_mode' => $type->getResponseMode(), 'redirect_uri' => $authorization->getRedirectUri(), 'state' => $authorization->getState()]);
+                return $exception->getHttpResponse();
+            }
+            switch ($type->getResponseMode()) {
+                case self::RESPONSE_MODE_QUERY:
+                case self::RESPONSE_MODE_FRAGMENT:
+                    $result[$type->getResponseMode()] = array_merge($result[$type->getResponseMode()], $values);
+                    break;
+                default:
+                    throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_response_mode', sprintf('The response mode "%s" is not supported.', $type->getResponseMode()));
+            }
         }
 
-        $result = $type->grantAuthorization($authorization);
-
-        switch ($response_mode) {
-            case self::RESPONSE_MODE_QUERY:
-            case self::RESPONSE_MODE_FRAGMENT:
-                $result = [$response_mode => $result];
-                break;
-            default:
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_response_mode', sprintf('The response mode "%s" is not supported.', $response_mode));
+        foreach ([self::RESPONSE_MODE_QUERY, self::RESPONSE_MODE_FRAGMENT] as $mode) {
+            if (empty($result[$mode])) {
+                unset($result[$mode]);
+            }
         }
+
 
         return new Response('', 302, [
             'Location' => Uri::buildUri($redirect_uri, $result),
@@ -175,7 +185,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Non-confidential clients must register at least one redirect URI');
         }
 
-        if ($authorization->getClient() instanceof ConfidentialClientInterface && $authorization->getResponseType() === 'token') {
+        if ($authorization->getClient() instanceof ConfidentialClientInterface && in_array('token', $authorization->getResponseTypes())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients must register at least one redirect URI when using "token" response type');
         }
 
@@ -196,6 +206,11 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         }
     }
 
+    /**
+     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
     protected function checkScope(AuthorizationInterface &$authorization)
     {
         try {
@@ -213,24 +228,47 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         }
     }
 
-    protected function getResponseType(AuthorizationInterface $authorization)
+    /**
+     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization
+     *
+     * @return \OAuth2\Grant\ResponseTypeSupportInterface[]
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    protected function getResponseTypes(AuthorizationInterface $authorization)
     {
         /*
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.1
          */
-        if (is_null($authorization->getResponseType())) {
+        if (empty($authorization->getResponseTypes())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing');
         }
 
-        $type = $authorization->getResponseType();
-        if (array_key_exists($type, $this->response_types)) {
-            $type = $this->response_types[$type];
-        } else {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Response type "'.$authorization->getResponseType().'" is not supported by this server');
+        $response_types = $authorization->getResponseTypes();
+        $types = [];
+        foreach ($response_types as $response_type) {
+            $types[$response_type] = $this->getResponseType($response_type, $authorization->getClient());
         }
 
-        if (!$authorization->getClient()->isAllowedGrantType($authorization->getResponseType())) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$authorization->getResponseType().'" is unauthorized for this client.');
+        return $types;
+    }
+
+    /**
+     * @param                                $response_type
+     * @param \OAuth2\Client\ClientInterface $client
+     *
+     * @return \OAuth2\Grant\ResponseTypeSupportInterface
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    protected function getResponseType($response_type, ClientInterface $client)
+    {
+        if (array_key_exists($response_type, $this->response_types)) {
+            $type = $this->response_types[$response_type];
+        } else {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Response type "'.$response_type.'" is not supported by this server');
+        }
+
+        if (!$client->isAllowedGrantType($response_type)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$response_type.'" is unauthorized for this client.');
         }
 
         return $type;

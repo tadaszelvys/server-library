@@ -22,7 +22,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
      * @param int                                          $expiresAt         Time until the code is valid
      * @param ClientInterface                              $client            Client
      * @param string                                       $redirectUri       Redirect URI
-     * @param \OAuth2\Scope\ScopeInterface[ ]              $scope             Scope
+     * @param string[ ]              $scope             Scope
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resourceOwner     Resource owner
      * @param bool                                         $issueRefreshToken Issue a refresh token with the access token
      *

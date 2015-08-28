@@ -37,7 +37,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     private $revoke_refresh_token;
 
     /**
-     * @param \OAuth2\Scope\ScopeInterface[]|string[]|string|null $requested_scope
+     * @param string[]|string[]|string|null $requested_scope
      *
      * @return self
      */
@@ -57,7 +57,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @param \OAuth2\Scope\ScopeInterface[]|string[]|string|null $available_scope
+     * @param string[]|string[]|string|null $available_scope
      *
      * @return self
      */
@@ -117,7 +117,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @param \OAuth2\Scope\ScopeInterface[]|string[]|string|null $refresh_token_scope
+     * @param string[]|string[]|string|null $refresh_token_scope
      *
      * @return self
      */

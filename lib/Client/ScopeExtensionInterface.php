@@ -14,7 +14,7 @@ interface ScopeExtensionInterface
      *
      * @param \Symfony\Component\HttpFoundation\Request $request The request
      *
-     * @return \OAuth2\Scope\ScopeInterface[] The available scopes depending on the client and the server.
+     * @return string[] The available scopes depending on the client and the server.
      *
      * @see https://tools.ietf.org/html/rfc6749#section-3.3
      */
@@ -25,7 +25,7 @@ interface ScopeExtensionInterface
      *
      * @param \Symfony\Component\HttpFoundation\Request $request The request
      *
-     * @return \OAuth2\Scope\ScopeInterface[] The default scopes depending on the client and the server.
+     * @return string[] The default scopes depending on the client and the server.
      *
      * @see https://tools.ietf.org/html/rfc6749#section-3.3
      */

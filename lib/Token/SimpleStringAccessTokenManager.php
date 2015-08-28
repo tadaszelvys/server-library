@@ -18,7 +18,7 @@ abstract class SimpleStringAccessTokenManager extends AccessTokenManager
      * @param string                                       $token         Code
      * @param int                                          $expiresAt     Time until the code is valid
      * @param \OAuth2\Client\ClientInterface               $client        Client
-     * @param \OAuth2\Scope\ScopeInterface[]               $scope         Scope
+     * @param string[]               $scope         Scope
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resourceOwner Resource owner
      * @param \OAuth2\Token\RefreshTokenInterface          $refresh_token Refresh token
      *

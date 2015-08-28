@@ -7,14 +7,14 @@ interface GrantTypeResponseInterface
     /**
      * The scope requested.
      *
-     * @return \OAuth2\Scope\ScopeInterface[]|string[]|string|null
+     * @return string[]|string[]|string|null
      */
     public function getRequestedScope();
 
     /**
      * The scope available.
      *
-     * @return \OAuth2\Scope\ScopeInterface[]|string[]|string|null
+     * @return string[]|string[]|string|null
      */
     public function getAvailableScope();
 
@@ -32,7 +32,7 @@ interface GrantTypeResponseInterface
     public function isRefreshTokenIssued();
 
     /**
-     * @return \OAuth2\Scope\ScopeInterface[]|string[]|string|null If not null, a refresh token will be issued using the scope returned
+     * @return string[]|string[]|string|null If not null, a refresh token will be issued using the scope returned
      */
     public function getRefreshTokenScope();
 
