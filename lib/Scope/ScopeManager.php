@@ -13,12 +13,12 @@ abstract class ScopeManager implements ScopeManagerInterface
     use HasExceptionManager;
 
     /**
-     * @return \OAuth2\Scope\ScopeInterface[]
+     * @return string[]
      */
     abstract public function getScopes();
 
     /**
-     * @return \OAuth2\Scope\ScopeInterface[]
+     * @return string[]
      */
     abstract public function getDefault();
 
@@ -26,15 +26,6 @@ abstract class ScopeManager implements ScopeManagerInterface
      * @return string
      */
     abstract public function getPolicy();
-
-    /**
-     * Create a ScopeInterface object.
-     *
-     * @param string $name Name of the scope to create
-     *
-     * @return ScopeInterface A ScopeInterface object
-     */
-    abstract public function createScope($name);
 
     protected static function supportedPolicies()
     {
@@ -97,41 +88,16 @@ abstract class ScopeManager implements ScopeManagerInterface
     }
 
     /**
-     * @param array $scopes
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return array
-     */
-    private function convertArrayToScope(array $scopes)
-    {
-        $result = [];
-        foreach ($scopes as $scope) {
-            if ($scope instanceof ScopeInterface) {
-                $result[] = $scope;
-            } elseif (is_string($scope) || is_array($scope)) {
-                $result = array_merge($result, $this->convertToScope($scope));
-            } else {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_parameter', 'The parameter must be null,a string or an array of ScopeInterface objects.');
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function convertToScope($scopes)
     {
         if (empty($scopes)) {
             return [];
-        }
-        if (is_array($scopes)) {
-            return $this->convertArrayToScope($scopes);
-        }
-        if (!is_string($scopes)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_parameter', 'The parameter must be null,a string or an array of ScopeInterface objects.');
+        } elseif (is_array($scopes)) {
+            return $scopes;
+        } elseif (!is_string($scopes)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_parameter', 'The parameter must be null,a string or an array of strings.');
         }
         $scopes = explode(' ', $scopes);
 
@@ -140,7 +106,7 @@ abstract class ScopeManager implements ScopeManagerInterface
             if (1 !== preg_match('/^[\x21\x23-\x5B\x5D-\x7E]+$/', $scope)) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_SCOPE, 'Scope contains illegal characters.');
             }
-            $result[] = $this->createScope($scope);
+            $result[] = $scope;
         }
 
         return $result;

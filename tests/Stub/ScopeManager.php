@@ -7,12 +7,12 @@ use OAuth2\Scope\ScopeManager as Base;
 class ScopeManager extends Base
 {
     /**
-     * @var \OAuth2\Scope\ScopeInterface[]
+     * @var string[]
      */
     private $available_scopes;
 
     /**
-     * @var \OAuth2\Scope\ScopeInterface[]
+     * @var string[]
      */
     private $default_scopes;
 
@@ -24,14 +24,14 @@ class ScopeManager extends Base
     public function __construct()
     {
         $this->available_scopes = [
-            $this->createScope('scope1'),
-            $this->createScope('scope2'),
-            $this->createScope('scope3'),
-            $this->createScope('scope4'),
+            'scope1',
+            'scope2',
+            'scope3',
+            'scope4',
         ];
         $this->default_scopes = [
-            $this->createScope('scope1'),
-            $this->createScope('scope2'),
+            'scope1',
+            'scope2',
         ];
         $this->policy = 'default';
     }
@@ -45,7 +45,7 @@ class ScopeManager extends Base
     }
 
     /**
-     * @param \OAuth2\Scope\ScopeInterface[] $available_scopes
+     * @param string[] $available_scopes
      *
      * @return self
      */
@@ -65,7 +65,7 @@ class ScopeManager extends Base
     }
 
     /**
-     * @param \OAuth2\Scope\ScopeInterface[] $default_scopes
+     * @param string[] $default_scopes
      *
      * @return self
      */
@@ -94,16 +94,5 @@ class ScopeManager extends Base
         $this->policy = $policy;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createScope($name)
-    {
-        $scope = new Scope();
-        $scope->setName($name);
-
-        return $scope;
     }
 }

@@ -17,7 +17,7 @@ interface ScopeManagerInterface
      * @param \OAuth2\Client\ClientInterface            $client  A client
      * @param \Symfony\Component\HttpFoundation\Request $request The request
      *
-     * @return \OAuth2\Scope\ScopeInterface[] Return an array ScopeInterface objects
+     * @return string[] Return an array scope
      */
     public function getAvailableScopes(ClientInterface $client = null, Request $request = null);
 
@@ -28,7 +28,7 @@ interface ScopeManagerInterface
      * @param \OAuth2\Client\ClientInterface            $client  A client
      * @param \Symfony\Component\HttpFoundation\Request $request The request
      *
-     * @return \OAuth2\Scope\ScopeInterface[] Return an array ScopeInterface objects
+     * @return string[] Return an array scope
      */
     public function getDefaultScopes(ClientInterface $client = null, Request $request = null);
 
@@ -47,27 +47,27 @@ interface ScopeManagerInterface
      * This function check if the scopes respect the scope policy for the client.
      *
      * @param \OAuth2\Client\ClientInterface            $client  A client
-     * @param \OAuth2\Scope\ScopeInterface[]            $scope   The scopes
+     * @param string[]                                  $scope   The scopes
      * @param \Symfony\Component\HttpFoundation\Request $request The request
      *
-     * @return \OAuth2\Scope\ScopeInterface[] An array ScopeInterface objects according to the scope policy
+     * @return string[] An array scopes according to the scope policy
      */
     public function checkScopePolicy(ClientInterface $client, array $scope, Request $request = null);
 
     /**
-     * @param ScopeInterface[] $requestedScopes An array of ScopeInterface objects that represents requested scopes
-     * @param ScopeInterface[] $availableScopes An array of ScopeInterface objects that represents available scopes
+     * @param string[] $requestedScopes An array of scopes that represents requested scopes
+     * @param string[] $availableScopes An array of scopes that represents available scopes
      *
      * @return bool Return true if the requested scope is within the available scope
      */
     public function checkScopes(array $requestedScopes, array $availableScopes);
 
     /**
-     * Convert a string that contains at least one scope to an array of ScopeInterface objects.
+     * Convert a string that contains at least one scope to an array of scopes.
      *
-     * @param null|string|string[]|\OAuth2\Scope\ScopeInterface[] $scope The string to convert
+     * @param null|string|string[] $scope The string to convert
      *
-     * @return \OAuth2\Scope\ScopeInterface[] An array of ScopeInterface objects
+     * @return string[] An array of scopes
      *
      * @throws \Exception If the string contains forbidden characters or if the scope is unknown.
      */

@@ -15,11 +15,6 @@ class AuthCodeManager extends Base
 
     public function __construct()
     {
-        $scope1 = new Scope();
-        $scope1->setName('scope1');
-        $scope2 = new Scope();
-        $scope2->setName('scope2');
-
         $valid_auth_code = new AuthCode();
         $valid_auth_code->setClientPublicId('bar')
                   ->setIssueRefreshToken(true)
@@ -27,8 +22,8 @@ class AuthCodeManager extends Base
                   ->setResourceOwnerPublicId(null)
                   ->setExipresAt(time() + 3000)
                   ->setScope([
-                      $scope1,
-                      $scope2,
+                      'scope1',
+                      'scope2',
                   ])
                   ->setCode('VALID_AUTH_CODE');
 
@@ -39,8 +34,8 @@ class AuthCodeManager extends Base
                   ->setResourceOwnerPublicId(null)
                   ->setExipresAt(time() - 1)
                   ->setScope([
-                      $scope1,
-                      $scope2,
+                      'scope1',
+                      'scope2',
                   ])
                   ->setCode('VALID_AUTH_CODE');
 

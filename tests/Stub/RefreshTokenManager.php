@@ -17,13 +17,6 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
 
     public function __construct()
     {
-        $scope1 = new Scope();
-        $scope1->setName('scope1');
-        $scope2 = new Scope();
-        $scope2->setName('scope2');
-        $scope3 = new Scope();
-        $scope3->setName('scope3');
-
         $bar = new PasswordClient();
         $bar->setPublicId('bar')
             ->setSecret('secret')
@@ -39,13 +32,13 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
             'VALID_REFRESH_TOKEN',
             time() + 10000,
             $bar,
-            [$scope1, $scope2, $scope3]
+            ['scope1', 'scope2', 'scope3']
         );
         $this->addRefreshToken(
             'EXPIRED_REFRESH_TOKEN',
             time() - 1,
             $foo,
-            [$scope1, $scope2, $scope3]
+            ['scope1', 'scope2', 'scope3']
         );
 
         $this->addRefreshToken(
