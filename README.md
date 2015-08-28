@@ -15,9 +15,7 @@ OAuth2 Server Library
 [![Latest Unstable Version](https://poser.pugx.org/Spomky-Labs/oauth2-server-library/v/unstable.png)](https://packagist.org/packages/Spomky-Labs/oauth2-server-library)
 [![License](https://poser.pugx.org/Spomky-Labs/oauth2-server-library/license.png)](https://packagist.org/packages/Spomky-Labs/oauth2-server-library)
 
-It relies on the [OAuth2 Interfaces Project](https://github.com/Spomky-Labs/oauth2-interface).
-
-Note: if you use Symfony, [a bundle is available](https://github.com/Spomky-Labs/OAuth2ServerBundle).
+*Note: if you use Symfony, [a bundle is available](https://github.com/Spomky-Labs/OAuth2ServerBundle).*
 
 # The Release Process
 

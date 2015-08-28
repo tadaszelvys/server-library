@@ -10,9 +10,9 @@ interface AuthorizationInterface
     public function getClient();
 
     /**
-     * @return string[] The response type
+     * @return string The response type
      */
-    public function getResponseTypes();
+    public function getResponseType();
 
     /**
      * @return string|null The redirect uri
@@ -25,14 +25,14 @@ interface AuthorizationInterface
     public function getResourceOwner();
 
     /**
-     * @return string[] An array of scopes
+     * @return \OAuth2\Scope\ScopeInterface[] An array of ScopeInterface objects
      */
     public function getScope();
 
     /**
      * Set the scope of the authorization object. This setter is needed if the requested scope is not compliant with the scope policy.
      *
-     * @param string[] $scope An array of scopes
+     * @param \OAuth2\Scope\ScopeInterface[] $scope An array of ScopeInterface objects
      *
      * @return self
      */

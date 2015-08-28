@@ -87,7 +87,7 @@ class ImplicitGrantTypeTest extends Base
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
-                      ->setResponseTypes('bad_response_type');
+                      ->setResponseType('bad_response_type');
 
         try {
             $this->getAuthorizationEndpoint()->authorize($authorization);
@@ -108,7 +108,7 @@ class ImplicitGrantTypeTest extends Base
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
-                      ->setResponseTypes('bad_response_type');
+                      ->setResponseType('bad_response_type');
 
         try {
             $this->getAuthorizationEndpoint()->authorize($authorization);
@@ -129,7 +129,7 @@ class ImplicitGrantTypeTest extends Base
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
-                      ->setResponseTypes('token');
+                      ->setResponseType('token');
 
         try {
             $this->getAuthorizationEndpoint()->authorize($authorization);
@@ -151,7 +151,7 @@ class ImplicitGrantTypeTest extends Base
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
                       ->setAuthorized(false)
-                      ->setResponseTypes('token');
+                      ->setResponseType('token');
 
         $response = $this->getAuthorizationEndpoint()->authorize($authorization);
         $this->assertEquals('http://example.com/test?good=false#error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied', $response->headers->get('Location'));
@@ -167,7 +167,7 @@ class ImplicitGrantTypeTest extends Base
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
-                      ->setResponseTypes('token')
+                      ->setResponseType('token')
                       ->setAuthorized(true);
 
         $response = $this->getAuthorizationEndpoint()->authorize($authorization);
@@ -184,7 +184,7 @@ class ImplicitGrantTypeTest extends Base
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
-                      ->setResponseTypes('token')
+                      ->setResponseType('token')
                       ->setState('0123456789')
                       ->setAuthorized(true);
 
