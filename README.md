@@ -3,6 +3,7 @@ OAuth2 Server Library
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/?branch=master)
+[![PHP 7 ready](http://php7ready.timesplinter.ch/Spomky-Labs/oauth2-server-library/badge.svg)](https://travis-ci.org/Spomky-Labs/oauth2-server-library)
 
 [![Build Status](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/build-status/master)
 [![HHVM Status](http://hhvm.h4cc.de/badge/spomky-labs/oauth2-server-library.svg)](http://hhvm.h4cc.de/package/spomky-labs/oauth2-server-library)
