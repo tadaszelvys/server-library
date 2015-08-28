@@ -13,7 +13,6 @@ tools:
     php_pdepend:
         excluded_dirs: [vendor, doc]
     external_code_coverage:
-        timeout: 3600
-        runs: 1
+        runs: 5
 filter:
     excluded_paths: [vendor/*, doc/*]
