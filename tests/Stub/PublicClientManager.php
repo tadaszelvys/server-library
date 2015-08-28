@@ -53,18 +53,21 @@ class PublicClientManager extends Base
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param string|null                               $client_public_id_found
      *
-     * @return null|string
+     * @return string|null
      */
-    protected function findClientUsingHeader(Request $request)
+    protected function findClientUsingHeader(Request $request, &$client_public_id_found = null)
     {
         $header = $request->headers->get('X-OAuth2-Public-Client-ID');
 
         if (empty($header)) {
             return;
         } elseif (is_array($header)) {
+            $client_public_id_found = $header[0];
             return $header[0];
         } else {
+            $client_public_id_found = $header;
             return $header;
         }
     }

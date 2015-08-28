@@ -42,20 +42,20 @@ abstract class PasswordClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(Request $request)
+    public function findClient(Request $request, &$client_public_id_found = null)
     {
         $methods = $this->findClientCredentialsMethods();
         $credentials = [];
 
         foreach ($methods as $method) {
-            $data = $this->$method($request);
+            $data = $this->$method($request, $client_public_id_found);
             if (!is_null($data)) {
                 $credentials[] = $data;
             }
         }
 
         $client = $this->checkResult($credentials);
-        if (is_null($client) || is_string($client)) {
+        if (is_null($client)) {
             return $client;
         }
 
@@ -64,7 +64,8 @@ abstract class PasswordClientManager implements ClientManagerInterface
         }
 
         if (!$this->checkClientCredentials($client, $credentials[0]['client_secret'])) {
-            return $client->getPublicId();
+            $client_public_id_found = $client->getPublicId();
+            return;
         }
 
         return $client;
@@ -75,7 +76,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      *
      * @return string[]
      */
-    protected function findCredentialsFromAuthenticationScheme(Request $request)
+    protected function findCredentialsFromAuthenticationScheme(Request $request, &$client_public_id_found = null)
     {
         if ($request->server->get('PHP_AUTH_USER') && $request->server->get('PHP_AUTH_PW')) {
             return [
@@ -99,7 +100,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      *
      * @return string[]|null
      */
-    protected function findCredentialsFromRequestBody(Request $request)
+    protected function findCredentialsFromRequestBody(Request $request, &$client_public_id_found = null)
     {
         $parameters = RequestBody::getParameters($request);
         if (is_null($parameters)) {
@@ -130,8 +131,6 @@ abstract class PasswordClientManager implements ClientManagerInterface
             return;
         }
 
-        $client = $this->getClient($result[0]['client_id']);
-
-        return is_null($client) ? $result[0]['client_id'] : $client;
+        return $this->getClient($result[0]['client_id']);
     }
 }

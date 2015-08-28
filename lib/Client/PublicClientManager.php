@@ -18,20 +18,20 @@ abstract class PublicClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(Request $request)
+    public function findClient(Request $request, &$client_public_id_found = null)
     {
         $methods = $this->findClientMethods();
         $result = [];
 
         foreach ($methods as $method) {
-            $data = $this->$method($request);
-            if (null !== $data) {
+            $data = $this->$method($request, $client_public_id_found);
+            if (!is_null($data)) {
                 $result[] = $data;
             }
         }
 
         $client = $this->checkResult($result);
-        if (is_null($client) || is_string($client)) {
+        if (is_null($client)) {
             return $client;
         }
 
@@ -59,8 +59,6 @@ abstract class PublicClientManager implements ClientManagerInterface
             return;
         }
 
-        $client = $this->getClient($result[0]);
-
-        return is_null($client) ? $result[0] : $client;
+        return $this->getClient($result[0]);
     }
 }

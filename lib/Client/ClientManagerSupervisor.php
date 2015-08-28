@@ -51,19 +51,15 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(Request $request, $throw_exception_if_not_found = true)
+    public function findClient(Request $request, &$client_public_id_found = null)
     {
         foreach ($this->getClientManagers() as $manager) {
-            $client = $manager->findClient($request);
+            $client = $manager->findClient($request, $client_public_id_found);
             if ($client instanceof ClientInterface) {
                 return $client;
-            } elseif (is_string($client)) {
-                throw $this->buildException($request);
             }
         }
-        if (true === $throw_exception_if_not_found) {
-            throw $this->buildException($request);
-        }
+        throw $this->buildException($request);
     }
 
     /**
