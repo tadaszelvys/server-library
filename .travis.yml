@@ -14,5 +14,4 @@ script:
     - vendor/bin/phpunit --coverage-clover build/logs/clover.xml
  
 after_success:
-    - head build/logs/clover.xml
     - vendor/bin/coveralls --no-interaction
