@@ -12,7 +12,7 @@ class RefreshToken implements RefreshTokenInterface
     private $used;
 
     /**
-     * @var \OAuth2\Scope\ScopeInterface[]
+     * @var string[]
      */
     private $scope;
 

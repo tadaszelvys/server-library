@@ -74,8 +74,6 @@ class AuthCodeManager extends Base
         if (isset($this->auth_codes[$code])) {
             return $this->auth_codes[$code];
         }
-
-        return;
     }
 
     public function markAuthCodeAsUsed(AuthCodeInterface $code)

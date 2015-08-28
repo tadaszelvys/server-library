@@ -92,8 +92,6 @@ abstract class PasswordClientManager implements ClientManagerInterface
                 ];
             }
         }
-
-        return;
     }
 
     /**
@@ -113,8 +111,6 @@ abstract class PasswordClientManager implements ClientManagerInterface
                 'client_secret' => $parameters['client_secret'],
             ];
         }
-
-        return;
     }
 
     /**

@@ -46,8 +46,6 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
                 return $client;
             }
         }
-
-        return;
     }
 
     /**
@@ -66,8 +64,6 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
         if (true === $throw_exception_if_not_found) {
             throw $this->buildException($request);
         }
-
-        return;
     }
 
     /**
