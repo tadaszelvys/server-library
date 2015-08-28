@@ -105,6 +105,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testNonConfidentialClientMustRegisterAtLeastOneRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('oof');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
@@ -122,6 +126,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testConfidentialClientWithRegisteredRedirectUriButUnsupportedResponseType()
     {
         $client = $this->getClientManagerSupervisor()->getClient('bar');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
@@ -139,6 +147,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testConfidentialClientWithUnregisteredRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('bar');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('https://example.com/test?good=false')
                       ->setClient($client)
@@ -156,6 +168,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testConfidentialClientUsingTokenResponseTypeWithoutRedirectUriRegistered()
     {
         $client = $this->getClientManagerSupervisor()->getClient('baz');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setClient($client)
                       ->setResponseType('token');
@@ -172,6 +188,10 @@ class AuthCodeGrantTypeTest extends Base
     public function testResponseTypeisNotAuthorizedForTheClient()
     {
         $client = $this->getClientManagerSupervisor()->getClient('baz');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)

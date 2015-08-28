@@ -101,6 +101,10 @@ class ImplicitGrantTypeTest extends Base
     public function testNonConfidentialClientMustRegisterAtLeastOneRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('oof');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
@@ -118,6 +122,10 @@ class ImplicitGrantTypeTest extends Base
     public function testResponseTypeisNotAuthorizedForTheClient()
     {
         $client = $this->getClientManagerSupervisor()->getClient('fii');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+            return;
+        }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client)
