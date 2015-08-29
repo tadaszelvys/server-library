@@ -2,7 +2,9 @@
 
 namespace OAuth2\Test;
 
+use OAuth2\Exception\BaseException;
 use OAuth2\Exception\BaseExceptionInterface;
+use SpomkyLabs\Service\Jose;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -119,5 +121,54 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->assertEquals('The client is not a confidential client', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
+    }
+
+    public function testGrantTypeAuthorizedForJWTClient()
+    {
+        $jose = Jose::getInstance();
+        $jose->getConfiguration()->set('algorithms', ['HS512', 'A256GCM', 'A256GCMKW']);
+        $jose->getConfiguration()->set('audience', 'My Authorization Server');
+        $jose->getKeysetManager()->loadKeyFromValues('JWK2',[
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+        /*$jws = $jose->sign(
+            'JWK2',
+            [
+                'exp' => time()+3600,
+                'aud' => 'My Authorization Server',
+                'iss' => 'jwt1',
+            ],
+            [
+                'alg' => 'HS512'
+            ]
+        );
+        var_dump($jws);
+        die();*/
+
+        $request = $this->createRequest(
+            '/',
+            'POST',
+            [],
+            ['HTTPS' => 'on'],
+            [],
+            http_build_query(
+                [
+                    'grant_type' => 'client_credentials',
+                    'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+                    'client_assertion' => 'eyJhbGciOiJIUzUxMiIsImtpZCI6IkpXSzIifQ.eyJleHAiOjE0NDA4ODc5NDcsImF1ZCI6Ik15IEF1dGhvcml6YXRpb24gU2VydmVyIiwiaXNzIjoiand0MSJ9.NmJTFCHidy5__R655Io_d_zGoxBhtNIqAgc3KZ4r10tZqMHvclGLwbgpHqEaaOl_f1K2-miyl2KP8Nu3kzdXkg',
+                ]
+            )
+        );
+
+        $response = $this->getTokenEndpoint()->getAccessToken($request);
+
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getContent());
     }
 }

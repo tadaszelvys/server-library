@@ -37,7 +37,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     private $revoke_refresh_token;
 
     /**
-     * @param string[]|string[]|string|null $requested_scope
+     * @param string[]|string|null $requested_scope
      *
      * @return self
      */
@@ -57,7 +57,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @param string[]|string[]|string|null $available_scope
+     * @param string[]|string|null $available_scope
      *
      * @return self
      */

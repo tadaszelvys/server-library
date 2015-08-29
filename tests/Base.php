@@ -15,6 +15,7 @@ use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\Configuration;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
+use OAuth2\Test\Stub\JWTClientManager;
 use OAuth2\Test\Stub\PasswordClientManager;
 use OAuth2\Test\Stub\PublicClientManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
@@ -192,6 +193,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->client_manager_supervisor->addClientManager($this->getPasswordClientManager());
             $this->client_manager_supervisor->addClientManager($this->getPublicClientManager());
+            $this->client_manager_supervisor->addClientManager($this->getJWTClientManager());
         }
 
         return $this->client_manager_supervisor;
@@ -232,6 +234,25 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->password_client_manager;
+    }
+
+    /**
+     * @var null|\OAuth2\Test\Stub\JWTClientManager
+     */
+    private $jwt_client_manager = null;
+
+    /**
+     * @return \OAuth2\Test\Stub\JWTClientManager
+     */
+    protected function getJWTClientManager()
+    {
+        if (is_null($this->jwt_client_manager)) {
+            $this->jwt_client_manager = new JWTClientManager();
+            $this->jwt_client_manager->setExceptionManager($this->getExceptionManager());
+            $this->jwt_client_manager->setConfiguration($this->getConfiguration());
+        }
+
+        return $this->jwt_client_manager;
     }
 
     /**

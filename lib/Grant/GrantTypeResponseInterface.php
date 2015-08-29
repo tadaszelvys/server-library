@@ -7,14 +7,14 @@ interface GrantTypeResponseInterface
     /**
      * The scope requested.
      *
-     * @return string[]|string[]|string|null
+     * @return string[]|string|null
      */
     public function getRequestedScope();
 
     /**
      * The scope available.
      *
-     * @return string[]|string[]|string|null
+     * @return string[]|string|null
      */
     public function getAvailableScope();
 
@@ -32,7 +32,7 @@ interface GrantTypeResponseInterface
     public function isRefreshTokenIssued();
 
     /**
-     * @return string[]|string[]|string|null If not null, a refresh token will be issued using the scope returned
+     * @return string[]|string|null If not null, a refresh token will be issued using the scope returned
      */
     public function getRefreshTokenScope();
 

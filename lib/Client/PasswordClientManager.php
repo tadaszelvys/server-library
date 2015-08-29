@@ -119,7 +119,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return null|\OAuth2\Client\ClientInterface|string
+     * @return null|\OAuth2\Client\ClientInterface
      */
     private function checkResult(array $result)
     {
