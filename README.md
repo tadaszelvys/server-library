@@ -17,6 +17,34 @@ OAuth2 Server Library
 
 *Note: if you use Symfony, [a bundle is available](https://github.com/Spomky-Labs/OAuth2ServerBundle).*
 
+This library provides components to build an authorization server based on the OAuth2 Framework protocol ([RFC6749](https://tools.ietf.org/html/rfc6749)) and associated behaviours.
+
+The following components:
+
+* Access token manager:
+    * [x] Simple string access token
+    * [ ] JWT access token (WIP)
+* Access token transport:
+    * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
+    * [ ] MAC access ([IETF draft](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-05))
+* [x] Exception manager
+* Clients:
+    * [x] Public clients
+    * [x] Password clients
+    * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523))
+    * [x] Unregistered clients
+* Endpoints:
+    * [x] Authorization endpoint
+    * [x] Token endpoint
+    * [x] Token revocation endpoint ([RFC7009](https://tools.ietf.org/html/rfc7009))
+* Grant types:
+    * [x] Implicit grant type
+    * [x] Authorization code grant type
+    * [x] Client credentials grant type
+    * [x] Resource Owner Password Credentials grant type
+    * [x] Refresh token grant type
+    * [ ] JWT Bearer token grant type (WIP - [RFC7523](https://tools.ietf.org/html/rfc7523))
+
 # The Release Process
 
 The release process [is described here](doc/Release.md).
