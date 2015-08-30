@@ -32,12 +32,25 @@ abstract class JWTClientManager implements ClientManagerInterface
     abstract protected function getAllowedEncryptionAlgorithms();
 
     /**
+     * By default, this method does nothing, but should be overridden and check other claims (issuer, jti...)
+     *
+     * @param \Jose\JWTInterface $jwt
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    protected function checkJWT(JWTInterface $jwt)
+    {
+    }
+
+    /**
      * @return string[]
      */
     protected function getRequiredClaims()
     {
         return [
+            'iss',
             'aud',
+            'sub',
             'exp',
         ];
     }
@@ -90,7 +103,7 @@ abstract class JWTClientManager implements ClientManagerInterface
         if (!$jwt instanceof JWSInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Encrypted token does not contain signed token.');
         }
-        if ($client->getPublicId() !== $jwt->getIssuer()) {
+        if ($client->getPublicId() !== $jwt->getSubject()) {
             return false;
         }
         return true;
@@ -190,6 +203,8 @@ abstract class JWTClientManager implements ClientManagerInterface
         } catch(\Exception $e) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
+
+        $this->checkJWT($jwt);
     }
 
     /**
@@ -209,6 +224,6 @@ abstract class JWTClientManager implements ClientManagerInterface
             return;
         }
 
-        return $this->getClient($result[0]->getIssuer());
+        return $this->getClient($result[0]->getSubject());
     }
 }

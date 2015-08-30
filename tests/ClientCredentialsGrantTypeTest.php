@@ -124,6 +124,20 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForJWTClientButTokenExpired()
     {
+        $jose = Jose::getInstance();
+        $jws = $jose->sign(
+            'JWK2',
+            [
+                'exp' => time()-1,
+                'aud' => 'My Authorization Server',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
+            ],
+            [
+                'alg' => 'HS512'
+            ]
+        );
+
         $request = $this->createRequest(
             '/',
             'POST',
@@ -134,7 +148,7 @@ class ClientCredentialsGrantTypeTest extends Base
                 [
                     'grant_type' => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                    'client_assertion' => 'eyJhbGciOiJIUzUxMiIsImtpZCI6IkpXSzIifQ.eyJleHAiOjE0NDA4ODc5NDcsImF1ZCI6Ik15IEF1dGhvcml6YXRpb24gU2VydmVyIiwiaXNzIjoiand0MSJ9.NmJTFCHidy5__R655Io_d_zGoxBhtNIqAgc3KZ4r10tZqMHvclGLwbgpHqEaaOl_f1K2-miyl2KP8Nu3kzdXkg',
+                    'client_assertion' => $jws,
                 ]
             )
         );
@@ -155,7 +169,8 @@ class ClientCredentialsGrantTypeTest extends Base
             [
                 'exp' => time()+3600,
                 'aud' => 'Bad Audience',
-                'iss' => 'jwt1',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
             ],
             [
                 'alg' => 'HS512'
@@ -193,7 +208,8 @@ class ClientCredentialsGrantTypeTest extends Base
             [
                 'exp' => time()+3600,
                 'aud' => 'My Authorization Server',
-                'iss' => 'jwt1',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
             ],
             [
                 'alg' => 'HS512'
@@ -231,7 +247,8 @@ class ClientCredentialsGrantTypeTest extends Base
             [
                 'exp' => time()+3600,
                 'aud' => 'My Authorization Server',
-                'iss' => 'jwt1',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
             ],
             'JWK2',
             [
@@ -245,7 +262,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'enc' => 'A256CBC-HS512',
                 'exp' => time()+3600,
                 'aud' => 'My Authorization Server',
-                'iss' => 'jwt1',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
             ]
         );
 
