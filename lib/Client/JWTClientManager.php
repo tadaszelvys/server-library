@@ -4,6 +4,7 @@ namespace OAuth2\Client;
 
 use Jose\JWEInterface;
 use Jose\JWSInterface;
+use Jose\JWTInterface;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -31,33 +32,68 @@ abstract class JWTClientManager implements ClientManagerInterface
     abstract protected function getAllowedEncryptionAlgorithms();
 
     /**
+     * @return string[]
+     */
+    protected function getRequiredClaims()
+    {
+        return [
+            'aud',
+            'exp',
+        ];
+    }
+
+    /**
      * @param \OAuth2\Client\JWTClientInterface     $client
      * @param \Jose\JWEInterface|\Jose\JWSInterface $jwt
      *
      * @return bool
+     * @throws \OAuth2\Exception\BaseExceptionInterface
      */
     protected function isClientAssertionValid(JWTClientInterface $client, $jwt)
     {
         //If the assertion is a JWE, we decrypt
-        if ($jwt instanceof JWEInterface) {
-            if (!in_array($jwt->getEncryptionAlgorithm(), $this->getAllowedEncryptionAlgorithms()) || !in_array($jwt->getAlgorithm(), $this->getAllowedEncryptionAlgorithms())) {
-                return false;
-            }
-            if (false === $this->getJWTLoader()->decrypt($jwt, $this->getPrivateKeySet())) {
-                return false;
-            }
-            $jwt = $jwt->getPayload();
-        }
-        //If the assertion (or the payload of the JWE) is not a JWS, this is not valid
-        if (!$jwt instanceof JWSInterface) {
+        if ($jwt instanceof JWEInterface && false === $this->loadJWE($client, $jwt)) {
             return false;
         }
+        //If the assertion (or the payload of the JWE) is not a JWS, this is not valid
         if (!in_array($jwt->getAlgorithm(), $client->getAllowedSignatureAlgorithms())) {
             return false;
         }
 
-        //Then we verify the algorithm used, the claims (expiration, audience...) and the signature and we return the result
-        return $this->getJWTLoader()->verify($jwt) && $this->getJWTLoader()->verifySignature($jwt, $client->getPublicKeySet());
+        $this->checkAssertion($jwt);
+
+        $is_signature_verified = $this->getJWTLoader()->verifySignature($jwt, $client->getPublicKeySet());
+
+        return $is_signature_verified;
+    }
+
+    /**
+     * @param \OAuth2\Client\JWTClientInterface $client
+     * @param \Jose\JWEInterface                 $jwt
+     *
+     * @return bool
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    protected function loadJWE(JWTClientInterface $client, JWEInterface &$jwt)
+    {
+        if (!in_array($jwt->getEncryptionAlgorithm(), $this->getAllowedEncryptionAlgorithms()) || !in_array($jwt->getAlgorithm(), $this->getAllowedEncryptionAlgorithms())) {
+            return false;
+        }
+        try {
+            if (false === $this->getJWTLoader()->decrypt($jwt, $this->getPrivateKeySet())) {
+                return false;
+            }
+            $jwt = $this->getJWTLoader()->load($jwt->getPayload());
+        } catch (\Exception $e) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+        }
+        if (!$jwt instanceof JWSInterface) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Encrypted token does not contain signed token.');
+        }
+        if ($client->getPublicId() !== $jwt->getIssuer()) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -93,7 +129,7 @@ abstract class JWTClientManager implements ClientManagerInterface
         }
 
         if (!$client instanceof JWTClientInterface) {
-            throw $this->getExceptionManager()->getException('InternalServerError', 'invalid_client', 'The client is not an instance of JWTClientInterface.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::INVALID_REQUEST, 'The client is not an instance of JWTClientInterface.');
         }
 
         if (!$this->isClientAssertionValid($client, $assertions[0])) {
@@ -132,11 +168,28 @@ abstract class JWTClientManager implements ClientManagerInterface
             return;
         }
 
-        if (is_null($jwt->getExpirationTime()) || !$this->getJWTLoader()->verify($jwt)) {
-            return;
-        }
+        $this->checkAssertion($jwt);
 
         return $jwt;
+    }
+
+    /**
+     * @param \Jose\JWTInterface $jwt
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function checkAssertion(JWTInterface $jwt)
+    {
+        foreach ($this->getRequiredClaims() as $claim) {
+            if (is_null($jwt->getHeaderOrPayloadValue($claim))) {
+                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Claim "%s" is mandatory.', $claim));
+            }
+        }
+        try {
+            $this->getJWTLoader()->verify($jwt);
+        } catch(\Exception $e) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+        }
     }
 
     /**

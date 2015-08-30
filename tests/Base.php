@@ -2,6 +2,7 @@
 
 namespace OAuth2\Test;
 
+use Base64Url\Base64Url;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\RevocationEndpoint;
@@ -22,6 +23,8 @@ use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Token\BearerAccessToken;
+use SpomkyLabs\Jose\Checker\AudienceChecker;
+use SpomkyLabs\Service\Jose;
 use Symfony\Component\HttpFoundation\Request;
 
 class Base extends \PHPUnit_Framework_TestCase
@@ -30,6 +33,23 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         //To fix HHVM tests on Travis-CI
         date_default_timezone_set('UTC');
+
+
+        $jose = Jose::getInstance();
+        $jose->getConfiguration()->set('algorithms', ['HS512', 'A256KW', 'A256CBC-HS512']);
+        $jose->getConfiguration()->set('audience', 'My Authorization Server');
+        $jose->getKeysetManager()->loadKeyFromValues('JWK1',[
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]);
+        $jose->getKeysetManager()->loadKeyFromValues('JWK2',[
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
     }
 
     /**

@@ -17,7 +17,7 @@ class JWTClientManager extends Base
             'kid' => 'JWK1',
             'use' => 'enc',
             'kty' => 'oct',
-            'k'   => 'GawgguFyGrWKav7AX4VKUg',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
         ]);
         $jwk2 = new JWK([
             'kid' => 'JWK2',
@@ -65,7 +65,7 @@ class JWTClientManager extends Base
             'kid' => 'JWK1',
             'use' => 'enc',
             'kty' => 'oct',
-            'k'   => 'GawgguFyGrWKav7AX4VKUg',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
         ]);
         $jwk2 = new JWK([
             'kid' => 'JWK2',
@@ -86,7 +86,7 @@ class JWTClientManager extends Base
      */
     public function getAllowedEncryptionAlgorithms()
     {
-        return ['A256KW', 'A128CBC-HS256'];
+        return ['A256KW', 'A256CBC-HS512'];
     }
 
     /**
