@@ -24,7 +24,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function getSignaturePublicKey()
     {
-
     }
 
     /**
@@ -32,7 +31,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function getEncryptionPublicKey()
     {
-
     }
 
     /**
@@ -40,7 +38,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function getEncryptionPrivateKey()
     {
-
     }
 
     /**
@@ -76,7 +73,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function generateTokenID()
     {
-        return null;
+        return;
     }
 
     /**
@@ -98,8 +95,8 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
 
         $access_token = new AccessToken();
         $access_token->setExipresAt(time() + $this->getLifetime($client))
-            ->setRefreshToken(is_null($refresh_token)?null:$refresh_token->getToken())
-            ->setResourceOwnerPublicId(is_null($resource_owner)?null:$resource_owner->getPublicId())
+            ->setRefreshToken(is_null($refresh_token) ? null : $refresh_token->getToken())
+            ->setResourceOwnerPublicId(is_null($resource_owner) ? null : $resource_owner->getPublicId())
             ->setScope($scope)
             ->setToken($jwt)
             ->setClientPublicId($client->getPublicId());
@@ -108,8 +105,9 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @return array
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return array
      */
     private function prepareEncryptionHeader(ClientInterface $client)
     {
@@ -147,8 +145,9 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @return array
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return array
      */
     private function prepareSignatureHeader()
     {
@@ -178,8 +177,9 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface|null $resource_owner
      * @param \OAuth2\Token\RefreshTokenInterface|null          $refresh_token
      *
-     * @return array
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return array
      */
     private function preparePayload(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null)
     {
@@ -231,7 +231,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $instruction->setKey($key)
             ->setProtectedHeader($header);
 
-        return $this->getSigner()->sign($payload,[$instruction],JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
+        return $this->getSigner()->sign($payload, [$instruction], JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
     }
 
     /**
@@ -265,7 +265,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      */
     public function getAccessToken($access_token)
     {
-
     }
 
     /**

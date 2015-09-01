@@ -25,11 +25,11 @@ interface AuthCodeManagerInterface
      * If storage fails for some reason, we're not currently checking for any sort of success/failure, so you should
      * bail out of the script and provide a descriptive fail message.
      *
-     * @param ClientInterface                $client            The client associated with this authorization code.
-     * @param string                         $redirectUri       Redirect URI to be stored.
-     * @param string[] $scope             (optional) Scopes to be stored.
-     * @param ResourceOwnerInterface         $resourceOwner     (optional) Application data to associate with this authorization code, such as a User object.
-     * @param bool                           $issueRefreshToken (optional) Issue a refresh token with the access token.
+     * @param ClientInterface        $client            The client associated with this authorization code.
+     * @param string                 $redirectUri       Redirect URI to be stored.
+     * @param string[]               $scope             (optional) Scopes to be stored.
+     * @param ResourceOwnerInterface $resourceOwner     (optional) Application data to associate with this authorization code, such as a User object.
+     * @param bool                   $issueRefreshToken (optional) Issue a refresh token with the access token.
      *
      * @return null|AuthCodeInterface
      */

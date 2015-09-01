@@ -9,9 +9,9 @@ interface TokenEndpointInterface
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request The request
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface If an error occurred
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getAccessToken(Request $request);
 }

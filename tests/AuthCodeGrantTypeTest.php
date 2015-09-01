@@ -42,10 +42,12 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         if (is_null($client)) {
             $this->fail('Should throw an Exception');
+
             return;
         }
         $authorization = new Authorization();
@@ -66,6 +68,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -86,6 +89,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -107,6 +111,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('oof');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -128,6 +133,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('bar');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -149,6 +155,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('bar');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -170,6 +177,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('baz');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -190,6 +198,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('baz');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -211,6 +220,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -228,6 +238,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -245,6 +256,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -261,6 +273,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -278,6 +291,7 @@ class AuthCodeGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();

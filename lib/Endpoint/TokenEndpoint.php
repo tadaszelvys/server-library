@@ -74,8 +74,9 @@ class TokenEndpoint implements TokenEndpointInterface
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleRequest(Request $request)
     {
@@ -162,7 +163,7 @@ class TokenEndpoint implements TokenEndpointInterface
 
     /**
      * @param \OAuth2\Client\ClientInterface $client
-     * @param  string                        $grant_type
+     * @param string                         $grant_type
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
