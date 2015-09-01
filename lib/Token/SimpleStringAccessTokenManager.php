@@ -31,7 +31,7 @@ abstract class SimpleStringAccessTokenManager extends AccessTokenManager
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function createAccessToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null)
+    public function createAccessToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null)
     {
         $length = $this->getConfiguration()->get('simple_string_access_token_length', 20);
         $charset = $this->getConfiguration()->get('simple_string_access_token_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
@@ -44,7 +44,7 @@ abstract class SimpleStringAccessTokenManager extends AccessTokenManager
             throw $this->createException('An error has occurred during the creation of the token.');
         }
 
-        $access_token = $this->addAccessToken($token, time() + $this->getLifetime($client), $client, $scope, $resourceOwner, $refresh_token);
+        $access_token = $this->addAccessToken($token, time() + $this->getLifetime($client), $client, $scope, $resource_owner, $refresh_token);
 
         return $access_token;
     }

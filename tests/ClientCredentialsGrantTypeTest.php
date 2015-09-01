@@ -108,6 +108,23 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getContent());
     }
 
+    public function testGrantTypeAuthorizedForClientAndJWTAccessToken()
+    {
+        $this->getTokenEndpoint()->setAccessTokenManager($this->getJWTAccessTokenManager());
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
+
+        $response = $this->getTokenEndpoint()->getAccessToken($request);
+
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getContent());
+        $values = json_decode($response->getContent(), true);
+        $this->assertEquals(5, count(explode('.', $values['access_token'])));
+        $this->getTokenEndpoint()->setAccessTokenManager($this->getSimpleStringAccessTokenManager());
+    }
+
     public function testClientNotConfidential()
     {
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'client_credentials']));

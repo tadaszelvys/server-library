@@ -2,7 +2,6 @@
 
 namespace OAuth2\Test;
 
-use Base64Url\Base64Url;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\RevocationEndpoint;
@@ -16,6 +15,7 @@ use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\Configuration;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
+use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\JWTClientManager;
 use OAuth2\Test\Stub\PasswordClientManager;
 use OAuth2\Test\Stub\PublicClientManager;
@@ -23,7 +23,6 @@ use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Token\BearerAccessToken;
-use SpomkyLabs\Jose\Checker\AudienceChecker;
 use SpomkyLabs\Service\Jose;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -38,6 +37,7 @@ class Base extends \PHPUnit_Framework_TestCase
         $jose = Jose::getInstance();
         $jose->getConfiguration()->set('algorithms', ['HS512', 'A256KW', 'A256CBC-HS512']);
         $jose->getConfiguration()->set('audience', 'My Authorization Server');
+
         $jose->getKeysetManager()->loadKeyFromValues('JWK1',[
             'kid' => 'JWK1',
             'use' => 'enc',
@@ -83,7 +83,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (is_null($this->revocation_endpoint)) {
             $this->revocation_endpoint = new RevocationEndpoint();
-            $this->revocation_endpoint->setAccessTokenManager($this->getAccessTokenManager());
+            $this->revocation_endpoint->setAccessTokenManager($this->getSimplestringAccessTokenManager());
             $this->revocation_endpoint->setConfiguration($this->getConfiguration());
             $this->revocation_endpoint->setExceptionManager($this->getExceptionManager());
             $this->revocation_endpoint->setClientManagerSupervisor($this->getClientManagerSupervisor());
@@ -108,7 +108,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->setExceptionManager($this->getExceptionManager());
             $this->token_endpoint->setScopeManager($this->getScopeManager());
             $this->token_endpoint->setAccessTokenType($this->getAccessTokenType());
-            $this->token_endpoint->setAccessTokenManager($this->getAccessTokenManager());
+            $this->token_endpoint->setAccessTokenManager($this->getSimplestringAccessTokenManager());
             $this->token_endpoint->setEndUserManager($this->getEndUserManager());
             $this->token_endpoint->setClientManagerSupervisor($this->getClientManagerSupervisor());
             $this->token_endpoint->setRefreshTokenManager($this->getRefreshTokenManager());
@@ -157,6 +157,12 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (is_null($this->configuration)) {
             $this->configuration = new Configuration();
+            $this->configuration->set('jwt_access_token_audience', 'My resource server');
+            $this->configuration->set('jwt_access_token_issuer', 'My authorization server');
+            $this->configuration->set('jwt_access_token_signature_algorithm', 'HS512');
+            $this->configuration->set('jwt_access_token_encrypted', true);
+            $this->configuration->set('jwt_access_token_key_encryption_algorithm', 'A256KW');
+            $this->configuration->set('jwt_access_token_content_encryption_algorithm', 'A256CBC-HS512');
         }
 
         return $this->configuration;
@@ -325,7 +331,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (is_null($this->implicit_grant_type)) {
             $this->implicit_grant_type = new ImplicitGrantType();
-            $this->implicit_grant_type->setAccessTokenManager($this->getAccessTokenManager());
+            $this->implicit_grant_type->setAccessTokenManager($this->getSimplestringAccessTokenManager());
             $this->implicit_grant_type->setAccessTokenType($this->getAccessTokenType());
         }
 
@@ -392,20 +398,39 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @return null|\OAuth2\Test\Stub\SimpleStringAccessTokenManager
      */
-    private $access_token_manager = null;
+    private $simple_string_access_token_manager = null;
 
     /**
      * @return \OAuth2\Test\Stub\SimpleStringAccessTokenManager
      */
-    protected function getAccessTokenManager()
+    protected function getSimpleStringAccessTokenManager()
     {
-        if (is_null($this->access_token_manager)) {
-            $this->access_token_manager = new SimpleStringAccessTokenManager();
-            $this->access_token_manager->setConfiguration($this->getConfiguration());
-            $this->access_token_manager->setExceptionManager($this->getExceptionManager());
+        if (is_null($this->simple_string_access_token_manager)) {
+            $this->simple_string_access_token_manager = new SimpleStringAccessTokenManager();
+            $this->simple_string_access_token_manager->setConfiguration($this->getConfiguration());
+            $this->simple_string_access_token_manager->setExceptionManager($this->getExceptionManager());
         }
 
-        return $this->access_token_manager;
+        return $this->simple_string_access_token_manager;
+    }
+
+    /**
+     * @return null|\OAuth2\Test\Stub\JWTAccessTokenManager
+     */
+    private $jwt_access_token_manager = null;
+
+    /**
+     * @return \OAuth2\Test\Stub\JWTAccessTokenManager
+     */
+    protected function getJWTAccessTokenManager()
+    {
+        if (is_null($this->jwt_access_token_manager)) {
+            $this->jwt_access_token_manager = new JWTAccessTokenManager();
+            $this->jwt_access_token_manager->setConfiguration($this->getConfiguration());
+            $this->jwt_access_token_manager->setExceptionManager($this->getExceptionManager());
+        }
+
+        return $this->jwt_access_token_manager;
     }
 
     /**
