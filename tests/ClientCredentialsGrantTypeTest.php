@@ -145,13 +145,13 @@ class ClientCredentialsGrantTypeTest extends Base
         $jws = $jose->sign(
             'JWK2',
             [
-                'exp' => time()-1,
+                'exp' => time() - 1,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
             ],
             [
-                'alg' => 'HS512'
+                'alg' => 'HS512',
             ]
         );
 
@@ -163,9 +163,9 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             http_build_query(
                 [
-                    'grant_type' => 'client_credentials',
+                    'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                    'client_assertion' => $jws,
+                    'client_assertion'      => $jws,
                 ]
             )
         );
@@ -184,13 +184,13 @@ class ClientCredentialsGrantTypeTest extends Base
         $jws = $jose->sign(
             'JWK2',
             [
-                'exp' => time()+3600,
+                'exp' => time() + 3600,
                 'aud' => 'Bad Audience',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
             ],
             [
-                'alg' => 'HS512'
+                'alg' => 'HS512',
             ]
         );
 
@@ -202,9 +202,9 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             http_build_query(
                 [
-                    'grant_type' => 'client_credentials',
+                    'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                    'client_assertion' => $jws,
+                    'client_assertion'      => $jws,
                 ]
             )
         );
@@ -223,13 +223,13 @@ class ClientCredentialsGrantTypeTest extends Base
         $jws = $jose->sign(
             'JWK2',
             [
-                'exp' => time()+3600,
+                'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
             ],
             [
-                'alg' => 'HS512'
+                'alg' => 'HS512',
             ]
         );
 
@@ -241,9 +241,9 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             http_build_query(
                 [
-                    'grant_type' => 'client_credentials',
+                    'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                    'client_assertion' => $jws,
+                    'client_assertion'      => $jws,
                 ]
             )
         );
@@ -262,7 +262,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $jose = Jose::getInstance();
         $jws = $jose->signAndEncrypt(
             [
-                'exp' => time()+3600,
+                'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
@@ -277,7 +277,7 @@ class ClientCredentialsGrantTypeTest extends Base
                 'cty' => 'JWT',
                 'alg' => 'A256KW',
                 'enc' => 'A256CBC-HS512',
-                'exp' => time()+3600,
+                'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
@@ -292,9 +292,9 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             http_build_query(
                 [
-                    'grant_type' => 'client_credentials',
+                    'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                    'client_assertion' => $jws,
+                    'client_assertion'      => $jws,
                 ]
             )
         );

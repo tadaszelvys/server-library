@@ -10,7 +10,6 @@ use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Exception\BaseException;
-use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -101,8 +100,9 @@ class RevocationEndpoint implements RevocationEndpointInterface
      * @param \OAuth2\Client\ClientInterface|null $client
      * @param string|null                         $callback
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function revokeToken($token = null, $token_type_hint = null, ClientInterface $client = null, $callback = null)
     {
@@ -116,8 +116,10 @@ class RevocationEndpoint implements RevocationEndpointInterface
             $this->$method($token, $client);
         } else {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::NOT_IMPLEMENTED, 'unsupported_token_type', sprintf('Token type "%s" not supported', $token_type_hint));
+
             return $this->getResponseContent($exception->getHttpResponse()->getContent(), $callback, $exception->getHttpCode());
         }
+
         return $this->getResponseContent('', $callback);
     }
 

@@ -65,9 +65,11 @@ class PublicClientManager extends Base
             return;
         } elseif (is_array($header)) {
             $client_public_id_found = $header[0];
+
             return $header[0];
         } else {
             $client_public_id_found = $header;
+
             return $header;
         }
     }

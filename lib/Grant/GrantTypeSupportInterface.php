@@ -21,9 +21,9 @@ interface GrantTypeSupportInterface
      * @param \Symfony\Component\HttpFoundation\Request $request The request
      * @param \OAuth2\Client\ClientInterface            $client  The client
      *
-     * @return \OAuth2\Grant\GrantTypeResponseInterface
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\Grant\GrantTypeResponseInterface
      */
     public function grantAccessToken(Request $request, ClientInterface $client);
 }

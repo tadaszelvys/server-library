@@ -3,8 +3,8 @@
 namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
-use Symfony\Component\HttpFoundation\Request;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 interface AccessTokenManagerInterface
 {
@@ -13,14 +13,14 @@ interface AccessTokenManagerInterface
      *
      * We need to store access token data as we create and verify tokens.
      *
-     * @param \OAuth2\Client\ClientInterface                    $client        The client associated with this access token.
-     * @param string[]                    $scope         (optional) Scopes of the access token.
+     * @param \OAuth2\Client\ClientInterface                    $client         The client associated with this access token.
+     * @param string[]                                          $scope          (optional) Scopes of the access token.
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface|null $resource_owner (optional) Resource owner associated with the access token.
-     * @param \OAuth2\Token\RefreshTokenInterface|null          $refresh_token (optional) Refresh token associated with the access token.
+     * @param \OAuth2\Token\RefreshTokenInterface|null          $refresh_token  (optional) Refresh token associated with the access token.
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    public function createAccessToken(ClientInterface $client, array $scope = array(), ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null);
+    public function createAccessToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null);
 
     /**
      * This function revoke an access token.
@@ -42,7 +42,7 @@ interface AccessTokenManagerInterface
     public function getAccessToken($access_token);
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface        $token
+     * @param \OAuth2\Token\AccessTokenInterface $token
      *
      * @return bool True if the access token is valid, else false
      */

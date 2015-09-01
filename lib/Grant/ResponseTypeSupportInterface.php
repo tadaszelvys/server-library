@@ -20,9 +20,9 @@ interface ResponseTypeSupportInterface
      *
      * @param \OAuth2\Endpoint\AuthorizationInterface $authorization The authorization object
      *
-     * @return array
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return array
      */
     public function grantAuthorization(AuthorizationInterface $authorization);
 

@@ -33,10 +33,10 @@ interface RefreshTokenManagerInterface
      * and provide a descriptive fail message.
      *
      * @param \OAuth2\Client\ClientInterface               $client        The client associated with this refresh token.
-     * @param string[]               $scope         (optional) Scopes of the refresh token.
+     * @param string[]                                     $scope         (optional) Scopes of the refresh token.
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resourceOwner Application data associated with the refresh token, such as a User object.
      */
-    public function createRefreshToken(ClientInterface $client, array $scope = array(), ResourceOwnerInterface $resourceOwner = null);
+    public function createRefreshToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null);
 
     /**
      * Revoke a refresh token.
