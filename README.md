@@ -23,7 +23,7 @@ The following components:
 
 * Access token manager:
     * [x] Simple string access token
-    * [ ] JWT access token (WIP)
+    * [x] JWT access token (WIP)
 * Access token transport:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
     * [ ] MAC access ([IETF draft](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-05))
@@ -44,6 +44,15 @@ The following components:
     * [x] Resource Owner Password Credentials grant type
     * [x] Refresh token grant type
     * [ ] JWT Bearer token grant type (WIP - [RFC7523](https://tools.ietf.org/html/rfc7523))
+
+* [ ] OpenID Connect
+    * [ ] Core
+    * [ ] Discovery
+    * [ ] Dynamic Registration
+    * [ ] Multiple response types
+    * [ ] Form post response mode
+    * [ ] Session Management
+    * [ ] HTTP Based logout
 
 # The Release Process
 

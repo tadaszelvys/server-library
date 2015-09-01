@@ -4,6 +4,7 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\SimpleStringAccessTokenManager as Base;
@@ -17,7 +18,7 @@ class SimpleStringAccessTokenManager extends Base
 
     public function __construct()
     {
-        $abcd = new SimpleStringAccessToken();
+        $abcd = new AccessToken();
         $abcd->setExipresAt(time() + 3600)
              ->setResourceOwnerPublicId(null)
              ->setScope([])
@@ -25,7 +26,7 @@ class SimpleStringAccessTokenManager extends Base
              ->setRefreshToken(null)
              ->setToken('ABCD');
 
-        $efgh = new SimpleStringAccessToken();
+        $efgh = new AccessToken();
         $efgh->setExipresAt(time() + 3600)
              ->setResourceOwnerPublicId(null)
              ->setScope([])
@@ -36,12 +37,13 @@ class SimpleStringAccessTokenManager extends Base
         $this->access_tokens['ABCD'] = $abcd;
         $this->access_tokens['EFGH'] = $efgh;
     }
+
     /**
      * {@inheritdoc}
      */
     protected function addAccessToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null)
     {
-        $access_token = new SimpleStringAccessToken();
+        $access_token = new AccessToken();
         $access_token->setExipresAt($expiresAt)
                      ->setScope($scope)
                      ->setResourceOwnerPublicId(is_null($resourceOwner) ? null : $resourceOwner->getPublicId())
