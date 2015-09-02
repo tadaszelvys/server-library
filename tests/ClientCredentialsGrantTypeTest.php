@@ -117,6 +117,36 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
+    public function testGrantTypeAuthorizedForClientUsingAuthorizationHeader()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:secret')], http_build_query(['grant_type' => 'client_credentials']));
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
+    }
+
+    public function testGrantTypeAuthorizedForClientUsingQueryRequest()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], [], http_build_query(['grant_type' => 'client_credentials', 'client_id' => 'bar', 'client_secret' => 'secret']));
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
+    }
+
     public function testGrantTypeAuthorizedForClientAndJWTAccessToken()
     {
         $response = new Response();

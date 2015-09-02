@@ -113,8 +113,9 @@ abstract class PasswordClientManager implements ClientManagerInterface
                 'client_secret' => $server_params['PHP_AUTH_PW'],
             ];
         }
-        if (!is_null($authenticate = $request->getAttribute('Authorization')) && strtolower(substr($authenticate, 0, 6)) === 'basic ') {
-            list($client_id, $client_secret) = explode(':', base64_decode(substr($authenticate, 6, strlen($authenticate) - 6)));
+        $header = $request->getHeader('Authorization');
+        if (0 < count($header) && strtolower(substr($header[0], 0, 6)) === 'basic ') {
+            list($client_id, $client_secret) = explode(':', base64_decode(substr($header[0], 6, strlen($header[0]) - 6)));
             if (!empty($client_id) && !empty($client_secret)) {
                 return [
                     'client_id'     => $client_id,
@@ -131,14 +132,13 @@ abstract class PasswordClientManager implements ClientManagerInterface
      */
     protected function findCredentialsFromRequestBody(ServerRequestInterface $request, &$client_public_id_found = null)
     {
-        $parameters = RequestBody::getParameters($request);
-        if (is_null($parameters)) {
-            return;
-        }
-        if (array_key_exists('client_id', $parameters) && array_key_exists('client_secret', $parameters)) {
+        $client_id = RequestBody::getParameter($request, 'client_id');
+        $client_secret = RequestBody::getParameter($request, 'client_secret');
+
+        if (!is_null($client_id) && !is_null($client_secret)) {
             return [
-                'client_id'     => $parameters['client_id'],
-                'client_secret' => $parameters['client_secret'],
+                'client_id'     => $client_id,
+                'client_secret' => $client_secret,
             ];
         }
     }
