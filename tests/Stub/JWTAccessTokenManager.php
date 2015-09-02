@@ -14,18 +14,21 @@ class JWTAccessTokenManager extends Base
     protected function getSignaturePrivateKey()
     {
         $jose = Jose::getInstance();
+
         return $jose->getKeysetManager()->getKeyByKid('JWK2');
     }
 
     protected function getSigner()
     {
         $jose = Jose::getInstance();
+
         return $jose->getSigner();
     }
 
     protected function getEncrypter()
     {
         $jose = Jose::getInstance();
+
         return $jose->getEncrypter();
     }
 
@@ -35,6 +38,7 @@ class JWTAccessTokenManager extends Base
     protected function getEncryptionPublicKey()
     {
         $jose = Jose::getInstance();
+
         return $jose->getKeysetManager()->getKeyByKid('JWK1');
     }
 }

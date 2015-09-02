@@ -34,7 +34,6 @@ class Base extends \PHPUnit_Framework_TestCase
         //To fix HHVM tests on Travis-CI
         date_default_timezone_set('UTC');
 
-
         // We set the configuration of the Jose Service
         $jose = Jose::getInstance();
         $jose->getConfiguration()->set('algorithms', ['HS512', 'A256KW', 'A256CBC-HS512']);
@@ -47,7 +46,7 @@ class Base extends \PHPUnit_Framework_TestCase
             'kty' => 'oct',
             'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
         ]);
-        $jose->getKeysetManager()->loadKeyFromValues('JWK2',[
+        $jose->getKeysetManager()->loadKeyFromValues('JWK2', [
             'kid' => 'JWK2',
             'use' => 'sig',
             'kty' => 'oct',

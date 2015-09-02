@@ -21,7 +21,7 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
      * @param string                                       $token         Token
      * @param int                                          $expiresAt     Time until the code is valid
      * @param \OAuth2\Client\ClientInterface               $client        Client
-     * @param string[]               $scope         Scope
+     * @param string[]                                     $scope         Scope
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resourceOwner Resource owner
      *
      * @return \OAuth2\Token\RefreshTokenInterface

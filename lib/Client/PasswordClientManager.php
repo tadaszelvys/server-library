@@ -92,6 +92,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
 
         if (!$this->checkClientCredentials($client, $credentials[0]['client_secret'])) {
             $client_public_id_found = $client->getPublicId();
+
             return;
         }
 

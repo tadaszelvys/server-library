@@ -24,9 +24,9 @@ interface ClientManagerSupervisorInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request                The request
      * @param null|string                              $client_public_id_found If a public client ID is found in the request, but the authentication failed or client is not found, this value value is set
      *
-     * @return \OAuth2\Client\ClientInterface Return the client object or null if no client is found.
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface Throw an exception if a client tried to authenticate against the server, but failed
+     *
+     * @return \OAuth2\Client\ClientInterface Return the client object or null if no client is found.
      */
     public function findClient(ServerRequestInterface $request, &$client_public_id_found = null);
 }

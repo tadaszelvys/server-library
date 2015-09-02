@@ -179,7 +179,7 @@ class TokenEndpoint implements TokenEndpointInterface
 
     /**
      * @param \OAuth2\Client\ClientInterface $client
-     * @param  string                        $grant_type
+     * @param string                         $grant_type
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */

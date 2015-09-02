@@ -36,7 +36,7 @@ interface ExceptionManagerInterface
      *
      * @return string|null
      */
-    public function getUri($type, $error, $error_description = null, array $data = array());
+    public function getUri($type, $error, $error_description = null, array $data = []);
 
     /**
      * This function will try to get the URI according to the type, error and description of the exception.
@@ -48,5 +48,5 @@ interface ExceptionManagerInterface
      *
      * @return \OAuth2\Exception\BaseExceptionInterface
      */
-    public function getException($type, $error, $error_description = null, array $data = array());
+    public function getException($type, $error, $error_description = null, array $data = []);
 }

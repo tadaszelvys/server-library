@@ -45,6 +45,7 @@ class ImplicitGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -66,6 +67,7 @@ class ImplicitGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -87,6 +89,7 @@ class ImplicitGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -109,6 +112,7 @@ class ImplicitGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('oof');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -131,6 +135,7 @@ class ImplicitGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('fii');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -153,6 +158,7 @@ class ImplicitGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -171,6 +177,7 @@ class ImplicitGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();
@@ -189,6 +196,7 @@ class ImplicitGrantTypeTest extends Base
         $client = $this->getClientManagerSupervisor()->getClient('foo');
         if (is_null($client)) {
             $this->fail('Unable to get client');
+
             return;
         }
         $authorization = new Authorization();

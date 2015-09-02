@@ -68,9 +68,9 @@ interface ScopeManagerInterface
      *
      * @param null|string|string[] $scope The string to convert
      *
-     * @return string[] An array of scopes
-     *
      * @throws \Exception If the string contains forbidden characters or if the scope is unknown.
+     *
+     * @return string[] An array of scopes
      */
     public function convertToScope($scope);
 }

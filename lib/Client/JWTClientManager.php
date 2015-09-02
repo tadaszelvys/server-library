@@ -69,6 +69,7 @@ abstract class JWTClientManager implements ClientManagerInterface
 
         if (!$this->isClientAssertionValid($client, $assertions[0])) {
             $client_public_id_found = $client->getPublicId();
+
             return;
         }
 
@@ -79,8 +80,9 @@ abstract class JWTClientManager implements ClientManagerInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param string|null                              $client_public_id_found
      *
-     * @return \Jose\JWEInterface|\Jose\JWEInterface[]|\Jose\JWSInterface|\Jose\JWSInterface[]|null
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \Jose\JWEInterface|\Jose\JWEInterface[]|\Jose\JWSInterface|\Jose\JWSInterface[]|null
      */
     protected function findCredentialsFromClientAssertion(ServerRequestInterface $request, &$client_public_id_found = null)
     {
@@ -130,7 +132,7 @@ abstract class JWTClientManager implements ClientManagerInterface
     }
 
     /**
-     * By default, this method does nothing, but should be overridden and check other claims (issuer, jti...)
+     * By default, this method does nothing, but should be overridden and check other claims (issuer, jti...).
      *
      * @param \Jose\JWTInterface $jwt
      *
@@ -157,8 +159,9 @@ abstract class JWTClientManager implements ClientManagerInterface
      * @param \OAuth2\Client\JWTClientInterface     $client
      * @param \Jose\JWEInterface|\Jose\JWSInterface $jwt
      *
-     * @return bool
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return bool
      */
     protected function isClientAssertionValid(JWTClientInterface $client, $jwt)
     {
@@ -180,7 +183,7 @@ abstract class JWTClientManager implements ClientManagerInterface
 
     /**
      * @param \OAuth2\Client\JWTClientInterface $client
-     * @param \Jose\JWEInterface                 $jwt
+     * @param \Jose\JWEInterface                $jwt
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
@@ -219,7 +222,7 @@ abstract class JWTClientManager implements ClientManagerInterface
         }
         try {
             $this->getJWTLoader()->verify($jwt);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
 

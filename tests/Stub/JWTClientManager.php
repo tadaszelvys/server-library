@@ -99,6 +99,7 @@ class JWTClientManager extends Base
     protected function getJWTLoader()
     {
         $jose = Jose::getInstance();
+
         return $jose->getLoader();
     }
 }
