@@ -48,13 +48,13 @@ The following components are implemented:
     * [ ] JWT Bearer token grant type (WIP - [RFC7523](https://tools.ietf.org/html/rfc7523))
 
 * [ ] OpenID Connect
-    * [ ] Core
-    * [ ] Discovery
-    * [ ] Dynamic Registration
-    * [ ] Multiple response types
-    * [ ] Form post response mode
-    * [ ] Session Management
-    * [ ] HTTP Based logout
+    * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
+    * [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
+    * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html)
+    * [ ] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
+    * [ ] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
+    * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
+    * [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
 
 # The Release Process
 
@@ -62,7 +62,7 @@ The release process [is described here](doc/Release.md).
 
 # Prerequisites
 
-This library needs at least ![PHP 5.6+](https://img.shields.io/badge/PHP-5.5%2B-ff69b4.svg).
+This library needs at least ![PHP 5.6+](https://img.shields.io/badge/PHP-5.6%2B-ff69b4.svg).
 
 It has been successfully tested using `PHP 5.6`, `PHP 7` and `HHVM`.
 
