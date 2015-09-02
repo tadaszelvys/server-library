@@ -20,11 +20,6 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
     private $password;
 
     /**
-     * @var string
-     */
-    private $public_id;
-
-    /**
      * @param string $username
      * @param string $password
      */
@@ -41,14 +36,6 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
     public function getType()
     {
         return 'end-user';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPublicId()
-    {
-        return $this->public_id;
     }
 
     public function getUsername()
