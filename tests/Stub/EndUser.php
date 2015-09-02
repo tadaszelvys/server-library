@@ -4,8 +4,8 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
-use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
 use OAuth2\EndUser\EndUser as BaseEndUser;
+use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
 
 class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
 {

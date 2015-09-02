@@ -9,8 +9,8 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use OAuth2\Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInterface
 {

@@ -46,6 +46,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
     private function isRequestSecured(ServerRequestInterface $request)
     {
         $server_params = $request->getServerParams();
+
         return !empty($server_params['HTTPS']) && 'off' !== strtolower($server_params['HTTPS']);
     }
 
@@ -59,12 +60,14 @@ class RevocationEndpoint implements RevocationEndpointInterface
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
 
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
+
             return;
         }
         if (is_null($token)) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
 
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
+
             return;
         }
         $found = null;
@@ -73,6 +76,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
         } catch (BaseExceptionInterface $e) {
             if (!is_null($found)) {
                 $this->getResponseContent($response, $e->getResponseBody(), $callback, $e->getHttpCode());
+
                 return;
             }
             $client = null;
@@ -111,7 +115,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
         $query_params = $request->getQueryParams();
         $body_params = RequestBody::getParameters($request);
         foreach (['token', 'token_type_hint', 'callback'] as $key) {
-            $$key = array_key_exists($key, $query_params) ? $query_params[$key] : (array_key_exists($key, $body_params) ? $body_params[$key]:null);
+            $$key = array_key_exists($key, $query_params) ? $query_params[$key] : (array_key_exists($key, $body_params) ? $body_params[$key] : null);
         }
     }
 
@@ -137,6 +141,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
         } else {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::NOT_IMPLEMENTED, 'unsupported_token_type', sprintf('Token type "%s" not supported', $token_type_hint));
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
+
             return;
         }
         $this->getResponseContent($response, '', $callback);

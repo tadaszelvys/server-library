@@ -4,8 +4,8 @@ namespace OAuth2\Token;
 
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use OAuth2\Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
 
 class BearerAccessToken implements AccessTokenTypeInterface
 {

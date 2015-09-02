@@ -55,7 +55,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     {
         $response->getBody()->write($this->getResponseBody());
         $response = $response->withStatus($this->getHttpCode());
-        foreach($this->getResponseHeaders() as $header => $value) {
+        foreach ($this->getResponseHeaders() as $header => $value) {
             $response = $response->withHeader($header, $value);
         }
     }

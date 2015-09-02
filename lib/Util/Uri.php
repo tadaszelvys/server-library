@@ -8,11 +8,11 @@ class Uri
      * @param string$uri    The URI
      * @param array $params Parameters added to the URI
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
-    public static function buildURI($uri, $params = array())
+    public static function buildURI($uri, $params = [])
     {
         $parse_url = parse_url($uri);
         if (false === $parse_url) {

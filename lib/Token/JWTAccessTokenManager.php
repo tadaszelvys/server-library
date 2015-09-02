@@ -95,8 +95,8 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
 
         $access_token = new AccessToken();
         $access_token->setExpiresAt(time() + $this->getLifetime($client))
-            ->setRefreshToken(is_null($refresh_token)?null:$refresh_token->getToken())
-            ->setResourceOwnerPublicId(is_null($resource_owner)?null:$resource_owner->getPublicId())
+            ->setRefreshToken(is_null($refresh_token) ? null : $refresh_token->getToken())
+            ->setResourceOwnerPublicId(is_null($resource_owner) ? null : $resource_owner->getPublicId())
             ->setScope($scope)
             ->setToken($jwt)
             ->setClientPublicId($client->getPublicId());
