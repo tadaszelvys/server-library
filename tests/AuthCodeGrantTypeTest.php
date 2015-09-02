@@ -5,6 +5,7 @@ namespace OAuth2\Test;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\BaseExceptionInterface;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\Uri;
 
 /**
  * @group AuthorizationCodeGrantType
@@ -319,6 +320,43 @@ class AuthCodeGrantTypeTest extends Base
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAuthcodeSuccessWithStateAndUnregisteredClient()
+    {
+        $client = $this->getClientManagerSupervisor()->getClient('**UNREGISTERED**--foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+
+            return;
+        }
+        $authorization = new Authorization();
+        $authorization->setRedirectUri('http://example.com/test?good=false')
+                      ->setClient($client)
+                      ->setResponseType('code')
+                      ->setState('0123456789')
+                      ->setAuthorized(true);
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+
+        $uri = new Uri($response->getHeader('Location')[0]);
+        parse_str($uri->getQuery(), $result);
+        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+        $this->assertEquals('**UNREGISTERED**--foo', $authcode->getClientPublicId());
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Unregistered-Client-ID' => '**UNREGISTERED**--foo'], http_build_query(['grant_type' => 'authorization_code', 'client_id' => '**UNREGISTERED**--foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken()]));
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
     public function testPublicClientWithoutPublicId()

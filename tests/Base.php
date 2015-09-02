@@ -22,6 +22,7 @@ use OAuth2\Test\Stub\PublicClientManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
+use OAuth2\Test\Stub\UnregisteredClientManager;
 use OAuth2\Token\BearerAccessToken;
 use SpomkyLabs\Service\Jose;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
@@ -221,12 +222,31 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_manager_supervisor = new ClientManagerSupervisor();
             $this->client_manager_supervisor->setExceptionManager($this->getExceptionManager());
 
+            $this->client_manager_supervisor->addClientManager($this->getUnregisteredClientManager());
             $this->client_manager_supervisor->addClientManager($this->getPasswordClientManager());
             $this->client_manager_supervisor->addClientManager($this->getPublicClientManager());
             $this->client_manager_supervisor->addClientManager($this->getJWTClientManager());
         }
 
         return $this->client_manager_supervisor;
+    }
+
+    /**
+     * @var null|\OAuth2\Test\Stub\UnregisteredClientManager
+     */
+    private $unregistered_client_manager = null;
+
+    /**
+     * @return \OAuth2\Test\Stub\UnregisteredClientManager
+     */
+    protected function getUnregisteredClientManager()
+    {
+        if (is_null($this->unregistered_client_manager)) {
+            $this->unregistered_client_manager = new UnregisteredClientManager();
+            $this->unregistered_client_manager->setExceptionManager($this->getExceptionManager());
+        }
+
+        return $this->unregistered_client_manager;
     }
 
     /**

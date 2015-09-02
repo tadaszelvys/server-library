@@ -33,7 +33,6 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
         parent::__construct();
         $this->username = $username;
         $this->password = $password;
-        $this->public_id = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
     }
 
     /**

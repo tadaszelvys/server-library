@@ -19,27 +19,27 @@ OAuth2 Server Library
 
 *Note: if you use Symfony, [a bundle is available](https://github.com/Spomky-Labs/OAuth2ServerBundle).*
 
-This library provides components to build an authorization server based on the OAuth2 Framework protocol ([RFC6749](https://tools.ietf.org/html/rfc6749)) and associated behaviours.
+This library provides components to build an authorization server based on the OAuth2 Framework protocol ([RFC6749](https://tools.ietf.org/html/rfc6749)) and associated features.
 
-The following components:
+The following components are implemented:
 
-* Access token manager:
+* [x] Access token manager:
     * [x] Simple string access token
     * [x] JWT access token (WIP)
-* Access token transport:
+* [ ] Access token transport:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
     * [ ] MAC access ([IETF draft](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-05))
 * [x] Exception manager
-* Clients:
+* [x] Clients:
     * [x] Public clients
     * [x] Password clients
     * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523))
     * [x] Unregistered clients
-* Endpoints:
+* [x] Endpoints:
     * [x] Authorization endpoint
     * [x] Token endpoint
     * [x] Token revocation endpoint ([RFC7009](https://tools.ietf.org/html/rfc7009))
-* Grant types:
+* [ ] Grant types:
     * [x] Implicit grant type
     * [x] Authorization code grant type
     * [x] Client credentials grant type
@@ -71,7 +71,7 @@ It has been successfully tested using `PHP 5.6`, `PHP 7` and `HHVM`.
 The preferred way to install this library is to rely on Composer:
 
 ```sh
-composer require "spomky-labs/oauth2-server-library" "~1.0"
+composer require "spomky-labs/oauth2-server-library" "dev-master"
 ```
 
 # Create missing components

@@ -11,6 +11,7 @@ class EndUser extends ResourceOwner implements EndUserInterface
 {
     public function __construct()
     {
+        parent::__construct();
         $this->setType('end_user');
     }
 }
