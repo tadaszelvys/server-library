@@ -26,7 +26,7 @@ class ObjectsTest extends Base
     {
         $client = new PublicClient();
         $client->setAllowedGrantTypes(['foo', 'bar']);
-        
+
         $this->assertEquals('public_client', $client->getType());
         $this->assertEquals(['foo', 'bar'], $client->getAllowedGrantTypes());
         $this->assertTrue($client->isAllowedGrantType('foo'));
