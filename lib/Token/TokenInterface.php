@@ -5,6 +5,18 @@ namespace OAuth2\Token;
 interface TokenInterface
 {
     /**
+     * @return string
+     */
+    public function getToken();
+
+    /**
+     * @param string $token
+     *
+     * @return self
+     */
+    public function setToken($token);
+
+    /**
      * @return string The public ID of the client associated with the token
      */
     public function getClientPublicId();

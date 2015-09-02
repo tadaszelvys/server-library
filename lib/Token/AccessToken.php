@@ -5,34 +5,9 @@ namespace OAuth2\Token;
 class AccessToken extends Token implements AccessTokenInterface
 {
     /**
-     * @var string
-     */
-    private $token;
-
-    /**
      * @var null|string
      */
     private $refresh_token;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getToken()
-    {
-        return $this->token;
-    }
-
-    /**
-     * @param string $token
-     *
-     * @return self
-     */
-    public function setToken($token)
-    {
-        $this->token = $token;
-
-        return $this;
-    }
 
     /**
      * {@inheritdoc}

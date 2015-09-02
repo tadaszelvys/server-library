@@ -62,9 +62,9 @@ The release process [is described here](doc/Release.md).
 
 # Prerequisites
 
-This library needs at least ![PHP 5.5+](https://img.shields.io/badge/PHP-5.5%2B-ff69b4.svg).
+This library needs at least ![PHP 5.6+](https://img.shields.io/badge/PHP-5.5%2B-ff69b4.svg).
 
-It has been successfully tested using `PHP 5.5`, `PHP 5.6`, `PHP 7` and `HHVM`
+It has been successfully tested using `PHP 5.6`, `PHP 7` and `HHVM`.
 
 # Installation
 

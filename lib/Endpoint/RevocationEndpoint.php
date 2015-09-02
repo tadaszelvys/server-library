@@ -83,8 +83,6 @@ class RevocationEndpoint implements RevocationEndpointInterface
         }
 
         $this->revokeToken($response, $token, $token_type_hint, $client, $callback);
-
-        return;
     }
 
     /**

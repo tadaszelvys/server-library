@@ -38,11 +38,11 @@ class BearerAccessToken implements AccessTokenTypeInterface
     {
         $header = $request->getHeader('AUTHORIZATION');
 
-        if (is_null($header)) {
+        if (0 === count($header)) {
             return;
         }
 
-        if (!preg_match('/'.preg_quote('Bearer', '/').'\s([a-zA-Z0-9\-_\+~\/\.]+)/', $header, $matches)) {
+        if (!preg_match('/'.preg_quote('Bearer', '/').'\s([a-zA-Z0-9\-_\+~\/\.]+)/', $header[0], $matches)) {
             return;
         }
 
@@ -72,11 +72,9 @@ class BearerAccessToken implements AccessTokenTypeInterface
      */
     protected function getTokenFromQuery(ServerRequestInterface $request)
     {
-        if (!$token = $request->query->get('access_token')) {
-            return;
-        }
+        $query_params = $request->getQueryParams();
 
-        return $token;
+        return array_key_exists('access_token', $query_params) ? $query_params['access_token'] : null;
     }
 
     /**

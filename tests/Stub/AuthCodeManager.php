@@ -25,7 +25,7 @@ class AuthCodeManager extends Base
                       'scope1',
                       'scope2',
                   ])
-                  ->setCode('VALID_AUTH_CODE');
+                  ->setToken('VALID_AUTH_CODE');
 
         $expired_auth_code = new AuthCode();
         $expired_auth_code->setClientPublicId('bar')
@@ -37,7 +37,7 @@ class AuthCodeManager extends Base
                       'scope1',
                       'scope2',
                   ])
-                  ->setCode('VALID_AUTH_CODE');
+                  ->setToken('VALID_AUTH_CODE');
 
         $this->auth_codes['VALID_AUTH_CODE'] = $valid_auth_code;
         $this->auth_codes['EXPIRED_AUTH_CODE'] = $expired_auth_code;
@@ -57,7 +57,7 @@ class AuthCodeManager extends Base
                   ->setRedirectUri($redirectUri)
                   ->setResourceOwnerPublicId(is_null($resourceOwner) ? null : $resourceOwner->getPublicId())
                   ->setScope($scope)
-                  ->setCode($code);
+                  ->setToken($code);
 
         $this->auth_codes[$code] = $auth_code;
 
@@ -73,8 +73,8 @@ class AuthCodeManager extends Base
 
     public function markAuthCodeAsUsed(AuthCodeInterface $code)
     {
-        if (isset($this->auth_codes[$code->getCode()])) {
-            unset($this->auth_codes[$code->getCode()]);
+        if (isset($this->auth_codes[$code->getToken()])) {
+            unset($this->auth_codes[$code->getToken()]);
         }
     }
 }

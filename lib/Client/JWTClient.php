@@ -12,7 +12,7 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
     private $allowed_signature_algorithms = [];
 
     /**
-     * @var string[]
+     * @var \Jose\JWKSetInterface
      */
     private $key_set = [];
 
@@ -34,6 +34,9 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
         return $this;
     }
 
+    /**
+     * @return \Jose\JWKSetInterface
+     */
     public function getPublicKeySet()
     {
         return $this->key_set;

@@ -5,11 +5,6 @@ namespace OAuth2\Token;
 class AuthCode extends Token implements AuthCodeInterface
 {
     /**
-     * @var string
-     */
-    private $code;
-
-    /**
      * @var bool|false
      */
     private $issue_refresh_token;
@@ -18,26 +13,6 @@ class AuthCode extends Token implements AuthCodeInterface
      * @var string
      */
     private $redirect_uri;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    /**
-     * @param string $code
-     *
-     * @return self
-     */
-    public function setCode($code)
-    {
-        $this->code = $code;
-
-        return $this;
-    }
 
     /**
      * {@inheritdoc}

@@ -73,7 +73,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function generateTokenID()
     {
-        return;
     }
 
     /**

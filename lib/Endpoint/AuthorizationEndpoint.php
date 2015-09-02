@@ -79,8 +79,6 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
         $response = $response->withStatus(302)
             ->withHeader('Location', Uri::buildUri($redirect_uri, $result));
-
-        return;
     }
 
     /**
