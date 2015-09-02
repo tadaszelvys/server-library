@@ -40,7 +40,7 @@ class Base extends \PHPUnit_Framework_TestCase
         $jose->getConfiguration()->set('audience', 'My Authorization Server');
 
         // We add our shared keys
-        $jose->getKeysetManager()->loadKeyFromValues('JWK1',[
+        $jose->getKeysetManager()->loadKeyFromValues('JWK1', [
             'kid' => 'JWK1',
             'use' => 'enc',
             'kty' => 'oct',
@@ -72,6 +72,7 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         $factory = new DiactorosFactory();
+
         return $factory->createRequest($request);
     }
     /**

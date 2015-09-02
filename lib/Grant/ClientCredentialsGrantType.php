@@ -7,8 +7,8 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use OAuth2\Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ClientCredentialsGrantType implements GrantTypeSupportInterface
 {

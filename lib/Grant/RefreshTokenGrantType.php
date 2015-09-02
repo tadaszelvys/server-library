@@ -7,8 +7,8 @@ use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use OAuth2\Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
 
 class RefreshTokenGrantType implements GrantTypeSupportInterface
 {

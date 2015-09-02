@@ -13,7 +13,7 @@ class RequestBody
      */
     public static function getParameters(ServerRequestInterface $request)
     {
-        $parameters = array();
+        $parameters = [];
         if (count($request->getHeader('CONTENT-TYPE')) < 1) {
             return $parameters;
         }
@@ -28,6 +28,7 @@ class RequestBody
             return $parameters;
         }
         parse_str($body, $parameters);
+
         return $parameters;
     }
 

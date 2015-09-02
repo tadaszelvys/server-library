@@ -5,7 +5,6 @@ namespace OAuth2\Client;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 class ClientManagerSupervisor implements ClientManagerSupervisorInterface
 {
@@ -74,7 +73,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
         $auth_scheme = null;
         if (!is_null($request->getAttribute('PHP_AUTH_USER'))) {
             $auth_scheme = 'Basic';
-        } elseif (count($authHeader) >0 && (0 !== $pos = strpos($authHeader[0], ' '))) {
+        } elseif (count($authHeader) > 0 && (0 !== $pos = strpos($authHeader[0], ' '))) {
             $auth_scheme = substr($authHeader[0], 0, $pos);
         }
 

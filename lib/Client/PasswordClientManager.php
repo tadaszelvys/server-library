@@ -5,8 +5,8 @@ namespace OAuth2\Client;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use OAuth2\Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class PasswordClientManager implements ClientManagerInterface
 {
@@ -29,7 +29,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
     protected function updateClientCredentials(PasswordClientInterface $client)
     {
         if (!is_null($client->getPlaintextSecret())) {
-            $secret = hash($this->getHashAlgorithm(),$client->getSalt().$client->getPlaintextSecret());
+            $secret = hash($this->getHashAlgorithm(), $client->getSalt().$client->getPlaintextSecret());
             $client->setSecret($secret);
             $client->clearCredentials();
         }
@@ -45,7 +45,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      */
     protected function checkClientCredentials(PasswordClientInterface $client, $secret)
     {
-        return hash($this->getHashAlgorithm(),$client->getSalt().$secret) === $client->getSecret();
+        return hash($this->getHashAlgorithm(), $client->getSalt().$secret) === $client->getSecret();
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 
 namespace OAuth2\EndUser;
+
 use OAuth2\ResourceOwner\ResourceOwner;
 
 /**

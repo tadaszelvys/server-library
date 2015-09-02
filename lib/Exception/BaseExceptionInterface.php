@@ -1,6 +1,7 @@
 <?php
 
 namespace OAuth2\Exception;
+
 use Psr\Http\Message\ResponseInterface;
 
 /**

@@ -16,7 +16,6 @@ use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response;
 
 class TokenEndpoint implements TokenEndpointInterface
 {
@@ -57,6 +56,7 @@ class TokenEndpoint implements TokenEndpointInterface
     private function isRequestSecured(ServerRequestInterface $request)
     {
         $server_params = $request->getServerParams();
+
         return !empty($server_params['HTTPS']) && 'off' !== strtolower($server_params['HTTPS']);
     }
 
@@ -132,7 +132,7 @@ class TokenEndpoint implements TokenEndpointInterface
             'Cache-Control' => 'no-store, private',
             'Pragma'        => 'no-cache',
         ];
-        foreach($headers as $key=>$value) {
+        foreach ($headers as $key => $value) {
             $response = $response->withHeader($key, $value);
         }
     }

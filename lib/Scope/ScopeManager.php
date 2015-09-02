@@ -7,7 +7,6 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ScopeExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 abstract class ScopeManager implements ScopeManagerInterface
 {

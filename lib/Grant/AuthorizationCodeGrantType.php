@@ -10,8 +10,8 @@ use OAuth2\Endpoint\AuthorizationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use OAuth2\Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
 
 class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
 {
@@ -132,7 +132,7 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \OAuth2\Client\ClientInterface            $client
+     * @param \OAuth2\Client\ClientInterface           $client
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */

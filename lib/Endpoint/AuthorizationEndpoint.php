@@ -62,6 +62,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', ['transport_mode' => $response_mode, 'redirect_uri' => $authorization->getRedirectUri(), 'state' => $authorization->getState()]);
 
             $exception->getHttpResponse($response);
+
             return;
         }
 

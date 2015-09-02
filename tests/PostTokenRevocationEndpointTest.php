@@ -1,6 +1,7 @@
 <?php
 
 namespace OAuth2\Test;
+
 use Zend\Diactoros\Response;
 
 /**
