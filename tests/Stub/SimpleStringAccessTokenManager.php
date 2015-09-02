@@ -19,7 +19,7 @@ class SimpleStringAccessTokenManager extends Base
     public function __construct()
     {
         $abcd = new AccessToken();
-        $abcd->setExipresAt(time() + 3600)
+        $abcd->setExpiresAt(time() + 3600)
              ->setResourceOwnerPublicId(null)
              ->setScope([])
              ->setClientPublicId('bar')
@@ -27,7 +27,7 @@ class SimpleStringAccessTokenManager extends Base
              ->setToken('ABCD');
 
         $efgh = new AccessToken();
-        $efgh->setExipresAt(time() + 3600)
+        $efgh->setExpiresAt(time() + 3600)
              ->setResourceOwnerPublicId(null)
              ->setScope([])
              ->setClientPublicId('foo')
@@ -44,7 +44,7 @@ class SimpleStringAccessTokenManager extends Base
     protected function addAccessToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null)
     {
         $access_token = new AccessToken();
-        $access_token->setExipresAt($expiresAt)
+        $access_token->setExpiresAt($expiresAt)
                      ->setScope($scope)
                      ->setResourceOwnerPublicId(is_null($resourceOwner) ? null : $resourceOwner->getPublicId())
                      ->setClientPublicId($client->getPublicId())

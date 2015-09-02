@@ -2,7 +2,7 @@
 
 namespace OAuth2\Client;
 
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 interface ClientManagerInterface
 {
@@ -10,12 +10,12 @@ interface ClientManagerInterface
      * Find a client using the request.
      * If the client is confidential, the client credentials must be checked.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request                The request
-     * @param null|string                               $client_public_id_found If a public client ID is found in the request, but the authentication failed or client is not found, this value value is set
+     * @param \Psr\Http\Message\ServerRequestInterface $request                The request
+     * @param null|string                              $client_public_id_found If a public client ID is found in the request, but the authentication failed or client is not found, this value value is set
      *
      * @return null|string|\OAuth2\Client\ClientInterface Return the client if found else null. If a client tried to authenticate against the server but failed, return the public ID found
      */
-    public function findClient(Request $request, &$client_public_id_found = null);
+    public function findClient(ServerRequestInterface $request, &$client_public_id_found = null);
 
     /**
      * Get a client by its ID.

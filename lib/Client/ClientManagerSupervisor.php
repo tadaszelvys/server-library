@@ -4,6 +4,7 @@ namespace OAuth2\Client;
 
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class ClientManagerSupervisor implements ClientManagerSupervisorInterface
@@ -51,7 +52,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(Request $request, &$client_public_id_found = null)
+    public function findClient(ServerRequestInterface $request, &$client_public_id_found = null)
     {
         foreach ($this->getClientManagers() as $manager) {
             $client = $manager->findClient($request, $client_public_id_found);
@@ -63,17 +64,18 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return \OAuth2\Exception\BaseExceptionInterface
      */
-    private function buildException(Request $request)
+    private function buildException(ServerRequestInterface $request)
     {
+        $authHeader = $request->getHeader('Authorization');
         $auth_scheme = null;
-        if (!is_null($request->server->get('PHP_AUTH_USER'))) {
+        if (!is_null($request->getAttribute('PHP_AUTH_USER'))) {
             $auth_scheme = 'Basic';
-        } elseif (!is_null($authHeader = $request->headers->get('Authorization')) && (0 !== $pos = strpos($authHeader, ' '))) {
-            $auth_scheme = substr($authHeader, 0, $pos);
+        } elseif (count($authHeader) >0 && (0 !== $pos = strpos($authHeader[0], ' '))) {
+            $auth_scheme = substr($authHeader[0], 0, $pos);
         }
 
         if (is_null($auth_scheme)) {

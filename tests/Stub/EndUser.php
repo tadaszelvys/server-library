@@ -4,10 +4,10 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
-use OAuth2\EndUser\EndUserInterface;
 use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
+use OAuth2\EndUser\EndUser as BaseEndUser;
 
-class EndUser implements EndUserInterface, IssueRefreshTokenExtensionInterface
+class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
 {
     /**
      * @var string
@@ -30,6 +30,7 @@ class EndUser implements EndUserInterface, IssueRefreshTokenExtensionInterface
      */
     public function __construct($username, $password)
     {
+        parent::__construct();
         $this->username = $username;
         $this->password = $password;
         $this->public_id = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);

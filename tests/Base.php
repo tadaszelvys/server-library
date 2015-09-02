@@ -3,6 +3,7 @@
 namespace OAuth2\Test;
 
 use OAuth2\Client\ClientManagerSupervisor;
+use OAuth2\Configuration\Configuration;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\RevocationEndpoint;
 use OAuth2\Endpoint\TokenEndpoint;
@@ -12,7 +13,6 @@ use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Test\Stub\AuthCodeManager;
-use OAuth2\Test\Stub\Configuration;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
@@ -24,6 +24,7 @@ use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Token\BearerAccessToken;
 use SpomkyLabs\Service\Jose;
+use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
 
 class Base extends \PHPUnit_Framework_TestCase
@@ -34,10 +35,12 @@ class Base extends \PHPUnit_Framework_TestCase
         date_default_timezone_set('UTC');
 
 
+        // We set the configuration of the Jose Service
         $jose = Jose::getInstance();
         $jose->getConfiguration()->set('algorithms', ['HS512', 'A256KW', 'A256CBC-HS512']);
         $jose->getConfiguration()->set('audience', 'My Authorization Server');
 
+        // We add our shared keys
         $jose->getKeysetManager()->loadKeyFromValues('JWK1',[
             'kid' => 'JWK1',
             'use' => 'enc',
@@ -60,7 +63,7 @@ class Base extends \PHPUnit_Framework_TestCase
      * @param array       $headers
      * @param null|string $content
      *
-     * @return \Symfony\Component\HttpFoundation\Request
+     * @return \Psr\Http\Message\ServerRequestInterface
      */
     protected function createRequest($uri = '/', $method = 'GET', array $parameters = [], array $server = [], array $headers = [], $content = null)
     {
@@ -69,7 +72,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $request->headers->set($key, $value);
         }
 
-        return $request;
+        $factory = new DiactorosFactory();
+        return $factory->createRequest($request);
     }
     /**
      * @var null|\OAuth2\Endpoint\RevocationEndpoint
@@ -146,12 +150,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Test\Stub\Configuration
+     * @var null|\OAuth2\Configuration\Configuration
      */
     private $configuration = null;
 
     /**
-     * @return \OAuth2\Test\Stub\Configuration
+     * @return \OAuth2\Configuration\Configuration
      */
     protected function getConfiguration()
     {

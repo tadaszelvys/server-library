@@ -4,6 +4,7 @@ namespace OAuth2\Test;
 
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\BaseExceptionInterface;
+use Zend\Diactoros\Response;
 
 /**
  * @group AuthorizationCodeGrantType
@@ -14,8 +15,9 @@ class AuthCodeGrantTypeTest extends Base
     {
         $authorization = new Authorization();
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -28,8 +30,9 @@ class AuthCodeGrantTypeTest extends Base
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test#bad');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -52,8 +55,9 @@ class AuthCodeGrantTypeTest extends Base
         $authorization->setRedirectUri('http://example.com/bade.redirect?URI')
                       ->setClient($client);
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -72,8 +76,9 @@ class AuthCodeGrantTypeTest extends Base
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client);
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -93,8 +98,9 @@ class AuthCodeGrantTypeTest extends Base
                       ->setClient($client)
                       ->setResponseType('bad_response_type');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -114,8 +120,9 @@ class AuthCodeGrantTypeTest extends Base
                       ->setClient($client)
                       ->setResponseType('bad_response_type');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_client', $e->getMessage());
@@ -135,8 +142,9 @@ class AuthCodeGrantTypeTest extends Base
                       ->setClient($client)
                       ->setResponseType('bad_response_type');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -156,8 +164,9 @@ class AuthCodeGrantTypeTest extends Base
                       ->setClient($client)
                       ->setResponseType('bad_response_type');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -176,8 +185,9 @@ class AuthCodeGrantTypeTest extends Base
         $authorization->setClient($client)
                       ->setResponseType('token');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_client', $e->getMessage());
@@ -197,8 +207,9 @@ class AuthCodeGrantTypeTest extends Base
                       ->setClient($client)
                       ->setResponseType('code');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('unauthorized_client', $e->getMessage());
@@ -219,8 +230,9 @@ class AuthCodeGrantTypeTest extends Base
                       ->setResponseType('code')
                       ->setAuthorized(false);
 
-        $response = $this->getAuthorizationEndpoint()->authorize($authorization);
-        $this->assertEquals('http://example.com/test?good=false&error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied', $response->headers->get('Location'));
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertEquals('http://example.com/test?good=false&error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccess()
@@ -236,8 +248,9 @@ class AuthCodeGrantTypeTest extends Base
                       ->setResponseType('code')
                       ->setAuthorized(true);
 
-        $response = $this->getAuthorizationEndpoint()->authorize($authorization);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+$/', $response->headers->get('Location'));
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccessWithoutRedirectUri()
@@ -252,8 +265,9 @@ class AuthCodeGrantTypeTest extends Base
                       ->setResponseType('code')
                       ->setAuthorized(true);
 
-        $response = $this->getAuthorizationEndpoint()->authorize($authorization);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+$/', $response->headers->get('Location'));
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccessUsingAnotherRedirectUri()
@@ -269,8 +283,9 @@ class AuthCodeGrantTypeTest extends Base
                       ->setResponseType('code')
                       ->setAuthorized(true);
 
-        $response = $this->getAuthorizationEndpoint()->authorize($authorization);
-        $this->assertRegExp('/^https:\/\/another.uri\/callback\?code=[^"]+$/', $response->headers->get('Location'));
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^https:\/\/another.uri\/callback\?code=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccessWithState()
@@ -287,16 +302,18 @@ class AuthCodeGrantTypeTest extends Base
                       ->setState('0123456789')
                       ->setAuthorized(true);
 
-        $response = $this->getAuthorizationEndpoint()->authorize($authorization);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->headers->get('Location'));
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
     }
 
     public function testPublicClientWithoutPublicId()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -306,10 +323,11 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testParameterCodeIsMissing()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -319,10 +337,11 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testParameterCodeIsMissing2()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -332,10 +351,11 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testExpiredAuthcode()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'EXPIRED_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_grant', $e->getMessage());
@@ -345,10 +365,11 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testRedirectUriMismatch()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -358,10 +379,11 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthCodeDoesNotExists()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'DO_NOT_EXIST', 'redirect_uri' => 'http://example.com/redirect_uri/bad/']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_grant', $e->getMessage());
@@ -371,10 +393,11 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthCodeNotForTheClient()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_grant', $e->getMessage());
@@ -384,14 +407,16 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testClientGranted()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/']));
 
-        $response = $this->getTokenEndpoint()->getAccessToken($request);
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
 
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
-        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getContent());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 }

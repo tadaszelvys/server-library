@@ -9,6 +9,11 @@ namespace OAuth2\Client;
  *
  * @see http://tools.ietf.org/html/rfc6749#section-2.1
  */
-abstract class UnregisteredClient extends Client
+class UnregisteredClient extends Client
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setType('unregistered_client');
+    }
 }

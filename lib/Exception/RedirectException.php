@@ -2,7 +2,7 @@
 
 namespace OAuth2\Exception;
 
-use Util\Uri;
+use OAuth2\Util\Uri;
 
 class RedirectException extends BaseException implements RedirectExceptionInterface
 {

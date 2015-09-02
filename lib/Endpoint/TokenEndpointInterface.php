@@ -2,16 +2,16 @@
 
 namespace OAuth2\Endpoint;
 
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 interface TokenEndpointInterface
 {
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request The request
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param \Psr\Http\Message\ServerRequestInterface $request  The request
+     * @param \Psr\Http\Message\ResponseInterface      $response The response
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface If an error occurred
      */
-    public function getAccessToken(Request $request);
+    public function getAccessToken(ServerRequestInterface $request, ResponseInterface &$response);
 }

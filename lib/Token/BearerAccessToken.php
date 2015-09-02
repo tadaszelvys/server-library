@@ -4,8 +4,8 @@ namespace OAuth2\Token;
 
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
+use OAuth2\Util\RequestBody;
 
 class BearerAccessToken implements AccessTokenTypeInterface
 {
@@ -30,13 +30,13 @@ class BearerAccessToken implements AccessTokenTypeInterface
     /**
      * Get the token from the authorization header.
      *
-     * @param Request $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string|null
      */
-    protected function getTokenFromHeaders(Request $request)
+    protected function getTokenFromHeaders(ServerRequestInterface $request)
     {
-        $header = $request->headers->get('AUTHORIZATION');
+        $header = $request->getHeader('AUTHORIZATION');
 
         if (is_null($header)) {
             return;
@@ -54,11 +54,11 @@ class BearerAccessToken implements AccessTokenTypeInterface
     /**
      * Get the token from the request body.
      *
-     * @param Request $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string|null
      */
-    protected function getTokenFromRequestBody(Request $request)
+    protected function getTokenFromRequestBody(ServerRequestInterface $request)
     {
         return RequestBody::getParameter($request, 'access_token');
     }
@@ -66,11 +66,11 @@ class BearerAccessToken implements AccessTokenTypeInterface
     /**
      * Get the token from the query string.
      *
-     * @param Request $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string|null
      */
-    protected function getTokenFromQuery(Request $request)
+    protected function getTokenFromQuery(ServerRequestInterface $request)
     {
         if (!$token = $request->query->get('access_token')) {
             return;
@@ -94,7 +94,7 @@ class BearerAccessToken implements AccessTokenTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function findAccessToken(Request $request)
+    public function findAccessToken(ServerRequestInterface $request)
     {
         $tokens = [];
         $methods = $this->getTokenFromMethods();
@@ -126,7 +126,7 @@ class BearerAccessToken implements AccessTokenTypeInterface
      *
      * {@inheritdoc}
      */
-    public function isAccessTokenValid(Request $request, AccessTokenInterface $token)
+    public function isAccessTokenValid(ServerRequestInterface $request, AccessTokenInterface $token)
     {
         return true;
     }

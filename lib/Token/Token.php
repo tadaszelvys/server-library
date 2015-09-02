@@ -1,18 +1,11 @@
 <?php
 
-namespace OAuth2\Test\Stub;
+namespace OAuth2\Token;
 
-use OAuth2\Token\RefreshTokenInterface;
-
-class RefreshToken implements RefreshTokenInterface
+class Token implements TokenInterface
 {
     /**
-     * @var bool
-     */
-    private $used;
-
-    /**
-     * @var string[]
+     * @var array
      */
     private $scope;
 
@@ -119,7 +112,7 @@ class RefreshToken implements RefreshTokenInterface
     /**
      * @return int
      */
-    public function getExipresAt()
+    public function getExpiresAt()
     {
         return $this->expires_at;
     }
@@ -129,7 +122,7 @@ class RefreshToken implements RefreshTokenInterface
      *
      * @return self
      */
-    public function setExipresAt($expires_at)
+    public function setExpiresAt($expires_at)
     {
         $this->expires_at = $expires_at;
 
@@ -150,25 +143,5 @@ class RefreshToken implements RefreshTokenInterface
     public function getExpiresIn()
     {
         return $this->expires_at - time() < 0 ? 0 : $this->expires_at - time();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUsed()
-    {
-        return $this->used;
-    }
-
-    /**
-     * @param bool $used
-     *
-     * @return self
-     */
-    public function setUsed($used)
-    {
-        $this->used = $used;
-
-        return $this;
     }
 }

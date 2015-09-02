@@ -4,7 +4,7 @@ namespace OAuth2\Client;
 
 use OAuth2\ResourceOwner\ResourceOwner;
 
-abstract class Client extends ResourceOwner implements ClientInterface
+class Client extends ResourceOwner implements ClientInterface
 {
     /**
      * @var string[]

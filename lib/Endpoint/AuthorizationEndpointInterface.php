@@ -2,12 +2,13 @@
 
 namespace OAuth2\Endpoint;
 
+use Psr\Http\Message\ResponseInterface;
+
 interface AuthorizationEndpointInterface
 {
     /**
-     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization Authorization information
-     *
-     * @return \Symfony\Component\HttpFoundation\Response The response to send back to the client
+     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization
+     * @param \Psr\Http\Message\ResponseInterface     $response
      */
-    public function authorize(AuthorizationInterface $authorization);
+    public function authorize(AuthorizationInterface $authorization, ResponseInterface &$response);
 }

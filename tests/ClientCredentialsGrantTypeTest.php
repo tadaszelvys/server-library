@@ -5,6 +5,7 @@ namespace OAuth2\Test;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use SpomkyLabs\Service\Jose;
+use Zend\Diactoros\Response;
 
 /**
  * @group ClientCredentialsGrantType
@@ -13,10 +14,11 @@ class ClientCredentialsGrantTypeTest extends Base
 {
     public function testUnsecuredRequest()
     {
+        $response = new Response();
         $request = $this->createRequest();
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -27,10 +29,11 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testNotPostMethod()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on']);
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -41,10 +44,11 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testGrantTypeIsMissing()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on']);
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -55,10 +59,11 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testUnknownClient()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'plic', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_client', $e->getMessage());
@@ -69,10 +74,11 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testUnsupportedGrantType()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'bar']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('unsupported_grant_type', $e->getMessage());
@@ -83,10 +89,11 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testGrantTypeUnauthorizedForClient()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('unauthorized_client', $e->getMessage());
@@ -97,40 +104,47 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForClient()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
 
-        $response = $this->getTokenEndpoint()->getAccessToken($request);
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
 
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
-        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getContent());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeAuthorizedForClientAndJWTAccessToken()
     {
+        $response = new Response();
         $this->getTokenEndpoint()->setAccessTokenManager($this->getJWTAccessTokenManager());
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
 
-        $response = $this->getTokenEndpoint()->getAccessToken($request);
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
 
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
-        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getContent());
-        $values = json_decode($response->getContent(), true);
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
+
+        $response->getBody()->rewind();
+        $values = json_decode($response->getBody()->getContents(), true);
         $this->assertEquals(5, count(explode('.', $values['access_token'])));
         $this->getTokenEndpoint()->setAccessTokenManager($this->getSimpleStringAccessTokenManager());
     }
 
     public function testClientNotConfidential()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'client_credentials']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_client', $e->getMessage());
@@ -141,6 +155,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForJWTClientButTokenExpired()
     {
+        $response = new Response();
         $jose = Jose::getInstance();
         $jws = $jose->sign(
             'JWK2',
@@ -171,7 +186,7 @@ class ClientCredentialsGrantTypeTest extends Base
         );
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The JWT has expired.', $e->getDescription());
@@ -180,6 +195,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForJWTClientButBadAudience()
     {
+        $response = new Response();
         $jose = Jose::getInstance();
         $jws = $jose->sign(
             'JWK2',
@@ -210,7 +226,7 @@ class ClientCredentialsGrantTypeTest extends Base
         );
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('Bad audience.', $e->getDescription());
@@ -219,6 +235,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
     public function testSignedAssertionForJWTClient()
     {
+        $response = new Response();
         $jose = Jose::getInstance();
         $jws = $jose->sign(
             'JWK2',
@@ -248,17 +265,19 @@ class ClientCredentialsGrantTypeTest extends Base
             )
         );
 
-        $response = $this->getTokenEndpoint()->getAccessToken($request);
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
 
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
-        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getContent());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
     public function testEncryptedAndSignedAssertionForJWTClient()
     {
+        $response = new Response();
         $jose = Jose::getInstance();
         $jws = $jose->signAndEncrypt(
             [
@@ -299,12 +318,13 @@ class ClientCredentialsGrantTypeTest extends Base
             )
         );
 
-        $response = $this->getTokenEndpoint()->getAccessToken($request);
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
 
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
-        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getContent());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 }

@@ -3,7 +3,10 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
+use OAuth2\Client\PasswordClient;
+use OAuth2\Client\PublicClient;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use OAuth2\Token\RefreshToken;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManager as Base;
 use OAuth2\Token\RefreshTokenManagerInterface;
@@ -11,7 +14,7 @@ use OAuth2\Token\RefreshTokenManagerInterface;
 class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
 {
     /**
-     * @var \OAuth2\Test\Stub\RefreshToken[]
+     * @var \OAuth2\Token\RefreshToken[]
      */
     private $refresh_tokens = [];
 
@@ -57,7 +60,7 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
     protected function addRefreshToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null)
     {
         $refresh_token = new RefreshToken();
-        $refresh_token->setExipresAt($expiresAt)
+        $refresh_token->setExpiresAt($expiresAt)
                       ->setToken($token)
                       ->setClientPublicId($client->getPublicId())
                       ->setResourceOwnerPublicId(is_null($resourceOwner) ? null : $resourceOwner->getPublicId())

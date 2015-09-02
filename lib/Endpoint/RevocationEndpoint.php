@@ -9,12 +9,11 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
-use OAuth2\Exception\BaseException;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Util\RequestBody;
+use OAuth2\Util\RequestBody;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class RevocationEndpoint implements RevocationEndpointInterface
 {
@@ -40,71 +39,92 @@ class RevocationEndpoint implements RevocationEndpointInterface
     }
 
     /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return bool
+     */
+    private function isRequestSecured(ServerRequestInterface $request)
+    {
+        $server_params = $request->getServerParams();
+        return !empty($server_params['HTTPS']) && 'off' !== strtolower($server_params['HTTPS']);
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function revoke(Request $request)
+    public function revoke(ServerRequestInterface $request, ResponseInterface &$response)
     {
         $this->getParameters($request, $token, $token_type_hint, $callback);
-        if (!$request->isSecure()) {
+        if (!$this->isRequestSecured($request)) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
 
-            return $this->getResponseContent($exception->getHttpResponse()->getContent(), $callback, $exception->getHttpCode());
+            $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
+            return;
         }
         if (is_null($token)) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
 
-            return $this->getResponseContent($exception->getHttpResponse()->getContent(), $callback, $exception->getHttpCode());
+            $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
+            return;
         }
         $found = null;
         try {
             $client = $this->getClientManagerSupervisor()->findClient($request, $found);
-        } catch (BaseException $e) {
+        } catch (BaseExceptionInterface $e) {
             if (!is_null($found)) {
-                return $this->getResponseContent($e->getHttpResponse()->getContent(), $callback, $e->getHttpCode());
+                $this->getResponseContent($response, $e->getResponseBody(), $callback, $e->getHttpCode());
+                return;
             }
             $client = null;
         }
 
-        return $this->revokeToken($token, $token_type_hint, $client, $callback);
+        $this->revokeToken($response, $token, $token_type_hint, $client, $callback);
+
+        return;
     }
 
     /**
-     * @param string      $content
-     * @param string|null $callback
-     * @param int         $code
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param string                              $content
+     * @param string|null                         $callback
+     * @param int                                 $code
      */
-    private function getResponseContent($content, $callback, $code = 200)
+    private function getResponseContent(ResponseInterface &$response, $content, $callback, $code = 200)
     {
-        return new Response(is_null($callback) ? '' : $callback.'('.$content.')', $code);
+        if (!is_null($callback)) {
+            $data = sprintf('%s(%s)', $callback, $content);
+            $response->getBody()->write($data);
+        }
+        $response = $response->withStatus($code);
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param string                                    $token
-     * @param string|null                               $token_type_hint
-     * @param string|null                               $callback
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param string                                   $token
+     * @param string|null                              $token_type_hint
+     * @param string|null                              $callback
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function getParameters(Request $request, &$token, &$token_type_hint, &$callback)
+    private function getParameters(ServerRequestInterface $request, &$token, &$token_type_hint, &$callback)
     {
+        $query_params = $request->getQueryParams();
+        $body_params = RequestBody::getParameters($request);
         foreach (['token', 'token_type_hint', 'callback'] as $key) {
-            $$key = $request->query->has($key) ? $request->query->get($key) : RequestBody::getParameter($request, $key);
+            $$key = array_key_exists($key, $query_params) ? $query_params[$key] : (array_key_exists($key, $body_params) ? $body_params[$key]:null);
         }
     }
 
     /**
+     * @param \Psr\Http\Message\ResponseInterface $response
      * @param string|null                         $token
      * @param string|null                         $token_type_hint
      * @param \OAuth2\Client\ClientInterface|null $client
      * @param string|null                         $callback
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function revokeToken($token = null, $token_type_hint = null, ClientInterface $client = null, $callback = null)
+    private function revokeToken(ResponseInterface &$response, $token = null, $token_type_hint = null, ClientInterface $client = null, $callback = null)
     {
         $methods = $this->getRevocationMethods();
         if (is_null($token_type_hint)) {
@@ -116,9 +136,10 @@ class RevocationEndpoint implements RevocationEndpointInterface
             $this->$method($token, $client);
         } else {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::NOT_IMPLEMENTED, 'unsupported_token_type', sprintf('Token type "%s" not supported', $token_type_hint));
-            return $this->getResponseContent($exception->getHttpResponse()->getContent(), $callback, $exception->getHttpCode());
+            $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
+            return;
         }
-        return $this->getResponseContent('', $callback);
+        $this->getResponseContent($response, '', $callback);
     }
 
     /**

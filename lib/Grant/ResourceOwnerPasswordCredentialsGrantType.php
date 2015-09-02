@@ -9,8 +9,8 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
+use OAuth2\Util\RequestBody;
 
 class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInterface
 {
@@ -29,7 +29,7 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInter
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(Request $request, ClientInterface $client)
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client)
     {
         $username = RequestBody::getParameter($request, 'username');
         $password = RequestBody::getParameter($request, 'password');
@@ -53,9 +53,13 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInter
     }
 
     /**
-     * @return bool
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param \OAuth2\EndUser\EndUserInterface         $end_user
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return bool|mixed
      */
-    protected function getIssueRefreshToken(ClientInterface $client, EndUserInterface $end_user, Request $request)
+    protected function getIssueRefreshToken(ClientInterface $client, EndUserInterface $end_user, ServerRequestInterface $request)
     {
         if ($end_user instanceof IssueRefreshTokenExtensionInterface && false === $end_user->isRefreshTokenIssuanceAllowed($client, 'password')) {
             return false;

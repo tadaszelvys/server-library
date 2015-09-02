@@ -3,7 +3,7 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Client\ClientInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 interface GrantTypeSupportInterface
 {
@@ -18,12 +18,12 @@ interface GrantTypeSupportInterface
      * This is the access token endpoint
      * This function checks the request and returns information to issue an access token.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request The request
-     * @param \OAuth2\Client\ClientInterface            $client  The client
+     * @param \Psr\Http\Message\ServerRequestInterface $request The request
+     * @param \OAuth2\Client\ClientInterface           $client  The client
      *
      * @return \OAuth2\Grant\GrantTypeResponseInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function grantAccessToken(Request $request, ClientInterface $client);
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client);
 }

@@ -2,13 +2,14 @@
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Client\PublicClient;
 use OAuth2\Client\PublicClientManager as Base;
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 class PublicClientManager extends Base
 {
     /**
-     * @var \OAuth2\Test\Stub\PublicClient[]
+     * @var \OAuth2\Client\PublicClient[]
      */
     private $clients = [];
 
@@ -52,14 +53,14 @@ class PublicClientManager extends Base
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param string|null                               $client_public_id_found
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param string|null                              $client_public_id_found
      *
      * @return string|null
      */
-    protected function findClientUsingHeader(Request $request, &$client_public_id_found = null)
+    protected function findClientUsingHeader(ServerRequestInterface $request, &$client_public_id_found = null)
     {
-        $header = $request->headers->get('X-OAuth2-Public-Client-ID');
+        $header = $request->getHeader('X-OAuth2-Public-Client-ID');
 
         if (empty($header)) {
             return;

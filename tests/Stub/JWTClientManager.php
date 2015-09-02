@@ -2,6 +2,7 @@
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Client\JWTClient;
 use OAuth2\Client\JWTClientManager as Base;
 use SpomkyLabs\Jose\JWK;
 use SpomkyLabs\Jose\JWKSet;
@@ -9,6 +10,9 @@ use SpomkyLabs\Service\Jose;
 
 class JWTClientManager extends Base
 {
+    /**
+     * @var \OAuth2\Client\JWTClient[]
+     */
     private $clients = [];
 
     public function __construct()

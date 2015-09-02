@@ -8,7 +8,7 @@ namespace OAuth2\Client;
  *
  * @see http://tools.ietf.org/html/rfc6749#section-2.1
  */
-abstract class RegisteredClient extends Client implements RegisteredClientInterface
+class RegisteredClient extends Client implements RegisteredClientInterface
 {
     /**
      * @var string[]

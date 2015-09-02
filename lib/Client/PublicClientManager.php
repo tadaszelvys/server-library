@@ -4,7 +4,7 @@ namespace OAuth2\Client;
 
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class PublicClientManager implements ClientManagerInterface
 {
@@ -18,7 +18,7 @@ abstract class PublicClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(Request $request, &$client_public_id_found = null)
+    public function findClient(ServerRequestInterface $request, &$client_public_id_found = null)
     {
         $methods = $this->findClientMethods();
         $result = [];

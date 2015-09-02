@@ -10,8 +10,8 @@ use OAuth2\Client\RegisteredClientInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\ResponseTypeSupportInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Util\Uri;
+use OAuth2\Util\Uri;
+use Psr\Http\Message\ResponseInterface;
 
 class AuthorizationEndpoint implements AuthorizationEndpointInterface
 {
@@ -44,7 +44,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
      * @throws \OAuth2\Exception\InternalServerErrorExceptionInterface
      */
-    public function authorize(AuthorizationInterface $authorization)
+    public function authorize(AuthorizationInterface $authorization, ResponseInterface &$response)
     {
         $redirect_uri = $this->checkRedirectUri($authorization);
         $this->checkRedirectUriFragment($redirect_uri);
@@ -61,7 +61,8 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         if ($authorization->isAuthorized() === false) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', ['transport_mode' => $response_mode, 'redirect_uri' => $authorization->getRedirectUri(), 'state' => $authorization->getState()]);
 
-            return $exception->getHttpResponse();
+            $exception->getHttpResponse($response);
+            return;
         }
 
         $result = $type->grantAuthorization($authorization);
@@ -75,9 +76,10 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_response_mode', sprintf('The response mode "%s" is not supported.', $response_mode));
         }
 
-        return new Response('', 302, [
-            'Location' => Uri::buildUri($redirect_uri, $result),
-        ]);
+        $response = $response->withStatus(302)
+            ->withHeader('Location', Uri::buildUri($redirect_uri, $result));
+
+        return;
     }
 
     /**

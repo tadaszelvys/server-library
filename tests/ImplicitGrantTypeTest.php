@@ -4,6 +4,7 @@ namespace OAuth2\Test;
 
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\BaseExceptionInterface;
+use Zend\Diactoros\Response;
 
 /**
  * @group ImplicitGrantType
@@ -14,8 +15,9 @@ class ImplicitGrantTypeTest extends Base
     {
         $authorization = new Authorization();
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -28,8 +30,9 @@ class ImplicitGrantTypeTest extends Base
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test#bad');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -48,8 +51,9 @@ class ImplicitGrantTypeTest extends Base
         $authorization->setRedirectUri('http://example.com/test?good=true')
                       ->setClient($client);
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -68,8 +72,9 @@ class ImplicitGrantTypeTest extends Base
         $authorization->setRedirectUri('http://example.com/test?good=false')
                       ->setClient($client);
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -89,8 +94,9 @@ class ImplicitGrantTypeTest extends Base
                       ->setClient($client)
                       ->setResponseType('bad_response_type');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -110,8 +116,9 @@ class ImplicitGrantTypeTest extends Base
                       ->setClient($client)
                       ->setResponseType('bad_response_type');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_client', $e->getMessage());
@@ -131,8 +138,9 @@ class ImplicitGrantTypeTest extends Base
                       ->setClient($client)
                       ->setResponseType('token');
 
+        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization);
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('unauthorized_client', $e->getMessage());
@@ -153,8 +161,9 @@ class ImplicitGrantTypeTest extends Base
                       ->setAuthorized(false)
                       ->setResponseType('token');
 
-        $response = $this->getAuthorizationEndpoint()->authorize($authorization);
-        $this->assertEquals('http://example.com/test?good=false#error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied', $response->headers->get('Location'));
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertEquals('http://example.com/test?good=false#error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccess()
@@ -170,8 +179,9 @@ class ImplicitGrantTypeTest extends Base
                       ->setResponseType('token')
                       ->setAuthorized(true);
 
-        $response = $this->getAuthorizationEndpoint()->authorize($authorization);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer$/', $response->headers->get('Location'));
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithState()
@@ -188,7 +198,8 @@ class ImplicitGrantTypeTest extends Base
                       ->setState('0123456789')
                       ->setAuthorized(true);
 
-        $response = $this->getAuthorizationEndpoint()->authorize($authorization);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer&state=[^"]+$/', $response->headers->get('Location'));
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer&state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 }

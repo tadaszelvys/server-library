@@ -2,26 +2,32 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\PasswordClientInterface;
+use OAuth2\Client\PasswordClient;
 use OAuth2\Client\PasswordClientManager as Base;
 
 class PasswordClientManager extends Base
 {
+    /**
+     * @var \OAuth2\Client\PasswordClient[]
+     */
     private $clients = [];
 
     public function __construct()
     {
         $bar = new PasswordClient();
-        $bar->setPublicId('bar')
-            ->setSecret('secret')
+        $bar->setPlaintextSecret('secret')
+            ->setRedirectUris(['http://example.com/test?good=false'])
             ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
-            ->setRedirectUris(['http://example.com/test?good=false']);
+            ->setPublicId('bar');
+        $this->updateClientCredentials($bar);
 
         $baz = new PasswordClient();
-        $baz->setPublicId('baz')
-            ->setSecret('secret')
+        $baz->setPlaintextSecret('secret')
+            ->setRedirectUris([])
             ->setAllowedGrantTypes(['authorization_code'])
-            ->setRedirectUris([]);
+            ->setPublicId('baz');
+        $this->updateClientCredentials($baz);
+
         $this->clients['bar'] = $bar;
         $this->clients['baz'] = $baz;
     }
@@ -32,17 +38,5 @@ class PasswordClientManager extends Base
     public function getClient($client_id)
     {
         return isset($this->clients[$client_id]) ? $this->clients[$client_id] : null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function checkClientCredentials(PasswordClientInterface $client, $secret)
-    {
-        if (!$client instanceof PasswordClient) {
-            return false;
-        }
-
-        return $client->getSecret() === $secret;
     }
 }

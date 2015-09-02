@@ -1,8 +1,6 @@
 <?php
 
-namespace OAuth2\Test\Stub;
-
-use OAuth2\Configuration\ConfigurationInterface;
+namespace OAuth2\Configuration;
 
 class Configuration implements ConfigurationInterface
 {

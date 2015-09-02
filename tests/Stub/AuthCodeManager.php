@@ -20,7 +20,7 @@ class AuthCodeManager extends Base
                   ->setIssueRefreshToken(true)
                   ->setRedirectUri('http://example.com/redirect_uri/')
                   ->setResourceOwnerPublicId(null)
-                  ->setExipresAt(time() + 3000)
+                  ->setExpiresAt(time() + 3000)
                   ->setScope([
                       'scope1',
                       'scope2',
@@ -32,7 +32,7 @@ class AuthCodeManager extends Base
                   ->setIssueRefreshToken(true)
                   ->setRedirectUri('http://example.com/redirect_uri/')
                   ->setResourceOwnerPublicId(null)
-                  ->setExipresAt(time() - 1)
+                  ->setExpiresAt(time() - 1)
                   ->setScope([
                       'scope1',
                       'scope2',
@@ -51,7 +51,7 @@ class AuthCodeManager extends Base
     protected function addAuthCode($code, $expiresAt, ClientInterface $client, $redirectUri, array $scope = [], ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false)
     {
         $auth_code = new AuthCode();
-        $auth_code->setExipresAt($expiresAt)
+        $auth_code->setExpiresAt($expiresAt)
                   ->setClientPublicId($client->getPublicId())
                   ->setIssueRefreshToken($issueRefreshToken)
                   ->setRedirectUri($redirectUri)

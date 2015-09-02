@@ -10,8 +10,8 @@ use OAuth2\Endpoint\AuthorizationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
+use OAuth2\Util\RequestBody;
 
 class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
 {
@@ -84,7 +84,7 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(Request $request, ClientInterface $client)
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client)
     {
         $this->checkClient($request, $client);
         $authCode = $this->getAuthCode($request);
@@ -114,13 +114,13 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return null|\OAuth2\Token\AuthCodeInterface
      */
-    protected function getAuthCode(Request $request)
+    protected function getAuthCode(ServerRequestInterface $request)
     {
         $code = RequestBody::getParameter($request, 'code');
         if (is_null($code)) {
@@ -130,7 +130,13 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
         return $this->getAuthCodeManager()->getAuthCode($code);
     }
 
-    protected function checkClient(Request $request, ClientInterface $client)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \OAuth2\Client\ClientInterface            $client
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    protected function checkClient(ServerRequestInterface $request, ClientInterface $client)
     {
         if (!$client instanceof ConfidentialClientInterface) {
             if (null === ($client_id = RequestBody::getParameter($request, 'client_id')) || $client_id !== $client->getPublicId()) {
@@ -141,7 +147,7 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
 
     /**
      * @param \OAuth2\Token\AuthCodeInterface $authCode
-     * @param                                 $redirect_uri
+     * @param string                          $redirect_uri
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */

@@ -3,6 +3,7 @@
 namespace OAuth2\Test;
 
 use OAuth2\Exception\BaseExceptionInterface;
+use Zend\Diactoros\Response;
 
 /**
  * @group RefreshTokenGrantType
@@ -11,10 +12,11 @@ class RefreshTokenGrantTypeTest extends Base
 {
     public function testUnsecuredRequest()
     {
+        $response = new Response();
         $request = $this->createRequest();
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -25,10 +27,11 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testNotPostMethod()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on']);
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -39,10 +42,11 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeIsMissing()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on']);
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -53,10 +57,11 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testUnknownClient()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'plic', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_client', $e->getMessage());
@@ -67,10 +72,11 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testUnsupportedGrantType()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'bar']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('unsupported_grant_type', $e->getMessage());
@@ -81,10 +87,11 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeUnauthorizedForClient()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('unauthorized_client', $e->getMessage());
@@ -95,23 +102,26 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForClient()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN']));
 
-        $response = $this->getTokenEndpoint()->getAccessToken($request);
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
 
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
-        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getContent());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
     public function testRefreshTokenParameterIsMissing()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
@@ -122,10 +132,11 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testRefreshTokenExpired()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'EXPIRED_REFRESH_TOKEN']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_grant', $e->getMessage());
@@ -136,10 +147,11 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testWrongClient()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN']));
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_grant', $e->getMessage());
@@ -150,18 +162,20 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForClientAndRefreshTokenIsMarkedAsUsed()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN']));
 
-        $response = $this->getTokenEndpoint()->getAccessToken($request);
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
 
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
-        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getContent());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getBody()->getContents());
 
         try {
-            $this->getTokenEndpoint()->getAccessToken($request);
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_grant', $e->getMessage());
@@ -172,14 +186,16 @@ class RefreshTokenGrantTypeTest extends Base
 
     public function testGrantTypeAuthorizedForClientWithReducedScope()
     {
+        $response = new Response();
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN', 'scope' => 'scope2']));
 
-        $response = $this->getTokenEndpoint()->getAccessToken($request);
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
 
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-        $this->assertEquals('no-store, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->headers->get('Pragma'));
-        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope2","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getContent());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope2","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 }

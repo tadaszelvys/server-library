@@ -6,6 +6,7 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ScopeExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class ScopeManager implements ScopeManagerInterface
@@ -35,7 +36,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getAvailableScopes(ClientInterface $client = null, Request $request = null)
+    public function getAvailableScopes(ClientInterface $client = null, ServerRequestInterface $request = null)
     {
         return ($client instanceof ScopeExtensionInterface && !is_null($client->getAvailableScopes($request))) ? $client->getAvailableScopes($request) : $this->getScopes();
     }
@@ -43,7 +44,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getDefaultScopes(ClientInterface $client = null, Request $request = null)
+    public function getDefaultScopes(ClientInterface $client = null, ServerRequestInterface $request = null)
     {
         return ($client instanceof ScopeExtensionInterface && !is_null($client->getDefaultScopes($request))) ? $client->getDefaultScopes($request) : $this->getDefault();
     }
@@ -51,7 +52,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getScopePolicy(ClientInterface $client = null, Request $request = null)
+    public function getScopePolicy(ClientInterface $client = null, ServerRequestInterface $request = null)
     {
         return ($client instanceof ScopeExtensionInterface && !is_null($client->getScopePolicy($request))) ? $client->getScopePolicy($request) : $this->getPolicy();
     }
@@ -59,7 +60,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function checkScopePolicy(ClientInterface $client, array $scope, Request $request = null)
+    public function checkScopePolicy(ClientInterface $client, array $scope, ServerRequestInterface $request = null)
     {
         $policy = $this->getScopePolicy($client, $request);
         if (!in_array($policy, self::supportedPolicies(), true)) {

@@ -2,7 +2,8 @@
 
 namespace OAuth2\Endpoint;
 
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 interface RevocationEndpointInterface
 {
@@ -13,9 +14,8 @@ interface RevocationEndpointInterface
      *   - revoke the token and token exists. For confidential clients, authentication is required.
      *   - in any case, return an HTTP response with code 200.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request The request
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param \Psr\Http\Message\ServerRequestInterface $request  The request
+     * @param \Psr\Http\Message\ResponseInterface      $response The response
      */
-    public function revoke(Request $request);
+    public function revoke(ServerRequestInterface $request, ResponseInterface &$response);
 }

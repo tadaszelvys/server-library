@@ -7,8 +7,8 @@ use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
+use OAuth2\Util\RequestBody;
 
 class RefreshTokenGrantType implements GrantTypeSupportInterface
 {
@@ -26,7 +26,7 @@ class RefreshTokenGrantType implements GrantTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(Request $request, ClientInterface $client)
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client)
     {
         $refresh_token = RequestBody::getParameter($request, 'refresh_token');
         if (is_null($refresh_token)) {

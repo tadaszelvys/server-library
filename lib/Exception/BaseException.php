@@ -2,10 +2,13 @@
 
 namespace OAuth2\Exception;
 
-use Symfony\Component\HttpFoundation\Response;
+use Psr\Http\Message\ResponseInterface;
 
-abstract class BaseException extends \Exception implements BaseExceptionInterface
+class BaseException extends \Exception implements BaseExceptionInterface
 {
+    /**
+     * @var array
+     */
     protected $errorData = [];
 
     /**
@@ -29,30 +32,45 @@ abstract class BaseException extends \Exception implements BaseExceptionInterfac
         }
     }
 
+    /**
+     * @return null|string
+     */
     public function getDescription()
     {
         return isset($this->errorData['error_description']) ? $this->errorData['error_description'] : null;
     }
 
+    /**
+     * @return null|string
+     */
     public function getUri()
     {
         return isset($this->errorData['error_uri']) ? urldecode($this->errorData['error_uri']) : null;
     }
 
-    public function getHttpResponse()
+    /**
+     * @param \Psr\Http\Message\ResponseInterface $response
+     */
+    public function getHttpResponse(ResponseInterface &$response)
     {
-        return new Response(
-            $this->getResponseBody(),
-            $this->getHttpCode(),
-            $this->getResponseHeaders()
-        );
+        $response->getBody()->write($this->getResponseBody());
+        $response = $response->withStatus($this->getHttpCode());
+        foreach($this->getResponseHeaders() as $header => $value) {
+            $response = $response->withHeader($header, $value);
+        }
     }
 
+    /**
+     * @return int
+     */
     public function getHttpCode()
     {
         return $this->getCode();
     }
 
+    /**
+     * @return array
+     */
     public function getResponseHeaders()
     {
         return [
@@ -62,6 +80,9 @@ abstract class BaseException extends \Exception implements BaseExceptionInterfac
         ];
     }
 
+    /**
+     * @return string
+     */
     public function getResponseBody()
     {
         return json_encode($this->errorData);

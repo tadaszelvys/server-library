@@ -7,8 +7,8 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
+use OAuth2\Util\RequestBody;
 
 class ClientCredentialsGrantType implements GrantTypeSupportInterface
 {
@@ -26,7 +26,7 @@ class ClientCredentialsGrantType implements GrantTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(Request $request, ClientInterface $client)
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client)
     {
         if (!$client instanceof ConfidentialClientInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a confidential client');

@@ -5,8 +5,8 @@ namespace OAuth2\Client;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
+use OAuth2\Util\RequestBody;
 
 abstract class PasswordClientManager implements ClientManagerInterface
 {
@@ -14,12 +14,39 @@ abstract class PasswordClientManager implements ClientManagerInterface
     use HasConfiguration;
 
     /**
+     * @return string
+     */
+    protected function getHashAlgorithm()
+    {
+        return 'sha512';
+    }
+
+    /**
+     * @param \OAuth2\Client\PasswordClientInterface $client
+     *
+     * @return self
+     */
+    protected function updateClientCredentials(PasswordClientInterface $client)
+    {
+        if (!is_null($client->getPlaintextSecret())) {
+            $secret = hash($this->getHashAlgorithm(),$client->getSalt().$client->getPlaintextSecret());
+            $client->setSecret($secret);
+            $client->clearCredentials();
+        }
+
+        return $this;
+    }
+
+    /**
      * @param \OAuth2\Client\PasswordClientInterface $client
      * @param string                                 $secret
      *
      * @return bool
      */
-    abstract protected function checkClientCredentials(PasswordClientInterface $client, $secret);
+    protected function checkClientCredentials(PasswordClientInterface $client, $secret)
+    {
+        return hash($this->getHashAlgorithm(),$client->getSalt().$secret) === $client->getSecret();
+    }
 
     /**
      * @return string[]
@@ -42,7 +69,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(Request $request, &$client_public_id_found = null)
+    public function findClient(ServerRequestInterface $request, &$client_public_id_found = null)
     {
         $methods = $this->findClientCredentialsMethods();
         $credentials = [];
@@ -72,19 +99,20 @@ abstract class PasswordClientManager implements ClientManagerInterface
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string[]
      */
-    protected function findCredentialsFromAuthenticationScheme(Request $request, &$client_public_id_found = null)
+    protected function findCredentialsFromAuthenticationScheme(ServerRequestInterface $request, &$client_public_id_found = null)
     {
-        if ($request->server->get('PHP_AUTH_USER') && $request->server->get('PHP_AUTH_PW')) {
+        $server_params = $request->getServerParams();
+        if (array_key_exists('PHP_AUTH_USER', $server_params) && array_key_exists('PHP_AUTH_PW', $server_params)) {
             return [
-                'client_id'     => $request->server->get('PHP_AUTH_USER'),
-                'client_secret' => $request->server->get('PHP_AUTH_PW'),
+                'client_id'     => $server_params['PHP_AUTH_USER'],
+                'client_secret' => $server_params['PHP_AUTH_PW'],
             ];
         }
-        if (!is_null($authenticate = $request->headers->get('Authorization')) && strtolower(substr($authenticate, 0, 6)) === 'basic ') {
+        if (!is_null($authenticate = $request->getAttribute('Authorization')) && strtolower(substr($authenticate, 0, 6)) === 'basic ') {
             list($client_id, $client_secret) = explode(':', base64_decode(substr($authenticate, 6, strlen($authenticate) - 6)));
             if (!empty($client_id) && !empty($client_secret)) {
                 return [
@@ -96,11 +124,11 @@ abstract class PasswordClientManager implements ClientManagerInterface
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string[]|null
      */
-    protected function findCredentialsFromRequestBody(Request $request, &$client_public_id_found = null)
+    protected function findCredentialsFromRequestBody(ServerRequestInterface $request, &$client_public_id_found = null)
     {
         $parameters = RequestBody::getParameters($request);
         if (is_null($parameters)) {

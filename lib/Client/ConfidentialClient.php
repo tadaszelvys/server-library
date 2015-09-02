@@ -8,6 +8,6 @@ namespace OAuth2\Client;
  *
  * @see http://tools.ietf.org/html/rfc6749#section-2.1
  */
-abstract class ConfidentialClient extends RegisteredClient implements ConfidentialClientInterface
+class ConfidentialClient extends RegisteredClient implements ConfidentialClientInterface
 {
 }

@@ -8,8 +8,8 @@ use Jose\JWTInterface;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Util\RequestBody;
+use Psr\Http\Message\ServerRequestInterface;
+use OAuth2\Util\RequestBody;
 
 abstract class JWTClientManager implements ClientManagerInterface
 {
@@ -46,7 +46,7 @@ abstract class JWTClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(Request $request, &$client_public_id_found = null)
+    public function findClient(ServerRequestInterface $request, &$client_public_id_found = null)
     {
         $methods = $this->findClientCredentialsMethods();
         $assertions = [];
@@ -76,13 +76,13 @@ abstract class JWTClientManager implements ClientManagerInterface
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param string|null                               $client_public_id_found
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param string|null                              $client_public_id_found
      *
      * @return \Jose\JWEInterface|\Jose\JWEInterface[]|\Jose\JWSInterface|\Jose\JWSInterface[]|null
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function findCredentialsFromClientAssertion(Request $request, &$client_public_id_found = null)
+    protected function findCredentialsFromClientAssertion(ServerRequestInterface $request, &$client_public_id_found = null)
     {
         $client_assertion_type = RequestBody::getParameter($request, 'client_assertion_type');
 

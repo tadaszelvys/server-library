@@ -2,7 +2,7 @@
 
 namespace OAuth2\Token;
 
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 interface AccessTokenTypeInterface
 {
@@ -36,17 +36,17 @@ interface AccessTokenTypeInterface
     /**
      * Tries to find an access token in the request.
      *
-     * @param Request $request The request.
+     * @param \Psr\Http\Message\ServerRequestInterface $request The request.
      *
      * @return string|null The access token
      */
-    public function findAccessToken(Request $request);
+    public function findAccessToken(ServerRequestInterface $request);
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \OAuth2\Token\AccessTokenInterface        $token
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \OAuth2\Token\AccessTokenInterface       $token
      *
      * @return bool True if the access token is valid, else false
      */
-    public function isAccessTokenValid(Request $request, AccessTokenInterface $token);
+    public function isAccessTokenValid(ServerRequestInterface $request, AccessTokenInterface $token);
 }

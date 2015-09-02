@@ -12,10 +12,24 @@ interface AccessTokenInterface extends TokenInterface, \JsonSerializable
     public function getToken();
 
     /**
+     * @param string $token
+     *
+     * @return self
+     */
+    public function setToken($token);
+
+    /**
      * The refresh token associated with the access token.
      * Return null if no refresh token is associated.
      *
      * @return string|null
      */
     public function getRefreshToken();
+
+    /**
+     * @param string|null $refresh_token
+     *
+     * @return self
+     */
+    public function setRefreshToken($refresh_token);
 }

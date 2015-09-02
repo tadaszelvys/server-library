@@ -10,6 +10,25 @@ interface TokenInterface
     public function getClientPublicId();
 
     /**
+     * @param string $client_public_id
+     *
+     * @return self
+     */
+    public function setClientPublicId($client_public_id);
+
+    /**
+     * @return int
+     */
+    public function getExpiresAt();
+
+    /**
+     * @param int $expires_at
+     *
+     * @return self
+     */
+    public function setExpiresAt($expires_at);
+
+    /**
      * @return bool true if the token has expired
      */
     public function hasExpired();
@@ -27,9 +46,23 @@ interface TokenInterface
     public function getScope();
 
     /**
+     * @param array $scope
+     *
+     * @return self
+     */
+    public function setScope(array $scope);
+
+    /**
      * The resource owner associated to the token.
      *
      * @return string|null The public ID of the resource owner associated with the token
      */
     public function getResourceOwnerPublicId();
+
+    /**
+     * @param string|null $resource_owner_public_id
+     *
+     * @return self
+     */
+    public function setResourceOwnerPublicId($resource_owner_public_id);
 }

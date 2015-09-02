@@ -28,7 +28,7 @@ class Authorization implements AuthorizationInterface
     protected $resource_owner = null;
 
     /**
-     * @var \OAuth2\Scope\ScopeInterface[]
+     * @var array
      */
     protected $scope = [];
 

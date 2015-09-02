@@ -1,6 +1,7 @@
 <?php
 
 namespace OAuth2\Exception;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * OAuth2 Exception that requires termination of process.
@@ -48,7 +49,7 @@ interface BaseExceptionInterface
     /**
      * Get the exception as a Response object.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param \Psr\Http\Message\ResponseInterface $response
      */
-    public function getHttpResponse();
+    public function getHttpResponse(ResponseInterface &$response);
 }

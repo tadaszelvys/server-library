@@ -13,9 +13,10 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Token\RefreshTokenInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Util\RequestBody;
+use OAuth2\Util\RequestBody;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response;
 
 class TokenEndpoint implements TokenEndpointInterface
 {
@@ -49,18 +50,29 @@ class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return bool
+     */
+    private function isRequestSecured(ServerRequestInterface $request)
+    {
+        $server_params = $request->getServerParams();
+        return !empty($server_params['HTTPS']) && 'off' !== strtolower($server_params['HTTPS']);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
      * @throws \OAuth2\Exception\NotImplementedExceptionInterface
      */
-    public function getAccessToken(Request $request)
+    public function getAccessToken(ServerRequestInterface $request, ResponseInterface &$response)
     {
-        if (!$request->isSecure()) {
+        if (!$this->isRequestSecured($request)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
         }
 
-        if (Request::METHOD_POST !== $request->getMethod()) {
+        if ('POST' !== $request->getMethod()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Method must be POST.');
         }
 
@@ -68,16 +80,16 @@ class TokenEndpoint implements TokenEndpointInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "grant_type" parameter is missing.');
         }
 
-        return $this->handleRequest($request);
+        $this->handleRequest($request, $response);
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface      $response
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function handleRequest(Request $request)
+    protected function handleRequest(ServerRequestInterface $request, ResponseInterface &$response)
     {
         $client = $this->getClientManagerSupervisor()->findClient($request);
         $grant_type = RequestBody::getParameter($request, 'grant_type');
@@ -113,11 +125,16 @@ class TokenEndpoint implements TokenEndpointInterface
 
         $prepared = $this->getAccessTokenType()->prepareAccessToken($token);
 
-        return new Response(json_encode($prepared), 200, [
+        $response->getBody()->write(json_encode($prepared));
+        $response = $response->withStatus(200);
+        $headers = [
             'Content-Type'  => 'application/json',
-            'Cache-Control' => 'no-store',
+            'Cache-Control' => 'no-store, private',
             'Pragma'        => 'no-cache',
-        ]);
+        ];
+        foreach($headers as $key=>$value) {
+            $response = $response->withHeader($key, $value);
+        }
     }
 
     /**
