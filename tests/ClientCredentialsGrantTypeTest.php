@@ -132,6 +132,32 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
+    public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButMissingPassword()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:')], http_build_query(['grant_type' => 'client_credentials']));
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals('Unknown client', $e->getDescription());
+        }
+    }
+
+    public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButBadPassword()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:foo')], http_build_query(['grant_type' => 'client_credentials']));
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals('Unknown client', $e->getDescription());
+        }
+    }
+
     public function testGrantTypeAuthorizedForClientUsingQueryRequest()
     {
         $response = new Response();
