@@ -470,5 +470,13 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getBody()->getContents());
+
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $access_token = $this->getSimpleStringAccessTokenManager()->getAccessToken($json['access_token']);
+
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_token);
+        $this->assertTrue($this->getSimpleStringAccessTokenManager()->isAccessTokenValid($access_token));
     }
 }
