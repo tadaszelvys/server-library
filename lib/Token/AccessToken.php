@@ -7,7 +7,7 @@ class AccessToken extends Token implements AccessTokenInterface
     /**
      * @var null|string
      */
-    private $refresh_token;
+    protected $refresh_token;
 
     /**
      * {@inheritdoc}

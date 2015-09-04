@@ -9,7 +9,7 @@ trait HasScopeManager
     /**
      * @var \OAuth2\Scope\ScopeManagerInterface
      */
-    private $scope_manager;
+    protected $scope_manager;
 
     /**
      * {@inheritdoc}

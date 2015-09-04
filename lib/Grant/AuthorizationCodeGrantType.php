@@ -19,7 +19,7 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
     /**
      * @var\OAuth2\Token\AuthCodeManagerInterface
      */
-    private $auth_code_manager;
+    protected $auth_code_manager;
 
     /**
      * @return \OAuth2\Token\AuthCodeManagerInterface

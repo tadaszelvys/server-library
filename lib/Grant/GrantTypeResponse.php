@@ -9,32 +9,32 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * @var
      */
-    private $requested_scope;
+    protected $requested_scope;
 
     /**
      * @var
      */
-    private $available_scope;
+    protected $available_scope;
 
     /**
      * @var
      */
-    private $resource_owner_public_id;
+    protected $resource_owner_public_id;
 
     /**
      * @var
      */
-    private $issue_refresh_token;
+    protected $issue_refresh_token;
 
     /**
      * @var
      */
-    private $refresh_token_scope;
+    protected $refresh_token_scope;
 
     /**
      * @var
      */
-    private $revoke_refresh_token;
+    protected $revoke_refresh_token;
 
     /**
      * @param string[]|string|null $requested_scope

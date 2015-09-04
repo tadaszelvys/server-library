@@ -9,7 +9,7 @@ class Client extends ResourceOwner implements ClientInterface
     /**
      * @var string[]
      */
-    private $grant_types = [];
+    protected $grant_types = [];
     /**
      * {@inheritdoc}
      */

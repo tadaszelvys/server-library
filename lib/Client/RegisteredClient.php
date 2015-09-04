@@ -13,7 +13,7 @@ class RegisteredClient extends Client implements RegisteredClientInterface
     /**
      * @var string[]
      */
-    private $redirect_uris = [];
+    protected $redirect_uris = [];
     /**
      * {@inheritdoc}
      */

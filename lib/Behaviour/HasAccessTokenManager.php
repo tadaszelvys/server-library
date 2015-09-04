@@ -9,7 +9,7 @@ trait HasAccessTokenManager
     /**
      * @var \OAuth2\Token\AccessTokenManagerInterface
      */
-    private $access_token_manager;
+    protected $access_token_manager;
 
     /**
      * @return \OAuth2\Token\AccessTokenManagerInterface

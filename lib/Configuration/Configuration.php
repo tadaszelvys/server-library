@@ -7,7 +7,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @var array
      */
-    private $config = [];
+    protected $config = [];
 
     /**
      * @param array $values

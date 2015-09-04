@@ -7,12 +7,12 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     /**
      * @var string
      */
-    private $secret;
+    protected $secret;
 
     /**
      * @var string
      */
-    private $salt;
+    protected $salt;
 
     /**
      * @var string

@@ -9,7 +9,7 @@ trait HasAccessTokenType
     /**
      * @var \OAuth2\Token\AccessTokenTypeInterface
      */
-    private $access_token_type;
+    protected $access_token_type;
 
     /**
      * @return \OAuth2\Token\AccessTokenTypeInterface

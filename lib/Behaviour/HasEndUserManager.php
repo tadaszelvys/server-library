@@ -9,7 +9,7 @@ trait HasEndUserManager
     /**
      * @var \OAuth2\EndUser\EndUserManagerInterface
      */
-    private $end_user_manager;
+    protected $end_user_manager;
 
     /**
      * @return \OAuth2\EndUser\EndUserManagerInterface

@@ -9,7 +9,7 @@ trait HasExceptionManager
     /**
      * @var\OAuth2\Exception\ExceptionManagerInterface
      */
-    private $exception_manager;
+    protected $exception_manager;
 
     /**
      * @return \OAuth2\Exception\ExceptionManagerInterface

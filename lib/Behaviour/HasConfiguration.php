@@ -9,7 +9,7 @@ trait HasConfiguration
     /**
      * @var \OAuth2\Configuration\ConfigurationInterface
      */
-    private $configuration;
+    protected $configuration;
 
     /**
      * {@inheritdoc}

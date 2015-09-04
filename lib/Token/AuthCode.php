@@ -7,12 +7,12 @@ class AuthCode extends Token implements AuthCodeInterface
     /**
      * @var bool|false
      */
-    private $issue_refresh_token;
+    protected $issue_refresh_token;
 
     /**
      * @var string
      */
-    private $redirect_uri;
+    protected $redirect_uri;
 
     /**
      * {@inheritdoc}

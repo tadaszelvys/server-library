@@ -9,7 +9,7 @@ trait HasClientManagerSupervisor
     /**
      * @var \OAuth2\Client\ClientManagerSupervisorInterface
      */
-    private $client_manager_supervisor;
+    protected $client_manager_supervisor;
 
     /**
      * @return \OAuth2\Client\ClientManagerSupervisorInterface

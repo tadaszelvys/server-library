@@ -7,7 +7,7 @@ class RefreshToken extends Token implements RefreshTokenInterface
     /**
      * @var bool
      */
-    private $used;
+    protected $used;
 
     /**
      * @return bool

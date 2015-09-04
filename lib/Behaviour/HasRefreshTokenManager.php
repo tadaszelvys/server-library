@@ -9,7 +9,7 @@ trait HasRefreshTokenManager
     /**
      * @var \OAuth2\Token\RefreshTokenManagerInterface|null
      */
-    private $refresh_token_manager = null;
+    protected $refresh_token_manager = null;
 
     /**
      * @return \OAuth2\Token\RefreshTokenManagerInterface|null

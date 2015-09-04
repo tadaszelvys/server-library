@@ -7,27 +7,27 @@ class Token implements TokenInterface
     /**
      * @var array
      */
-    private $scope;
+    protected $scope;
 
     /**
      * @var string
      */
-    private $token;
+    protected $token;
 
     /**
      * @var string
      */
-    private $client_public_id;
+    protected $client_public_id;
 
     /**
      * @var int
      */
-    private $expires_at;
+    protected $expires_at;
 
     /**
      * @var null|string
      */
-    private $resource_owner_public_id;
+    protected $resource_owner_public_id;
 
     /**
      * {@inheritdoc}

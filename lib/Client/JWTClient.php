@@ -9,12 +9,12 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
     /**
      * @var string[]
      */
-    private $allowed_signature_algorithms = [];
+    protected $allowed_signature_algorithms = [];
 
     /**
      * @var \Jose\JWKSetInterface
      */
-    private $key_set = [];
+    protected $key_set = [];
 
     public function __construct()
     {

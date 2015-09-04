@@ -7,12 +7,12 @@ class ResourceOwner implements ResourceOwnerInterface
     /**
      * @var string
      */
-    private $public_id;
+    protected $public_id;
 
     /**
      * @var string
      */
-    private $type;
+    protected $type;
 
     public function __construct()
     {

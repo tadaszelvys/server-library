@@ -13,7 +13,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     /**
      * @var \OAuth2\Client\ClientManagerInterface[]
      */
-    private $client_managers = [];
+    protected $client_managers = [];
 
     /**
      * {@inheritdoc}
