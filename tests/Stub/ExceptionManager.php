@@ -12,6 +12,6 @@ class ExceptionManager extends Base
             return "https://foo.test/Error/$type/$error";
         }
 
-        return "https://foo.test/Internal/$type/$error";;
+        return "https://foo.test/Internal/$type/$error";
     }
 }
