@@ -9,6 +9,11 @@ class RefreshToken extends Token implements RefreshTokenInterface
      */
     protected $used;
 
+    public function __construct()
+    {
+        $this->used = false;
+    }
+
     /**
      * @return bool
      */
