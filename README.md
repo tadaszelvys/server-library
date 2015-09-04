@@ -26,7 +26,7 @@ The following components are implemented:
 * [x] Access token manager:
     * [x] Simple string access token
     * [x] JWT access token (WIP)
-* [ ] Access token transport:
+* [ ] Access token type:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
     * [ ] MAC access ([IETF draft](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-05))
 * [x] Exception manager
