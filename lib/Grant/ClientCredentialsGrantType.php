@@ -26,7 +26,14 @@ class ClientCredentialsGrantType implements GrantTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client)
+    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
+    {
+        // Nothing to do
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         if (!$client instanceof ConfidentialClientInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a confidential client');
@@ -34,14 +41,11 @@ class ClientCredentialsGrantType implements GrantTypeSupportInterface
         $issue_refresh_token = $this->getConfiguration()->get('issue_refresh_token_with_client_credentials_grant_type', false);
         $scope = RequestBody::getParameter($request, 'scope');
 
-        $response = new GrantTypeResponse();
-        $response->setRequestedScope($scope)
+        $grant_type_response->setRequestedScope($scope)
                  ->setAvailableScope(null)
                  ->setResourceOwnerPublicId($client->getPublicId())
                  ->setRefreshTokenIssued($issue_refresh_token)
                  ->setRefreshTokenScope($scope)
                  ->setRefreshTokenRevoked(null);
-
-        return $response;
     }
 }

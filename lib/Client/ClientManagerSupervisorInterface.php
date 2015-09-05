@@ -29,4 +29,11 @@ interface ClientManagerSupervisorInterface
      * @return \OAuth2\Client\ClientInterface Return the client object or null if no client is found.
      */
     public function findClient(ServerRequestInterface $request, &$client_public_id_found = null);
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \OAuth2\Exception\BaseExceptionInterface
+     */
+    public function buildAuthenticationException(ServerRequestInterface $request);
 }

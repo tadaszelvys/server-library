@@ -26,7 +26,15 @@ class RefreshTokenGrantType implements GrantTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client)
+    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
+    {
+        // Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         $refresh_token = RequestBody::getParameter($request, 'refresh_token');
         if (is_null($refresh_token)) {
@@ -41,15 +49,12 @@ class RefreshTokenGrantType implements GrantTypeSupportInterface
 
         $this->checkRefreshToken($token, $client);
 
-        $response = new GrantTypeResponse();
-        $response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $token->getScope())
+        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $token->getScope())
                  ->setAvailableScope($token->getScope())
                  ->setResourceOwnerPublicId($token->getResourceOwnerPublicId())
                  ->setRefreshTokenIssued(true)
                  ->setRefreshTokenScope($token->getScope())
                  ->setRefreshTokenRevoked($token);
-
-        return $response;
     }
 
     /**

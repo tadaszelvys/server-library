@@ -25,7 +25,7 @@ The following components are implemented:
 
 * [x] Access token manager:
     * [x] Simple string access token
-    * [x] JWT access token (WIP)
+    * [x] JWT access token
 * [ ] Access token type:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
     * [ ] MAC access ([IETF draft](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-05))
@@ -47,7 +47,7 @@ The following components are implemented:
     * [x] Resource Owner Password Credentials grant type
     * [x] Refresh token grant type
     * [ ] SAML grant type ([RFC7522](https://tools.ietf.org/html/rfc7522))
-    * [ ] JWT Bearer token grant type (WIP - [RFC7523](https://tools.ietf.org/html/rfc7523))
+    * [x] JWT Bearer token grant type ([RFC7523](https://tools.ietf.org/html/rfc7523))
 
 * [ ] OpenID Connect
     * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html)

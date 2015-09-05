@@ -11,6 +11,8 @@ use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Grant\GrantTypeResponse;
+use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Util\RequestBody;
@@ -91,11 +93,18 @@ class TokenEndpoint implements TokenEndpointInterface
      */
     protected function handleRequest(ServerRequestInterface $request, ResponseInterface &$response)
     {
-        $client = $this->getClientManagerSupervisor()->findClient($request);
         $grant_type = RequestBody::getParameter($request, 'grant_type');
         $type = $this->getGrantType($grant_type);
+
+        $grant_type_response = new GrantTypeResponse();
+        $type->prepareGrantTypeResponse($request, $grant_type_response);
+
+        $client = $this->findClient($request, $grant_type_response);
         $this->checkGrantType($client, $grant_type);
-        $grant_type_response = $type->grantAccessToken($request, $client);
+
+        $grant_type_response->setClientPublicId($client->getPublicId());
+
+        $type->grantAccessToken($request, $client, $grant_type_response);
 
         $result = [
             'requested_scope'          => $grant_type_response->getRequestedScope() ?: $this->getScopeManager()->getDefaultScopes($client),
@@ -120,7 +129,7 @@ class TokenEndpoint implements TokenEndpointInterface
             throw $this->getExceptionManager()->getException('BadRequest', 'invalid_scope', 'An unsupported scope was requested. Available scopes are ['.implode(',', $result['available_scope']).']');
         }
 
-        //Create and return access token (with refresh token if asked) as an array
+        //Create and return access token (with refresh token and other information if asked) as an array
         $token = $this->createAccessToken($client, $result);
 
         $prepared = $this->getAccessTokenType()->prepareAccessToken($token);
@@ -135,6 +144,19 @@ class TokenEndpoint implements TokenEndpointInterface
         foreach ($headers as $key => $value) {
             $response = $response->withHeader($key, $value);
         }
+    }
+
+    protected function findClient(ServerRequestInterface $request, GrantTypeResponseInterface $grant_type_response)
+    {
+        if (is_null($grant_type_response->getClientPublicId())) {
+            return $this->getClientManagerSupervisor()->findClient($request);
+        }
+        $client_public_id = $grant_type_response->getClientPublicId();
+        $client = $this->getClientManagerSupervisor()->getClient($client_public_id);
+        if (!$client instanceof ClientInterface) {
+            $this->getClientManagerSupervisor()->buildAuthenticationException($request);
+        }
+        return $client;
     }
 
     /**

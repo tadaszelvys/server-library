@@ -29,7 +29,15 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInter
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client)
+    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
+    {
+        // Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         $username = RequestBody::getParameter($request, 'username');
         $password = RequestBody::getParameter($request, 'password');
@@ -41,15 +49,12 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInter
 
         $scope = RequestBody::getParameter($request, 'scope');
 
-        $response = new GrantTypeResponse();
-        $response->setRequestedScope($scope)
+        $grant_type_response->setRequestedScope($scope)
                  ->setAvailableScope(null)
                  ->setResourceOwnerPublicId($end_user->getPublicId())
                  ->setRefreshTokenIssued($this->getIssueRefreshToken($client, $end_user, $request))
                  ->setRefreshTokenScope($scope)
                  ->setRefreshTokenRevoked(null);
-
-        return $response;
     }
 
     /**

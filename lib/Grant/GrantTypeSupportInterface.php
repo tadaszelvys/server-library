@@ -15,15 +15,21 @@ interface GrantTypeSupportInterface
     public function getGrantType();
 
     /**
-     * This is the access token endpoint
      * This function checks the request and returns information to issue an access token.
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request The request
-     * @param \OAuth2\Client\ClientInterface           $client  The client
+     * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return \OAuth2\Grant\GrantTypeResponseInterface
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client);
+    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response);
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response);
 }

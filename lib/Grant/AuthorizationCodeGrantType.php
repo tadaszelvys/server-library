@@ -84,7 +84,15 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client)
+    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         $this->checkClient($request, $client);
         $authCode = $this->getAuthCode($request);
@@ -102,15 +110,12 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
 
         $this->getAuthCodeManager()->markAuthCodeAsUsed($authCode);
 
-        $response = new GrantTypeResponse();
-        $response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $authCode->getScope())
-                 ->setAvailableScope($authCode->getScope())
-                 ->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId())
-                 ->setRefreshTokenIssued($authCode->getIssueRefreshToken())
-                 ->setRefreshTokenScope($authCode->getScope())
-                 ->setRefreshTokenRevoked(null);
-
-        return $response;
+        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $authCode->getScope())
+            ->setAvailableScope($authCode->getScope())
+            ->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId())
+            ->setRefreshTokenIssued($authCode->getIssueRefreshToken())
+            ->setRefreshTokenScope($authCode->getScope())
+            ->setRefreshTokenRevoked(null);
     }
 
     /**

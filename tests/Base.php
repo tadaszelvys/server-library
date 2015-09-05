@@ -10,6 +10,7 @@ use OAuth2\Endpoint\TokenEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
+use OAuth2\Grant\JWTBearerGrantType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Test\Stub\AuthCodeManager;
@@ -122,6 +123,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->addGrantType($this->getClientCredentialsGrantType());
             $this->token_endpoint->addGrantType($this->getRefreshTokenGrantType());
             $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
+            $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
         }
 
         return $this->token_endpoint;
@@ -362,6 +364,45 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->client_credentials_grant_type;
+    }
+
+    /**
+     * @var null|\OAuth2\Grant\JWTBearerGrantType
+     */
+    private $jwt_bearer_grant_type = null;
+
+    /**
+     * @return \OAuth2\Grant\JWTBearerGrantType
+     */
+    protected function getJWTBearerGrantType()
+    {
+        if (is_null($this->jwt_bearer_grant_type)) {
+            $jose = Jose::getInstance();
+            $this->jwt_bearer_grant_type = new JWTBearerGrantType();
+            $this->jwt_bearer_grant_type->setExceptionManager($this->getExceptionManager());
+            $this->jwt_bearer_grant_type->setConfiguration($this->getConfiguration());
+            $this->jwt_bearer_grant_type->setJWTLoader($jose->getLoader());
+            $this->jwt_bearer_grant_type->setKeySetManager($jose->getKeysetManager());
+            $this->jwt_bearer_grant_type->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
+            $this->jwt_bearer_grant_type->setPrivateKeySet(
+                ['keys' =>
+                    [
+                        'kid' => 'JWK1',
+                        'use' => 'enc',
+                        'kty' => 'oct',
+                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                    ],
+                    [
+                        'kid' => 'JWK2',
+                        'use' => 'sig',
+                        'kty' => 'oct',
+                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                    ]
+                ]
+            );
+        }
+
+        return $this->jwt_bearer_grant_type;
     }
 
     /**

@@ -59,15 +59,13 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
                 return $client;
             }
         }
-        throw $this->buildException($request);
+        throw $this->buildAuthenticationException($request);
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return \OAuth2\Exception\BaseExceptionInterface
+     * {@inheritdoc}
      */
-    private function buildException(ServerRequestInterface $request)
+    public function buildAuthenticationException(ServerRequestInterface $request)
     {
         $authHeader = $request->getHeader('Authorization');
         $auth_scheme = null;

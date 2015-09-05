@@ -2,7 +2,7 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Token\RefreshTokenInterface;
+use OAuth2\Client\ClientInterface;
 
 class GrantTypeResponse implements GrantTypeResponseInterface
 {
@@ -24,6 +24,11 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * @var
      */
+    protected $client_public_id;
+
+    /**
+     * @var
+     */
     protected $issue_refresh_token;
 
     /**
@@ -37,9 +42,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     protected $revoke_refresh_token;
 
     /**
-     * @param string[]|string|null $requested_scope
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setRequestedScope($requested_scope = null)
     {
@@ -57,9 +60,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @param string[]|string|null $available_scope
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setAvailableScope($available_scope = null)
     {
@@ -77,9 +78,25 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @param string|null $resource_owner_public_id
-     *
-     * @return self
+     * {@inheritdoc}
+     */
+    public function setClientPublicId($client_public_id)
+    {
+        $this->client_public_id = $client_public_id;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClientPublicId()
+    {
+        return $this->client_public_id;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function setResourceOwnerPublicId($resource_owner_public_id = null)
     {
@@ -89,7 +106,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getResourceOwnerPublicId()
     {
@@ -137,11 +154,9 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @param \OAuth2\Token\RefreshTokenInterface|null $revoke_refresh_token
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function setRefreshTokenRevoked(RefreshTokenInterface $revoke_refresh_token = null)
+    public function setRefreshTokenRevoked($revoke_refresh_token = null)
     {
         $this->revoke_refresh_token = $revoke_refresh_token;
 
@@ -149,7 +164,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @return \OAuth2\Token\RefreshTokenInterface|null
+     * {@inheritdoc}
      */
     public function getRefreshTokenRevoked()
     {
