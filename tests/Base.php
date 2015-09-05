@@ -297,9 +297,30 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTClientManager()
     {
         if (is_null($this->jwt_client_manager)) {
+            $jose = Jose::getInstance();
+
             $this->jwt_client_manager = new JWTClientManager();
             $this->jwt_client_manager->setExceptionManager($this->getExceptionManager());
             $this->jwt_client_manager->setConfiguration($this->getConfiguration());
+            $this->jwt_client_manager->setJWTLoader($jose->getLoader());
+            $this->jwt_client_manager->setKeySetManager($jose->getKeysetManager());
+            $this->jwt_client_manager->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
+            $this->jwt_client_manager->setPrivateKeySet(
+                ['keys' =>
+                    [
+                        'kid' => 'JWK1',
+                        'use' => 'enc',
+                        'kty' => 'oct',
+                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                    ],
+                    [
+                        'kid' => 'JWK2',
+                        'use' => 'sig',
+                        'kty' => 'oct',
+                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                    ]
+                ]
+            );
         }
 
         return $this->jwt_client_manager;

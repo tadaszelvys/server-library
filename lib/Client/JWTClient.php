@@ -2,8 +2,6 @@
 
 namespace OAuth2\Client;
 
-use Jose\JWKSetInterface;
-
 class JWTClient extends ConfidentialClient implements JWTClientInterface
 {
     /**
@@ -12,9 +10,9 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
     protected $allowed_signature_algorithms = [];
 
     /**
-     * @var \Jose\JWKSetInterface
+     * @var array
      */
-    protected $key_set = [];
+    protected $signature_public_key_set = [];
 
     public function __construct()
     {
@@ -23,23 +21,23 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
     }
 
     /**
-     * @param \Jose\JWKSetInterface $key_set
+     * @param array $key_set
      *
      * @return self
      */
-    public function setPublicKeySet(JWKSetInterface $key_set)
+    public function setSignaturePublicKeySet(array $key_set)
     {
-        $this->key_set = $key_set;
+        $this->signature_public_key_set = $key_set;
 
         return $this;
     }
 
     /**
-     * @return \Jose\JWKSetInterface
+     * @return array
      */
-    public function getPublicKeySet()
+    public function getSignaturePublicKeySet()
     {
-        return $this->key_set;
+        return $this->signature_public_key_set;
     }
 
     /**

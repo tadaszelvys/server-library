@@ -3,8 +3,10 @@
 namespace OAuth2\Client;
 
 use Jose\JWEInterface;
+use Jose\JWKSetManagerInterface;
 use Jose\JWSInterface;
 use Jose\JWTInterface;
+use Jose\LoaderInterface;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -17,19 +19,104 @@ abstract class JWTClientManager implements ClientManagerInterface
     use HasConfiguration;
 
     /**
-     * @return \Jose\LoaderInterface
+     * @var \Jose\LoaderInterface
      */
-    abstract protected function getJWTLoader();
+    protected $jwt_loader;
 
     /**
-     * @return \Jose\JWKSetInterface
+     * @var \Jose\JWKSetManagerInterface
      */
-    abstract protected function getPrivateKeySet();
+    protected $key_set_manager;
+
+    /**
+     * @var string[]
+     */
+    protected $allowed_encryption_algorithms = [];
+
+    /**
+     * @var array
+     */
+    protected $private_key_set;
+
+    /**
+     * @return \Jose\JWKSetManagerInterface
+     */
+    public function getKeySetManager()
+    {
+        return $this->key_set_manager;
+    }
+
+    /**
+     * @param  $key_set_manager
+     *
+     * @return self
+     */
+    public function setKeySetManager(JWKSetManagerInterface $key_set_manager)
+    {
+        $this->key_set_manager = $key_set_manager;
+
+        return $this;
+    }
+
+    /**
+     * @return \Jose\LoaderInterface
+     */
+    public function getJWTLoader()
+    {
+        return $this->jwt_loader;
+    }
+
+    /**
+     * @param \Jose\LoaderInterface $jwt_loader
+     *
+     * @return self
+     */
+    public function setJWTLoader(LoaderInterface $jwt_loader)
+    {
+        $this->jwt_loader = $jwt_loader;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrivateKeySet()
+    {
+        return $this->private_key_set;
+    }
+
+    /**
+     * @param array $private_key_set
+     *
+     * @return self
+     */
+    public function setPrivateKeySet(array $private_key_set)
+    {
+        $this->private_key_set = $private_key_set;
+
+        return $this;
+    }
 
     /**
      * @return string[]
      */
-    abstract protected function getAllowedEncryptionAlgorithms();
+    public function getAllowedEncryptionAlgorithms()
+    {
+        return $this->allowed_encryption_algorithms;
+    }
+
+    /**
+     * @param string[] $allowed_encryption_algorithms
+     *
+     * @return self
+     */
+    public function setAllowedEncryptionAlgorithms(array $allowed_encryption_algorithms)
+    {
+        $this->allowed_encryption_algorithms = $allowed_encryption_algorithms;
+
+        return $this;
+    }
 
     /**
      * @return string[]
@@ -175,8 +262,9 @@ abstract class JWTClientManager implements ClientManagerInterface
         }
 
         $this->checkAssertion($jwt);
+        $keyset = $this->getKeySetManager()->createJWKSet($client->getSignaturePublicKeySet());
 
-        $is_signature_verified = $this->getJWTLoader()->verifySignature($jwt, $client->getPublicKeySet());
+        $is_signature_verified = $this->getJWTLoader()->verifySignature($jwt, $keyset);
 
         return $is_signature_verified;
     }
@@ -193,7 +281,8 @@ abstract class JWTClientManager implements ClientManagerInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unauthorized algorithm. Please use one of the following: %s.', json_encode($this->getAllowedEncryptionAlgorithms())));
         }
         try {
-            if (false === $this->getJWTLoader()->decrypt($jwt, $this->getPrivateKeySet())) {
+            $private_keyset = $this->getKeySetManager()->createJWKSet($this->getPrivateKeySet());
+            if (false === $this->getJWTLoader()->decrypt($jwt, $private_keyset)) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable tu decrypt the assertion.');
             }
             $jwt = $this->getJWTLoader()->load($jwt->getPayload());
