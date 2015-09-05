@@ -156,6 +156,7 @@ class TokenEndpoint implements TokenEndpointInterface
         if (!$client instanceof ClientInterface) {
             $this->getClientManagerSupervisor()->buildAuthenticationException($request);
         }
+
         return $client;
     }
 

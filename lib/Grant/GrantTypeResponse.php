@@ -2,8 +2,6 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Client\ClientInterface;
-
 class GrantTypeResponse implements GrantTypeResponseInterface
 {
     /**
@@ -61,7 +59,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
      */
     public function getAdditionalData($key)
     {
-        return array_key_exists($key, $this->additional_data)?$this->additional_data[$key]:null;
+        return array_key_exists($key, $this->additional_data) ? $this->additional_data[$key] : null;
     }
 
     /**
