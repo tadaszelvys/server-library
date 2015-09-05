@@ -7,6 +7,11 @@ use OAuth2\Client\ClientInterface;
 class GrantTypeResponse implements GrantTypeResponseInterface
 {
     /**
+     * @var array
+     */
+    protected $additional_data = [];
+
+    /**
      * @var
      */
     protected $requested_scope;
@@ -40,6 +45,24 @@ class GrantTypeResponse implements GrantTypeResponseInterface
      * @var
      */
     protected $revoke_refresh_token;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAdditionalData($key, $data)
+    {
+        $this->additional_data[$key] = $data;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAdditionalData($key)
+    {
+        return array_key_exists($key, $this->additional_data)?$this->additional_data[$key]:null;
+    }
 
     /**
      * {@inheritdoc}

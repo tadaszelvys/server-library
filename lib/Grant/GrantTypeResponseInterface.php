@@ -5,6 +5,21 @@ namespace OAuth2\Grant;
 interface GrantTypeResponseInterface
 {
     /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function getAdditionalData($key);
+
+    /**
+     * @param string $key
+     * @param mixed  $data
+     *
+     * @return self
+     */
+    public function setAdditionalData($key, $data);
+
+    /**
      * The scope requested.
      *
      * @return string[]|string|null
