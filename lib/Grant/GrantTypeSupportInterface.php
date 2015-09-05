@@ -17,7 +17,7 @@ interface GrantTypeSupportInterface
     /**
      * This function checks the request and returns information to issue an access token.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request
+     * @param \Psr\Http\Message\ServerRequestInterface $request             The request
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface

@@ -308,8 +308,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->jwt_client_manager->setKeySetManager($jose->getKeysetManager());
             $this->jwt_client_manager->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
             $this->jwt_client_manager->setPrivateKeySet(
-                ['keys' =>
-                    [
+                ['keys' => [
                         'kid' => 'JWK1',
                         'use' => 'enc',
                         'kty' => 'oct',
@@ -320,7 +319,7 @@ class Base extends \PHPUnit_Framework_TestCase
                         'use' => 'sig',
                         'kty' => 'oct',
                         'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                    ]
+                    ],
                 ]
             );
         }
@@ -385,8 +384,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->jwt_bearer_grant_type->setKeySetManager($jose->getKeysetManager());
             $this->jwt_bearer_grant_type->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
             $this->jwt_bearer_grant_type->setPrivateKeySet(
-                ['keys' =>
-                    [
+                ['keys' => [
                         'kid' => 'JWK1',
                         'use' => 'enc',
                         'kty' => 'oct',
@@ -397,7 +395,7 @@ class Base extends \PHPUnit_Framework_TestCase
                         'use' => 'sig',
                         'kty' => 'oct',
                         'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                    ]
+                    ],
                 ]
             );
         }

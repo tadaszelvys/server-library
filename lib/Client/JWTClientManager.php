@@ -3,10 +3,6 @@
 namespace OAuth2\Client;
 
 use Jose\JWEInterface;
-use Jose\JWKSetManagerInterface;
-use Jose\JWSInterface;
-use Jose\JWTInterface;
-use Jose\LoaderInterface;
 use OAuth2\Behaviour\CanLoadJWT;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;

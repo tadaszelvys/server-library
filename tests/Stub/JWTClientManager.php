@@ -4,9 +4,6 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\JWTClient;
 use OAuth2\Client\JWTClientManager as Base;
-use SpomkyLabs\Jose\JWK;
-use SpomkyLabs\Jose\JWKSet;
-use SpomkyLabs\Service\Jose;
 
 class JWTClientManager extends Base
 {
@@ -17,8 +14,7 @@ class JWTClientManager extends Base
 
     public function __construct()
     {
-        $keys = ['keys' =>
-            [
+        $keys = ['keys' => [
                 'kid' => 'JWK1',
                 'use' => 'enc',
                 'kty' => 'oct',
@@ -29,7 +25,7 @@ class JWTClientManager extends Base
                 'use' => 'sig',
                 'kty' => 'oct',
                 'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-            ]
+            ],
         ];
 
         $jwt1 = new JWTClient();

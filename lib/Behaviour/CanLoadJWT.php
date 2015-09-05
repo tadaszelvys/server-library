@@ -120,9 +120,9 @@ trait CanLoadJWT
     /**
      * @param $assertion
      *
-     * @return \Jose\JWEInterface|\Jose\JWSInterface
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \Jose\JWEInterface|\Jose\JWSInterface
      */
     protected function loadAssertion($assertion)
     {
@@ -130,15 +130,16 @@ trait CanLoadJWT
         if (!$jwt instanceof JWEInterface && !$jwt instanceof JWSInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The assertion does not contain a single JWS or a single JWE.');
         }
+
         return $jwt;
     }
 
     /**
      * @param \Jose\JWEInterface $jwe
      *
-     * @return \Jose\JWSInterface
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \Jose\JWSInterface
      */
     protected function decryptAssertion(JWEInterface $jwe)
     {
@@ -153,6 +154,7 @@ trait CanLoadJWT
         if (!$jws instanceof JWSInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The encrypted assertion does not contain a single JWS.');
         }
+
         return $jws;
     }
 
