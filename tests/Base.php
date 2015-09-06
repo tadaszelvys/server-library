@@ -164,8 +164,8 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (is_null($this->configuration)) {
             $this->configuration = new Configuration();
-            $this->configuration->set('jwt_access_token_audience', 'My resource server');
-            $this->configuration->set('jwt_access_token_issuer', 'My authorization server');
+            $this->configuration->set('jwt_access_token_audience', 'My Authorization Server');
+            $this->configuration->set('jwt_access_token_issuer', 'My Authorization Server');
             $this->configuration->set('jwt_access_token_signature_algorithm', 'HS512');
             $this->configuration->set('jwt_access_token_encrypted', true);
             $this->configuration->set('jwt_access_token_key_encryption_algorithm', 'A256KW');

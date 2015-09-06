@@ -191,6 +191,12 @@ class ClientCredentialsGrantTypeTest extends Base
         $response->getBody()->rewind();
         $values = json_decode($response->getBody()->getContents(), true);
         $this->assertEquals(5, count(explode('.', $values['access_token'])));
+
+        $access_token = $this->getJWTAccessTokenManager()->getAccessToken($values['access_token']);
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_token);
+        $this->assertEquals('bar', $access_token->getClientPublicId());
+        $this->assertEquals('bar', $access_token->getResourceOwnerPublicId());
+        $this->assertTrue($access_token->getExpiresIn() <= 3600);
         $this->getTokenEndpoint()->setAccessTokenManager($this->getSimpleStringAccessTokenManager());
     }
 

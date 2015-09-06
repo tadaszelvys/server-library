@@ -281,6 +281,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
                 'typ' => 'JWT',
                 'alg' => $key_encryption_algorithm,
                 'enc' => $content_encryption_algorithm,
+                'sub' => $client->getPublicId(),
             ]
         );
 
@@ -414,8 +415,31 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     /**
      * {@inheritdoc}
      */
-    public function getAccessToken($access_token)
+    public function getAccessToken($assertion)
     {
+        //We load the assertion
+        $jwt = $this->loadAssertion($assertion);
+        if ($jwt instanceof JWEInterface) {
+            $this->verifyAssertion($jwt);
+            $jwt = $this->decryptAssertion($jwt);
+        }
+        $this->verifyAssertion($jwt);
+
+        $access_token = new AccessToken();
+        $access_token->setClientPublicId($jwt->getSubject())
+            ->setExpiresAt($jwt->getExpirationTime())
+            ->setToken($assertion);
+        if (!is_null($resource_owner = $jwt->getPayloadValue('r_o'))) {
+            $access_token->setResourceOwnerPublicId($resource_owner);
+        }
+        if (!is_null($scope = $jwt->getPayloadValue('sco'))) {
+            $access_token->setScope($scope);
+        }
+        if (!is_null($refresh_token = $jwt->getPayloadValue('ref'))) {
+            $access_token->setRefreshToken($refresh_token);
+        }
+
+        return $access_token;
     }
 
     /**
@@ -457,7 +481,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $key = $this->getKeyManager()->createJWK($this->getEncryptionPrivateKey());
         $key_set->addKey($key);
 
-        if ($jwe->getAlgorithm() !== $this->getKeyEncryptionAlgorithm() || $jwe->getAlgorithm() !== $this->getContentEncryptionAlgorithm()) {
+        if ($jwe->getAlgorithm() !== $this->getKeyEncryptionAlgorithm() || $jwe->getEncryptionAlgorithm() !== $this->getContentEncryptionAlgorithm()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode([$this->getKeyEncryptionAlgorithm(), $this->getContentEncryptionAlgorithm()])));
         }
         $this->getLoader()->decrypt($jwe, $key_set);

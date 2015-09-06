@@ -7,6 +7,13 @@ use SpomkyLabs\Service\Jose;
 
 class JWTAccessTokenManager extends Base
 {
+    public function getLoader()
+    {
+        $jose = Jose::getInstance();
+
+        return $jose->getLoader();
+    }
+
     public function getSigner()
     {
         $jose = Jose::getInstance();
@@ -42,10 +49,27 @@ class JWTAccessTokenManager extends Base
         return $jose->getKeysetManager()->getKeyByKid('JWK2')->getValues();
     }
 
+    public function getSignaturePublicKey()
+    {
+        $jose = Jose::getInstance();
+
+        return $jose->getKeysetManager()->getKeyByKid('JWK2')->getValues();
+    }
+
     /**
      * @return \Jose\JWKInterface
      */
     public function getEncryptionPublicKey()
+    {
+        $jose = Jose::getInstance();
+
+        return $jose->getKeysetManager()->getKeyByKid('JWK1')->getValues();
+    }
+
+    /**
+     * @return \Jose\JWKInterface
+     */
+    public function getEncryptionPrivateKey()
     {
         $jose = Jose::getInstance();
 
