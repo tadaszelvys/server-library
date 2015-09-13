@@ -4,7 +4,6 @@ namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 interface AccessTokenManagerInterface
 {

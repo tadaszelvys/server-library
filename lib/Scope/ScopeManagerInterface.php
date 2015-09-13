@@ -4,7 +4,6 @@ namespace OAuth2\Scope;
 
 use OAuth2\Client\ClientInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 interface ScopeManagerInterface
 {

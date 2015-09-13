@@ -3,7 +3,6 @@
 namespace OAuth2\Client;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 interface ClientManagerSupervisorInterface
 {
