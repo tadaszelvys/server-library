@@ -3,7 +3,7 @@
 namespace OAuth2\Endpoint;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
-use OAuth2\Behaviour\HasAccessTokenType;
+use OAuth2\Behaviour\HasAccessTokenTypeManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
@@ -22,7 +22,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class TokenEndpoint implements TokenEndpointInterface
 {
     use HasEndUserManager;
-    use HasAccessTokenType;
+    use HasAccessTokenTypeManager;
     use HasScopeManager;
     use HasExceptionManager;
     use HasClientManagerSupervisor;
@@ -132,7 +132,7 @@ class TokenEndpoint implements TokenEndpointInterface
         //Create and return access token (with refresh token and other information if asked) as an array
         $token = $this->createAccessToken($client, $result);
 
-        $prepared = $this->getAccessTokenType()->prepareAccessToken($token);
+        $prepared = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType()->prepareAccessToken($token);
 
         $response->getBody()->write(json_encode($prepared));
         $response = $response->withStatus(200);

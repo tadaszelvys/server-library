@@ -10,24 +10,27 @@ class BearerTokenTest extends Base
     public function testAccessTokenFromQuery()
     {
         $request = $this->createRequest('/foo?access_token=ABCD');
-        $access_token = $this->getAccessTokenType()->findAccessToken($request);
+        $access_token = $this->getAccessTokenTypeManager()->findAccessToken($request, $type);
 
         $this->assertEquals('ABCD', $access_token);
+        $this->assertInstanceOf('\OAuth2\Token\BearerAccessToken', $type);
     }
 
     public function testAccessTokenFromHeader()
     {
         $request = $this->createRequest('/', 'GET', [], [], ['Authorization' => 'Bearer ABCD']);
-        $access_token = $this->getAccessTokenType()->findAccessToken($request);
+        $access_token = $this->getAccessTokenTypeManager()->findAccessToken($request, $type);
 
         $this->assertEquals('ABCD', $access_token);
+        $this->assertInstanceOf('\OAuth2\Token\BearerAccessToken', $type);
     }
 
     public function testAccessTokenFromRequestBody()
     {
         $request = $this->createRequest('/', 'POST', [], [], [], http_build_query(['foo' => 'bar', 'access_token' => 'ABCD']));
-        $access_token = $this->getAccessTokenType()->findAccessToken($request);
+        $access_token = $this->getAccessTokenTypeManager()->findAccessToken($request, $type);
 
         $this->assertEquals('ABCD', $access_token);
+        $this->assertInstanceOf('\OAuth2\Token\BearerAccessToken', $type);
     }
 }

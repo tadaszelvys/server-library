@@ -49,4 +49,9 @@ interface AccessTokenTypeInterface
      * @return bool True if the access token is valid, else false
      */
     public function isAccessTokenValid(ServerRequestInterface $request, AccessTokenInterface $token);
+
+    /**
+     * @return string
+     */
+    public function getScheme();
 }

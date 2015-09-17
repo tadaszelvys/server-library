@@ -24,6 +24,7 @@ use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
+use OAuth2\Token\AccessTokenTypeManager;
 use OAuth2\Token\BearerAccessToken;
 use SpomkyLabs\Service\Jose;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
@@ -113,7 +114,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint = new TokenEndpoint();
             $this->token_endpoint->setExceptionManager($this->getExceptionManager());
             $this->token_endpoint->setScopeManager($this->getScopeManager());
-            $this->token_endpoint->setAccessTokenType($this->getAccessTokenType());
+            $this->token_endpoint->setAccessTokenTypeManager($this->getAccessTokenTypeManager());
             $this->token_endpoint->setAccessTokenManager($this->getSimplestringAccessTokenManager());
             $this->token_endpoint->setEndUserManager($this->getEndUserManager());
             $this->token_endpoint->setClientManagerSupervisor($this->getClientManagerSupervisor());
@@ -416,7 +417,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (is_null($this->implicit_grant_type)) {
             $this->implicit_grant_type = new ImplicitGrantType();
             $this->implicit_grant_type->setAccessTokenManager($this->getSimplestringAccessTokenManager());
-            $this->implicit_grant_type->setAccessTokenType($this->getAccessTokenType());
+            $this->implicit_grant_type->setAccessTokenTypeManager($this->getAccessTokenTypeManager());
         }
 
         return $this->implicit_grant_type;
@@ -520,19 +521,38 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @return null|\OAuth2\Token\BearerAccessToken
      */
-    private $access_token_type = null;
+    private $bearer_access_token_type = null;
 
     /**
      * @return \OAuth2\Token\BearerAccessToken
      */
-    protected function getAccessTokenType()
+    protected function getBearerAccessTokenType()
     {
-        if (is_null($this->access_token_type)) {
-            $this->access_token_type = new BearerAccessToken();
-            $this->access_token_type->setExceptionManager($this->getExceptionManager());
+        if (is_null($this->bearer_access_token_type)) {
+            $this->bearer_access_token_type = new BearerAccessToken();
+            $this->bearer_access_token_type->setExceptionManager($this->getExceptionManager());
         }
 
-        return $this->access_token_type;
+        return $this->bearer_access_token_type;
+    }
+
+    /**
+     * @return null|\OAuth2\Token\AccessTokenTypeManagerInterface
+     */
+    private $access_token_type_manager = null;
+
+    /**
+     * @return \OAuth2\Token\AccessTokenTypeManagerInterface
+     */
+    protected function getAccessTokenTypeManager()
+    {
+        if (is_null($this->access_token_type_manager)) {
+            $this->access_token_type_manager = new AccessTokenTypeManager();
+            $this->access_token_type_manager->setExceptionManager($this->getExceptionManager());
+            $this->access_token_type_manager->addAccessTokenType($this->getBearerAccessTokenType());
+        }
+
+        return $this->access_token_type_manager;
     }
 
     /**

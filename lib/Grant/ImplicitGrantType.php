@@ -3,13 +3,13 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
-use OAuth2\Behaviour\HasAccessTokenType;
+use OAuth2\Behaviour\HasAccessTokenTypeManager;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\AuthorizationInterface;
 
 class ImplicitGrantType implements ResponseTypeSupportInterface
 {
-    use HasAccessTokenType;
+    use HasAccessTokenTypeManager;
     use HasAccessTokenManager;
 
     /**
@@ -34,7 +34,7 @@ class ImplicitGrantType implements ResponseTypeSupportInterface
     public function grantAuthorization(AuthorizationInterface $authorization)
     {
         $token = $this->getAccessTokenManager()->createAccessToken($authorization->getClient(), $authorization->getScope(), $authorization->getResourceOwner());
-        $params = $this->getAccessTokenType()->prepareAccessToken($token);
+        $params = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType()->prepareAccessToken($token);
 
         $state = $authorization->getState();
         if (!empty($state)) {
