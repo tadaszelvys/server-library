@@ -216,7 +216,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-      * @return string|null
+     * @return string|null
      */
     protected function generateTokenID()
     {
@@ -388,8 +388,9 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      * @param string                         $payload
      * @param \OAuth2\Client\ClientInterface $client
      *
-     * @return string
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     private function encrypt($payload, ClientInterface $client)
     {
@@ -495,7 +496,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @param \Jose\JWSInterface                $jws
+     * @param \Jose\JWSInterface $jws
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
@@ -558,9 +559,9 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @return string
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     protected function getSignatureAlgorithm()
     {
@@ -568,13 +569,14 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         if (!is_string($signature_algorithm)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'signature_algorithm_not_defined', 'The signature algorithm used to sign access tokens is not set.');
         }
+
         return $signature_algorithm;
     }
 
     /**
-     * @return string
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     protected function getKeyEncryptionAlgorithm()
     {
@@ -582,13 +584,14 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         if (!is_string($key_encryption_algorithm)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'key_encryption_algorithm_not_defined', 'The key encryption algorithm used to encrypt access tokens is not set.');
         }
+
         return $key_encryption_algorithm;
     }
 
     /**
-     * @return string
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     protected function getContentEncryptionAlgorithm()
     {
@@ -596,6 +599,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         if (!is_string($content_encryption_algorithm)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'content_encryption_algorithm_not_defined', 'The content encryption algorithm used to encrypt access tokens is not set.');
         }
+
         return $content_encryption_algorithm;
     }
 }

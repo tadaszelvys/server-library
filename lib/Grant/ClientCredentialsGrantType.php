@@ -30,6 +30,7 @@ class ClientCredentialsGrantType implements GrantTypeSupportInterface
     {
         // Nothing to do
     }
+
     /**
      * {@inheritdoc}
      */
