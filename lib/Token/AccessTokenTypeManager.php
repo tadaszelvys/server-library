@@ -2,7 +2,6 @@
 
 namespace OAuth2\Token;
 
-
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -40,9 +39,10 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
      */
     public function findAccessToken(ServerRequestInterface $request, AccessTokenTypeInterface &$access_token_type = null)
     {
-        foreach($this->access_token_types as $type) {
+        foreach ($this->access_token_types as $type) {
             if (null !== $token = $type->findAccessToken($request)) {
                 $access_token_type = $type;
+
                 return $token;
             }
         }
@@ -57,6 +57,7 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'No access token type defined or invalid access token type.');
             throw $exception;
         }
+
         return $this->access_token_types[$this->default_access_token_type];
     }
 }

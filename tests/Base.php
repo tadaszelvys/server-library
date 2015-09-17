@@ -78,6 +78,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
         return $factory->createRequest($request);
     }
+
     /**
      * @var null|\OAuth2\Endpoint\RevocationEndpoint
      */

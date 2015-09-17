@@ -2,7 +2,6 @@
 
 namespace OAuth2\Behaviour;
 
-use OAuth2\Token\AccessTokenTypeInterface;
 use OAuth2\Token\AccessTokenTypeManagerInterface;
 
 trait HasAccessTokenTypeManager
