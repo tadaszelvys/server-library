@@ -12,7 +12,7 @@ interface AccessTokenTypeManagerInterface
      * @param \Psr\Http\Message\ServerRequestInterface    $request           The request.
      * @param \OAuth2\Token\AccessTokenTypeInterface|null $access_token_type
      *
-     * @return \OAuth2\Token\AccessTokenInterface|null The access token
+     * @return string|null The access token
      */
     public function findAccessToken(ServerRequestInterface $request, AccessTokenTypeInterface &$access_token_type = null);
 
