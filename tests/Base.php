@@ -166,6 +166,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (is_null($this->configuration)) {
             $this->configuration = new Configuration();
+            $this->configuration->set('realm', 'testrealm@host.com');
             $this->configuration->set('jwt_access_token_audience', 'My Authorization Server');
             $this->configuration->set('jwt_access_token_issuer', 'My Authorization Server');
             $this->configuration->set('jwt_access_token_signature_algorithm', 'HS512');
@@ -225,6 +226,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (is_null($this->client_manager_supervisor)) {
             $this->client_manager_supervisor = new ClientManagerSupervisor();
             $this->client_manager_supervisor->setExceptionManager($this->getExceptionManager());
+            $this->client_manager_supervisor->setConfiguration($this->getConfiguration());
 
             $this->client_manager_supervisor->addClientManager($this->getUnregisteredClientManager());
             $this->client_manager_supervisor->addClientManager($this->getPasswordClientManager());
@@ -592,5 +594,45 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->auth_code_manager;
+    }
+
+    protected function createValidDigest($method, $uri, $client_id, $client_secret,$qop = 'auth', $content = null)
+    {
+        $nonce = uniqid();
+        $cnonce = uniqid();
+
+        $ha1 = hash('md5',sprintf('%s:%s:%s', $client_id, $this->getConfiguration()->get('realm', 'Service'), $client_secret));
+        if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
+            $ha1 = hash('md5', sprintf('s%:s%:s', $ha1, $nonce, $cnonce));
+        }
+
+        $a2 = sprintf('%s:%s', $method, $uri);
+        if ('auth-int' === $qop) {
+            $a2 .= ':'.hash('md5', $content);
+        }
+        $ha2 = hash('md5', $a2);
+        $response = hash('md5', sprintf(
+            '%s:%s:%s:%s:%s:%s',
+            $ha1,
+            $nonce,
+            '00000001',
+            $cnonce,
+            $qop,
+            $ha2
+        ));
+
+        $digest = sprintf(
+            'username="%s",realm="%s",nonce="%s",uri="%s",qop=%s,nc=00000001,cnonce="%s",response="%s",opaque="%s"',
+            $client_id,
+            $this->getConfiguration()->get('realm', 'Service'),
+            $nonce,
+            $uri,
+            $qop,
+            $cnonce,
+            $response,
+            hash('md5', $this->getConfiguration()->get('realm', 'Service'))
+        );
+
+        return $digest;
     }
 }

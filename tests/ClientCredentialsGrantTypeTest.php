@@ -117,6 +117,37 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
+    public function testGrantTypeAuthorizedForClientUsingDigestAuthenticationScheme()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Circle Of Life')], [], http_build_query(['grant_type' => 'client_credentials']));
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
+    }
+
+    public function testGrantTypeNotAuthorizedForClientUsingDigestAuthenticationScheme()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Bad secret')], [], http_build_query(['grant_type' => 'client_credentials']));
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_client', $e->getMessage());
+            $this->assertEquals('Unknown client', $e->getDescription());
+            $this->assertEquals(401, $e->getHttpCode());
+            $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
+        }
+    }
+
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeader()
     {
         $response = new Response();
