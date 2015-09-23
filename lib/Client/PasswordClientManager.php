@@ -22,7 +22,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
 
         $key = $this->getConfiguration()->get('digest_authentication_key');
         if (empty($key)) {
-            return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Parameter "digest_authentication_key" must be set');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Parameter "digest_authentication_key" must be set');
         }
         $nonce_lifetime = $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300);
 
@@ -73,10 +73,9 @@ abstract class PasswordClientManager implements ClientManagerInterface
             $secret = hash($this->getHashAlgorithm(), $client->getSalt().$client->getPlaintextSecret());
             $client->setSecret($secret);
 
-            if ($client instanceof PasswordClientWithDigestSupportInterface) {
-                $a1MD5 = md5(sprintf('%s:%s:%s', $client->getPublicId(), $this->getConfiguration()->get('realm', 'Service'), $client->getPlaintextSecret()));
-                $client->setA1Hash($a1MD5);
-            }
+            $a1MD5 = md5(sprintf('%s:%s:%s', $client->getPublicId(), $this->getConfiguration()->get('realm', 'Service'), $client->getPlaintextSecret()));
+            $client->setA1Hash($a1MD5);
+
             $client->clearCredentials();
         }
 
@@ -103,10 +102,12 @@ abstract class PasswordClientManager implements ClientManagerInterface
             $algorithm = $this->getConfiguration()->get('digest_authentication_scheme_algorithm', 'MD5');
             $request->getBody()->rewind();
             $content_hash = md5($request->getBody()->getContents());
-            if (!$client instanceof PasswordClientWithDigestSupportInterface) {
-                $secret = !empty($client->getPlaintextSecret()) ? $client->getPlaintextSecret() : $client->getSecret();
 
-                return $client_credentials->getResponse() === $client_credentials->calculateServerDigestUsingPassword($secret, $request->getMethod(), $algorithm, $content_hash);
+            $secret = !empty($client->getPlaintextSecret()) ? $client->getPlaintextSecret() : $client->getSecret();
+
+            $result = $client_credentials->getResponse() === $client_credentials->calculateServerDigestUsingPassword($secret, $request->getMethod(), $algorithm, $content_hash);
+            if (true === $result) {
+                return true;
             }
 
             return $client_credentials->getResponse() === $client_credentials->calculateServerDigestUsingA1MD5($client->getA1Hash(), $request->getMethod(), $algorithm, $content_hash);

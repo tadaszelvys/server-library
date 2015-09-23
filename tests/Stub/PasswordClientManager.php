@@ -37,7 +37,7 @@ class PasswordClientManager extends Base
             ->setPublicId('baz');
         $this->updateClientCredentials($baz);
 
-        $digest = new PasswordClientWithDigestSupport();
+        $digest = new PasswordClient();
         $digest->setPlaintextSecret('Circle Of Life')
             ->setRedirectUris([])
             ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])

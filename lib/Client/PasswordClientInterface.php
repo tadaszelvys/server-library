@@ -44,4 +44,15 @@ interface PasswordClientInterface extends ConfidentialClientInterface
      * @return self
      */
     public function clearCredentials();
+    /**
+     * @return string
+     */
+    public function getA1Hash();
+
+    /**
+     * @param string $ha1
+     *
+     * @return self
+     */
+    public function setA1Hash($ha1);
 }

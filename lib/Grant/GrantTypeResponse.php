@@ -2,6 +2,8 @@
 
 namespace OAuth2\Grant;
 
+use OAuth2\Token\RefreshTokenInterface;
+
 class GrantTypeResponse implements GrantTypeResponseInterface
 {
     /**
@@ -40,7 +42,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     protected $refresh_token_scope;
 
     /**
-     * @var
+     * @var \OAuth2\Token\RefreshTokenInterface
      */
     protected $revoke_refresh_token;
 
@@ -177,7 +179,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function setRefreshTokenRevoked($revoke_refresh_token = null)
+    public function setRefreshTokenRevoked(RefreshTokenInterface $revoke_refresh_token = null)
     {
         $this->revoke_refresh_token = $revoke_refresh_token;
 

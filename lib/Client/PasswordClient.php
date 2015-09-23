@@ -19,6 +19,11 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
      */
     private $plaintext_secret;
 
+    /**
+     * @var string
+     */
+    private $ha1;
+
     public function __construct()
     {
         parent::__construct();
@@ -65,6 +70,24 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     public function clearCredentials()
     {
         $this->plaintext_secret = null;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getA1Hash()
+    {
+        return $this->ha1;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setA1Hash($ha1)
+    {
+        $this->ha1 = $ha1;
 
         return $this;
     }

@@ -28,9 +28,8 @@ class AuthenticateException extends BaseException implements AuthenticateExcepti
             }
             $schemes[] = $scheme.' '.implode(',',$result);
         }
-        $headers = implode(', ', $schemes);
 
-        $this->header = ['WWW-Authenticate' => $headers];
+        $this->header = ['WWW-Authenticate' => $schemes];
     }
 
     public function getResponseHeaders()

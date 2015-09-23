@@ -2,6 +2,8 @@
 
 namespace OAuth2\Grant;
 
+use OAuth2\Token\RefreshTokenInterface;
+
 interface GrantTypeResponseInterface
 {
     /**
@@ -99,14 +101,14 @@ interface GrantTypeResponseInterface
     public function setRefreshTokenScope($refresh_token_scope = null);
 
     /**
-     * @return string|null If not null, the refresh token will be revoked
+     * @return \OAuth2\Token\RefreshTokenInterface|null If not null, the refresh token will be revoked
      */
     public function getRefreshTokenRevoked();
 
     /**
-     * @param string|null $revoke_refresh_token
+     * @param \OAuth2\Token\RefreshTokenInterface|null $revoke_refresh_token
      *
      * @return self
      */
-    public function setRefreshTokenRevoked($revoke_refresh_token = null);
+    public function setRefreshTokenRevoked(RefreshTokenInterface $revoke_refresh_token = null);
 }
