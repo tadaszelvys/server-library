@@ -5,10 +5,11 @@ namespace OAuth2\Client;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Util\DigestData;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class PasswordClientManager implements PasswordClientManagerInterface
+abstract class PasswordClientManager implements ClientManagerInterface
 {
     use HasExceptionManager;
     use HasConfiguration;
@@ -22,13 +23,6 @@ abstract class PasswordClientManager implements PasswordClientManagerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getClientFromA1($a1)
-    {
-    }
-
-    /**
      * @param \OAuth2\Client\PasswordClientInterface $client
      *
      * @return self
@@ -38,6 +32,11 @@ abstract class PasswordClientManager implements PasswordClientManagerInterface
         if (!is_null($client->getPlaintextSecret())) {
             $secret = hash($this->getHashAlgorithm(), $client->getSalt().$client->getPlaintextSecret());
             $client->setSecret($secret);
+
+            if ($client instanceof PasswordClientWithDigestSupportInterface) {
+                $a1MD5 = md5(sprintf('%s:%s:%s', $client->getPublicId(), $this->getConfiguration()->get('realm', 'Service'), $client->getPlaintextSecret()));
+                $client->setA1Hash($a1MD5);
+            }
             $client->clearCredentials();
         }
 
@@ -57,31 +56,16 @@ abstract class PasswordClientManager implements PasswordClientManagerInterface
     {
         if (is_string($client_credentials)) {
             return hash($this->getHashAlgorithm(), $client->getSalt().$client_credentials) === $client->getSecret();
-        } elseif (is_array($client_credentials)) {
+        } elseif ($client_credentials instanceof DigestData) {
+            $algorithm = $this->getConfiguration()->get('digest_authentication_scheme_algorithm', 'MD5');
+            $request->getBody()->rewind();
+            $content_hash = md5($request->getBody()->getContents());
             if (!$client instanceof PasswordClientWithDigestSupportInterface) {
-                return false;
+                $secret = !empty($client->getPlaintextSecret())?$client->getPlaintextSecret():$client->getSecret();
+                return $client_credentials->getResponse() === $client_credentials->calculateServerDigestUsingPassword($secret, $request->getMethod(), $algorithm, $content_hash);
             }
-            $ha1 = $client->getA1Hash();
-            if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
-                $ha1 = hash('md5', $ha1.sprintf(':s%:s', $ha1, $client_credentials['nonce'], $client_credentials['cnonce']));
-            }
-            $a2 = sprintf('%s:%s', $request->getMethod(), $request->getRequestTarget());
-            if (array_key_exists('qop', $client_credentials) && 'auth-int' === $client_credentials['qop']) {
-                $request->getBody()->rewind();
+            return $client_credentials->getResponse() === $client_credentials->calculateServerDigestUsingA1MD5($client->getA1Hash(), $request->getMethod(), $algorithm, $content_hash);
 
-                $a2 .= ':'.hash('md5', $request->getBody()->getContents());
-            }
-            $ha2 = hash('md5', $a2);
-            $calculated_response = hash('md5', sprintf(
-                '%s:%s:%s:%s:%s:%s',
-                $ha1,
-                $client_credentials['nonce'],
-                $client_credentials['nc'],
-                $client_credentials['cnonce'],
-                $client_credentials['qop'],
-                $ha2
-            ));
-            return $client_credentials['response'] === $calculated_response;
         }
         throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::NOT_IMPLEMENTED, 'Client credentials type not supported');
     }
@@ -95,7 +79,7 @@ abstract class PasswordClientManager implements PasswordClientManagerInterface
             'findCredentialsFromBasicAuthenticationScheme',
         ];
 
-        // This authentication method is not enabled by default, but highly recommended as it provides a secured way to authenticate the client against the server.
+        // This authentication method is not enabled by default, but recommended as it provides a secured way to authenticate the client against the server.
         if ($this->getConfiguration()->get('enable_digest_authentication_scheme', true)) {
             $methods[] = 'findCredentialsFromDigestAuthenticationScheme';
         }
@@ -151,17 +135,17 @@ abstract class PasswordClientManager implements PasswordClientManagerInterface
     {
         $server_params = $request->getServerParams();
         if (array_key_exists('PHP_AUTH_DIGEST', $server_params)) {
-            $parsed_digest = $this->parseDigest($server_params['PHP_AUTH_DIGEST'], $request);
+            $parsed_digest = $this->parseDigest($server_params['PHP_AUTH_DIGEST']);
             return [
-                'client_id'          => $parsed_digest['username'],
+                'client_id'          => $parsed_digest->getUsername(),
                 'client_credentials' => $parsed_digest,
             ];
         }
         $header = $request->getHeader('Authorization');
         if (0 < count($header) && strtolower(substr($header[0], 0, 7)) === 'digest ') {
-            $parsed_digest = $this->parseDigest(substr($header[0], 7, strlen($header[0]) - 7), $request);
+            $parsed_digest = $this->parseDigest(substr($header[0], 7, strlen($header[0]) - 7));
             return [
-                'client_id'          => $parsed_digest['username'],
+                'client_id'          => $parsed_digest->getUsername(),
                 'client_credentials' => $parsed_digest,
             ];
         }
@@ -233,43 +217,18 @@ abstract class PasswordClientManager implements PasswordClientManagerInterface
 
     /**
      * @param string $digest
-     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return array
+     * @return \OAuth2\Util\DigestData
      */
-    private function parseDigest($digest, ServerRequestInterface $request)
+    private function parseDigest($digest)
     {
-        $needed_parts = [
-            'nonce'=>1,
-            'nc'=>1,
-            'cnonce'=>1,
-            'qop'=>1,
-            'username'=>1,
-            'uri'=>1,
-            'response'=>1
-        ];
-        $data = [];
-
-        preg_match_all('@(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))@', $digest, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $m) {
-            $data[$m[1]] = $m[2] ? $m[2] : $m[3];
-            unset($needed_parts[$m[1]]);
-        }
-
-        if (!empty($needed_parts)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Bad HTTP Digest Authenticate message.');
-        }
-
-        if ($data['realm'] !== $this->getConfiguration()->get('realm', 'Service')) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Bad realm.');
-        }
-
-        if ($data['uri'] !== $request->getRequestTarget()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Bad URI.');
-        }
+        $data = new DigestData($digest);
+        $data->validateAndDecode(
+            $this->getConfiguration()->get('digest_authentication_key'),
+            $this->getConfiguration()->get('realm', 'Service')
+        );
 
         return $data;
     }

@@ -13,7 +13,15 @@ class PasswordClientManager extends Base
      */
     private $clients = [];
 
-    public function __construct()
+    /**
+     * {@inheritdoc}
+     */
+    public function getClient($client_id)
+    {
+        return isset($this->clients[$client_id]) ? $this->clients[$client_id] : null;
+    }
+
+    public function createClients()
     {
         $bar = new PasswordClient();
         $bar->setPlaintextSecret('secret')
@@ -30,8 +38,7 @@ class PasswordClientManager extends Base
         $this->updateClientCredentials($baz);
 
         $digest = new PasswordClientWithDigestSupport();
-        $digest->setA1Hash(hash('md5', sprintf('%s:%s:%s', 'Mufasa', 'testrealm@host.com', 'Circle Of Life')))
-            ->setPlaintextSecret('Circle Of Life')
+        $digest->setPlaintextSecret('Circle Of Life')
             ->setRedirectUris([])
             ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
             ->setPublicId('Mufasa');
@@ -40,13 +47,5 @@ class PasswordClientManager extends Base
         $this->clients['bar'] = $bar;
         $this->clients['baz'] = $baz;
         $this->clients['Mufasa'] = $digest;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getClient($client_id)
-    {
-        return isset($this->clients[$client_id]) ? $this->clients[$client_id] : null;
     }
 }

@@ -167,6 +167,9 @@ class Base extends \PHPUnit_Framework_TestCase
         if (is_null($this->configuration)) {
             $this->configuration = new Configuration();
             $this->configuration->set('realm', 'testrealm@host.com');
+            $this->configuration->set('digest_authentication_key', 'This is my secret key');
+            $this->configuration->set('digest_authentication_scheme_algorithm', 'MD5-sess');
+            $this->configuration->set('digest_authentication_nonce_lifetime', 300);
             $this->configuration->set('jwt_access_token_audience', 'My Authorization Server');
             $this->configuration->set('jwt_access_token_issuer', 'My Authorization Server');
             $this->configuration->set('jwt_access_token_signature_algorithm', 'HS512');
@@ -287,6 +290,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->password_client_manager = new PasswordClientManager();
             $this->password_client_manager->setExceptionManager($this->getExceptionManager());
             $this->password_client_manager->setConfiguration($this->getConfiguration());
+            $this->password_client_manager->createClients();
         }
 
         return $this->password_client_manager;
@@ -598,12 +602,16 @@ class Base extends \PHPUnit_Framework_TestCase
 
     protected function createValidDigest($method, $uri, $client_id, $client_secret,$qop = 'auth', $content = null)
     {
-        $nonce = uniqid();
+        $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
+        $signatureValue = md5($expiryTime.':'.$this->getConfiguration()->get('digest_authentication_key'));
+        $nonceValue = $expiryTime.':'.$signatureValue;
+        $nonceValueBase64 = base64_encode($nonceValue);
+
         $cnonce = uniqid();
 
         $ha1 = hash('md5',sprintf('%s:%s:%s', $client_id, $this->getConfiguration()->get('realm', 'Service'), $client_secret));
         if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
-            $ha1 = hash('md5', sprintf('s%:s%:s', $ha1, $nonce, $cnonce));
+            $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
         }
 
         $a2 = sprintf('%s:%s', $method, $uri);
@@ -614,7 +622,7 @@ class Base extends \PHPUnit_Framework_TestCase
         $response = hash('md5', sprintf(
             '%s:%s:%s:%s:%s:%s',
             $ha1,
-            $nonce,
+            $nonceValueBase64,
             '00000001',
             $cnonce,
             $qop,
@@ -625,7 +633,7 @@ class Base extends \PHPUnit_Framework_TestCase
             'username="%s",realm="%s",nonce="%s",uri="%s",qop=%s,nc=00000001,cnonce="%s",response="%s",opaque="%s"',
             $client_id,
             $this->getConfiguration()->get('realm', 'Service'),
-            $nonce,
+            $nonceValueBase64,
             $uri,
             $qop,
             $cnonce,

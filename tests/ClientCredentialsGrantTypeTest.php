@@ -120,7 +120,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingDigestAuthenticationScheme()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Circle Of Life')], [], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Circle Of Life', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))], [], http_build_query(['grant_type' => 'client_credentials']));
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -135,7 +135,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeNotAuthorizedForClientUsingDigestAuthenticationScheme()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Bad secret')], [], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Bad secret', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))], [], http_build_query(['grant_type' => 'client_credentials']));
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);

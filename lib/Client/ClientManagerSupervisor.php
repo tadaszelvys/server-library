@@ -86,7 +86,18 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
         $params = ['scheme' => $auth_scheme];
         if ('Digest' === $auth_scheme) {
             $qop = $this->getConfiguration()->get('digest_authentication_scheme_quality_of_protection', 'auth,auth-int');
-            $params['nonce'] = uniqid();
+            $key = $this->getConfiguration()->get('digest_authentication_key');
+            if (empty($key)) {
+                return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Parameter "digest_authentication_key" must be set');
+            }
+            $nonce_lifetime = $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300);
+
+            $expiryTime = microtime(true) + $nonce_lifetime * 1000;
+            $signatureValue = md5($expiryTime.':'.$key);
+            $nonceValue = $expiryTime.':'.$signatureValue;
+            $nonceValueBase64 = base64_encode($nonceValue);
+
+            $params['nonce'] = $nonceValueBase64;
             $params['opaque'] = hash('md5', $this->getConfiguration()->get('realm', 'Service'));
             $algorithm = $this->configuration->get('digest_authentication_scheme_algorithm', null);
 
