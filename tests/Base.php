@@ -600,7 +600,7 @@ class Base extends \PHPUnit_Framework_TestCase
         return $this->auth_code_manager;
     }
 
-    protected function createValidDigest($method, $uri, $client_id, $client_secret,$qop = 'auth', $content = null)
+    protected function createValidDigest($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
     {
         $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
         $signatureValue = md5($expiryTime.':'.$this->getConfiguration()->get('digest_authentication_key'));
@@ -609,7 +609,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
         $cnonce = uniqid();
 
-        $ha1 = hash('md5',sprintf('%s:%s:%s', $client_id, $this->getConfiguration()->get('realm', 'Service'), $client_secret));
+        $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $this->getConfiguration()->get('realm', 'Service'), $client_secret));
         if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
             $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
         }

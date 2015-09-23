@@ -56,7 +56,7 @@ class DigestData
      */
     public function getUsername()
     {
-        return strtr($this->elements['username'], array('\\"' => '"', '\\\\' => '\\'));
+        return strtr($this->elements['username'], ['\\"' => '"', '\\\\' => '\\']);
     }
 
     /**
@@ -67,7 +67,7 @@ class DigestData
      */
     public function validateAndDecode($entryPointKey, $expectedRealm)
     {
-        if ($keys = array_diff(array('username', 'realm', 'nonce', 'uri', 'response', 'opaque'), array_keys($this->elements))) {
+        if ($keys = array_diff(['username', 'realm', 'nonce', 'uri', 'response', 'opaque'], array_keys($this->elements))) {
             throw new \InvalidArgumentException(sprintf('Missing mandatory digest value; received header "%s" (%s)', $this->header, implode(', ', $keys)));
         }
         if (in_array($this->elements['qop'], ['auth','auth-int'])) {
@@ -126,16 +126,17 @@ class DigestData
         $digest = $a1Md5.':'.$this->elements['nonce'];
         if (isset($this->elements['qop'])) {
             if ('auth' === $this->elements['qop']) {
-                $digest .= ':' . $this->elements['nc'] . ':' . $this->elements['cnonce'] . ':' . $this->elements['qop'];
+                $digest .= ':'.$this->elements['nc'].':'.$this->elements['cnonce'].':'.$this->elements['qop'];
             } elseif ('auth-int' === $this->elements['qop']) {
-                $digest .= ':' . $this->elements['nc'] . ':' . $this->elements['cnonce'] . ':' . $this->elements['qop'];
-                $a2 .= ':' . $content_hash;
+                $digest .= ':'.$this->elements['nc'].':'.$this->elements['cnonce'].':'.$this->elements['qop'];
+                $a2 .= ':'.$content_hash;
             } else {
                 throw new \InvalidArgumentException('This method does not support a qop: "%s".', $this->elements['qop']);
             }
         }
         $a2Md5 = md5($a2);
         $digest .= ':'.$a2Md5;
+
         return md5($digest);
     }
 

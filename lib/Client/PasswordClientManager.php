@@ -64,11 +64,12 @@ abstract class PasswordClientManager implements ClientManagerInterface
             $request->getBody()->rewind();
             $content_hash = md5($request->getBody()->getContents());
             if (!$client instanceof PasswordClientWithDigestSupportInterface) {
-                $secret = !empty($client->getPlaintextSecret())?$client->getPlaintextSecret():$client->getSecret();
+                $secret = !empty($client->getPlaintextSecret()) ? $client->getPlaintextSecret() : $client->getSecret();
+
                 return $client_credentials->getResponse() === $client_credentials->calculateServerDigestUsingPassword($secret, $request->getMethod(), $algorithm, $content_hash);
             }
-            return $client_credentials->getResponse() === $client_credentials->calculateServerDigestUsingA1MD5($client->getA1Hash(), $request->getMethod(), $algorithm, $content_hash);
 
+            return $client_credentials->getResponse() === $client_credentials->calculateServerDigestUsingA1MD5($client->getA1Hash(), $request->getMethod(), $algorithm, $content_hash);
         }
         throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::NOT_IMPLEMENTED, 'Client credentials type not supported');
     }
@@ -139,6 +140,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
         $server_params = $request->getServerParams();
         if (array_key_exists('PHP_AUTH_DIGEST', $server_params)) {
             $parsed_digest = $this->parseDigest($server_params['PHP_AUTH_DIGEST']);
+
             return [
                 'client_id'          => $parsed_digest->getUsername(),
                 'client_credentials' => $parsed_digest,
@@ -147,6 +149,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
         $header = $request->getHeader('Authorization');
         if (0 < count($header) && strtolower(substr($header[0], 0, 7)) === 'digest ') {
             $parsed_digest = $this->parseDigest(substr($header[0], 7, strlen($header[0]) - 7));
+
             return [
                 'client_id'          => $parsed_digest->getUsername(),
                 'client_credentials' => $parsed_digest,
