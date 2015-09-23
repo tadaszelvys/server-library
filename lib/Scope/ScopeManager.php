@@ -63,7 +63,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     {
         $policy = $this->getScopePolicy($client, $request);
         if (!in_array($policy, self::supportedPolicies(), true)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_scope_policy', 'The policy must be one of these values: '.json_encode(self::supportedPolicies()));
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The policy must be one of these values: '.json_encode(self::supportedPolicies()));
         }
 
         // If Scopes Policy is set to "error" and no scope is set, then throws an error
@@ -97,7 +97,7 @@ abstract class ScopeManager implements ScopeManagerInterface
         } elseif (is_array($scopes)) {
             return $scopes;
         } elseif (!is_string($scopes)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_parameter', 'The parameter must be null,a string or an array of strings.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The parameter must be null,a string or an array of strings.');
         }
         $scopes = explode(' ', $scopes);
 

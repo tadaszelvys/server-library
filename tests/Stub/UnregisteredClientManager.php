@@ -15,6 +15,14 @@ class UnregisteredClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
+    public function getSchemesParameters()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function findClient(ServerRequestInterface $request, &$client_public_id_found = null)
     {
         $methods = $this->findClientMethods();
@@ -56,7 +64,13 @@ class UnregisteredClientManager implements ClientManagerInterface
             return;
         }
 
-        return $this->getClient($result[0]);
+        $client = $this->getClient($result[0]);
+
+        if (!$client instanceof UnregisteredClient) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $this->getSchemesParameters()]);
+        }
+
+        return $client;
     }
 
     /**

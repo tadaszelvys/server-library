@@ -65,6 +65,6 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
 
     private function createException($message)
     {
-        return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'token_creation_error', $message);
+        return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, $message);
     }
 }

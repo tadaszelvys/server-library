@@ -15,6 +15,46 @@ abstract class PasswordClientManager implements ClientManagerInterface
     use HasConfiguration;
 
     /**
+     * {@inheritdoc}
+     */
+    public function getSchemesParameters()
+    {
+
+        $key = $this->getConfiguration()->get('digest_authentication_key');
+        if (empty($key)) {
+            return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Parameter "digest_authentication_key" must be set');
+        }
+        $nonce_lifetime = $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300);
+
+        $expiryTime = microtime(true) + $nonce_lifetime * 1000;
+        $signatureValue = md5($expiryTime.':'.$key);
+        $nonceValue = $expiryTime.':'.$signatureValue;
+        $nonceValueBase64 = base64_encode($nonceValue);
+
+        $digest_params = [
+            'realm' => $this->getConfiguration()->get('realm', 'Service'),
+            'nonce' => $nonceValueBase64,
+            'opaque' => hash('md5', $this->getConfiguration()->get('realm', 'Service')),
+        ];
+
+        $qop = $this->getConfiguration()->get('digest_authentication_scheme_quality_of_protection', 'auth,auth-int');
+        if (null !== $qop) {
+            $digest_params['qop'] = $qop;
+        }
+        $algorithm = $this->configuration->get('digest_authentication_scheme_algorithm', null);
+        if (null !== $algorithm) {
+            $digest_params['algorithm'] = $algorithm;
+        }
+
+        return [
+            'Basic' => [
+                'realm' => $this->getConfiguration()->get('realm', 'Service'),
+            ],
+            'Digest' => $digest_params,
+        ];
+    }
+
+    /**
      * @return string
      */
     protected function getHashAlgorithm()
@@ -71,7 +111,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
 
             return $client_credentials->getResponse() === $client_credentials->calculateServerDigestUsingA1MD5($client->getA1Hash(), $request->getMethod(), $algorithm, $content_hash);
         }
-        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::NOT_IMPLEMENTED, 'Client credentials type not supported');
+        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Client credentials type not supported');
     }
 
     /**
@@ -100,13 +140,13 @@ abstract class PasswordClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request, &$client_public_id_found = null)
+    public function findClient(ServerRequestInterface $request)
     {
         $methods = $this->findClientCredentialsMethods();
         $credentials = [];
 
         foreach ($methods as $method) {
-            $data = $this->$method($request, $client_public_id_found);
+            $data = $this->$method($request);
             if (!is_null($data)) {
                 $credentials[] = $data;
             }
@@ -117,14 +157,8 @@ abstract class PasswordClientManager implements ClientManagerInterface
             return $client;
         }
 
-        if (!$client instanceof PasswordClientInterface) {
-            throw $this->getExceptionManager()->getException('InternalServerError', 'invalid_client', 'The client is not an instance of PasswordClientInterface.');
-        }
-
         if (!$this->checkClientCredentials($client, $credentials[0]['client_credentials'], $request)) {
-            $client_public_id_found = $client->getPublicId();
-
-            return;
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Invalid client credentials.', ['schemes' => $this->getSchemesParameters()]);
         }
 
         return $client;
@@ -135,7 +169,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      *
      * @return string[]
      */
-    protected function findCredentialsFromDigestAuthenticationScheme(ServerRequestInterface $request, &$client_public_id_found = null)
+    protected function findCredentialsFromDigestAuthenticationScheme(ServerRequestInterface $request)
     {
         $server_params = $request->getServerParams();
         if (array_key_exists('PHP_AUTH_DIGEST', $server_params)) {
@@ -162,7 +196,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      *
      * @return string[]
      */
-    protected function findCredentialsFromBasicAuthenticationScheme(ServerRequestInterface $request, &$client_public_id_found = null)
+    protected function findCredentialsFromBasicAuthenticationScheme(ServerRequestInterface $request)
     {
         $server_params = $request->getServerParams();
         if (array_key_exists('PHP_AUTH_USER', $server_params) && array_key_exists('PHP_AUTH_PW', $server_params)) {
@@ -188,7 +222,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      *
      * @return string[]|null
      */
-    protected function findCredentialsFromRequestBody(ServerRequestInterface $request, &$client_public_id_found = null)
+    protected function findCredentialsFromRequestBody(ServerRequestInterface $request)
     {
         $client_id = RequestBody::getParameter($request, 'client_id');
         $client_secret = RequestBody::getParameter($request, 'client_secret');
@@ -218,7 +252,13 @@ abstract class PasswordClientManager implements ClientManagerInterface
             return;
         }
 
-        return $this->getClient($result[0]['client_id']);
+        $client = $this->getClient($result[0]['client_id']);
+
+        if (!$client instanceof PasswordClientInterface) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $this->getSchemesParameters()]);
+        }
+
+        return $client;
     }
 
     /**

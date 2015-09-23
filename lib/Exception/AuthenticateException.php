@@ -16,17 +16,19 @@ class AuthenticateException extends BaseException implements AuthenticateExcepti
     {
         parent::__construct(401, $error, $error_description, $error_uri);
 
-        if (!isset($data['scheme'])) {
-            throw new \InvalidArgumentException('scheme_not_defined');
+        if (!isset($data['schemes'])) {
+            throw new \InvalidArgumentException('schemes_not_defined');
         }
 
-        $headers = $data['scheme'].' ';
-        unset($data['scheme']);
-        $params = [];
-        foreach ($data as $key => $value) {
-            $params[] = sprintf('%s=%s', $key, $this->quote($value));
+        $schemes = [];
+        foreach($data['schemes'] as $scheme=>$values) {
+            $result = [];
+            foreach ($values as $key => $value) {
+                $result[] = sprintf('%s=%s', $key, $this->quote($value));
+            }
+            $schemes[] = $scheme.' '.implode(',',$result);
         }
-        $headers .= implode(',', $params);
+        $headers = implode(', ', $schemes);
 
         $this->header = ['WWW-Authenticate' => $headers];
     }

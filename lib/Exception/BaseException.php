@@ -33,7 +33,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @return null|string
+     * @{inheritdoc}
      */
     public function getDescription()
     {
@@ -41,7 +41,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @return null|string
+     * @{inheritdoc}
      */
     public function getUri()
     {
@@ -49,7 +49,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response
+     * @{inheritdoc}
      */
     public function getHttpResponse(ResponseInterface &$response)
     {
@@ -61,7 +61,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @return int
+     * @{inheritdoc}
      */
     public function getHttpCode()
     {
@@ -69,7 +69,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @return array
+     * @{inheritdoc}
      */
     public function getResponseHeaders()
     {
@@ -81,10 +81,18 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @return string
+     * @{inheritdoc}
+     */
+    public function getResponseData()
+    {
+        return $this->errorData;
+    }
+
+    /**
+     * @{inheritdoc}
      */
     public function getResponseBody()
     {
-        return json_encode($this->errorData);
+        return json_encode($this->getResponseData());
     }
 }

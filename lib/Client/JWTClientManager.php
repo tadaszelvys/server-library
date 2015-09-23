@@ -17,6 +17,14 @@ abstract class JWTClientManager implements ClientManagerInterface
     use CanLoadJWT;
 
     /**
+     * {@inheritdoc}
+     */
+    public function getSchemesParameters()
+    {
+        return [];
+    }
+
+    /**
      * @return string[]
      */
     protected function findClientCredentialsMethods()
@@ -31,13 +39,13 @@ abstract class JWTClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request, &$client_public_id_found = null)
+    public function findClient(ServerRequestInterface $request)
     {
         $methods = $this->findClientCredentialsMethods();
         $assertions = [];
 
         foreach ($methods as $method) {
-            $data = $this->$method($request, $client_public_id_found);
+            $data = $this->$method($request);
             if (!is_null($data)) {
                 $assertions[] = $data;
             }
@@ -48,10 +56,6 @@ abstract class JWTClientManager implements ClientManagerInterface
             return $client;
         }
 
-        if (!$client instanceof JWTClientInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::INVALID_REQUEST, 'The client is not an instance of JWTClientInterface.');
-        }
-
         $this->verifySignature($assertions[0], $client);
 
         return $client;
@@ -59,13 +63,12 @@ abstract class JWTClientManager implements ClientManagerInterface
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param string|null                              $client_public_id_found
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return \Jose\JWSInterface
      */
-    protected function findCredentialsFromClientAssertion(ServerRequestInterface $request, &$client_public_id_found = null)
+    protected function findCredentialsFromClientAssertion(ServerRequestInterface $request)
     {
         $client_assertion_type = RequestBody::getParameter($request, 'client_assertion_type');
 
@@ -108,6 +111,12 @@ abstract class JWTClientManager implements ClientManagerInterface
             return;
         }
 
-        return $this->getClient($result[0]->getSubject());
+        $client = $this->getClient($result[0]->getSubject());
+
+        if (!$client instanceof JWTClientInterface) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $this->getSchemesParameters()]);
+        }
+
+        return $client;
     }
 }

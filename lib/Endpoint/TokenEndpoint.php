@@ -146,6 +146,12 @@ class TokenEndpoint implements TokenEndpointInterface
         }
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
+     *
+     * @return \OAuth2\Client\ClientInterface
+     */
     protected function findClient(ServerRequestInterface $request, GrantTypeResponseInterface $grant_type_response)
     {
         if (is_null($grant_type_response->getClientPublicId())) {

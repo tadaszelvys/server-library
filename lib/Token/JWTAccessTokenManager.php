@@ -265,10 +265,10 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $issuer = $this->getConfiguration()->get('jwt_access_token_issuer', null);
 
         if (!is_string($key_encryption_algorithm)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'key_encryption_algorithm_not_defined', 'The configuration option "jwt_access_token_key_encryption_algorithm" is not set.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_key_encryption_algorithm" is not set.');
         }
         if (!is_string($content_encryption_algorithm)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'content_encryption_algorithm_not_defined', 'The configuration option "jwt_access_token_content_encryption_algorithm" is not set.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_content_encryption_algorithm" is not set.');
         }
 
         $header = array_merge(
@@ -302,7 +302,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     {
         $signature_algorithm = $this->getSignatureAlgorithm();
         if (!is_string($signature_algorithm)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'signature_algorithm_not_defined', 'The configuration option "jwt_access_token_signature_algorithm" is not set.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_signature_algorithm" is not set.');
         }
         $header = array_merge(
             [
@@ -336,10 +336,10 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $issuer = $this->getConfiguration()->get('jwt_access_token_issuer', null);
 
         if (!is_string($audience)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'audience_not_defined', 'The configuration option "jwt_access_token_audience" is not set.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_audience" is not set.');
         }
         if (!is_string($issuer)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'issuer_not_defined', 'The configuration option "jwt_access_token_issuer" is not set.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_issuer" is not set.');
         }
 
         $payload = array_merge(
@@ -567,7 +567,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     {
         $signature_algorithm = $this->getConfiguration()->get('jwt_access_token_signature_algorithm', null);
         if (!is_string($signature_algorithm)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'signature_algorithm_not_defined', 'The signature algorithm used to sign access tokens is not set.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The signature algorithm used to sign access tokens is not set.');
         }
 
         return $signature_algorithm;
@@ -582,7 +582,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     {
         $key_encryption_algorithm = $this->getConfiguration()->get('jwt_access_token_key_encryption_algorithm', null);
         if (!is_string($key_encryption_algorithm)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'key_encryption_algorithm_not_defined', 'The key encryption algorithm used to encrypt access tokens is not set.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The key encryption algorithm used to encrypt access tokens is not set.');
         }
 
         return $key_encryption_algorithm;
@@ -597,7 +597,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     {
         $content_encryption_algorithm = $this->getConfiguration()->get('jwt_access_token_content_encryption_algorithm', null);
         if (!is_string($content_encryption_algorithm)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'content_encryption_algorithm_not_defined', 'The content encryption algorithm used to encrypt access tokens is not set.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The content encryption algorithm used to encrypt access tokens is not set.');
         }
 
         return $content_encryption_algorithm;

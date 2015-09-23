@@ -9,8 +9,10 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
+use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Exception\InternalServerErrorExceptionInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -70,13 +72,15 @@ class RevocationEndpoint implements RevocationEndpointInterface
 
             return;
         }
-        $found = null;
+        $client = null;
         try {
-            $client = $this->getClientManagerSupervisor()->findClient($request, $found);
+            $client = $this->getClientManagerSupervisor()->findClient($request/*, $found*/);
         } catch (BaseExceptionInterface $e) {
-            if (!is_null($found)) {
-                $this->getResponseContent($response, $e->getResponseBody(), $callback, $e->getHttpCode());
-
+            if ($e instanceof InternalServerErrorExceptionInterface) {
+                throw $e;
+            }
+            if ($e instanceof AuthenticateExceptionInterface) {
+                $this->getResponseContent($response, json_encode($e->getResponseData()), $callback, $e->getHttpCode());
                 return;
             }
             $client = null;

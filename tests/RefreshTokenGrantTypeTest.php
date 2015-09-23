@@ -65,7 +65,7 @@ class RefreshTokenGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_client', $e->getMessage());
-            $this->assertEquals('Unknown client', $e->getDescription());
+            $this->assertEquals('Client authentication failed.', $e->getDescription());
             $this->assertEquals(401, $e->getHttpCode());
         }
     }

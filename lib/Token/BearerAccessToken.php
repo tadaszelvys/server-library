@@ -113,7 +113,7 @@ class BearerAccessToken implements AccessTokenTypeInterface
 
         $accessToken = current($tokens);
         if (!is_string($accessToken)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_result', 'A method returned an invalid data type.');
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'A method returned an invalid data type.');
         }
 
         return $accessToken;

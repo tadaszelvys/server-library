@@ -53,4 +53,9 @@ interface BaseExceptionInterface
      * @param \Psr\Http\Message\ResponseInterface $response
      */
     public function getHttpResponse(ResponseInterface &$response);
+
+    /**
+     * @return array
+     */
+    public function getResponseData();
 }

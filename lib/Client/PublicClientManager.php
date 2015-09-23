@@ -11,6 +11,14 @@ abstract class PublicClientManager implements ClientManagerInterface
     use HasExceptionManager;
 
     /**
+     * {@inheritdoc}
+     */
+    public function getSchemesParameters()
+    {
+        return [];
+    }
+
+    /**
      * @return array
      */
     abstract protected function findClientMethods();
@@ -18,25 +26,21 @@ abstract class PublicClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request, &$client_public_id_found = null)
+    public function findClient(ServerRequestInterface $request)
     {
         $methods = $this->findClientMethods();
         $result = [];
 
         foreach ($methods as $method) {
-            $data = $this->$method($request, $client_public_id_found);
-            if (!is_null($data)) {
+            $data = $this->$method($request);
+            if (null !== $data) {
                 $result[] = $data;
             }
         }
 
         $client = $this->checkResult($result);
-        if (is_null($client)) {
+        if (null === $client) {
             return $client;
-        }
-
-        if (!$client instanceof PublicClientInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::INVALID_CLIENT, 'The client is not an instance of PublicClientInterface.');
         }
 
         return $client;
@@ -59,6 +63,12 @@ abstract class PublicClientManager implements ClientManagerInterface
             return;
         }
 
-        return $this->getClient($result[0]);
+        $client = $this->getClient($result[0]);
+
+        if (!$client instanceof PublicClientInterface) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $this->getSchemesParameters()]);
+        }
+
+        return $client;
     }
 }

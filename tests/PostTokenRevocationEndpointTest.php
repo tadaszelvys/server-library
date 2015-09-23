@@ -165,7 +165,7 @@ class PostTokenRevocationEndpointTest extends Base
 
         $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(401, $response->getStatusCode());
         $this->assertEquals('', $response->getBody()->getContents());
     }
 
@@ -181,8 +181,8 @@ class PostTokenRevocationEndpointTest extends Base
 
         $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('foo.bar({"error":"invalid_client","error_description":"Unknown client","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_client"})', $response->getBody()->getContents());
+        $this->assertEquals(401, $response->getStatusCode());
+        $this->assertEquals('foo.bar({"error":"invalid_client","error_description":"Client authentication failed.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FAuthenticate%2Finvalid_client"})', $response->getBody()->getContents());
     }
 
     public function testAccessTokenRevokedForNotAuthenticatedPublicClient()

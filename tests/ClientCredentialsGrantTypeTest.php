@@ -67,7 +67,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_client', $e->getMessage());
-            $this->assertEquals('Unknown client', $e->getDescription());
+            $this->assertEquals('Client authentication failed.', $e->getDescription());
             $this->assertEquals(401, $e->getHttpCode());
         }
     }
@@ -142,7 +142,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_client', $e->getMessage());
-            $this->assertEquals('Unknown client', $e->getDescription());
+            $this->assertEquals('Invalid client credentials.', $e->getDescription());
             $this->assertEquals(401, $e->getHttpCode());
             $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
         }
@@ -172,7 +172,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
-            $this->assertEquals('Unknown client', $e->getDescription());
+            $this->assertEquals('Client authentication failed.', $e->getDescription());
         }
     }
 
@@ -185,7 +185,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
-            $this->assertEquals('Unknown client', $e->getDescription());
+            $this->assertEquals('Invalid client credentials.', $e->getDescription());
         }
     }
 

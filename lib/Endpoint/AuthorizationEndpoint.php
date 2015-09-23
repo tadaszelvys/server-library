@@ -74,7 +74,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
                 $result = [$response_mode => $result];
                 break;
             default:
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'invalid_response_mode', sprintf('The response mode "%s" is not supported.', $response_mode));
+                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('The response mode "%s" is not supported.', $response_mode));
         }
 
         $response = $response->withStatus(302)
