@@ -34,7 +34,7 @@ The following components are implemented:
     * [x] Public clients
     * [x] Password clients
         * [x] HTTP Basic Authentication Scheme
-        * [ ] HTTP Digest Authentication Scheme (WIP)
+        * [x] HTTP Digest Authentication Scheme
         * [x] Credentials from request body
     * [ ] SAML clients ([RFC7522](https://tools.ietf.org/html/rfc7522))
     * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523))

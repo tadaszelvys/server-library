@@ -629,7 +629,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $ha2
         ));
 
-        $digest = sprintf(
+        return sprintf(
             'username="%s",realm="%s",nonce="%s",uri="%s",qop=%s,nc=00000001,cnonce="%s",response="%s",opaque="%s"',
             $client_id,
             $this->getConfiguration()->get('realm', 'Service'),
@@ -640,7 +640,5 @@ class Base extends \PHPUnit_Framework_TestCase
             $response,
             hash('md5', $this->getConfiguration()->get('realm', 'Service'))
         );
-
-        return $digest;
     }
 }

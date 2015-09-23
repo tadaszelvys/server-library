@@ -57,6 +57,9 @@ abstract class PasswordClientManager implements ClientManagerInterface
         if (is_string($client_credentials)) {
             return hash($this->getHashAlgorithm(), $client->getSalt().$client_credentials) === $client->getSecret();
         } elseif ($client_credentials instanceof DigestData) {
+            if ($client_credentials->isNonceExpired()) {
+                return false;
+            }
             $algorithm = $this->getConfiguration()->get('digest_authentication_scheme_algorithm', 'MD5');
             $request->getBody()->rewind();
             $content_hash = md5($request->getBody()->getContents());

@@ -34,6 +34,7 @@ class DigestData
     public function __construct($header)
     {
         $this->header = $header;
+        $matches = [];
         preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             if (isset($match[1]) && isset($match[3])) {
@@ -105,7 +106,7 @@ class DigestData
     {
         $a1Md5 = md5($this->elements['username'].':'.$this->elements['realm'].':'.$password);
 
-        return $this->calculateServerDigestUsingA1MD5($a1Md5, $httpMethod, $algorithm);
+        return $this->calculateServerDigestUsingA1MD5($a1Md5, $httpMethod, $algorithm, $content_hash);
     }
 
     /**
@@ -123,14 +124,15 @@ class DigestData
         }
         $a2 = strtoupper($httpMethod).':'.$this->elements['uri'];
         $digest = $a1Md5.':'.$this->elements['nonce'];
-        if (!isset($this->elements['qop'])) {
-        } elseif ('auth' === $this->elements['qop']) {
-            $digest .= ':'.$this->elements['nc'].':'.$this->elements['cnonce'].':'.$this->elements['qop'];
-        } elseif ('auth-int' === $this->elements['qop']) {
-            $digest .= ':'.$this->elements['nc'].':'.$this->elements['cnonce'].':'.$this->elements['qop'];
-            $a2 .= ':'.$content_hash;
-        } else {
-            throw new \InvalidArgumentException('This method does not support a qop: "%s".', $this->elements['qop']);
+        if (isset($this->elements['qop'])) {
+            if ('auth' === $this->elements['qop']) {
+                $digest .= ':' . $this->elements['nc'] . ':' . $this->elements['cnonce'] . ':' . $this->elements['qop'];
+            } elseif ('auth-int' === $this->elements['qop']) {
+                $digest .= ':' . $this->elements['nc'] . ':' . $this->elements['cnonce'] . ':' . $this->elements['qop'];
+                $a2 .= ':' . $content_hash;
+            } else {
+                throw new \InvalidArgumentException('This method does not support a qop: "%s".', $this->elements['qop']);
+            }
         }
         $a2Md5 = md5($a2);
         $digest .= ':'.$a2Md5;
