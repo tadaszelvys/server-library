@@ -31,12 +31,18 @@ class AuthenticateException extends BaseException implements AuthenticateExcepti
 
         $this->header = ['WWW-Authenticate' => $schemes];
     }
-
+    
+    /**
+     * {@inheritdoc}
+     */
     public function getResponseHeaders()
     {
-        return $this->header + parent::getResponseHeaders();
+        return array_merge(parent::getResponseHeaders(), $this->header);
     }
-
+    
+    /**
+     * {@inheritdoc}
+     */
     public function getResponseBody()
     {
     }
