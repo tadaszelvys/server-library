@@ -38,7 +38,7 @@ class JWTBearerGrantTypeTest extends Base
             http_build_query(
                 [
                     'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                    'assertion' => $jws,
+                    'assertion'  => $jws,
                 ]
             )
         );
@@ -77,7 +77,7 @@ class JWTBearerGrantTypeTest extends Base
             http_build_query(
                 [
                     'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                    'assertion' => $jws,
+                    'assertion'  => $jws,
                 ]
             )
         );
@@ -129,7 +129,7 @@ class JWTBearerGrantTypeTest extends Base
             http_build_query(
                 [
                     'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                    'assertion' => $jws,
+                    'assertion'  => $jws,
                 ]
             )
         );

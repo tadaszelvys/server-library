@@ -271,9 +271,9 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             http_build_query(
                 [
-                    'grant_type' => 'client_credentials',
+                    'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                    'client_assertion' => $jws,
+                    'client_assertion'      => $jws,
                 ]
             )
         );
@@ -311,9 +311,9 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             http_build_query(
                 [
-                    'grant_type' => 'client_credentials',
+                    'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                    'client_assertion' => $jws,
+                    'client_assertion'      => $jws,
                 ]
             )
         );
@@ -351,9 +351,9 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             http_build_query(
                 [
-                    'grant_type' => 'client_credentials',
+                    'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                    'client_assertion' => $jws,
+                    'client_assertion'      => $jws,
                 ]
             )
         );
@@ -404,9 +404,9 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             http_build_query(
                 [
-                    'grant_type' => 'client_credentials',
+                    'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                    'client_assertion' => $jws,
+                    'client_assertion'      => $jws,
                 ]
             )
         );
