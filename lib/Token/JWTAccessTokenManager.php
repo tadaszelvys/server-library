@@ -234,8 +234,9 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     /**
      * @param array $payload
      *
-     * @return string
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     private function sign(array $payload)
     {

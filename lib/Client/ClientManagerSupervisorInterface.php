@@ -20,7 +20,7 @@ interface ClientManagerSupervisorInterface
      * This interface should send the request to all its ClientManager and return null or a ClientInterface object.
      * If client is Confidential, the client credentials must be checked by by the client manager.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request                The request
+     * @param \Psr\Http\Message\ServerRequestInterface $request The request
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface Throw an exception if a client tried to authenticate against the server, but failed
      *

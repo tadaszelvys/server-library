@@ -81,6 +81,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
             }
             if ($e instanceof AuthenticateExceptionInterface) {
                 $this->getResponseContent($response, json_encode($e->getResponseData()), $callback, $e->getHttpCode());
+
                 return;
             }
             $client = null;

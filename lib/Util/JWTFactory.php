@@ -139,12 +139,12 @@ class JWTFactory
     /**
      * @param array $payload
      *
-     * @return string
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     public function sign(array $payload)
     {
-
     }
 
     /**
@@ -157,6 +157,5 @@ class JWTFactory
      */
     public function encrypt($payload, ClientInterface $client)
     {
-
     }
 }
