@@ -34,8 +34,10 @@ class DigestData
     public function __construct($header)
     {
         $this->header = $header;
-        $matches = [];
         preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
+        if (!is_array($matches)) {
+            throw new \InvalidArgumentException('Unable to parse header');
+        }
         foreach ($matches as $match) {
             if (isset($match[1]) && isset($match[3])) {
                 $this->elements[$match[1]] = isset($match[4]) ? $match[4] : $match[3];
