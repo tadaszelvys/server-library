@@ -161,7 +161,7 @@ class TokenEndpoint implements TokenEndpointInterface
             $client = $this->getClientManagerSupervisor()->getClient($client_public_id);
         }
         if (!$client instanceof ClientInterface) {
-            $this->getClientManagerSupervisor()->buildAuthenticationException($request);
+            throw $this->getClientManagerSupervisor()->buildAuthenticationException($request);
         }
 
         return $client;
