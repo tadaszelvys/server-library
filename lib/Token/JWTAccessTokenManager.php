@@ -237,6 +237,9 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
 
         if (true === $is_encrypted && !is_null($this->getEncrypter())) {
             $jwt = $this->encrypt($jwt, $client);
+            if (is_array($jwt)) {
+                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'JWT should be a string.');
+            }
         }
 
         $access_token = new AccessToken();
