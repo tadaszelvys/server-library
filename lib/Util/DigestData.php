@@ -69,20 +69,67 @@ class DigestData
      */
     public function validateAndDecode($entryPointKey, $expectedRealm)
     {
+        $this->checkElements();
+        $this->checkQualityOfProtection();
+        $this->checkRealm($expectedRealm);
+        $this->checkOpaque(md5($expectedRealm));
+        $this->checkNonce($entryPointKey);
+
+    }
+
+    /**
+     * @throws \InvalidArgumentException
+     */
+    public function checkElements()
+    {
         if ($keys = array_diff(['username', 'realm', 'nonce', 'uri', 'response', 'opaque'], array_keys($this->elements))) {
             throw new \InvalidArgumentException(sprintf('Missing mandatory digest value; received header "%s" (%s)', $this->header, implode(', ', $keys)));
         }
+    }
+
+    /**
+     * @throws \InvalidArgumentException
+     */
+    public function checkQualityOfProtection()
+    {
         if (in_array($this->elements['qop'], ['auth','auth-int'])) {
             if (!isset($this->elements['nc']) || !isset($this->elements['cnonce'])) {
                 throw new \InvalidArgumentException(sprintf('Missing mandatory digest value; received header "%s"', $this->header));
             }
         }
+    }
+
+    /**
+     * @param string $expectedRealm
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function checkRealm($expectedRealm)
+    {
         if ($expectedRealm !== $this->elements['realm']) {
             throw new \InvalidArgumentException(sprintf('Response realm name "%s" does not match system realm name of "%s".', $this->elements['realm'], $expectedRealm));
         }
-        if (md5($expectedRealm) !== $this->elements['opaque']) {
+    }
+
+    /**
+     * @param string $opaque
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function checkOpaque($opaque)
+    {
+        if ($opaque !== $this->elements['opaque']) {
             throw new \InvalidArgumentException('Invalid "opaque" value.');
         }
+    }
+
+    /**
+     * @param string $entryPointKey
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function checkNonce($entryPointKey)
+    {
         if (false === $nonceAsPlainText = base64_decode($this->elements['nonce'])) {
             throw new \InvalidArgumentException(sprintf('Nonce is not encoded in Base64; received nonce "%s".', $this->elements['nonce']));
         }
