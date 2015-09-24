@@ -116,7 +116,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     protected function checkRedirectUriIfRequired(AuthorizationInterface $authorization)
     {
         //If the redirect URI is not set and the configuration requires it, throws an exception
-        if (true === $this->getConfiguration()->get('enforce_redirect_uri', false) && null ===$authorization->getRedirectUri()) {
+        if (true === $this->getConfiguration()->get('enforce_redirect_uri', false) && null === $authorization->getRedirectUri()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is mandatory');
         }
     }

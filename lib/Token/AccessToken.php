@@ -33,8 +33,8 @@ class AccessToken extends Token implements AccessTokenInterface
     {
         $values = [
            'access_token' => $this->getToken(),
-           'expires_in'   => $this->getExpiresIn(),
-           'scope'        => count($this->getScope()) ? implode(' ', $this->getScope()) : null,
+           'expires_in' => $this->getExpiresIn(),
+           'scope' => count($this->getScope()) ? implode(' ', $this->getScope()) : null,
         ];
 
         if (!empty($this->getRefreshToken())) {

@@ -107,13 +107,13 @@ class TokenEndpoint implements TokenEndpointInterface
         $type->grantAccessToken($request, $client, $grant_type_response);
 
         $result = [
-            'requested_scope'          => $grant_type_response->getRequestedScope() ?: $this->getScopeManager()->getDefaultScopes($client),
-            'available_scope'          => $grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopes($client),
+            'requested_scope' => $grant_type_response->getRequestedScope() ?: $this->getScopeManager()->getDefaultScopes($client),
+            'available_scope' => $grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopes($client),
             'resource_owner_public_id' => $grant_type_response->getResourceOwnerPublicid(),
-            'refresh_token'            => [
+            'refresh_token' => [
                 'issued' => $grant_type_response->isRefreshTokenIssued(),
-                'scope'  => $grant_type_response->getRefreshTokenScope(),
-                'used'   => $grant_type_response->getRefreshTokenRevoked(),
+                'scope' => $grant_type_response->getRefreshTokenScope(),
+                'used' => $grant_type_response->getRefreshTokenRevoked(),
             ],
         ];
 
@@ -137,9 +137,9 @@ class TokenEndpoint implements TokenEndpointInterface
         $response->getBody()->write(json_encode($prepared));
         $response = $response->withStatus(200);
         $headers = [
-            'Content-Type'  => 'application/json',
+            'Content-Type' => 'application/json',
             'Cache-Control' => 'no-store, private',
-            'Pragma'        => 'no-cache',
+            'Pragma' => 'no-cache',
         ];
         foreach ($headers as $key => $value) {
             $response = $response->withHeader($key, $value);

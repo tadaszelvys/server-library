@@ -91,7 +91,7 @@ class DigestData
      */
     public function checkQualityOfProtection()
     {
-        if (in_array($this->elements['qop'], ['auth','auth-int'])) {
+        if (in_array($this->elements['qop'], ['auth', 'auth-int'])) {
             if (!isset($this->elements['nc']) || !isset($this->elements['cnonce'])) {
                 throw new \InvalidArgumentException(sprintf('Missing mandatory digest value; received header "%s"', $this->header));
             }

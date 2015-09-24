@@ -31,8 +31,8 @@ abstract class PasswordClientManager implements ClientManagerInterface
         $nonceValueBase64 = base64_encode($nonceValue);
 
         $digest_params = [
-            'realm'  => $this->getConfiguration()->get('realm', 'Service'),
-            'nonce'  => $nonceValueBase64,
+            'realm' => $this->getConfiguration()->get('realm', 'Service'),
+            'nonce' => $nonceValueBase64,
             'opaque' => hash('md5', $this->getConfiguration()->get('realm', 'Service')),
         ];
 
@@ -176,7 +176,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
             $parsed_digest = $this->parseDigest($server_params['PHP_AUTH_DIGEST']);
 
             return [
-                'client_id'          => $parsed_digest->getUsername(),
+                'client_id' => $parsed_digest->getUsername(),
                 'client_credentials' => $parsed_digest,
             ];
         }
@@ -185,7 +185,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
             $parsed_digest = $this->parseDigest(substr($header[0], 7, strlen($header[0]) - 7));
 
             return [
-                'client_id'          => $parsed_digest->getUsername(),
+                'client_id' => $parsed_digest->getUsername(),
                 'client_credentials' => $parsed_digest,
             ];
         }
@@ -201,7 +201,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
         $server_params = $request->getServerParams();
         if (array_key_exists('PHP_AUTH_USER', $server_params) && array_key_exists('PHP_AUTH_PW', $server_params)) {
             return [
-                'client_id'          => $server_params['PHP_AUTH_USER'],
+                'client_id' => $server_params['PHP_AUTH_USER'],
                 'client_credentials' => $server_params['PHP_AUTH_PW'],
             ];
         }
@@ -210,7 +210,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
             list($client_id, $client_secret) = explode(':', base64_decode(substr($header[0], 6, strlen($header[0]) - 6)));
             if (!empty($client_id) && !empty($client_secret)) {
                 return [
-                    'client_id'          => $client_id,
+                    'client_id' => $client_id,
                     'client_credentials' => $client_secret,
                 ];
             }
@@ -229,7 +229,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
 
         if (null !== ($client_id) && null !== ($client_secret)) {
             return [
-                'client_id'          => $client_id,
+                'client_id' => $client_id,
                 'client_credentials' => $client_secret,
             ];
         }

@@ -74,9 +74,9 @@ class BaseException extends \Exception implements BaseExceptionInterface
     public function getResponseHeaders()
     {
         return [
-            'Content-Type'  => 'application/json',
+            'Content-Type' => 'application/json',
             'Cache-Control' => 'no-store',
-            'Pragma'        => 'no-cache',
+            'Pragma' => 'no-cache',
         ];
     }
 
