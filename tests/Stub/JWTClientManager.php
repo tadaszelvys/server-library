@@ -18,13 +18,13 @@ class JWTClientManager extends Base
                 'kid' => 'JWK1',
                 'use' => 'enc',
                 'kty' => 'oct',
-                'k' => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
             ],
             [
                 'kid' => 'JWK2',
                 'use' => 'sig',
                 'kty' => 'oct',
-                'k' => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
             ],
         ];
 
