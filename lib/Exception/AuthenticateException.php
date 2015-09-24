@@ -4,7 +4,7 @@ namespace OAuth2\Exception;
 
 class AuthenticateException extends BaseException implements AuthenticateExceptionInterface
 {
-    protected $header;
+    protected $header = [];
 
     /**
      * @param string $error             Short name of the error
