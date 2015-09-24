@@ -21,17 +21,17 @@ class AuthenticateException extends BaseException implements AuthenticateExcepti
         }
 
         $schemes = [];
-        foreach($data['schemes'] as $scheme=>$values) {
+        foreach ($data['schemes'] as $scheme => $values) {
             $result = [];
             foreach ($values as $key => $value) {
                 $result[] = sprintf('%s=%s', $key, $this->quote($value));
             }
-            $schemes[] = $scheme.' '.implode(',',$result);
+            $schemes[] = $scheme.' '.implode(',', $result);
         }
 
         $this->header = ['WWW-Authenticate' => $schemes];
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -39,7 +39,7 @@ class AuthenticateException extends BaseException implements AuthenticateExcepti
     {
         return array_merge(parent::getResponseHeaders(), $this->header);
     }
-    
+
     /**
      * {@inheritdoc}
      */

@@ -44,6 +44,7 @@ interface PasswordClientInterface extends ConfidentialClientInterface
      * @return self
      */
     public function clearCredentials();
+
     /**
      * @return string
      */

@@ -74,7 +74,6 @@ class DigestData
         $this->checkRealm($expectedRealm);
         $this->checkOpaque(md5($expectedRealm));
         $this->checkNonce($entryPointKey);
-
     }
 
     /**

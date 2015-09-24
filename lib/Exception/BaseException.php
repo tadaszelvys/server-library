@@ -33,7 +33,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getDescription()
     {
@@ -41,7 +41,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getUri()
     {
@@ -49,7 +49,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getHttpResponse(ResponseInterface &$response)
     {
@@ -61,7 +61,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getHttpCode()
     {
@@ -69,7 +69,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getResponseHeaders()
     {
@@ -81,7 +81,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getResponseData()
     {
@@ -89,7 +89,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getResponseBody()
     {

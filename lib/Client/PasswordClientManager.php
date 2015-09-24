@@ -19,7 +19,6 @@ abstract class PasswordClientManager implements ClientManagerInterface
      */
     public function getSchemesParameters()
     {
-
         $key = $this->getConfiguration()->get('digest_authentication_key');
         if (empty($key)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Parameter "digest_authentication_key" must be set');
@@ -32,8 +31,8 @@ abstract class PasswordClientManager implements ClientManagerInterface
         $nonceValueBase64 = base64_encode($nonceValue);
 
         $digest_params = [
-            'realm' => $this->getConfiguration()->get('realm', 'Service'),
-            'nonce' => $nonceValueBase64,
+            'realm'  => $this->getConfiguration()->get('realm', 'Service'),
+            'nonce'  => $nonceValueBase64,
             'opaque' => hash('md5', $this->getConfiguration()->get('realm', 'Service')),
         ];
 
