@@ -154,11 +154,12 @@ class TokenEndpoint implements TokenEndpointInterface
      */
     protected function findClient(ServerRequestInterface $request, GrantTypeResponseInterface $grant_type_response)
     {
-        if (is_null($grant_type_response->getClientPublicId())) {
-            return $this->getClientManagerSupervisor()->findClient($request);
+        if (null === $grant_type_response->getClientPublicId())) {
+            $client = $this->getClientManagerSupervisor()->findClient($request);
+        } else {
+            $client_public_id = $grant_type_response->getClientPublicId();
+            $client = $this->getClientManagerSupervisor()->getClient($client_public_id);
         }
-        $client_public_id = $grant_type_response->getClientPublicId();
-        $client = $this->getClientManagerSupervisor()->getClient($client_public_id);
         if (!$client instanceof ClientInterface) {
             $this->getClientManagerSupervisor()->buildAuthenticationException($request);
         }
