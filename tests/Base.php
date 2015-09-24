@@ -26,6 +26,7 @@ use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
 use OAuth2\Token\AccessTokenTypeManager;
 use OAuth2\Token\BearerAccessToken;
+use OAuth2\Util\JWTFactory;
 use SpomkyLabs\Service\Jose;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -507,6 +508,29 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return null|\OAuth2\Util\JWTFactory
+     */
+    private $jwt_factory = null;
+
+    /**
+     * @return \OAuth2\Util\JWTFactory
+     */
+    protected function getJWTFactory()
+    {
+        if (is_null($this->jwt_factory)) {
+            $jose = Jose::getInstance();
+            $this->jwt_factory = new JWTFactory();
+            $this->jwt_factory->setEncrypter($jose->getEncrypter());
+            $this->jwt_factory->setKeyManager($jose->getKeyManager());
+            $this->jwt_factory->setKeySetManager($jose->getKeysetManager());
+            $this->jwt_factory->setLoader($jose->getLoader());
+            $this->jwt_factory->setSigner($jose->getSigner());
+        }
+
+        return $this->jwt_factory;
+    }
+
+    /**
      * @return null|\OAuth2\Test\Stub\JWTAccessTokenManager
      */
     private $jwt_access_token_manager = null;
@@ -520,6 +544,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->jwt_access_token_manager = new JWTAccessTokenManager();
             $this->jwt_access_token_manager->setConfiguration($this->getConfiguration());
             $this->jwt_access_token_manager->setExceptionManager($this->getExceptionManager());
+            $this->jwt_access_token_manager->setJWTFactory($this->getJWTFactory());
         }
 
         return $this->jwt_access_token_manager;
