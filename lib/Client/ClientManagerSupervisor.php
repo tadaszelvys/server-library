@@ -76,8 +76,16 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
         }
 
         $schemes = [];
+        $all_schemes = [];
         foreach ($this->getClientManagers() as $manager) {
-            $schemes = array_merge($schemes, $manager->getSchemesParameters());
+            $manager_schemes = $manager->getSchemesParameters();
+            $all_schemes = array_merge($all_schemes, $manager_schemes);
+            if (array_key_exists($auth_scheme, $manager_schemes)) {
+                $schemes[] = $manager_schemes[$auth_scheme];
+            }
+        }
+        if (empty($schemes)) {
+            $schemes = $all_schemes;
         }
 
         return $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $schemes]);
