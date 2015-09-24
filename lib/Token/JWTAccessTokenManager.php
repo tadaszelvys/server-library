@@ -229,21 +229,10 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      */
     public function createAccessToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null)
     {
-        $is_encrypted = $this->getConfiguration()->get('jwt_access_token_encrypted', false);
-
         $payload = $this->preparePayload($client, $scope, $resource_owner, $refresh_token);
 
         $jwt = $this->sign($payload);
-        if (is_array($jwt)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'JWT should be a string.');
-        }
-
-        if (true === $is_encrypted && !is_null($this->getEncrypter())) {
-            $jwt = $this->encrypt($jwt, $client);
-            if (is_array($jwt)) {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'JWT should be a string.');
-            }
-        }
+        $jwt = $this->encrypt($jwt, $client);
 
         $access_token = new AccessToken();
         $access_token->setRefreshToken(is_null($refresh_token) ? null : $refresh_token->getToken())
@@ -374,6 +363,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      * @param array $payload
      *
      * @return string
+     * @throws \OAuth2\Exception\BaseExceptionInterface
      */
     private function sign(array $payload)
     {
@@ -387,7 +377,12 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $instruction->setKey($key)
             ->setProtectedHeader($header);
 
-        return $this->getSigner()->sign($payload, [$instruction], JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
+        $jwt = $this->getSigner()->sign($payload, [$instruction], JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
+        if (is_array($jwt)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'JWT should be a string.');
+        }
+
+        return $jwt;
     }
 
     /**
@@ -400,6 +395,13 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      */
     private function encrypt($payload, ClientInterface $client)
     {
+        if (false === $this->getConfiguration()->get('jwt_access_token_encrypted', false)) {
+            return $payload;
+        }
+        if (null === $this->getEncrypter()) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Encrypter is not defined.');
+        }
+
         $header = array_merge(
             [],
             $this->prepareEncryptionHeader($client)
@@ -416,7 +418,12 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
             $instruction->setSenderKey($private_key);
         }
 
-        return $this->getEncrypter()->encrypt($payload, [$instruction], $header);
+        $jwt = $this->getEncrypter()->encrypt($payload, [$instruction], $header);
+        if (is_array($jwt)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'JWT should be a string.');
+        }
+
+        return $jwt;
     }
 
     /**
