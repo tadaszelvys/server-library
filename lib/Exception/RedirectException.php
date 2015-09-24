@@ -32,7 +32,7 @@ class RedirectException extends BaseException implements RedirectExceptionInterf
 
         $this->redirect_uri = $data['redirect_uri'];
 
-        if (array_key_exists('state', $data) && !is_null($data['state'])) {
+        if (array_key_exists('state', $data) && null !== ($data['state'])) {
             $this->errorData['state'] = $data['state'];
         }
     }

@@ -78,7 +78,7 @@ class TokenEndpoint implements TokenEndpointInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Method must be POST.');
         }
 
-        if (is_null(RequestBody::getParameter($request, 'grant_type'))) {
+        if (null === (RequestBody::getParameter($request, 'grant_type'))) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "grant_type" parameter is missing.');
         }
 
@@ -177,7 +177,7 @@ class TokenEndpoint implements TokenEndpointInterface
     {
         $refresh_token = null;
         $resource_owner = $this->getResourceOwner($values['resource_owner_public_id']);
-        if (!is_null($this->getRefreshTokenManager())) {
+        if (null !== ($this->getRefreshTokenManager())) {
             if (true === $values['refresh_token']['issued']) {
                 $values['refresh_token']['scope'] = $this->getScopeManager()->convertToScope($values['refresh_token']['scope']);
                 $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $values['refresh_token']['scope'], $resource_owner);
@@ -228,11 +228,11 @@ class TokenEndpoint implements TokenEndpointInterface
     protected function getResourceOwner($resource_owner_public_id)
     {
         $client = $this->getClientManagerSupervisor()->getClient($resource_owner_public_id);
-        if (!is_null($client)) {
+        if (null !== ($client)) {
             return $client;
         }
         $end_user = $this->getEndUserManager()->getEndUser($resource_owner_public_id);
 
-        return is_null($end_user) ? null : $end_user;
+        return null === ($end_user) ? null : $end_user;
     }
 }

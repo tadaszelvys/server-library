@@ -33,7 +33,7 @@ class JWTBearerGrantType implements GrantTypeSupportInterface
     {
         $assertion = RequestBody::getParameter($request, 'assertion');
         //We verify the client_public_id assertion exists
-        if (is_null($assertion)) {
+        if (null === ($assertion)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "assertion" is missing.');
         }
 

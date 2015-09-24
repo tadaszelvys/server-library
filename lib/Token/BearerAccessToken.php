@@ -100,7 +100,7 @@ class BearerAccessToken implements AccessTokenTypeInterface
         foreach ($methods as $method) {
             $token = $this->$method($request);
 
-            if (!is_null($token)) {
+            if (null !== ($token)) {
                 $tokens[] = $token;
             }
         }

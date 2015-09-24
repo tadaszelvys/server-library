@@ -90,10 +90,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     protected function checkRedirectUri(AuthorizationInterface $authorization)
     {
-        //If the redirect URI is not set and the configuration requires it, throws an exception
-        if (true === $this->getConfiguration()->get('enforce_redirect_uri', false) && is_null($authorization->getRedirectUri())) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is mandatory');
-        }
+        $this->checkRedirectUriIfRequired($authorization);
 
         $redirect_uri = $authorization->getRedirectUri();
         $redirect_uris = $this->getClientRedirectUris($authorization);
@@ -109,6 +106,19 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         }
 
         return $redirect_uris[0];
+    }
+
+    /**
+     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    protected function checkRedirectUriIfRequired(AuthorizationInterface $authorization)
+    {
+        //If the redirect URI is not set and the configuration requires it, throws an exception
+        if (true === $this->getConfiguration()->get('enforce_redirect_uri', false) && null ===$authorization->getRedirectUri()) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is mandatory');
+        }
     }
 
     /**
@@ -192,7 +202,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     protected function checkState(AuthorizationInterface $authorization)
     {
-        if (is_null($authorization->getState()) && $this->getConfiguration()->get('enforce_state', false)) {
+        if (null === ($authorization->getState()) && $this->getConfiguration()->get('enforce_state', false)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "state" parameter is mandatory');
         }
     }
@@ -219,7 +229,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         /*
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.1
          */
-        if (is_null($authorization->getResponseType())) {
+        if (null === ($authorization->getResponseType())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing');
         }
 

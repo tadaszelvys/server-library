@@ -46,13 +46,13 @@ abstract class JWTClientManager implements ClientManagerInterface
 
         foreach ($methods as $method) {
             $data = $this->$method($request);
-            if (!is_null($data)) {
+            if (null !== ($data)) {
                 $assertions[] = $data;
             }
         }
 
         $client = $this->checkResult($assertions);
-        if (is_null($client)) {
+        if (null === ($client)) {
             return $client;
         }
 
@@ -79,7 +79,7 @@ abstract class JWTClientManager implements ClientManagerInterface
 
         $client_assertion = RequestBody::getParameter($request, 'client_assertion');
         //We verify the client assertion exists
-        if (is_null($client_assertion)) {
+        if (null === ($client_assertion)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_assertion" is missing.');
         }
 

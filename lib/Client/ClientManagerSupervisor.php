@@ -44,7 +44,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     {
         foreach ($this->getClientManagers() as $manager) {
             $client = $manager->getClient($client_id);
-            if (!is_null($client)) {
+            if (null !== ($client)) {
                 return $client;
             }
         }
@@ -80,7 +80,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
             $auth_scheme = substr($authHeader[0], 0, $pos);
         }
 
-        if (is_null($auth_scheme)) {
+        if (null === ($auth_scheme)) {
             return $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Unknown client');
         }
 

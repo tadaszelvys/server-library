@@ -68,7 +68,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      */
     protected function updateClientCredentials(PasswordClientInterface $client)
     {
-        if (!is_null($client->getPlaintextSecret())) {
+        if (null !== ($client->getPlaintextSecret())) {
             $secret = hash($this->getHashAlgorithm(), $client->getSalt().$client->getPlaintextSecret());
             $client->setSecret($secret);
 
@@ -147,13 +147,13 @@ abstract class PasswordClientManager implements ClientManagerInterface
 
         foreach ($methods as $method) {
             $data = $this->$method($request);
-            if (!is_null($data)) {
+            if (null !== ($data)) {
                 $credentials[] = $data;
             }
         }
 
         $client = $this->checkResult($credentials);
-        if (is_null($client)) {
+        if (null === ($client)) {
             return $client;
         }
 
@@ -227,7 +227,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
         $client_id = RequestBody::getParameter($request, 'client_id');
         $client_secret = RequestBody::getParameter($request, 'client_secret');
 
-        if (!is_null($client_id) && !is_null($client_secret)) {
+        if (null !== ($client_id) && null !== ($client_secret)) {
             return [
                 'client_id'          => $client_id,
                 'client_credentials' => $client_secret,

@@ -66,7 +66,7 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
         $params = [
             'code' => $code->getToken(),
         ];
-        if (!is_null($authorization->getState())) {
+        if (null !== ($authorization->getState())) {
             $params['state'] = $authorization->getState();
         }
 
@@ -128,7 +128,7 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
     protected function getAuthCode(ServerRequestInterface $request)
     {
         $code = RequestBody::getParameter($request, 'code');
-        if (is_null($code)) {
+        if (null === ($code)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Missing parameter. "code" is required.');
         }
 

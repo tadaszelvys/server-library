@@ -27,7 +27,7 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
             throw $exception;
         }
         $this->access_token_types[$access_token_type->getScheme()] = $access_token_type;
-        if (is_null($this->default_access_token_type) || true === $default) {
+        if (null === ($this->default_access_token_type) || true === $default) {
             $this->default_access_token_type = $access_token_type->getScheme();
         }
 
@@ -53,7 +53,7 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
      */
     public function getDefaultAccessTokenType()
     {
-        if (is_null($this->default_access_token_type) || !array_key_exists($this->default_access_token_type, $this->access_token_types)) {
+        if (null === ($this->default_access_token_type) || !array_key_exists($this->default_access_token_type, $this->access_token_types)) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'No access token type defined or invalid access token type.');
             throw $exception;
         }

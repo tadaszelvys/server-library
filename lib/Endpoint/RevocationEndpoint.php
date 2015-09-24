@@ -33,7 +33,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
         $managers = [
             'access_token' => 'tryRevokeAccessToken',
         ];
-        if (!is_null($this->getRefreshTokenManager())) {
+        if (null !== ($this->getRefreshTokenManager())) {
             $managers['refresh_token'] = 'tryRevokeRefreshToken';
         }
 
@@ -65,7 +65,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
 
             return;
         }
-        if (is_null($token)) {
+        if (null === ($token)) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
 
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
@@ -98,7 +98,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
      */
     private function getResponseContent(ResponseInterface &$response, $content, $callback, $code = 200)
     {
-        if (!is_null($callback)) {
+        if (null !== ($callback)) {
             $data = sprintf('%s(%s)', $callback, $content);
             $response->getBody()->write($data);
         }
@@ -134,7 +134,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
     private function revokeToken(ResponseInterface &$response, $token = null, $token_type_hint = null, ClientInterface $client = null, $callback = null)
     {
         $methods = $this->getRevocationMethods();
-        if (is_null($token_type_hint)) {
+        if (null === ($token_type_hint)) {
             foreach ($methods as $method) {
                 $this->$method($token, $client);
             }
@@ -157,8 +157,8 @@ class RevocationEndpoint implements RevocationEndpointInterface
     private function tryRevokeAccessToken($token = null, ClientInterface $client = null)
     {
         $access_token = $this->getAccessTokenManager()->getAccessToken($token);
-        if (!is_null($access_token) && true === $this->isClientVerified($access_token, $client)) {
-            if (true === $this->getConfiguration()->get('revoke_refresh_token_and_access_token', true) && !is_null($access_token->getRefreshToken())) {
+        if (null !== ($access_token) && true === $this->isClientVerified($access_token, $client)) {
+            if (true === $this->getConfiguration()->get('revoke_refresh_token_and_access_token', true) && null !== ($access_token->getRefreshToken())) {
                 $this->tryRevokeRefreshToken($access_token->getRefreshToken(), $client);
             }
             $this->getAccessTokenManager()->revokeAccessToken($access_token);
@@ -174,7 +174,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
     private function tryRevokeRefreshToken($token = null, ClientInterface $client = null)
     {
         $refresh_token = $this->getRefreshTokenManager()->getRefreshToken($token);
-        if (!is_null($refresh_token) && true === $this->isClientVerified($refresh_token, $client)) {
+        if (null !== ($refresh_token) && true === $this->isClientVerified($refresh_token, $client)) {
             $this->getRefreshTokenManager()->revokeRefreshToken($refresh_token);
         }
     }
@@ -187,7 +187,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
      */
     private function isClientVerified($token, ClientInterface $client = null)
     {
-        if (!is_null($client)) {
+        if (null !== ($client)) {
             // The client ID of the token is the same as client authenticated
             return $token->getClientPublicId() === $client->getPublicId();
         } else {
