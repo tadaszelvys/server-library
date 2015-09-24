@@ -69,18 +69,9 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
      */
     public function buildAuthenticationException(ServerRequestInterface $request)
     {
-        $authHeader = $request->getHeader('Authorization');
-        $auth_scheme = null;
-        $server_params = $request->getServerParams();
-        if (array_key_exists('PHP_AUTH_USER', $server_params)) {
-            $auth_scheme = 'Basic';
-        } elseif (array_key_exists('PHP_AUTH_DIGEST', $server_params)) {
-            $auth_scheme = 'Digest';
-        } elseif (count($authHeader) > 0 && (0 !== $pos = strpos($authHeader[0], ' '))) {
-            $auth_scheme = substr($authHeader[0], 0, $pos);
-        }
+        $auth_scheme = $this->getAuthorizationScheme($request);
 
-        if (null === ($auth_scheme)) {
+        if (null === $auth_scheme) {
             return $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Unknown client');
         }
 
@@ -90,5 +81,23 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
         }
 
         return $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $schemes]);
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return string|null
+     */
+    private function getAuthorizationScheme(ServerRequestInterface $request)
+    {
+        $authHeader = $request->getHeader('Authorization');
+        $server_params = $request->getServerParams();
+        if (array_key_exists('PHP_AUTH_USER', $server_params)) {
+            return 'Basic';
+        } elseif (array_key_exists('PHP_AUTH_DIGEST', $server_params)) {
+            return 'Digest';
+        } elseif (count($authHeader) > 0 && (0 !== $pos = strpos($authHeader[0], ' '))) {
+            return substr($authHeader[0], 0, $pos);
+        }
     }
 }
