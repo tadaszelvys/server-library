@@ -4,6 +4,7 @@ namespace OAuth2\Endpoint;
 
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasResponseModeSupport;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Client\RegisteredClientInterface;
@@ -15,12 +16,10 @@ use Psr\Http\Message\ResponseInterface;
 
 class AuthorizationEndpoint implements AuthorizationEndpointInterface
 {
-    const RESPONSE_MODE_QUERY = 'query';
-    const RESPONSE_MODE_FRAGMENT = 'fragment';
-
     use HasConfiguration;
     use HasExceptionManager;
     use HasScopeManager;
+    use HasResponseModeSupport;
 
     /**
      * @var \OAuth2\Grant\ResponseTypeSupportInterface[]
@@ -53,32 +52,22 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $this->checkState($authorization);
         $this->checkScope($authorization);
 
-        //Open ID Connect introduce the possibility of combination of response type (id_token+code...)
-        //This library must handle these combinations or must be designed to support Open ID Connect in the future
         $type = $this->getResponseType($authorization);
-        $response_mode = $type->getResponseMode();
+
+        $response_mode = $this->getResponseMode(null !== $authorization->getResponseMode() && true === $this->getConfiguration()->get('allow_response_mode_parameter_in_authorization_request', false)?$authorization->getResponseMode():$type->getResponseMode());
+        if (null === $response_mode) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('The response mode "%s" is not supported.', $type->getResponseMode()));
+        }
 
         if ($authorization->isAuthorized() === false) {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', ['transport_mode' => $response_mode, 'redirect_uri' => $authorization->getRedirectUri(), 'state' => $authorization->getState()]);
-
+            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', ['transport_mode' => $response_mode->getName(), 'redirect_uri' => $authorization->getRedirectUri(), 'state' => $authorization->getState()]);
             $exception->getHttpResponse($response);
 
             return;
         }
 
         $result = $type->grantAuthorization($authorization);
-
-        switch ($response_mode) {
-            case self::RESPONSE_MODE_QUERY:
-            case self::RESPONSE_MODE_FRAGMENT:
-                $result = [$response_mode => $result];
-                break;
-            default:
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('The response mode "%s" is not supported.', $response_mode));
-        }
-
-        $response = $response->withStatus(302)
-            ->withHeader('Location', Uri::buildUri($redirect_uri, $result));
+        $response_mode->prepareResponse($redirect_uri, $result, $response);
     }
 
     /**

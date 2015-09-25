@@ -4,6 +4,7 @@ namespace OAuth2\Endpoint;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Authorization implements AuthorizationInterface
 {
@@ -46,6 +47,11 @@ class Authorization implements AuthorizationInterface
      * @var bool
      */
     protected $authorized = false;
+
+    /**
+     * @var null|string
+     */
+    protected $response_mode = null;
 
     /**
      * {@inheritdoc}
@@ -203,5 +209,49 @@ class Authorization implements AuthorizationInterface
         $this->authorized = $authorized;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseMode()
+    {
+        return $this->response_mode;
+    }
+
+    /**
+     * @param string $response_mode
+     *
+     * @return $this
+     */
+    public function setResponseMode($response_mode)
+    {
+        $this->response_mode = $response_mode;
+
+        return $this;
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \OAuth2\Endpoint\Authorization
+     */
+    public static function createFromRequest(ServerRequestInterface $request)
+    {
+        $params = $request->getQueryParams();
+        $authorization = new Authorization();
+        $methods = [
+            'setRedirectUri'  => 'redirect_uri',
+            'setResponseMode' => 'response_mode',
+            'setResponseType' => 'response_type',
+            'setScope'        => 'scope',
+            'setState'        => 'state',
+        ];
+
+        foreach($methods as $method=>$param) {
+            $authorization->$method(isset($params['$param'])?$params['$param']:null);
+        }
+
+        return $authorization;
     }
 }

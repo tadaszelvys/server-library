@@ -52,4 +52,9 @@ interface AuthorizationInterface
      * @return bool The resource owner authorized the client
      */
     public function isAuthorized();
+
+    /**
+     * @return string The response mode
+     */
+    public function getResponseMode();
 }

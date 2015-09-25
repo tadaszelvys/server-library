@@ -5,6 +5,9 @@ namespace OAuth2\Test;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Configuration\Configuration;
 use OAuth2\Endpoint\AuthorizationEndpoint;
+use OAuth2\Endpoint\FormPostResponseMode;
+use OAuth2\Endpoint\FragmentResponseMode;
+use OAuth2\Endpoint\QueryResponseMode;
 use OAuth2\Endpoint\RevocationEndpoint;
 use OAuth2\Endpoint\TokenEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
@@ -150,6 +153,10 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->authorization_endpoint->addResponseType($this->getAuthorizationCodeGrantType());
             $this->authorization_endpoint->addResponseType($this->getImplicitGrantType());
+
+            $this->authorization_endpoint->addResponseMode(new QueryResponseMode());
+            $this->authorization_endpoint->addResponseMode(new FragmentResponseMode());
+            $this->authorization_endpoint->addResponseMode(new FormPostResponseMode());
         }
 
         return $this->authorization_endpoint;
@@ -177,6 +184,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->configuration->set('jwt_access_token_encrypted', true);
             $this->configuration->set('jwt_access_token_key_encryption_algorithm', 'A256KW');
             $this->configuration->set('jwt_access_token_content_encryption_algorithm', 'A256CBC-HS512');
+            $this->configuration->set('allow_response_mode_parameter_in_authorization_request', true);
         }
 
         return $this->configuration;

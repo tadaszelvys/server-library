@@ -25,7 +25,7 @@ class ImplicitGrantType implements ResponseTypeSupportInterface
      */
     public function getResponseMode()
     {
-        return AuthorizationEndpoint::RESPONSE_MODE_FRAGMENT;
+        return 'fragment';
     }
 
     /**

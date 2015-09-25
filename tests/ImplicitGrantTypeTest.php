@@ -5,6 +5,7 @@ namespace OAuth2\Test;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\BaseExceptionInterface;
 use Zend\Diactoros\Response;
+use PHPHtmlParser\Dom;
 
 /**
  * @group ImplicitGrantType
@@ -209,5 +210,35 @@ class ImplicitGrantTypeTest extends Base
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer&state=[^"]+$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAccessTokenSuccessWithStateAndForPoostResponseMode()
+    {
+        $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (is_null($client)) {
+            $this->fail('Unable to get client');
+
+            return;
+        }
+        $authorization = new Authorization();
+        $authorization->setRedirectUri('http://example.com/test?good=false')
+                      ->setClient($client)
+                      ->setResponseType('token')
+                      ->setState('0123456789')
+                      ->setResponseMode('form_post')
+                      ->setAuthorized(true);
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $dom = new Dom();
+        $dom->load($content);
+        $inputs = $dom->find('input');
+
+        $this->assertNotNull($inputs);
+        $this->assertEquals(5, count($inputs));
     }
 }

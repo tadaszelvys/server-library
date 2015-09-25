@@ -54,7 +54,7 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
      */
     public function getResponseMode()
     {
-        return AuthorizationEndpoint::RESPONSE_MODE_QUERY;
+        return 'query';
     }
 
     /**
