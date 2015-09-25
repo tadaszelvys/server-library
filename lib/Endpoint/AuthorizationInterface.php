@@ -2,6 +2,10 @@
 
 namespace OAuth2\Endpoint;
 
+use OAuth2\Client\ClientInterface;
+use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
 interface AuthorizationInterface
 {
     /**
@@ -25,14 +29,14 @@ interface AuthorizationInterface
     public function getResourceOwner();
 
     /**
-     * @return \OAuth2\Scope\ScopeInterface[] An array of ScopeInterface objects
+     * @return string[] An array of ScopeInterface objects
      */
     public function getScope();
 
     /**
      * Set the scope of the authorization object. This setter is needed if the requested scope is not compliant with the scope policy.
      *
-     * @param \OAuth2\Scope\ScopeInterface[] $scope An array of ScopeInterface objects
+     * @param string[] $scope An array of ScopeInterface objects
      *
      * @return self
      */
@@ -57,4 +61,67 @@ interface AuthorizationInterface
      * @return string The response mode
      */
     public function getResponseMode();
+
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     *
+     * @return $this
+     */
+    public function setClient(ClientInterface $client);
+
+    /**
+     * @param string $response_type
+     *
+     * @return $this
+     */
+    public function setResponseType($response_type);
+
+    /**
+     * @param string $redirect_uri
+     *
+     * @return $this
+     */
+    public function setRedirectUri($redirect_uri);
+
+    /**
+     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resource_owner
+     *
+     * @return $this
+     */
+    public function setResourceOwner(ResourceOwnerInterface $resource_owner);
+
+    /**
+     * @param string $state
+     *
+     * @return $this
+     */
+    public function setState($state);
+
+    /**
+     * @param bool $issue_refresh_token
+     *
+     * @return $this
+     */
+    public function setIssueRefreshToken($issue_refresh_token);
+
+    /**
+     * @param bool $authorized
+     *
+     * @return $this
+     */
+    public function setAuthorized($authorized);
+
+    /**
+     * @param string $response_mode
+     *
+     * @return $this
+     */
+    public function setResponseMode($response_mode);
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \OAuth2\Endpoint\Authorization
+     */
+    public static function createFromRequest(ServerRequestInterface $request);
 }

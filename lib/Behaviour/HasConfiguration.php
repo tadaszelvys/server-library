@@ -12,7 +12,7 @@ trait HasConfiguration
     protected $configuration;
 
     /**
-     * {@inheritdoc}
+     * @return \OAuth2\Configuration\ConfigurationInterface
      */
     public function getConfiguration()
     {

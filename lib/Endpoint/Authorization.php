@@ -62,9 +62,7 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setClient(ClientInterface $client)
     {
@@ -82,9 +80,7 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * @param string $response_type
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setResponseType($response_type)
     {
@@ -102,9 +98,7 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * @param string $redirect_uri
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setRedirectUri($redirect_uri)
     {
@@ -122,9 +116,7 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resource_owner
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setResourceOwner(ResourceOwnerInterface $resource_owner)
     {
@@ -160,9 +152,7 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * @param string $state
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setState($state)
     {
@@ -180,9 +170,7 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * @param bool $issue_refresh_token
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setIssueRefreshToken($issue_refresh_token)
     {
@@ -200,9 +188,7 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * @param bool $authorized
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setAuthorized($authorized)
     {
@@ -220,9 +206,7 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * @param string $response_mode
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setResponseMode($response_mode)
     {
@@ -232,9 +216,7 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return \OAuth2\Endpoint\Authorization
+     * {@inheritdoc}
      */
     public static function createFromRequest(ServerRequestInterface $request)
     {

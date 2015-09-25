@@ -52,12 +52,9 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $this->checkState($authorization);
         $this->checkScope($authorization);
 
-        $type = $this->getResponseType($authorization);
+        $types = $this->getResponseTypes($authorization);
 
-        $response_mode = $this->getResponseMode(null !== $authorization->getResponseMode() && true === $this->getConfiguration()->get('allow_response_mode_parameter_in_authorization_request', false)?$authorization->getResponseMode():$type->getResponseMode());
-        if (null === $response_mode) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('The response mode "%s" is not supported.', $type->getResponseMode()));
-        }
+        $response_mode = $this->getResponseMode($types, $authorization);
 
         if ($authorization->isAuthorized() === false) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', ['transport_mode' => $response_mode->getName(), 'redirect_uri' => $authorization->getRedirectUri(), 'state' => $authorization->getState()]);
@@ -66,7 +63,12 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
             return;
         }
 
-        $result = $type->grantAuthorization($authorization);
+        $result = [];
+        foreach($types as $type) {
+            $temp = $type->grantAuthorization($authorization);
+            $result = array_merge($result, $temp);
+        }
+
         $response_mode->prepareResponse($redirect_uri, $result, $response);
     }
 
@@ -240,7 +242,13 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         }
     }
 
-    protected function getResponseType(AuthorizationInterface $authorization)
+    /**
+     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization
+     *
+     * @return \OAuth2\Grant\ResponseTypeSupportInterface[]
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    protected function getResponseTypes(AuthorizationInterface $authorization)
     {
         /*
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.1
@@ -249,17 +257,24 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing');
         }
 
-        $type = $authorization->getResponseType();
-        if (array_key_exists($type, $this->response_types)) {
-            $type = $this->response_types[$type];
-        } else {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Response type "'.$authorization->getResponseType().'" is not supported by this server');
+        $types = explode(' ', $authorization->getResponseType());
+        $response_types = [];
+
+        foreach($types as $type) {
+            if (1 < count(array_keys($types, $type))) {
+                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Scope "%s" appears more than once.', $scope));
+            }
+            if (array_key_exists($type, $this->response_types)) {
+                $response_types[] = $this->response_types[$type];
+            } else {
+                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Response type "'.$type.'" is not supported by this server');
+            }
+
+            if (!$authorization->getClient()->isAllowedGrantType($type)) {
+                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$authorization->getResponseType().'" is unauthorized for this client.');
+            }
         }
 
-        if (!$authorization->getClient()->isAllowedGrantType($authorization->getResponseType())) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$authorization->getResponseType().'" is unauthorized for this client.');
-        }
-
-        return $type;
+        return $response_types;
     }
 }
