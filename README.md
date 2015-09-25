@@ -56,8 +56,8 @@ The following components are implemented:
     * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
     * [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
     * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html)
-    * [ ] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
-    * [ ] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
+    * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
+    * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
     * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
     * [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
 

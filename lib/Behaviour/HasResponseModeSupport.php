@@ -32,8 +32,6 @@ trait HasResponseModeSupport
      */
     public function getResponseMode(array $types, AuthorizationInterface $authorization)
     {
-        $mode = null;
-
         if (null !== $authorization->getResponseMode() && true === $this->getConfiguration()->get('allow_response_mode_parameter_in_authorization_request', false)) {
             // The client uses the response_mode parameter and the server allows it
             $mode = $authorization->getResponseMode();
