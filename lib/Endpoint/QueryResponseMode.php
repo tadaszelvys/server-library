@@ -20,7 +20,9 @@ class QueryResponseMode implements ResponseModeInterface
      */
     public function prepareResponse($redirect_uri, array $data, ResponseInterface &$response)
     {
+        $params = empty($data)?[]:[$this->getName() => $data];
+
         $response = $response->withStatus(302)
-            ->withHeader('Location', Uri::buildUri($redirect_uri, [$this->getName() => $data]));
+            ->withHeader('Location', Uri::buildUri($redirect_uri, $params));
     }
 }

@@ -25,7 +25,7 @@ class PasswordClientManager extends Base
         $bar = new PasswordClient();
         $bar->setPlaintextSecret('secret')
             ->setRedirectUris(['http://example.com/test?good=false'])
-            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
+            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code'])
             ->setPublicId('bar');
         $this->updateClientCredentials($bar);
 
@@ -39,7 +39,7 @@ class PasswordClientManager extends Base
         $digest = new PasswordClient();
         $digest->setPlaintextSecret('Circle Of Life')
             ->setRedirectUris([])
-            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
+            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code'])
             ->setPublicId('Mufasa');
         $this->updateClientCredentials($digest);
 

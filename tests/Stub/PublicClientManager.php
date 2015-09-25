@@ -17,7 +17,7 @@ class PublicClientManager extends Base
     {
         $foo = new PublicClient();
         $foo->setPublicId('foo')
-            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
+            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code'])
             ->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback']);
 
         $oof = new PublicClient();

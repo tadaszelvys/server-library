@@ -12,8 +12,10 @@ use OAuth2\Endpoint\RevocationEndpoint;
 use OAuth2\Endpoint\TokenEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
+use OAuth2\Grant\IdTokenResponseType;
 use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\JWTBearerGrantType;
+use OAuth2\Grant\NoneResponseType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Test\Stub\AuthCodeManager;
@@ -153,6 +155,8 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->authorization_endpoint->addResponseType($this->getAuthorizationCodeGrantType());
             $this->authorization_endpoint->addResponseType($this->getImplicitGrantType());
+            $this->authorization_endpoint->addResponseType($this->getIdTokenResponseType());
+            $this->authorization_endpoint->addResponseType($this->getNoneResponseType());
 
             $this->authorization_endpoint->addResponseMode(new QueryResponseMode());
             $this->authorization_endpoint->addResponseMode(new FragmentResponseMode());
@@ -418,6 +422,42 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->jwt_bearer_grant_type;
+    }
+
+    /**
+     * @var null|\OAuth2\Grant\IdTokenResponseType
+     */
+    private $id_token_response_type = null;
+
+    /**
+     * @return \OAuth2\Grant\IdTokenResponseType
+     */
+    protected function getIdTokenResponseType()
+    {
+        if (is_null($this->id_token_response_type)) {
+            $this->id_token_response_type = new IdTokenResponseType();
+        }
+
+        return $this->id_token_response_type;
+    }
+
+    /**
+     * @var null|\OAuth2\Grant\NoneResponseType
+     */
+    private $none_response_type = null;
+
+    /**
+     * @return \OAuth2\Grant\NoneResponseType
+     */
+    protected function getNoneResponseType()
+    {
+        if (is_null($this->none_response_type)) {
+            $this->none_response_type = new NoneResponseType();
+
+            $this->none_response_type->setAccessTokenManager($this->getSimpleStringAccessTokenManager());
+        }
+
+        return $this->none_response_type;
     }
 
     /**
