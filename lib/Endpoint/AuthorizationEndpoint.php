@@ -177,7 +177,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         if (!empty($redirect_uris)) {
             return $redirect_uris;
         }
-        
+
         $this->checkRedirectUriIfRequiredForRegisteredClients();
         $this->checkRedirectUriForNonConfidentialClient($client);
         $this->checkRedirectUriForConfidentialClient($client, $authorization->getResponseType());

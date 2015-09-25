@@ -62,7 +62,7 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInter
      * @param \OAuth2\EndUser\EndUserInterface         $end_user
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return boolean
+     * @return bool
      */
     protected function getIssueRefreshToken(ClientInterface $client, EndUserInterface $end_user, ServerRequestInterface $request)
     {
