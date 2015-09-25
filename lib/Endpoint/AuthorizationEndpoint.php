@@ -196,11 +196,11 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
+     * @param \OAuth2\Client\RegisteredClientInterface $client
      * 
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUriForNonConfidentialClient(ClientInterface $client)
+    protected function checkRedirectUriForNonConfidentialClient(RegisteredClientInterface $client)
     {
         if (!$client instanceof ConfidentialClientInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Non-confidential clients must register at least one redirect URI');
@@ -208,12 +208,12 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param satring                        $response_type
+     * @param \OAuth2\Client\RegisteredClientInterface $client
+     * @param satring                                  $response_type
      * 
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUriForConfidentialClient(ClientInterface $client, $response_type)
+    protected function checkRedirectUriForConfidentialClient(RegisteredClientInterface $client, $response_type)
     {
         if ($client instanceof ConfidentialClientInterface && $response_type === 'token') {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients must register at least one redirect URI when using "token" response type');
