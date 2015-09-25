@@ -118,11 +118,11 @@ trait CanLoadJWT
     }
 
     /**
-     * @param $assertion
+     * @param string $assertion
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return \Jose\JWEInterface|\Jose\JWSInterface
+     * @return JWTInterface
      */
     protected function loadAssertion($assertion)
     {
