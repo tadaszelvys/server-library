@@ -178,7 +178,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
             return $redirect_uris;
         }
         
-        $this->checkRedirectUriIfRequired();
+        $this->checkRedirectUriIfRequiredForRegisteredClients();
         $this->checkRedirectUriForNonConfidentialClient($client);
         $this->checkRedirectUriForConfidentialClient($client, $authorization->getResponseType());
 
@@ -188,7 +188,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUriIfRequired()
+    protected function checkRedirectUriIfRequiredForRegisteredClients()
     {
         if (true === $this->getConfiguration()->get('enforce_registered_client_redirect_uris', false)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Registered clients must register at least one redirect URI');
