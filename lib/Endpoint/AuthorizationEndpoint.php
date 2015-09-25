@@ -209,7 +209,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
     /**
      * @param \OAuth2\Client\RegisteredClientInterface $client
-     * @param satring                                  $response_type
+     * @param string                                   $response_type
      * 
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
