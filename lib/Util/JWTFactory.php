@@ -77,7 +77,7 @@ class JWTFactory
     }
 
     /**
-     * @return \Jose\EncrypterInterface|null
+     * @return EncrypterInterface
      */
     public function getEncrypter()
     {

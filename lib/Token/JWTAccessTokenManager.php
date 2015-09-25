@@ -339,7 +339,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @param $assertion
+     * @param string $assertion
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
