@@ -2,12 +2,54 @@
 
 namespace OAuth2\Endpoint;
 
+/**
+ * @method null|\OAuth2\Client\ClientInterface getClient()
+ * @method self setClient(null|\OAuth2\Client\ClientInterface $client)
+ * @method null|\OAuth2\ResourceOwner\ResourceOwnerInterface getResourceOwner()
+ * @method self setResourceOwner(null|\OAuth2\ResourceOwner\ResourceOwnerInterface $client)
+ * @method null|string getResponseType()
+ * @method self setResponseType(string $response_type)
+ * @method null|string getRedirectUri()
+ * @method self setRedirectUri(string $redirect_uri)
+ * @method null|string getScope()
+ * @method self setScope(string $scope)
+ * @method null|string getState()
+ * @method self setState(string $state)
+ * @method bool isAuthorized()
+ * @method self setAuthorized(bool $authorized)
+ * @method bool getIssuerRefreshToken()
+ * @method self setIssuerRefreshToken(bool $issue_refresh_token)
+ * @method null|string getResponseMode()
+ * @method self setResponseMode(string $response_mode)
+ * @method null|string getNonce()
+ * @method self setNonce(string $nonce)
+ * @method null|string getDisplay()
+ * @method self setDisplay(string $display)
+ * @method null|string getPrompt()
+ * @method self setPrompt(string $prompt)
+ * @method null|int getMaxAge()
+ * @method self setMaxAge(int $max_age)
+ * @method null|string getUiLocales()
+ * @method self setUiLocales(string $ui_locales)
+ * @method null|string getIdTokenHint()
+ * @method self setIdTokenHint(string $id_token_hint)
+ * @method null|string getLoginHint()
+ * @method self setLoginHint(string $login_hint)
+ * @method null|string getAcrValues()
+ * @method self setAcrValues(string $acr_values)
+ */
+
 class Authorization
 {
     /**
      * @var null|\OAuth2\Client\ClientInterface
      */
     protected $client = null;
+
+    /**
+     * @var null|string
+     */
+    protected $client_id = null;
 
     /**
      * @var null|string
@@ -74,6 +116,17 @@ class Authorization
     const DISPLAY_TOUCH = 'touch';
     const DISPLAY_WAP = 'wap';
 
+    public function getAllowedDisplayValues()
+    {
+        return [
+            null,
+            self::DISPLAY_PAGE,
+            self::DISPLAY_POPUP,
+            self::DISPLAY_TOUCH,
+            self::DISPLAY_WAP,
+        ];
+    }
+
     /**
      * @var null|string
      */
@@ -83,6 +136,17 @@ class Authorization
     const PROMPT_LOGIN ='login';
     const PROMPT_CONSENT ='consent';
     const PROMPT_SELECT_ACCOUNT = 'select_account';
+
+    public function getAllowedPromptValues()
+    {
+        return [
+            null,
+            self::PROMPT_NONE,
+            self::PROMPT_LOGIN,
+            self::PROMPT_CONSENT,
+            self::PROMPT_SELECT_ACCOUNT,
+        ];
+    }
 
     /**
      * @var null|string

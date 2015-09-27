@@ -262,7 +262,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
         foreach($types as $type) {
             if (1 < count(array_keys($types, $type))) {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Scope "%s" appears more than once.', $scope));
+                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'A response type appears more than once.');
             }
             if (array_key_exists($type, $this->response_types)) {
                 $response_types[] = $this->response_types[$type];
