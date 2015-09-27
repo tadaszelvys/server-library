@@ -2,7 +2,7 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Endpoint\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization;
 
 interface ResponseTypeSupportInterface
 {
@@ -18,13 +18,13 @@ interface ResponseTypeSupportInterface
      * This is the authorization endpoint of the grant type
      * This function checks the request and returns authorize or not the client.
      *
-     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization The authorization object
+     * @param \OAuth2\Endpoint\Authorization $authorization The authorization object
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return array
      */
-    public function grantAuthorization(AuthorizationInterface $authorization);
+    public function grantAuthorization(Authorization $authorization);
 
     /**
      * Returns the response mode of the response type or the error returned.

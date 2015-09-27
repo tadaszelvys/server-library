@@ -4,8 +4,7 @@ namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasAccessTokenTypeManager;
-use OAuth2\Endpoint\AuthorizationEndpoint;
-use OAuth2\Endpoint\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization;
 
 class ImplicitGrantType implements ResponseTypeSupportInterface
 {
@@ -31,7 +30,7 @@ class ImplicitGrantType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAuthorization(AuthorizationInterface $authorization)
+    public function grantAuthorization(Authorization $authorization)
     {
         $token = $this->getAccessTokenManager()->createAccessToken($authorization->getClient(), $authorization->getScope(), $authorization->getResourceOwner());
         $params = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType()->prepareAccessToken($token);

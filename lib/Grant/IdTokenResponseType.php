@@ -3,7 +3,7 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasIdTokenManager;
-use OAuth2\Endpoint\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization;
 
 class IdTokenResponseType implements ResponseTypeSupportInterface
 {
@@ -28,7 +28,7 @@ class IdTokenResponseType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAuthorization(AuthorizationInterface $authorization)
+    public function grantAuthorization(Authorization $authorization)
     {
         $id_token = $this->getIdTokenManager()->createIdToken($authorization->getClient(), $authorization->getScope(), $authorization->getResourceOwner());
 

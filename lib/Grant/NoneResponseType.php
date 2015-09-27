@@ -3,7 +3,7 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
-use OAuth2\Endpoint\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization;
 use OAuth2\Token\AccessTokenInterface;
 
 /**
@@ -38,7 +38,7 @@ class NoneResponseType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAuthorization(AuthorizationInterface $authorization)
+    public function grantAuthorization(Authorization $authorization)
     {
         $token = $this->getAccessTokenManager()->createAccessToken($authorization->getClient(), $authorization->getScope(), $authorization->getResourceOwner());
         $this->finishAccessTokenCreation($token);

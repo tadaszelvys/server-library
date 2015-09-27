@@ -5,8 +5,7 @@ namespace OAuth2\Grant;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
-use OAuth2\Endpoint\AuthorizationEndpoint;
-use OAuth2\Endpoint\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
@@ -60,7 +59,7 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
     /**
      * {@inheritdoc}
      */
-    public function grantAuthorization(AuthorizationInterface $authorization)
+    public function grantAuthorization(Authorization $authorization)
     {
         $code = $this->getAuthCodeManager()->createAuthCode($authorization->getClient(), $authorization->getRedirectUri(), $authorization->getScope(), $authorization->getResourceOwner(), $authorization->getIssueRefreshToken());
         $params = [

@@ -2,11 +2,7 @@
 
 namespace OAuth2\Endpoint;
 
-use OAuth2\Client\ClientInterface;
-use OAuth2\ResourceOwner\ResourceOwnerInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
-class Authorization implements AuthorizationInterface
+class Authorization
 {
     /**
      * @var null|\OAuth2\Client\ClientInterface
@@ -54,186 +50,107 @@ class Authorization implements AuthorizationInterface
     protected $response_mode = null;
 
     /**
-     * {@inheritdoc}
+     * @var null|string
      */
-    public function getClient()
-    {
-        return $this->client;
-    }
+    protected $nonce = null;
 
     /**
-     * {@inheritdoc}
+     * @var array
      */
-    public function setClient(ClientInterface $client)
-    {
-        $this->client = $client;
-
-        return $this;
-    }
+    protected $claims = [];
 
     /**
-     * {@inheritdoc}
+     * @var null|int
      */
-    public function getResponseType()
-    {
-        return $this->response_type;
-    }
+    protected $max_age = null;
 
     /**
-     * {@inheritdoc}
+     * @var null|string
      */
-    public function setResponseType($response_type)
-    {
-        $this->response_type = $response_type;
+    protected $display = null;
 
-        return $this;
-    }
+    const DISPLAY_PAGE = 'page';
+    const DISPLAY_POPUP = 'popup';
+    const DISPLAY_TOUCH = 'touch';
+    const DISPLAY_WAP = 'wap';
 
     /**
-     * {@inheritdoc}
+     * @var null|string
      */
-    public function getRedirectUri()
-    {
-        return $this->redirect_uri;
-    }
+    protected $prompt = null;
+
+    const PROMPT_NONE ='none';
+    const PROMPT_LOGIN ='login';
+    const PROMPT_CONSENT ='consent';
+    const PROMPT_SELECT_ACCOUNT = 'select_account';
 
     /**
-     * {@inheritdoc}
+     * @var null|string
      */
-    public function setRedirectUri($redirect_uri)
-    {
-        $this->redirect_uri = $redirect_uri;
-
-        return $this;
-    }
+    protected $ui_locales = null;
 
     /**
-     * {@inheritdoc}
+     * @var null|string
      */
-    public function getResourceOwner()
-    {
-        return $this->resource_owner;
-    }
+    protected $id_token_hint = null;
 
     /**
-     * {@inheritdoc}
+     * @var null|string
      */
-    public function setResourceOwner(ResourceOwnerInterface $resource_owner)
-    {
-        $this->resource_owner = $resource_owner;
-
-        return $this;
-    }
+    protected $login_hint = null;
 
     /**
-     * {@inheritdoc}
+     * @var null|string
      */
-    public function getScope()
-    {
-        return $this->scope;
-    }
+    protected $acr_values = null;
 
     /**
-     * {@inheritdoc}
+     * @param       $method
+     * @param array $arguments
+     *
+     * @return mixed
      */
-    public function setScope(array $scope)
+    public function __call($method, array $arguments)
     {
-        $this->scope = $scope;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getState()
-    {
-        return $this->state;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setState($state)
-    {
-        $this->state = $state;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIssueRefreshToken()
-    {
-        return $this->issue_refresh_token;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setIssueRefreshToken($issue_refresh_token)
-    {
-        $this->issue_refresh_token = $issue_refresh_token;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAuthorized()
-    {
-        return $this->authorized;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAuthorized($authorized)
-    {
-        $this->authorized = $authorized;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getResponseMode()
-    {
-        return $this->response_mode;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setResponseMode($response_mode)
-    {
-        $this->response_mode = $response_mode;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function createFromRequest(ServerRequestInterface $request)
-    {
-        $params = $request->getQueryParams();
-        $authorization = new Authorization();
-        $methods = [
-            'setRedirectUri'  => 'redirect_uri',
-            'setResponseMode' => 'response_mode',
-            'setResponseType' => 'response_type',
-            'setScope'        => 'scope',
-            'setState'        => 'state',
-        ];
-
-        foreach($methods as $method=>$param) {
-            $authorization->$method(isset($params['$param'])?$params['$param']:null);
+        if (method_exists($this, $method)) {
+            return call_user_func_array([$this, $method], $arguments);
         }
 
-        return $authorization;
+        if (0 === strpos($method, 'get')) {
+            $param = $this->underscore(substr($method, 3));
+            if (property_exists($this, $param)) {
+                return $this->$param;
+            }
+        } elseif (0 === strpos($method, 'is')) {
+            $param = $this->underscore(substr($method, 2));
+            if (property_exists($this, $param)) {
+                return $this->$param;
+            }
+        } elseif (0 === strpos($method, 'set')) {
+            $param = $this->underscore(substr($method, 3));
+            if (property_exists($this, $param)) {
+                if (count($arguments) !== 1) {
+                    throw new \InvalidArgumentException('Only one argument allowed');
+                }
+                $this->$param = $arguments[0];
+
+                return $this;
+            }
+        }
+        throw new \BadMethodCallException('Unknown method "'.$method.'""');
+    }
+
+    /**
+     * @param string $cameled
+     *
+     * @return string
+     */
+    private function underscore($cameled)
+    {
+        return implode(
+            '_',
+            array_map(
+                'strtolower',
+                preg_split('/([A-Z]{1}[^A-Z]*)/', $cameled, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY)));
     }
 }

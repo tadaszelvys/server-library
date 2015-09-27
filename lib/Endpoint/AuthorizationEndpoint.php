@@ -43,7 +43,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
      * @throws \OAuth2\Exception\InternalServerErrorExceptionInterface
      */
-    public function authorize(AuthorizationInterface $authorization, ResponseInterface &$response)
+    public function authorize(Authorization $authorization, ResponseInterface &$response)
     {
         $redirect_uri = $this->checkRedirectUri($authorization);
         $this->checkRedirectUriFragment($redirect_uri);
@@ -73,13 +73,13 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization An array with mixed values
+     * @param \OAuth2\Endpoint\Authorization $authorization An array with mixed values
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return string
      */
-    protected function checkRedirectUri(AuthorizationInterface $authorization)
+    protected function checkRedirectUri(Authorization $authorization)
     {
         $this->checkRedirectUriIfRequired($authorization);
 
@@ -100,11 +100,11 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization
+     * @param \OAuth2\Endpoint\Authorization $authorization
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUriIfRequired(AuthorizationInterface $authorization)
+    protected function checkRedirectUriIfRequired(Authorization $authorization)
     {
         //If the redirect URI is not set and the configuration requires it, throws an exception
         if (true === $this->getConfiguration()->get('enforce_redirect_uri', false) && null === $authorization->getRedirectUri()) {
@@ -148,13 +148,13 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * Check if the redirect URIs stored by the client.
      *
-     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization An array with mixed values
+     * @param \OAuth2\Endpoint\Authorization $authorization An array with mixed values
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return array
      */
-    protected function getClientRedirectUris(AuthorizationInterface $authorization)
+    protected function getClientRedirectUris(Authorization $authorization)
     {
         $client = $authorization->getClient();
         if (!$client instanceof RegisteredClientInterface) {
@@ -212,20 +212,20 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization An array with mixed values
+     * @param \OAuth2\Endpoint\Authorization $authorization An array with mixed values
      *
      * @see http://tools.ietf.org/html/rfc6749#section-3.1.2
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkState(AuthorizationInterface $authorization)
+    protected function checkState(Authorization $authorization)
     {
         if (null === ($authorization->getState()) && $this->getConfiguration()->get('enforce_state', false)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "state" parameter is mandatory');
         }
     }
 
-    protected function checkScope(AuthorizationInterface &$authorization)
+    protected function checkScope(Authorization &$authorization)
     {
         try {
             $scope = $this->getScopeManager()->checkScopePolicy($authorization->getClient(), $authorization->getScope());
@@ -243,12 +243,12 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Endpoint\AuthorizationInterface $authorization
+     * @param \OAuth2\Endpoint\Authorization $authorization
      *
      * @return \OAuth2\Grant\ResponseTypeSupportInterface[]
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function getResponseTypes(AuthorizationInterface $authorization)
+    protected function getResponseTypes(Authorization $authorization)
     {
         /*
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.1

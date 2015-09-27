@@ -2,7 +2,7 @@
 
 namespace OAuth2\Behaviour;
 
-use OAuth2\Endpoint\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization;
 use OAuth2\Endpoint\ResponseModeInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
@@ -25,12 +25,12 @@ trait HasResponseModeSupport
 
     /**
      * @param \OAuth2\Grant\ResponseTypeSupportInterface[] $types
-     * @param \OAuth2\Endpoint\AuthorizationInterface      $authorization
+     * @param \OAuth2\Endpoint\Authorization               $authorization
      *
      * @return \OAuth2\Endpoint\ResponseModeInterface
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function getResponseMode(array $types, AuthorizationInterface $authorization)
+    public function getResponseMode(array $types, Authorization $authorization)
     {
         if (null !== $authorization->getResponseMode() && true === $this->getConfiguration()->get('allow_response_mode_parameter_in_authorization_request', false)) {
             // The client uses the response_mode parameter and the server allows it
