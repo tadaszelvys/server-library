@@ -26,6 +26,7 @@ class AuthorizationFactory
         } elseif (isset($params['request_uri'])) {
             return $this->createFromRequestUriParameter($params);
         }
+
         return $this->createFromStandardRequest($params);
     }
 
@@ -72,8 +73,8 @@ class AuthorizationFactory
             'setAcrValues'    => 'acr_values',
         ];
 
-        foreach($methods as $method=>$param) {
-            $authorization->$method(isset($params['$param'])?$params['$param']:null);
+        foreach ($methods as $method => $param) {
+            $authorization->$method(isset($params['$param']) ? $params['$param'] : null);
         }
         $this->populateClient($params, $authorization);
         $this->populateScope($params, $authorization);
