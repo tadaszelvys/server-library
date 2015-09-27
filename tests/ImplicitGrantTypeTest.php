@@ -4,8 +4,8 @@ namespace OAuth2\Test;
 
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\BaseExceptionInterface;
-use Zend\Diactoros\Response;
 use PHPHtmlParser\Dom;
+use Zend\Diactoros\Response;
 
 /**
  * @group ImplicitGrantType

@@ -20,7 +20,7 @@ class FormPostResponseMode implements ResponseModeInterface
     public function prepareResponse($redirect_uri, array $data, ResponseInterface &$response)
     {
         $input = [];
-        foreach ($data as $key=>$value) {
+        foreach ($data as $key => $value) {
             $input[] = sprintf('<input type="hidden" name="%s" value="%s"/>', $key, $value);
         }
         $replacements = [

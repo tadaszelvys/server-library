@@ -64,7 +64,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         }
 
         $result = [];
-        foreach($types as $type) {
+        foreach ($types as $type) {
             $temp = $type->grantAuthorization($authorization);
             $result = array_merge($result, $temp);
         }
@@ -245,8 +245,9 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * @param \OAuth2\Endpoint\Authorization $authorization
      *
-     * @return \OAuth2\Grant\ResponseTypeSupportInterface[]
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\Grant\ResponseTypeSupportInterface[]
      */
     protected function getResponseTypes(Authorization $authorization)
     {
@@ -260,7 +261,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $types = explode(' ', $authorization->getResponseType());
         $response_types = [];
 
-        foreach($types as $type) {
+        foreach ($types as $type) {
             if (1 < count(array_keys($types, $type))) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'A response type appears more than once.');
             }

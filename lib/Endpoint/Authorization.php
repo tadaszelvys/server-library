@@ -38,7 +38,6 @@ namespace OAuth2\Endpoint;
  * @method null|string getAcrValues()
  * @method self setAcrValues(string $acr_values)
  */
-
 class Authorization
 {
     /**
@@ -132,9 +131,9 @@ class Authorization
      */
     protected $prompt = null;
 
-    const PROMPT_NONE ='none';
-    const PROMPT_LOGIN ='login';
-    const PROMPT_CONSENT ='consent';
+    const PROMPT_NONE = 'none';
+    const PROMPT_LOGIN = 'login';
+    const PROMPT_CONSENT = 'consent';
     const PROMPT_SELECT_ACCOUNT = 'select_account';
 
     public function getAllowedPromptValues()
@@ -215,6 +214,6 @@ class Authorization
             '_',
             array_map(
                 'strtolower',
-                preg_split('/([A-Z]{1}[^A-Z]*)/', $cameled, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY)));
+                preg_split('/([A-Z]{1}[^A-Z]*)/', $cameled, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY)));
     }
 }
