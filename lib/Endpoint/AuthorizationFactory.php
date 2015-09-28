@@ -26,6 +26,7 @@ class AuthorizationFactory
         } elseif (isset($params['request_uri'])) {
             return $this->createFromRequestUriParameter($params);
         }
+
         return $this->createFromStandardRequest($params);
     }
 
@@ -63,8 +64,8 @@ class AuthorizationFactory
             'setState'        => 'state',
         ];
 
-        foreach($methods as $method=>$param) {
-            $authorization->$method(isset($params['$param'])?$params['$param']:null);
+        foreach ($methods as $method => $param) {
+            $authorization->$method(isset($params['$param']) ? $params['$param'] : null);
         }
         $this->populateClient($authorization);
         /*$authorization->setClient()

@@ -3,9 +3,7 @@
 namespace OAuth2\Test;
 
 use OAuth2\Endpoint\Authorization;
-use OAuth2\Exception\BaseExceptionInterface;
 use Zend\Diactoros\Response;
-use Zend\Diactoros\Uri;
 
 /**
  * @group OpenIDConnect
@@ -34,6 +32,7 @@ class OpenIDConnectTest extends Base
     public function testCodeIdTokenTokenSuccess()
     {
         $this->markTestIncomplete('ID Token not yet implemented');
+
         return;
 
         $client = $this->getClientManagerSupervisor()->getClient('foo');

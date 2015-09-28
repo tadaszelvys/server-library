@@ -27,8 +27,9 @@ trait HasResponseModeSupport
      * @param \OAuth2\Grant\ResponseTypeSupportInterface[] $types
      * @param \OAuth2\Endpoint\Authorization               $authorization
      *
-     * @return \OAuth2\Endpoint\ResponseModeInterface
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\Endpoint\ResponseModeInterface
      */
     public function getResponseMode(array $types, Authorization $authorization)
     {
@@ -60,14 +61,14 @@ trait HasResponseModeSupport
      */
     public function getResponseModeIfMultipleResponseTypes($response_type)
     {
-        switch($response_type) {
+        switch ($response_type) {
             case 'code token':
             case 'code id_token':
             case 'id_token token':
             case 'code id_token token':
                 return 'fragment';
             default:
-                return null;
+                return;
         }
     }
 
