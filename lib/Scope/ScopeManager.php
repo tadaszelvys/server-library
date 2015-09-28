@@ -113,7 +113,7 @@ abstract class ScopeManager implements ScopeManagerInterface
 
     /**
      * @param string $scope
-     * @param array $scopes
+     * @param array  $scopes
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */

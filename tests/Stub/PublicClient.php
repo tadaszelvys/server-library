@@ -2,8 +2,8 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\Client\PublicClient as BasePublicClient;
+use OAuth2\Client\TokenLifetimeExtensionInterface;
 
 class PublicClient extends BasePublicClient implements TokenLifetimeExtensionInterface
 {

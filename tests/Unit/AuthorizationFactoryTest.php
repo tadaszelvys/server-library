@@ -13,12 +13,12 @@ class AuthorizationFactoryTest extends Base
     public function testCreateValidAuthorization()
     {
         $params = [
-            'client_id' => 'foo',
-            'state' => '0123456789',
-            'scope' => 'scope1 scope2',
+            'client_id'     => 'foo',
+            'state'         => '0123456789',
+            'scope'         => 'scope1 scope2',
             'response_type' => 'token',
-            'display' => 'page',
-            'prompt' => 'none',
+            'display'       => 'page',
+            'prompt'        => 'none',
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
         $authorization = $this->getAuthorizationFactory()->createFromRequest($request);
@@ -40,12 +40,12 @@ class AuthorizationFactoryTest extends Base
     public function testCreateAuthorizationWithBadPrompt()
     {
         $params = [
-            'client_id' => 'foo',
-            'state' => '0123456789',
-            'scope' => 'scope1 scope2',
+            'client_id'     => 'foo',
+            'state'         => '0123456789',
+            'scope'         => 'scope1 scope2',
             'response_type' => 'token',
-            'display' => 'page',
-            'prompt' => 'foo',
+            'display'       => 'page',
+            'prompt'        => 'foo',
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
         $this->getAuthorizationFactory()->createFromRequest($request);
@@ -58,12 +58,12 @@ class AuthorizationFactoryTest extends Base
     public function testCreateAuthorizationWithBadDisplay()
     {
         $params = [
-            'client_id' => 'foo',
-            'state' => '0123456789',
-            'scope' => 'scope1 scope2',
+            'client_id'     => 'foo',
+            'state'         => '0123456789',
+            'scope'         => 'scope1 scope2',
             'response_type' => 'token',
-            'display' => 'foo',
-            'prompt' => 'none',
+            'display'       => 'foo',
+            'prompt'        => 'none',
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
         $this->getAuthorizationFactory()->createFromRequest($request);
