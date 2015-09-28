@@ -4,7 +4,7 @@ namespace OAuth2\Endpoint;
 
 /**
  * @method string getClientId()
- * @method self setClient(string $client_id)
+ * @method self setClientId(string $client_id)
  * @method \OAuth2\Client\ClientInterface getClient()
  * @method self setClient(\OAuth2\Client\ClientInterface $client)
  * @method \OAuth2\EndUser\EndUserInterface getEndUser()
