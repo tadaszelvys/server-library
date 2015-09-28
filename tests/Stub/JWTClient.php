@@ -2,8 +2,8 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\Client\JWTClient as BaseJWTClient;
+use OAuth2\Client\TokenLifetimeExtensionInterface;
 
 class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
 {
