@@ -65,7 +65,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
 
             return;
         }
-        if (null === ($token)) {
+        if (null === $token) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
 
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
@@ -134,7 +134,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
     private function revokeToken(ResponseInterface &$response, $token = null, $token_type_hint = null, ClientInterface $client = null, $callback = null)
     {
         $methods = $this->getRevocationMethods();
-        if (null === ($token_type_hint)) {
+        if (null === $token_type_hint) {
             foreach ($methods as $method) {
                 $this->$method($token, $client);
             }

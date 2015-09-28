@@ -2,6 +2,7 @@
 
 namespace OAuth2\Test\Functional;
 
+use OAuth2\Exception\InternalServerErrorException;
 use OAuth2\Test\Base;
 
 /**
@@ -34,5 +35,24 @@ class BearerTokenTest extends Base
 
         $this->assertEquals('ABCD', $access_token);
         $this->assertInstanceOf('\OAuth2\Token\BearerAccessToken', $type);
+    }
+
+    public function testInvalidAccessToken()
+    {
+        $request = $this->createRequest('/', 'GET', [], [], ['Authorization' => 'MAC ABCD']);
+        $access_token = $this->getAccessTokenTypeManager()->findAccessToken($request, $type);
+
+        $this->assertNull($access_token);
+    }
+
+    public function testAccessTokenTypeAlreadyAdded()
+    {
+        try {
+            $this->getAccessTokenTypeManager()->addAccessTokenType($this->getBearerAccessTokenType());
+            $this->fail('Should throw an Exception');
+        } catch (InternalServerErrorException $e) {
+            $this->assertEquals('server_error', $e->getMessage());
+            $this->assertEquals('Scheme "Bearer" already defined.', $e->getDescription());
+        }
     }
 }

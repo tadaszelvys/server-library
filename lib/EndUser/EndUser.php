@@ -9,7 +9,7 @@ use OAuth2\ResourceOwner\ResourceOwner;
  */
 class EndUser extends ResourceOwner implements EndUserInterface
 {
-    private $last_login_at = null;
+    protected $last_login_at = null;
 
     public function __construct()
     {

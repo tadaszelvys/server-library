@@ -37,7 +37,7 @@ class RefreshTokenGrantType implements GrantTypeSupportInterface
     public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         $refresh_token = RequestBody::getParameter($request, 'refresh_token');
-        if (null === ($refresh_token)) {
+        if (null === $refresh_token) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'No "refresh_token" parameter found');
         }
 

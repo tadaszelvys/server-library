@@ -59,4 +59,16 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
     {
         return $client instanceof ConfidentialClientInterface;
     }
+
+    /**
+     * @param int $last_login_at
+     *
+     * @return self
+     */
+    public function setLastLoginAt($last_login_at)
+    {
+        $this->last_login_at = $last_login_at;
+
+        return $this;
+    }
 }

@@ -153,7 +153,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
         }
 
         $client = $this->checkResult($credentials);
-        if (null === ($client)) {
+        if (null === $client) {
             return $client;
         }
 

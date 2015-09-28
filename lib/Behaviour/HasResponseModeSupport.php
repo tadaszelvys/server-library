@@ -36,7 +36,7 @@ trait HasResponseModeSupport
         if (null !== $authorization->getResponseMode() && true === $this->getConfiguration()->get('allow_response_mode_parameter_in_authorization_request', false)) {
             // The client uses the response_mode parameter and the server allows it
             $mode = $authorization->getResponseMode();
-        } elseif (null !== ($multiple = $this->getResponseModeIfMultipleResponseTypes($authorization->getResponseType()))) {
+        } elseif (null !== $multiple = $this->getResponseModeIfMultipleResponseTypes($authorization->getResponseType())) {
             // The response type contains multiple types defined by OpenID Connect Specification
             $mode = $multiple;
         } elseif (1 < count($types)) {

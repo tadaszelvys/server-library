@@ -220,7 +220,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     protected function checkState(Authorization $authorization)
     {
-        if (null === ($authorization->getState()) && $this->getConfiguration()->get('enforce_state', false)) {
+        if (null === $authorization->getState() && $this->getConfiguration()->get('enforce_state', false)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "state" parameter is mandatory');
         }
     }
@@ -254,7 +254,7 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         /*
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.1
          */
-        if (null === ($authorization->getResponseType())) {
+        if (null === $authorization->getResponseType()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing');
         }
 

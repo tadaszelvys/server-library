@@ -24,10 +24,10 @@ class BaseException extends \Exception implements BaseExceptionInterface
         //Check %x20-21 / %x23-5B / %x5D-7E for error and error_description
         //Check %x21 / %x23-5B / %x5D-7E for error_uri
         $this->errorData['error'] = $error;
-        if (null !== ($error_description)) {
+        if (null !== $error_description) {
             $this->errorData['error_description'] = $error_description;
         }
-        if (null !== ($error_uri)) {
+        if (null !== $error_uri) {
             $this->errorData['error_uri'] = urlencode($error_uri);
         }
     }

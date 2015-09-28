@@ -17,6 +17,14 @@ interface AccessTokenTypeManagerInterface
     public function findAccessToken(ServerRequestInterface $request, AccessTokenTypeInterface &$access_token_type = null);
 
     /**
+     * @param \OAuth2\Token\AccessTokenTypeInterface $access_token_type
+     * @param bool                                   $default
+     *
+     * @return self
+     */
+    public function addAccessTokenType(AccessTokenTypeInterface $access_token_type, $default = false);
+
+    /**
      * @return \OAuth2\Token\AccessTokenTypeInterface
      */
     public function getDefaultAccessTokenType();

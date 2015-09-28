@@ -107,9 +107,9 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $jwt = $this->encrypt($jwt, $client);
 
         $access_token = new AccessToken();
-        $access_token->setRefreshToken(null === ($refresh_token) ? null : $refresh_token->getToken())
+        $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken())
             ->setExpiresAt(time() + $this->getLifetime($client))
-            ->setResourceOwnerPublicId(null === ($resource_owner) ? null : $resource_owner->getPublicId())
+            ->setResourceOwnerPublicId(null === $resource_owner ? null : $resource_owner->getPublicId())
             ->setScope($scope)
             ->setToken($jwt)
             ->setClientPublicId($client->getPublicId());
@@ -153,7 +153,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         );
 
         $jti = $this->generateTokenID();
-        if (null !== ($jti)) {
+        if (null !== $jti) {
             $header['jti'] = $jti;
         }
 
@@ -180,7 +180,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         );
 
         $jti = $this->generateTokenID();
-        if (null !== ($jti)) {
+        if (null !== $jti) {
             $header['jti'] = $jti;
         }
 
@@ -221,10 +221,10 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
             ],
             $this->getJWTExtraClaims()
         );
-        if (null !== ($resource_owner)) {
+        if (null !== $resource_owner) {
             $payload['r_o'] = $resource_owner->getPublicId();
         }
-        if (null !== ($refresh_token)) {
+        if (null !== $refresh_token) {
             $payload['ref'] = $refresh_token->getToken();
         }
 
@@ -243,7 +243,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $header = $this->prepareSignatureHeader();
         $key = $this->getJWTFactory()->getKeyManager()->createJWK($this->getSignaturePrivateKey());
 
-        if (null !== ($key->getKeyID())) {
+        if (null !== $key->getKeyID()) {
             $header['kid'] = $key->getKeyID();
         }
         $instruction = new SignatureInstruction();
@@ -282,12 +282,12 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $public_key = $this->getJWTFactory()->getKeyManager()->createJWK($this->getEncryptionPublicKey());
         $private_key = $this->getJWTFactory()->getKeyManager()->createJWK($this->getEncryptionPrivateKey());
 
-        if (null !== ($public_key->getKeyID())) {
+        if (null !== $public_key->getKeyID()) {
             $header['kid'] = $public_key->getKeyID();
         }
         $instruction = new EncryptionInstruction();
         $instruction->setRecipientKey($public_key);
-        if (null !== ($private_key)) {
+        if (null !== $private_key) {
             $instruction->setSenderKey($private_key);
         }
 
@@ -316,13 +316,13 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $access_token->setClientPublicId($jwt->getSubject())
             ->setExpiresAt($jwt->getExpirationTime())
             ->setToken($assertion);
-        if (null !== ($resource_owner = $jwt->getPayloadValue('r_o'))) {
+        if (null !== $resource_owner = $jwt->getPayloadValue('r_o')) {
             $access_token->setResourceOwnerPublicId($resource_owner);
         }
-        if (null !== ($scope = $jwt->getPayloadValue('sco'))) {
+        if (null !== $scope = $jwt->getPayloadValue('sco')) {
             $access_token->setScope($scope);
         }
-        if (null !== ($refresh_token = $jwt->getPayloadValue('ref'))) {
+        if (null !== $refresh_token = $jwt->getPayloadValue('ref')) {
             $access_token->setRefreshToken($refresh_token);
         }
 
@@ -407,7 +407,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     protected function verifyAssertion(JWTInterface $jwt)
     {
         foreach ($this->getRequiredClaims() as $claim) {
-            if (null === ($jwt->getHeaderOrPayloadValue($claim))) {
+            if (null === $jwt->getHeaderOrPayloadValue($claim)) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Claim "%s" is mandatory.', $claim));
             }
         }

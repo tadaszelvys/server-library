@@ -183,7 +183,7 @@ trait CanLoadJWT
     protected function verifyAssertion(JWTInterface $jwt)
     {
         foreach ($this->getRequiredClaims() as $claim) {
-            if (null === ($jwt->getHeaderOrPayloadValue($claim))) {
+            if (null === $jwt->getHeaderOrPayloadValue($claim)) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Claim "%s" is mandatory.', $claim));
             }
         }
