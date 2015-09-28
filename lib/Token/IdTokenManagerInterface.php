@@ -3,19 +3,20 @@
 namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
+use OAuth2\EndUser\EndUserInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
 interface IdTokenManagerInterface
 {
     /**
      * @param \OAuth2\Client\ClientInterface                    $client         The client associated with this access token.
+     * @param \OAuth2\EndUser\EndUserInterface                  $end_user       Resource owner associated with the access token.
      * @param string[]                                          $scope          (optional) Scopes of the access token.
-     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface|null $resource_owner (optional) Resource owner associated with the access token.
      * @param \OAuth2\Token\RefreshTokenInterface|null          $refresh_token  (optional) Refresh token associated with the access token.
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    public function createIdToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null);
+    public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $scope = [], RefreshTokenInterface $refresh_token = null);
 
     /**
      * @param \OAuth2\Token\IdTokenInterface $token The ID token to revoke

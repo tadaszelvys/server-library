@@ -30,7 +30,7 @@ class IdTokenResponseType implements ResponseTypeSupportInterface
      */
     public function grantAuthorization(Authorization $authorization)
     {
-        $id_token = $this->getIdTokenManager()->createIdToken($authorization->getClient(), $authorization->getScope(), $authorization->getResourceOwner());
+        $id_token = $this->getIdTokenManager()->createIdToken($authorization->getClient(), $authorization->getEndUser(), $authorization->getScope());
 
         $params = [
             'id_token' => $id_token,

@@ -29,7 +29,9 @@ class ImplicitGrantTypeTest extends Base
     public function testRedirectUriParameterWithFragment()
     {
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test#bad');
+        $authorization
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setRedirectUri('http://example.com/test#bad');
 
         $response = new Response();
         try {
@@ -51,7 +53,8 @@ class ImplicitGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=true')
-                      ->setClient($client);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client);
 
         $response = new Response();
         try {
@@ -73,7 +76,8 @@ class ImplicitGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client);
 
         $response = new Response();
         try {
@@ -95,8 +99,9 @@ class ImplicitGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('bad_response_type');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -118,8 +123,9 @@ class ImplicitGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('bad_response_type');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -141,8 +147,9 @@ class ImplicitGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('token');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('token');
 
         $response = new Response();
         try {
@@ -164,9 +171,10 @@ class ImplicitGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setAuthorized(false)
-                      ->setResponseType('token');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setAuthorized(false)
+            ->setResponseType('token');
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -183,9 +191,10 @@ class ImplicitGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('token')
-                      ->setAuthorized(true);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('token')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -202,10 +211,11 @@ class ImplicitGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('token')
-                      ->setState('0123456789')
-                      ->setAuthorized(true);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('token')
+            ->setState('0123456789')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -222,11 +232,12 @@ class ImplicitGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('token')
-                      ->setState('0123456789')
-                      ->setResponseMode('form_post')
-                      ->setAuthorized(true);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('token')
+            ->setState('0123456789')
+            ->setResponseMode('form_post')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);

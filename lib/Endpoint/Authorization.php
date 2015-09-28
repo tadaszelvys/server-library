@@ -5,8 +5,8 @@ namespace OAuth2\Endpoint;
 /**
  * @method \OAuth2\Client\ClientInterface getClient()
  * @method self setClient(\OAuth2\Client\ClientInterface $client)
- * @method \OAuth2\ResourceOwner\ResourceOwnerInterface getResourceOwner()
- * @method self setResourceOwner(\OAuth2\ResourceOwner\ResourceOwnerInterface $client)
+ * @method \OAuth2\EndUser\EndUserInterface getEndUser()
+ * @method self setEndUser(\OAuth2\EndUser\EndUserInterface $end_user)
  * @method null|string getResponseType()
  * @method self setResponseType(string $response_type)
  * @method null|string getRedirectUri()
@@ -61,9 +61,9 @@ class Authorization
     protected $redirect_uri = null;
 
     /**
-     * @var null|\OAuth2\ResourceOwner\ResourceOwnerInterface
+     * @var null|\OAuth2\EndUser\EndUserInterface
      */
-    protected $resource_owner = null;
+    protected $end_user = null;
 
     /**
      * @var array

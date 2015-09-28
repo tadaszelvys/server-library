@@ -20,9 +20,10 @@ class OpenIDConnectTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('code token')
-                      ->setAuthorized(true);
+            ->setClient($client)
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setResponseType('code token')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -43,9 +44,10 @@ class OpenIDConnectTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('code id_token token')
-                      ->setAuthorized(true);
+            ->setClient($client)
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setResponseType('code id_token token')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -63,10 +65,11 @@ class OpenIDConnectTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('none')
-                      ->setState('0123456789')
-                      ->setAuthorized(true);
+            ->setClient($client)
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setResponseType('none')
+            ->setState('0123456789')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);

@@ -9,4 +9,8 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
  */
 interface EndUserInterface extends ResourceOwnerInterface
 {
+    /**
+     * @return int
+     */
+    public function getLastLoginAt();
 }

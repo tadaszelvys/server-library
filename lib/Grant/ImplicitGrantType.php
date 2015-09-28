@@ -32,7 +32,7 @@ class ImplicitGrantType implements ResponseTypeSupportInterface
      */
     public function grantAuthorization(Authorization $authorization)
     {
-        $token = $this->getAccessTokenManager()->createAccessToken($authorization->getClient(), $authorization->getScope(), $authorization->getResourceOwner());
+        $token = $this->getAccessTokenManager()->createAccessToken($authorization->getClient(), $authorization->getEndUser(), $authorization->getScope());
         $params = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType()->prepareAccessToken($token);
 
         $state = $authorization->getState();

@@ -21,17 +21,17 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
      * @param string                                       $token         Token
      * @param int                                          $expiresAt     Time until the code is valid
      * @param \OAuth2\Client\ClientInterface               $client        Client
-     * @param string[]                                     $scope         Scope
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resourceOwner Resource owner
+     * @param string[]                                     $scope         Scope
      *
      * @return \OAuth2\Token\RefreshTokenInterface
      */
-    abstract protected function addRefreshToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null);
+    abstract protected function addRefreshToken($token, $expiresAt, ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = []);
 
     /**
      * {@inheritdoc}
      */
-    public function createRefreshToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null)
+    public function createRefreshToken(ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [])
     {
         $length = $this->getConfiguration()->get('refresh_token_length', 20);
         $charset = $this->getConfiguration()->get('refresh_token_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
@@ -44,7 +44,7 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
             throw $this->createException('An error has occurred during the creation of the refresh token.');
         }
 
-        $refresh_token = $this->addRefreshToken($token, time() + $this->getLifetime($client), $client, $scope, $resourceOwner);
+        $refresh_token = $this->addRefreshToken($token, time() + $this->getLifetime($client), $client, $resourceOwner, $scope);
 
         return $refresh_token;
     }

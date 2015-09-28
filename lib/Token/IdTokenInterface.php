@@ -2,7 +2,7 @@
 
 namespace OAuth2\Token;
 
-interface IdTokenInterface extends TokenInterface, \JsonSerializable
+interface IdTokenInterface extends TokenInterface
 {
     /**
      * The unique token string to identify the Access Token.

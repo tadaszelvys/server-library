@@ -41,7 +41,7 @@ class SimpleStringAccessTokenManager extends Base
     /**
      * {@inheritdoc}
      */
-    protected function addAccessToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null)
+    protected function addAccessToken($token, $expiresAt, ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [], RefreshTokenInterface $refresh_token = null)
     {
         $access_token = new AccessToken();
         $access_token->setExpiresAt($expiresAt)

@@ -99,7 +99,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function createAccessToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null)
+    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [], RefreshTokenInterface $refresh_token = null)
     {
         $payload = $this->preparePayload($client, $scope, $resource_owner, $refresh_token);
 

@@ -56,7 +56,8 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/bade.redirect?URI')
-                      ->setClient($client);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client);
 
         $response = new Response();
         try {
@@ -78,7 +79,8 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client);
 
         $response = new Response();
         try {
@@ -100,8 +102,9 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('bad_response_type');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -123,8 +126,9 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('bad_response_type');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -146,8 +150,9 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('bad_response_type');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -169,8 +174,9 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('https://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('bad_response_type');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -192,7 +198,8 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setClient($client)
-                      ->setResponseType('token');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setResponseType('token');
 
         $response = new Response();
         try {
@@ -214,8 +221,9 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('code');
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('code');
 
         $response = new Response();
         try {
@@ -237,9 +245,10 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('code')
-                      ->setAuthorized(false);
+            ->setClient($client)
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setResponseType('code')
+            ->setAuthorized(false);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -256,9 +265,10 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('code')
-                      ->setAuthorized(true);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('code')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -275,8 +285,9 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setClient($client)
-                      ->setResponseType('code')
-                      ->setAuthorized(true);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setResponseType('code')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -293,9 +304,10 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('https://another.uri/callback')
-                      ->setClient($client)
-                      ->setResponseType('code')
-                      ->setAuthorized(true);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('code')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -312,10 +324,11 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('code')
-                      ->setState('0123456789')
-                      ->setAuthorized(true);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('code')
+            ->setState('0123456789')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -332,10 +345,11 @@ class AuthCodeGrantTypeTest extends Base
         }
         $authorization = new Authorization();
         $authorization->setRedirectUri('http://example.com/test?good=false')
-                      ->setClient($client)
-                      ->setResponseType('code')
-                      ->setState('0123456789')
-                      ->setAuthorized(true);
+            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
+            ->setClient($client)
+            ->setResponseType('code')
+            ->setState('0123456789')
+            ->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);

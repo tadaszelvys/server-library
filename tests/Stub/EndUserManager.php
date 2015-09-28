@@ -36,8 +36,8 @@ class EndUserManager implements EndUserManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getEndUser($username)
+    public function getEndUser($public_id)
     {
-        return isset($this->users[$username]) ? $this->users[$username] : null;
+        return isset($this->users[$public_id]) ? $this->users[$public_id] : null;
     }
 }

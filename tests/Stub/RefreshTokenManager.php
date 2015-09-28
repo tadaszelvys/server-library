@@ -21,19 +21,20 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
     public function __construct()
     {
         $bar = new PasswordClient();
-        $bar->setPublicId('bar')
-            ->setSecret('secret')
+        $bar->setSecret('secret')
+            ->setRedirectUris(['http://example.com/test?good=false'])
             ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
-            ->setRedirectUris(['http://example.com/test?good=false']);
+            ->setPublicId('bar');
 
         $foo = new PublicClient();
-        $foo->setPublicId('foo')
+        $foo->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback'])
             ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
-            ->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback']);
+            ->setPublicId('foo');
 
         $this->addRefreshToken(
             'VALID_REFRESH_TOKEN',
             time() + 10000,
+            $bar,
             $bar,
             ['scope1', 'scope2', 'scope3']
         );
@@ -41,12 +42,14 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
             'EXPIRED_REFRESH_TOKEN',
             time() - 1,
             $foo,
+            $foo,
             ['scope1', 'scope2', 'scope3']
         );
 
         $this->addRefreshToken(
             'REFRESH_EFGH',
             time() + 36000,
+            $foo,
             $foo,
             []
         );
@@ -57,15 +60,15 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
         return array_keys($this->refresh_tokens);
     }
 
-    protected function addRefreshToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null)
+    protected function addRefreshToken($token, $expiresAt, ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [])
     {
         $refresh_token = new RefreshToken();
-        $refresh_token->setExpiresAt($expiresAt)
+        $refresh_token->setUsed(false)
+                      ->setExpiresAt($expiresAt)
                       ->setToken($token)
                       ->setClientPublicId($client->getPublicId())
                       ->setResourceOwnerPublicId(is_null($resourceOwner) ? null : $resourceOwner->getPublicId())
-                      ->setScope($scope)
-                      ->setUsed(false);
+                      ->setScope($scope);
 
         $this->refresh_tokens[$refresh_token->getToken()] = $refresh_token;
 

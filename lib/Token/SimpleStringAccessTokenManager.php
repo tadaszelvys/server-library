@@ -18,20 +18,20 @@ abstract class SimpleStringAccessTokenManager extends AccessTokenManager
      * @param string                                       $token         Code
      * @param int                                          $expiresAt     Time until the code is valid
      * @param \OAuth2\Client\ClientInterface               $client        Client
-     * @param string[]                                     $scope         Scope
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resourceOwner Resource owner
+     * @param string[]                                     $scope         Scope
      * @param \OAuth2\Token\RefreshTokenInterface          $refresh_token Refresh token
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    abstract protected function addAccessToken($token, $expiresAt, ClientInterface $client, array $scope = [], ResourceOwnerInterface $resourceOwner = null, RefreshTokenInterface $refresh_token = null);
+    abstract protected function addAccessToken($token, $expiresAt, ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [], RefreshTokenInterface $refresh_token = null);
 
     /**
      * {@inheritdoc}
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function createAccessToken(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null)
+    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [], RefreshTokenInterface $refresh_token = null)
     {
         $length = $this->getConfiguration()->get('simple_string_access_token_length', 20);
         $charset = $this->getConfiguration()->get('simple_string_access_token_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
@@ -44,7 +44,7 @@ abstract class SimpleStringAccessTokenManager extends AccessTokenManager
             throw $this->createException('An error has occurred during the creation of the token.');
         }
 
-        $access_token = $this->addAccessToken($token, time() + $this->getLifetime($client), $client, $scope, $resource_owner, $refresh_token);
+        $access_token = $this->addAccessToken($token, time() + $this->getLifetime($client), $client, $resource_owner, $scope, $refresh_token);
 
         return $access_token;
     }

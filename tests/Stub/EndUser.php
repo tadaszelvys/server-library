@@ -26,6 +26,7 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
     public function __construct($username, $password)
     {
         parent::__construct();
+        $this->setPublicId($username);
         $this->username = $username;
         $this->password = $password;
     }

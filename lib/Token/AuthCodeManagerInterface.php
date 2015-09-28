@@ -3,6 +3,8 @@
 namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
+use OAuth2\EndUser\EndUser;
+use OAuth2\EndUser\EndUserInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
 interface AuthCodeManagerInterface
@@ -26,14 +28,14 @@ interface AuthCodeManagerInterface
      * bail out of the script and provide a descriptive fail message.
      *
      * @param ClientInterface        $client            The client associated with this authorization code.
+     * @param EndUserInterface       $end_user          End user to associate with this authorization code.
      * @param string                 $redirectUri       Redirect URI to be stored.
      * @param string[]               $scope             (optional) Scopes to be stored.
-     * @param ResourceOwnerInterface $resourceOwner     (optional) Application data to associate with this authorization code, such as a User object.
      * @param bool                   $issueRefreshToken (optional) Issue a refresh token with the access token.
      *
      * @return null|AuthCodeInterface
      */
-    public function createAuthCode(ClientInterface $client, $redirectUri, array $scope = [], ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false);
+    public function createAuthCode(ClientInterface $client, EndUserInterface $end_user, $redirectUri, array $scope = [], $issueRefreshToken = false);
 
     /**
      * Marks auth code as expired.

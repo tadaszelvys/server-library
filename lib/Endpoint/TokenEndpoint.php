@@ -78,7 +78,7 @@ class TokenEndpoint implements TokenEndpointInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Method must be POST.');
         }
 
-        if (null === (RequestBody::getParameter($request, 'grant_type'))) {
+        if (null === RequestBody::getParameter($request, 'grant_type')) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "grant_type" parameter is missing.');
         }
 
@@ -151,6 +151,7 @@ class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
      *
      * @return \OAuth2\Client\ClientInterface
+     * @throws \OAuth2\Exception\BaseExceptionInterface
      */
     protected function findClient(ServerRequestInterface $request, GrantTypeResponseInterface $grant_type_response)
     {
@@ -177,17 +178,17 @@ class TokenEndpoint implements TokenEndpointInterface
     {
         $refresh_token = null;
         $resource_owner = $this->getResourceOwner($values['resource_owner_public_id']);
-        if (null !== ($this->getRefreshTokenManager())) {
+        if (null !== $this->getRefreshTokenManager()) {
             if (true === $values['refresh_token']['issued']) {
                 $values['refresh_token']['scope'] = $this->getScopeManager()->convertToScope($values['refresh_token']['scope']);
-                $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $values['refresh_token']['scope'], $resource_owner);
+                $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $resource_owner, $values['refresh_token']['scope']);
             }
             if ($values['refresh_token']['used'] instanceof RefreshTokenInterface) {
                 $this->getRefreshTokenManager()->markRefreshTokenAsUsed($values['refresh_token']['used']);
             }
         }
 
-        $access_token = $this->getAccessTokenManager()->createAccessToken($client, $values['requested_scope'], $resource_owner, $refresh_token);
+        $access_token = $this->getAccessTokenManager()->createAccessToken($client, $resource_owner, $values['requested_scope'], $refresh_token);
 
         return $access_token;
     }
@@ -221,18 +222,22 @@ class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param string $resource_owner_public_id
+     * @param $resource_owner_public_id
      *
-     * @return \OAuth2\ResourceOwner\ResourceOwnerInterface
+     * @return null|\OAuth2\Client\ClientInterface|\OAuth2\EndUser\EndUserInterface
+     * @throws \OAuth2\Exception\BaseExceptionInterface
      */
     protected function getResourceOwner($resource_owner_public_id)
     {
         $client = $this->getClientManagerSupervisor()->getClient($resource_owner_public_id);
-        if (null !== ($client)) {
+        if (null !== $client) {
             return $client;
         }
         $end_user = $this->getEndUserManager()->getEndUser($resource_owner_public_id);
+        if (null !== $end_user) {
+            return $end_user;
+        }
 
-        return null === ($end_user) ? null : $end_user;
+        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
     }
 }

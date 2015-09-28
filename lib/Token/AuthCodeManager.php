@@ -6,6 +6,8 @@ use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\EndUser\EndUser;
+use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use Security\DefuseGenerator;
@@ -23,17 +25,17 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
      * @param ClientInterface                              $client            Client
      * @param string                                       $redirectUri       Redirect URI
      * @param string[ ]                                    $scope             Scope
-     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resourceOwner     Resource owner
+     * @param \OAuth2\EndUser\EndUserInterface             $end_user     Resource owner
      * @param bool                                         $issueRefreshToken Issue a refresh token with the access token
      *
      * @return \OAuth2\Token\AuthCodeInterface
      */
-    abstract protected function addAuthCode($code, $expiresAt, ClientInterface $client, $redirectUri, array $scope = [], ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false);
+    abstract protected function addAuthCode($code, $expiresAt, ClientInterface $client, EndUserInterface $end_user, $redirectUri, array $scope = [], $issueRefreshToken = false);
 
     /**
      * {@inheritdoc}
      */
-    public function createAuthCode(ClientInterface $client, $redirectUri, array $scope = [], ResourceOwnerInterface $resourceOwner = null, $issueRefreshToken = false)
+    public function createAuthCode(ClientInterface $client, EndUserInterface $end_user, $redirectUri, array $scope = [], $issueRefreshToken = false)
     {
         $length = $this->getConfiguration()->get('auth_code_length', 20);
         $charset = $this->getConfiguration()->get('auth_code_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
@@ -46,7 +48,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
             throw $this->createException('An error has occurred during the creation of the authorization code.');
         }
 
-        $authcode = $this->addAuthCode($code, time() + $this->getLifetime($client), $client, $redirectUri, $scope, $resourceOwner, $issueRefreshToken);
+        $authcode = $this->addAuthCode($code, time() + $this->getLifetime($client), $client, $end_user, $redirectUri, $scope, $issueRefreshToken);
 
         return $authcode;
     }

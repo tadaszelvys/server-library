@@ -9,9 +9,16 @@ use OAuth2\ResourceOwner\ResourceOwner;
  */
 class EndUser extends ResourceOwner implements EndUserInterface
 {
+    private $last_login_at = null;
+
     public function __construct()
     {
         parent::__construct();
         $this->setType('end_user');
+    }
+
+    public function getLastLoginAt()
+    {
+        return $this->last_login_at;
     }
 }
