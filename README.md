@@ -31,25 +31,26 @@ The following components are implemented:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
     * [ ] MAC access ([IETF draft](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-05)) - *The implementation is stopped until the specification has not reach maturity*
 * [x] Exception manager
+* [x] Scope manager ([RFC67849, section 3.3](https://tools.ietf.org/html/rfc6749#section-3.3))
 * [ ] Clients:
-    * [x] Public clients
-    * [x] Password clients
+    * [x] Public clients ([RFC67849, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1))
+    * [x] Password clients ([RFC67849, section 2.3.1](https://tools.ietf.org/html/rfc6749#section-2.3.1))
         * [x] HTTP Basic Authentication Scheme
         * [x] HTTP Digest Authentication Scheme
         * [x] Credentials from request body
     * [ ] SAML clients ([RFC7522](https://tools.ietf.org/html/rfc7522))
     * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523))
-    * [x] Unregistered clients
+    * [x] Unregistered clients ([RFC67849, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4))
 * [x] Endpoints:
-    * [x] Authorization endpoint
-    * [x] Token endpoint
+    * [x] Authorization endpoint ([RFC67849, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
+    * [x] Token endpoint ([RFC67849, section 3.2](https://tools.ietf.org/html/rfc6749#section-3.2))
     * [x] Token revocation endpoint ([RFC7009](https://tools.ietf.org/html/rfc7009))
 * [ ] Grant types:
-    * [x] Implicit grant type
-    * [x] Authorization code grant type
-    * [x] Client credentials grant type
-    * [x] Resource Owner Password Credentials grant type
-    * [x] Refresh token grant type
+    * [x] Authorization code grant type ([RFC67849, section 4.1](https://tools.ietf.org/html/rfc6749#section-4.1))
+    * [x] Implicit grant type ([RFC67849, section 4.2](https://tools.ietf.org/html/rfc6749#section-4.2))
+    * [x] Resource Owner Password Credentials grant type ([RFC67849, section 4.3](https://tools.ietf.org/html/rfc6749#section-4.3))
+    * [x] Client credentials grant type ([RFC67849, section 4.4](https://tools.ietf.org/html/rfc6749#section-4.4))
+    * [x] Refresh token grant type ([RFC67849, section 6](https://tools.ietf.org/html/rfc6749#section-6))
     * [ ] SAML grant type ([RFC7522](https://tools.ietf.org/html/rfc7522))
     * [x] JWT Bearer token grant type ([RFC7523](https://tools.ietf.org/html/rfc7523))
 
