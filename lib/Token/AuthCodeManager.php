@@ -6,10 +6,8 @@ use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\EndUser\EndUser;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use Security\DefuseGenerator;
 
 abstract class AuthCodeManager implements AuthCodeManagerInterface
@@ -20,13 +18,13 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     /**
      * Generate and add an Authorization Code using the parameters.
      *
-     * @param string                                       $code              Code
-     * @param int                                          $expiresAt         Time until the code is valid
-     * @param ClientInterface                              $client            Client
-     * @param string                                       $redirectUri       Redirect URI
-     * @param string[ ]                                    $scope             Scope
-     * @param \OAuth2\EndUser\EndUserInterface             $end_user     Resource owner
-     * @param bool                                         $issueRefreshToken Issue a refresh token with the access token
+     * @param string                           $code              Code
+     * @param int                              $expiresAt         Time until the code is valid
+     * @param ClientInterface                  $client            Client
+     * @param string                           $redirectUri       Redirect URI
+     * @param string[ ]                        $scope             Scope
+     * @param \OAuth2\EndUser\EndUserInterface $end_user          Resource owner
+     * @param bool                             $issueRefreshToken Issue a refresh token with the access token
      *
      * @return \OAuth2\Token\AuthCodeInterface
      */

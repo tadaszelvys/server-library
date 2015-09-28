@@ -150,8 +150,9 @@ class TokenEndpoint implements TokenEndpointInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
      *
-     * @return \OAuth2\Client\ClientInterface
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\Client\ClientInterface
      */
     protected function findClient(ServerRequestInterface $request, GrantTypeResponseInterface $grant_type_response)
     {
@@ -224,8 +225,9 @@ class TokenEndpoint implements TokenEndpointInterface
     /**
      * @param $resource_owner_public_id
      *
-     * @return null|\OAuth2\Client\ClientInterface|\OAuth2\EndUser\EndUserInterface
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return null|\OAuth2\Client\ClientInterface|\OAuth2\EndUser\EndUserInterface
      */
     protected function getResourceOwner($resource_owner_public_id)
     {
