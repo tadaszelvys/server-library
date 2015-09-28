@@ -3,8 +3,6 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\PasswordClient;
-use OAuth2\Client\PublicClient;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Token\RefreshToken;
 use OAuth2\Token\RefreshTokenInterface;

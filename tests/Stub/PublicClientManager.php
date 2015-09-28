@@ -2,7 +2,6 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\PublicClient;
 use OAuth2\Client\PublicClientManager as Base;
 use Psr\Http\Message\ServerRequestInterface;
 

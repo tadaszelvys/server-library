@@ -1,8 +1,9 @@
 <?php
 
-namespace OAuth2\Test;
+namespace OAuth2\Test\Unit;
 
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Test\Base;
 
 /**
  * @group Objects

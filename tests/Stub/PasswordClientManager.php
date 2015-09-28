@@ -2,7 +2,6 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\PasswordClient;
 use OAuth2\Client\PasswordClientManager as Base;
 
 class PasswordClientManager extends Base

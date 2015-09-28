@@ -1,9 +1,10 @@
 <?php
 
-namespace OAuth2\Test;
+namespace OAuth2\Test\Functional;
 
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Test\Base;
 use SpomkyLabs\Service\Jose;
 use Zend\Diactoros\Response;
 

@@ -2,7 +2,6 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\JWTClient;
 use OAuth2\Client\JWTClientManager as Base;
 
 class JWTClientManager extends Base
