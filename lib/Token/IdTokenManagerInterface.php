@@ -4,15 +4,14 @@ namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\EndUser\EndUserInterface;
-use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
 interface IdTokenManagerInterface
 {
     /**
-     * @param \OAuth2\Client\ClientInterface                    $client         The client associated with this access token.
-     * @param \OAuth2\EndUser\EndUserInterface                  $end_user       Resource owner associated with the access token.
-     * @param string[]                                          $scope          (optional) Scopes of the access token.
-     * @param \OAuth2\Token\RefreshTokenInterface|null          $refresh_token  (optional) Refresh token associated with the access token.
+     * @param \OAuth2\Client\ClientInterface           $client        The client associated with this access token.
+     * @param \OAuth2\EndUser\EndUserInterface         $end_user      Resource owner associated with the access token.
+     * @param string[]                                 $scope         (optional) Scopes of the access token.
+     * @param \OAuth2\Token\RefreshTokenInterface|null $refresh_token (optional) Refresh token associated with the access token.
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
