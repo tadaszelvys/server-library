@@ -56,6 +56,9 @@ class AuthorizationFactory
     public function createFromStandardRequest(array $params)
     {
         $authorization = new Authorization();
+
+        $authorization->setQueryParams($params);
+
         $methods = [
             'setRedirectUri'  => 'redirect_uri',
             'setResponseMode' => 'response_mode',

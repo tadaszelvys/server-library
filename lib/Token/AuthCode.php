@@ -15,6 +15,11 @@ class AuthCode extends Token implements AuthCodeInterface
     protected $redirect_uri;
 
     /**
+     * @var array
+     */
+    protected $query_params;
+
+    /**
      * {@inheritdoc}
      */
     public function getIssueRefreshToken()
@@ -23,9 +28,7 @@ class AuthCode extends Token implements AuthCodeInterface
     }
 
     /**
-     * @param bool $issue_refresh_token
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setIssueRefreshToken($issue_refresh_token)
     {
@@ -43,13 +46,29 @@ class AuthCode extends Token implements AuthCodeInterface
     }
 
     /**
-     * @param string $redirect_uri
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setRedirectUri($redirect_uri)
     {
         $this->redirect_uri = $redirect_uri;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQueryParams()
+    {
+        return $this->query_params;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setQueryParams(array $query_params)
+    {
+        $this->query_params = $query_params;
 
         return $this;
     }

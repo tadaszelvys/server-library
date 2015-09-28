@@ -10,6 +10,24 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
 interface AuthCodeManagerInterface
 {
     /**
+     * Take the provided authorization code values and store them somewhere.
+     *
+     * This function should be the storage counterpart to getAuthCode().
+     * If storage fails for some reason, we're not currently checking for any sort of success/failure, so you should
+     * bail out of the script and provide a descriptive fail message.
+     *
+     * @param ClientInterface        $client            The client associated with this authorization code.
+     * @param EndUserInterface       $end_user          End user to associate with this authorization code.
+     * @param array                  $query_params      The authorization request query parameters.
+     * @param string                 $redirectUri       Redirect URI to be stored.
+     * @param string[]               $scope             (optional) Scopes to be stored.
+     * @param bool                   $issueRefreshToken (optional) Issue a refresh token with the access token.
+     *
+     * @return null|AuthCodeInterface
+     */
+    public function createAuthCode(ClientInterface $client, EndUserInterface $end_user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false);
+
+    /**
      * Retrieve the stored data for the given authorization code.
      *
      * @param string $code The authorization code string for which to fetch data.
@@ -19,23 +37,6 @@ interface AuthCodeManagerInterface
      * @see     http://tools.ietf.org/html/rfc6749#section-4.1
      */
     public function getAuthCode($code);
-
-    /**
-     * Take the provided authorization code values and store them somewhere.
-     *
-     * This function should be the storage counterpart to getAuthCode().
-     * If storage fails for some reason, we're not currently checking for any sort of success/failure, so you should
-     * bail out of the script and provide a descriptive fail message.
-     *
-     * @param ClientInterface        $client            The client associated with this authorization code.
-     * @param EndUserInterface       $end_user          End user to associate with this authorization code.
-     * @param string                 $redirectUri       Redirect URI to be stored.
-     * @param string[]               $scope             (optional) Scopes to be stored.
-     * @param bool                   $issueRefreshToken (optional) Issue a refresh token with the access token.
-     *
-     * @return null|AuthCodeInterface
-     */
-    public function createAuthCode(ClientInterface $client, EndUserInterface $end_user, $redirectUri, array $scope = [], $issueRefreshToken = false);
 
     /**
      * Marks auth code as expired.

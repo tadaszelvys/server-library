@@ -48,10 +48,11 @@ class AuthCodeManager extends Base
         return new DefuseGenerator();
     }
 
-    protected function addAuthCode($code, $expiresAt, ClientInterface $client, EndUserInterface $end_user, $redirectUri, array $scope = [], $issueRefreshToken = false)
+    protected function addAuthCode($code, $expiresAt, ClientInterface $client, EndUserInterface $end_user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
     {
         $auth_code = new AuthCode();
         $auth_code->setIssueRefreshToken($issueRefreshToken)
+            ->setQueryParams($query_params)
             ->setRedirectUri($redirectUri)
             ->setClientPublicId($client->getPublicId())
             ->setExpiresAt($expiresAt)

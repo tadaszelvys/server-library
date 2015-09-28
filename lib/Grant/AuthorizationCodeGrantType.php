@@ -61,7 +61,7 @@ class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantT
      */
     public function grantAuthorization(Authorization $authorization)
     {
-        $code = $this->getAuthCodeManager()->createAuthCode($authorization->getClient(), $authorization->getEndUser(), $authorization->getRedirectUri(), $authorization->getScope(), $authorization->getIssueRefreshToken());
+        $code = $this->getAuthCodeManager()->createAuthCode($authorization->getClient(), $authorization->getEndUser(), $authorization->getQueryParams(), $authorization->getRedirectUri(), $authorization->getScope(), $authorization->getIssueRefreshToken());
         $params = [
             'code' => $code->getToken(),
         ];

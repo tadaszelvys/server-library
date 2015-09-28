@@ -27,4 +27,16 @@ interface AuthCodeInterface extends TokenInterface
      * @return self
      */
     public function setRedirectUri($redirect_uri);
+
+    /**
+     * @return string The parameters from the authorization request
+     */
+    public function getQueryParams();
+
+    /**
+     * @param array $query_params
+     *
+     * @return self
+     */
+    public function setQueryParams(array $query_params);
 }
