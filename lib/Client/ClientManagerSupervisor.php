@@ -81,7 +81,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
             $manager_schemes = $manager->getSchemesParameters();
             $all_schemes = array_merge($all_schemes, $manager_schemes);
             if (array_key_exists($auth_scheme, $manager_schemes)) {
-                $schemes[] = $manager_schemes[$auth_scheme];
+                $schemes[$auth_scheme] = $manager_schemes[$auth_scheme];
             }
         }
         if (empty($schemes)) {
@@ -104,8 +104,12 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
             return 'Basic';
         } elseif (array_key_exists('PHP_AUTH_DIGEST', $server_params)) {
             return 'Digest';
-        } elseif (count($authHeader) > 0 && (0 !== $pos = strpos($authHeader[0], ' '))) {
-            return substr($authHeader[0], 0, $pos);
+        } elseif (count($authHeader) > 0) {
+            if (false !== $pos = strpos($authHeader[0], ' ')) {
+                return substr($authHeader[0], 0, $pos);
+            } else {
+                return $authHeader[0];
+            }
         }
     }
 }

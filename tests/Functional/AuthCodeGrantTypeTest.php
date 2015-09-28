@@ -359,6 +359,8 @@ class AuthCodeGrantTypeTest extends Base
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
         $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+
+        $this->assertTrue($authcode->getExpiresAt() <= time()+100);
         $this->assertEquals('**UNREGISTERED**--foo', $authcode->getClientPublicId());
 
         $response = new Response();

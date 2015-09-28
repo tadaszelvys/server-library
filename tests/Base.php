@@ -169,6 +169,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->setRefreshTokenManager($this->getRefreshTokenManager());
 
             $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
+            $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
             $this->token_endpoint->addGrantType($this->getClientCredentialsGrantType());
             $this->token_endpoint->addGrantType($this->getRefreshTokenGrantType());
             $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());

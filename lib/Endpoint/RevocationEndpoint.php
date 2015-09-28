@@ -74,7 +74,7 @@ class RevocationEndpoint implements RevocationEndpointInterface
         }
         $client = null;
         try {
-            $client = $this->getClientManagerSupervisor()->findClient($request/*, $found*/);
+            $client = $this->getClientManagerSupervisor()->findClient($request);
         } catch (BaseExceptionInterface $e) {
             if ($e instanceof InternalServerErrorExceptionInterface) {
                 throw $e;

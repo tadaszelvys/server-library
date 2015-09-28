@@ -131,6 +131,42 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
+    public function testGrantTypeAuthorizedForClientButScopeInvalid()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'password', 'username' => 'user1', 'password' => 'password1', 'scope' => 'scope12']));
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_scope', $e->getMessage());
+            $this->assertEquals('An unsupported scope was requested. Available scopes are [scope1,scope2,scope3,scope4]', $e->getDescription());
+            $this->assertEquals(400, $e->getHttpCode());
+        }
+    }
+
+    public function testListSchemes()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic'], http_build_query(['grant_type' => 'password', 'username' => 'user1', 'password' => 'password1', 'scope' => 'scope12']));
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_client', $e->getMessage());
+            $this->assertEquals('Client authentication failed.', $e->getDescription());
+            $this->assertEquals(401, $e->getHttpCode());
+            $this->assertEquals([
+                'Content-Type' => 'application/json',
+                'Cache-Control' => 'no-store',
+                'Pragma' => 'no-cache',
+                'WWW-Authenticate' => ['Basic realm="testrealm@host.com"'],
+            ], $e->getResponseHeaders());
+        }
+    }
+
     public function testWrongUsername()
     {
         $response = new Response();
@@ -155,7 +191,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            //$this->assertEquals('invalid_grant', $e->getMessage());
+            $this->assertEquals('invalid_grant', $e->getMessage());
             $this->assertEquals('Invalid username and password combination', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
