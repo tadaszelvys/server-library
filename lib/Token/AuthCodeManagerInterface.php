@@ -3,9 +3,7 @@
 namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\EndUser\EndUser;
 use OAuth2\EndUser\EndUserInterface;
-use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
 interface AuthCodeManagerInterface
 {
@@ -16,12 +14,12 @@ interface AuthCodeManagerInterface
      * If storage fails for some reason, we're not currently checking for any sort of success/failure, so you should
      * bail out of the script and provide a descriptive fail message.
      *
-     * @param ClientInterface        $client            The client associated with this authorization code.
-     * @param EndUserInterface       $end_user          End user to associate with this authorization code.
-     * @param array                  $query_params      The authorization request query parameters.
-     * @param string                 $redirectUri       Redirect URI to be stored.
-     * @param string[]               $scope             (optional) Scopes to be stored.
-     * @param bool                   $issueRefreshToken (optional) Issue a refresh token with the access token.
+     * @param \OAuth2\Client\ClientInterface   $client            The client associated with this authorization code.
+     * @param \OAuth2\EndUser\EndUserInterface $end_user          End user to associate with this authorization code.
+     * @param array                            $query_params      The authorization request query parameters.
+     * @param string                           $redirectUri       Redirect URI to be stored.
+     * @param string[]                         $scope             (optional) Scopes to be stored.
+     * @param bool                             $issueRefreshToken (optional) Issue a refresh token with the access token.
      *
      * @return null|AuthCodeInterface
      */
