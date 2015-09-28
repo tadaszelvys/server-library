@@ -77,7 +77,7 @@ class AuthorizationFactory
         ];
 
         foreach ($methods as $method => $param) {
-            $authorization->$method(isset($params['$param']) ? $params['$param'] : null);
+            $authorization->$method(isset($params[$param]) ? $params[$param] : null);
         }
         $this->populateClient($params, $authorization);
         $this->populateScope($params, $authorization);

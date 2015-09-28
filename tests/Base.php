@@ -5,6 +5,7 @@ namespace OAuth2\Test;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Configuration\Configuration;
 use OAuth2\Endpoint\AuthorizationEndpoint;
+use OAuth2\Endpoint\AuthorizationFactory;
 use OAuth2\Endpoint\FormPostResponseMode;
 use OAuth2\Endpoint\FragmentResponseMode;
 use OAuth2\Endpoint\QueryResponseMode;
@@ -83,6 +84,46 @@ class Base extends \PHPUnit_Framework_TestCase
         $factory = new DiactorosFactory();
 
         return $factory->createRequest($request);
+    }
+
+    /**
+     * @var \OAuth2\Endpoint\AuthorizationFactory
+     */
+    private $authorization_factory;
+
+    /**
+     * @return \OAuth2\Endpoint\AuthorizationFactory
+     */
+    protected function getAuthorizationFactory()
+    {
+        if (is_null($this->authorization_factory)) {
+            $jose = Jose::getInstance();
+            $this->authorization_factory = new AuthorizationFactory();
+            $this->authorization_factory->setClientManagerSupervisor($this->getClientManagerSupervisor());
+            $this->authorization_factory->setScopeManager($this->getScopeManager());
+            $this->authorization_factory->setExceptionManager($this->getExceptionManager());
+            $this->authorization_factory->setExceptionManager($this->getExceptionManager());
+            $this->authorization_factory->setJWTLoader($jose->getLoader());
+            $this->authorization_factory->setKeySetManager($jose->getKeysetManager());
+            $this->authorization_factory->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
+            $this->authorization_factory->setPrivateKeySet(
+                ['keys' => [
+                    'kid' => 'JWK1',
+                    'use' => 'enc',
+                    'kty' => 'oct',
+                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                ],
+                    [
+                        'kid' => 'JWK2',
+                        'use' => 'sig',
+                        'kty' => 'oct',
+                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                    ],
+                ]
+            );
+        }
+
+        return $this->authorization_factory;
     }
 
     /**
