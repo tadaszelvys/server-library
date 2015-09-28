@@ -37,7 +37,7 @@ namespace OAuth2\Endpoint;
  * @method self setLoginHint(string $login_hint)
  * @method null|string getAcrValues()
  * @method self setAcrValues(string $acr_values)
- * @method null|string getQueryParams()
+ * @method array getQueryParams()
  * @method self setQueryParams(array $query_params)
  */
 class Authorization

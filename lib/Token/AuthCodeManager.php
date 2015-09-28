@@ -18,14 +18,14 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     /**
      * Generate and add an Authorization Code using the parameters.
      *
-     * @param string                                       $code              Code
-     * @param int                                          $expiresAt         Time until the code is valid
-     * @param \OAuth2\Client\ClientInterface               $client            Client
-     * @param \OAuth2\EndUser\EndUserInterface             $end_user          Resource owner
-     * @param array                                        $query_params      The authorization request query parameters.
-     * @param string                                       $redirectUri       Redirect URI
-     * @param string[ ]                                    $scope             Scope
-     * @param bool                                         $issueRefreshToken Issue a refresh token with the access token
+     * @param string                           $code              Code
+     * @param int                              $expiresAt         Time until the code is valid
+     * @param \OAuth2\Client\ClientInterface   $client            Client
+     * @param \OAuth2\EndUser\EndUserInterface $end_user          Resource owner
+     * @param array                            $query_params      The authorization request query parameters.
+     * @param string                           $redirectUri       Redirect URI
+     * @param string[ ]                        $scope             Scope
+     * @param bool                             $issueRefreshToken Issue a refresh token with the access token
      *
      * @return \OAuth2\Token\AuthCodeInterface
      */
