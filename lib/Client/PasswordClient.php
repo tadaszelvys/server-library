@@ -17,12 +17,12 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     /**
      * @var string
      */
-    private $plaintext_secret;
+    protected $ha1;
 
     /**
      * @var string
      */
-    private $ha1;
+    private $plaintext_secret;
 
     public function __construct()
     {

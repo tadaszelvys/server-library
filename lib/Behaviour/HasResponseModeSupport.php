@@ -21,7 +21,7 @@ trait HasResponseModeSupport
     /**
      * @var \OAuth2\Endpoint\ResponseModeInterface[]
      */
-    protected $response_modes;
+    protected $response_modes = [];
 
     /**
      * @param \OAuth2\Grant\ResponseTypeSupportInterface[] $types

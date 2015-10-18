@@ -240,7 +240,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return null|\OAuth2\Client\ClientInterface
+     * @return null|\OAuth2\Client\PasswordClientInterface
      */
     private function checkResult(array $result)
     {
