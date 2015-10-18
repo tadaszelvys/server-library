@@ -63,4 +63,12 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
 
         return $this->access_token_types[$this->default_access_token_type];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessTokenTypes()
+    {
+        return $this->access_token_types;
+    }
 }
