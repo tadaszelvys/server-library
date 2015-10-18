@@ -132,8 +132,8 @@ class BearerAccessToken implements AccessTokenTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getScheme()
+    public function getSchemeParameters()
     {
-        return 'Bearer';
+        return ['Bearer' => []];
     }
 }

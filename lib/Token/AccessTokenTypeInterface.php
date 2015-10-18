@@ -51,7 +51,7 @@ interface AccessTokenTypeInterface
     public function isAccessTokenValid(ServerRequestInterface $request, AccessTokenInterface $token);
 
     /**
-     * @return string
+     * @return array
      */
-    public function getScheme();
+    public function getSchemeParameters();
 }

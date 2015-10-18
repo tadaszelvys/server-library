@@ -44,15 +44,4 @@ class BearerTokenTest extends Base
 
         $this->assertNull($access_token);
     }
-
-    public function testAccessTokenTypeAlreadyAdded()
-    {
-        try {
-            $this->getAccessTokenTypeManager()->addAccessTokenType($this->getBearerAccessTokenType());
-            $this->fail('Should throw an Exception');
-        } catch (InternalServerErrorException $e) {
-            $this->assertEquals('server_error', $e->getMessage());
-            $this->assertEquals('Scheme "Bearer" already defined.', $e->getDescription());
-        }
-    }
 }
