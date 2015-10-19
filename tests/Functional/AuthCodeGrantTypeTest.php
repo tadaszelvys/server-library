@@ -360,7 +360,7 @@ class AuthCodeGrantTypeTest extends Base
         parse_str($uri->getQuery(), $result);
         $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
 
-        $this->assertTrue($authcode->getExpiresAt() <= time()+100);
+        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
         $this->assertEquals('**UNREGISTERED**--foo', $authcode->getClientPublicId());
 
         $response = new Response();
