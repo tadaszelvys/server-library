@@ -2,7 +2,6 @@
 
 namespace OAuth2\Test\Functional;
 
-use OAuth2\Exception\InternalServerErrorException;
 use OAuth2\Test\Base;
 
 /**

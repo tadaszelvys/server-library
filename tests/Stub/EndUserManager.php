@@ -15,10 +15,10 @@ class EndUserManager implements EndUserManagerInterface
     public function __construct()
     {
         $user1 = new EndUser('user1', 'password1');
-        $user1->setLastLoginAt(time()-100);
+        $user1->setLastLoginAt(time() - 100);
 
         $user2 = new EndUser('user2', 'password2');
-        $user2->setLastLoginAt(time()-1000);
+        $user2->setLastLoginAt(time() - 1000);
 
         $this->users['user1'] = $user1;
         $this->users['user2'] = $user2;
