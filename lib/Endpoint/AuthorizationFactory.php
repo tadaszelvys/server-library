@@ -16,7 +16,9 @@ class AuthorizationFactory
     use CanLoadJWT;
 
     /**
-     * {@inheritdoc}
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \OAuth2\Endpoint\Authorization
      */
     public function createFromRequest(ServerRequestInterface $request)
     {
@@ -87,6 +89,9 @@ class AuthorizationFactory
         return $authorization;
     }
 
+    /**
+     * @param \OAuth2\Endpoint\Authorization $authorization
+     */
     private function checkDisplay(Authorization $authorization)
     {
         if (!in_array($authorization->getDisplay(), $authorization->getAllowedDisplayValues())) {
@@ -94,6 +99,9 @@ class AuthorizationFactory
         }
     }
 
+    /**
+     * @param \OAuth2\Endpoint\Authorization $authorization
+     */
     private function checkPrompt(Authorization $authorization)
     {
         if (!in_array($authorization->getPrompt(), $authorization->getAllowedPromptValues())) {
@@ -101,6 +109,10 @@ class AuthorizationFactory
         }
     }
 
+    /**
+     * @param array                          $params
+     * @param \OAuth2\Endpoint\Authorization $authorization
+     */
     private function populateClient(array $params, Authorization &$authorization)
     {
         if (!isset($params['client_id'])) {
@@ -113,6 +125,10 @@ class AuthorizationFactory
         $authorization->setClient($client);
     }
 
+    /**
+     * @param array                          $params
+     * @param \OAuth2\Endpoint\Authorization $authorization
+     */
     private function populateScope(array $params, Authorization &$authorization)
     {
         if (!isset($params['scope'])) {
