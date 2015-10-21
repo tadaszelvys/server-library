@@ -39,7 +39,7 @@ The following components are implemented:
         * [x] HTTP Digest Authentication Scheme
         * [x] Credentials from request body
     * [ ] SAML clients ([RFC7522](https://tools.ietf.org/html/rfc7522))
-    * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523))
+    * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523)) - *Help requested!*
     * [x] Unregistered clients ([RFC67849, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4))
 * [x] Endpoints:
     * [x] Authorization endpoint ([RFC67849, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
@@ -51,7 +51,7 @@ The following components are implemented:
     * [x] Resource Owner Password Credentials grant type ([RFC67849, section 4.3](https://tools.ietf.org/html/rfc6749#section-4.3))
     * [x] Client credentials grant type ([RFC67849, section 4.4](https://tools.ietf.org/html/rfc6749#section-4.4))
     * [x] Refresh token grant type ([RFC67849, section 6](https://tools.ietf.org/html/rfc6749#section-6))
-    * [ ] SAML grant type ([RFC7522](https://tools.ietf.org/html/rfc7522))
+    * [ ] SAML grant type ([RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
     * [x] JWT Bearer token grant type ([RFC7523](https://tools.ietf.org/html/rfc7523))
 
 * [ ] OpenID Connect
