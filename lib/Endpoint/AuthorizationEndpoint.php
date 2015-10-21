@@ -261,6 +261,14 @@ class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $types = explode(' ', $authorization->getResponseType());
         $response_types = [];
 
+        /*
+         * Multiple response types support must be enabled.
+         * This option should be set to true only if OpenID Connect is used.
+         */
+        if (1 < count($types) && false === $this->getConfiguration()->get('multiple_response_types_support_enabled', false)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Multiple response types is disabled.');
+        }
+
         foreach ($types as $type) {
             if (1 < count(array_keys($types, $type))) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'A response type appears more than once.');
