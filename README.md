@@ -35,11 +35,11 @@ The following components are implemented:
 * [ ] Clients:
     * [x] Public clients ([RFC67849, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1))
     * [x] Password clients ([RFC67849, section 2.3.1](https://tools.ietf.org/html/rfc6749#section-2.3.1))
-        * [x] HTTP Basic Authentication Scheme
-        * [x] HTTP Digest Authentication Scheme
+        * [x] HTTP Basic Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617)) - *Note: ([RFC7617](https://tools.ietf.org/html/rfc7617)) support is scheduled*
+        * [x] HTTP Digest Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617)) - *Note: ([RFC7616](https://tools.ietf.org/html/rfc7616)) support is scheduled*
         * [x] Credentials from request body
-    * [ ] SAML clients ([RFC7522](https://tools.ietf.org/html/rfc7522))
-    * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523)) - *Help requested!*
+    * [ ] SAML clients ([RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
+    * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523))
     * [x] Unregistered clients ([RFC67849, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4))
 * [x] Endpoints:
     * [x] Authorization endpoint ([RFC67849, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
