@@ -2,6 +2,8 @@
 
 namespace OAuth2\ResourceOwner;
 
+use Base64Url\Base64Url;
+
 class ResourceOwner implements ResourceOwnerInterface
 {
     /**
@@ -16,7 +18,7 @@ class ResourceOwner implements ResourceOwnerInterface
 
     public function __construct()
     {
-        $this->setPublicId(base_convert(sha1(uniqid(mt_rand(), true)), 16, 36));
+        $this->setPublicId(trim(chunk_split(Base64Url::encode(uniqid(mt_rand(), true)), 16, '-'),'-'));
     }
 
     /**
