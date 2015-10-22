@@ -231,6 +231,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->configuration->set('jwt_access_token_key_encryption_algorithm', 'A256KW');
             $this->configuration->set('jwt_access_token_content_encryption_algorithm', 'A256CBC-HS512');
             $this->configuration->set('allow_response_mode_parameter_in_authorization_request', true);
+            $this->configuration->set('multiple_response_types_support_enabled', true);
         }
 
         return $this->configuration;
