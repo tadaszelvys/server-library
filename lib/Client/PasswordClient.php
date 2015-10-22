@@ -31,11 +31,17 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
         $this->setType('password_client');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSecret()
     {
         return $this->secret;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setSecret($secret)
     {
         $this->secret = $secret;
@@ -48,6 +54,9 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
         return $this->salt;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setSalt($salt)
     {
         $this->salt = $salt;
@@ -55,11 +64,17 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getPlaintextSecret()
     {
         return $this->plaintext_secret;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setPlaintextSecret($plaintext_secret)
     {
         $this->plaintext_secret = $plaintext_secret;
@@ -67,6 +82,9 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function clearCredentials()
     {
         $this->plaintext_secret = null;

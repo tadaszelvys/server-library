@@ -17,8 +17,21 @@ class EndUser extends ResourceOwner implements EndUserInterface
         $this->setType('end_user');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getLastLoginAt()
     {
         return $this->last_login_at;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLastLoginAt($last_login_at)
+    {
+        $this->last_login_at = $last_login_at;
+
+        return $this;
     }
 }

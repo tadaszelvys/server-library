@@ -28,9 +28,7 @@ class ResourceOwner implements ResourceOwnerInterface
     }
 
     /**
-     * @param string $public_id
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setPublicId($public_id)
     {
@@ -48,9 +46,7 @@ class ResourceOwner implements ResourceOwnerInterface
     }
 
     /**
-     * @param string $type
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setType($type)
     {

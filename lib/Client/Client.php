@@ -20,7 +20,7 @@ class Client extends ResourceOwner implements ClientInterface
     }
 
     /**
-     * @return string[]
+     * {@inheritdoc}
      */
     public function getAllowedGrantTypes()
     {
@@ -28,13 +28,32 @@ class Client extends ResourceOwner implements ClientInterface
     }
 
     /**
-     * @param string[] $grant_types
-     *
-     * @return self
+     * {@inheritdoc}
+     */
+    public function addAllowedGrantType($grant_type)
+    {
+        if (!$this->isAllowedGrantType($grant_type)) {
+            $this->grant_types[] = $grant_type;
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function setAllowedGrantTypes(array $grant_types)
     {
         $this->grant_types = $grant_types;
+
+        return $this;
+    }
+
+    public function removeAllowedGrantType($grant_type)
+    {
+        if ($this->isAllowedGrantType($grant_type)) {
+            unset($this->grant_types[$grant_type]);
+        }
 
         return $this;
     }

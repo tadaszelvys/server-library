@@ -31,14 +31,6 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
         $this->password = $password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'end-user';
-    }
-
     public function getUsername()
     {
         return $this->username;
@@ -58,17 +50,5 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
     public function isRefreshTokenIssuanceAllowed(ClientInterface $client, $grant_type)
     {
         return $client instanceof ConfidentialClientInterface;
-    }
-
-    /**
-     * @param int $last_login_at
-     *
-     * @return self
-     */
-    public function setLastLoginAt($last_login_at)
-    {
-        $this->last_login_at = $last_login_at;
-
-        return $this;
     }
 }

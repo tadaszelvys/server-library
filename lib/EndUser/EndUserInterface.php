@@ -10,7 +10,14 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
 interface EndUserInterface extends ResourceOwnerInterface
 {
     /**
-     * @return int
+     * @return null|int
      */
     public function getLastLoginAt();
+
+    /**
+     * @param null|int $last_login_at
+     *
+     * @return self
+     */
+    public function setLastLoginAt($last_login_at);
 }

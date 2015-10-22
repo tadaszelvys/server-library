@@ -20,4 +20,32 @@ interface RegisteredClientInterface extends ClientInterface
      * @see http://tools.ietf.org/html/rfc6749#section-3.1.2.2
      */
     public function getRedirectUris();
+
+    /**
+     * @param string[] $redirect_uris
+     *
+     * @return self
+     */
+    public function setRedirectUris(array $redirect_uris);
+
+    /**
+     * @param string $redirect_uri
+     *
+     * @return bool
+     */
+    public function hasRedirectUri($redirect_uri);
+
+    /**
+     * @param string $redirect_uri
+     *
+     * @return self
+     */
+    public function addRedirectUri($redirect_uri);
+
+    /**
+     * @param string $redirect_uri
+     *
+     * @return self
+     */
+    public function removeRedirectUri($redirect_uri);
 }

@@ -14,4 +14,30 @@ interface ClientInterface extends ResourceOwnerInterface
      * @return bool true if the grant type is allowed, else false
      */
     public function isAllowedGrantType($grant_type);
+
+    /**
+     * @return string[]
+     */
+    public function getAllowedGrantTypes();
+
+    /**
+     * @param string[] $grant_types
+     *
+     * @return self
+     */
+    public function setAllowedGrantTypes(array $grant_types);
+
+    /**
+     * @param $grant_type
+     *
+     * @return self
+     */
+    public function addAllowedGrantType($grant_type);
+
+    /**
+     * @param string $grant_type
+     *
+     * @return self
+     */
+    public function removeAllowedGrantType($grant_type);
 }

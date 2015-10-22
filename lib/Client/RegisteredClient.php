@@ -24,13 +24,37 @@ class RegisteredClient extends Client implements RegisteredClientInterface
     }
 
     /**
-     * @param string[] $redirect_uris
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setRedirectUris(array $redirect_uris)
     {
         $this->redirect_uris = $redirect_uris;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasRedirectUri($redirect_uri)
+    {
+        return in_array($redirect_uri, $this->redirect_uris);
+    }
+
+    public function addRedirectUri($redirect_uri)
+    {
+        if (!$this->hasRedirectUri($redirect_uri)) {
+            $this->redirect_uris[] = $redirect_uri;
+        }
+
+        return $this;
+    }
+
+    public function removeRedirectUri($redirect_uri)
+    {
+        if ($this->hasRedirectUri($redirect_uri)) {
+            unset($this->redirect_uris[$redirect_uri]);
+        }
 
         return $this;
     }
