@@ -21,7 +21,7 @@ class JWTEncrypter
     protected $key_manager;
 
     /**
-     * @var \Jose\JWKSetInterface
+     * @var \Jose\JWKInterface
      */
     protected $key_encryption_key;
 
