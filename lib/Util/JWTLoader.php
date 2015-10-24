@@ -1,21 +1,19 @@
 <?php
 
-namespace OAuth2\Behaviour;
+namespace OAuth2\Util;
 
 use Jose\JWEInterface;
 use Jose\JWKSetManagerInterface;
 use Jose\JWSInterface;
 use Jose\JWTInterface;
 use Jose\LoaderInterface;
+use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\JWTClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
-trait CanLoadJWT
+class JWTLoader
 {
-    /**
-     * @return \OAuth2\Exception\ExceptionManagerInterface
-     */
-    abstract public function getExceptionManager();
+    use HasExceptionManager;
 
     /**
      * @var \Jose\LoaderInterface
@@ -33,7 +31,7 @@ trait CanLoadJWT
     protected $allowed_encryption_algorithms = [];
 
     /**
-     * @var array
+     * @var \Jose\JWKSetInterface
      */
     protected $private_key_set;
 
@@ -78,7 +76,7 @@ trait CanLoadJWT
     }
 
     /**
-     * @return array
+     * @return \Jose\JWKSetInterface
      */
     public function getPrivateKeySet()
     {
@@ -92,7 +90,7 @@ trait CanLoadJWT
      */
     public function setPrivateKeySet(array $private_key_set)
     {
-        $this->private_key_set = $private_key_set;
+        $this->private_key_set = $this->getKeySetManager()->createJWKSet($private_key_set);
 
         return $this;
     }
@@ -115,6 +113,25 @@ trait CanLoadJWT
         $this->allowed_encryption_algorithms = $allowed_encryption_algorithms;
 
         return $this;
+    }
+
+    /**
+     * @param $assertion
+     *
+     * @return \Jose\JWSInterface|\Jose\JWEInterface
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    public function load($assertion)
+    {
+        //We load the assertion
+        $jwt = $this->loadAssertion($assertion);
+        if ($jwt instanceof JWEInterface) {
+            $this->verifyAssertion($jwt);
+            $jwt = $this->decryptAssertion($jwt);
+        }
+        $this->verifyAssertion($jwt);
+
+        return $jwt;
     }
 
     /**
@@ -143,13 +160,13 @@ trait CanLoadJWT
      */
     protected function decryptAssertion(JWEInterface $jwe)
     {
-        $key_set = $this->getKeySetManager()->createJWKSet($this->getPrivateKeySet());
-
         if (!in_array($jwe->getAlgorithm(), $this->getAllowedEncryptionAlgorithms()) || !in_array($jwe->getEncryptionAlgorithm(), $this->getAllowedEncryptionAlgorithms())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($this->getAllowedEncryptionAlgorithms())));
         }
-        $this->getJWTLoader()->decrypt($jwe, $key_set);
-
+        $this->getJWTLoader()->decrypt($jwe, $this->getPrivateKeySet());
+        if (null == $jwe->getPayload()) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to decrypt the payload. Please verify keys used for encryption.');
+        }
         $jws = $this->getJWTLoader()->load($jwe->getPayload());
         if (!$jws instanceof JWSInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The encrypted assertion does not contain a single JWS.');
@@ -164,13 +181,13 @@ trait CanLoadJWT
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function verifySignature(JWSInterface $jws, JWTClientInterface $client)
+    public function verifySignature(JWSInterface $jws, JWTClientInterface $client)
     {
         if (!in_array($jws->getAlgorithm(), $client->getAllowedSignatureAlgorithms())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($client->getAllowedSignatureAlgorithms())));
         }
-        $key_set = $this->getKeySetManager()->createJWKSet($client->getSignaturePublicKeySet());
-        if (false === $this->getJWTLoader()->verifySignature($jws, $key_set)) {
+
+        if (false === $this->getJWTLoader()->verifySignature($jws, $this->getPrivateKeySet())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid signature.');
         }
     }
@@ -180,7 +197,7 @@ trait CanLoadJWT
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function verifyAssertion(JWTInterface $jwt)
+    public function verifyAssertion(JWTInterface $jwt)
     {
         foreach ($this->getRequiredClaims() as $claim) {
             if (null === $jwt->getHeaderOrPayloadValue($claim)) {

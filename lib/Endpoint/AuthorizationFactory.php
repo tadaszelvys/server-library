@@ -2,7 +2,6 @@
 
 namespace OAuth2\Endpoint;
 
-use OAuth2\Behaviour\CanLoadJWT;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasScopeManager;
@@ -13,7 +12,6 @@ class AuthorizationFactory
     use HasScopeManager;
     use HasClientManagerSupervisor;
     use HasExceptionManager;
-    use CanLoadJWT;
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request

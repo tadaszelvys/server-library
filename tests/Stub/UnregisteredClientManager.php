@@ -30,7 +30,7 @@ class UnregisteredClientManager implements ClientManagerInterface
 
         foreach ($methods as $method) {
             $data = $this->$method($request, $client_public_id_found);
-            if (!is_null($data)) {
+            if (null !== $data) {
                 $result[] = $data;
             }
         }

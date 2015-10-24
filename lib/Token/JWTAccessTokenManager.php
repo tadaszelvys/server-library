@@ -2,32 +2,22 @@
 
 namespace OAuth2\Token;
 
-use Jose\JSONSerializationModes;
-use Jose\JWEInterface;
-use Jose\JWSInterface;
 use Jose\JWTInterface;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasJWTFactory;
+use OAuth2\Behaviour\HasJWTEncrypter;
+use OAuth2\Behaviour\HasJWTLoader;
+use OAuth2\Behaviour\HasJWTSigner;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
-use SpomkyLabs\Jose\EncryptionInstruction;
-use SpomkyLabs\Jose\SignatureInstruction;
+use OAuth2\Util\JWTEncrypter;
 
 abstract class JWTAccessTokenManager extends AccessTokenManager
 {
     use HasExceptionManager;
-    use HasJWTFactory;
-
-    /**
-     * @var array
-     */
-    protected $signature_private_key = [];
-
-    /**
-     * @var array
-     */
-    protected $signature_public_key = [];
+    use HasJWTLoader;
+    use HasJWTSigner;
+    use HasJWTEncrypter;
 
     /**
      * @var array
@@ -35,40 +25,23 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     protected $encryption_private_key = [];
 
     /**
-     * @var array
-     */
-    protected $encryption_public_key = [];
-
-    /**
-     * @return array
-     */
-    public function getSignaturePrivateKey()
-    {
-        return $this->signature_private_key;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSignaturePublicKey()
-    {
-        return $this->signature_public_key;
-    }
-
-    /**
      * @return array
      */
     public function getEncryptionPrivateKey()
     {
-        return $this->encryption_public_key;
+        return $this->encryption_private_key;
     }
 
     /**
-     * @return array
+     * @param array $encryption_private_key
+     *
+     * @return $this
      */
-    public function getEncryptionPublicKey()
+    public function setEncryptionPrivateKey(array $encryption_private_key)
     {
-        return $this->encryption_public_key;
+        $this->encryption_private_key = $encryption_private_key;
+
+        return $this;
     }
 
     /**
@@ -241,21 +214,13 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     private function sign(array $payload)
     {
         $header = $this->prepareSignatureHeader();
-        $key = $this->getJWTFactory()->getKeyManager()->createJWK($this->getSignaturePrivateKey());
+        $key = $this->getJWTSigner()->getSignatureKey();
 
         if (null !== $key->getKeyID()) {
             $header['kid'] = $key->getKeyID();
         }
-        $instruction = new SignatureInstruction();
-        $instruction->setKey($key)
-            ->setProtectedHeader($header);
 
-        $jwt = $this->getJWTFactory()->getSigner()->sign($payload, [$instruction], JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
-        if (is_array($jwt)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'JWT should be a string.');
-        }
-
-        return $jwt;
+        return $this->getJWTSigner()->sign($payload, $header);
     }
 
     /**
@@ -271,7 +236,8 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         if (false === $this->getConfiguration()->get('jwt_access_token_encrypted', false)) {
             return $payload;
         }
-        if (null === $this->getJWTFactory()->getEncrypter()) {
+
+        if (!$this->getJWTEncrypter() instanceof JWTEncrypter) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Encrypter is not defined.');
         }
 
@@ -279,24 +245,13 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
             [],
             $this->prepareEncryptionHeader($client)
         );
-        $public_key = $this->getJWTFactory()->getKeyManager()->createJWK($this->getEncryptionPublicKey());
-        $private_key = $this->getJWTFactory()->getKeyManager()->createJWK($this->getEncryptionPrivateKey());
+        $public_key = $this->getJWTEncrypter()->getKeyEncryptionKey();
 
         if (null !== $public_key->getKeyID()) {
             $header['kid'] = $public_key->getKeyID();
         }
-        $instruction = new EncryptionInstruction();
-        $instruction->setRecipientKey($public_key);
-        if (null !== $private_key) {
-            $instruction->setSenderKey($private_key);
-        }
 
-        $jwt = $this->getJWTFactory()->getEncrypter()->encrypt($payload, [$instruction], $header);
-        if (is_array($jwt)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'JWT should be a string.');
-        }
-
-        return $jwt;
+        return $this->getJWTEncrypter()->encrypt($payload, $header, $this->getEncryptionPrivateKey());
     }
 
     /**
@@ -304,13 +259,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      */
     public function getAccessToken($assertion)
     {
-        //We load the assertion
-        $jwt = $this->loadAssertion($assertion);
-        if ($jwt instanceof JWEInterface) {
-            $this->verifyAssertion($jwt);
-            $jwt = $this->decryptAssertion($jwt);
-        }
-        $this->verifyAssertion($jwt);
+        $jwt = $this->getJWTLoader()->load($assertion);
 
         $access_token = new AccessToken();
         $access_token->setClientPublicId($jwt->getSubject())
@@ -336,88 +285,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     {
         //Not implemented
         return $this;
-    }
-
-    /**
-     * @param string $assertion
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return \Jose\JWEInterface|\Jose\JWSInterface
-     */
-    protected function loadAssertion($assertion)
-    {
-        $jwt = $this->getJWTFactory()->getLoader()->load($assertion);
-        if (!$jwt instanceof JWEInterface && !$jwt instanceof JWSInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The assertion does not contain a single JWS or a single JWE.');
-        }
-
-        return $jwt;
-    }
-
-    /**
-     * @param \Jose\JWEInterface $jwe
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return \Jose\JWSInterface
-     */
-    protected function decryptAssertion(JWEInterface $jwe)
-    {
-        $key_set = $this->getJWTFactory()->getKeySetManager()->createJWKSet();
-        $key = $this->getJWTFactory()->getKeyManager()->createJWK($this->getEncryptionPrivateKey());
-        $key_set->addKey($key);
-
-        if ($jwe->getAlgorithm() !== $this->getKeyEncryptionAlgorithm() || $jwe->getEncryptionAlgorithm() !== $this->getContentEncryptionAlgorithm()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode([$this->getKeyEncryptionAlgorithm(), $this->getContentEncryptionAlgorithm()])));
-        }
-        $this->getJWTFactory()->getLoader()->decrypt($jwe, $key_set);
-
-        $jws = $this->getJWTFactory()->getLoader()->load($jwe->getPayload());
-        if (!$jws instanceof JWSInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The encrypted assertion does not contain a single JWS.');
-        }
-
-        return $jws;
-    }
-
-    /**
-     * @param \Jose\JWSInterface $jws
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    protected function verifySignature(JWSInterface $jws)
-    {
-        if ($jws->getAlgorithm() !== $this->getSignatureAlgorithm()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithm is "%s".', $this->getSignatureAlgorithm()));
-        }
-        $key_set = $this->getJWTFactory()->getKeySetManager()->createJWKSet();
-        $key_set->addKey($this->getJWTFactory()->getKeyManager()->createJWK($this->getSignaturePublicKey()));
-
-        if (false === $this->getJWTFactory()->getLoader()->verifySignature($jws, $key_set)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid signature.');
-        }
-    }
-
-    /**
-     * @param \Jose\JWTInterface $jwt
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    protected function verifyAssertion(JWTInterface $jwt)
-    {
-        foreach ($this->getRequiredClaims() as $claim) {
-            if (null === $jwt->getHeaderOrPayloadValue($claim)) {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Claim "%s" is mandatory.', $claim));
-            }
-        }
-        try {
-            $this->getJWTFactory()->getLoader()->verify($jwt);
-        } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
-        }
-
-        $this->checkJWT($jwt);
     }
 
     /**

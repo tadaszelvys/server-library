@@ -3,9 +3,10 @@
 namespace OAuth2\Grant;
 
 use Jose\JWEInterface;
-use OAuth2\Behaviour\CanLoadJWT;
+use Jose\JWSInterface;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\JWTClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -16,7 +17,7 @@ class JWTBearerGrantType implements GrantTypeSupportInterface
 {
     use HasExceptionManager;
     use HasConfiguration;
-    use CanLoadJWT;
+    use HasJWTLoader;
 
     /**
      * {@inheritdoc}
@@ -37,13 +38,10 @@ class JWTBearerGrantType implements GrantTypeSupportInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "assertion" is missing.');
         }
 
-        //We load the assertion
-        $jwt = $this->loadAssertion($assertion);
-        if ($jwt instanceof JWEInterface) {
-            $this->verifyAssertion($jwt);
-            $jwt = $this->decryptAssertion($jwt);
+        $jwt = $this->getJWTLoader()->load($assertion);
+        if (!$jwt instanceof JWSInterface) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain signed claims.');
         }
-        $this->verifyAssertion($jwt);
 
         $grant_type_response->setClientPublicId($jwt->getSubject())
             ->setAdditionalData('jwt', $jwt);
@@ -59,7 +57,7 @@ class JWTBearerGrantType implements GrantTypeSupportInterface
         }
         $jwt = $grant_type_response->getAdditionalData('jwt');
 
-        $this->verifySignature($jwt, $client);
+        $this->getJWTLoader()->verifySignature($jwt, $client);
 
         $issue_refresh_token = $this->getConfiguration()->get('issue_refresh_token_with_client_credentials_grant_type', false);
         $scope = RequestBody::getParameter($request, 'scope');

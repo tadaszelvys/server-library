@@ -3,9 +3,9 @@
 namespace OAuth2\Client;
 
 use Jose\JWEInterface;
-use OAuth2\Behaviour\CanLoadJWT;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,7 +14,7 @@ abstract class JWTClientManager implements ClientManagerInterface
 {
     use HasExceptionManager;
     use HasConfiguration;
-    use CanLoadJWT;
+    use HasJWTLoader;
 
     /**
      * {@inheritdoc}
@@ -56,7 +56,7 @@ abstract class JWTClientManager implements ClientManagerInterface
             return $client;
         }
 
-        $this->verifySignature($assertions[0], $client);
+        $this->getJWTLoader()->verifySignature($assertions[0], $client);
 
         return $client;
     }
@@ -84,12 +84,7 @@ abstract class JWTClientManager implements ClientManagerInterface
         }
 
         //We load the assertion
-        $jwt = $this->loadAssertion($client_assertion);
-        if ($jwt instanceof JWEInterface) {
-            $this->verifyAssertion($jwt);
-            $jwt = $this->decryptAssertion($jwt);
-        }
-        $this->verifyAssertion($jwt);
+        $jwt = $this->getJWTLoader()->load($client_assertion);
 
         return $jwt;
     }
