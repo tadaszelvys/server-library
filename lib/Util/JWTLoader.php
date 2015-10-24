@@ -164,7 +164,7 @@ class JWTLoader
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($this->getAllowedEncryptionAlgorithms())));
         }
         $this->getJWTLoader()->decrypt($jwe, $this->getPrivateKeySet());
-        if (null == $jwe->getPayload()) {
+        if (null === $jwe->getPayload()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to decrypt the payload. Please verify keys used for encryption.');
         }
         $jws = $this->getJWTLoader()->load($jwe->getPayload());
