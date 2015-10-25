@@ -33,7 +33,6 @@ class JWTBearerGrantType implements GrantTypeSupportInterface
     public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
     {
         $assertion = RequestBody::getParameter($request, 'assertion');
-        //We verify the client_public_id assertion exists
         if (null === $assertion) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "assertion" is missing.');
         }
@@ -43,6 +42,9 @@ class JWTBearerGrantType implements GrantTypeSupportInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain signed claims.');
         }
 
+        //We modify the response:
+        // - We add the subject as the client public id
+        // - We transmit the JWT to the response for further needs
         $grant_type_response->setClientPublicId($jwt->getSubject())
             ->setAdditionalData('jwt', $jwt);
     }

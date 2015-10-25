@@ -17,16 +17,27 @@ class JWTBearerGrantTypeTest extends Base
     {
         $response = new Response();
         $jose = Jose::getInstance();
-        $jws = $jose->sign(
-            'JWK2',
+        $jws = $jose->signAndEncrypt(
             [
                 'exp' => time() + 3600,
-                'aud' => 'Bad Audience',
+                'aud' => 'Bad audience',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
             ],
+            'JWK2',
             [
+                'cty' => 'JWT',
                 'alg' => 'HS512',
+            ],
+            'JWK1',
+            [
+                'cty' => 'JWT',
+                'alg' => 'A256KW',
+                'enc' => 'A256CBC-HS512',
+                'exp' => time() + 3600,
+                'aud' => 'My Authorization Server',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
             ]
         );
 
@@ -83,14 +94,12 @@ class JWTBearerGrantTypeTest extends Base
             )
         );
 
-        $this->getTokenEndpoint()->getAccessToken($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
-        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals('The assertion must be encrypted.', $e->getDescription());
+        }
     }
 
     public function testEncryptedAndSignedAssertionForJWTClient()

@@ -99,30 +99,29 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthorizationFactory()
     {
         if (is_null($this->authorization_factory)) {
-            //$jose = Jose::getInstance();
+            $jose = Jose::getInstance();
             $this->authorization_factory = new AuthorizationFactory();
             $this->authorization_factory->setClientManagerSupervisor($this->getClientManagerSupervisor());
             $this->authorization_factory->setScopeManager($this->getScopeManager());
             $this->authorization_factory->setExceptionManager($this->getExceptionManager());
             $this->authorization_factory->setExceptionManager($this->getExceptionManager());
-            /*$this->authorization_factory->setJWTLoader($jose->getLoader());
-            $this->authorization_factory->setKeySetManager($jose->getKeysetManager());
-            $this->authorization_factory->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $this->authorization_factory->setPrivateKeySet(
-                ['keys' => [
+
+            $jwt_loader = new JWTLoader();
+            $jwt_loader->setJWTLoader($jose->getLoader());
+            $jwt_loader->setExceptionManager($this->getExceptionManager());
+            $jwt_loader->setEncryptionRequired(false);
+            $jwt_loader->setKeySetManager($jose->getKeysetManager());
+            $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
+            $jwt_loader->setKeySet([
+                [
                     'kid' => 'JWK1',
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ],
-                    [
-                        'kid' => 'JWK2',
-                        'use' => 'sig',
-                        'kty' => 'oct',
-                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                    ],
                 ]
-            );*/
+            ]);
+
+            $this->authorization_factory->setJWTLoader($jwt_loader);
         }
 
         return $this->authorization_factory;
@@ -374,9 +373,10 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader = new JWTLoader();
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
+            $jwt_loader->setEncryptionRequired(false);
             $jwt_loader->setKeySetManager($jose->getKeysetManager());
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setPrivateKeySet([
+            $jwt_loader->setKeySet([
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
@@ -454,9 +454,10 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader = new JWTLoader();
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
+            $jwt_loader->setEncryptionRequired(true);
             $jwt_loader->setKeySetManager($jose->getKeysetManager());
-            $jwt_loader->setAllowedEncryptionAlgorithms(['HS512', 'A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setPrivateKeySet([
+            $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
+            $jwt_loader->setKeySet([
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
@@ -647,9 +648,10 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader = new JWTLoader();
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
+            $jwt_loader->setEncryptionRequired(true);
             $jwt_loader->setKeySetManager($jose->getKeysetManager());
             $jwt_loader->setAllowedEncryptionAlgorithms(['HS512', 'A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setPrivateKeySet([
+            $jwt_loader->setKeySet([
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',

@@ -16,6 +16,11 @@ class JWTLoader
     use HasExceptionManager;
 
     /**
+     * @var bool
+     */
+    protected $is_encryption_required = false;
+
+    /**
      * @var \Jose\LoaderInterface
      */
     protected $jwt_loader;
@@ -33,7 +38,7 @@ class JWTLoader
     /**
      * @var \Jose\JWKSetInterface
      */
-    protected $private_key_set;
+    protected $key_set;
 
     /**
      * @return \Jose\JWKSetManagerInterface
@@ -44,13 +49,33 @@ class JWTLoader
     }
 
     /**
-     * @param  $key_set_manager
+     * @param \Jose\JWKSetManagerInterface $key_set_manager
      *
      * @return self
      */
     public function setKeySetManager(JWKSetManagerInterface $key_set_manager)
     {
         $this->key_set_manager = $key_set_manager;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEncryptionRequired()
+    {
+        return $this->is_encryption_required;
+    }
+
+    /**
+     * @param bool $is_encryption_required
+     *
+     * @return self
+     */
+    public function setEncryptionRequired($is_encryption_required)
+    {
+        $this->is_encryption_required = $is_encryption_required;
 
         return $this;
     }
@@ -78,19 +103,19 @@ class JWTLoader
     /**
      * @return \Jose\JWKSetInterface
      */
-    public function getPrivateKeySet()
+    public function getKeySet()
     {
-        return $this->private_key_set;
+        return $this->key_set;
     }
 
     /**
-     * @param array $private_key_set
+     * @param array $key_set
      *
      * @return self
      */
-    public function setPrivateKeySet(array $private_key_set)
+    public function setKeySet(array $key_set)
     {
-        $this->private_key_set = $this->getKeySetManager()->createJWKSet($private_key_set);
+        $this->key_set = $this->getKeySetManager()->createJWKSet($key_set);
 
         return $this;
     }
@@ -128,6 +153,8 @@ class JWTLoader
         if ($jwt instanceof JWEInterface) {
             $this->verifyAssertion($jwt);
             $jwt = $this->decryptAssertion($jwt);
+        } elseif (true === $this->isEncryptionRequired()) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The assertion must be encrypted.');
         }
         $this->verifyAssertion($jwt);
 
@@ -163,7 +190,7 @@ class JWTLoader
         if (!in_array($jwe->getAlgorithm(), $this->getAllowedEncryptionAlgorithms()) || !in_array($jwe->getEncryptionAlgorithm(), $this->getAllowedEncryptionAlgorithms())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($this->getAllowedEncryptionAlgorithms())));
         }
-        $this->getJWTLoader()->decrypt($jwe, $this->getPrivateKeySet());
+        $this->getJWTLoader()->decrypt($jwe, $this->getKeySet());
         if (null === $jwe->getPayload()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to decrypt the payload. Please verify keys used for encryption.');
         }
@@ -187,7 +214,7 @@ class JWTLoader
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($client->getAllowedSignatureAlgorithms())));
         }
 
-        if (false === $this->getJWTLoader()->verifySignature($jws, $this->getPrivateKeySet())) {
+        if (false === $this->getJWTLoader()->verifySignature($jws, $this->getKeySet())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid signature.');
         }
     }
@@ -199,11 +226,6 @@ class JWTLoader
      */
     public function verifyAssertion(JWTInterface $jwt)
     {
-        foreach ($this->getRequiredClaims() as $claim) {
-            if (null === $jwt->getHeaderOrPayloadValue($claim)) {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Claim "%s" is mandatory.', $claim));
-            }
-        }
         try {
             $this->getJWTLoader()->verify($jwt);
         } catch (\Exception $e) {
@@ -214,7 +236,7 @@ class JWTLoader
     }
 
     /**
-     * By default, this method does nothing, but should be overridden and check other claims (issuer, jti...).
+     * By default, this method does nothing, but should be overridden and to check claims and headers.
      *
      * @param \Jose\JWTInterface $jwt
      *
@@ -222,18 +244,5 @@ class JWTLoader
      */
     protected function checkJWT(JWTInterface $jwt)
     {
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getRequiredClaims()
-    {
-        return [
-            'iss',
-            'aud',
-            'sub',
-            'exp',
-        ];
     }
 }

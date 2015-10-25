@@ -4,14 +4,66 @@ namespace OAuth2\Endpoint;
 
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasScopeManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AuthorizationFactory
 {
+    use HasJWTLoader;
     use HasScopeManager;
     use HasClientManagerSupervisor;
     use HasExceptionManager;
+
+    /**
+     * @var bool
+     */
+    private $is_request_parameter_supported = false;
+
+    /**
+     * @var bool
+     */
+    private $is_request_uri_parameter_supported = false;
+
+    /**
+     * @param bool $is_request_parameter_supported
+     *
+     * @return self
+     */
+    public function setRequestParameterSupported($is_request_parameter_supported)
+    {
+        $this->is_request_parameter_supported = $is_request_parameter_supported;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequestParameterSupported()
+    {
+        return $this->is_request_parameter_supported;
+    }
+
+    /**
+     * @param bool $is_request_uri_parameter_supported
+     *
+     * @return self
+     */
+    public function setRequestUriParameterSupported($is_request_uri_parameter_supported)
+    {
+        $this->is_request_uri_parameter_supported = $is_request_uri_parameter_supported;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequestUriParameterSupported()
+    {
+        return $this->is_request_uri_parameter_supported;
+    }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
@@ -21,9 +73,9 @@ class AuthorizationFactory
     public function createFromRequest(ServerRequestInterface $request)
     {
         $params = $request->getQueryParams();
-        if (isset($params['request'])) {
+        if (isset($params['request']) && true === $this->isRequestParameterSupported()) {
             return $this->createFromRequestParameter($params);
-        } elseif (isset($params['request_uri'])) {
+        } elseif (isset($params['request_uri']) && true === $this->isRequestUriParameterSupported()) {
             return $this->createFromRequestUriParameter($params);
         }
 
@@ -37,6 +89,7 @@ class AuthorizationFactory
      */
     public function createFromRequestParameter(array $params)
     {
+        throw new \RuntimeException('Not supported');
     }
 
     /**
@@ -46,6 +99,7 @@ class AuthorizationFactory
      */
     public function createFromRequestUriParameter(array $params)
     {
+        throw new \RuntimeException('Not supported');
     }
 
     /**

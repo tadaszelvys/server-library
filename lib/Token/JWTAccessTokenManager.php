@@ -11,6 +11,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Util\JWTEncrypter;
+use SpomkyLabs\Jose\JWT;
 
 abstract class JWTAccessTokenManager extends AccessTokenManager
 {
@@ -45,29 +46,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @return array
-     */
-    protected function getJWTExtraClaims()
-    {
-        return [];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getJWTExtraHeaders()
-    {
-        return [];
-    }
-
-    /**
-     * @return string|null
-     */
-    protected function generateTokenID()
-    {
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
@@ -75,16 +53,21 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [], RefreshTokenInterface $refresh_token = null)
     {
         $payload = $this->preparePayload($client, $scope, $resource_owner, $refresh_token);
+        $signature_header = $this->prepareSignatureHeader();
 
-        $jwt = $this->sign($payload);
-        $jwt = $this->encrypt($jwt, $client);
+        $jwt = new JWT();
+        $jwt->setPayload($payload)
+            ->setProtectedHeader($signature_header);
+
+        $jws = $this->getJWTSigner()->sign($jwt->getPayload(), $jwt->getProtectedHeader());
+        $jwe = $this->encrypt($jws, $client);
 
         $access_token = new AccessToken();
         $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken())
             ->setExpiresAt(time() + $this->getLifetime($client))
             ->setResourceOwnerPublicId(null === $resource_owner ? null : $resource_owner->getPublicId())
             ->setScope($scope)
-            ->setToken($jwt)
+            ->setToken($jwe)
             ->setClientPublicId($client->getPublicId());
 
         return $access_token;
@@ -97,7 +80,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      *
      * @return array
      */
-    private function prepareEncryptionHeader(ClientInterface $client)
+    protected function prepareEncryptionHeader(ClientInterface $client)
     {
         $key_encryption_algorithm = $this->getKeyEncryptionAlgorithm();
         $content_encryption_algorithm = $this->getContentEncryptionAlgorithm();
@@ -121,13 +104,12 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
                 'typ' => 'JWT',
                 'alg' => $key_encryption_algorithm,
                 'enc' => $content_encryption_algorithm,
-                'sub' => $client->getPublicId(),
             ]
         );
 
-        $jti = $this->generateTokenID();
-        if (null !== $jti) {
-            $header['jti'] = $jti;
+        $key = $this->getJWTEncrypter()->getKeyEncryptionKey();
+        if (null !== $key->getKeyID()) {
+            $header['kid'] = $key->getKeyID();
         }
 
         return $header;
@@ -138,23 +120,21 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      *
      * @return array
      */
-    private function prepareSignatureHeader()
+    protected function prepareSignatureHeader()
     {
         $signature_algorithm = $this->getSignatureAlgorithm();
         if (!is_string($signature_algorithm)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_signature_algorithm" is not set.');
         }
-        $header = array_merge(
-            [
-                'typ' => 'JWT',
-                'alg' => $signature_algorithm,
-            ],
-            $this->getJWTExtraHeaders()
-        );
 
-        $jti = $this->generateTokenID();
-        if (null !== $jti) {
-            $header['jti'] = $jti;
+        $header = [
+            'typ' => 'JWT',
+            'alg' => $signature_algorithm,
+        ];
+
+        $key = $this->getJWTSigner()->getSignatureKey();
+        if (null !== $key->getKeyID()) {
+            $header['kid'] = $key->getKeyID();
         }
 
         return $header;
@@ -170,7 +150,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
      *
      * @return array
      */
-    private function preparePayload(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null)
+    protected function preparePayload(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null)
     {
         $audience = $this->getConfiguration()->get('jwt_access_token_audience', null);
         $issuer = $this->getConfiguration()->get('jwt_access_token_issuer', null);
@@ -182,18 +162,15 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_issuer" is not set.');
         }
 
-        $payload = array_merge(
-            [
-                'iss' => $issuer,
-                'aud' => $audience,
-                'iat' => time(),
-                'nbf' => time(),
-                'exp' => time() + $this->getLifetime($client),
-                'sub' => $client->getPublicId(),
-                'sco' => $scope,
-            ],
-            $this->getJWTExtraClaims()
-        );
+        $payload = [
+            'iss' => $issuer,
+            'aud' => $audience,
+            'iat' => time(),
+            'nbf' => time(),
+            'exp' => time() + $this->getLifetime($client),
+            'sub' => $client->getPublicId(),
+            'sco' => $scope,
+        ];
         if (null !== $resource_owner) {
             $payload['r_o'] = $resource_owner->getPublicId();
         }
@@ -202,25 +179,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         }
 
         return $payload;
-    }
-
-    /**
-     * @param array $payload
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return string
-     */
-    private function sign(array $payload)
-    {
-        $header = $this->prepareSignatureHeader();
-        $key = $this->getJWTSigner()->getSignatureKey();
-
-        if (null !== $key->getKeyID()) {
-            $header['kid'] = $key->getKeyID();
-        }
-
-        return $this->getJWTSigner()->sign($payload, $header);
     }
 
     /**
@@ -241,15 +199,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Encrypter is not defined.');
         }
 
-        $header = array_merge(
-            [],
-            $this->prepareEncryptionHeader($client)
-        );
-        $public_key = $this->getJWTEncrypter()->getKeyEncryptionKey();
-
-        if (null !== $public_key->getKeyID()) {
-            $header['kid'] = $public_key->getKeyID();
-        }
+        $header = $this->prepareEncryptionHeader($client);
 
         return $this->getJWTEncrypter()->encrypt($payload, $header, $this->getEncryptionPrivateKey());
     }
