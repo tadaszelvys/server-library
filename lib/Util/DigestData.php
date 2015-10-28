@@ -140,7 +140,7 @@ class DigestData
             throw new \InvalidArgumentException(sprintf('Nonce should have yielded two tokens but was "%s".', $nonceAsPlainText));
         }
         $this->nonceExpiryTime = $nonceTokens[0];
-        if (hash_hmac('sha512', $this->nonceExpiryTime.$entryPointKey, $entryPointKey, true) !== $nonceTokens[1]) {
+        if (hash_hmac('sha512', $this->nonceExpiryTime.$entryPointKey, $entryPointKey) !== $nonceTokens[1]) {
             throw new \InvalidArgumentException(sprintf('Nonce token compromised "%s".', $nonceAsPlainText));
         }
     }

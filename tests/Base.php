@@ -752,7 +752,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function createValidDigest($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
     {
         $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
-        $signatureValue = hash_hmac('sha512',$expiryTime.$this->getConfiguration()->get('digest_authentication_key'), $this->getConfiguration()->get('digest_authentication_key'), true);
+        $signatureValue = hash_hmac('sha512',$expiryTime.$this->getConfiguration()->get('digest_authentication_key'), $this->getConfiguration()->get('digest_authentication_key'));
         $nonceValue = $expiryTime.':'.$signatureValue;
         $nonceValueBase64 = base64_encode($nonceValue);
 
