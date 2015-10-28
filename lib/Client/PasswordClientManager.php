@@ -99,8 +99,8 @@ abstract class PasswordClientManager implements ClientManagerInterface
                 return false;
             }
             $algorithm = $this->getConfiguration()->get('digest_authentication_scheme_algorithm', 'MD5');
-            $request->getBody()->rewind();
-            $content_hash = md5($request->getBody()->getContents());
+            $body = http_build_query($request->getParsedBody());
+            $content_hash = md5($body);
 
             $secret = !empty($client->getPlaintextSecret()) ? $client->getPlaintextSecret() : $client->getSecret();
 

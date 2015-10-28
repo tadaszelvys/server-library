@@ -47,12 +47,12 @@ class JWTBearerGrantTypeTest extends Base
             [],
             ['HTTPS' => 'on'],
             [],
-            http_build_query(
+
                 [
                     'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
                     'assertion'  => $jws,
                 ]
-            )
+
         );
 
         try {
@@ -86,12 +86,12 @@ class JWTBearerGrantTypeTest extends Base
             [],
             ['HTTPS' => 'on'],
             [],
-            http_build_query(
+
                 [
                     'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
                     'assertion'  => $jws,
                 ]
-            )
+
         );
 
         try {
@@ -136,12 +136,12 @@ class JWTBearerGrantTypeTest extends Base
             [],
             ['HTTPS' => 'on'],
             [],
-            http_build_query(
+
                 [
                     'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
                     'assertion'  => $jws,
                 ]
-            )
+
         );
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);

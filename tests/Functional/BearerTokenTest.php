@@ -29,7 +29,7 @@ class BearerTokenTest extends Base
 
     public function testAccessTokenFromRequestBody()
     {
-        $request = $this->createRequest('/', 'POST', [], [], [], http_build_query(['foo' => 'bar', 'access_token' => 'ABCD']));
+        $request = $this->createRequest('/', 'POST', [], [], [], ['foo' => 'bar', 'access_token' => 'ABCD']);
         $access_token = $this->getAccessTokenTypeManager()->findAccessToken($request, $type);
 
         $this->assertEquals('ABCD', $access_token);

@@ -13,23 +13,7 @@ class RequestBody
      */
     public static function getParameters(ServerRequestInterface $request)
     {
-        $parameters = [];
-        if (count($request->getHeader('CONTENT-TYPE')) < 1) {
-            return $parameters;
-        }
-
-        if (!preg_match('/^application\/x-www-form-urlencoded([\s|;].*)?$/', $request->getHeader('CONTENT-TYPE')[0])) {
-            return $parameters;
-        }
-
-        $request->getBody()->rewind();
-        $body = $request->getBody()->getContents();
-        if (!is_string($body)) {
-            return $parameters;
-        }
-        parse_str($body, $parameters);
-
-        return $parameters;
+        return $request->getParsedBody();
     }
 
     /**

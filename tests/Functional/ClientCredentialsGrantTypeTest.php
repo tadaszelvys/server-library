@@ -61,7 +61,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testUnknownClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'plic', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'plic', 'PHP_AUTH_PW' => 'secret'], [], ['grant_type' => 'client_credentials']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -76,7 +76,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testUnsupportedGrantType()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'bar']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], ['grant_type' => 'bar']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -91,7 +91,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeUnauthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret'], [], ['grant_type' => 'client_credentials']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -106,7 +106,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], ['grant_type' => 'client_credentials']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -121,7 +121,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingDigestAuthenticationScheme()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Circle Of Life', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))], [], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Circle Of Life', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))], [], ['grant_type' => 'client_credentials']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -136,7 +136,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeNotAuthorizedForClientUsingDigestAuthenticationScheme()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Bad secret', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))], [], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Bad secret', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))], [], ['grant_type' => 'client_credentials']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -152,7 +152,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeader()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:secret')], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:secret')], ['grant_type' => 'client_credentials']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -167,7 +167,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButMissingPassword()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:')], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:')], ['grant_type' => 'client_credentials']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -180,7 +180,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButBadPassword()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:foo')], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:foo')], ['grant_type' => 'client_credentials']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -193,7 +193,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingQueryRequest()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], [], http_build_query(['grant_type' => 'client_credentials', 'client_id' => 'bar', 'client_secret' => 'secret']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], [], ['grant_type' => 'client_credentials', 'client_id' => 'bar', 'client_secret' => 'secret']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -209,7 +209,7 @@ class ClientCredentialsGrantTypeTest extends Base
     {
         $response = new Response();
         $this->getTokenEndpoint()->setAccessTokenManager($this->getJWTAccessTokenManager());
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret'], [], ['grant_type' => 'client_credentials']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -235,7 +235,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testClientNotConfidential()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], http_build_query(['grant_type' => 'client_credentials']));
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo'], ['grant_type' => 'client_credentials']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -270,13 +270,13 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             ['HTTPS' => 'on'],
             [],
-            http_build_query(
+
                 [
                     'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
                     'client_assertion'      => $jws,
                 ]
-            )
+
         );
 
         try {
@@ -310,13 +310,13 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             ['HTTPS' => 'on'],
             [],
-            http_build_query(
+
                 [
                     'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
                     'client_assertion'      => $jws,
                 ]
-            )
+
         );
 
         try {
@@ -350,13 +350,13 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             ['HTTPS' => 'on'],
             [],
-            http_build_query(
+
                 [
                     'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
                     'client_assertion'      => $jws,
                 ]
-            )
+
         );
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -403,13 +403,13 @@ class ClientCredentialsGrantTypeTest extends Base
             [],
             ['HTTPS' => 'on'],
             [],
-            http_build_query(
+
                 [
                     'grant_type'            => 'client_credentials',
                     'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
                     'client_assertion'      => $jws,
                 ]
-            )
+
         );
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
