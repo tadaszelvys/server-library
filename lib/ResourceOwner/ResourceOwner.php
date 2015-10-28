@@ -18,7 +18,7 @@ class ResourceOwner implements ResourceOwnerInterface
 
     public function __construct()
     {
-        $this->setPublicId(trim(chunk_split(Base64Url::encode(uniqid(mt_rand(), true)), 16, '-'),'-'));
+        $this->setPublicId(trim(chunk_split(Base64Url::encode(uniqid(mt_rand(), true)), 16, '-'), '-'));
     }
 
     /**

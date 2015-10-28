@@ -2,7 +2,6 @@
 
 namespace OAuth2\Client;
 
-use Jose\JWEInterface;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;

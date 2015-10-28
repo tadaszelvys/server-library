@@ -64,18 +64,20 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     }
 
     /**
-     * @return int
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return int
      */
     private function getRefreshTokenLength()
     {
         $min_length = $this->getConfiguration()->get('refresh_token_min_length', 20);
         $max_length = $this->getConfiguration()->get('refresh_token_max_length', 30);
-        if ($min_length>$max_length) {
+        if ($min_length > $max_length) {
             throw $this->createException('Invalid configuration: "refresh_token_min_length" value must be lower thant "refresh_token_max_length"');
         }
         srand();
-        return rand($min_length,$max_length);
+
+        return rand($min_length, $max_length);
     }
 
     /**

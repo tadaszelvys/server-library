@@ -94,7 +94,7 @@ class JWTEncrypter
      */
     public function encrypt($payload, array $protected_headers, array $sender_key = [])
     {
-        $sender_key = empty($sender_key)?null:$this->getKeyManager()->createJWK($sender_key);
+        $sender_key = empty($sender_key) ? null : $this->getKeyManager()->createJWK($sender_key);
         $instruction = new EncryptionInstruction();
         $instruction->setRecipientKey($this->getKeyEncryptionKey());
         if ($sender_key instanceof JWKInterface) {
@@ -105,6 +105,7 @@ class JWTEncrypter
         if (!is_string($result)) {
             throw new \RuntimeException('Unable to sign claims.');
         }
+
         return $result;
     }
 }

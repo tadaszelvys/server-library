@@ -100,6 +100,7 @@ class JWTSigner
         if (!is_string($result)) {
             throw new \RuntimeException('Unable to sign claims.');
         }
+
         return $result;
     }
 }

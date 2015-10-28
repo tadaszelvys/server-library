@@ -2,7 +2,6 @@
 
 namespace OAuth2\Grant;
 
-use Jose\JWEInterface;
 use Jose\JWSInterface;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
