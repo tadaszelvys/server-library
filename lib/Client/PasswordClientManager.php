@@ -26,14 +26,14 @@ abstract class PasswordClientManager implements ClientManagerInterface
         $nonce_lifetime = $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300);
 
         $expiryTime = microtime(true) + $nonce_lifetime * 1000;
-        $signatureValue = md5($expiryTime.':'.$key);
+        $signatureValue = hash_hmac('sha512', $expiryTime.$key, $key, true);
         $nonceValue = $expiryTime.':'.$signatureValue;
         $nonceValueBase64 = base64_encode($nonceValue);
 
         $digest_params = [
             'realm'  => $this->getConfiguration()->get('realm', 'Service'),
             'nonce'  => $nonceValueBase64,
-            'opaque' => hash('md5', $this->getConfiguration()->get('realm', 'Service')),
+            'opaque' => base64_decode(hash_hmac('sha512', $nonceValueBase64.$this->getConfiguration()->get('realm', 'Service'), $key, true)),
         ];
 
         $qop = $this->getConfiguration()->get('digest_authentication_scheme_quality_of_protection', 'auth,auth-int');

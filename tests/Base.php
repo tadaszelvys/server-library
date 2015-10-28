@@ -118,7 +118,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ],
+                ]
             ]);
 
             $this->authorization_factory->setJWTLoader($jwt_loader);
@@ -752,7 +752,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function createValidDigest($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
     {
         $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
-        $signatureValue = md5($expiryTime.':'.$this->getConfiguration()->get('digest_authentication_key'));
+        $signatureValue = hash_hmac('sha512',$expiryTime.$this->getConfiguration()->get('digest_authentication_key'), $this->getConfiguration()->get('digest_authentication_key'), true);
         $nonceValue = $expiryTime.':'.$signatureValue;
         $nonceValueBase64 = base64_encode($nonceValue);
 
@@ -787,7 +787,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $qop,
             $cnonce,
             $response,
-            hash('md5', $this->getConfiguration()->get('realm', 'Service'))
+            base64_encode(hash_hmac('sha512', $nonceValueBase64.$this->getConfiguration()->get('realm', 'Service'), $this->getConfiguration()->get('digest_authentication_key'), true))
         );
     }
 }

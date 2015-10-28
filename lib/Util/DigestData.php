@@ -72,7 +72,7 @@ class DigestData
         $this->checkElements();
         $this->checkQualityOfProtection();
         $this->checkRealm($expectedRealm);
-        $this->checkOpaque(md5($expectedRealm));
+        $this->checkOpaque($expectedRealm, $entryPointKey);
         $this->checkNonce($entryPointKey);
     }
 
@@ -111,12 +111,15 @@ class DigestData
     }
 
     /**
-     * @param string $opaque
+     * @param string $expectedRealm
+     * @param string $entryPointKey
      *
      * @throws \InvalidArgumentException
      */
-    public function checkOpaque($opaque)
+    public function checkOpaque($expectedRealm, $entryPointKey)
     {
+        $opaque = base64_encode(hash_hmac('sha512', $this->elements['nonce'].$expectedRealm, $entryPointKey, true));
+
         if ($opaque !== $this->elements['opaque']) {
             throw new \InvalidArgumentException('Invalid "opaque" value.');
         }
@@ -137,7 +140,7 @@ class DigestData
             throw new \InvalidArgumentException(sprintf('Nonce should have yielded two tokens but was "%s".', $nonceAsPlainText));
         }
         $this->nonceExpiryTime = $nonceTokens[0];
-        if (md5($this->nonceExpiryTime.':'.$entryPointKey) !== $nonceTokens[1]) {
+        if (hash_hmac('sha512', $this->nonceExpiryTime.$entryPointKey, $entryPointKey, true) !== $nonceTokens[1]) {
             throw new \InvalidArgumentException(sprintf('Nonce token compromised "%s".', $nonceAsPlainText));
         }
     }
