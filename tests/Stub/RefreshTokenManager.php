@@ -65,7 +65,7 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
                       ->setExpiresAt($expiresAt)
                       ->setToken($token)
                       ->setClientPublicId($client->getPublicId())
-                      ->setResourceOwnerPublicId(is_null($resourceOwner) ? null : $resourceOwner->getPublicId())
+                      ->setResourceOwnerPublicId(null === $resourceOwner ? null : $resourceOwner->getPublicId())
                       ->setScope($scope);
 
         $this->refresh_tokens[$refresh_token->getToken()] = $refresh_token;

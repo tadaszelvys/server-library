@@ -36,7 +36,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
      */
     public function createAuthCode(ClientInterface $client, EndUserInterface $end_user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
     {
-        $length = $this->getConfiguration()->get('auth_code_length', 20);
+        $length = $this->getAuthCodeLength();
         $charset = $this->getConfiguration()->get('auth_code_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
         try {
             $code = DefuseGenerator::getRandomString($length, $charset);
@@ -65,6 +65,27 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
         return $lifetime;
     }
 
+    /**
+     * @return int
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function getAuthCodeLength()
+    {
+        $min_length = $this->getConfiguration()->get('auth_code_min_length', 20);
+        $max_length = $this->getConfiguration()->get('auth_code_max_length', 30);
+        if ($min_length>$max_length) {
+            throw $this->createException('Invalid configuration: "auth_code_min_length" value must be lower thant "auth_code_max_length"');
+        }
+        srand();
+        return rand($min_length,$max_length);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return \OAuth2\Exception\BaseExceptionInterface
+     */
     private function createException($message)
     {
         return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, $message);

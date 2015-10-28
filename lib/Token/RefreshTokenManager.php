@@ -33,7 +33,7 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
      */
     public function createRefreshToken(ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [])
     {
-        $length = $this->getConfiguration()->get('refresh_token_length', 20);
+        $length = $this->getRefreshTokenLength();
         $charset = $this->getConfiguration()->get('refresh_token_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
         try {
             $token = DefuseGenerator::getRandomString($length, $charset);
@@ -63,6 +63,26 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
         return  $this->getConfiguration()->get('refresh_token_lifetime', 1209600);
     }
 
+    /**
+     * @return int
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function getRefreshTokenLength()
+    {
+        $min_length = $this->getConfiguration()->get('refresh_token_min_length', 20);
+        $max_length = $this->getConfiguration()->get('refresh_token_max_length', 30);
+        if ($min_length>$max_length) {
+            throw $this->createException('Invalid configuration: "refresh_token_min_length" value must be lower thant "refresh_token_max_length"');
+        }
+        srand();
+        return rand($min_length,$max_length);
+    }
+
+    /**
+     * @param $message
+     *
+     * @return \OAuth2\Exception\BaseExceptionInterface
+     */
     private function createException($message)
     {
         return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, $message);

@@ -47,7 +47,7 @@ class ImplicitGrantTypeTest extends Base
     public function testRedirectUriParameterIsNotValid()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -70,7 +70,7 @@ class ImplicitGrantTypeTest extends Base
     public function testResponseTypeParameterIsMissing()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -93,7 +93,7 @@ class ImplicitGrantTypeTest extends Base
     public function testResponseTypeParameterIsNotSupported()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -117,7 +117,7 @@ class ImplicitGrantTypeTest extends Base
     public function testNonConfidentialClientMustRegisterAtLeastOneRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('oof');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -141,7 +141,7 @@ class ImplicitGrantTypeTest extends Base
     public function testResponseTypeisNotAuthorizedForTheClient()
     {
         $client = $this->getClientManagerSupervisor()->getClient('fii');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -165,7 +165,7 @@ class ImplicitGrantTypeTest extends Base
     public function testResourceOwnerDeniedAccess()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -185,7 +185,7 @@ class ImplicitGrantTypeTest extends Base
     public function testAccessTokenSuccess()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -205,7 +205,7 @@ class ImplicitGrantTypeTest extends Base
     public function testAccessTokenSuccessWithState()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -226,7 +226,7 @@ class ImplicitGrantTypeTest extends Base
     public function testAccessTokenSuccessWithStateAndForPoostResponseMode()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;

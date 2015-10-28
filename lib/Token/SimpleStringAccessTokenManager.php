@@ -33,7 +33,7 @@ abstract class SimpleStringAccessTokenManager extends AccessTokenManager
      */
     public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [], RefreshTokenInterface $refresh_token = null)
     {
-        $length = $this->getConfiguration()->get('simple_string_access_token_length', 20);
+        $length = $this->getAccessTokenLength();
         $charset = $this->getConfiguration()->get('simple_string_access_token_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
         try {
             $token = DefuseGenerator::getRandomString($length, $charset);
@@ -49,6 +49,26 @@ abstract class SimpleStringAccessTokenManager extends AccessTokenManager
         return $access_token;
     }
 
+    /**
+     * @return int
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function getAccessTokenLength()
+    {
+        $min_length = $this->getConfiguration()->get('simple_string_access_token_min_length', 20);
+        $max_length = $this->getConfiguration()->get('simple_string_access_token_max_length', 30);
+        if ($min_length>$max_length) {
+            throw $this->createException('Invalid configuration: "simple_string_access_token_min_length" value must be lower thant "simple_string_access_token_max_length"');
+        }
+        srand();
+        return rand($min_length,$max_length);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return \OAuth2\Exception\BaseExceptionInterface
+     */
     private function createException($message)
     {
         return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, $message);

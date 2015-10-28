@@ -45,12 +45,12 @@ class AuthCodeGrantTypeTest extends Base
     public function testRedirectUriParameterIsNotValid()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
         }
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Should throw an Exception');
 
             return;
@@ -73,7 +73,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testResponseTypeParameterIsMissing()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -96,7 +96,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testResponseTypeParameterIsNotSupported()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -120,7 +120,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testNonConfidentialClientMustRegisterAtLeastOneRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('oof');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -144,7 +144,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testConfidentialClientWithRegisteredRedirectUriButUnsupportedResponseType()
     {
         $client = $this->getClientManagerSupervisor()->getClient('bar');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -168,7 +168,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testConfidentialClientWithUnregisteredRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('bar');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -192,7 +192,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testConfidentialClientUsingTokenResponseTypeWithoutRedirectUriRegistered()
     {
         $client = $this->getClientManagerSupervisor()->getClient('baz');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -215,7 +215,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testResponseTypeisNotAuthorizedForTheClient()
     {
         $client = $this->getClientManagerSupervisor()->getClient('baz');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -239,7 +239,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testResourceOwnerDeniedAccess()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -259,7 +259,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthcodeSuccess()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -279,7 +279,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthcodeSuccessWithoutRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -298,7 +298,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthcodeSuccessUsingAnotherRedirectUri()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -318,7 +318,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthcodeSuccessWithState()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;
@@ -339,7 +339,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthcodeSuccessWithStateAndUnregisteredClient()
     {
         $client = $this->getClientManagerSupervisor()->getClient('**UNREGISTERED**--foo');
-        if (is_null($client)) {
+        if (null === $client) {
             $this->fail('Unable to get client');
 
             return;

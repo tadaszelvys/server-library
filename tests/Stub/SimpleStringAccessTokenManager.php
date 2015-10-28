@@ -46,9 +46,9 @@ class SimpleStringAccessTokenManager extends Base
         $access_token = new AccessToken();
         $access_token->setExpiresAt($expiresAt)
                      ->setScope($scope)
-                     ->setResourceOwnerPublicId(is_null($resourceOwner) ? null : $resourceOwner->getPublicId())
+                     ->setResourceOwnerPublicId(null === $resourceOwner ? null : $resourceOwner->getPublicId())
                      ->setClientPublicId($client->getPublicId())
-                     ->setRefreshToken(is_null($refresh_token) ? null : $refresh_token->getToken())
+                     ->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken())
                      ->setToken($token);
 
         $this->access_tokens[$access_token->getToken()] = $access_token;

@@ -36,7 +36,7 @@ class UnregisteredClientManager implements ClientManagerInterface
         }
 
         $client = $this->checkResult($result);
-        if (is_null($client)) {
+        if (null === $client) {
             return $client;
         }
 
