@@ -118,7 +118,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ]
+                ],
             ]);
 
             $this->authorization_factory->setJWTLoader($jwt_loader);
