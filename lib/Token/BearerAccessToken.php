@@ -124,7 +124,7 @@ class BearerAccessToken implements AccessTokenTypeInterface
      *
      * {@inheritdoc}
      */
-    public function isAccessTokenValid(ServerRequestInterface $request, AccessTokenInterface $token)
+    public function isAccessTokenRequestValid(ServerRequestInterface $request, AccessTokenInterface $token)
     {
         return true;
     }

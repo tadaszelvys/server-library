@@ -43,12 +43,15 @@ interface AccessTokenTypeInterface
     public function findAccessToken(ServerRequestInterface $request);
 
     /**
+     * This method verifies the access token request is valid.
+     * Be careful: it MUST not verify the access token itself.
+     *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \OAuth2\Token\AccessTokenInterface       $token
      *
-     * @return bool True if the access token is valid, else false
+     * @return bool True if the access token request is valid, else false
      */
-    public function isAccessTokenValid(ServerRequestInterface $request, AccessTokenInterface $token);
+    public function isAccessTokenRequestValid(ServerRequestInterface $request, AccessTokenInterface $token);
 
     /**
      * @return array
