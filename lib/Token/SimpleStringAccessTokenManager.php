@@ -50,18 +50,20 @@ abstract class SimpleStringAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @return int
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return int
      */
     private function getAccessTokenLength()
     {
         $min_length = $this->getConfiguration()->get('simple_string_access_token_min_length', 20);
         $max_length = $this->getConfiguration()->get('simple_string_access_token_max_length', 30);
-        if ($min_length>$max_length) {
+        if ($min_length > $max_length) {
             throw $this->createException('Invalid configuration: "simple_string_access_token_min_length" value must be lower thant "simple_string_access_token_max_length"');
         }
         srand();
-        return rand($min_length,$max_length);
+
+        return rand($min_length, $max_length);
     }
 
     /**
