@@ -44,15 +44,11 @@ class JWTBearerGrantTypeTest extends Base
         $request = $this->createRequest(
             '/',
             'POST',
-            [],
-            ['HTTPS' => 'on'],
-            [],
-
-                [
-                    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                    'assertion'  => $jws,
-                ]
-
+            [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion'  => $jws,
+            ],
+            ['HTTPS' => 'on']
         );
 
         try {
@@ -83,15 +79,11 @@ class JWTBearerGrantTypeTest extends Base
         $request = $this->createRequest(
             '/',
             'POST',
-            [],
-            ['HTTPS' => 'on'],
-            [],
-
-                [
-                    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                    'assertion'  => $jws,
-                ]
-
+            [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion'  => $jws,
+            ],
+            ['HTTPS' => 'on']
         );
 
         try {
@@ -133,15 +125,11 @@ class JWTBearerGrantTypeTest extends Base
         $request = $this->createRequest(
             '/',
             'POST',
-            [],
-            ['HTTPS' => 'on'],
-            [],
-
-                [
-                    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                    'assertion'  => $jws,
-                ]
-
+            [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion'  => $jws,
+            ],
+            ['HTTPS' => 'on']
         );
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);

@@ -76,16 +76,16 @@ class Base extends \PHPUnit_Framework_TestCase
      *
      * @return \Psr\Http\Message\ServerRequestInterface
      */
-    protected function createRequest($uri = '/', $method = 'GET', array $parameters = [], array $server = [], array $headers = [], array $content = [])
+    protected function createRequest($uri = '/', $method = 'GET', array $parameters = [], array $server = [], array $headers = [], $content = null)
     {
-        $request = Request::create($uri, $method, $parameters, [], [], $server);
+        $request = Request::create($uri, $method, $parameters, [], [], $server, $content);
         foreach ($headers as $key => $value) {
             $request->headers->set($key, $value);
         }
 
         $factory = new DiactorosFactory();
 
-        return $factory->createRequest($request)->withParsedBody($content);
+        return $factory->createRequest($request);
     }
 
     /**
