@@ -103,7 +103,7 @@ class JWTEncrypter
 
         $result = $this->getJWTEncrypter()->encrypt($payload, [$instruction], $protected_headers, [], JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
         if (!is_string($result)) {
-            throw new \RuntimeException('Unable to sign claims.');
+            throw new \RuntimeException('Unable to encrypt claims.');
         }
 
         return $result;

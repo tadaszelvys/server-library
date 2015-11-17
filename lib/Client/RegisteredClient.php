@@ -52,8 +52,9 @@ class RegisteredClient extends Client implements RegisteredClientInterface
 
     public function removeRedirectUri($redirect_uri)
     {
-        if ($this->hasRedirectUri($redirect_uri)) {
-            unset($this->redirect_uris[$redirect_uri]);
+        $key = array_search($redirect_uri, $this->redirect_uris);
+        if (false !== $key) {
+            unset($this->redirect_uris[$key]);
         }
 
         return $this;

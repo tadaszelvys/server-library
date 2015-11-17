@@ -5,9 +5,9 @@ namespace OAuth2\Test\Stub;
 use OAuth2\Client\PublicClient as BasePublicClient;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 
-class PublicClient extends BasePublicClient implements TokenLifetimeExtensionInterface
+class PublicClient extends BasePublicClient/* implements TokenLifetimeExtensionInterface*/
 {
-    public function getTokenLifetime($token)
+    /*public function getTokenLifetime($token)
     {
         switch ($token) {
             case 'authcode':
@@ -18,5 +18,5 @@ class PublicClient extends BasePublicClient implements TokenLifetimeExtensionInt
             default:
                 return 2000;
         }
-    }
+    }*/
 }

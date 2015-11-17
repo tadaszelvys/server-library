@@ -199,7 +199,7 @@ class ImplicitGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=1000&scope=scope1\+scope2&token_type=Bearer$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithState()
@@ -220,7 +220,7 @@ class ImplicitGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=1000&scope=scope1\+scope2&token_type=Bearer&state=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer&state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithStateAndForPoostResponseMode()

@@ -47,7 +47,8 @@ class PublicClientManager extends Base
     protected function findClientMethods()
     {
         return [
-            'findClientUsingHeader',
+            'findClientUsingHeader1',
+            'findClientUsingHeader2',
         ];
     }
 
@@ -57,9 +58,32 @@ class PublicClientManager extends Base
      *
      * @return string|null
      */
-    protected function findClientUsingHeader(ServerRequestInterface $request, &$client_public_id_found = null)
+    protected function findClientUsingHeader1(ServerRequestInterface $request, &$client_public_id_found = null)
     {
         $header = $request->getHeader('X-OAuth2-Public-Client-ID');
+
+        if (empty($header)) {
+            return;
+        } elseif (is_array($header)) {
+            $client_public_id_found = $header[0];
+
+            return $header[0];
+        } else {
+            $client_public_id_found = $header;
+
+            return $header;
+        }
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param string|null                              $client_public_id_found
+     *
+     * @return string|null
+     */
+    protected function findClientUsingHeader2(ServerRequestInterface $request, &$client_public_id_found = null)
+    {
+        $header = $request->getHeader('XX-OAuth2-Public-Client-ID');
 
         if (empty($header)) {
             return;

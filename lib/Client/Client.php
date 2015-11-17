@@ -51,8 +51,9 @@ class Client extends ResourceOwner implements ClientInterface
 
     public function removeAllowedGrantType($grant_type)
     {
-        if ($this->isAllowedGrantType($grant_type)) {
-            unset($this->grant_types[$grant_type]);
+        $key = array_search($grant_type, $this->grant_types);
+        if (false !== $key) {
+            unset($this->grant_types[$key]);
         }
 
         return $this;

@@ -390,6 +390,20 @@ class AuthCodeGrantTypeTest extends Base
         }
     }
 
+    public function testPublicClientWithMultipleAuthenticationProcess()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo', 'XX-OAuth2-Public-Client-ID' => 'foo']);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Only one authentication method may be used to authenticate the client.', $e->getDescription());
+        }
+    }
+
     public function testParameterCodeIsMissing()
     {
         $response = new Response();
