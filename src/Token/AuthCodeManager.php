@@ -74,12 +74,9 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     {
         $min_length = $this->getConfiguration()->get('auth_code_min_length', 20);
         $max_length = $this->getConfiguration()->get('auth_code_max_length', 30);
-        if ($min_length > $max_length) {
-            throw $this->createException('Invalid configuration: "auth_code_min_length" value must be lower thant "auth_code_max_length"');
-        }
         srand();
 
-        return rand($min_length, $max_length);
+        return rand(min($min_length, $max_length), max($min_length, $max_length));
     }
 
     /**

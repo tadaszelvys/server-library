@@ -488,7 +488,30 @@ class AuthCodeGrantTypeTest extends Base
         }
     }
 
-    public function testClientGranted()
+    public function testPublicClientGranted()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['client_id' => 'foo', 'grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE_PUBLIC_CLIENT', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","token_type":"Bearer"}', $response->getBody()->getContents());
+
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $access_token = $this->getSimpleStringAccessTokenManager()->getAccessToken($json['access_token']);
+
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_token);
+        $this->assertTrue($this->getSimpleStringAccessTokenManager()->isAccessTokenValid($access_token));
+    }
+
+    public function testPrivateClientGranted()
     {
         $response = new Response();
         $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);

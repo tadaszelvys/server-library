@@ -15,8 +15,8 @@ class AuthCodeManager extends Base
 
     public function __construct()
     {
-        $valid_auth_code = new AuthCode();
-        $valid_auth_code->setIssueRefreshToken(true)
+        $valid_auth_code1 = new AuthCode();
+        $valid_auth_code1->setIssueRefreshToken(true)
             ->setRedirectUri('http://example.com/redirect_uri/')
             ->setClientPublicId('bar')
             ->setResourceOwnerPublicId('user1')
@@ -26,6 +26,18 @@ class AuthCodeManager extends Base
                 'scope2',
             ])
             ->setToken('VALID_AUTH_CODE');
+
+        $valid_auth_code2 = new AuthCode();
+        $valid_auth_code2->setIssueRefreshToken(true)
+            ->setRedirectUri('http://example.com/redirect_uri/')
+            ->setClientPublicId('foo')
+            ->setResourceOwnerPublicId('user1')
+            ->setExpiresAt(time() + 3000)
+            ->setScope([
+                'scope1',
+                'scope2',
+            ])
+            ->setToken('VALID_AUTH_CODE_PUBLIC_CLIENT');
 
         $expired_auth_code = new AuthCode();
         $expired_auth_code->setIssueRefreshToken(true)
@@ -39,7 +51,8 @@ class AuthCodeManager extends Base
             ])
             ->setToken('EXPIRED_AUTH_CODE');
 
-        $this->auth_codes['VALID_AUTH_CODE'] = $valid_auth_code;
+        $this->auth_codes['VALID_AUTH_CODE'] = $valid_auth_code1;
+        $this->auth_codes['VALID_AUTH_CODE_PUBLIC_CLIENT'] = $valid_auth_code2;
         $this->auth_codes['EXPIRED_AUTH_CODE'] = $expired_auth_code;
     }
 

@@ -3,7 +3,10 @@
 namespace OAuth2\Test\Unit;
 
 use OAuth2\Client\PublicClient;
+use OAuth2\Exception\AuthenticateException;
 use OAuth2\Test\Base;
+use OAuth2\Test\Stub\EndUser;
+use OAuth2\Token\AuthCode;
 
 /**
  * @group Objects
@@ -40,5 +43,47 @@ class ObjectsTest extends Base
         $this->assertFalse($client->hasRedirectUri('https://bar.com'));
         $this->assertTrue($client->isAllowedGrantType('foo'));
         $this->assertFalse($client->isAllowedGrantType('baz'));
+    }
+
+    public function testEndUser()
+    {
+        $user = new EndUser('user1', 'pass');
+        $user->setLastLoginAt(time()-1000);
+
+        $this->assertEquals('end_user', $user->getType());
+        $this->assertTrue($user->getLastLoginAt() <= time()-1000);
+        $this->assertEquals('user1', $user->getUsername());
+    }
+
+    public function testAuthCodeQueryParams()
+    {
+        $auth_code = new AuthCode();
+        $auth_code->setQueryParams(['foo'=>'bar']);
+
+        $this->assertEquals(['foo'=>'bar'], $auth_code->getQueryParams());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage schemes_not_defined
+     */
+    public function testAuthenticateExceptionConstructionFailed()
+    {
+        new AuthenticateException('foo_error', 'foo_description', 'https://foo.com/error', []);
+    }
+
+    public function testAuthenticateException()
+    {
+        $exception = new AuthenticateException('foo_error', 'foo_description', 'https://foo.com/error', ['schemes' => ['Bearer' => []]]);
+
+        $this->assertNull($exception->getResponseBody());
+        $this->assertEquals([
+            'Content-Type' => 'application/json',
+            'Cache-Control' => 'no-store',
+            'Pragma' => 'no-cache',
+            'WWW-Authenticate' => [
+                'Bearer'
+            ],
+        ], $exception->getResponseHeaders());
     }
 }

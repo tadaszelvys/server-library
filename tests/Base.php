@@ -100,13 +100,8 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->authorization_factory) {
             $jose = Jose::getInstance();
-            $this->authorization_factory = new AuthorizationFactory();
-            $this->authorization_factory->setClientManagerSupervisor($this->getClientManagerSupervisor());
-            $this->authorization_factory->setScopeManager($this->getScopeManager());
-            $this->authorization_factory->setExceptionManager($this->getExceptionManager());
-            $this->authorization_factory->setExceptionManager($this->getExceptionManager());
-
             $jwt_loader = new JWTLoader();
+
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(false);
@@ -121,7 +116,13 @@ class Base extends \PHPUnit_Framework_TestCase
                 ],
             ]);
 
+            $this->authorization_factory = new AuthorizationFactory();
+            $this->authorization_factory->setClientManagerSupervisor($this->getClientManagerSupervisor());
+            $this->authorization_factory->setScopeManager($this->getScopeManager());
+            $this->authorization_factory->setExceptionManager($this->getExceptionManager());
             $this->authorization_factory->setJWTLoader($jwt_loader);
+            $this->authorization_factory->setRequestParameterSupported(true);
+            $this->authorization_factory->setRequestUriParameterSupported(true);
         }
 
         return $this->authorization_factory;

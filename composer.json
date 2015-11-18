@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "OAuth2\\": "lib/"
+            "OAuth2\\": "src/"
         }
     },
     "autoload-dev": {
