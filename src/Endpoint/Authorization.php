@@ -209,7 +209,7 @@ class Authorization
                 return $this;
             }
         }
-        throw new \BadMethodCallException('Unknown method "'.$method.'""');
+        throw new \BadMethodCallException(sprintf('Unknown method "%s"', $method));
     }
 
     /**

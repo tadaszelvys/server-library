@@ -2,6 +2,7 @@
 
 namespace OAuth2\Test\Functional;
 
+use OAuth2\Exception\BaseException;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Test\Base;
@@ -116,6 +117,51 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
+    }
+
+    public function testGrantTypeAuthorizedForClientUsingBadDigestAuthenticationScheme1()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => '0123456789']);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+        } catch (BaseException $e) {
+            $this->assertEquals('invalid_client', $e->getMessage());
+            $this->assertEquals('Missing mandatory digest value(s): username, realm, nonce, uri, response, opaque.', $e->getDescription());
+            $this->assertEquals(401, $e->getHttpCode());
+            $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
+        }
+    }
+
+    public function testGrantTypeAuthorizedForClientUsingBadDigestAuthenticationScheme2()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createHttpDigestWithBadRealm('POST', '/', 'Mufasa', 'Circle Of Life', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))]);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+        } catch (BaseException $e) {
+            $this->assertEquals('invalid_client', $e->getMessage());
+            $this->assertEquals('Response realm name "Foo Bar Service" does not match system realm name of "testrealm@host.com".', $e->getDescription());
+            $this->assertEquals(401, $e->getHttpCode());
+            $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
+        }
+    }
+
+    public function testGrantTypeAuthorizedForClientUsingBadDigestAuthenticationScheme3()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createHttpDigestWithoutCNonce('POST', '/', 'Mufasa', 'Circle Of Life', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))]);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+        } catch (BaseException $e) {
+            $this->assertEquals('invalid_client', $e->getMessage());
+            $this->assertEquals('Missing mandatory digest value "nc" or "cnonce".', $e->getDescription());
+            $this->assertEquals(401, $e->getHttpCode());
+            $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
+        }
     }
 
     public function testGrantTypeAuthorizedForClientUsingDigestAuthenticationScheme()

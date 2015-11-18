@@ -270,12 +270,16 @@ abstract class PasswordClientManager implements ClientManagerInterface
      */
     private function parseDigest($digest)
     {
-        $data = new DigestData($digest);
-        $data->validateAndDecode(
-            $this->getConfiguration()->get('digest_authentication_key'),
-            $this->getConfiguration()->get('realm', 'Service')
-        );
+        try {
+            $data = new DigestData($digest);
+            $data->validateAndDecode(
+                $this->getConfiguration()->get('digest_authentication_key'),
+                $this->getConfiguration()->get('realm', 'Service')
+            );
 
-        return $data;
+            return $data;
+        } catch (\InvalidArgumentException $e) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage(), ['schemes' => $this->getSchemesParameters()]);
+        }
     }
 }

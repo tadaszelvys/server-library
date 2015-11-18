@@ -750,25 +750,58 @@ class Base extends \PHPUnit_Framework_TestCase
         return $this->auth_code_manager;
     }
 
-    protected function createValidDigest($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
+    protected function createHttpDigest($username = null, $realm = null, $nonce = null, $uri = null, $qop = null, $nc = null, $cnonce = null, $response = null, $opaque = null)
+    {
+        $data = [
+            'username' => $username,
+            'realm' => $realm,
+            'nonce' => $nonce,
+            'uri' => $uri,
+            'qop' => $qop,
+            'nc' => $nc,
+            'cnonce' => $cnonce,
+            'response' => $response,
+            'opaque' => $opaque,
+        ];
+        $quoted = [
+            'username',
+            'realm',
+            'nonce',
+            'uri',
+            'cnonce',
+            'response',
+            'opaque',
+        ];
+        $compiled = [];
+
+        foreach($data as $key=>$value) {
+            if (null !== $value) {
+                if (in_array($key, $quoted)) {
+                    $compiled[] .= sprintf('%s="%s"', $key, $value);
+                } else {
+                    $compiled[] .= sprintf('%s=%s', $key, $value);
+                }
+            }
+        }
+        return implode(',', $compiled);
+    }
+
+    protected function createHttpDigestWithBadRealm($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
     {
         $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
         $signatureValue = hash_hmac('sha512', $expiryTime.$this->getConfiguration()->get('digest_authentication_key'), $this->getConfiguration()->get('digest_authentication_key'));
         $nonceValue = $expiryTime.':'.$signatureValue;
         $nonceValueBase64 = base64_encode($nonceValue);
+        $realm = 'Foo Bar Service';
 
         $cnonce = uniqid();
 
-        $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $this->getConfiguration()->get('realm', 'Service'), $client_secret));
+        $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $realm, $client_secret));
         if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
             $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
         }
 
-        $a2 = sprintf('%s:%s', $method, $uri);
-        if ('auth-int' === $qop) {
-            $a2 .= ':'.hash('md5', $content);
-        }
-        $ha2 = hash('md5', $a2);
+        $ha2 = $this->computeHA2($method, $uri, $qop, $content);
         $response = hash('md5', sprintf(
             '%s:%s:%s:%s:%s:%s',
             $ha1,
@@ -779,16 +812,103 @@ class Base extends \PHPUnit_Framework_TestCase
             $ha2
         ));
 
-        return sprintf(
-            'username="%s",realm="%s",nonce="%s",uri="%s",qop=%s,nc=00000001,cnonce="%s",response="%s",opaque="%s"',
+        return $this->createHttpDigest(
             $client_id,
-            $this->getConfiguration()->get('realm', 'Service'),
+            $realm,
             $nonceValueBase64,
             $uri,
             $qop,
+            '00000001',
             $cnonce,
             $response,
-            base64_encode(hash_hmac('sha512', $nonceValueBase64.$this->getConfiguration()->get('realm', 'Service'), $this->getConfiguration()->get('digest_authentication_key'), true))
+            base64_encode(hash_hmac('sha512', $nonceValueBase64.$realm, $this->getConfiguration()->get('digest_authentication_key'), true))
         );
+    }
+
+    protected function createHttpDigestWithoutCNonce($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
+    {
+        $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
+        $signatureValue = hash_hmac('sha512', $expiryTime.$this->getConfiguration()->get('digest_authentication_key'), $this->getConfiguration()->get('digest_authentication_key'));
+        $nonceValue = $expiryTime.':'.$signatureValue;
+        $nonceValueBase64 = base64_encode($nonceValue);
+        $realm = $this->getConfiguration()->get('realm', 'Service');
+
+        $cnonce = uniqid();
+
+        $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $realm, $client_secret));
+        if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
+            $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
+        }
+
+        $ha2 = $this->computeHA2($method, $uri, $qop, $content);
+        $response = hash('md5', sprintf(
+            '%s:%s:%s:%s:%s:%s',
+            $ha1,
+            $nonceValueBase64,
+            '00000001',
+            $cnonce,
+            $qop,
+            $ha2
+        ));
+
+        return $this->createHttpDigest(
+            $client_id,
+            $realm,
+            $nonceValueBase64,
+            $uri,
+            $qop,
+            '00000001',
+            null,
+            $response,
+            base64_encode(hash_hmac('sha512', $nonceValueBase64.$realm, $this->getConfiguration()->get('digest_authentication_key'), true))
+        );
+    }
+
+    protected function createValidDigest($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
+    {
+        $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
+        $signatureValue = hash_hmac('sha512', $expiryTime.$this->getConfiguration()->get('digest_authentication_key'), $this->getConfiguration()->get('digest_authentication_key'));
+        $nonceValue = $expiryTime.':'.$signatureValue;
+        $nonceValueBase64 = base64_encode($nonceValue);
+        $realm = $this->getConfiguration()->get('realm', 'Service');
+
+        $cnonce = uniqid();
+
+        $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $realm, $client_secret));
+        if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
+            $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
+        }
+
+        $ha2 = $this->computeHA2($method, $uri, $qop, $content);
+        $response = hash('md5', sprintf(
+            '%s:%s:%s:%s:%s:%s',
+            $ha1,
+            $nonceValueBase64,
+            '00000001',
+            $cnonce,
+            $qop,
+            $ha2
+        ));
+
+        return $this->createHttpDigest(
+            $client_id,
+            $realm,
+            $nonceValueBase64,
+            $uri,
+            $qop,
+            '00000001',
+            $cnonce,
+            $response,
+            base64_encode(hash_hmac('sha512', $nonceValueBase64.$realm, $this->getConfiguration()->get('digest_authentication_key'), true))
+        );
+    }
+
+    private function computeHA2($method, $uri, $qop, $content)
+    {
+        $a2 = sprintf('%s:%s', $method, $uri);
+        if ('auth-int' === $qop) {
+            $a2 .= ':'.hash('md5', $content);
+        }
+        return hash('md5', $a2);
     }
 }

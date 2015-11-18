@@ -82,7 +82,7 @@ class DigestData
     public function checkElements()
     {
         if ($keys = array_diff(['username', 'realm', 'nonce', 'uri', 'response', 'opaque'], array_keys($this->elements))) {
-            throw new \InvalidArgumentException(sprintf('Missing mandatory digest value; received header "%s" (%s)', $this->header, implode(', ', $keys)));
+            throw new \InvalidArgumentException(sprintf('Missing mandatory digest value(s): %s.', implode(', ', $keys)));
         }
     }
 
@@ -93,7 +93,7 @@ class DigestData
     {
         if (in_array($this->elements['qop'], ['auth', 'auth-int'])) {
             if (!isset($this->elements['nc']) || !isset($this->elements['cnonce'])) {
-                throw new \InvalidArgumentException(sprintf('Missing mandatory digest value; received header "%s"', $this->header));
+                throw new \InvalidArgumentException(sprintf('Missing mandatory digest value "nc" or "cnonce".'));
             }
         }
     }
