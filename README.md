@@ -45,6 +45,7 @@ The following components are implemented:
     * [x] Authorization endpoint ([RFC6749, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
     * [x] Token endpoint ([RFC6749, section 3.2](https://tools.ietf.org/html/rfc6749#section-3.2))
     * [x] Token revocation endpoint ([RFC7009](https://tools.ietf.org/html/rfc7009))
+    * [ ] Token introspection endpoint ([RFC7662](https://tools.ietf.org/html/rfc7662))
 * [ ] Grant types:
     * [x] Authorization code grant type ([RFC6749, section 4.1](https://tools.ietf.org/html/rfc6749#section-4.1))
     * [x] Implicit grant type ([RFC6749, section 4.2](https://tools.ietf.org/html/rfc6749#section-4.2))
