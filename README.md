@@ -24,15 +24,15 @@ This library provides components to build an authorization server based on the O
 
 The following components are implemented:
 
-* [x] Access token manager:
+* Access token manager:
     * [x] Simple string access token
     * [x] JWT access token
-* [ ] Access token type:
+* Access token type:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
     * [ ] MAC access ([IETF draft](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-05)) - *The implementation is stopped until the specification has not reach maturity*
 * [x] Exception manager
 * [x] Scope manager ([RFC6749, section 3.3](https://tools.ietf.org/html/rfc6749#section-3.3))
-* [ ] Clients:
+* Clients:
     * [x] Public clients ([RFC6749, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1))
     * [x] Password clients ([RFC6749, section 2.3.1](https://tools.ietf.org/html/rfc6749#section-2.3.1))
         * [x] HTTP Basic Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617)) - *Note: ([RFC7617](https://tools.ietf.org/html/rfc7617)) support is scheduled*
@@ -41,12 +41,12 @@ The following components are implemented:
     * [ ] SAML clients ([RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
     * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523))
     * [x] Unregistered clients ([RFC6749, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4))
-* [x] Endpoints:
+* Endpoints:
     * [x] Authorization endpoint ([RFC6749, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
     * [x] Token endpoint ([RFC6749, section 3.2](https://tools.ietf.org/html/rfc6749#section-3.2))
     * [x] Token revocation endpoint ([RFC7009](https://tools.ietf.org/html/rfc7009))
     * [ ] Token introspection endpoint ([RFC7662](https://tools.ietf.org/html/rfc7662))
-* [ ] Grant types:
+* Grant types:
     * [x] Authorization code grant type ([RFC6749, section 4.1](https://tools.ietf.org/html/rfc6749#section-4.1))
     * [x] Implicit grant type ([RFC6749, section 4.2](https://tools.ietf.org/html/rfc6749#section-4.2))
     * [x] Resource Owner Password Credentials grant type ([RFC6749, section 4.3](https://tools.ietf.org/html/rfc6749#section-4.3))
@@ -55,7 +55,7 @@ The following components are implemented:
     * [ ] SAML grant type ([RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
     * [x] JWT Bearer token grant type ([RFC7523](https://tools.ietf.org/html/rfc7523))
 
-* [ ] OpenID Connect
+* OpenID Connect
     * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
     * [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
     * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html)
