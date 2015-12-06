@@ -3,21 +3,17 @@
 namespace OAuth2\Util;
 
 use Jose\JSONSerializationModes;
+use Jose\JWKManager;
 use Jose\JWKManagerInterface;
 use Jose\SignerInterface;
-use SpomkyLabs\Jose\SignatureInstruction;
+use Jose\SignatureInstruction;
 
-class JWTSigner
+final class JWTSigner
 {
     /**
      * @var \Jose\SignerInterface
      */
     protected $jwt_signer;
-
-    /**
-     * @var \Jose\JWKManagerInterface
-     */
-    protected $key_manager;
 
     /**
      * @var \Jose\JWKInterface
@@ -29,19 +25,7 @@ class JWTSigner
      */
     public function getKeyManager()
     {
-        return $this->key_manager;
-    }
-
-    /**
-     * @param  $key_manager
-     *
-     * @return self
-     */
-    public function setKeyManager(JWKManagerInterface $key_manager)
-    {
-        $this->key_manager = $key_manager;
-
-        return $this;
+        return new JWKManager();
     }
 
     /**
@@ -92,9 +76,7 @@ class JWTSigner
      */
     public function sign(array $claims, array $protected_headers)
     {
-        $instruction = new SignatureInstruction();
-        $instruction->setKey($this->getSignatureKey())
-            ->setProtectedHeader($protected_headers);
+        $instruction = new SignatureInstruction($this->getSignatureKey(), $protected_headers);
 
         $result = $this->getJWTSigner()->sign($claims, [$instruction], JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
         if (!is_string($result)) {

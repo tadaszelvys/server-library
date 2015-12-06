@@ -2,7 +2,7 @@
 
 namespace OAuth2\Exception;
 
-class BadRequestException extends BaseException implements BadRequestExceptionInterface
+final class BadRequestException extends BaseException implements BadRequestExceptionInterface
 {
     /**
      * @param string $error             Short name of the error

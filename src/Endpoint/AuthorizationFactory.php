@@ -8,7 +8,7 @@ use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasScopeManager;
 use Psr\Http\Message\ServerRequestInterface;
 
-class AuthorizationFactory
+final class AuthorizationFactory
 {
     use HasJWTLoader;
     use HasScopeManager;

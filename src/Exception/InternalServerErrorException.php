@@ -2,7 +2,7 @@
 
 namespace OAuth2\Exception;
 
-class InternalServerErrorException extends BaseException implements InternalServerErrorExceptionInterface
+final class InternalServerErrorException extends BaseException implements InternalServerErrorExceptionInterface
 {
     /**
      * @param string $error             Short name of the error

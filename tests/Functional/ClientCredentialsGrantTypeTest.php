@@ -2,6 +2,9 @@
 
 namespace OAuth2\Test\Functional;
 
+use Jose\EncryptionInstruction;
+use Jose\JWKManager;
+use Jose\SignatureInstruction;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -167,7 +170,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingDigestAuthenticationScheme()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Circle Of Life', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))]);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Circle Of Life', 'auth', http_build_query(['grant_type' => 'client_credentials']))]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -407,20 +410,45 @@ class ClientCredentialsGrantTypeTest extends Base
     {
         $response = new Response();
         $jose = Jose::getInstance();
-        $jws = $jose->signAndEncrypt(
+        $jwk_manager = new JWKManager();
+        $jwk1 = $jwk_manager->createJWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]);
+        $jwk2 = $jwk_manager->createJWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $signature_instruction = new SignatureInstruction(
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+        $jws = $jose->sign(
+            [$signature_instruction],
             [
                 'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ],
-            'JWK2',
+            ]
+        );
+
+        $encryption_instruction = new EncryptionInstruction($jwk1);
+
+        $jwe = $jose->encrypt(
+            [$encryption_instruction],
+            $jws,
             [
-                'cty' => 'JWT',
-                'alg' => 'HS512',
-            ],
-            'JWK1',
-            [
+                'kid' => 'JWK1',
                 'cty' => 'JWT',
                 'alg' => 'A256KW',
                 'enc' => 'A256CBC-HS512',
@@ -437,7 +465,7 @@ class ClientCredentialsGrantTypeTest extends Base
             [
                 'grant_type'            => 'client_credentials',
                 'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                'client_assertion'      => $jws,
+                'client_assertion'      => $jwe,
             ],
             ['HTTPS' => 'on']
         );

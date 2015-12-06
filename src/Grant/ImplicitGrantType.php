@@ -6,7 +6,7 @@ use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasAccessTokenTypeManager;
 use OAuth2\Endpoint\Authorization;
 
-class ImplicitGrantType implements ResponseTypeSupportInterface
+final class ImplicitGrantType implements ResponseTypeSupportInterface
 {
     use HasAccessTokenTypeManager;
     use HasAccessTokenManager;

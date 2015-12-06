@@ -3,6 +3,7 @@
 namespace OAuth2\Util;
 
 use Jose\JWEInterface;
+use Jose\JWKSetManager;
 use Jose\JWKSetManagerInterface;
 use Jose\JWSInterface;
 use Jose\JWTInterface;
@@ -11,7 +12,7 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\JWTClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
-class JWTLoader
+final class JWTLoader
 {
     use HasExceptionManager;
 
@@ -24,11 +25,6 @@ class JWTLoader
      * @var \Jose\LoaderInterface
      */
     protected $jwt_loader;
-
-    /**
-     * @var \Jose\JWKSetManagerInterface
-     */
-    protected $key_set_manager;
 
     /**
      * @var string[]
@@ -45,19 +41,7 @@ class JWTLoader
      */
     public function getKeySetManager()
     {
-        return $this->key_set_manager;
-    }
-
-    /**
-     * @param \Jose\JWKSetManagerInterface $key_set_manager
-     *
-     * @return self
-     */
-    public function setKeySetManager(JWKSetManagerInterface $key_set_manager)
-    {
-        $this->key_set_manager = $key_set_manager;
-
-        return $this;
+        return new JWKSetManager();
     }
 
     /**

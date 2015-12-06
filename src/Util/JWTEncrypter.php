@@ -5,20 +5,16 @@ namespace OAuth2\Util;
 use Jose\EncrypterInterface;
 use Jose\JSONSerializationModes;
 use Jose\JWKInterface;
+use Jose\JWKManager;
 use Jose\JWKManagerInterface;
-use SpomkyLabs\Jose\EncryptionInstruction;
+use Jose\EncryptionInstruction;
 
-class JWTEncrypter
+final class JWTEncrypter
 {
     /**
      * @var \Jose\EncrypterInterface
      */
     protected $jwt_encrypter;
-
-    /**
-     * @var \Jose\JWKManagerInterface
-     */
-    protected $key_manager;
 
     /**
      * @var \Jose\JWKInterface
@@ -30,19 +26,7 @@ class JWTEncrypter
      */
     public function getKeyManager()
     {
-        return $this->key_manager;
-    }
-
-    /**
-     * @param  $key_manager
-     *
-     * @return self
-     */
-    public function setKeyManager(JWKManagerInterface $key_manager)
-    {
-        $this->key_manager = $key_manager;
-
-        return $this;
+        return new JWKManager();
     }
 
     /**
@@ -95,11 +79,7 @@ class JWTEncrypter
     public function encrypt($payload, array $protected_headers, array $sender_key = [])
     {
         $sender_key = empty($sender_key) ? null : $this->getKeyManager()->createJWK($sender_key);
-        $instruction = new EncryptionInstruction();
-        $instruction->setRecipientKey($this->getKeyEncryptionKey());
-        if ($sender_key instanceof JWKInterface) {
-            $instruction->setSenderKey($sender_key);
-        }
+        $instruction = new EncryptionInstruction($this->getKeyEncryptionKey(), $sender_key);
 
         $result = $this->getJWTEncrypter()->encrypt($payload, [$instruction], $protected_headers, [], JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
         if (!is_string($result)) {

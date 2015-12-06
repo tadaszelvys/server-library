@@ -12,7 +12,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInterface
+final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInterface
 {
     use HasExceptionManager;
     use HasConfiguration;

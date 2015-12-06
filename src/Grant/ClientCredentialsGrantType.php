@@ -10,7 +10,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ClientCredentialsGrantType implements GrantTypeSupportInterface
+final class ClientCredentialsGrantType implements GrantTypeSupportInterface
 {
     use HasExceptionManager;
     use HasConfiguration;

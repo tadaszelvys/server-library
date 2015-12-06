@@ -2,7 +2,7 @@
 
 namespace OAuth2\Exception;
 
-class AuthenticateException extends BaseException implements AuthenticateExceptionInterface
+final class AuthenticateException extends BaseException implements AuthenticateExceptionInterface
 {
     protected $header = [];
 

@@ -19,7 +19,7 @@ use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class TokenEndpoint implements TokenEndpointInterface
+final class TokenEndpoint implements TokenEndpointInterface
 {
     use HasEndUserManager;
     use HasAccessTokenTypeManager;

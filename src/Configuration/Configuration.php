@@ -2,7 +2,7 @@
 
 namespace OAuth2\Configuration;
 
-class Configuration implements ConfigurationInterface
+final class Configuration implements ConfigurationInterface
 {
     /**
      * @var array

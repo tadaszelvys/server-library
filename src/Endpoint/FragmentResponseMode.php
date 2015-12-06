@@ -5,7 +5,7 @@ namespace OAuth2\Endpoint;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
 
-class FragmentResponseMode implements ResponseModeInterface
+final class FragmentResponseMode implements ResponseModeInterface
 {
     /**
      * {@inheritdoc}

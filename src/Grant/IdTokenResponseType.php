@@ -5,7 +5,7 @@ namespace OAuth2\Grant;
 use OAuth2\Behaviour\HasIdTokenManager;
 use OAuth2\Endpoint\Authorization;
 
-class IdTokenResponseType implements ResponseTypeSupportInterface
+final class IdTokenResponseType implements ResponseTypeSupportInterface
 {
     use HasIdTokenManager;
 

@@ -4,7 +4,7 @@ namespace OAuth2\Grant;
 
 use OAuth2\Token\RefreshTokenInterface;
 
-class GrantTypeResponse implements GrantTypeResponseInterface
+final class GrantTypeResponse implements GrantTypeResponseInterface
 {
     /**
      * @var array

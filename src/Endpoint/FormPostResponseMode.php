@@ -4,7 +4,7 @@ namespace OAuth2\Endpoint;
 
 use Psr\Http\Message\ResponseInterface;
 
-class FormPostResponseMode implements ResponseModeInterface
+final class FormPostResponseMode implements ResponseModeInterface
 {
     /**
      * {@inheritdoc}

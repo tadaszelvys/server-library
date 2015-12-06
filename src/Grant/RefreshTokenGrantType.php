@@ -10,7 +10,7 @@ use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-class RefreshTokenGrantType implements GrantTypeSupportInterface
+final class RefreshTokenGrantType implements GrantTypeSupportInterface
 {
     use HasExceptionManager;
     use HasRefreshTokenManager;

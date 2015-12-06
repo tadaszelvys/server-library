@@ -17,7 +17,7 @@ use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class RevocationEndpoint implements RevocationEndpointInterface
+final class RevocationEndpoint implements RevocationEndpointInterface
 {
     use HasConfiguration;
     use HasExceptionManager;

@@ -4,7 +4,7 @@ namespace OAuth2\Util;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-class RequestBody
+final class RequestBody
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request The request

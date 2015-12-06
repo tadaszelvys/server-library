@@ -5,7 +5,7 @@ namespace OAuth2\Endpoint;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
 
-class QueryResponseMode implements ResponseModeInterface
+final class QueryResponseMode implements ResponseModeInterface
 {
     /**
      * {@inheritdoc}

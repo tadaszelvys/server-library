@@ -2,7 +2,7 @@
 
 namespace OAuth2\Util;
 
-class Uri
+final class Uri
 {
     /**
      * @param string$uri    The URI

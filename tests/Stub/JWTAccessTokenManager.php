@@ -2,6 +2,8 @@
 
 namespace OAuth2\Test\Stub;
 
+use Jose\JWKManager;
+use Jose\JWKSetManager;
 use OAuth2\Token\JWTAccessTokenManager as Base;
 use SpomkyLabs\Service\Jose;
 
@@ -30,30 +32,32 @@ class JWTAccessTokenManager extends Base
 
     public function getKeyManager()
     {
-        $jose = Jose::getInstance();
-
-        return $jose->getKeyManager();
+        return new JWKManager();
     }
 
     public function getKeySetManager()
     {
-        $jose = Jose::getInstance();
-
-        return $jose->getKeysetManager();
+        return new JWKSetManager();
     }
 
     public function getSignaturePrivateKey()
     {
-        $jose = Jose::getInstance();
-
-        return $jose->getKeysetManager()->getKeyByKid('JWK2')->getValues();
+        return [
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ];
     }
 
     public function getSignaturePublicKey()
     {
-        $jose = Jose::getInstance();
-
-        return $jose->getKeysetManager()->getKeyByKid('JWK2')->getValues();
+        return [
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ];
     }
 
     /**
@@ -61,9 +65,12 @@ class JWTAccessTokenManager extends Base
      */
     public function getEncryptionPublicKey()
     {
-        $jose = Jose::getInstance();
-
-        return $jose->getKeysetManager()->getKeyByKid('JWK1')->getValues();
+        return [
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ];
     }
 
     /**
@@ -71,8 +78,11 @@ class JWTAccessTokenManager extends Base
      */
     public function getEncryptionPrivateKey()
     {
-        $jose = Jose::getInstance();
-
-        return $jose->getKeysetManager()->getKeyByKid('JWK1')->getValues();
+        return [
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ];
     }
 }

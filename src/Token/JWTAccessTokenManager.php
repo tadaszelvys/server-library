@@ -2,6 +2,7 @@
 
 namespace OAuth2\Token;
 
+use Jose\JWT;
 use Jose\JWTInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTEncrypter;
@@ -11,7 +12,6 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Util\JWTEncrypter;
-use SpomkyLabs\Jose\JWT;
 
 abstract class JWTAccessTokenManager extends AccessTokenManager
 {
@@ -56,8 +56,8 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $signature_header = $this->prepareSignatureHeader();
 
         $jwt = new JWT();
-        $jwt->setPayload($payload)
-            ->setProtectedHeader($signature_header);
+        $jwt = $jwt->withPayload($payload);
+        $jwt = $jwt->withProtectedHeader($signature_header);
 
         $jws = $this->getJWTSigner()->sign($jwt->getPayload(), $jwt->getProtectedHeader());
         $jwe = $this->encrypt($jws, $client);

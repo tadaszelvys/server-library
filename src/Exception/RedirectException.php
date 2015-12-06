@@ -4,7 +4,7 @@ namespace OAuth2\Exception;
 
 use OAuth2\Util\Uri;
 
-class RedirectException extends BaseException implements RedirectExceptionInterface
+final class RedirectException extends BaseException implements RedirectExceptionInterface
 {
     protected $redirect_uri;
     protected $transport_mode;

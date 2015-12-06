@@ -12,7 +12,7 @@ use OAuth2\Token\AuthCodeManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
+final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
 {
     use HasExceptionManager;
     /**

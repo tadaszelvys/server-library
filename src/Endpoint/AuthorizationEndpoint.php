@@ -14,7 +14,7 @@ use OAuth2\Grant\ResponseTypeSupportInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
 
-class AuthorizationEndpoint implements AuthorizationEndpointInterface
+final class AuthorizationEndpoint implements AuthorizationEndpointInterface
 {
     use HasConfiguration;
     use HasExceptionManager;

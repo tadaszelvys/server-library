@@ -2,6 +2,9 @@
 
 namespace OAuth2\Test\Functional;
 
+use Jose\EncryptionInstruction;
+use Jose\JWKManager;
+use Jose\SignatureInstruction;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Test\Base;
@@ -17,20 +20,45 @@ class JWTBearerGrantTypeTest extends Base
     {
         $response = new Response();
         $jose = Jose::getInstance();
-        $jws = $jose->signAndEncrypt(
+        $jwk_manager = new JWKManager();
+        $jwk1 = $jwk_manager->createJWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]);
+        $jwk2 = $jwk_manager->createJWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $signature_instruction = new SignatureInstruction(
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+        $jws = $jose->sign(
+            [$signature_instruction],
             [
                 'exp' => time() + 3600,
                 'aud' => 'Bad audience',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ],
-            'JWK2',
+            ]
+        );
+
+        $encryption_instruction = new EncryptionInstruction($jwk1);
+
+        $jwe = $jose->encrypt(
+            [$encryption_instruction],
+            $jws,
             [
-                'cty' => 'JWT',
-                'alg' => 'HS512',
-            ],
-            'JWK1',
-            [
+                'kid' => 'JWK1',
                 'cty' => 'JWT',
                 'alg' => 'A256KW',
                 'enc' => 'A256CBC-HS512',
@@ -46,7 +74,7 @@ class JWTBearerGrantTypeTest extends Base
             'POST',
             [
                 'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion'  => $jws,
+                'assertion'  => $jwe,
             ],
             ['HTTPS' => 'on']
         );
@@ -98,21 +126,45 @@ class JWTBearerGrantTypeTest extends Base
     {
         $response = new Response();
         $jose = Jose::getInstance();
-        $jws = $jose->signAndEncrypt(
+        $jwk_manager = new JWKManager();
+        $jwk1 = $jwk_manager->createJWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]);
+        $jwk2 = $jwk_manager->createJWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $signature_instruction = new SignatureInstruction(
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+        $jws = $jose->sign(
+            [$signature_instruction],
             [
                 'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ],
-            'JWK2',
+            ]
+        );
+
+        $encryption_instruction = new EncryptionInstruction($jwk1);
+
+        $jwe = $jose->encrypt(
+            [$encryption_instruction],
+            $jws,
             [
-                'cty' => 'JWT',
-                'alg' => 'HS512',
-            ],
-            'JWK1',
-            [
-                'cty' => 'JWT',
+                'kid' => 'JWK1',
                 'alg' => 'A256KW',
                 'enc' => 'A256CBC-HS512',
                 'exp' => time() + 3600,
@@ -127,7 +179,7 @@ class JWTBearerGrantTypeTest extends Base
             'POST',
             [
                 'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion'  => $jws,
+                'assertion'  => $jwe,
             ],
             ['HTTPS' => 'on']
         );

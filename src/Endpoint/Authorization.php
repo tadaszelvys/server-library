@@ -42,7 +42,7 @@ namespace OAuth2\Endpoint;
  * @method array getQueryParams()
  * @method self setQueryParams(array $query_params)
  */
-class Authorization
+final class Authorization
 {
     /**
      * @var null|\OAuth2\Client\ClientInterface

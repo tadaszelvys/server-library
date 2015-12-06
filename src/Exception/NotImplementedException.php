@@ -2,7 +2,7 @@
 
 namespace OAuth2\Exception;
 
-class NotImplementedException extends BaseException implements NotImplementedExceptionInterface
+final class NotImplementedException extends BaseException implements NotImplementedExceptionInterface
 {
     /**
      * @param string $error             Short name of the error

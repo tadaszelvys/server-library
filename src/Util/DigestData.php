@@ -11,7 +11,7 @@ namespace OAuth2\Util;
  * file that was distributed with this source code.
  */
 
-class DigestData
+final class DigestData
 {
     /**
      * @var array

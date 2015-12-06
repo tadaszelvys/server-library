@@ -3,7 +3,6 @@
 namespace OAuth2\Test;
 
 use OAuth2\Client\ClientManagerSupervisor;
-use OAuth2\Configuration\Configuration;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\AuthorizationFactory;
 use OAuth2\Endpoint\FormPostResponseMode;
@@ -35,6 +34,7 @@ use OAuth2\Token\BearerAccessToken;
 use OAuth2\Util\JWTEncrypter;
 use OAuth2\Util\JWTLoader;
 use OAuth2\Util\JWTSigner;
+use SpomkyLabs\Service\Configuration;
 use SpomkyLabs\Service\Jose;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,23 +46,29 @@ class Base extends \PHPUnit_Framework_TestCase
         //To fix HHVM tests on Travis-CI
         date_default_timezone_set('UTC');
 
-        // We set the configuration of the Jose Service
-        $jose = Jose::getInstance();
-        $jose->getConfiguration()->set('algorithms', ['HS512', 'A256KW', 'A256CBC-HS512']);
-        $jose->getConfiguration()->set('audience', 'My Authorization Server');
+        //We configure our services
+        $config = Configuration::getInstance();
 
-        // We add our shared keys
-        $jose->getKeysetManager()->loadKeyFromValues('JWK1', [
-            'kid' => 'JWK1',
-            'use' => 'enc',
-            'kty' => 'oct',
-            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-        ]);
-        $jose->getKeysetManager()->loadKeyFromValues('JWK2', [
-            'kid' => 'JWK2',
-            'use' => 'sig',
-            'kty' => 'oct',
-            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        $config->set('algorithms', ['HS512', 'A256KW', 'A256CBC-HS512']);
+        $config->set('audience', 'My Authorization Server');
+
+        $config->set('keys', [
+            'JWK1' => [
+                'values' => [
+                    'kid' => 'JWK1',
+                    'use' => 'enc',
+                    'kty' => 'oct',
+                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                ],
+            ],
+            'JWK2' => [
+                'values' => [
+                    'kid' => 'JWK2',
+                    'use' => 'sig',
+                    'kty' => 'oct',
+                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                ],
+            ],
         ]);
     }
 
@@ -105,7 +111,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(false);
-            $jwt_loader->setKeySetManager($jose->getKeysetManager());
+            //$jwt_loader->setKeySetManager($jose->getKeysetManager());
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
             $jwt_loader->setKeySet([
                 [
@@ -221,7 +227,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getConfiguration()
     {
         if (null === $this->configuration) {
-            $this->configuration = new Configuration();
+            $this->configuration = new \OAuth2\Configuration\Configuration();
             $this->configuration->set('realm', 'testrealm@host.com');
             $this->configuration->set('digest_authentication_key', 'This is my secret key');
             $this->configuration->set('digest_authentication_scheme_algorithm', 'MD5-sess');
@@ -375,7 +381,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(false);
-            $jwt_loader->setKeySetManager($jose->getKeysetManager());
+            //$jwt_loader->setKeySetManager($jose->getKeysetManager());
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
             $jwt_loader->setKeySet([
                 [
@@ -456,7 +462,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(true);
-            $jwt_loader->setKeySetManager($jose->getKeysetManager());
+            //$jwt_loader->setKeySetManager($jose->getKeysetManager());
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
             $jwt_loader->setKeySet([
                 [
@@ -628,7 +634,6 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $jwt_encrypter = new JWTEncrypter();
             $jwt_encrypter->setJWTEncrypter($jose->getEncrypter());
-            $jwt_encrypter->setKeyManager($jose->getKeyManager());
             $jwt_encrypter->setKeyEncryptionKey([
                 'kid' => 'JWK1',
                 'use' => 'enc',
@@ -638,7 +643,6 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $jwt_signer = new JWTSigner();
             $jwt_signer->setJWTSigner($jose->getSigner());
-            $jwt_signer->setKeyManager($jose->getKeyManager());
             $jwt_signer->setSignatureKey([
                 'kid' => 'JWK2',
                 'use' => 'sig',
@@ -650,7 +654,6 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(true);
-            $jwt_loader->setKeySetManager($jose->getKeysetManager());
             $jwt_loader->setAllowedEncryptionAlgorithms(['HS512', 'A256KW', 'A256CBC-HS512']);
             $jwt_loader->setKeySet([
                 [
@@ -796,21 +799,9 @@ class Base extends \PHPUnit_Framework_TestCase
 
         $cnonce = uniqid();
 
-        $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $realm, $client_secret));
-        if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
-            $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
-        }
-
+        $ha1 = $this->computeHA1($client_id, $realm, $client_secret, $nonceValueBase64, $cnonce);
         $ha2 = $this->computeHA2($method, $uri, $qop, $content);
-        $response = hash('md5', sprintf(
-            '%s:%s:%s:%s:%s:%s',
-            $ha1,
-            $nonceValueBase64,
-            '00000001',
-            $cnonce,
-            $qop,
-            $ha2
-        ));
+        $response = $this->computeResponse($ha1, $nonceValueBase64, $cnonce, $qop, $ha2);
 
         return $this->createHttpDigest(
             $client_id,
@@ -835,21 +826,9 @@ class Base extends \PHPUnit_Framework_TestCase
 
         $cnonce = uniqid();
 
-        $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $realm, $client_secret));
-        if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
-            $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
-        }
-
+        $ha1 = $this->computeHA1($client_id, $realm, $client_secret, $nonceValueBase64, $cnonce);
         $ha2 = $this->computeHA2($method, $uri, $qop, $content);
-        $response = hash('md5', sprintf(
-            '%s:%s:%s:%s:%s:%s',
-            $ha1,
-            $nonceValueBase64,
-            '00000001',
-            $cnonce,
-            $qop,
-            $ha2
-        ));
+        $response = $this->computeResponse($ha1, $nonceValueBase64, $cnonce, $qop, $ha2);
 
         return $this->createHttpDigest(
             $client_id,
@@ -874,21 +853,9 @@ class Base extends \PHPUnit_Framework_TestCase
 
         $cnonce = uniqid();
 
-        $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $realm, $client_secret));
-        if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
-            $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
-        }
-
+        $ha1 = $this->computeHA1($client_id, $realm, $client_secret, $nonceValueBase64, $cnonce);
         $ha2 = $this->computeHA2($method, $uri, $qop, $content);
-        $response = hash('md5', sprintf(
-            '%s:%s:%s:%s:%s:%s',
-            $ha1,
-            $nonceValueBase64,
-            '00000001',
-            $cnonce,
-            $qop,
-            $ha2
-        ));
+        $response = $this->computeResponse($ha1, $nonceValueBase64, $cnonce, $qop, $ha2);
 
         return $this->createHttpDigest(
             $client_id,
@@ -901,6 +868,28 @@ class Base extends \PHPUnit_Framework_TestCase
             $response,
             base64_encode(hash_hmac('sha512', $nonceValueBase64.$realm, $this->getConfiguration()->get('digest_authentication_key'), true))
         );
+    }
+
+    private function computeResponse($ha1, $nonceValueBase64, $cnonce, $qop, $ha2)
+    {
+        return hash('md5', sprintf(
+            '%s:%s:%s:%s:%s:%s',
+            $ha1,
+            $nonceValueBase64,
+            '00000001',
+            $cnonce,
+            $qop,
+            $ha2
+        ));
+    }
+
+    private function computeHA1($client_id, $realm, $client_secret, $nonceValueBase64, $cnonce)
+    {
+        $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $realm, $client_secret));
+        if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
+            $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
+        }
+        return $ha1;
     }
 
     private function computeHA2($method, $uri, $qop, $content)
