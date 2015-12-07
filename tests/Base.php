@@ -111,16 +111,15 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(false);
-            //$jwt_loader->setKeySetManager($jose->getKeysetManager());
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet([
+            $jwt_loader->setKeySet([ 'keys' => [
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
                 ],
-            ]);
+            ]]);
 
             $this->authorization_factory = new AuthorizationFactory();
             $this->authorization_factory->setClientManagerSupervisor($this->getClientManagerSupervisor());
@@ -381,9 +380,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(false);
-            //$jwt_loader->setKeySetManager($jose->getKeysetManager());
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet([
+            $jwt_loader->setKeySet([ 'keys' => [
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
@@ -396,7 +394,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ],
-            ]);
+            ]]);
 
             $this->jwt_client_manager->setJWTLoader($jwt_loader);
         }
@@ -462,9 +460,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setJWTLoader($jose->getLoader());
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(true);
-            //$jwt_loader->setKeySetManager($jose->getKeysetManager());
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet([
+            $jwt_loader->setKeySet([ 'keys' => [
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
@@ -477,7 +474,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ],
-            ]);
+            ]]);
 
             $this->jwt_bearer_grant_type->setJWTLoader($jwt_loader);
         }
@@ -655,7 +652,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(true);
             $jwt_loader->setAllowedEncryptionAlgorithms(['HS512', 'A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet([
+            $jwt_loader->setKeySet([ 'keys' => [
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
@@ -668,7 +665,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ],
-            ]);
+            ]]);
 
             $this->jwt_access_token_manager->setJWTEncrypter($jwt_encrypter);
             $this->jwt_access_token_manager->setJWTSigner($jwt_signer);

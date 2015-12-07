@@ -91,16 +91,29 @@ class JWTBearerGrantTypeTest extends Base
     {
         $response = new Response();
         $jose = Jose::getInstance();
+        $jwk_manager = new JWKManager();
+        $jwk2 = $jwk_manager->createJWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $signature_instruction = new SignatureInstruction(
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
         $jws = $jose->sign(
-            'JWK2',
+            [$signature_instruction],
             [
                 'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ],
-            [
-                'alg' => 'HS512',
             ]
         );
 
