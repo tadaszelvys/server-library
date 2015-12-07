@@ -4,7 +4,6 @@ namespace OAuth2\Util;
 
 use Jose\JWEInterface;
 use Jose\JWKSetManager;
-use Jose\JWKSetManagerInterface;
 use Jose\JWSInterface;
 use Jose\JWTInterface;
 use Jose\LoaderInterface;
