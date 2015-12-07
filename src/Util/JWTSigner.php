@@ -4,9 +4,8 @@ namespace OAuth2\Util;
 
 use Jose\JSONSerializationModes;
 use Jose\JWKManager;
-use Jose\JWKManagerInterface;
-use Jose\SignerInterface;
 use Jose\SignatureInstruction;
+use Jose\SignerInterface;
 
 final class JWTSigner
 {
