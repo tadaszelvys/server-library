@@ -4,9 +4,7 @@ namespace OAuth2\Util;
 
 use Jose\EncrypterInterface;
 use Jose\JSONSerializationModes;
-use Jose\JWKInterface;
 use Jose\JWKManager;
-use Jose\JWKManagerInterface;
 use Jose\EncryptionInstruction;
 
 final class JWTEncrypter

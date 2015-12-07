@@ -22,7 +22,7 @@
         "phpunit/phpunit": "~4.5",
         "symfony/psr-http-message-bridge": "~0.2",
         "satooshi/php-coveralls": "*",
-        "spomky-labs/jose-service": "~0.2.0",
+        "spomky-labs/jose-service": "~0.2.1",
         "paquettg/php-html-parser": "~1.6"
     },
     "autoload": {
