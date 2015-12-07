@@ -49,19 +49,19 @@ class ObjectsTest extends Base
     public function testEndUser()
     {
         $user = new EndUser('user1', 'pass');
-        $user->setLastLoginAt(time()-1000);
+        $user->setLastLoginAt(time() - 1000);
 
         $this->assertEquals('end_user', $user->getType());
-        $this->assertTrue($user->getLastLoginAt() <= time()-1000);
+        $this->assertTrue($user->getLastLoginAt() <= time() - 1000);
         $this->assertEquals('user1', $user->getUsername());
     }
 
     public function testAuthCodeQueryParams()
     {
         $auth_code = new AuthCode();
-        $auth_code->setQueryParams(['foo'=>'bar']);
+        $auth_code->setQueryParams(['foo' => 'bar']);
 
-        $this->assertEquals(['foo'=>'bar'], $auth_code->getQueryParams());
+        $this->assertEquals(['foo' => 'bar'], $auth_code->getQueryParams());
     }
 
     /**
@@ -79,11 +79,11 @@ class ObjectsTest extends Base
 
         $this->assertNull($exception->getResponseBody());
         $this->assertEquals([
-            'Content-Type' => 'application/json',
-            'Cache-Control' => 'no-store',
-            'Pragma' => 'no-cache',
+            'Content-Type'     => 'application/json',
+            'Cache-Control'    => 'no-store',
+            'Pragma'           => 'no-cache',
             'WWW-Authenticate' => [
-                'Bearer'
+                'Bearer',
             ],
         ], $exception->getResponseHeaders());
     }

@@ -112,7 +112,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(false);
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet([ 'keys' => [
+            $jwt_loader->setKeySet(['keys' => [
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
@@ -381,7 +381,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(false);
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet([ 'keys' => [
+            $jwt_loader->setKeySet(['keys' => [
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
@@ -461,7 +461,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(true);
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet([ 'keys' => [
+            $jwt_loader->setKeySet(['keys' => [
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
@@ -652,7 +652,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(true);
             $jwt_loader->setAllowedEncryptionAlgorithms(['HS512', 'A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet([ 'keys' => [
+            $jwt_loader->setKeySet(['keys' => [
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
@@ -754,14 +754,14 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         $data = [
             'username' => $username,
-            'realm' => $realm,
-            'nonce' => $nonce,
-            'uri' => $uri,
-            'qop' => $qop,
-            'nc' => $nc,
-            'cnonce' => $cnonce,
+            'realm'    => $realm,
+            'nonce'    => $nonce,
+            'uri'      => $uri,
+            'qop'      => $qop,
+            'nc'       => $nc,
+            'cnonce'   => $cnonce,
             'response' => $response,
-            'opaque' => $opaque,
+            'opaque'   => $opaque,
         ];
         $quoted = [
             'username',
@@ -774,7 +774,7 @@ class Base extends \PHPUnit_Framework_TestCase
         ];
         $compiled = [];
 
-        foreach($data as $key=>$value) {
+        foreach ($data as $key => $value) {
             if (null !== $value) {
                 if (in_array($key, $quoted)) {
                     $compiled[] .= sprintf('%s="%s"', $key, $value);
@@ -783,6 +783,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 }
             }
         }
+
         return implode(',', $compiled);
     }
 
@@ -886,6 +887,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if ('MD5-sess' === $this->getConfiguration()->get('digest_authentication_scheme_algorithm', null)) {
             $ha1 = hash('md5', sprintf('%s:%s:%s', $ha1, $nonceValueBase64, $cnonce));
         }
+
         return $ha1;
     }
 
@@ -895,6 +897,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if ('auth-int' === $qop) {
             $a2 .= ':'.hash('md5', $content);
         }
+
         return hash('md5', $a2);
     }
 }
