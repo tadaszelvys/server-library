@@ -10,6 +10,7 @@ use OAuth2\Endpoint\FragmentResponseMode;
 use OAuth2\Endpoint\QueryResponseMode;
 use OAuth2\Endpoint\RevocationEndpoint;
 use OAuth2\Endpoint\TokenEndpoint;
+use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\IdTokenResponseType;
@@ -153,6 +154,27 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->revocation_endpoint;
+    }
+
+    /**
+     * @var null|\OAuth2\Endpoint\TokenIntrospectionEndpoint
+     */
+    private $token_introspection_endpoint = null;
+
+    /**
+     * @return \OAuth2\Endpoint\TokenIntrospectionEndpoint
+     */
+    protected function getTokenIntrospectionEndpoint()
+    {
+        if (null === $this->token_introspection_endpoint) {
+            $this->token_introspection_endpoint = new TokenIntrospectionEndpoint();
+            $this->token_introspection_endpoint->setAccessTokenManager($this->getSimplestringAccessTokenManager());
+            $this->token_introspection_endpoint->setExceptionManager($this->getExceptionManager());
+            $this->token_introspection_endpoint->setClientManagerSupervisor($this->getClientManagerSupervisor());
+            $this->token_introspection_endpoint->setRefreshTokenManager($this->getRefreshTokenManager());
+        }
+
+        return $this->token_introspection_endpoint;
     }
 
     /**

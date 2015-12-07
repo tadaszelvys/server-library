@@ -157,7 +157,7 @@ final class RevocationEndpoint implements RevocationEndpointInterface
     private function tryRevokeAccessToken($token = null, ClientInterface $client = null)
     {
         $access_token = $this->getAccessTokenManager()->getAccessToken($token);
-        if (null !== ($access_token) && true === $this->isClientVerified($access_token, $client)) {
+        if (null !== $access_token && true === $this->isClientVerified($access_token, $client)) {
             if (true === $this->getConfiguration()->get('revoke_refresh_token_and_access_token', true) && null !== ($access_token->getRefreshToken())) {
                 $this->tryRevokeRefreshToken($access_token->getRefreshToken(), $client);
             }
@@ -174,7 +174,7 @@ final class RevocationEndpoint implements RevocationEndpointInterface
     private function tryRevokeRefreshToken($token = null, ClientInterface $client = null)
     {
         $refresh_token = $this->getRefreshTokenManager()->getRefreshToken($token);
-        if (null !== ($refresh_token) && true === $this->isClientVerified($refresh_token, $client)) {
+        if (null !== $refresh_token && true === $this->isClientVerified($refresh_token, $client)) {
             $this->getRefreshTokenManager()->revokeRefreshToken($refresh_token);
         }
     }
@@ -187,7 +187,7 @@ final class RevocationEndpoint implements RevocationEndpointInterface
      */
     private function isClientVerified($token, ClientInterface $client = null)
     {
-        if (null !== ($client)) {
+        if (null !== $client) {
             // The client ID of the token is the same as client authenticated
             return $token->getClientPublicId() === $client->getPublicId();
         } else {
