@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014-2015 Spomky-Labs
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ */
+
 namespace OAuth2\Endpoint;
 
 use Jose\JWTInterface;
@@ -10,8 +19,8 @@ use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Exception\BaseExceptionInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Exception\InternalServerErrorExceptionInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
@@ -125,8 +134,8 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         }
 
         $result = [
-            'active' => !$access_token->hasExpired(),
-            'client_id' => $access_token->getClientPublicId(),
+            'active'     => !$access_token->hasExpired(),
+            'client_id'  => $access_token->getClientPublicId(),
             'token_type' => 'access_token',
         ];
         if (!empty($access_token->getScope())) {
@@ -135,7 +144,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         if ($access_token instanceof JWTInterface) {
             $result = array_merge($result, $this->getJWTInformation($access_token));
         }
-        foreach($this->extensions as $extension) {
+        foreach ($this->extensions as $extension) {
             $result = array_merge($result, $extension->getTokenInformation($access_token));
         }
 
@@ -162,8 +171,8 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         }
 
         $result = [
-            'active' => !$refresh_token->hasExpired() && !$refresh_token->isUsed(),
-            'client_id' => $refresh_token->getClientPublicId(),
+            'active'     => !$refresh_token->hasExpired() && !$refresh_token->isUsed(),
+            'client_id'  => $refresh_token->getClientPublicId(),
             'token_type' => 'refresh_token',
         ];
         if (!empty($refresh_token->getScope())) {
@@ -172,7 +181,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         if ($refresh_token instanceof JWTInterface) {
             $result = array_merge($result, $this->getJWTInformation($refresh_token));
         }
-        foreach($this->extensions as $extension) {
+        foreach ($this->extensions as $extension) {
             $result = array_merge($result, $extension->getTokenInformation($refresh_token));
         }
 
@@ -202,7 +211,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     private function getJWTInformation(JWTInterface $token)
     {
         $result = [];
-        foreach(['exp', 'iat', 'nbf', 'sub', 'aud', 'iss', 'jti'] as $key) {
+        foreach (['exp', 'iat', 'nbf', 'sub', 'aud', 'iss', 'jti'] as $key) {
             if (null !== ($value = $token->getPayloadValue($key))) {
                 $result[$key] = $value;
             }
