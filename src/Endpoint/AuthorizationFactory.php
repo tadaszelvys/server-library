@@ -18,6 +18,7 @@ use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\Util\JWTLoader;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationFactory
@@ -26,17 +27,6 @@ final class AuthorizationFactory
     use HasScopeManager;
     use HasClientManagerSupervisor;
     use HasExceptionManager;
-
-    public function __construct(
-        ScopeManagerInterface $scope_manager,
-        ClientManagerSupervisorInterface $client_manager_supervisor,
-        ExceptionManagerInterface $exception_manager
-    )
-    {
-        $this->setScopeManager($scope_manager);
-        $this->setClientManagerSupervisor($client_manager_supervisor);
-        $this->setExceptionManager($exception_manager);
-    }
 
     /**
      * @var bool
@@ -49,11 +39,30 @@ final class AuthorizationFactory
     private $is_request_uri_parameter_supported = false;
 
     /**
-     * @param bool $is_request_parameter_supported
+     * AuthorizationFactory constructor.
+     *
+     * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
+     * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
+     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     * @param \OAuth2\Util\JWTLoader                          $jwt_loader
+     * @param bool                                            $is_request_parameter_supported
+     * @param bool                                            $is_request_uri_parameter_supported
      */
-    public function setRequestParameterSupported($is_request_parameter_supported)
+    public function __construct(
+        ScopeManagerInterface $scope_manager,
+        ClientManagerSupervisorInterface $client_manager_supervisor,
+        ExceptionManagerInterface $exception_manager,
+        JWTLoader $jwt_loader,
+        $is_request_parameter_supported,
+        $is_request_uri_parameter_supported
+    )
     {
+        $this->setJWTLoader($jwt_loader);
+        $this->setScopeManager($scope_manager);
+        $this->setClientManagerSupervisor($client_manager_supervisor);
+        $this->setExceptionManager($exception_manager);
         $this->is_request_parameter_supported = $is_request_parameter_supported;
+        $this->is_request_uri_parameter_supported = $is_request_uri_parameter_supported;
     }
 
     /**
@@ -62,14 +71,6 @@ final class AuthorizationFactory
     public function isRequestParameterSupported()
     {
         return $this->is_request_parameter_supported;
-    }
-
-    /**
-     * @param bool $is_request_uri_parameter_supported
-     */
-    public function setRequestUriParameterSupported($is_request_uri_parameter_supported)
-    {
-        $this->is_request_uri_parameter_supported = $is_request_uri_parameter_supported;
     }
 
     /**

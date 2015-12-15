@@ -21,7 +21,7 @@ final class JWTSigner
     /**
      * @var \Jose\SignerInterface
      */
-    protected $jwt_signer;
+    protected $signer;
 
     /**
      * @var \Jose\Object\JWKInterface
@@ -29,34 +29,14 @@ final class JWTSigner
     protected $signature_key;
 
     /**
-     * @return \Jose\SignerInterface
+     * JWTSigner constructor.
+     *
+     * @param \Jose\SignerInterface $signer
+     * @param array                 $signature_key
      */
-    public function getJWTSigner()
+    public function __construct(SignerInterface $signer, array $signature_key)
     {
-        return $this->jwt_signer;
-    }
-
-    /**
-     * @param \Jose\SignerInterface $jwt_signer
-     */
-    public function setJWTSigner(SignerInterface $jwt_signer)
-    {
-        $this->jwt_signer = $jwt_signer;
-    }
-
-    /**
-     * @return \Jose\Object\JWKInterface
-     */
-    public function getSignatureKey()
-    {
-        return $this->signature_key;
-    }
-
-    /**
-     * @param array $signature_key
-     */
-    public function setSignatureKey(array $signature_key)
-    {
+        $this->signer = $signer;
         $this->signature_key = new JWK($signature_key);
     }
 
@@ -68,13 +48,12 @@ final class JWTSigner
      */
     public function sign(array $claims, array $protected_headers)
     {
-        $instruction = new SignatureInstruction($this->getSignatureKey(), $protected_headers);
+        $instruction = new SignatureInstruction($this->signature_key, $protected_headers);
 
-        $result = $this->getJWTSigner()->sign($claims, [$instruction], JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
-        if (!is_string($result)) {
-            throw new \RuntimeException('Unable to sign claims.');
-        }
-
-        return $result;
+        return $this->signer->sign(
+            $claims,
+            [$instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
+        );
     }
 }

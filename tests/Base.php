@@ -114,31 +114,30 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthorizationFactory()
     {
         if (null === $this->authorization_factory) {
-            //$jose = Jose::getInstance();
-            $jwt_loader = new JWTLoader();
-
-            //$jwt_loader->setJWTLoader($jose->getLoader());
-            //$jwt_loader->setExceptionManager($this->getExceptionManager());
-            $jwt_loader->setEncryptionRequired(false);
-            $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet(['keys' => [
-                [
-                    'kid' => 'JWK1',
-                    'use' => 'enc',
-                    'kty' => 'oct',
-                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ],
-            ]]);
+            $jwt_loader = new JWTLoader(
+                $this->getLoader(),
+                $this->getVerifier(),
+                $this->getDecrypter(),
+                ['A256KW', 'A256CBC-HS512'],
+                ['keys' => [
+                    [
+                        'kid' => 'JWK1',
+                        'use' => 'enc',
+                        'kty' => 'oct',
+                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                    ],
+                ]],
+                false
+            );
 
             $this->authorization_factory = new AuthorizationFactory(
                 $this->getScopeManager(),
                 $this->getClientManagerSupervisor(),
-                $this->getExceptionManager()
+                $this->getExceptionManager(),
+                $jwt_loader,
+                true,
+                true
             );
-
-            //$this->authorization_factory->setJWTLoader($jwt_loader);
-            $this->authorization_factory->setRequestParameterSupported(true);
-            $this->authorization_factory->setRequestUriParameterSupported(true);
         }
 
         return $this->authorization_factory;

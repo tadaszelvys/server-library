@@ -11,11 +11,12 @@
 
 namespace OAuth2\Util;
 
+use Jose\DecrypterInterface;
 use Jose\Object\JWEInterface;
 use Jose\Object\JWKSet;
 use Jose\Object\JWSInterface;
-use Jose\Object\JWTInterface;
 use Jose\LoaderInterface;
+use Jose\VerifierInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\JWTClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -32,7 +33,17 @@ final class JWTLoader
     /**
      * @var \Jose\LoaderInterface
      */
-    protected $jwt_loader;
+    protected $loader;
+
+    /**
+     * @var \Jose\DecrypterInterface
+     */
+    protected $decrypter;
+
+    /**
+     * @var \Jose\VerifierInterface
+     */
+    protected $verifier;
 
     /**
      * @var string[]
@@ -45,67 +56,30 @@ final class JWTLoader
     protected $key_set;
 
     /**
-     * @return bool
+     * JWTLoader constructor.
+     *
+     * @param \Jose\LoaderInterface    $loader
+     * @param \Jose\VerifierInterface  $verifier
+     * @param \Jose\DecrypterInterface $decrypter
+     * @param string[]                 $allowed_encryption_algorithms
+     * @param array                    $key_set
+     * @param bool                     $is_encryption_required
      */
-    public function isEncryptionRequired()
+    public function __construct(
+        LoaderInterface $loader,
+        VerifierInterface $verifier,
+        DecrypterInterface $decrypter,
+        array $allowed_encryption_algorithms,
+        array $key_set,
+        $is_encryption_required = false
+    )
     {
-        return $this->is_encryption_required;
-    }
-
-    /**
-     * @param bool $is_encryption_required
-     */
-    public function setEncryptionRequired($is_encryption_required)
-    {
-        $this->is_encryption_required = $is_encryption_required;
-    }
-
-    /**
-     * @return \Jose\LoaderInterface
-     */
-    public function getJWTLoader()
-    {
-        return $this->jwt_loader;
-    }
-
-    /**
-     * @param \Jose\LoaderInterface $jwt_loader
-     */
-    public function setJWTLoader(LoaderInterface $jwt_loader)
-    {
-        $this->jwt_loader = $jwt_loader;
-    }
-
-    /**
-     * @return \Jose\Object\JWKSetInterface
-     */
-    public function getKeySet()
-    {
-        return $this->key_set;
-    }
-
-    /**
-     * @param array $key_set
-     */
-    public function setKeySet(array $key_set)
-    {
-        $this->key_set = new JWKSet($key_set);
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getAllowedEncryptionAlgorithms()
-    {
-        return $this->allowed_encryption_algorithms;
-    }
-
-    /**
-     * @param string[] $allowed_encryption_algorithms
-     */
-    public function setAllowedEncryptionAlgorithms(array $allowed_encryption_algorithms)
-    {
+        $this->loader = $loader;
+        $this->verifier = $verifier;
+        $this->decrypter = $decrypter;
         $this->allowed_encryption_algorithms = $allowed_encryption_algorithms;
+        $this->key_set = new JWKSet($key_set);
+        $this->is_encryption_required = $is_encryption_required;
     }
 
     /**
@@ -120,12 +94,10 @@ final class JWTLoader
         //We load the assertion
         $jwt = $this->loadAssertion($assertion);
         if ($jwt instanceof JWEInterface) {
-            $this->verifyAssertion($jwt);
             $jwt = $this->decryptAssertion($jwt);
-        } elseif (true === $this->isEncryptionRequired()) {
+        } elseif (true === $this->is_encryption_required) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The assertion must be encrypted.');
         }
-        $this->verifyAssertion($jwt);
 
         return $jwt;
     }
@@ -135,11 +107,11 @@ final class JWTLoader
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return JWTInterface
+     * @return \Jose\Object\JWSInterface|\Jose\Object\JWEInterface
      */
     protected function loadAssertion($assertion)
     {
-        $jwt = $this->getJWTLoader()->load($assertion);
+        $jwt = $this->loader->load($assertion);
         if (!$jwt instanceof JWEInterface && !$jwt instanceof JWSInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The assertion does not contain a single JWS or a single JWE.');
         }
@@ -156,14 +128,14 @@ final class JWTLoader
      */
     protected function decryptAssertion(JWEInterface $jwe)
     {
-        if (!in_array($jwe->getHeader('alg'), $this->getAllowedEncryptionAlgorithms()) || !in_array($jwe->getHeader('enc'), $this->getAllowedEncryptionAlgorithms())) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($this->getAllowedEncryptionAlgorithms())));
+        if (!in_array($jwe->getHeader('alg'), $this->allowed_encryption_algorithms) || !in_array($jwe->getHeader('enc'), $this->allowed_encryption_algorithms)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($this->allowed_encryption_algorithms)));
         }
-        $this->getJWTLoader()->decrypt($jwe, $this->getKeySet());
+        $this->decrypter->decrypt($jwe, $this->key_set);
         if (null === $jwe->getPayload()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to decrypt the payload. Please verify keys used for encryption.');
         }
-        $jws = $this->getJWTLoader()->load($jwe->getPayload());
+        $jws = $this->loader->load($jwe->getPayload());
         if (!$jws instanceof JWSInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The encrypted assertion does not contain a single JWS.');
         }
@@ -172,7 +144,7 @@ final class JWTLoader
     }
 
     /**
-     * @param \Jose\Object\JWSInterface                $jws
+     * @param \Jose\Object\JWSInterface         $jws
      * @param \OAuth2\Client\JWTClientInterface $client
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
@@ -183,35 +155,8 @@ final class JWTLoader
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($client->getAllowedSignatureAlgorithms())));
         }
 
-        if (false === $this->getJWTLoader()->verifySignature($jws, $this->getKeySet())) {
+        if (false === $this->verifier->verify($jws, $this->key_set)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid signature.');
         }
-    }
-
-    /**
-     * @param \Jose\Object\JWTInterface $jwt
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    public function verifyAssertion(JWTInterface $jwt)
-    {
-        try {
-            $this->getJWTLoader()->verify($jwt);
-        } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
-        }
-
-        $this->checkJWT($jwt);
-    }
-
-    /**
-     * By default, this method does nothing, but should be overridden and to check claims and headers.
-     *
-     * @param \Jose\Object\JWTInterface $jwt
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    protected function checkJWT(JWTInterface $jwt)
-    {
     }
 }
