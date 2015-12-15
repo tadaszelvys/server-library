@@ -22,14 +22,10 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
 
     /**
      * @param array $key_set
-     *
-     * @return self
      */
     public function setSignaturePublicKeySet(array $key_set)
     {
         $this->signature_public_key_set = $key_set;
-
-        return $this;
     }
 
     /**
@@ -42,14 +38,10 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
 
     /**
      * @param string[] $allowed_signature_algorithms
-     *
-     * @return self
      */
     public function setAllowedSignatureAlgorithms(array $allowed_signature_algorithms)
     {
         $this->allowed_signature_algorithms = $allowed_signature_algorithms;
-
-        return $this;
     }
 
     /**

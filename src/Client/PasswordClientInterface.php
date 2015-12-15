@@ -11,8 +11,6 @@ interface PasswordClientInterface extends ConfidentialClientInterface
 
     /**
      * @param string $secret
-     *
-     * @return self
      */
     public function setSecret($secret);
 
@@ -23,8 +21,6 @@ interface PasswordClientInterface extends ConfidentialClientInterface
 
     /**
      * @param string $salt
-     *
-     * @return self
      */
     public function setSalt($salt);
 
@@ -35,13 +31,10 @@ interface PasswordClientInterface extends ConfidentialClientInterface
 
     /**
      * @param string $plaintext_secret
-     *
-     * @return self
      */
     public function setPlaintextSecret($plaintext_secret);
 
     /**
-     * @return self
      */
     public function clearCredentials();
 
@@ -52,8 +45,6 @@ interface PasswordClientInterface extends ConfidentialClientInterface
 
     /**
      * @param string $ha1
-     *
-     * @return self
      */
     public function setA1Hash($ha1);
 }

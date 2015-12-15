@@ -5,6 +5,7 @@ namespace OAuth2\Grant;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Token\AccessTokenManagerInterface;
 
 /**
  * This response type has been introduced by OpenID Connect
@@ -18,6 +19,16 @@ use OAuth2\Token\AccessTokenInterface;
 final class NoneResponseType implements ResponseTypeSupportInterface
 {
     use HasAccessTokenManager;
+
+    /**
+     * NoneResponseType constructor.
+     *
+     * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
+     */
+    public function __construct(AccessTokenManagerInterface $access_token_manager)
+    {
+        $this->setAccessTokenManager($access_token_manager);
+    }
 
     /**
      * {@inheritdoc}

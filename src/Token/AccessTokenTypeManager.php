@@ -11,6 +11,16 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
     use HasExceptionManager;
 
     /**
+     * ClientCredentialsGrantType constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager)
+    {
+        $this->setExceptionManager($exception_manager);
+    }
+
+    /**
      * @var \OAuth2\Token\AccessTokenTypeInterface[]
      */
     private $access_token_types = [];
@@ -29,8 +39,6 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
         if (null === $this->default_access_token_type || true === $default) {
             $this->default_access_token_type = $access_token_type;
         }
-
-        return $this;
     }
 
     /**

@@ -19,8 +19,6 @@ interface IdTokenManagerInterface
 
     /**
      * @param \OAuth2\Token\IdTokenInterface $token The ID token to revoke
-     *
-     * @return self
      */
     public function revokeIdToken(IdTokenInterface $token);
 

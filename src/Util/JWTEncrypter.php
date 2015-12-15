@@ -3,9 +3,9 @@
 namespace OAuth2\Util;
 
 use Jose\EncrypterInterface;
-use Jose\EncryptionInstruction;
+use Jose\Object\EncryptionInstruction;
 use Jose\JSONSerializationModes;
-use Jose\JWKManager;
+use Jose\Object\JWK;
 
 final class JWTEncrypter
 {
@@ -15,17 +15,9 @@ final class JWTEncrypter
     protected $jwt_encrypter;
 
     /**
-     * @var \Jose\JWKInterface
+     * @var \Jose\Object\JWKInterface
      */
     protected $key_encryption_key;
-
-    /**
-     * @return \Jose\JWKManagerInterface
-     */
-    public function getKeyManager()
-    {
-        return new JWKManager();
-    }
 
     /**
      * @return \Jose\EncrypterInterface
@@ -37,18 +29,14 @@ final class JWTEncrypter
 
     /**
      * @param \Jose\EncrypterInterface $jwt_encrypter
-     *
-     * @return self
      */
     public function setJWTEncrypter(EncrypterInterface $jwt_encrypter)
     {
         $this->jwt_encrypter = $jwt_encrypter;
-
-        return $this;
     }
 
     /**
-     * @return \Jose\JWKInterface
+     * @return \Jose\Object\JWKInterface
      */
     public function getKeyEncryptionKey()
     {
@@ -57,14 +45,10 @@ final class JWTEncrypter
 
     /**
      * @param array $key_encryption_key
-     *
-     * @return self
      */
     public function setKeyEncryptionKey(array $key_encryption_key)
     {
-        $this->key_encryption_key = $this->getKeyManager()->createJWK($key_encryption_key);
-
-        return $this;
+        $this->key_encryption_key = new JWK($key_encryption_key);
     }
 
     /**
@@ -76,10 +60,15 @@ final class JWTEncrypter
      */
     public function encrypt($payload, array $protected_headers, array $sender_key = [])
     {
-        $sender_key = empty($sender_key) ? null : $this->getKeyManager()->createJWK($sender_key);
+        $sender_key = empty($sender_key) ? null : new JWK($sender_key);
         $instruction = new EncryptionInstruction($this->getKeyEncryptionKey(), $sender_key);
 
-        $result = $this->getJWTEncrypter()->encrypt($payload, [$instruction], $protected_headers, [], JSONSerializationModes::JSON_COMPACT_SERIALIZATION);
+        $result = $this->getJWTEncrypter()->encrypt(
+            $payload,
+            [$instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION,
+            $protected_headers
+        );
         if (!is_string($result)) {
             throw new \RuntimeException('Unable to encrypt claims.');
         }

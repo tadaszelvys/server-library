@@ -52,8 +52,6 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function setAdditionalData($key, $data)
     {
         $this->additional_data[$key] = $data;
-
-        return $this;
     }
 
     /**
@@ -70,8 +68,6 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function setRequestedScope($requested_scope = null)
     {
         $this->requested_scope = $requested_scope;
-
-        return $this;
     }
 
     /**
@@ -88,8 +84,6 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function setAvailableScope($available_scope = null)
     {
         $this->available_scope = $available_scope;
-
-        return $this;
     }
 
     /**
@@ -106,8 +100,6 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function setClientPublicId($client_public_id)
     {
         $this->client_public_id = $client_public_id;
-
-        return $this;
     }
 
     /**
@@ -124,8 +116,6 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function setResourceOwnerPublicId($resource_owner_public_id = null)
     {
         $this->resource_owner_public_id = $resource_owner_public_id;
-
-        return $this;
     }
 
     /**
@@ -138,14 +128,10 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
 
     /**
      * @param bool $issue_refresh_token
-     *
-     * @return self
      */
     public function setRefreshTokenIssued($issue_refresh_token = false)
     {
         $this->issue_refresh_token = $issue_refresh_token;
-
-        return $this;
     }
 
     /**
@@ -157,15 +143,11 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @param string[]|string[]|string|null $refresh_token_scope
-     *
-     * @return self
+     * @param string[]|string|null $refresh_token_scope
      */
     public function setRefreshTokenScope($refresh_token_scope = null)
     {
         $this->refresh_token_scope = $refresh_token_scope;
-
-        return $this;
     }
 
     /**
@@ -182,8 +164,6 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function setRefreshTokenRevoked(RefreshTokenInterface $revoke_refresh_token = null)
     {
         $this->revoke_refresh_token = $revoke_refresh_token;
-
-        return $this;
     }
 
     /**

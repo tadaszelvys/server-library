@@ -30,12 +30,12 @@ class ObjectsTest extends Base
     public function testClient()
     {
         $client = new PublicClient();
-        $client->setAllowedGrantTypes(['foo', 'bar'])
-            ->addAllowedGrantType('baz')
-            ->removeAllowedGrantType('baz')
-            ->setRedirectUris(['https://foo.com'])
-            ->addRedirectUri('https://baz.com')
-            ->removeRedirectUri('https://baz.com');
+        $client->setAllowedGrantTypes(['foo', 'bar']);
+        $client->addAllowedGrantType('baz');
+        $client->removeAllowedGrantType('baz');
+        $client->setRedirectUris(['https://foo.com']);
+        $client->addRedirectUri('https://baz.com');
+        $client->removeRedirectUri('https://baz.com');
 
         $this->assertEquals('public_client', $client->getType());
         $this->assertEquals(['foo', 'bar'], $client->getAllowedGrantTypes());

@@ -3,6 +3,7 @@
 namespace OAuth2\Test;
 
 use OAuth2\Client\ClientManagerSupervisor;
+use OAuth2\Configuration\Configuration;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\AuthorizationFactory;
 use OAuth2\Endpoint\FormPostResponseMode;
@@ -35,8 +36,6 @@ use OAuth2\Token\BearerAccessToken;
 use OAuth2\Util\JWTEncrypter;
 use OAuth2\Util\JWTLoader;
 use OAuth2\Util\JWTSigner;
-use SpomkyLabs\Service\Configuration;
-use SpomkyLabs\Service\Jose;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -48,7 +47,7 @@ class Base extends \PHPUnit_Framework_TestCase
         date_default_timezone_set('UTC');
 
         //We configure our services
-        $config = Configuration::getInstance();
+        /*$config = Configuration::getInstance();
 
         $config->set('algorithms', ['HS512', 'A256KW', 'A256CBC-HS512']);
         $config->set('audience', 'My Authorization Server');
@@ -70,7 +69,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ],
             ],
-        ]);
+        ]);*/
     }
 
     /**
@@ -106,11 +105,11 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthorizationFactory()
     {
         if (null === $this->authorization_factory) {
-            $jose = Jose::getInstance();
+            //$jose = Jose::getInstance();
             $jwt_loader = new JWTLoader();
 
-            $jwt_loader->setJWTLoader($jose->getLoader());
-            $jwt_loader->setExceptionManager($this->getExceptionManager());
+            //$jwt_loader->setJWTLoader($jose->getLoader());
+            //$jwt_loader->setExceptionManager($this->getExceptionManager());
             $jwt_loader->setEncryptionRequired(false);
             $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
             $jwt_loader->setKeySet(['keys' => [
@@ -122,11 +121,13 @@ class Base extends \PHPUnit_Framework_TestCase
                 ],
             ]]);
 
-            $this->authorization_factory = new AuthorizationFactory();
-            $this->authorization_factory->setClientManagerSupervisor($this->getClientManagerSupervisor());
-            $this->authorization_factory->setScopeManager($this->getScopeManager());
-            $this->authorization_factory->setExceptionManager($this->getExceptionManager());
-            $this->authorization_factory->setJWTLoader($jwt_loader);
+            $this->authorization_factory = new AuthorizationFactory(
+                $this->getScopeManager(),
+                $this->getClientManagerSupervisor(),
+                $this->getExceptionManager()
+            );
+
+            //$this->authorization_factory->setJWTLoader($jwt_loader);
             $this->authorization_factory->setRequestParameterSupported(true);
             $this->authorization_factory->setRequestUriParameterSupported(true);
         }
@@ -145,12 +146,13 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRevocationTokenEndpoint()
     {
         if (null === $this->revocation_endpoint) {
-            $this->revocation_endpoint = new RevocationEndpoint();
-            $this->revocation_endpoint->setAccessTokenManager($this->getSimplestringAccessTokenManager());
-            $this->revocation_endpoint->setConfiguration($this->getConfiguration());
-            $this->revocation_endpoint->setExceptionManager($this->getExceptionManager());
-            $this->revocation_endpoint->setClientManagerSupervisor($this->getClientManagerSupervisor());
-            $this->revocation_endpoint->setRefreshTokenManager($this->getRefreshTokenManager());
+            $this->revocation_endpoint = new RevocationEndpoint(
+                $this->getSimplestringAccessTokenManager(),
+                $this->getRefreshTokenManager(),
+                $this->getClientManagerSupervisor(),
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
         }
 
         return $this->revocation_endpoint;
@@ -167,11 +169,12 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getTokenIntrospectionEndpoint()
     {
         if (null === $this->token_introspection_endpoint) {
-            $this->token_introspection_endpoint = new TokenIntrospectionEndpoint();
-            $this->token_introspection_endpoint->setAccessTokenManager($this->getSimplestringAccessTokenManager());
-            $this->token_introspection_endpoint->setExceptionManager($this->getExceptionManager());
-            $this->token_introspection_endpoint->setClientManagerSupervisor($this->getClientManagerSupervisor());
-            $this->token_introspection_endpoint->setRefreshTokenManager($this->getRefreshTokenManager());
+            $this->token_introspection_endpoint = new TokenIntrospectionEndpoint(
+                $this->getSimplestringAccessTokenManager(),
+                $this->getRefreshTokenManager(),
+                $this->getClientManagerSupervisor(),
+                $this->getExceptionManager()
+            );
         }
 
         return $this->token_introspection_endpoint;
@@ -188,21 +191,22 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getTokenEndpoint()
     {
         if (null === $this->token_endpoint) {
-            $this->token_endpoint = new TokenEndpoint();
-            $this->token_endpoint->setExceptionManager($this->getExceptionManager());
-            $this->token_endpoint->setScopeManager($this->getScopeManager());
-            $this->token_endpoint->setAccessTokenTypeManager($this->getAccessTokenTypeManager());
-            $this->token_endpoint->setAccessTokenManager($this->getSimplestringAccessTokenManager());
-            $this->token_endpoint->setEndUserManager($this->getEndUserManager());
-            $this->token_endpoint->setClientManagerSupervisor($this->getClientManagerSupervisor());
-            $this->token_endpoint->setRefreshTokenManager($this->getRefreshTokenManager());
+            $this->token_endpoint = new TokenEndpoint(
+                $this->getSimplestringAccessTokenManager(),
+                $this->getAccessTokenTypeManager(),
+                $this->getRefreshTokenManager(),
+                $this->getClientManagerSupervisor(),
+                $this->getEndUserManager(),
+                $this->getScopeManager(),
+                $this->getExceptionManager()
+            );
 
             $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
             $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
             $this->token_endpoint->addGrantType($this->getClientCredentialsGrantType());
             $this->token_endpoint->addGrantType($this->getRefreshTokenGrantType());
             $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
-            $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
+            //$this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
         }
 
         return $this->token_endpoint;
@@ -219,14 +223,15 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthorizationEndpoint()
     {
         if (null === $this->authorization_endpoint) {
-            $this->authorization_endpoint = new AuthorizationEndpoint();
-            $this->authorization_endpoint->setConfiguration($this->getConfiguration());
-            $this->authorization_endpoint->setExceptionManager($this->getExceptionManager());
-            $this->authorization_endpoint->setScopeManager($this->getScopeManager());
+            $this->authorization_endpoint = new AuthorizationEndpoint(
+                $this->getScopeManager(),
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
 
             $this->authorization_endpoint->addResponseType($this->getAuthorizationCodeGrantType());
             $this->authorization_endpoint->addResponseType($this->getImplicitGrantType());
-            $this->authorization_endpoint->addResponseType($this->getIdTokenResponseType());
+            //$this->authorization_endpoint->addResponseType($this->getIdTokenResponseType());
             $this->authorization_endpoint->addResponseType($this->getNoneResponseType());
 
             $this->authorization_endpoint->addResponseMode(new QueryResponseMode());
@@ -248,7 +253,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getConfiguration()
     {
         if (null === $this->configuration) {
-            $this->configuration = new \OAuth2\Configuration\Configuration();
+            $this->configuration = new Configuration();
             $this->configuration->set('realm', 'testrealm@host.com');
             $this->configuration->set('digest_authentication_key', 'This is my secret key');
             $this->configuration->set('digest_authentication_scheme_algorithm', 'MD5-sess');
@@ -277,8 +282,9 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getExceptionManager()
     {
         if (null === $this->exception_manager) {
-            $this->exception_manager = new ExceptionManager();
-            $this->exception_manager->setConfiguration($this->getConfiguration());
+            $this->exception_manager = new ExceptionManager(
+                $this->getConfiguration()
+            );
         }
 
         return $this->exception_manager;
@@ -312,14 +318,15 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getClientManagerSupervisor()
     {
         if (null === $this->client_manager_supervisor) {
-            $this->client_manager_supervisor = new ClientManagerSupervisor();
-            $this->client_manager_supervisor->setExceptionManager($this->getExceptionManager());
-            $this->client_manager_supervisor->setConfiguration($this->getConfiguration());
+            $this->client_manager_supervisor = new ClientManagerSupervisor(
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
 
             $this->client_manager_supervisor->addClientManager($this->getUnregisteredClientManager());
             $this->client_manager_supervisor->addClientManager($this->getPasswordClientManager());
             $this->client_manager_supervisor->addClientManager($this->getPublicClientManager());
-            $this->client_manager_supervisor->addClientManager($this->getJWTClientManager());
+            //$this->client_manager_supervisor->addClientManager($this->getJWTClientManager());
         }
 
         return $this->client_manager_supervisor;
@@ -336,8 +343,9 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getUnregisteredClientManager()
     {
         if (null === $this->unregistered_client_manager) {
-            $this->unregistered_client_manager = new UnregisteredClientManager();
-            $this->unregistered_client_manager->setExceptionManager($this->getExceptionManager());
+            $this->unregistered_client_manager = new UnregisteredClientManager(
+                $this->getExceptionManager()
+            );
         }
 
         return $this->unregistered_client_manager;
@@ -354,8 +362,9 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getPublicClientManager()
     {
         if (null === $this->public_client_manager) {
-            $this->public_client_manager = new PublicClientManager();
-            $this->public_client_manager->setExceptionManager($this->getExceptionManager());
+            $this->public_client_manager = new PublicClientManager(
+                $this->getExceptionManager()
+            );
         }
 
         return $this->public_client_manager;
@@ -372,9 +381,11 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getPasswordClientManager()
     {
         if (null === $this->password_client_manager) {
-            $this->password_client_manager = new PasswordClientManager();
-            $this->password_client_manager->setExceptionManager($this->getExceptionManager());
-            $this->password_client_manager->setConfiguration($this->getConfiguration());
+            $this->password_client_manager = new PasswordClientManager(
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
+
             $this->password_client_manager->createClients();
         }
 
@@ -391,12 +402,13 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getJWTClientManager()
     {
-        if (null === $this->jwt_client_manager) {
+        /*if (null === $this->jwt_client_manager) {
             $jose = Jose::getInstance();
 
-            $this->jwt_client_manager = new JWTClientManager();
-            $this->jwt_client_manager->setExceptionManager($this->getExceptionManager());
-            $this->jwt_client_manager->setConfiguration($this->getConfiguration());
+            $this->jwt_client_manager = new JWTClientManager(
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
 
             $jwt_loader = new JWTLoader();
             $jwt_loader->setJWTLoader($jose->getLoader());
@@ -419,7 +431,7 @@ class Base extends \PHPUnit_Framework_TestCase
             ]]);
 
             $this->jwt_client_manager->setJWTLoader($jwt_loader);
-        }
+        }*/
 
         return $this->jwt_client_manager;
     }
@@ -435,9 +447,10 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthorizationCodeGrantType()
     {
         if (null === $this->authorization_code_grant_type) {
-            $this->authorization_code_grant_type = new AuthorizationCodeGrantType();
-            $this->authorization_code_grant_type->setExceptionManager($this->getExceptionManager());
-            $this->authorization_code_grant_type->setAuthCodeManager($this->getAuthCodeManager());
+            $this->authorization_code_grant_type = new AuthorizationCodeGrantType(
+                $this->getAuthCodeManager(),
+                $this->getExceptionManager()
+            );
         }
 
         return $this->authorization_code_grant_type;
@@ -454,9 +467,10 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getClientCredentialsGrantType()
     {
         if (null === $this->client_credentials_grant_type) {
-            $this->client_credentials_grant_type = new ClientCredentialsGrantType();
-            $this->client_credentials_grant_type->setExceptionManager($this->getExceptionManager());
-            $this->client_credentials_grant_type->setConfiguration($this->getConfiguration());
+            $this->client_credentials_grant_type = new ClientCredentialsGrantType(
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
         }
 
         return $this->client_credentials_grant_type;
@@ -472,11 +486,15 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getJWTBearerGrantType()
     {
-        if (null === $this->jwt_bearer_grant_type) {
+        /*if (null === $this->jwt_bearer_grant_type) {
             $jose = Jose::getInstance();
-            $this->jwt_bearer_grant_type = new JWTBearerGrantType();
-            $this->jwt_bearer_grant_type->setExceptionManager($this->getExceptionManager());
-            $this->jwt_bearer_grant_type->setConfiguration($this->getConfiguration());
+            $this->jwt_bearer_grant_type = new JWTBearerGrantType(
+                null,
+                null,
+                null,
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
 
             $jwt_loader = new JWTLoader();
             $jwt_loader->setJWTLoader($jose->getLoader());
@@ -499,7 +517,7 @@ class Base extends \PHPUnit_Framework_TestCase
             ]]);
 
             $this->jwt_bearer_grant_type->setJWTLoader($jwt_loader);
-        }
+        }*/
 
         return $this->jwt_bearer_grant_type;
     }
@@ -514,9 +532,11 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getIdTokenResponseType()
     {
-        if (null === $this->id_token_response_type) {
-            $this->id_token_response_type = new IdTokenResponseType();
-        }
+        /*if (null === $this->id_token_response_type) {
+            $this->id_token_response_type = new IdTokenResponseType(
+
+            );
+        }*/
 
         return $this->id_token_response_type;
     }
@@ -532,9 +552,9 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getNoneResponseType()
     {
         if (null === $this->none_response_type) {
-            $this->none_response_type = new NoneResponseType();
-
-            $this->none_response_type->setAccessTokenManager($this->getSimpleStringAccessTokenManager());
+            $this->none_response_type = new NoneResponseType(
+                $this->getSimpleStringAccessTokenManager()
+            );
         }
 
         return $this->none_response_type;
@@ -551,9 +571,10 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getImplicitGrantType()
     {
         if (null === $this->implicit_grant_type) {
-            $this->implicit_grant_type = new ImplicitGrantType();
-            $this->implicit_grant_type->setAccessTokenManager($this->getSimplestringAccessTokenManager());
-            $this->implicit_grant_type->setAccessTokenTypeManager($this->getAccessTokenTypeManager());
+            $this->implicit_grant_type = new ImplicitGrantType(
+                $this->getSimplestringAccessTokenManager(),
+                $this->getAccessTokenTypeManager()
+            );
         }
 
         return $this->implicit_grant_type;
@@ -570,9 +591,10 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRefreshTokenGrantType()
     {
         if (null === $this->refresh_token_grant_type) {
-            $this->refresh_token_grant_type = new RefreshTokenGrantType();
-            $this->refresh_token_grant_type->setRefreshTokenManager($this->getRefreshTokenManager());
-            $this->refresh_token_grant_type->setExceptionManager($this->getExceptionManager());
+            $this->refresh_token_grant_type = new RefreshTokenGrantType(
+                $this->getRefreshTokenManager(),
+                $this->getExceptionManager()
+            );
         }
 
         return $this->refresh_token_grant_type;
@@ -589,10 +611,11 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getResourceOwnerPasswordCredentialsGrantType()
     {
         if (null === $this->resource_owner_password_credentials_grant_type) {
-            $this->resource_owner_password_credentials_grant_type = new ResourceOwnerPasswordCredentialsGrantType();
-            $this->resource_owner_password_credentials_grant_type->setConfiguration($this->getConfiguration());
-            $this->resource_owner_password_credentials_grant_type->setExceptionManager($this->getExceptionManager());
-            $this->resource_owner_password_credentials_grant_type->setEndUserManager($this->getEndUserManager());
+            $this->resource_owner_password_credentials_grant_type = new ResourceOwnerPasswordCredentialsGrantType(
+                $this->getEndUserManager(),
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
         }
 
         return $this->resource_owner_password_credentials_grant_type;
@@ -609,8 +632,9 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getScopeManager()
     {
         if (null === $this->scope_manager) {
-            $this->scope_manager = new ScopeManager();
-            $this->scope_manager->setExceptionManager($this->getExceptionManager());
+            $this->scope_manager = new ScopeManager(
+                $this->getExceptionManager()
+            );
         }
 
         return $this->scope_manager;
@@ -627,9 +651,9 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getSimpleStringAccessTokenManager()
     {
         if (null === $this->simple_string_access_token_manager) {
-            $this->simple_string_access_token_manager = new SimpleStringAccessTokenManager();
-            $this->simple_string_access_token_manager->setConfiguration($this->getConfiguration());
-            $this->simple_string_access_token_manager->setExceptionManager($this->getExceptionManager());
+            $this->simple_string_access_token_manager = new SimpleStringAccessTokenManager(
+                $this->getConfiguration()
+            );
         }
 
         return $this->simple_string_access_token_manager;
@@ -645,11 +669,12 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getJWTAccessTokenManager()
     {
-        if (null === $this->jwt_access_token_manager) {
+        /*if (null === $this->jwt_access_token_manager) {
             $jose = Jose::getInstance();
-            $this->jwt_access_token_manager = new JWTAccessTokenManager();
-            $this->jwt_access_token_manager->setConfiguration($this->getConfiguration());
-            $this->jwt_access_token_manager->setExceptionManager($this->getExceptionManager());
+            $this->jwt_access_token_manager = new JWTAccessTokenManager(
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
 
             $jwt_encrypter = new JWTEncrypter();
             $jwt_encrypter->setJWTEncrypter($jose->getEncrypter());
@@ -692,7 +717,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->jwt_access_token_manager->setJWTEncrypter($jwt_encrypter);
             $this->jwt_access_token_manager->setJWTSigner($jwt_signer);
             $this->jwt_access_token_manager->setJWTLoader($jwt_loader);
-        }
+        }*/
 
         return $this->jwt_access_token_manager;
     }
@@ -708,8 +733,9 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getBearerAccessTokenType()
     {
         if (null === $this->bearer_access_token_type) {
-            $this->bearer_access_token_type = new BearerAccessToken();
-            $this->bearer_access_token_type->setExceptionManager($this->getExceptionManager());
+            $this->bearer_access_token_type = new BearerAccessToken(
+                $this->getExceptionManager()
+            );
         }
 
         return $this->bearer_access_token_type;
@@ -726,9 +752,11 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAccessTokenTypeManager()
     {
         if (null === $this->access_token_type_manager) {
-            $this->access_token_type_manager = new AccessTokenTypeManager();
-            $this->access_token_type_manager->setExceptionManager($this->getExceptionManager());
-            $this->access_token_type_manager->addAccessTokenType($this->getBearerAccessTokenType());
+            $this->access_token_type_manager = new AccessTokenTypeManager(
+                $this->getExceptionManager()
+            );
+
+            $this->access_token_type_manager->addAccessTokenType($this->getBearerAccessTokenType(), true);
         }
 
         return $this->access_token_type_manager;
@@ -745,9 +773,10 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRefreshTokenManager()
     {
         if (null === $this->refresh_token_manager) {
-            $this->refresh_token_manager = new RefreshTokenManager();
-            $this->refresh_token_manager->setConfiguration($this->getConfiguration());
-            $this->refresh_token_manager->setExceptionManager($this->getExceptionManager());
+            $this->refresh_token_manager = new RefreshTokenManager(
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
         }
 
         return $this->refresh_token_manager;
@@ -764,14 +793,28 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthCodeManager()
     {
         if (null === $this->auth_code_manager) {
-            $this->auth_code_manager = new AuthCodeManager();
-            $this->auth_code_manager->setConfiguration($this->getConfiguration());
-            $this->auth_code_manager->setExceptionManager($this->getExceptionManager());
+            $this->auth_code_manager = new AuthCodeManager(
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
         }
 
         return $this->auth_code_manager;
     }
 
+    /**
+     * @param null $username
+     * @param null $realm
+     * @param null $nonce
+     * @param null $uri
+     * @param null $qop
+     * @param null $nc
+     * @param null $cnonce
+     * @param null $response
+     * @param null $opaque
+     *
+     * @return string
+     */
     protected function createHttpDigest($username = null, $realm = null, $nonce = null, $uri = null, $qop = null, $nc = null, $cnonce = null, $response = null, $opaque = null)
     {
         $data = [
@@ -809,6 +852,16 @@ class Base extends \PHPUnit_Framework_TestCase
         return implode(',', $compiled);
     }
 
+    /**
+     * @param        $method
+     * @param        $uri
+     * @param        $client_id
+     * @param        $client_secret
+     * @param string $qop
+     * @param null   $content
+     *
+     * @return string
+     */
     protected function createHttpDigestWithBadRealm($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
     {
         $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
@@ -836,6 +889,16 @@ class Base extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param        $method
+     * @param        $uri
+     * @param        $client_id
+     * @param        $client_secret
+     * @param string $qop
+     * @param null   $content
+     *
+     * @return string
+     */
     protected function createHttpDigestWithoutCNonce($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
     {
         $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
@@ -863,6 +926,16 @@ class Base extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param        $method
+     * @param        $uri
+     * @param        $client_id
+     * @param        $client_secret
+     * @param string $qop
+     * @param null   $content
+     *
+     * @return string
+     */
     protected function createValidDigest($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
     {
         $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
@@ -890,6 +963,15 @@ class Base extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param $ha1
+     * @param $nonceValueBase64
+     * @param $cnonce
+     * @param $qop
+     * @param $ha2
+     *
+     * @return string
+     */
     private function computeResponse($ha1, $nonceValueBase64, $cnonce, $qop, $ha2)
     {
         return hash('md5', sprintf(
@@ -903,6 +985,15 @@ class Base extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * @param $client_id
+     * @param $realm
+     * @param $client_secret
+     * @param $nonceValueBase64
+     * @param $cnonce
+     *
+     * @return string
+     */
     private function computeHA1($client_id, $realm, $client_secret, $nonceValueBase64, $cnonce)
     {
         $ha1 = hash('md5', sprintf('%s:%s:%s', $client_id, $realm, $client_secret));
@@ -913,6 +1004,14 @@ class Base extends \PHPUnit_Framework_TestCase
         return $ha1;
     }
 
+    /**
+     * @param $method
+     * @param $uri
+     * @param $qop
+     * @param $content
+     *
+     * @return string
+     */
     private function computeHA2($method, $uri, $qop, $content)
     {
         $a2 = sprintf('%s:%s', $method, $uri);

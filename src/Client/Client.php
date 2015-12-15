@@ -35,8 +35,6 @@ class Client extends ResourceOwner implements ClientInterface
         if (!$this->isAllowedGrantType($grant_type)) {
             $this->grant_types[] = $grant_type;
         }
-
-        return $this;
     }
 
     /**
@@ -45,8 +43,6 @@ class Client extends ResourceOwner implements ClientInterface
     public function setAllowedGrantTypes(array $grant_types)
     {
         $this->grant_types = $grant_types;
-
-        return $this;
     }
 
     public function removeAllowedGrantType($grant_type)
@@ -55,7 +51,5 @@ class Client extends ResourceOwner implements ClientInterface
         if (false !== $key) {
             unset($this->grant_types[$key]);
         }
-
-        return $this;
     }
 }

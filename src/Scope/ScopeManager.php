@@ -13,6 +13,16 @@ abstract class ScopeManager implements ScopeManagerInterface
     use HasExceptionManager;
 
     /**
+     * ClientCredentialsGrantType constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager)
+    {
+        $this->setExceptionManager($exception_manager);
+    }
+
+    /**
      * @return string[]
      */
     abstract public function getScopes();

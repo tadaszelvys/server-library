@@ -2,10 +2,10 @@
 
 namespace OAuth2\Util;
 
-use Jose\JWEInterface;
-use Jose\JWKSetManager;
-use Jose\JWSInterface;
-use Jose\JWTInterface;
+use Jose\Object\JWEInterface;
+use Jose\Object\JWKSet;
+use Jose\Object\JWSInterface;
+use Jose\Object\JWTInterface;
 use Jose\LoaderInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\JWTClientInterface;
@@ -31,17 +31,9 @@ final class JWTLoader
     protected $allowed_encryption_algorithms = [];
 
     /**
-     * @var \Jose\JWKSetInterface
+     * @var \Jose\Object\JWKSetInterface
      */
     protected $key_set;
-
-    /**
-     * @return \Jose\JWKSetManagerInterface
-     */
-    public function getKeySetManager()
-    {
-        return new JWKSetManager();
-    }
 
     /**
      * @return bool
@@ -53,14 +45,10 @@ final class JWTLoader
 
     /**
      * @param bool $is_encryption_required
-     *
-     * @return self
      */
     public function setEncryptionRequired($is_encryption_required)
     {
         $this->is_encryption_required = $is_encryption_required;
-
-        return $this;
     }
 
     /**
@@ -73,18 +61,14 @@ final class JWTLoader
 
     /**
      * @param \Jose\LoaderInterface $jwt_loader
-     *
-     * @return self
      */
     public function setJWTLoader(LoaderInterface $jwt_loader)
     {
         $this->jwt_loader = $jwt_loader;
-
-        return $this;
     }
 
     /**
-     * @return \Jose\JWKSetInterface
+     * @return \Jose\Object\JWKSetInterface
      */
     public function getKeySet()
     {
@@ -93,14 +77,10 @@ final class JWTLoader
 
     /**
      * @param array $key_set
-     *
-     * @return self
      */
     public function setKeySet(array $key_set)
     {
-        $this->key_set = $this->getKeySetManager()->createJWKSet($key_set);
-
-        return $this;
+        $this->key_set = new JWKSet($key_set);
     }
 
     /**
@@ -113,14 +93,10 @@ final class JWTLoader
 
     /**
      * @param string[] $allowed_encryption_algorithms
-     *
-     * @return self
      */
     public function setAllowedEncryptionAlgorithms(array $allowed_encryption_algorithms)
     {
         $this->allowed_encryption_algorithms = $allowed_encryption_algorithms;
-
-        return $this;
     }
 
     /**
@@ -128,7 +104,7 @@ final class JWTLoader
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return \Jose\JWSInterface|\Jose\JWEInterface
+     * @return \Jose\Object\JWSInterface|\Jose\Object\JWEInterface
      */
     public function load($assertion)
     {
@@ -163,15 +139,15 @@ final class JWTLoader
     }
 
     /**
-     * @param \Jose\JWEInterface $jwe
+     * @param \Jose\Object\JWEInterface $jwe
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return \Jose\JWSInterface
+     * @return \Jose\Object\JWSInterface
      */
     protected function decryptAssertion(JWEInterface $jwe)
     {
-        if (!in_array($jwe->getAlgorithm(), $this->getAllowedEncryptionAlgorithms()) || !in_array($jwe->getEncryptionAlgorithm(), $this->getAllowedEncryptionAlgorithms())) {
+        if (!in_array($jwe->getHeader('alg'), $this->getAllowedEncryptionAlgorithms()) || !in_array($jwe->getHeader('enc'), $this->getAllowedEncryptionAlgorithms())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($this->getAllowedEncryptionAlgorithms())));
         }
         $this->getJWTLoader()->decrypt($jwe, $this->getKeySet());
@@ -187,14 +163,14 @@ final class JWTLoader
     }
 
     /**
-     * @param \Jose\JWSInterface                $jws
+     * @param \Jose\Object\JWSInterface                $jws
      * @param \OAuth2\Client\JWTClientInterface $client
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
     public function verifySignature(JWSInterface $jws, JWTClientInterface $client)
     {
-        if (!in_array($jws->getAlgorithm(), $client->getAllowedSignatureAlgorithms())) {
+        if (!in_array($jws->getHeader('alg'), $client->getAllowedSignatureAlgorithms())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($client->getAllowedSignatureAlgorithms())));
         }
 
@@ -204,7 +180,7 @@ final class JWTLoader
     }
 
     /**
-     * @param \Jose\JWTInterface $jwt
+     * @param \Jose\Object\JWTInterface $jwt
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
@@ -222,7 +198,7 @@ final class JWTLoader
     /**
      * By default, this method does nothing, but should be overridden and to check claims and headers.
      *
-     * @param \Jose\JWTInterface $jwt
+     * @param \Jose\Object\JWTInterface $jwt
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */

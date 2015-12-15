@@ -21,7 +21,7 @@ trait HasResponseModeSupport
     /**
      * @var \OAuth2\Endpoint\ResponseModeInterface[]
      */
-    protected $response_modes = [];
+    private $response_modes = [];
 
     /**
      * @param \OAuth2\Grant\ResponseTypeSupportInterface[] $types
@@ -82,13 +82,9 @@ trait HasResponseModeSupport
 
     /**
      * @param \OAuth2\Endpoint\ResponseModeInterface $response_mode
-     *
-     * @return self
      */
     public function addResponseMode(ResponseModeInterface $response_mode)
     {
         $this->response_modes[$response_mode->getName()] = $response_mode;
-
-        return $this;
     }
 }

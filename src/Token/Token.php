@@ -39,14 +39,10 @@ class Token implements TokenInterface
 
     /**
      * @param string $client_public_id
-     *
-     * @return self
      */
     public function setClientPublicId($client_public_id)
     {
         $this->client_public_id = $client_public_id;
-
-        return $this;
     }
 
     /**
@@ -59,14 +55,10 @@ class Token implements TokenInterface
 
     /**
      * @param string $token
-     *
-     * @return self
      */
     public function setToken($token)
     {
         $this->token = $token;
-
-        return $this;
     }
 
     /**
@@ -79,14 +71,10 @@ class Token implements TokenInterface
 
     /**
      * @param array $scope
-     *
-     * @return self
      */
     public function setScope(array $scope)
     {
         $this->scope = $scope;
-
-        return $this;
     }
 
     /**
@@ -99,14 +87,10 @@ class Token implements TokenInterface
 
     /**
      * @param string|null $resource_owner_public_id
-     *
-     * @return self
      */
     public function setResourceOwnerPublicId($resource_owner_public_id)
     {
         $this->resource_owner_public_id = $resource_owner_public_id;
-
-        return $this;
     }
 
     /**
@@ -119,14 +103,10 @@ class Token implements TokenInterface
 
     /**
      * @param int $expires_at
-     *
-     * @return self
      */
     public function setExpiresAt($expires_at)
     {
         $this->expires_at = $expires_at;
-
-        return $this;
     }
 
     /**

@@ -3,8 +3,8 @@
 namespace OAuth2\Util;
 
 use Jose\JSONSerializationModes;
-use Jose\JWKManager;
-use Jose\SignatureInstruction;
+use Jose\Object\JWK;
+use Jose\Object\SignatureInstruction;
 use Jose\SignerInterface;
 
 final class JWTSigner
@@ -15,17 +15,9 @@ final class JWTSigner
     protected $jwt_signer;
 
     /**
-     * @var \Jose\JWKInterface
+     * @var \Jose\Object\JWKInterface
      */
     protected $signature_key;
-
-    /**
-     * @return \Jose\JWKManagerInterface
-     */
-    public function getKeyManager()
-    {
-        return new JWKManager();
-    }
 
     /**
      * @return \Jose\SignerInterface
@@ -37,18 +29,14 @@ final class JWTSigner
 
     /**
      * @param \Jose\SignerInterface $jwt_signer
-     *
-     * @return self
      */
     public function setJWTSigner(SignerInterface $jwt_signer)
     {
         $this->jwt_signer = $jwt_signer;
-
-        return $this;
     }
 
     /**
-     * @return \Jose\JWKInterface
+     * @return \Jose\Object\JWKInterface
      */
     public function getSignatureKey()
     {
@@ -57,14 +45,10 @@ final class JWTSigner
 
     /**
      * @param array $signature_key
-     *
-     * @return self
      */
     public function setSignatureKey(array $signature_key)
     {
-        $this->signature_key = $this->getKeyManager()->createJWK($signature_key);
-
-        return $this;
+        $this->signature_key = new JWK($signature_key);
     }
 
     /**

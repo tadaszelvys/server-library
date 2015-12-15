@@ -19,13 +19,9 @@ class RefreshToken extends Token implements RefreshTokenInterface
 
     /**
      * @param bool $used
-     *
-     * @return self
      */
     public function setUsed($used)
     {
         $this->used = $used;
-
-        return $this;
     }
 }

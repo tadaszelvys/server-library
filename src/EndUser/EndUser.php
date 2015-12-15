@@ -31,7 +31,5 @@ class EndUser extends ResourceOwner implements EndUserInterface
     public function setLastLoginAt($last_login_at)
     {
         $this->last_login_at = $last_login_at;
-
-        return $this;
     }
 }

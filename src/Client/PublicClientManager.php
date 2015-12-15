@@ -11,6 +11,16 @@ abstract class PublicClientManager implements ClientManagerInterface
     use HasExceptionManager;
 
     /**
+     * PublicClientManager constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager)
+    {
+        $this->setExceptionManager($exception_manager);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getSchemesParameters()

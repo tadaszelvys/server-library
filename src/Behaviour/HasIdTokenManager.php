@@ -9,25 +9,21 @@ trait HasIdTokenManager
     /**
      * @var \OAuth2\Token\IdTokenManagerInterface
      */
-    protected $id_token_manager;
+    private $id_token_manager;
 
     /**
      * @return \OAuth2\Token\IdTokenManagerInterface
      */
-    public function getIdTokenManager()
+    protected function getIdTokenManager()
     {
         return $this->id_token_manager;
     }
 
     /**
      * @param \OAuth2\Token\IdTokenManagerInterface $id_token_manager
-     *
-     * @return self
      */
-    public function setIdTokenManager(IdTokenManagerInterface $id_token_manager)
+    private function setIdTokenManager(IdTokenManagerInterface $id_token_manager)
     {
         $this->id_token_manager = $id_token_manager;
-
-        return $this;
     }
 }

@@ -5,10 +5,21 @@ namespace OAuth2\Token;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Configuration\ConfigurationInterface;
 
 abstract class AccessTokenManager implements AccessTokenManagerInterface
 {
     use HasConfiguration;
+
+    /**
+     * AccessTokenManager constructor.
+     *
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(ConfigurationInterface $configuration)
+    {
+        $this->setConfiguration($configuration);
+    }
 
     /**
      * @param \OAuth2\Client\ClientInterface $client Client

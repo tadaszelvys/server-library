@@ -20,11 +20,11 @@ class OpenIDConnectTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setClient($client)
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setResponseType('code token')
-            ->setAuthorized(true);
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setClient($client);
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setResponseType('code token');
+        $authorization->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -44,11 +44,11 @@ class OpenIDConnectTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setClient($client)
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setResponseType('code id_token token')
-            ->setAuthorized(true);
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setClient($client);
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setResponseType('code id_token token');
+        $authorization->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -65,12 +65,12 @@ class OpenIDConnectTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setClient($client)
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setResponseType('none')
-            ->setState('0123456789')
-            ->setAuthorized(true);
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setClient($client);
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setResponseType('none');
+        $authorization->setState('0123456789');
+        $authorization->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);

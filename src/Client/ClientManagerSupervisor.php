@@ -4,6 +4,7 @@ namespace OAuth2\Client;
 
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -18,6 +19,18 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     protected $client_managers = [];
 
     /**
+     * ClientManagerSupervisor constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    {
+        $this->setExceptionManager($exception_manager);
+        $this->setConfiguration($configuration);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getClientManagers()
@@ -27,14 +40,10 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
 
     /**
      * @param \OAuth2\Client\ClientManagerInterface $client_manager
-     *
-     * @return self
      */
     public function addClientManager(ClientManagerInterface $client_manager)
     {
         $this->client_managers[] = $client_manager;
-
-        return $this;
     }
 
     /**
@@ -44,7 +53,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     {
         foreach ($this->getClientManagers() as $manager) {
             $client = $manager->getClient($client_id);
-            if (null !== ($client)) {
+            if (null !== $client) {
                 return $client;
             }
         }

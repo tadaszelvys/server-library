@@ -35,8 +35,6 @@ class ResourceOwner implements ResourceOwnerInterface
     public function setPublicId($public_id)
     {
         $this->public_id = $public_id;
-
-        return $this;
     }
 
     /**
@@ -53,7 +51,5 @@ class ResourceOwner implements ResourceOwnerInterface
     public function setType($type)
     {
         $this->type = $type;
-
-        return $this;
     }
 }

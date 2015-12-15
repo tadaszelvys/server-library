@@ -13,6 +13,16 @@ class UnregisteredClientManager implements ClientManagerInterface
     use HasExceptionManager;
 
     /**
+     * UnregisteredClientManager constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager)
+    {
+        $this->setExceptionManager($exception_manager);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getSchemesParameters()
@@ -88,9 +98,8 @@ class UnregisteredClientManager implements ClientManagerInterface
         }
 
         $client = new UnregisteredClient();
-        $client
-            ->setAllowedGrantTypes(['code', 'authorization_code'])
-            ->setPublicId($client_id);
+        $client->setAllowedGrantTypes(['code', 'authorization_code']);
+        $client->setPublicId($client_id);
 
         return $client;
     }

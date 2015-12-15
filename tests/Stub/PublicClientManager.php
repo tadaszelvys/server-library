@@ -3,6 +3,7 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\PublicClientManager as Base;
+use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PublicClientManager extends Base
@@ -12,22 +13,29 @@ class PublicClientManager extends Base
      */
     private $clients = [];
 
-    public function __construct()
+    /**
+     * PublicClientManager constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager)
     {
+        parent::__construct($exception_manager);
+
         $foo = new PublicClient();
-        $foo->setPublicId('foo')
-            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code'])
-            ->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback']);
+        $foo->setPublicId('foo');
+        $foo->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
+        $foo->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback']);
 
         $oof = new PublicClient();
-        $oof->setPublicId('oof')
-            ->setAllowedGrantTypes([])
-            ->setRedirectUris([]);
+        $oof->setPublicId('oof');
+        $oof->setAllowedGrantTypes([]);
+        $oof->setRedirectUris([]);
 
         $fii = new PublicClient();
-        $fii->setPublicId('fii')
-            ->setAllowedGrantTypes([])
-            ->setRedirectUris(['http://example.com/test?good=false']);
+        $fii->setPublicId('fii');
+        $fii->setAllowedGrantTypes([]);
+        $fii->setRedirectUris(['http://example.com/test?good=false']);
         $this->clients['foo'] = $foo;
         $this->clients['oof'] = $oof;
         $this->clients['fii'] = $fii;

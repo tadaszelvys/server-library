@@ -28,18 +28,18 @@ class JWTClientManager extends Base
         ];
 
         $jwt1 = new JWTClient();
-        $jwt1->setAllowedSignatureAlgorithms(['HS512'])
-             ->setSignaturePublicKeySet($keys)
-             ->setRedirectUris(['http://example.com/test?good=false'])
-             ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'])
-             ->setPublicId('jwt1');
+        $jwt1->setAllowedSignatureAlgorithms(['HS512']);
+        $jwt1->setSignaturePublicKeySet($keys);
+        $jwt1->setRedirectUris(['http://example.com/test?good=false']);
+        $jwt1->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
+        $jwt1->setPublicId('jwt1');
 
         $jwt2 = new JWTClient();
-        $jwt2->setAllowedSignatureAlgorithms(['HS512'])
-             ->setSignaturePublicKeySet($keys)
-             ->setRedirectUris([])
-             ->setAllowedGrantTypes(['authorization_code'])
-             ->setPublicId('jwt2');
+        $jwt2->setAllowedSignatureAlgorithms(['HS512']);
+        $jwt2->setSignaturePublicKeySet($keys);
+        $jwt2->setRedirectUris([]);
+        $jwt2->setAllowedGrantTypes(['authorization_code']);
+        $jwt2->setPublicId('jwt2');
 
         $this->clients['jwt1'] = $jwt1;
         $this->clients['jwt2'] = $jwt2;

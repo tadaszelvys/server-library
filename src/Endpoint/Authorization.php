@@ -4,43 +4,43 @@ namespace OAuth2\Endpoint;
 
 /**
  * @method string getClientId()
- * @method self setClientId(string $client_id)
+ * @method setClientId(string $client_id)
  * @method \OAuth2\Client\ClientInterface getClient()
- * @method self setClient(\OAuth2\Client\ClientInterface $client)
+ * @method setClient(\OAuth2\Client\ClientInterface $client)
  * @method \OAuth2\EndUser\EndUserInterface getEndUser()
- * @method self setEndUser(\OAuth2\EndUser\EndUserInterface $end_user)
+ * @method setEndUser(\OAuth2\EndUser\EndUserInterface $end_user)
  * @method null|string getResponseType()
- * @method self setResponseType(string $response_type)
+ * @method setResponseType(string $response_type)
  * @method null|string getRedirectUri()
- * @method self setRedirectUri(string $redirect_uri)
+ * @method setRedirectUri(string $redirect_uri)
  * @method string[] getScope()
- * @method self setScope(string[] $scope)
+ * @method setScope(string[] $scope)
  * @method null|string getState()
- * @method self setState(string $state)
+ * @method setState(string $state)
  * @method bool isAuthorized()
- * @method self setAuthorized(bool $authorized)
+ * @method setAuthorized(bool $authorized)
  * @method bool getIssueRefreshToken()
- * @method self setIssueRefreshToken(bool $issue_refresh_token)
+ * @method setIssueRefreshToken(bool $issue_refresh_token)
  * @method null|string getResponseMode()
- * @method self setResponseMode(string $response_mode)
+ * @method setResponseMode(string $response_mode)
  * @method null|string getNonce()
- * @method self setNonce(string $nonce)
+ * @method setNonce(string $nonce)
  * @method null|string getDisplay()
- * @method self setDisplay(string $display)
+ * @method setDisplay(string $display)
  * @method null|string getPrompt()
- * @method self setPrompt(string $prompt)
+ * @method setPrompt(string $prompt)
  * @method null|int getMaxAge()
- * @method self setMaxAge(int $max_age)
+ * @method setMaxAge(int $max_age)
  * @method null|string getUiLocales()
- * @method self setUiLocales(string $ui_locales)
+ * @method setUiLocales(string $ui_locales)
  * @method null|string getIdTokenHint()
- * @method self setIdTokenHint(string $id_token_hint)
+ * @method setIdTokenHint(string $id_token_hint)
  * @method null|string getLoginHint()
- * @method self setLoginHint(string $login_hint)
+ * @method setLoginHint(string $login_hint)
  * @method null|string getAcrValues()
- * @method self setAcrValues(string $acr_values)
+ * @method setAcrValues(string $acr_values)
  * @method array getQueryParams()
- * @method self setQueryParams(array $query_params)
+ * @method setQueryParams(array $query_params)
  */
 final class Authorization
 {
@@ -206,7 +206,7 @@ final class Authorization
                 }
                 $this->$param = $arguments[0];
 
-                return $this;
+                return;
             }
         }
         throw new \BadMethodCallException(sprintf('Unknown method "%s"', $method));

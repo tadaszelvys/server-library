@@ -2,6 +2,7 @@
 
 namespace OAuth2\Grant;
 
+use Base64Url\Base64Url;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
@@ -15,10 +16,23 @@ use Psr\Http\Message\ServerRequestInterface;
 final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
 {
     use HasExceptionManager;
+
     /**
      * @var\OAuth2\Token\AuthCodeManagerInterface
      */
     protected $auth_code_manager;
+
+    /**
+     * AuthorizationCodeGrantType constructor.
+     *
+     * @param \OAuth2\Token\AuthCodeManagerInterface      $auth_code_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     */
+    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager)
+    {
+        $this->auth_code_manager = $auth_code_manager;
+        $this->setExceptionManager($exception_manager);
+    }
 
     /**
      * @return \OAuth2\Token\AuthCodeManagerInterface
@@ -26,18 +40,6 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     protected function getAuthCodeManager()
     {
         return $this->auth_code_manager;
-    }
-
-    /**
-     * @param \OAuth2\Token\AuthCodeManagerInterface $auth_code_manager
-     *
-     * @return self
-     */
-    public function setAuthCodeManager(AuthCodeManagerInterface $auth_code_manager)
-    {
-        $this->auth_code_manager = $auth_code_manager;
-
-        return $this;
     }
 
     /**
@@ -100,6 +102,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
         }
 
+        $this->checkPKCE($request, $authCode);
         $this->checkAuthCode($authCode, $client);
 
         $redirect_uri = RequestBody::getParameter($request, 'redirect_uri');
@@ -109,12 +112,12 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
 
         $this->getAuthCodeManager()->markAuthCodeAsUsed($authCode);
 
-        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $authCode->getScope())
-            ->setAvailableScope($authCode->getScope())
-            ->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId())
-            ->setRefreshTokenIssued($authCode->getIssueRefreshToken())
-            ->setRefreshTokenScope($authCode->getScope())
-            ->setRefreshTokenRevoked(null);
+        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $authCode->getScope());
+        $grant_type_response->setAvailableScope($authCode->getScope());
+        $grant_type_response->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
+        $grant_type_response->setRefreshTokenIssued($authCode->getIssueRefreshToken());
+        $grant_type_response->setRefreshTokenScope($authCode->getScope());
+        $grant_type_response->setRefreshTokenRevoked(null);
     }
 
     /**
@@ -146,6 +149,35 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             if (null === ($client_id = RequestBody::getParameter($request, 'client_id')) || $client_id !== $client->getPublicId()) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The client_id parameter is required for non-confidential clients.');
             }
+        }
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \OAuth2\Token\AuthCodeInterface          $authCode
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    protected function checkPKCE(ServerRequestInterface $request, AuthCodeInterface $authCode)
+    {
+        $params = $authCode->getQueryParams();
+        if (!array_key_exists('code_challenge', $params)) {
+            return;
+        }
+        $code_verifier = RequestBody::getParameter($request, 'code_verifier');
+        if (null === $code_verifier) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "code_verifier" is required.');
+        }
+        $code_challenge = $params['code_challenge'];
+        $code_challenge_method = array_key_exists('code_challenge_method', $params)?$params['code_challenge']:'plain';
+
+        if (!in_array($code_challenge_method, ['plain', 'S256'])) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported "code_challenge_method".');
+        }
+        $calculated = 'plain' === $code_challenge_method?$code_verifier:Base64Url::encode(hash('sha256', $code_verifier, true));
+
+        if (!hash_equals($code_challenge, $calculated)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid parameter "code_verifier".');
         }
     }
 

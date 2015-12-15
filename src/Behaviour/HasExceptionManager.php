@@ -9,25 +9,21 @@ trait HasExceptionManager
     /**
      * @var\OAuth2\Exception\ExceptionManagerInterface
      */
-    protected $exception_manager;
+    private $exception_manager;
 
     /**
      * @return \OAuth2\Exception\ExceptionManagerInterface
      */
-    public function getExceptionManager()
+    protected function getExceptionManager()
     {
         return $this->exception_manager;
     }
 
     /**
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     *
-     * @return self
      */
-    public function setExceptionManager(ExceptionManagerInterface $exception_manager)
+    private function setExceptionManager(ExceptionManagerInterface $exception_manager)
     {
         $this->exception_manager = $exception_manager;
-
-        return $this;
     }
 }

@@ -2,8 +2,7 @@
 
 namespace OAuth2\Token;
 
-use Jose\JWT;
-use Jose\JWTInterface;
+use Jose\Object\JWTInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTEncrypter;
 use OAuth2\Behaviour\HasJWTLoader;
@@ -41,8 +40,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     public function setEncryptionPrivateKey(array $encryption_private_key)
     {
         $this->encryption_private_key = $encryption_private_key;
-
-        return $this;
     }
 
     /**
@@ -55,11 +52,7 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $payload = $this->preparePayload($client, $scope, $resource_owner, $refresh_token);
         $signature_header = $this->prepareSignatureHeader();
 
-        $jwt = new JWT();
-        $jwt = $jwt->withPayload($payload);
-        $jwt = $jwt->withProtectedHeader($signature_header);
-
-        $jws = $this->getJWTSigner()->sign($jwt->getPayload(), $jwt->getProtectedHeader());
+        $jws = $this->getJWTSigner()->sign($payload, $signature_header);
         $jwe = $this->encrypt($jws, $client);
 
         $access_token = new AccessToken();
@@ -108,8 +101,8 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         );
 
         $key = $this->getJWTEncrypter()->getKeyEncryptionKey();
-        if (null !== $key->getKeyID()) {
-            $header['kid'] = $key->getKeyID();
+        if ($key->has('kid')) {
+            $header['kid'] = $key->get('kid');
         }
 
         return $header;
@@ -133,8 +126,8 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         ];
 
         $key = $this->getJWTSigner()->getSignatureKey();
-        if (null !== $key->getKeyID()) {
-            $header['kid'] = $key->getKeyID();
+        if ($key->has('kid')) {
+            $header['kid'] = $key->get('kid');
         }
 
         return $header;
@@ -212,17 +205,17 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $jwt = $this->getJWTLoader()->load($assertion);
 
         $access_token = new AccessToken();
-        $access_token->setClientPublicId($jwt->getSubject())
-            ->setExpiresAt($jwt->getExpirationTime())
+        $access_token->setClientPublicId($jwt->getClaim('sub'))
+            ->setExpiresAt($jwt->getClaim('exp'))
             ->setToken($assertion);
-        if (null !== $resource_owner = $jwt->getPayloadValue('r_o')) {
-            $access_token->setResourceOwnerPublicId($resource_owner);
+        if ($jwt->hasClaim('r_o')) {
+            $access_token->setResourceOwnerPublicId($jwt->getClaim('r_o'));
         }
-        if (null !== $scope = $jwt->getPayloadValue('sco')) {
-            $access_token->setScope($scope);
+        if ($jwt->hasClaim('sco')) {
+            $access_token->setScope($jwt->getClaim('sco'));
         }
-        if (null !== $refresh_token = $jwt->getPayloadValue('ref')) {
-            $access_token->setRefreshToken($refresh_token);
+        if ($jwt->hasClaim('ref')) {
+            $access_token->setRefreshToken($jwt->getClaim('ref'));
         }
 
         return $access_token;
@@ -234,13 +227,12 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     public function revokeAccessToken(AccessTokenInterface $access_token)
     {
         //Not implemented
-        return $this;
     }
 
     /**
      * By default, this method does nothing, but should be overridden and check other claims (issuer, jti...).
      *
-     * @param \Jose\JWTInterface $jwt
+     * @param \Jose\Object\JWTInterface $jwt
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */

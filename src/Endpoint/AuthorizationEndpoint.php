@@ -8,9 +8,11 @@ use OAuth2\Behaviour\HasResponseModeSupport;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Client\RegisteredClientInterface;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\ResponseTypeSupportInterface;
+use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
 
@@ -26,15 +28,33 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     protected $response_types = [];
 
+    /**
+     * AuthorizationEndpoint constructor.
+     *
+     * @param \OAuth2\Scope\ScopeManagerInterface          $scope_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(
+        ScopeManagerInterface $scope_manager,
+        ExceptionManagerInterface $exception_manager,
+        ConfigurationInterface $configuration
+    )
+    {
+        $this->setExceptionManager($exception_manager);
+        $this->setConfiguration($configuration);
+        $this->setScopeManager($scope_manager);
+    }
+
+    /**
+     * @param \OAuth2\Grant\ResponseTypeSupportInterface $response_type
+     */
     public function addResponseType(ResponseTypeSupportInterface $response_type)
     {
         $type = $response_type->getResponseType();
-        if (array_key_exists($type, $this->response_types)) {
-            return $this;
+        if (!array_key_exists($type, $this->response_types)) {
+            $this->response_types[$type] = $response_type;
         }
-        $this->response_types[$type] = $response_type;
-
-        return $this;
     }
 
     /**

@@ -19,8 +19,6 @@ interface AccessTokenTypeManagerInterface
     /**
      * @param \OAuth2\Token\AccessTokenTypeInterface $access_token_type
      * @param bool                                   $default
-     *
-     * @return self
      */
     public function addAccessTokenType(AccessTokenTypeInterface $access_token_type, $default = false);
 

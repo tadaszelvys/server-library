@@ -9,25 +9,21 @@ trait HasConfiguration
     /**
      * @var \OAuth2\Configuration\ConfigurationInterface
      */
-    protected $configuration;
+    private $configuration;
 
     /**
      * @return \OAuth2\Configuration\ConfigurationInterface
      */
-    public function getConfiguration()
+    protected function getConfiguration()
     {
         return $this->configuration;
     }
 
     /**
      * @param \OAuth2\Configuration\ConfigurationInterface $configuration
-     *
-     * @return self
      */
-    public function setConfiguration(ConfigurationInterface $configuration)
+    private function setConfiguration(ConfigurationInterface $configuration)
     {
         $this->configuration = $configuration;
-
-        return $this;
     }
 }

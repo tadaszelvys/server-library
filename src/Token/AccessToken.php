@@ -19,14 +19,10 @@ class AccessToken extends Token implements AccessTokenInterface
 
     /**
      * @param string|null $refresh_token
-     *
-     * @return self
      */
     public function setRefreshToken($refresh_token)
     {
         $this->refresh_token = $refresh_token;
-
-        return $this;
     }
 
     public function jsonSerialize()

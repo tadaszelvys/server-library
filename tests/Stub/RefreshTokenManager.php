@@ -3,6 +3,8 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
+use OAuth2\Configuration\ConfigurationInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Token\RefreshToken;
 use OAuth2\Token\RefreshTokenInterface;
@@ -16,18 +18,26 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
      */
     private $refresh_tokens = [];
 
-    public function __construct()
+    /**
+     * ClientCredentialsGrantType constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
     {
+        parent::__construct($exception_manager, $configuration);
+
         $bar = new PasswordClient();
-        $bar->setSecret('secret')
-            ->setRedirectUris(['http://example.com/test?good=false'])
-            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
-            ->setPublicId('bar');
+        $bar->setSecret('secret');
+        $bar->setRedirectUris(['http://example.com/test?good=false']);
+        $bar->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
+        $bar->setPublicId('bar');
 
         $foo = new PublicClient();
-        $foo->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback'])
-            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code'])
-            ->setPublicId('foo');
+        $foo->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback']);
+        $foo->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
+        $foo->setPublicId('foo');
 
         $this->addRefreshToken(
             'VALID_REFRESH_TOKEN',
@@ -61,12 +71,12 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
     protected function addRefreshToken($token, $expiresAt, ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [])
     {
         $refresh_token = new RefreshToken();
-        $refresh_token->setUsed(false)
-                      ->setExpiresAt($expiresAt)
-                      ->setToken($token)
-                      ->setClientPublicId($client->getPublicId())
-                      ->setResourceOwnerPublicId(null === $resourceOwner ? null : $resourceOwner->getPublicId())
-                      ->setScope($scope);
+        $refresh_token->setUsed(false);
+        $refresh_token->setExpiresAt($expiresAt);
+        $refresh_token->setToken($token);
+        $refresh_token->setClientPublicId($client->getPublicId());
+        $refresh_token->setResourceOwnerPublicId(null === $resourceOwner ? null : $resourceOwner->getPublicId());
+        $refresh_token->setScope($scope);
 
         $this->refresh_tokens[$refresh_token->getToken()] = $refresh_token;
 

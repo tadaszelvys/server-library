@@ -6,8 +6,6 @@ interface JWTClientInterface extends ConfidentialClientInterface
 {
     /**
      * @param array $key_set
-     *
-     * @return self
      */
     public function setSignaturePublicKeySet(array $key_set);
 
@@ -18,8 +16,6 @@ interface JWTClientInterface extends ConfidentialClientInterface
 
     /**
      * @param string[] $allowed_signature_algorithms
-     *
-     * @return self
      */
     public function setAllowedSignatureAlgorithms(array $allowed_signature_algorithms);
 

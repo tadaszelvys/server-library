@@ -9,25 +9,21 @@ trait HasJWTLoader
     /**
      * @var \OAuth2\Util\JWTLoader
      */
-    protected $jwt_loader;
+    private $jwt_loader;
 
     /**
      * @return \OAuth2\Util\JWTLoader
      */
-    public function getJWTLoader()
+    protected function getJWTLoader()
     {
         return $this->jwt_loader;
     }
 
     /**
      * @param \OAuth2\Util\JWTLoader $jwt_loader
-     *
-     * @return self
      */
-    public function setJWTLoader(JWTLoader $jwt_loader)
+    private function setJWTLoader(JWTLoader $jwt_loader)
     {
         $this->jwt_loader = $jwt_loader;
-
-        return $this;
     }
 }

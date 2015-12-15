@@ -16,8 +16,6 @@ interface EndUserInterface extends ResourceOwnerInterface
 
     /**
      * @param null|int $last_login_at
-     *
-     * @return self
      */
     public function setLastLoginAt($last_login_at);
 }

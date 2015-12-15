@@ -15,8 +15,6 @@ interface ResourceOwnerInterface
 
     /**
      * @param string $public_id
-     *
-     * @return self
      */
     public function setPublicId($public_id);
 
@@ -29,8 +27,6 @@ interface ResourceOwnerInterface
 
     /**
      * @param string $type
-     *
-     * @return self
      */
     public function setType($type);
 }

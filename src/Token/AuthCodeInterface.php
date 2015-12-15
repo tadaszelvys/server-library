@@ -11,8 +11,6 @@ interface AuthCodeInterface extends TokenInterface
 
     /**
      * @param bool $issue_refresh_token
-     *
-     * @return self
      */
     public function setIssueRefreshToken($issue_refresh_token);
 
@@ -23,8 +21,6 @@ interface AuthCodeInterface extends TokenInterface
 
     /**
      * @param string $redirect_uri
-     *
-     * @return self
      */
     public function setRedirectUri($redirect_uri);
 
@@ -35,8 +31,6 @@ interface AuthCodeInterface extends TokenInterface
 
     /**
      * @param array $query_params
-     *
-     * @return self
      */
     public function setQueryParams(array $query_params);
 }

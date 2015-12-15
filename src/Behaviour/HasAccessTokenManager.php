@@ -9,25 +9,21 @@ trait HasAccessTokenManager
     /**
      * @var \OAuth2\Token\AccessTokenManagerInterface
      */
-    protected $access_token_manager;
+    private $access_token_manager;
 
     /**
      * @return \OAuth2\Token\AccessTokenManagerInterface
      */
-    public function getAccessTokenManager()
+    protected function getAccessTokenManager()
     {
         return $this->access_token_manager;
     }
 
     /**
      * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
-     *
-     * @return self
      */
-    public function setAccessTokenManager(AccessTokenManagerInterface $access_token_manager)
+    private function setAccessTokenManager(AccessTokenManagerInterface $access_token_manager)
     {
         $this->access_token_manager = $access_token_manager;
-
-        return $this;
     }
 }

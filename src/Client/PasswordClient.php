@@ -45,8 +45,6 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     public function setSecret($secret)
     {
         $this->secret = $secret;
-
-        return $this;
     }
 
     public function getSalt()
@@ -60,8 +58,6 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     public function setSalt($salt)
     {
         $this->salt = $salt;
-
-        return $this;
     }
 
     /**
@@ -78,8 +74,6 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     public function setPlaintextSecret($plaintext_secret)
     {
         $this->plaintext_secret = $plaintext_secret;
-
-        return $this;
     }
 
     /**
@@ -88,8 +82,6 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     public function clearCredentials()
     {
         $this->plaintext_secret = null;
-
-        return $this;
     }
 
     /**
@@ -106,7 +98,5 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     public function setA1Hash($ha1)
     {
         $this->ha1 = $ha1;
-
-        return $this;
     }
 }

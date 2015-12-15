@@ -6,6 +6,9 @@ use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasScopeManager;
+use OAuth2\Client\ClientManagerSupervisorInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Scope\ScopeManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationFactory
@@ -14,6 +17,17 @@ final class AuthorizationFactory
     use HasScopeManager;
     use HasClientManagerSupervisor;
     use HasExceptionManager;
+
+    public function __construct(
+        ScopeManagerInterface $scope_manager,
+        ClientManagerSupervisorInterface $client_manager_supervisor,
+        ExceptionManagerInterface $exception_manager
+    )
+    {
+        $this->setScopeManager($scope_manager);
+        $this->setClientManagerSupervisor($client_manager_supervisor);
+        $this->setExceptionManager($exception_manager);
+    }
 
     /**
      * @var bool
@@ -27,14 +41,10 @@ final class AuthorizationFactory
 
     /**
      * @param bool $is_request_parameter_supported
-     *
-     * @return self
      */
     public function setRequestParameterSupported($is_request_parameter_supported)
     {
         $this->is_request_parameter_supported = $is_request_parameter_supported;
-
-        return $this;
     }
 
     /**
@@ -47,14 +57,10 @@ final class AuthorizationFactory
 
     /**
      * @param bool $is_request_uri_parameter_supported
-     *
-     * @return self
      */
     public function setRequestUriParameterSupported($is_request_uri_parameter_supported)
     {
         $this->is_request_uri_parameter_supported = $is_request_uri_parameter_supported;
-
-        return $this;
     }
 
     /**

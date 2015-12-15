@@ -6,6 +6,7 @@ use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use Security\DefuseGenerator;
@@ -14,6 +15,18 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
 {
     use HasExceptionManager;
     use HasConfiguration;
+
+    /**
+     * ClientCredentialsGrantType constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    {
+        $this->setExceptionManager($exception_manager);
+        $this->setConfiguration($configuration);
+    }
 
     /**
      * Generate and add a Refresh Token using the parameters.

@@ -7,6 +7,7 @@ use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
+use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -14,6 +15,18 @@ final class RefreshTokenGrantType implements GrantTypeSupportInterface
 {
     use HasExceptionManager;
     use HasRefreshTokenManager;
+
+    /**
+     * RefreshTokenGrantType constructor.
+     *
+     * @param \OAuth2\Token\RefreshTokenManagerInterface  $refresh_token_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     */
+    public function __construct(RefreshTokenManagerInterface $refresh_token_manager, ExceptionManagerInterface $exception_manager)
+    {
+        $this->setRefreshTokenManager($refresh_token_manager);
+        $this->setExceptionManager($exception_manager);
+    }
 
     /**
      * {@inheritdoc}
@@ -49,12 +62,12 @@ final class RefreshTokenGrantType implements GrantTypeSupportInterface
 
         $this->checkRefreshToken($token, $client);
 
-        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $token->getScope())
-                 ->setAvailableScope($token->getScope())
-                 ->setResourceOwnerPublicId($token->getResourceOwnerPublicId())
-                 ->setRefreshTokenIssued(true)
-                 ->setRefreshTokenScope($token->getScope())
-                 ->setRefreshTokenRevoked($token);
+        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $token->getScope());
+        $grant_type_response->setAvailableScope($token->getScope());
+        $grant_type_response->setResourceOwnerPublicId($token->getResourceOwnerPublicId());
+        $grant_type_response->setRefreshTokenIssued(true);
+        $grant_type_response->setRefreshTokenScope($token->getScope());
+        $grant_type_response->setRefreshTokenRevoked($token);
     }
 
     /**

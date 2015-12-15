@@ -28,27 +28,19 @@ final class Configuration implements ConfigurationInterface
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return self
      */
     public function set($name, $value)
     {
         $this->config[$name] = $value;
-
-        return $this;
     }
 
     /**
      * @param string $name
-     *
-     * @return self
      */
     public function delete($name)
     {
         if (isset($this->config[$name])) {
             unset($this->config[$name]);
         }
-
-        return $this;
     }
 }

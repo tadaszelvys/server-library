@@ -12,6 +12,16 @@ class BearerAccessToken implements AccessTokenTypeInterface
     use HasExceptionManager;
 
     /**
+     * ClientCredentialsGrantType constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager)
+    {
+        $this->setExceptionManager($exception_manager);
+    }
+
+    /**
      * Get the list of methods to find the access token
      * This method can be override to add new way to find an access token.
      * These methods are those official supported by the RFC6750.

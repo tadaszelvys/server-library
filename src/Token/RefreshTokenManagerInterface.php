@@ -42,8 +42,6 @@ interface RefreshTokenManagerInterface
      * Revoke a refresh token.
      *
      * @param \OAuth2\Token\RefreshTokenInterface $refreshToken The refresh token string to revoke.
-     *
-     * @return self
      */
     public function revokeRefreshToken(RefreshTokenInterface $refreshToken);
 

@@ -3,7 +3,9 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\EndUser\EndUserInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AuthCode;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManager as Base;
@@ -13,43 +15,51 @@ class AuthCodeManager extends Base
 {
     private $auth_codes = [];
 
-    public function __construct()
+    /**
+     * AuthCodeManager constructor.
+     *
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
     {
+        parent::__construct($exception_manager, $configuration);
+
         $valid_auth_code1 = new AuthCode();
-        $valid_auth_code1->setIssueRefreshToken(true)
-            ->setRedirectUri('http://example.com/redirect_uri/')
-            ->setClientPublicId('bar')
-            ->setResourceOwnerPublicId('user1')
-            ->setExpiresAt(time() + 3000)
-            ->setScope([
+        $valid_auth_code1->setIssueRefreshToken(true);
+        $valid_auth_code1->setRedirectUri('http://example.com/redirect_uri/');
+        $valid_auth_code1->setClientPublicId('bar');
+        $valid_auth_code1->setResourceOwnerPublicId('user1');
+        $valid_auth_code1->setExpiresAt(time() + 3000);
+        $valid_auth_code1->setScope([
                 'scope1',
                 'scope2',
-            ])
-            ->setToken('VALID_AUTH_CODE');
+            ]);
+        $valid_auth_code1->setToken('VALID_AUTH_CODE');
 
         $valid_auth_code2 = new AuthCode();
-        $valid_auth_code2->setIssueRefreshToken(true)
-            ->setRedirectUri('http://example.com/redirect_uri/')
-            ->setClientPublicId('foo')
-            ->setResourceOwnerPublicId('user1')
-            ->setExpiresAt(time() + 3000)
-            ->setScope([
+        $valid_auth_code2->setIssueRefreshToken(true);
+        $valid_auth_code2->setRedirectUri('http://example.com/redirect_uri/');
+        $valid_auth_code2->setClientPublicId('foo');
+        $valid_auth_code2->setResourceOwnerPublicId('user1');
+        $valid_auth_code2->setExpiresAt(time() + 3000);
+        $valid_auth_code2->setScope([
                 'scope1',
                 'scope2',
-            ])
-            ->setToken('VALID_AUTH_CODE_PUBLIC_CLIENT');
+            ]);
+        $valid_auth_code2->setToken('VALID_AUTH_CODE_PUBLIC_CLIENT');
 
         $expired_auth_code = new AuthCode();
-        $expired_auth_code->setIssueRefreshToken(true)
-            ->setRedirectUri('http://example.com/redirect_uri/')
-            ->setClientPublicId('bar')
-            ->setResourceOwnerPublicId('user1')
-            ->setExpiresAt(time() - 1)
-            ->setScope([
+        $expired_auth_code->setIssueRefreshToken(true);
+        $expired_auth_code->setRedirectUri('http://example.com/redirect_uri/');
+        $expired_auth_code->setClientPublicId('bar');
+        $expired_auth_code->setResourceOwnerPublicId('user1');
+        $expired_auth_code->setExpiresAt(time() - 1);
+        $expired_auth_code->setScope([
                 'scope1',
                 'scope2',
-            ])
-            ->setToken('EXPIRED_AUTH_CODE');
+            ]);
+        $expired_auth_code->setToken('EXPIRED_AUTH_CODE');
 
         $this->auth_codes['VALID_AUTH_CODE'] = $valid_auth_code1;
         $this->auth_codes['VALID_AUTH_CODE_PUBLIC_CLIENT'] = $valid_auth_code2;
@@ -64,14 +74,14 @@ class AuthCodeManager extends Base
     protected function addAuthCode($code, $expiresAt, ClientInterface $client, EndUserInterface $end_user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
     {
         $auth_code = new AuthCode();
-        $auth_code->setIssueRefreshToken($issueRefreshToken)
-            ->setQueryParams($query_params)
-            ->setRedirectUri($redirectUri)
-            ->setClientPublicId($client->getPublicId())
-            ->setExpiresAt($expiresAt)
-            ->setResourceOwnerPublicId($end_user->getPublicId())
-            ->setScope($scope)
-            ->setToken($code);
+        $auth_code->setIssueRefreshToken($issueRefreshToken);
+        $auth_code->setQueryParams($query_params);
+        $auth_code->setRedirectUri($redirectUri);
+        $auth_code->setClientPublicId($client->getPublicId());
+        $auth_code->setExpiresAt($expiresAt);
+        $auth_code->setResourceOwnerPublicId($end_user->getPublicId());
+        $auth_code->setScope($scope);
+        $auth_code->setToken($code);
 
         $this->auth_codes[$code] = $auth_code;
 

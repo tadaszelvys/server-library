@@ -22,24 +22,24 @@ class PasswordClientManager extends Base
     public function createClients()
     {
         $bar = new PasswordClient();
-        $bar->setPlaintextSecret('secret')
-            ->setRedirectUris(['http://example.com/test?good=false'])
-            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code'])
-            ->setPublicId('bar');
+        $bar->setPlaintextSecret('secret');
+        $bar->setRedirectUris(['http://example.com/test?good=false']);
+        $bar->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
+        $bar->setPublicId('bar');
         $this->updateClientCredentials($bar);
 
         $baz = new PasswordClient();
-        $baz->setPlaintextSecret('secret')
-            ->setRedirectUris([])
-            ->setAllowedGrantTypes(['authorization_code'])
-            ->setPublicId('baz');
+        $baz->setPlaintextSecret('secret');
+        $baz->setRedirectUris([]);
+        $baz->setAllowedGrantTypes(['authorization_code']);
+        $baz->setPublicId('baz');
         $this->updateClientCredentials($baz);
 
         $digest = new PasswordClient();
-        $digest->setPlaintextSecret('Circle Of Life')
-            ->setRedirectUris([])
-            ->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code'])
-            ->setPublicId('Mufasa');
+        $digest->setPlaintextSecret('Circle Of Life');
+        $digest->setRedirectUris([]);
+        $digest->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
+        $digest->setPublicId('Mufasa');
         $this->updateClientCredentials($digest);
 
         $this->clients['bar'] = $bar;

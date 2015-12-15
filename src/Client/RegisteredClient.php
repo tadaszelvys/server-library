@@ -29,8 +29,6 @@ class RegisteredClient extends Client implements RegisteredClientInterface
     public function setRedirectUris(array $redirect_uris)
     {
         $this->redirect_uris = $redirect_uris;
-
-        return $this;
     }
 
     /**
@@ -46,8 +44,6 @@ class RegisteredClient extends Client implements RegisteredClientInterface
         if (!$this->hasRedirectUri($redirect_uri)) {
             $this->redirect_uris[] = $redirect_uri;
         }
-
-        return $this;
     }
 
     public function removeRedirectUri($redirect_uri)
@@ -56,7 +52,5 @@ class RegisteredClient extends Client implements RegisteredClientInterface
         if (false !== $key) {
             unset($this->redirect_uris[$key]);
         }
-
-        return $this;
     }
 }

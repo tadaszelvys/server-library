@@ -56,9 +56,9 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/bade.redirect?URI')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client);
+        $authorization->setRedirectUri('http://example.com/bade.redirect?URI');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
 
         $response = new Response();
         try {
@@ -79,9 +79,9 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client);
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
 
         $response = new Response();
         try {
@@ -102,10 +102,10 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client)
-            ->setResponseType('bad_response_type');
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -126,10 +126,10 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client)
-            ->setResponseType('bad_response_type');
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -150,10 +150,10 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client)
-            ->setResponseType('bad_response_type');
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -174,10 +174,10 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('https://example.com/test?good=false')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client)
-            ->setResponseType('bad_response_type');
+        $authorization->setRedirectUri('https://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('bad_response_type');
 
         $response = new Response();
         try {
@@ -198,9 +198,9 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setClient($client)
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setResponseType('token');
+        $authorization->setClient($client);
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setResponseType('token');
 
         $response = new Response();
         try {
@@ -221,10 +221,10 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client)
-            ->setResponseType('code');
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
 
         $response = new Response();
         try {
@@ -245,11 +245,11 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setClient($client)
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setResponseType('code')
-            ->setAuthorized(false);
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setClient($client);
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setResponseType('code');
+        $authorization->setAuthorized(false);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -265,11 +265,11 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client)
-            ->setResponseType('code')
-            ->setAuthorized(true);
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -285,10 +285,10 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setClient($client)
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setResponseType('code')
-            ->setAuthorized(true);
+        $authorization->setClient($client);
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setResponseType('code');
+        $authorization->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -304,11 +304,11 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('https://another.uri/callback')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client)
-            ->setResponseType('code')
-            ->setAuthorized(true);
+        $authorization->setRedirectUri('https://another.uri/callback');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -324,12 +324,12 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client)
-            ->setResponseType('code')
-            ->setState('0123456789')
-            ->setAuthorized(true);
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setState('0123456789');
+        $authorization->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -345,12 +345,12 @@ class AuthCodeGrantTypeTest extends Base
             return;
         }
         $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false')
-            ->setEndUser($this->getEndUserManager()->getEndUser('user1'))
-            ->setClient($client)
-            ->setResponseType('code')
-            ->setState('0123456789')
-            ->setAuthorized(true);
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setState('0123456789');
+        $authorization->setAuthorized(true);
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);

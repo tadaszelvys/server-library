@@ -3,6 +3,7 @@
 namespace OAuth2\Exception;
 
 use OAuth2\Behaviour\HasConfiguration;
+use OAuth2\Configuration\ConfigurationInterface;
 
 /**
  * An exception manager.
@@ -10,6 +11,16 @@ use OAuth2\Behaviour\HasConfiguration;
 class ExceptionManager implements ExceptionManagerInterface
 {
     use HasConfiguration;
+
+    /**
+     * ExceptionManager constructor.
+     *
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(ConfigurationInterface $configuration)
+    {
+        $this->setConfiguration($configuration);
+    }
 
     /**
      * {@inheritdoc}

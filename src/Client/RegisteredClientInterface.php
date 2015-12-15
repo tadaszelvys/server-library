@@ -23,8 +23,6 @@ interface RegisteredClientInterface extends ClientInterface
 
     /**
      * @param string[] $redirect_uris
-     *
-     * @return self
      */
     public function setRedirectUris(array $redirect_uris);
 
@@ -37,15 +35,11 @@ interface RegisteredClientInterface extends ClientInterface
 
     /**
      * @param string $redirect_uri
-     *
-     * @return self
      */
     public function addRedirectUri($redirect_uri);
 
     /**
      * @param string $redirect_uri
-     *
-     * @return self
      */
     public function removeRedirectUri($redirect_uri);
 }

@@ -13,8 +13,6 @@ interface RefreshTokenInterface extends TokenInterface
 
     /**
      * @param bool $used
-     *
-     * @return self
      */
     public function setUsed($used);
 }

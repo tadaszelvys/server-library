@@ -3,6 +3,7 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
@@ -16,23 +17,30 @@ class SimpleStringAccessTokenManager extends Base
      */
     private $access_tokens = [];
 
-    public function __construct()
+    /**
+     * AccessTokenManager constructor.
+     *
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(ConfigurationInterface $configuration)
     {
+        parent::__construct($configuration);
+
         $abcd = new AccessToken();
-        $abcd->setExpiresAt(time() + 3600)
-             ->setResourceOwnerPublicId(null)
-             ->setScope([])
-             ->setClientPublicId('bar')
-             ->setRefreshToken(null)
-             ->setToken('ABCD');
+        $abcd->setExpiresAt(time() + 3600);
+        $abcd->setResourceOwnerPublicId(null);
+        $abcd->setScope([]);
+        $abcd->setClientPublicId('bar');
+        $abcd->setRefreshToken(null);
+        $abcd->setToken('ABCD');
 
         $efgh = new AccessToken();
-        $efgh->setExpiresAt(time() + 3600)
-             ->setResourceOwnerPublicId(null)
-             ->setScope([])
-             ->setClientPublicId('foo')
-             ->setRefreshToken('REFRESH_EFGH')
-             ->setToken('EFGH');
+        $efgh->setExpiresAt(time() + 3600);
+        $efgh->setResourceOwnerPublicId(null);
+        $efgh->setScope([]);
+        $efgh->setClientPublicId('foo');
+        $efgh->setRefreshToken('REFRESH_EFGH');
+        $efgh->setToken('EFGH');
 
         $this->access_tokens['ABCD'] = $abcd;
         $this->access_tokens['EFGH'] = $efgh;
@@ -44,12 +52,12 @@ class SimpleStringAccessTokenManager extends Base
     protected function addAccessToken($token, $expiresAt, ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [], RefreshTokenInterface $refresh_token = null)
     {
         $access_token = new AccessToken();
-        $access_token->setExpiresAt($expiresAt)
-                     ->setScope($scope)
-                     ->setResourceOwnerPublicId(null === $resourceOwner ? null : $resourceOwner->getPublicId())
-                     ->setClientPublicId($client->getPublicId())
-                     ->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken())
-                     ->setToken($token);
+        $access_token->setExpiresAt($expiresAt);
+        $access_token->setScope($scope);
+        $access_token->setResourceOwnerPublicId(null === $resourceOwner ? null : $resourceOwner->getPublicId());
+        $access_token->setClientPublicId($client->getPublicId());
+        $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
+        $access_token->setToken($token);
 
         $this->access_tokens[$access_token->getToken()] = $access_token;
 

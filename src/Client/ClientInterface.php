@@ -22,22 +22,16 @@ interface ClientInterface extends ResourceOwnerInterface
 
     /**
      * @param string[] $grant_types
-     *
-     * @return self
      */
     public function setAllowedGrantTypes(array $grant_types);
 
     /**
      * @param $grant_type
-     *
-     * @return self
      */
     public function addAllowedGrantType($grant_type);
 
     /**
      * @param string $grant_type
-     *
-     * @return self
      */
     public function removeAllowedGrantType($grant_type);
 }

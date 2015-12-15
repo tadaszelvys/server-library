@@ -6,7 +6,9 @@ use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\EndUser\EndUserInterface;
+use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
@@ -17,6 +19,24 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
     use HasExceptionManager;
     use HasConfiguration;
     use HasEndUserManager;
+
+    /**
+     * ResourceOwnerPasswordCredentialsGrantType constructor.
+     *
+     * @param \OAuth2\EndUser\EndUserManagerInterface      $end_user_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(
+        EndUserManagerInterface $end_user_manager,
+        ExceptionManagerInterface $exception_manager,
+        ConfigurationInterface $configuration
+    )
+    {
+        $this->setEndUserManager($end_user_manager);
+        $this->setExceptionManager($exception_manager);
+        $this->setConfiguration($configuration);
+    }
 
     /**
      * {@inheritdoc}
@@ -49,12 +69,12 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
 
         $scope = RequestBody::getParameter($request, 'scope');
 
-        $grant_type_response->setRequestedScope($scope)
-                 ->setAvailableScope(null)
-                 ->setResourceOwnerPublicId($end_user->getPublicId())
-                 ->setRefreshTokenIssued($this->getIssueRefreshToken($client, $end_user, $request))
-                 ->setRefreshTokenScope($scope)
-                 ->setRefreshTokenRevoked(null);
+        $grant_type_response->setRequestedScope($scope);
+        $grant_type_response->setAvailableScope(null);
+        $grant_type_response->setResourceOwnerPublicId($end_user->getPublicId());
+        $grant_type_response->setRefreshTokenIssued($this->getIssueRefreshToken($client, $end_user, $request));
+        $grant_type_response->setRefreshTokenScope($scope);
+        $grant_type_response->setRefreshTokenRevoked(null);
     }
 
     /**

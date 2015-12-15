@@ -13,8 +13,6 @@ interface AccessTokenInterface extends TokenInterface, \JsonSerializable
 
     /**
      * @param string $token
-     *
-     * @return self
      */
     public function setToken($token);
 
@@ -28,8 +26,6 @@ interface AccessTokenInterface extends TokenInterface, \JsonSerializable
 
     /**
      * @param string|null $refresh_token
-     *
-     * @return self
      */
     public function setRefreshToken($refresh_token);
 }

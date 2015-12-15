@@ -11,8 +11,6 @@ interface TokenInterface
 
     /**
      * @param string $token
-     *
-     * @return self
      */
     public function setToken($token);
 
@@ -23,8 +21,6 @@ interface TokenInterface
 
     /**
      * @param string $client_public_id
-     *
-     * @return self
      */
     public function setClientPublicId($client_public_id);
 
@@ -35,8 +31,6 @@ interface TokenInterface
 
     /**
      * @param int $expires_at
-     *
-     * @return self
      */
     public function setExpiresAt($expires_at);
 
@@ -59,8 +53,6 @@ interface TokenInterface
 
     /**
      * @param array $scope
-     *
-     * @return self
      */
     public function setScope(array $scope);
 
@@ -73,8 +65,6 @@ interface TokenInterface
 
     /**
      * @param string|null $resource_owner_public_id
-     *
-     * @return self
      */
     public function setResourceOwnerPublicId($resource_owner_public_id);
 }

@@ -2,12 +2,16 @@
 
 namespace OAuth2\Grant;
 
-use Jose\JWSInterface;
+use Jose\DecrypterInterface;
+use Jose\LoaderInterface;
+use Jose\Object\JWSInterface;
+use Jose\VerifierInterface;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\JWTClientInterface;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,6 +21,31 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     use HasExceptionManager;
     use HasConfiguration;
     use HasJWTLoader;
+
+    /**
+     * JWTBearerGrantType constructor.
+     *
+     * @param \Jose\LoaderInterface                        $loader
+     * @param \Jose\VerifierInterface                      $verifier
+     * @param \Jose\DecrypterInterface                     $decrypter
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     */
+    public function __construct(
+        LoaderInterface $loader,
+        VerifierInterface $verifier,
+        DecrypterInterface $decrypter,
+        ExceptionManagerInterface $exception_manager,
+        ConfigurationInterface $configuration
+    )
+    {
+        $this->setJWTLoader($loader);
+        /**
+         * @TODO
+         */
+        $this->setExceptionManager($exception_manager);
+        $this->setConfiguration($configuration);
+    }
 
     /**
      * {@inheritdoc}
@@ -41,10 +70,14 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain signed claims.');
         }
 
+        if (!$jwt->hasClaim('sub')) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain "sub" claims.');
+        }
+
         //We modify the response:
         // - We add the subject as the client public id
         // - We transmit the JWT to the response for further needs
-        $grant_type_response->setClientPublicId($jwt->getSubject())
+        $grant_type_response->setClientPublicId($jwt->getClaim('sub'))
             ->setAdditionalData('jwt', $jwt);
     }
 

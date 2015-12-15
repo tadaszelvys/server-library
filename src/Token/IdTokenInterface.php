@@ -13,8 +13,6 @@ interface IdTokenInterface extends TokenInterface
 
     /**
      * @param string $token
-     *
-     * @return self
      */
     public function setToken($token);
 }

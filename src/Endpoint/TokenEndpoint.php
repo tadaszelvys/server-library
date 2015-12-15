@@ -10,11 +10,17 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
+use OAuth2\Client\ClientManagerSupervisorInterface;
+use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponse;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Grant\GrantTypeSupportInterface;
+use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\Token\AccessTokenManagerInterface;
+use OAuth2\Token\AccessTokenTypeManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
+use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,19 +41,44 @@ final class TokenEndpoint implements TokenEndpointInterface
     protected $grant_types = [];
 
     /**
-     * @param \OAuth2\Grant\GrantTypeSupportInterface $grant_type
+     * TokenEndpoint constructor.
      *
-     * @return self
+     * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
+     * @param \OAuth2\Token\AccessTokenTypeManagerInterface   $access_token_type_manager
+     * @param \OAuth2\Token\RefreshTokenManagerInterface      $refresh_token_manager
+     * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
+     * @param \OAuth2\EndUser\EndUserManagerInterface         $end_user_manager
+     * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     */
+    public function __construct(
+        AccessTokenManagerInterface $access_token_manager,
+        AccessTokenTypeManagerInterface $access_token_type_manager,
+        RefreshTokenManagerInterface $refresh_token_manager,
+        ClientManagerSupervisorInterface $client_manager_supervisor,
+        EndUserManagerInterface $end_user_manager,
+        ScopeManagerInterface $scope_manager,
+        ExceptionManagerInterface $exception_manager
+    )
+    {
+        $this->setAccessTokenManager($access_token_manager);
+        $this->setAccessTokenTypeManager($access_token_type_manager);
+        $this->setRefreshTokenManager($refresh_token_manager);
+        $this->setClientManagerSupervisor($client_manager_supervisor);
+        $this->setEndUserManager($end_user_manager);
+        $this->setScopeManager($scope_manager);
+        $this->setExceptionManager($exception_manager);
+    }
+
+    /**
+     * @param \OAuth2\Grant\GrantTypeSupportInterface $grant_type
      */
     public function addGrantType(GrantTypeSupportInterface $grant_type)
     {
         $type = $grant_type->getGrantType();
-        if (array_key_exists($type, $this->grant_types)) {
-            return $this;
+        if (!array_key_exists($type, $this->grant_types)) {
+            $this->grant_types[$type] = $grant_type;
         }
-        $this->grant_types[$type] = $grant_type;
-
-        return $this;
     }
 
     /**

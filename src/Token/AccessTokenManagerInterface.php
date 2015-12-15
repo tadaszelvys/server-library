@@ -25,8 +25,6 @@ interface AccessTokenManagerInterface
      * This function revoke an access token.
      *
      * @param \OAuth2\Token\AccessTokenInterface $token The access token to revoke
-     *
-     * @return self
      */
     public function revokeAccessToken(AccessTokenInterface $token);
 

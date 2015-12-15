@@ -16,8 +16,6 @@ interface GrantTypeResponseInterface
     /**
      * @param string $key
      * @param mixed  $data
-     *
-     * @return self
      */
     public function setAdditionalData($key, $data);
 
@@ -30,8 +28,6 @@ interface GrantTypeResponseInterface
 
     /**
      * @param string[]|string|null $requested_scope
-     *
-     * @return self
      */
     public function setRequestedScope($requested_scope = null);
 
@@ -44,8 +40,6 @@ interface GrantTypeResponseInterface
 
     /**
      * @param string[]|string|null $available_scope
-     *
-     * @return self
      */
     public function setAvailableScope($available_scope = null);
 
@@ -56,8 +50,6 @@ interface GrantTypeResponseInterface
 
     /**
      * @param string $client_owner_public_id
-     *
-     * @return self
      */
     public function setClientPublicId($client_owner_public_id);
 
@@ -71,8 +63,6 @@ interface GrantTypeResponseInterface
 
     /**
      * @param string|null $resource_owner_public_id
-     *
-     * @return self
      */
     public function setResourceOwnerPublicId($resource_owner_public_id = null);
 
@@ -83,8 +73,6 @@ interface GrantTypeResponseInterface
 
     /**
      * @param bool $issue_refresh_token
-     *
-     * @return self
      */
     public function setRefreshTokenIssued($issue_refresh_token = false);
 
@@ -95,8 +83,6 @@ interface GrantTypeResponseInterface
 
     /**
      * @param string[]|string[]|string|null $refresh_token_scope
-     *
-     * @return self
      */
     public function setRefreshTokenScope($refresh_token_scope = null);
 
@@ -107,8 +93,6 @@ interface GrantTypeResponseInterface
 
     /**
      * @param \OAuth2\Token\RefreshTokenInterface|null $revoke_refresh_token
-     *
-     * @return self
      */
     public function setRefreshTokenRevoked(RefreshTokenInterface $revoke_refresh_token = null);
 }
