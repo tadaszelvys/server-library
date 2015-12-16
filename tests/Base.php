@@ -11,6 +11,25 @@
 
 namespace OAuth2\Test;
 
+use Jose\Algorithm\JWAManager;
+use Jose\Checker\AudienceChecker;
+use Jose\Checker\CheckerManager;
+use Jose\Checker\CriticalChecker;
+use Jose\Checker\ExpirationChecker;
+use Jose\Checker\IssuedAtChecker;
+use Jose\Checker\NotBeforeChecker;
+use Jose\Compression\CompressionManager;
+use Jose\Compression\Deflate;
+use Jose\Compression\GZip;
+use Jose\Compression\ZLib;
+use Jose\Decrypter;
+use Jose\Encrypter;
+use Jose\Loader;
+use Jose\Payload\JWKConverter;
+use Jose\Payload\JWKSetConverter;
+use Jose\Payload\PayloadConverterManager;
+use Jose\Signer;
+use Jose\Verifier;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Configuration\Configuration;
 use OAuth2\Endpoint\AuthorizationEndpoint;
@@ -54,31 +73,6 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         //To fix HHVM tests on Travis-CI
         date_default_timezone_set('UTC');
-
-        //We configure our services
-        /*$config = Configuration::getInstance();
-
-        $config->set('algorithms', ['HS512', 'A256KW', 'A256CBC-HS512']);
-        $config->set('audience', 'My Authorization Server');
-
-        $config->set('keys', [
-            'JWK1' => [
-                'values' => [
-                    'kid' => 'JWK1',
-                    'use' => 'enc',
-                    'kty' => 'oct',
-                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ],
-            ],
-            'JWK2' => [
-                'values' => [
-                    'kid' => 'JWK2',
-                    'use' => 'sig',
-                    'kty' => 'oct',
-                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ],
-            ],
-        ]);*/
     }
 
     /**
@@ -114,10 +108,8 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthorizationFactory()
     {
         if (null === $this->authorization_factory) {
-            $jwt_loader = new JWTLoader(
-                $this->getLoader(),
-                $this->getVerifier(),
-                $this->getDecrypter(),
+            $jwt_loader = $this->getJWTLoader(
+                ['HS512'],
                 ['A256KW', 'A256CBC-HS512'],
                 ['keys' => [
                     [
@@ -126,6 +118,12 @@ class Base extends \PHPUnit_Framework_TestCase
                         'kty' => 'oct',
                         'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
                     ],
+                    [
+                        'kid' => 'JWK2',
+                        'use' => 'sig',
+                        'kty' => 'oct',
+                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                    ]
                 ]],
                 false
             );
@@ -214,10 +212,42 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->addGrantType($this->getClientCredentialsGrantType());
             $this->token_endpoint->addGrantType($this->getRefreshTokenGrantType());
             $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
-            //$this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
+            $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
         }
 
         return $this->token_endpoint;
+    }
+
+    /**
+     * @var null|\OAuth2\Endpoint\TokenEndpoint
+     */
+    private $token_endpoint_jwt_access_token = null;
+
+    /**
+     * @return \OAuth2\Endpoint\TokenEndpoint
+     */
+    protected function getTokenEndpointJWTAccessToken()
+    {
+        if (null === $this->token_endpoint_jwt_access_token) {
+            $this->token_endpoint_jwt_access_token = new TokenEndpoint(
+                $this->getJWTAccessTokenManager(),
+                $this->getAccessTokenTypeManager(),
+                $this->getRefreshTokenManager(),
+                $this->getClientManagerSupervisor(),
+                $this->getEndUserManager(),
+                $this->getScopeManager(),
+                $this->getExceptionManager()
+            );
+
+            $this->token_endpoint_jwt_access_token->addGrantType($this->getAuthorizationCodeGrantType());
+            $this->token_endpoint_jwt_access_token->addGrantType($this->getAuthorizationCodeGrantType());
+            $this->token_endpoint_jwt_access_token->addGrantType($this->getClientCredentialsGrantType());
+            $this->token_endpoint_jwt_access_token->addGrantType($this->getRefreshTokenGrantType());
+            $this->token_endpoint_jwt_access_token->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
+            $this->token_endpoint_jwt_access_token->addGrantType($this->getJWTBearerGrantType());
+        }
+
+        return $this->token_endpoint_jwt_access_token;
     }
 
     /**
@@ -334,7 +364,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_manager_supervisor->addClientManager($this->getUnregisteredClientManager());
             $this->client_manager_supervisor->addClientManager($this->getPasswordClientManager());
             $this->client_manager_supervisor->addClientManager($this->getPublicClientManager());
-            //$this->client_manager_supervisor->addClientManager($this->getJWTClientManager());
+            $this->client_manager_supervisor->addClientManager($this->getJWTClientManager());
         }
 
         return $this->client_manager_supervisor;
@@ -410,36 +440,34 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getJWTClientManager()
     {
-        /*if (null === $this->jwt_client_manager) {
-            $jose = Jose::getInstance();
+        if (null === $this->jwt_client_manager) {
+
+            $jwt_loader = $this->getJWTLoader(
+                ['HS512'],
+                ['A256KW', 'A256CBC-HS512'],
+                ['keys' => [
+                    [
+                        'kid' => 'JWK1',
+                        'use' => 'enc',
+                        'kty' => 'oct',
+                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                    ],
+                    [
+                        'kid' => 'JWK2',
+                        'use' => 'sig',
+                        'kty' => 'oct',
+                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                    ],
+                ]],
+                false
+            );
 
             $this->jwt_client_manager = new JWTClientManager(
+                $jwt_loader,
                 $this->getExceptionManager(),
                 $this->getConfiguration()
             );
-
-            $jwt_loader = new JWTLoader();
-            $jwt_loader->setJWTLoader($jose->getLoader());
-            $jwt_loader->setExceptionManager($this->getExceptionManager());
-            $jwt_loader->setEncryptionRequired(false);
-            $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet(['keys' => [
-                [
-                    'kid' => 'JWK1',
-                    'use' => 'enc',
-                    'kty' => 'oct',
-                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ],
-                [
-                    'kid' => 'JWK2',
-                    'use' => 'sig',
-                    'kty' => 'oct',
-                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ],
-            ]]);
-
-            $this->jwt_client_manager->setJWTLoader($jwt_loader);
-        }*/
+        }
 
         return $this->jwt_client_manager;
     }
@@ -494,38 +522,34 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getJWTBearerGrantType()
     {
-        /*if (null === $this->jwt_bearer_grant_type) {
-            $jose = Jose::getInstance();
+        if (null === $this->jwt_bearer_grant_type) {
+
+            $jwt_loader = $this->getJWTLoader(
+                ['HS512'],
+                ['A256KW', 'A256CBC-HS512'],
+                ['keys' => [
+                    [
+                        'kid' => 'JWK1',
+                        'use' => 'enc',
+                        'kty' => 'oct',
+                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                    ],
+                    [
+                        'kid' => 'JWK2',
+                        'use' => 'sig',
+                        'kty' => 'oct',
+                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                    ],
+                ]],
+                true
+            );
+
             $this->jwt_bearer_grant_type = new JWTBearerGrantType(
-                null,
-                null,
-                null,
+                $jwt_loader,
                 $this->getExceptionManager(),
                 $this->getConfiguration()
             );
-
-            $jwt_loader = new JWTLoader();
-            $jwt_loader->setJWTLoader($jose->getLoader());
-            $jwt_loader->setExceptionManager($this->getExceptionManager());
-            $jwt_loader->setEncryptionRequired(true);
-            $jwt_loader->setAllowedEncryptionAlgorithms(['A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet(['keys' => [
-                [
-                    'kid' => 'JWK1',
-                    'use' => 'enc',
-                    'kty' => 'oct',
-                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ],
-                [
-                    'kid' => 'JWK2',
-                    'use' => 'sig',
-                    'kty' => 'oct',
-                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ],
-            ]]);
-
-            $this->jwt_bearer_grant_type->setJWTLoader($jwt_loader);
-        }*/
+        }
 
         return $this->jwt_bearer_grant_type;
     }
@@ -677,55 +701,55 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getJWTAccessTokenManager()
     {
-        /*if (null === $this->jwt_access_token_manager) {
-            $jose = Jose::getInstance();
-            $this->jwt_access_token_manager = new JWTAccessTokenManager(
-                $this->getExceptionManager(),
-                $this->getConfiguration()
-            );
-
-            $jwt_encrypter = new JWTEncrypter();
-            $jwt_encrypter->setJWTEncrypter($jose->getEncrypter());
-            $jwt_encrypter->setKeyEncryptionKey([
-                'kid' => 'JWK1',
-                'use' => 'enc',
-                'kty' => 'oct',
-                'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-            ]);
-
-            $jwt_signer = new JWTSigner();
-            $jwt_signer->setJWTSigner($jose->getSigner());
-            $jwt_signer->setSignatureKey([
-                'kid' => 'JWK2',
-                'use' => 'sig',
-                'kty' => 'oct',
-                'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-            ]);
-
-            $jwt_loader = new JWTLoader();
-            $jwt_loader->setJWTLoader($jose->getLoader());
-            $jwt_loader->setExceptionManager($this->getExceptionManager());
-            $jwt_loader->setEncryptionRequired(true);
-            $jwt_loader->setAllowedEncryptionAlgorithms(['HS512', 'A256KW', 'A256CBC-HS512']);
-            $jwt_loader->setKeySet(['keys' => [
+        if (null === $this->jwt_access_token_manager) {
+            $jwt_encrypter = $this->getJWTEncrypter(
+                ['A256KW', 'A256CBC-HS512'],
                 [
                     'kid' => 'JWK1',
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ],
+                ]
+            );
+
+            $jwt_signer = $this->getJWTSigner(
+                ['HS512'],
                 [
                     'kid' => 'JWK2',
                     'use' => 'sig',
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ],
-            ]]);
+                ]
+            );
 
-            $this->jwt_access_token_manager->setJWTEncrypter($jwt_encrypter);
-            $this->jwt_access_token_manager->setJWTSigner($jwt_signer);
-            $this->jwt_access_token_manager->setJWTLoader($jwt_loader);
-        }*/
+            $jwt_loader = $this->getJWTLoader(
+                ['HS512'],
+                ['A256KW', 'A256CBC-HS512'],
+                ['keys' => [
+                    [
+                        'kid' => 'JWK1',
+                        'use' => 'enc',
+                        'kty' => 'oct',
+                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                    ],
+                    [
+                        'kid' => 'JWK2',
+                        'use' => 'sig',
+                        'kty' => 'oct',
+                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                    ],
+                ]],
+                true
+            );
+
+            $this->jwt_access_token_manager = new JWTAccessTokenManager(
+                $jwt_loader,
+                $jwt_signer,
+                $jwt_encrypter,
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
+        }
 
         return $this->jwt_access_token_manager;
     }
@@ -808,6 +832,235 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->auth_code_manager;
+    }
+
+    /**
+     * @param string[] $allowed_signature_algorithms
+     * @param string[] $allowed_encryption_algorithms
+     * @param array    $key_set
+     * @param bool    $is_encryption_required
+     *
+     * @return \OAuth2\Util\JWTLoader
+     */
+    protected function getJWTLoader(array $allowed_signature_algorithms, array $allowed_encryption_algorithms, array $key_set, $is_encryption_required = false)
+    {
+        $jwt_loader = new JWTLoader(
+            $this->getLoader(),
+            $this->getVerifier($allowed_signature_algorithms),
+            $this->getDecrypter($allowed_encryption_algorithms),
+            $this->getExceptionManager(),
+            $allowed_encryption_algorithms,
+            $key_set,
+            $is_encryption_required
+        );
+
+        return $jwt_loader;
+    }
+
+    /**
+     * @param string[] $allowed_signature_algorithms
+     * @param array    $signature_key
+     *
+     * @return \OAuth2\Util\JWTSigner
+     */
+    protected function getJWTSigner($allowed_signature_algorithms, array $signature_key)
+    {
+        $jwt_signer = new JWTSigner(
+            $this->getSigner($allowed_signature_algorithms),
+            $signature_key
+        );
+
+        return $jwt_signer;
+    }
+
+    /**
+     * @param string[] $allowed_encryption_algorithms
+     * @param array    $encryption_key
+     *
+     * @return \OAuth2\Util\JWTEncrypter
+     */
+    protected function getJWTEncrypter($allowed_encryption_algorithms, array $encryption_key)
+    {
+        $jwt_encrypter = new JWTEncrypter(
+            $this->getEncrypter($allowed_encryption_algorithms),
+            $encryption_key
+        );
+
+        return $jwt_encrypter;
+    }
+
+    /**
+     * @param string[] $allowed_signature_algorithms
+     *
+     * @return \Jose\SignerInterface
+     */
+    protected function getSigner($allowed_signature_algorithms)
+    {
+        return new Signer(
+            $this->getJWAManager($allowed_signature_algorithms),
+            $this->getPayloadConverterManager()
+        );
+    }
+
+    /**
+     * @param string[] $allowed_encryption_algorithms
+     *
+     * @return \Jose\EncrypterInterface
+     */
+    protected function getEncrypter($allowed_encryption_algorithms)
+    {
+        return new Encrypter(
+            $this->getJWAManager($allowed_encryption_algorithms),
+            $this->getPayloadConverterManager(),
+            $this->getCompressionManager()
+        );
+    }
+
+    /**
+     * @param string[] $allowed_encryption_algorithms
+     *
+     * @return \Jose\DecrypterInterface
+     */
+    protected function getDecrypter($allowed_encryption_algorithms)
+    {
+        return new Decrypter(
+            $this->getJWAManager($allowed_encryption_algorithms),
+            $this->getPayloadConverterManager(),
+            $this->getCompressionManager(),
+            $this->getCheckerManager('My Authorization Server')
+        );
+    }
+
+    /**
+     * @param string[] $allowed_encryption_algorithms
+     *
+     * @return \Jose\VerifierInterface
+     */
+    protected function getVerifier($allowed_encryption_algorithms)
+    {
+        return new Verifier(
+            $this->getJWAManager($allowed_encryption_algorithms),
+            $this->getCheckerManager('My Authorization Server')
+        );
+    }
+
+    /**
+     * @return \Jose\LoaderInterface
+     */
+    protected function getLoader()
+    {
+        return new Loader(
+            $this->getPayloadConverterManager(),
+            $this->getCheckerManager('My Authorization Server')
+        );
+    }
+
+    /**
+     * @param string|string[] $audience
+     *
+     * @return \Jose\Checker\CheckerManager
+     */
+    protected function getCheckerManager($audience)
+    {
+        $checker_manager = new CheckerManager();
+        $checker_manager->addChecker(new ExpirationChecker());
+        $checker_manager->addChecker(new NotBeforeChecker());
+        $checker_manager->addChecker(new IssuedAtChecker());
+        $checker_manager->addChecker(new CriticalChecker());
+        $checker_manager->addChecker(new AudienceChecker($audience));
+
+        return $checker_manager;
+    }
+
+    /**
+     * @return \Jose\Compression\CompressionManager
+     */
+    protected function getCompressionManager()
+    {
+        $compression_manager = new CompressionManager();
+        $compression_manager->addCompressionAlgorithm(new Deflate());
+        $compression_manager->addCompressionAlgorithm(new GZip());
+        $compression_manager->addCompressionAlgorithm(new ZLib());
+
+        return$compression_manager;
+    }
+
+    /**
+     * @return \Jose\Payload\PayloadConverterManager
+     */
+    protected function getPayloadConverterManager()
+    {
+        $payload_converter_manager = new PayloadConverterManager();
+        $payload_converter_manager->addConverter(new JWKConverter());
+        $payload_converter_manager->addConverter(new JWKSetConverter());
+
+        return $payload_converter_manager;
+    }
+
+    /**
+     * @param string[] $algorithms
+     *
+     * @return \Jose\Algorithm\JWAManager
+     */
+    protected function getJWAManager(array $algorithms)
+    {
+        $jwa_manager = new JWAManager();
+        $available_algorithms = $this->getSupportedJWTAlgorithms();
+        foreach($algorithms as $algorithm) {
+            if (!array_key_exists($algorithm, $available_algorithms)) {
+                throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $algorithm));
+            }
+            /*
+             * @var \Jose\Algorithm\JWAInterface $alg
+             */
+            $class = $available_algorithms[$algorithm];
+            $alg = new $class();
+            $jwa_manager->addAlgorithm($alg);
+        }
+
+        return $jwa_manager;
+    }
+
+    protected function getSupportedJWTAlgorithms()
+    {
+        return [
+            'HS256'              => '\Jose\Algorithm\Signature\HS256',
+            'HS384'              => '\Jose\Algorithm\Signature\HS384',
+            'HS512'              => '\Jose\Algorithm\Signature\HS512',
+            'ES256'              => '\Jose\Algorithm\Signature\ES256',
+            'ES384'              => '\Jose\Algorithm\Signature\ES384',
+            'ES512'              => '\Jose\Algorithm\Signature\ES512',
+            'none'               => '\Jose\Algorithm\Signature\None',
+            'RS256'              => '\Jose\Algorithm\Signature\RS256',
+            'RS384'              => '\Jose\Algorithm\Signature\RS384',
+            'RS512'              => '\Jose\Algorithm\Signature\RS512',
+            'PS256'              => '\Jose\Algorithm\Signature\PS256',
+            'PS384'              => '\Jose\Algorithm\Signature\PS384',
+            'PS512'              => '\Jose\Algorithm\Signature\PS512',
+            'A128GCM'            => '\Jose\Algorithm\ContentEncryption\A128GCM',
+            'A192GCM'            => '\Jose\Algorithm\ContentEncryption\A192GCM',
+            'A256GCM'            => '\Jose\Algorithm\ContentEncryption\A256GCM',
+            'A128CBC-HS256'      => '\Jose\Algorithm\ContentEncryption\A128CBCHS256',
+            'A192CBC-HS384'      => '\Jose\Algorithm\ContentEncryption\A192CBCHS384',
+            'A256CBC-HS512'      => '\Jose\Algorithm\ContentEncryption\A256CBCHS512',
+            'A128KW'             => '\Jose\Algorithm\KeyEncryption\A128KW',
+            'A192KW'             => '\Jose\Algorithm\KeyEncryption\A192KW',
+            'A256KW'             => '\Jose\Algorithm\KeyEncryption\A256KW',
+            'A128GCMKW'          => '\Jose\Algorithm\KeyEncryption\A128GCMKW',
+            'A192GCMKW'          => '\Jose\Algorithm\KeyEncryption\A192GCMKW',
+            'A256GCMKW'          => '\Jose\Algorithm\KeyEncryption\A256GCMKW',
+            'dir'                => '\Jose\Algorithm\KeyEncryption\Dir',
+            'ECDH-ES'            => '\Jose\Algorithm\KeyEncryption\ECDHES',
+            'ECDH-ES+A128KW'     => '\Jose\Algorithm\KeyEncryption\ECDHESA128KW',
+            'ECDH-ES+A192KW'     => '\Jose\Algorithm\KeyEncryption\ECDHESA192KW',
+            'ECDH-ES+A256KW'     => '\Jose\Algorithm\KeyEncryption\ECDHESA256KW',
+            'PBES2-HS256+A128KW' => '\Jose\Algorithm\KeyEncryption\PBES2HS256A128KW',
+            'PBES2-HS384+A192KW' => '\Jose\Algorithm\KeyEncryption\PBES2HS384A192KW',
+            'PBES2-HS512+A256KW' => '\Jose\Algorithm\KeyEncryption\PBES2HS512A256KW',
+            'RSA1_5'             => '\Jose\Algorithm\KeyEncryption\RSA15',
+            'RSA-OAEP'           => '\Jose\Algorithm\KeyEncryption\RSAOAEP',
+            'RSA-OAEP-256'       => '\Jose\Algorithm\KeyEncryption\RSAOAEP256',
+        ];
     }
 
     /**

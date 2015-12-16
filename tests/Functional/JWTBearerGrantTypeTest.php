@@ -11,7 +11,9 @@
 
 namespace OAuth2\Test\Functional;
 
+use Jose\JSONSerializationModes;
 use Jose\Object\EncryptionInstruction;
+use Jose\Object\JWK;
 use Jose\Object\SignatureInstruction;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -23,18 +25,16 @@ use Zend\Diactoros\Response;
  */
 class JWTBearerGrantTypeTest extends Base
 {
-    /*public function testGrantTypeAuthorizedForJWTClientButBadAudience()
+    public function testGrantTypeAuthorizedForJWTClientButBadAudience()
     {
         $response = new Response();
-        $jose = Jose::getInstance();
-        $jwk_manager = new JWKManager();
-        $jwk1 = $jwk_manager->createJWK([
+        $jwk1 = new JWK([
             'kid' => 'JWK1',
             'use' => 'enc',
             'kty' => 'oct',
             'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
         ]);
-        $jwk2 = $jwk_manager->createJWK([
+        $jwk2 = new JWK([
             'kid' => 'JWK2',
             'use' => 'sig',
             'kty' => 'oct',
@@ -49,21 +49,25 @@ class JWTBearerGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $jws = $jose->sign(
-            [$signature_instruction],
+        $signer = $this->getSigner(['HS512']);
+        $jws = $signer->sign(
             [
                 'exp' => time() + 3600,
                 'aud' => 'Bad audience',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ]
+            ],
+            [$signature_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
         );
 
         $encryption_instruction = new EncryptionInstruction($jwk1);
 
-        $jwe = $jose->encrypt(
-            [$encryption_instruction],
+        $encrypter = $this->getEncrypter(['A256KW', 'A256CBC-HS512']);
+        $jwe = $encrypter->encrypt(
             $jws,
+            [$encryption_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION,
             [
                 'kid' => 'JWK1',
                 'cty' => 'JWT',
@@ -92,14 +96,12 @@ class JWTBearerGrantTypeTest extends Base
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('Bad audience.', $e->getDescription());
         }
-    }*/
+    }
 
-    /*public function testSignedAssertionForJWTClient()
+    public function testSignedAssertionForJWTClient()
     {
         $response = new Response();
-        $jose = Jose::getInstance();
-        $jwk_manager = new JWKManager();
-        $jwk2 = $jwk_manager->createJWK([
+        $jwk2 = new JWK([
             'kid' => 'JWK2',
             'use' => 'sig',
             'kty' => 'oct',
@@ -114,14 +116,16 @@ class JWTBearerGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $jws = $jose->sign(
-            [$signature_instruction],
+        $signer = $this->getSigner(['HS512']);
+        $jws = $signer->sign(
             [
                 'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ]
+            ],
+            [$signature_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
         );
 
         $request = $this->createRequest(
@@ -140,20 +144,18 @@ class JWTBearerGrantTypeTest extends Base
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The assertion must be encrypted.', $e->getDescription());
         }
-    }*/
+    }
 
-    /*public function testEncryptedAndSignedAssertionForJWTClient()
+    public function testEncryptedAndSignedAssertionForJWTClient()
     {
         $response = new Response();
-        $jose = Jose::getInstance();
-        $jwk_manager = new JWKManager();
-        $jwk1 = $jwk_manager->createJWK([
+        $jwk1 = new JWK([
             'kid' => 'JWK1',
             'use' => 'enc',
             'kty' => 'oct',
             'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
         ]);
-        $jwk2 = $jwk_manager->createJWK([
+        $jwk2 = new JWK([
             'kid' => 'JWK2',
             'use' => 'sig',
             'kty' => 'oct',
@@ -168,21 +170,25 @@ class JWTBearerGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $jws = $jose->sign(
-            [$signature_instruction],
+        $signer = $this->getSigner(['HS512']);
+        $jws = $signer->sign(
             [
                 'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ]
+            ],
+            [$signature_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
         );
 
         $encryption_instruction = new EncryptionInstruction($jwk1);
 
-        $jwe = $jose->encrypt(
-            [$encryption_instruction],
+        $encrypter = $this->getEncrypter(['A256KW', 'A256CBC-HS512']);
+        $jwe = $encrypter->encrypt(
             $jws,
+            [$encryption_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION,
             [
                 'kid' => 'JWK1',
                 'alg' => 'A256KW',
@@ -212,5 +218,5 @@ class JWTBearerGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
-    }*/
+    }
 }

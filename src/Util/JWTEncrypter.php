@@ -41,6 +41,14 @@ final class JWTEncrypter
     }
 
     /**
+     * @return \Jose\Object\JWKInterface
+     */
+    public function getKeyEncryptionKey()
+    {
+        return $this->encryption_key;
+    }
+
+    /**
      * @param string $payload
      * @param array  $protected_headers
      * @param array  $sender_key

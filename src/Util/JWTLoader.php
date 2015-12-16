@@ -58,19 +58,21 @@ final class JWTLoader
     /**
      * JWTLoader constructor.
      *
-     * @param \Jose\LoaderInterface    $loader
-     * @param \Jose\VerifierInterface  $verifier
-     * @param \Jose\DecrypterInterface $decrypter
-     * @param string[]                 $allowed_encryption_algorithms
-     * @param array                    $key_set
-     * @param bool                     $is_encryption_required
+     * @param \Jose\LoaderInterface                       $loader
+     * @param \Jose\VerifierInterface                     $verifier
+     * @param \Jose\DecrypterInterface                    $decrypter
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param string[]                                    $allowed_encryption_algorithms
+     * @param array                                       $key_set
+     * @param bool                                        $is_encryption_required
      */
     public function __construct(
         LoaderInterface $loader,
         VerifierInterface $verifier,
         DecrypterInterface $decrypter,
-        array $allowed_encryption_algorithms,
-        array $key_set,
+        ExceptionManagerInterface $exception_manager,
+        array $allowed_encryption_algorithms = [],
+        array $key_set = [],
         $is_encryption_required = false
     )
     {
@@ -80,6 +82,7 @@ final class JWTLoader
         $this->allowed_encryption_algorithms = $allowed_encryption_algorithms;
         $this->key_set = new JWKSet($key_set);
         $this->is_encryption_required = $is_encryption_required;
+        $this->setExceptionManager($exception_manager);
     }
 
     /**

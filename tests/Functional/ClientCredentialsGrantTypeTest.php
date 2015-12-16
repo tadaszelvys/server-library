@@ -11,7 +11,9 @@
 
 namespace OAuth2\Test\Functional;
 
+use Jose\JSONSerializationModes;
 use Jose\Object\EncryptionInstruction;
+use Jose\Object\JWK;
 use Jose\Object\SignatureInstruction;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\BaseExceptionInterface;
@@ -264,10 +266,9 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientAndJWTAccessToken()
     {
         $response = new Response();
-        //$this->getTokenEndpoint()->setAccessTokenManager($this->getJWTAccessTokenManager());
         $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $this->getTokenEndpointJWTAccessToken()->getAccessToken($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
@@ -285,7 +286,6 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('bar', $access_token->getClientPublicId());
         $this->assertEquals('bar', $access_token->getResourceOwnerPublicId());
         $this->assertTrue($access_token->getExpiresIn() <= 3600);
-        //$this->getTokenEndpoint()->setAccessTokenManager($this->getSimpleStringAccessTokenManager());
     }
 
     public function testClientNotConfidential()
@@ -303,12 +303,10 @@ class ClientCredentialsGrantTypeTest extends Base
         }
     }
 
-    /*public function testGrantTypeAuthorizedForJWTClientButTokenExpired()
+    public function testGrantTypeAuthorizedForJWTClientButTokenExpired()
     {
         $response = new Response();
-        $jose = Jose::getInstance();
-        $jwk_manager = new JWKManager();
-        $jwk2 = $jwk_manager->createJWK([
+        $jwk2 = new JWK([
             'kid' => 'JWK2',
             'use' => 'sig',
             'kty' => 'oct',
@@ -323,14 +321,16 @@ class ClientCredentialsGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $jws = $jose->sign(
-            [$signature_instruction],
+        $signer = $this->getSigner(['HS512']);
+        $jws = $signer->sign(
             [
                 'exp' => time() - 1,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ]
+            ],
+            [$signature_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
         );
 
         $request = $this->createRequest(
@@ -350,14 +350,12 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The JWT has expired.', $e->getDescription());
         }
-    }*/
+    }
 
-    /*public function testGrantTypeAuthorizedForJWTClientButBadAudience()
+    public function testGrantTypeAuthorizedForJWTClientButBadAudience()
     {
         $response = new Response();
-        $jose = Jose::getInstance();
-        $jwk_manager = new JWKManager();
-        $jwk2 = $jwk_manager->createJWK([
+        $jwk2 = new JWK([
             'kid' => 'JWK2',
             'use' => 'sig',
             'kty' => 'oct',
@@ -372,14 +370,16 @@ class ClientCredentialsGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $jws = $jose->sign(
-            [$signature_instruction],
+        $signer = $this->getSigner(['HS512']);
+        $jws = $signer->sign(
             [
                 'exp' => time() + 3600,
                 'aud' => 'Bad Audience',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ]
+            ],
+            [$signature_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
         );
 
         $request = $this->createRequest(
@@ -399,14 +399,12 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('Bad audience.', $e->getDescription());
         }
-    }*/
+    }
 
-    /*public function testSignedAssertionForJWTClient()
+    public function testSignedAssertionForJWTClient()
     {
         $response = new Response();
-        $jose = Jose::getInstance();
-        $jwk_manager = new JWKManager();
-        $jwk2 = $jwk_manager->createJWK([
+        $jwk2 = new JWK([
             'kid' => 'JWK2',
             'use' => 'sig',
             'kty' => 'oct',
@@ -421,14 +419,16 @@ class ClientCredentialsGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $jws = $jose->sign(
-            [$signature_instruction],
+        $signer = $this->getSigner(['HS512']);
+        $jws = $signer->sign(
             [
                 'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ]
+            ],
+            [$signature_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
         );
 
         $request = $this->createRequest(
@@ -450,20 +450,18 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
-    }*/
+    }
 
-    /*public function testEncryptedAndSignedAssertionForJWTClient()
+    public function testEncryptedAndSignedAssertionForJWTClient()
     {
         $response = new Response();
-        $jose = Jose::getInstance();
-        $jwk_manager = new JWKManager();
-        $jwk1 = $jwk_manager->createJWK([
+        $jwk1 = new JWK([
             'kid' => 'JWK1',
             'use' => 'enc',
             'kty' => 'oct',
             'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
         ]);
-        $jwk2 = $jwk_manager->createJWK([
+        $jwk2 = new JWK([
             'kid' => 'JWK2',
             'use' => 'sig',
             'kty' => 'oct',
@@ -478,21 +476,25 @@ class ClientCredentialsGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $jws = $jose->sign(
-            [$signature_instruction],
+        $signer = $this->getSigner(['HS512']);
+        $jws = $signer->sign(
             [
                 'exp' => time() + 3600,
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
-            ]
+            ],
+            [$signature_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
         );
 
         $encryption_instruction = new EncryptionInstruction($jwk1);
 
-        $jwe = $jose->encrypt(
-            [$encryption_instruction],
+        $encrypter = $this->getEncrypter(['A256KW', 'A256CBC-HS512']);
+        $jwe = $encrypter->encrypt(
             $jws,
+            [$encryption_instruction],
+            JSONSerializationModes::JSON_COMPACT_SERIALIZATION,
             [
                 'kid' => 'JWK1',
                 'cty' => 'JWT',
@@ -524,5 +526,5 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
-    }*/
+    }
 }

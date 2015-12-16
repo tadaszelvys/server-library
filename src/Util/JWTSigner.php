@@ -41,6 +41,14 @@ final class JWTSigner
     }
 
     /**
+     * @return \Jose\Object\JWKInterface
+     */
+    public function getSignatureKey()
+    {
+        return $this->signature_key;
+    }
+
+    /**
      * @param array $claims
      * @param array $protected_headers
      *

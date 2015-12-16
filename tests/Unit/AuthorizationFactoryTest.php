@@ -19,7 +19,7 @@ use OAuth2\Test\Base;
  */
 class AuthorizationFactoryTest extends Base
 {
-    /*public function testCreateValidAuthorization()
+    public function testCreateValidAuthorization()
     {
         $params = [
             'client_id'     => 'foo',
@@ -40,13 +40,13 @@ class AuthorizationFactoryTest extends Base
         $this->assertEquals('none', $authorization->getPrompt());
         $this->assertEquals(['scope1', 'scope2'], $authorization->getScope());
         $this->assertEquals($params, $authorization->getQueryParams());
-    }*/
+    }
 
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage  Invalid "prompt" parameter. Allowed values are [null,"none","login","consent","select_account"]
      */
-    /*public function testCreateAuthorizationWithBadPrompt()
+    public function testCreateAuthorizationWithBadPrompt()
     {
         $params = [
             'client_id'     => 'foo',
@@ -58,13 +58,13 @@ class AuthorizationFactoryTest extends Base
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
         $this->getAuthorizationFactory()->createFromRequest($request);
-    }*/
+    }
 
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage  Invalid "display" parameter. Allowed values are [null,"page","popup","touch","wap"]
      */
-    /*public function testCreateAuthorizationWithBadDisplay()
+    public function testCreateAuthorizationWithBadDisplay()
     {
         $params = [
             'client_id'     => 'foo',
@@ -76,15 +76,15 @@ class AuthorizationFactoryTest extends Base
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
         $this->getAuthorizationFactory()->createFromRequest($request);
-    }*/
+    }
 
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage  Only one argument allowed
      */
-    /*public function testBadParameterNumber()
+    public function testBadParameterNumber()
     {
         $authorization = new Authorization();
         $authorization->setClientId('foo', 'bar');
-    }*/
+    }
 }
