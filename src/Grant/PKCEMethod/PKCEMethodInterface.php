@@ -11,7 +11,6 @@
 
 namespace OAuth2\Grant\PKCEMethod;
 
-
 interface PKCEMethodInterface
 {
     /**

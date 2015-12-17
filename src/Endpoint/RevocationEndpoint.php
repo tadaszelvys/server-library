@@ -200,8 +200,8 @@ final class RevocationEndpoint implements RevocationEndpointInterface
 
     /**
      * @param \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface $token_type
-     * @param string                                                            $token
-     * @param \OAuth2\Client\ClientInterface|null                               $client
+     * @param string                                                  $token
+     * @param \OAuth2\Client\ClientInterface|null                     $client
      *
      * @return bool
      */
@@ -215,6 +215,7 @@ final class RevocationEndpoint implements RevocationEndpointInterface
                 return true;
             }
         }
+
         return false;
     }
 

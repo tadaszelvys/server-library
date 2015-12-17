@@ -42,6 +42,7 @@ final class Configuration implements ConfigurationInterface
         if ($this->has($name)) {
             return $this->config[$name];
         }
+
         return $default;
     }
 

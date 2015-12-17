@@ -174,7 +174,7 @@ final class Authorization
     /**
      * @var null|string
      */
-    Private $id_token_hint = null;
+    private $id_token_hint = null;
 
     /**
      * @var null|string

@@ -29,8 +29,8 @@ interface ConfigurationInterface
     public function get($name, $default = null);
 
     /**
-     * @param string $name Name of the option
-     * @param mixed $value Value of the option
+     * @param string $name  Name of the option
+     * @param mixed  $value Value of the option
      *
      * @return mixed
      */
