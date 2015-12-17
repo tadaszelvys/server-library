@@ -125,7 +125,6 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
      */
     private function getTokenInformation(ResponseInterface &$response, $token, $token_type_hint = null, ClientInterface $client = null)
     {
-        $result = null;
         if ('access_token' === $token_type_hint) {
             $this->findAccessTokenAndGetInformation($response, $token, $client);
         } elseif ('refresh_token' === $token_type_hint) {
