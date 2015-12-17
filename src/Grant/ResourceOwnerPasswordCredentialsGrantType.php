@@ -88,7 +88,6 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
     /**
      * @param \OAuth2\Client\ClientInterface           $client
      * @param \OAuth2\EndUser\EndUserInterface         $end_user
-     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return bool
      */
