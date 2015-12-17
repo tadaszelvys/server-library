@@ -11,7 +11,6 @@
 
 namespace OAuth2\Grant;
 
-use Base64Url\Base64Url;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
@@ -72,6 +71,8 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     }
 
     /**
+     * @param string $method
+     *
      * @return \OAuth2\Grant\PKCEMethod\PKCEMethodInterface
      */
     private function getPKCEMethod($method)
@@ -214,7 +215,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "code_verifier" is required.');
         }
         $code_challenge = $params['code_challenge'];
-        $code_challenge_method = array_key_exists('code_challenge_method', $params)?$params['code_challenge']:'plain';
+        $code_challenge_method = array_key_exists('code_challenge_method', $params) ? $params['code_challenge'] : 'plain';
 
         if (!in_array($code_challenge_method, $this->getPKCEMethods())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported "code_challenge_method".');

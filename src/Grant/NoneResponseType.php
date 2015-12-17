@@ -61,7 +61,6 @@ final class NoneResponseType implements ResponseTypeSupportInterface
     public function grantAuthorization(Authorization $authorization)
     {
         $token = $this->getAccessTokenManager()->createAccessToken($authorization->getClient(), $authorization->getEndUser(), $authorization->getScope());
-        $this->finishAccessTokenCreation($token);
 
         $params = [];
         $state = $authorization->getState();
@@ -70,9 +69,5 @@ final class NoneResponseType implements ResponseTypeSupportInterface
         }
 
         return $params;
-    }
-
-    protected function finishAccessTokenCreation(AccessTokenInterface $access_token)
-    {
     }
 }

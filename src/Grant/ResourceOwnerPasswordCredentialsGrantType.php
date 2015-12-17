@@ -40,8 +40,7 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
         EndUserManagerInterface $end_user_manager,
         ExceptionManagerInterface $exception_manager,
         ConfigurationInterface $configuration
-    )
-    {
+    ) {
         $this->setEndUserManager($end_user_manager);
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
@@ -81,7 +80,7 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
         $grant_type_response->setRequestedScope($scope);
         $grant_type_response->setAvailableScope(null);
         $grant_type_response->setResourceOwnerPublicId($end_user->getPublicId());
-        $grant_type_response->setRefreshTokenIssued($this->getIssueRefreshToken($client, $end_user, $request));
+        $grant_type_response->setRefreshTokenIssued($this->getIssueRefreshToken($client, $end_user));
         $grant_type_response->setRefreshTokenScope($scope);
         $grant_type_response->setRefreshTokenRevoked(null);
     }
@@ -89,11 +88,10 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
     /**
      * @param \OAuth2\Client\ClientInterface           $client
      * @param \OAuth2\EndUser\EndUserInterface         $end_user
-     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return bool
      */
-    protected function getIssueRefreshToken(ClientInterface $client, EndUserInterface $end_user, ServerRequestInterface $request)
+    private function getIssueRefreshToken(ClientInterface $client, EndUserInterface $end_user)
     {
         if ($end_user instanceof IssueRefreshTokenExtensionInterface && false === $end_user->isRefreshTokenIssuanceAllowed($client, 'password')) {
             return false;

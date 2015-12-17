@@ -49,8 +49,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         RefreshTokenManagerInterface $refresh_token_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
         ExceptionManagerInterface $exception_manager
-    )
-    {
+    ) {
         $this->setAccessTokenManager($access_token_manager);
         $this->setRefreshTokenManager($refresh_token_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
@@ -126,7 +125,6 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
      */
     private function getTokenInformation(ResponseInterface &$response, $token, $token_type_hint = null, ClientInterface $client = null)
     {
-        $result = null;
         if ('access_token' === $token_type_hint) {
             $this->findAccessTokenAndGetInformation($response, $token, $client);
         } elseif ('refresh_token' === $token_type_hint) {
@@ -235,7 +233,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     private function getJWTInformation(JWTInterface $token)
     {
         $result = [];
-        foreach(['exp', 'iat', 'nbf', 'sub', 'aud', 'iss', 'jti'] as $key) {
+        foreach (['exp', 'iat', 'nbf', 'sub', 'aud', 'iss', 'jti'] as $key) {
             if ($token->hasClaim($key)) {
                 $result[$key] = $token->getClaim($key);
             }

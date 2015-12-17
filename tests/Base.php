@@ -123,7 +123,7 @@ class Base extends \PHPUnit_Framework_TestCase
                         'use' => 'sig',
                         'kty' => 'oct',
                         'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                    ]
+                    ],
                 ]],
                 false
             );
@@ -441,7 +441,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTClientManager()
     {
         if (null === $this->jwt_client_manager) {
-
             $jwt_loader = $this->getJWTLoader(
                 ['HS512'],
                 ['A256KW', 'A256CBC-HS512'],
@@ -523,7 +522,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTBearerGrantType()
     {
         if (null === $this->jwt_bearer_grant_type) {
-
             $jwt_loader = $this->getJWTLoader(
                 ['HS512'],
                 ['A256KW', 'A256CBC-HS512'],
@@ -838,7 +836,7 @@ class Base extends \PHPUnit_Framework_TestCase
      * @param string[] $allowed_signature_algorithms
      * @param string[] $allowed_encryption_algorithms
      * @param array    $key_set
-     * @param bool    $is_encryption_required
+     * @param bool     $is_encryption_required
      *
      * @return \OAuth2\Util\JWTLoader
      */
@@ -1006,7 +1004,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         $jwa_manager = new JWAManager();
         $available_algorithms = $this->getSupportedJWTAlgorithms();
-        foreach($algorithms as $algorithm) {
+        foreach ($algorithms as $algorithm) {
             if (!array_key_exists($algorithm, $available_algorithms)) {
                 throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $algorithm));
             }
