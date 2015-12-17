@@ -9,25 +9,13 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\RevocationTokenType;
+namespace OAuth2\Endpoint\TokenType;
 
 
 use OAuth2\Token\TokenInterface;
 
-interface RevocationTokenTypeInterface
+interface RevocationTokenTypeInterface extends TokenTypeInterface
 {
-    /**
-     * @return string
-     */
-    public function getTokenTypeHint();
-
-    /**
-     * @param string $token
-     *
-     * @return \OAuth2\Token\TokenInterface|null
-     */
-    public function getToken($token);
-
     /**
      * @param \OAuth2\Token\TokenInterface $token
      */

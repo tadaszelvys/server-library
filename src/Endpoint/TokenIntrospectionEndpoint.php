@@ -11,20 +11,23 @@
 
 namespace OAuth2\Endpoint;
 
-use Jose\Object\JWTInterface;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
+use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Client\ConfidentialClientInterface;
+use OAuth2\Configuration\ConfigurationInterface;
+use OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Exception\InternalServerErrorExceptionInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
+use OAuth2\Token\TokenInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -37,7 +40,12 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     use HasRefreshTokenManager;
 
     /**
-     * RevocationEndpoint constructor.
+     * @var \OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface[]
+     */
+    private $token_types = [];
+
+    /**
+     * TokenIntrospectionEndpoint constructor.
      *
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
      * @param \OAuth2\Token\RefreshTokenManagerInterface      $refresh_token_manager
@@ -57,16 +65,21 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     }
 
     /**
-     * @var \OAuth2\Endpoint\TokenIntrospectionEndpointExtensionInterface[]
+     * @param \OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface $token_type
      */
-    private $extensions = [];
+    public function addIntrospectionTokenType(IntrospectionTokenTypeInterface $token_type)
+    {
+        if (!array_key_exists($token_type->getTokenTypeHint(), $this->token_types)) {
+            $this->token_types[$token_type->getTokenTypeHint()] = $token_type;
+        }
+    }
 
     /**
-     * {@inheritdoc}
+     * @return \OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface[]
      */
-    public function addExtension(TokenIntrospectionEndpointExtensionInterface $extension)
+    private function getTokenTypes()
     {
-        $this->extensions[] = $extension;
+        return $this->token_types;
     }
 
     /**
@@ -85,13 +98,6 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
 
         if (null === $token) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
-            $exception->getHttpResponse($response);
-
-            return;
-        }
-
-        if (null !== $token_type_hint && !in_array($token_type_hint, ['access_token', 'refresh_token'])) {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported token type hint');
             $exception->getHttpResponse($response);
 
             return;
@@ -125,91 +131,48 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
      */
     private function getTokenInformation(ResponseInterface &$response, $token, $token_type_hint = null, ClientInterface $client = null)
     {
-        if ('access_token' === $token_type_hint) {
-            $this->findAccessTokenAndGetInformation($response, $token, $client);
-        } elseif ('refresh_token' === $token_type_hint) {
-            $this->findRefreshTokenAndGetInformation($response, $token, $client);
+        $token_types = $this->getTokenTypes();
+        if (null === $token_type_hint) {
+            foreach ($token_types as $token_type) {
+                if (true === $this->tryIntrospectToken($response, $token_type, $token, $client)) {
+                    return;
+                }
+            }
+            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find token or client not authenticated.');
+            $exception->getHttpResponse($response);
+        } elseif (array_key_exists($token_type_hint, $token_types)) {
+            $token_type = $token_types[$token_type_hint];
+            if (false === $this->tryIntrospectToken($response, $token_type, $token, $client)) {
+                $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find token or client not authenticated.');
+                $exception->getHttpResponse($response);
+            }
         } else {
-            if ($this->findAccessTokenAndGetInformation($response, $token, $client)) {
-                return;
-            } elseif ($this->findRefreshTokenAndGetInformation($response, $token, $client)) {
-                return;
+            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported token type hint');
+            $exception->getHttpResponse($response);
+        }
+    }
+
+    /**
+     * @param \Psr\Http\Message\ResponseInterface                        $response
+     * @param \OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface $token_type
+     * @param string                                                     $token
+     * @param \OAuth2\Client\ClientInterface|null                        $client
+     *
+     * @return bool
+     */
+    private function tryIntrospectToken(ResponseInterface &$response, IntrospectionTokenTypeInterface $token_type, $token, ClientInterface $client = null)
+    {
+        $result = $token_type->getToken($token);
+        if ($result instanceof TokenInterface) {
+            if ($this->isClientVerified($result, $client)) {
+                $data = $token_type->introspectToken($result);
+                $this->populateResponse($response, $data);
+
+                return true;
             }
         }
-    }
 
-    /**
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param string                              $token
-     * @param \OAuth2\Client\ClientInterface      $client
-     *
-     * @return bool
-     */
-    private function findAccessTokenAndGetInformation(ResponseInterface &$response, $token, ClientInterface $client = null)
-    {
-        $access_token = $this->getAccessTokenManager()->getAccessToken($token);
-        if (null === $access_token || !$this->isClientVerified($access_token, $client)) {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find token or client not authenticated.');
-            $exception->getHttpResponse($response);
-
-            return true;
-        }
-
-        $result = [
-            'active'     => !$access_token->hasExpired(),
-            'client_id'  => $access_token->getClientPublicId(),
-            'token_type' => 'access_token',
-        ];
-        if (!empty($access_token->getScope())) {
-            $result['scope'] = $access_token->getScope();
-        }
-        if ($access_token instanceof JWTInterface) {
-            $result = array_merge($result, $this->getJWTInformation($access_token));
-        }
-        foreach ($this->extensions as $extension) {
-            $result = array_merge($result, $extension->getTokenInformation($access_token));
-        }
-
-        $this->populateResponse($response, $result);
-
-        return true;
-    }
-
-    /**
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param string                              $token
-     * @param \OAuth2\Client\ClientInterface      $client
-     *
-     * @return bool
-     */
-    private function findRefreshTokenAndGetInformation(ResponseInterface &$response, $token, ClientInterface $client = null)
-    {
-        $refresh_token = $this->getRefreshTokenManager()->getRefreshToken($token);
-        if (null === $refresh_token || !$this->isClientVerified($refresh_token, $client)) {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find token or client not authenticated.');
-            $exception->getHttpResponse($response);
-
-            return true;
-        }
-
-        $result = [
-            'active'     => !$refresh_token->hasExpired() && !$refresh_token->isUsed(),
-            'client_id'  => $refresh_token->getClientPublicId(),
-            'token_type' => 'refresh_token',
-        ];
-        if (!empty($refresh_token->getScope())) {
-            $result['scope'] = $refresh_token->getScope();
-        }
-        if ($refresh_token instanceof JWTInterface) {
-            $result = array_merge($result, $this->getJWTInformation($refresh_token));
-        }
-        foreach ($this->extensions as $extension) {
-            $result = array_merge($result, $extension->getTokenInformation($refresh_token));
-        }
-
-        $this->populateResponse($response, $result);
-
-        return true;
+        return false;
     }
 
     /**
@@ -226,35 +189,18 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     }
 
     /**
-     * @param \Jose\Object\JWTInterface $token
-     *
-     * @return array
-     */
-    private function getJWTInformation(JWTInterface $token)
-    {
-        $result = [];
-        foreach (['exp', 'iat', 'nbf', 'sub', 'aud', 'iss', 'jti'] as $key) {
-            if ($token->hasClaim($key)) {
-                $result[$key] = $token->getClaim($key);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param \OAuth2\Token\AccessTokenInterface|\OAuth2\Token\RefreshTokenInterface $token
-     * @param \OAuth2\Client\ClientInterface|null                                    $client
+     * @param \OAuth2\Token\TokenInterface        $token
+     * @param \OAuth2\Client\ClientInterface|null $client
      *
      * @return bool
      */
     private function isClientVerified($token, ClientInterface $client = null)
     {
         if (null !== $client) {
-            // The client ID of the token is the same as client authenticated
+            // The client ID of the token is the same as authenticated client
             return $token->getClientPublicId() === $client->getPublicId();
         } else {
-            // We try to get the client
+            // We try to get the client associated with the token
             $client = $this->getClientManagerSupervisor()->getClient($token->getClientPublicId());
 
             // Return false if the client is a confidential client (confidential client must be authenticated)

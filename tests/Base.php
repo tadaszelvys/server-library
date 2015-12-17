@@ -40,6 +40,8 @@ use OAuth2\Endpoint\QueryResponseMode;
 use OAuth2\Endpoint\RevocationEndpoint;
 use OAuth2\Endpoint\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospectionEndpoint;
+use OAuth2\Endpoint\TokenType\AccessToken;
+use OAuth2\Endpoint\TokenType\RefreshToken;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\IdTokenResponseType;
@@ -159,6 +161,9 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager(),
                 $this->getConfiguration()
             );
+
+            $this->revocation_endpoint->addRevocationTokenType($this->getAccessTokenType());
+            $this->revocation_endpoint->addRevocationTokenType($this->getRefreshTokenType());
         }
 
         return $this->revocation_endpoint;
@@ -181,6 +186,9 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getClientManagerSupervisor(),
                 $this->getExceptionManager()
             );
+
+            $this->token_introspection_endpoint->addIntrospectionTokenType($this->getAccessTokenType());
+            $this->token_introspection_endpoint->addIntrospectionTokenType($this->getRefreshTokenType());
         }
 
         return $this->token_introspection_endpoint;
@@ -981,6 +989,26 @@ class Base extends \PHPUnit_Framework_TestCase
         $compression_manager->addCompressionAlgorithm(new ZLib());
 
         return$compression_manager;
+    }
+
+    /**
+     * @return \OAuth2\Endpoint\TokenType\AccessToken
+     */
+    protected function getAccessTokenType()
+    {
+        return new AccessToken(
+            $this->getConfiguration(),
+            $this->getSimpleStringAccessTokenManager(),
+            $this->getRefreshTokenManager()
+        );
+    }
+
+    /**
+     * @return \OAuth2\Endpoint\TokenType\RefreshToken
+     */
+    protected function getRefreshTokenType()
+    {
+        return new RefreshToken($this->getRefreshTokenManager());
     }
 
     /**

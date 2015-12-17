@@ -20,9 +20,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Configuration\ConfigurationInterface;
-use OAuth2\Endpoint\RevocationTokenType\AccessToken;
-use OAuth2\Endpoint\RevocationTokenType\RefreshToken;
-use OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface;
+use OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -43,7 +41,7 @@ final class RevocationEndpoint implements RevocationEndpointInterface
     use HasAccessTokenManager;
 
     /**
-     * @var \OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface[]
+     * @var \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface[]
      */
     private $token_types = [];
 
@@ -68,13 +66,10 @@ final class RevocationEndpoint implements RevocationEndpointInterface
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
-
-        $this->addRevocationTokenType(new AccessToken($this->getAccessTokenManager()));
-        $this->addRevocationTokenType(new RefreshToken($this->getRefreshTokenManager()));
     }
 
     /**
-     * @param \OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface $token_type
+     * @param \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface $token_type
      */
     public function addRevocationTokenType(RevocationTokenTypeInterface $token_type)
     {
@@ -84,7 +79,7 @@ final class RevocationEndpoint implements RevocationEndpointInterface
     }
 
     /**
-     * @return \OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface[]
+     * @return \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface[]
      */
     private function getTokenTypes()
     {
@@ -204,7 +199,7 @@ final class RevocationEndpoint implements RevocationEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface $token_type
+     * @param \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface $token_type
      * @param string                                                            $token
      * @param \OAuth2\Client\ClientInterface|null                               $client
      *

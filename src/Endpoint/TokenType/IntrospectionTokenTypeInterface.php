@@ -9,14 +9,17 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint;
+namespace OAuth2\Endpoint\TokenType;
 
-interface TokenIntrospectionEndpointextensionInterface
+
+use OAuth2\Token\TokenInterface;
+
+interface IntrospectionTokenTypeInterface extends TokenTypeInterface
 {
     /**
-     * @param \OAuth2\Token\AccessTokenInterface|\OAuth2\Token\RefreshTokenInterface $token
+     * @param \OAuth2\Token\TokenInterface $token
      *
      * @return array
      */
-    public function getTokenInformation($token);
+    public function introspectToken(TokenInterface $token);
 }
