@@ -68,6 +68,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      */
     private function getPKCEMethods()
     {
+        return $this->pkce_methods;
     }
 
     /**
@@ -210,18 +211,19 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         if (!array_key_exists('code_challenge', $params)) {
             return;
         }
+
+        $code_challenge = $params['code_challenge'];
+        $code_challenge_method = array_key_exists('code_challenge_method', $params) ? $params['code_challenge_method'] : 'plain';
+
+        if (!array_key_exists($code_challenge_method, $this->getPKCEMethods())) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported code challenge method "%s".', $code_challenge_method));
+        }
+        $method = $this->getPKCEMethod($code_challenge_method);
+
         $code_verifier = RequestBody::getParameter($request, 'code_verifier');
         if (null === $code_verifier) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "code_verifier" is required.');
         }
-        $code_challenge = $params['code_challenge'];
-        $code_challenge_method = array_key_exists('code_challenge_method', $params) ? $params['code_challenge'] : 'plain';
-
-        if (!in_array($code_challenge_method, $this->getPKCEMethods())) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported "code_challenge_method".');
-        }
-        $method = $this->getPKCEMethod($code_challenge_method);
-
         if (!$method->isChallengeVerified($code_verifier, $code_challenge)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid parameter "code_verifier".');
         }

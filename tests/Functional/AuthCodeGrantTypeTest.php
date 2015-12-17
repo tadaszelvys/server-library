@@ -385,6 +385,225 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
+    /**
+     * @see https://tools.ietf.org/html/rfc7636#appendix-B
+     */
+    public function testAuthcodeSuccessWithPKCEAndS256AndPublicClient()
+    {
+        $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (null === $client) {
+            $this->fail('Unable to get client');
+
+            return;
+        }
+        $authorization = new Authorization();
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setState('0123456789');
+        $authorization->setQueryParams([
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'S256'
+        ]);
+        $authorization->setAuthorized(true);
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+
+        $uri = new Uri($response->getHeader('Location')[0]);
+        parse_str($uri->getQuery(), $result);
+        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+
+        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
+        $this->assertEquals('foo', $authcode->getClientPublicId());
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
+    }
+
+    public function testAuthcodeSuccessWithPKCEAndPlainAndPublicClient()
+    {
+        $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (null === $client) {
+            $this->fail('Unable to get client');
+
+            return;
+        }
+        $authorization = new Authorization();
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setState('0123456789');
+        $authorization->setQueryParams([
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'plain'
+        ]);
+        $authorization->setAuthorized(true);
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+
+        $uri = new Uri($response->getHeader('Location')[0]);
+        parse_str($uri->getQuery(), $result);
+        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+
+        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
+        $this->assertEquals('foo', $authcode->getClientPublicId());
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
+    }
+
+    public function testAuthcodeSuccessWithPKCEAndDefaultMethodAndPublicClient()
+    {
+        $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (null === $client) {
+            $this->fail('Unable to get client');
+
+            return;
+        }
+        $authorization = new Authorization();
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setState('0123456789');
+        $authorization->setQueryParams([
+            'code_challenge' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'
+        ]);
+        $authorization->setAuthorized(true);
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+
+        $uri = new Uri($response->getHeader('Location')[0]);
+        parse_str($uri->getQuery(), $result);
+        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+
+        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
+        $this->assertEquals('foo', $authcode->getClientPublicId());
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
+    }
+
+    public function testAuthcodeFailedWithPKCEBecauseCodeVerifierIsNotSet()
+    {
+        $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (null === $client) {
+            $this->fail('Unable to get client');
+
+            return;
+        }
+        $authorization = new Authorization();
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setState('0123456789');
+        $authorization->setQueryParams([
+            'code_challenge' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'
+        ]);
+        $authorization->setAuthorized(true);
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+
+        $uri = new Uri($response->getHeader('Location')[0]);
+        parse_str($uri->getQuery(), $result);
+        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+
+        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
+        $this->assertEquals('foo', $authcode->getClientPublicId());
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken()], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('The parameter "code_verifier" is required.', $e->getDescription());
+        }
+    }
+
+    public function testAuthcodeFailedWithPKCEBecauseCodeChallengeMethodIsNotSupported()
+    {
+        $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (null === $client) {
+            $this->fail('Unable to get client');
+
+            return;
+        }
+        $authorization = new Authorization();
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setState('0123456789');
+        $authorization->setQueryParams([
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'S512',
+        ]);
+        $authorization->setAuthorized(true);
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+
+        $uri = new Uri($response->getHeader('Location')[0]);
+        parse_str($uri->getQuery(), $result);
+        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+
+        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
+        $this->assertEquals('foo', $authcode->getClientPublicId());
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken()], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Unsupported code challenge method "S512".', $e->getDescription());
+        }
+    }
+
     public function testPublicClientWithoutPublicId()
     {
         $response = new Response();
