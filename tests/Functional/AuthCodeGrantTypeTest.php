@@ -519,6 +519,48 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","expires_in":[^"]+,"scope":"scope1 scope2","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
+    public function testAuthcodeFailedWithBadCodeVerifier()
+    {
+        $client = $this->getClientManagerSupervisor()->getClient('foo');
+        if (null === $client) {
+            $this->fail('Unable to get client');
+
+            return;
+        }
+        $authorization = new Authorization();
+        $authorization->setRedirectUri('http://example.com/test?good=false');
+        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
+        $authorization->setClient($client);
+        $authorization->setResponseType('code');
+        $authorization->setState('0123456789');
+        $authorization->setQueryParams([
+            'code_challenge' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'
+        ]);
+        $authorization->setAuthorized(true);
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+
+        $uri = new Uri($response->getHeader('Location')[0]);
+        parse_str($uri->getQuery(), $result);
+        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+
+        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
+        $this->assertEquals('foo', $authcode->getClientPublicId());
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'Bad PKCE'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Invalid parameter "code_verifier".', $e->getDescription());
+        }
+    }
+
     public function testAuthcodeFailedWithPKCEBecauseCodeVerifierIsNotSet()
     {
         $client = $this->getClientManagerSupervisor()->getClient('foo');
