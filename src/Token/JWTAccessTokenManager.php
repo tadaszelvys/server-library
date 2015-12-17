@@ -79,7 +79,13 @@ class JWTAccessTokenManager extends AccessTokenManager
         $signature_header = $this->prepareSignatureHeader();
 
         $jws = $this->getJWTSigner()->sign($payload, $signature_header);
+        if (!is_string($jws)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'An error occured during the creation of the access token.');
+        }
         $jwe = $this->encrypt($jws, $client);
+        if (!is_string($jwe)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'An error occured during the creation of the access token.');
+        }
 
         $access_token = new AccessToken();
         $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
@@ -253,17 +259,6 @@ class JWTAccessTokenManager extends AccessTokenManager
     public function revokeAccessToken(AccessTokenInterface $access_token)
     {
         //Not implemented
-    }
-
-    /**
-     * By default, this method does nothing, but should be overridden and check other claims (issuer, jti...).
-     *
-     * @param \Jose\Object\JWTInterface $jwt
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    protected function checkJWT(JWTInterface $jwt)
-    {
     }
 
     /**
