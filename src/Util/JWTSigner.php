@@ -21,12 +21,12 @@ final class JWTSigner
     /**
      * @var \Jose\SignerInterface
      */
-    protected $signer;
+    private $signer;
 
     /**
      * @var \Jose\Object\JWKInterface
      */
-    protected $signature_key;
+    private $signature_key;
 
     /**
      * JWTSigner constructor.

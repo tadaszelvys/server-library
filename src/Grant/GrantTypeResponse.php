@@ -18,42 +18,42 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * @var array
      */
-    protected $additional_data = [];
+    private $additional_data = [];
 
     /**
      * @var
      */
-    protected $requested_scope;
+    private $requested_scope;
 
     /**
      * @var
      */
-    protected $available_scope;
+    private $available_scope;
 
     /**
      * @var
      */
-    protected $resource_owner_public_id;
+    private $resource_owner_public_id;
 
     /**
      * @var
      */
-    protected $client_public_id;
+    private $client_public_id;
 
     /**
      * @var
      */
-    protected $issue_refresh_token;
+    private $issue_refresh_token;
 
     /**
      * @var
      */
-    protected $refresh_token_scope;
+    private $refresh_token_scope;
 
     /**
      * @var \OAuth2\Token\RefreshTokenInterface
      */
-    protected $revoke_refresh_token;
+    private $revoke_refresh_token;
 
     /**
      * {@inheritdoc}

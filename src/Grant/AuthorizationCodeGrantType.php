@@ -17,6 +17,9 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
+use OAuth2\Grant\PKCEMethod\Plain;
+use OAuth2\Grant\PKCEMethod\S256;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
 use OAuth2\Util\RequestBody;
@@ -27,9 +30,14 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     use HasExceptionManager;
 
     /**
-     * @var\OAuth2\Token\AuthCodeManagerInterface
+     * @var \OAuth2\Token\AuthCodeManagerInterface
      */
-    protected $auth_code_manager;
+    private $auth_code_manager;
+
+    /**
+     * @var \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]
+     */
+    private $pkce_methods = [];
 
     /**
      * AuthorizationCodeGrantType constructor.
@@ -41,12 +49,40 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     {
         $this->auth_code_manager = $auth_code_manager;
         $this->setExceptionManager($exception_manager);
+
+        $this->addPKCEMethod(new Plain());
+        $this->addPKCEMethod(new S256());
+    }
+
+    /**
+     * @param \OAuth2\Grant\PKCEMethod\PKCEMethodInterface $method
+     */
+    public function addPKCEMethod(PKCEMethodInterface $method)
+    {
+        if (!array_key_exists($method->getMethodName(), $this->pkce_methods)) {
+            $this->pkce_methods[$method->getMethodName()] = $method;
+        }
+    }
+
+    /**
+     * @return \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]
+     */
+    private function getPKCEMethods()
+    {
+    }
+
+    /**
+     * @return \OAuth2\Grant\PKCEMethod\PKCEMethodInterface
+     */
+    private function getPKCEMethod($method)
+    {
+        return $this->pkce_methods[$method];
     }
 
     /**
      * @return \OAuth2\Token\AuthCodeManagerInterface
      */
-    protected function getAuthCodeManager()
+    private function getAuthCodeManager()
     {
         return $this->auth_code_manager;
     }
@@ -136,7 +172,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      *
      * @return null|\OAuth2\Token\AuthCodeInterface
      */
-    protected function getAuthCode(ServerRequestInterface $request)
+    private function getAuthCode(ServerRequestInterface $request)
     {
         $code = RequestBody::getParameter($request, 'code');
         if (null === $code) {
@@ -152,7 +188,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkClient(ServerRequestInterface $request, ClientInterface $client)
+    private function checkClient(ServerRequestInterface $request, ClientInterface $client)
     {
         if (!$client instanceof ConfidentialClientInterface) {
             if (null === ($client_id = RequestBody::getParameter($request, 'client_id')) || $client_id !== $client->getPublicId()) {
@@ -167,7 +203,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkPKCE(ServerRequestInterface $request, AuthCodeInterface $authCode)
+    private function checkPKCE(ServerRequestInterface $request, AuthCodeInterface $authCode)
     {
         $params = $authCode->getQueryParams();
         if (!array_key_exists('code_challenge', $params)) {
@@ -180,12 +216,12 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         $code_challenge = $params['code_challenge'];
         $code_challenge_method = array_key_exists('code_challenge_method', $params)?$params['code_challenge']:'plain';
 
-        if (!in_array($code_challenge_method, ['plain', 'S256'])) {
+        if (!in_array($code_challenge_method, $this->getPKCEMethods())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported "code_challenge_method".');
         }
-        $calculated = 'plain' === $code_challenge_method?$code_verifier:Base64Url::encode(hash('sha256', $code_verifier, true));
+        $method = $this->getPKCEMethod($code_challenge_method);
 
-        if (!hash_equals($code_challenge, $calculated)) {
+        if (!$method->isChallengeVerified($code_verifier, $code_challenge)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid parameter "code_verifier".');
         }
     }
@@ -196,7 +232,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUri(AuthCodeInterface $authCode, $redirect_uri)
+    private function checkRedirectUri(AuthCodeInterface $authCode, $redirect_uri)
     {
         if (null !== $authCode->getRedirectUri() && $redirect_uri !== $authCode->getRedirectUri()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The redirect URI is missing or does not match.');
@@ -209,7 +245,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkAuthCode(AuthCodeInterface $authCode, ClientInterface $client)
+    private function checkAuthCode(AuthCodeInterface $authCode, ClientInterface $client)
     {
         if ($client->getPublicId() !== $authCode->getClientPublicId()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");

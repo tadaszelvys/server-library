@@ -21,12 +21,12 @@ final class JWTEncrypter
     /**
      * @var \Jose\EncrypterInterface
      */
-    protected $encrypter;
+    private $encrypter;
 
     /**
      * @var \Jose\Object\JWKInterface
      */
-    protected $encryption_key;
+    private $encryption_key;
 
     /**
      * JWTEncrypter constructor.

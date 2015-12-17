@@ -28,32 +28,32 @@ final class JWTLoader
     /**
      * @var bool
      */
-    protected $is_encryption_required = false;
+    private $is_encryption_required = false;
 
     /**
      * @var \Jose\LoaderInterface
      */
-    protected $loader;
+    private $loader;
 
     /**
      * @var \Jose\DecrypterInterface
      */
-    protected $decrypter;
+    private $decrypter;
 
     /**
      * @var \Jose\VerifierInterface
      */
-    protected $verifier;
+    private $verifier;
 
     /**
      * @var string[]
      */
-    protected $allowed_encryption_algorithms = [];
+    private $allowed_encryption_algorithms = [];
 
     /**
      * @var \Jose\Object\JWKSetInterface
      */
-    protected $key_set;
+    private $key_set;
 
     /**
      * JWTLoader constructor.
