@@ -55,8 +55,7 @@ final class AuthorizationFactory
         JWTLoader $jwt_loader,
         $is_request_parameter_supported,
         $is_request_uri_parameter_supported
-    )
-    {
+    ) {
         $this->setJWTLoader($jwt_loader);
         $this->setScopeManager($scope_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);

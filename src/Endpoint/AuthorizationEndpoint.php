@@ -48,8 +48,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
         ConfigurationInterface $configuration
-    )
-    {
+    ) {
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
         $this->setScopeManager($scope_manager);

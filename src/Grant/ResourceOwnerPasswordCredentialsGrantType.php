@@ -40,8 +40,7 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
         EndUserManagerInterface $end_user_manager,
         ExceptionManagerInterface $exception_manager,
         ConfigurationInterface $configuration
-    )
-    {
+    ) {
         $this->setEndUserManager($end_user_manager);
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
