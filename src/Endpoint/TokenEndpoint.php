@@ -68,8 +68,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         EndUserManagerInterface $end_user_manager,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager
-    )
-    {
+    ) {
         $this->setAccessTokenManager($access_token_manager);
         $this->setAccessTokenTypeManager($access_token_type_manager);
         $this->setRefreshTokenManager($refresh_token_manager);

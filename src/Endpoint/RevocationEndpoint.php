@@ -53,8 +53,7 @@ final class RevocationEndpoint implements RevocationEndpointInterface
         ClientManagerSupervisorInterface $client_manager_supervisor,
         ExceptionManagerInterface $exception_manager,
         ConfigurationInterface $configuration
-    )
-    {
+    ) {
         $this->setAccessTokenManager($access_token_manager);
         $this->setRefreshTokenManager($refresh_token_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);

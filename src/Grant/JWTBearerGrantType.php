@@ -40,8 +40,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         JWTLoader $loader,
         ExceptionManagerInterface $exception_manager,
         ConfigurationInterface $configuration
-    )
-    {
+    ) {
         $this->setJWTLoader($loader);
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);

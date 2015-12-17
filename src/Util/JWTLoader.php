@@ -12,10 +12,10 @@
 namespace OAuth2\Util;
 
 use Jose\DecrypterInterface;
+use Jose\LoaderInterface;
 use Jose\Object\JWEInterface;
 use Jose\Object\JWKSet;
 use Jose\Object\JWSInterface;
-use Jose\LoaderInterface;
 use Jose\VerifierInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\JWTClientInterface;
@@ -74,8 +74,7 @@ final class JWTLoader
         array $allowed_encryption_algorithms = [],
         array $key_set = [],
         $is_encryption_required = false
-    )
-    {
+    ) {
         $this->loader = $loader;
         $this->verifier = $verifier;
         $this->decrypter = $decrypter;

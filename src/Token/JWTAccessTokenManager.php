@@ -37,8 +37,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         JWTEncrypter $jwt_encrypter,
         ExceptionManagerInterface $exception_manager,
         ConfigurationInterface $configuration
-    )
-    {
+    ) {
         parent::__construct($configuration);
         $this->setJWTLoader($jwt_loader);
         $this->setJWTSigner($jwt_signer);
@@ -71,7 +70,7 @@ class JWTAccessTokenManager extends AccessTokenManager
 
     /**
      * {@inheritdoc}
-+     *
+     +     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
     public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [], RefreshTokenInterface $refresh_token = null)

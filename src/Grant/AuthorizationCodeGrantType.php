@@ -178,12 +178,12 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "code_verifier" is required.');
         }
         $code_challenge = $params['code_challenge'];
-        $code_challenge_method = array_key_exists('code_challenge_method', $params)?$params['code_challenge']:'plain';
+        $code_challenge_method = array_key_exists('code_challenge_method', $params) ? $params['code_challenge'] : 'plain';
 
         if (!in_array($code_challenge_method, ['plain', 'S256'])) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported "code_challenge_method".');
         }
-        $calculated = 'plain' === $code_challenge_method?$code_verifier:Base64Url::encode(hash('sha256', $code_verifier, true));
+        $calculated = 'plain' === $code_challenge_method ? $code_verifier : Base64Url::encode(hash('sha256', $code_verifier, true));
 
         if (!hash_equals($code_challenge, $calculated)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid parameter "code_verifier".');
