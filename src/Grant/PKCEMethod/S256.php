@@ -11,7 +11,6 @@
 
 namespace OAuth2\Grant\PKCEMethod;
 
-
 use Base64Url\Base64Url;
 
 final class S256 implements PKCEMethodInterface

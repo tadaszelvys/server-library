@@ -11,7 +11,6 @@
 
 namespace OAuth2\Endpoint\TokenType;
 
-
 use OAuth2\Token\TokenInterface;
 
 interface IntrospectionTokenTypeInterface extends TokenTypeInterface

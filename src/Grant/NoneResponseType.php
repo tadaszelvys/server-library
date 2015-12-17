@@ -13,7 +13,6 @@ namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Endpoint\Authorization;
-use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 
 /**

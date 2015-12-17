@@ -11,7 +11,6 @@
 
 namespace OAuth2\Token;
 
-use Jose\Object\JWTInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTEncrypter;
 use OAuth2\Behaviour\HasJWTLoader;
