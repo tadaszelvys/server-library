@@ -1,6 +1,8 @@
 OAuth2 Server Library
 =====================
 
+[![Join the chat at https://gitter.im/Spomky-Labs/oauth2-server-library](https://badges.gitter.im/Spomky-Labs/oauth2-server-library.svg)](https://gitter.im/Spomky-Labs/oauth2-server-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/?branch=master)
 [![Coverage Status](https://coveralls.io/repos/Spomky-Labs/oauth2-server-library/badge.svg?branch=master&service=github)](https://coveralls.io/github/Spomky-Labs/oauth2-server-library?branch=master)
 [![PSR-7 ready](https://img.shields.io/badge/PSR--7-ready-brightgreen.svg)](http://www.php-fig.org/psr/psr-7/)
