@@ -16,7 +16,7 @@ final class Configuration implements ConfigurationInterface
     /**
      * @var array
      */
-    protected $config = [];
+    private $config = [];
 
     /**
      * @param array $values
@@ -29,14 +29,24 @@ final class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function get($name, $default = null)
+    public function has($name)
     {
-        return isset($this->config[$name]) ? $this->config[$name] : $default;
+        return array_key_exists($name, $this->config);
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * {@inheritdoc}
+     */
+    public function get($name, $default = null)
+    {
+        if ($this->has($name)) {
+            return $this->config[$name];
+        }
+        return $default;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function set($name, $value)
     {
@@ -44,7 +54,7 @@ final class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param string $name
+     * {@inheritdoc}
      */
     public function delete($name)
     {

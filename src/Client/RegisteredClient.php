@@ -48,6 +48,9 @@ class RegisteredClient extends Client implements RegisteredClientInterface
         return in_array($redirect_uri, $this->redirect_uris);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function addRedirectUri($redirect_uri)
     {
         if (!$this->hasRedirectUri($redirect_uri)) {
@@ -55,6 +58,9 @@ class RegisteredClient extends Client implements RegisteredClientInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function removeRedirectUri($redirect_uri)
     {
         $key = array_search($redirect_uri, $this->redirect_uris);

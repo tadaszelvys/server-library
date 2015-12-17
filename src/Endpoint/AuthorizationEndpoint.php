@@ -35,7 +35,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * @var \OAuth2\Grant\ResponseTypeSupportInterface[]
      */
-    protected $response_types = [];
+    private $response_types = [];
 
     /**
      * AuthorizationEndpoint constructor.
@@ -67,9 +67,6 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
-     * @throws \OAuth2\Exception\InternalServerErrorExceptionInterface
      */
     public function authorize(Authorization $authorization, ResponseInterface &$response)
     {
@@ -107,7 +104,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @return string
      */
-    protected function checkRedirectUri(Authorization $authorization)
+    private function checkRedirectUri(Authorization $authorization)
     {
         $this->checkRedirectUriIfRequired($authorization);
 
@@ -132,7 +129,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUriIfRequired(Authorization $authorization)
+    private function checkRedirectUriIfRequired(Authorization $authorization)
     {
         //If the redirect URI is not set and the configuration requires it, throws an exception
         if (true === $this->getConfiguration()->get('enforce_redirect_uri', false) && null === $authorization->getRedirectUri()) {
@@ -149,7 +146,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUriFragment($redirect_uri)
+    private function checkRedirectUriFragment($redirect_uri)
     {
         $uri = parse_url($redirect_uri);
         if (isset($uri['fragment'])) {
@@ -166,7 +163,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkSecuredRedirectUri($redirect_uri)
+    private function checkSecuredRedirectUri($redirect_uri)
     {
         if (true === $this->getConfiguration()->get('enforce_secured_redirect_uri', false) && 'https' !== substr($redirect_uri, 0, 5)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must be secured');
@@ -182,7 +179,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @return array
      */
-    protected function getClientRedirectUris(Authorization $authorization)
+    private function getClientRedirectUris(Authorization $authorization)
     {
         $client = $authorization->getClient();
         if (!$client instanceof RegisteredClientInterface) {
@@ -207,7 +204,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUriIfRequiredForRegisteredClients()
+    private function checkRedirectUriIfRequiredForRegisteredClients()
     {
         if (true === $this->getConfiguration()->get('enforce_registered_client_redirect_uris', false)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Registered clients must register at least one redirect URI');
@@ -219,7 +216,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      * 
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUriForNonConfidentialClient(RegisteredClientInterface $client)
+    private function checkRedirectUriForNonConfidentialClient(RegisteredClientInterface $client)
     {
         if (!$client instanceof ConfidentialClientInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Non-confidential clients must register at least one redirect URI');
@@ -232,7 +229,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      * 
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkRedirectUriForConfidentialClient(RegisteredClientInterface $client, $response_type)
+    private function checkRedirectUriForConfidentialClient(RegisteredClientInterface $client, $response_type)
     {
         if ($client instanceof ConfidentialClientInterface && $response_type === 'token') {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients must register at least one redirect URI when using "token" response type');
@@ -246,14 +243,14 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkState(Authorization $authorization)
+    private function checkState(Authorization $authorization)
     {
         if (null === $authorization->getState() && $this->getConfiguration()->get('enforce_state', false)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "state" parameter is mandatory');
         }
     }
 
-    protected function checkScope(Authorization &$authorization)
+    private function checkScope(Authorization &$authorization)
     {
         try {
             $scope = $this->getScopeManager()->checkScopePolicy($authorization->getClient(), $authorization->getScope());
@@ -277,7 +274,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @return \OAuth2\Grant\ResponseTypeSupportInterface[]
      */
-    protected function getResponseTypes(Authorization $authorization)
+    private function getResponseTypes(Authorization $authorization)
     {
         /*
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.1

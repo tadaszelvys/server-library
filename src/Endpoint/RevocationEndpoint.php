@@ -20,12 +20,16 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Configuration\ConfigurationInterface;
+use OAuth2\Endpoint\RevocationTokenType\AccessToken;
+use OAuth2\Endpoint\RevocationTokenType\RefreshToken;
+use OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Exception\InternalServerErrorExceptionInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
+use OAuth2\Token\TokenInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -37,6 +41,11 @@ final class RevocationEndpoint implements RevocationEndpointInterface
     use HasClientManagerSupervisor;
     use HasRefreshTokenManager;
     use HasAccessTokenManager;
+
+    /**
+     * @var \OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface[]
+     */
+    private $token_types = [];
 
     /**
      * RevocationEndpoint constructor.
@@ -59,21 +68,27 @@ final class RevocationEndpoint implements RevocationEndpointInterface
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
+
+        $this->addRevocationTokenType(new AccessToken($this->getAccessTokenManager()));
+        $this->addRevocationTokenType(new RefreshToken($this->getRefreshTokenManager()));
     }
 
     /**
-     * @return string[]
+     * @param \OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface $token_type
      */
-    protected function getRevocationMethods()
+    public function addRevocationTokenType(RevocationTokenTypeInterface $token_type)
     {
-        $managers = [
-            'access_token' => 'tryRevokeAccessToken',
-        ];
-        if (null !== ($this->getRefreshTokenManager())) {
-            $managers['refresh_token'] = 'tryRevokeRefreshToken';
+        if (!array_key_exists($token_type->getTokenTypeHint(), $this->token_types)) {
+            $this->token_types[$token_type->getTokenTypeHint()] = $token_type;
         }
+    }
 
-        return $managers;
+    /**
+     * @return \OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface[]
+     */
+    private function getTokenTypes()
+    {
+        return $this->token_types;
     }
 
     /**
@@ -160,23 +175,25 @@ final class RevocationEndpoint implements RevocationEndpointInterface
 
     /**
      * @param \Psr\Http\Message\ResponseInterface $response
-     * @param string|null                         $token
+     * @param string                              $token
      * @param string|null                         $token_type_hint
      * @param \OAuth2\Client\ClientInterface|null $client
      * @param string|null                         $callback
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function revokeToken(ResponseInterface &$response, $token = null, $token_type_hint = null, ClientInterface $client = null, $callback = null)
+    private function revokeToken(ResponseInterface &$response, $token, $token_type_hint = null, ClientInterface $client = null, $callback = null)
     {
-        $methods = $this->getRevocationMethods();
+        $token_types = $this->getTokenTypes();
         if (null === $token_type_hint) {
-            foreach ($methods as $method) {
-                $this->$method($token, $client);
+            foreach ($token_types as $token_type) {
+                if (true === $this->tryRevokeToken($token_type, $token, $client)) {
+                    break;
+                }
             }
-        } elseif (array_key_exists($token_type_hint, $methods)) {
-            $method = $methods[$token_type_hint];
-            $this->$method($token, $client);
+        } elseif (array_key_exists($token_type_hint, $token_types)) {
+            $token_type = $token_types[$token_type_hint];
+            $this->tryRevokeToken($token_type, $token, $client);
         } else {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::NOT_IMPLEMENTED, 'unsupported_token_type', sprintf('Token type "%s" not supported', $token_type_hint));
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
@@ -187,47 +204,38 @@ final class RevocationEndpoint implements RevocationEndpointInterface
     }
 
     /**
-     * @param string|null                    $token
-     * @param \OAuth2\Client\ClientInterface $client
-     */
-    private function tryRevokeAccessToken($token = null, ClientInterface $client = null)
-    {
-        $access_token = $this->getAccessTokenManager()->getAccessToken($token);
-        if (null !== $access_token && true === $this->isClientVerified($access_token, $client)) {
-            if (true === $this->getConfiguration()->get('revoke_refresh_token_and_access_token', true) && null !== ($access_token->getRefreshToken())) {
-                $this->tryRevokeRefreshToken($access_token->getRefreshToken(), $client);
-            }
-            $this->getAccessTokenManager()->revokeAccessToken($access_token);
-        }
-    }
-
-    /**
-     * @param string|null                    $token
-     * @param \OAuth2\Client\ClientInterface $client
+     * @param \OAuth2\Endpoint\RevocationTokenType\RevocationTokenTypeInterface $token_type
+     * @param string                                                            $token
+     * @param \OAuth2\Client\ClientInterface|null                               $client
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @return bool
      */
-    private function tryRevokeRefreshToken($token = null, ClientInterface $client = null)
+    private function tryRevokeToken(RevocationTokenTypeInterface $token_type, $token, ClientInterface $client = null)
     {
-        $refresh_token = $this->getRefreshTokenManager()->getRefreshToken($token);
-        if (null !== $refresh_token && true === $this->isClientVerified($refresh_token, $client)) {
-            $this->getRefreshTokenManager()->revokeRefreshToken($refresh_token);
+        $result = $token_type->getToken($token);
+        if ($result instanceof TokenInterface) {
+            if ($this->isClientVerified($result, $client)) {
+                $token_type->revokeToken($result);
+
+                return true;
+            }
         }
+        return false;
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface|\OAuth2\Token\RefreshTokenInterface $token
-     * @param \OAuth2\Client\ClientInterface|null                                    $client
+     * @param \OAuth2\Token\TokenInterface        $token
+     * @param \OAuth2\Client\ClientInterface|null $client
      *
      * @return bool
      */
     private function isClientVerified($token, ClientInterface $client = null)
     {
         if (null !== $client) {
-            // The client ID of the token is the same as client authenticated
+            // The client ID of the token is the same as authenticated client
             return $token->getClientPublicId() === $client->getPublicId();
         } else {
-            // We try to get the client
+            // We try to get the client associated with the token
             $client = $this->getClientManagerSupervisor()->getClient($token->getClientPublicId());
 
             // Return false if the client is a confidential client (confidential client must be authenticated)

@@ -23,7 +23,7 @@ namespace OAuth2\Endpoint;
  * @method null|string getRedirectUri()
  * @method setRedirectUri(string $redirect_uri)
  * @method string[] getScope()
- * @method setScope(string[] $scope)
+ * @method setScope(array $scope)
  * @method null|string getState()
  * @method setState(string $state)
  * @method bool isAuthorized()
@@ -56,78 +56,81 @@ final class Authorization
     /**
      * @var null|\OAuth2\Client\ClientInterface
      */
-    protected $client = null;
+    private $client = null;
 
     /**
      * @var null|string
      */
-    protected $client_id = null;
+    private $client_id = null;
 
     /**
      * @var null|string
      */
-    protected $response_type = null;
+    private $response_type = null;
 
     /**
      * @var null|string
      */
-    protected $redirect_uri = null;
+    private $redirect_uri = null;
 
     /**
      * @var null|\OAuth2\EndUser\EndUserInterface
      */
-    protected $end_user = null;
+    private $end_user = null;
 
     /**
      * @var array
      */
-    protected $scope = [];
+    private $scope = [];
 
     /**
      * @var null|string
      */
-    protected $state = null;
+    private $state = null;
 
     /**
      * @var bool
      */
-    protected $issue_refresh_token = false;
+    private $issue_refresh_token = false;
 
     /**
      * @var bool
      */
-    protected $authorized = false;
+    private $authorized = false;
 
     /**
      * @var null|string
      */
-    protected $response_mode = null;
+    private $response_mode = null;
 
     /**
      * @var null|string
      */
-    protected $nonce = null;
+    private $nonce = null;
 
     /**
      * @var array
      */
-    protected $claims = [];
+    private $claims = [];
 
     /**
      * @var null|int
      */
-    protected $max_age = null;
+    private $max_age = null;
 
     /**
      * @var null|string
      */
-    protected $display = null;
+    private $display = null;
 
     const DISPLAY_PAGE = 'page';
     const DISPLAY_POPUP = 'popup';
     const DISPLAY_TOUCH = 'touch';
     const DISPLAY_WAP = 'wap';
 
+    /**
+     * @return array
+     */
     public function getAllowedDisplayValues()
     {
         return [
@@ -142,13 +145,16 @@ final class Authorization
     /**
      * @var null|string
      */
-    protected $prompt = null;
+    private $prompt = null;
 
     const PROMPT_NONE = 'none';
     const PROMPT_LOGIN = 'login';
     const PROMPT_CONSENT = 'consent';
     const PROMPT_SELECT_ACCOUNT = 'select_account';
 
+    /**
+     * @return array
+     */
     public function getAllowedPromptValues()
     {
         return [
@@ -163,31 +169,31 @@ final class Authorization
     /**
      * @var null|string
      */
-    protected $ui_locales = null;
+    private $ui_locales = null;
 
     /**
      * @var null|string
      */
-    protected $id_token_hint = null;
+    Private $id_token_hint = null;
 
     /**
      * @var null|string
      */
-    protected $login_hint = null;
+    private $login_hint = null;
 
     /**
      * @var null|string
      */
-    protected $acr_values = null;
+    private $acr_values = null;
 
     /**
      * @var array
      */
-    protected $query_params = [];
+    private $query_params = [];
 
     /**
-     * @param       $method
-     * @param array $arguments
+     * @param string $method
+     * @param array  $arguments
      *
      * @return mixed
      */

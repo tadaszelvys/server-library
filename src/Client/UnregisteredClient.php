@@ -20,6 +20,9 @@ namespace OAuth2\Client;
  */
 class UnregisteredClient extends Client
 {
+    /**
+     * UnregisteredClient constructor.
+     */
     public function __construct()
     {
         parent::__construct();

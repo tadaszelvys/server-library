@@ -17,7 +17,7 @@ use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ClientManagerSupervisor implements ClientManagerSupervisorInterface
+final class ClientManagerSupervisor implements ClientManagerSupervisorInterface
 {
     use HasExceptionManager;
     use HasConfiguration;
@@ -25,7 +25,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     /**
      * @var \OAuth2\Client\ClientManagerInterface[]
      */
-    protected $client_managers = [];
+    private $client_managers = [];
 
     /**
      * ClientManagerSupervisor constructor.
@@ -40,9 +40,9 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return \OAuth2\Client\ClientManagerInterface[]
      */
-    protected function getClientManagers()
+    private function getClientManagers()
     {
         return $this->client_managers;
     }

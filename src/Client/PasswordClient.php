@@ -56,6 +56,9 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
         $this->secret = $secret;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSalt()
     {
         return $this->salt;

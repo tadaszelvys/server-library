@@ -13,7 +13,7 @@ namespace OAuth2\Exception;
 
 final class AuthenticateException extends BaseException implements AuthenticateExceptionInterface
 {
-    protected $header = [];
+    private $header = [];
 
     /**
      * @param string $error             Short name of the error
@@ -60,7 +60,12 @@ final class AuthenticateException extends BaseException implements AuthenticateE
     {
     }
 
-    protected function quote($text)
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
+    private function quote($text)
     {
         // Reference to IETF Draft must be updated
         // https://tools.ietf.org/html/draft-ietf-httpbis-p1-messaging-17#section-3.2.3

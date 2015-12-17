@@ -15,8 +15,15 @@ use OAuth2\Util\Uri;
 
 final class RedirectException extends BaseException implements RedirectExceptionInterface
 {
-    protected $redirect_uri;
-    protected $transport_mode;
+    /**
+     * @var string
+     */
+    private $redirect_uri;
+
+    /**
+     * @var string
+     */
+    private $transport_mode;
 
     /**
      * @param string $error             Short name of the error
@@ -46,10 +53,16 @@ final class RedirectException extends BaseException implements RedirectException
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getResponseBody()
     {
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getResponseHeaders()
     {
         $data = $this->errorData;

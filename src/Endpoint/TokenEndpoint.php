@@ -103,9 +103,6 @@ final class TokenEndpoint implements TokenEndpointInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
-     * @throws \OAuth2\Exception\NotImplementedExceptionInterface
      */
     public function getAccessToken(ServerRequestInterface $request, ResponseInterface &$response)
     {
@@ -130,7 +127,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function handleRequest(ServerRequestInterface $request, ResponseInterface &$response)
+    private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response)
     {
         $grant_type = RequestBody::getParameter($request, 'grant_type');
         $type = $this->getGrantType($grant_type);
@@ -193,7 +190,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @return \OAuth2\Client\ClientInterface
      */
-    protected function findClient(ServerRequestInterface $request, GrantTypeResponseInterface $grant_type_response)
+    private function findClient(ServerRequestInterface $request, GrantTypeResponseInterface $grant_type_response)
     {
         if (null === $grant_type_response->getClientPublicId()) {
             $client = $this->getClientManagerSupervisor()->findClient($request);
@@ -214,7 +211,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    protected function createAccessToken(ClientInterface $client, array $values)
+    private function createAccessToken(ClientInterface $client, array $values)
     {
         $refresh_token = null;
         $resource_owner = $this->getResourceOwner($values['resource_owner_public_id']);
@@ -240,7 +237,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @return \OAuth2\Grant\GrantTypeSupportInterface
      */
-    protected function getGrantType($grant_type)
+    private function getGrantType($grant_type)
     {
         if (array_key_exists($grant_type, $this->grant_types)) {
             return $this->grant_types[$grant_type];
@@ -254,7 +251,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function checkGrantType(ClientInterface $client, $grant_type)
+    private function checkGrantType(ClientInterface $client, $grant_type)
     {
         if (!$client->isAllowedGrantType($grant_type)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The grant type "'.$grant_type.'" is unauthorized for this client_id');
@@ -268,7 +265,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @return null|\OAuth2\Client\ClientInterface|\OAuth2\EndUser\EndUserInterface
      */
-    protected function getResourceOwner($resource_owner_public_id)
+    private function getResourceOwner($resource_owner_public_id)
     {
         $client = $this->getClientManagerSupervisor()->getClient($resource_owner_public_id);
         if (null !== $client) {

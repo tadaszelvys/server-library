@@ -19,6 +19,9 @@ namespace OAuth2\Client;
  */
 class PublicClient extends RegisteredClient implements PublicClientInterface
 {
+    /**
+     * PublicClient constructor.
+     */
     public function __construct()
     {
         parent::__construct();

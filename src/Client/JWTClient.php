@@ -30,7 +30,7 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
     }
 
     /**
-     * @param array $key_set
+     * {@inheritdoc}
      */
     public function setSignaturePublicKeySet(array $key_set)
     {
@@ -38,7 +38,7 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSignaturePublicKeySet()
     {
@@ -46,7 +46,7 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
     }
 
     /**
-     * @param string[] $allowed_signature_algorithms
+     * {@inheritdoc}
      */
     public function setAllowedSignatureAlgorithms(array $allowed_signature_algorithms)
     {
@@ -54,7 +54,7 @@ class JWTClient extends ConfidentialClient implements JWTClientInterface
     }
 
     /**
-     * @return string[]
+     * {@inheritdoc}
      */
     public function getAllowedSignatureAlgorithms()
     {

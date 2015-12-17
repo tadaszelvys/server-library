@@ -54,6 +54,9 @@ class Client extends ResourceOwner implements ClientInterface
         $this->grant_types = $grant_types;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function removeAllowedGrantType($grant_type)
     {
         $key = array_search($grant_type, $this->grant_types);
