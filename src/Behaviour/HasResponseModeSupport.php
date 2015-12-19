@@ -42,22 +42,32 @@ trait HasResponseModeSupport
      */
     public function getResponseMode(array $types, Authorization $authorization)
     {
-        if ($authorization->has('response_mode') && true === $this->getConfiguration()->get('allow_response_mode_parameter_in_authorization_request', false)) {
-            // The client uses the response_mode parameter and the server allows it
-            $mode = $authorization->get('response_mode');
-        } elseif (null !== $multiple = $this->getResponseModeIfMultipleResponseTypes($authorization->get('response_type'))) {
-            // The response type contains multiple types defined by OpenID Connect Specification
-            $mode = $multiple;
-        } elseif (1 < count($types)) {
-            // The response type contains multiple types but not defined by OpenID Connect Specification
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('The response mode "%s" is not supported.', $authorization->getResponseType()));
-        } else {
-            // The response type contains only one type
-            $mode = $types[0]->getResponseMode();
+        if ($authorization->has('response_mode')) {
+            if ($this->getConfiguration()->get('allow_response_mode_parameter_in_authorization_request', false)) {
+                return $this->getResponseModeService($authorization->get('response_mode'));
+            }
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The response mode parameter is not authorized.');
         }
+        if (null !== $mode = $this->getResponseModeIfMultipleResponseTypes($authorization->get('response_type'))) {
+            return $this->getResponseModeService($mode);
+        }
+        if (1 === count($types)) {
+            return $this->getResponseModeService($types[0]->getResponseMode());
+        }
+        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unable to retrieve response mode for response type "%s".', $authorization->get('response_type')));
+    }
 
+    /**
+     * @param string $mode
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\Endpoint\ResponseModeInterface
+     */
+    private function getResponseModeService($mode)
+    {
         if (!array_key_exists($mode, $this->response_modes)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('Unable to retrieve response mode for response type "%s".', $authorization->getResponseType()));
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported response mode "%s".', $mode));
         }
 
         return $this->response_modes[$mode];
@@ -68,7 +78,7 @@ trait HasResponseModeSupport
      *
      * @return null|string
      */
-    public function getResponseModeIfMultipleResponseTypes($response_type)
+    private function getResponseModeIfMultipleResponseTypes($response_type)
     {
         switch ($response_type) {
             case 'code token':

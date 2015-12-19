@@ -26,17 +26,22 @@ This library provides components to build an authorization server based on the O
 
 The following components are implemented:
 
-* Access token manager:
+* Access Token Managers:
     * [x] Simple string access token
     * [x] JWT access token
-* Access token type:
+    * [x] Ability to use other Access Token managers
+* Access Token Types:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
     * [ ] MAC access ([IETF draft](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-05)) - *The implementation is stopped until the specification has not reach maturity*
+    * [x] Ability to use other Access Token Types
 * [x] Exception manager
 * [x] Scope manager ([RFC6749, section 3.3](https://tools.ietf.org/html/rfc6749#section-3.3))
-* Clients:
+* Clients Managers:
     * [x] Public clients ([RFC6749, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1))
         * [x] Proof Key for Code Exchange by OAuth Public Clients ([RFC7636](https://tools.ietf.org/html/rfc7636))
+            * [x] Plain
+            * [x] S256
+            * [x] Ability to use other challenge methods
     * [x] Password clients ([RFC6749, section 2.3.1](https://tools.ietf.org/html/rfc6749#section-2.3.1))
         * [x] HTTP Basic Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617)) - *Note: ([RFC7617](https://tools.ietf.org/html/rfc7617)) support is scheduled*
         * [x] HTTP Digest Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617)) - *Note: ([RFC7616](https://tools.ietf.org/html/rfc7616)) support is scheduled*
@@ -44,11 +49,13 @@ The following components are implemented:
     * [ ] SAML clients ([RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
     * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523))
     * [x] Unregistered clients ([RFC6749, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4))
+    * [x] Ability to use other Client Managers
 * Endpoints:
     * [x] Authorization endpoint ([RFC6749, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
     * [x] Token endpoint ([RFC6749, section 3.2](https://tools.ietf.org/html/rfc6749#section-3.2))
     * [x] Token revocation endpoint ([RFC7009](https://tools.ietf.org/html/rfc7009))
     * [x] Token introspection endpoint ([RFC7662](https://tools.ietf.org/html/rfc7662))
+    * [x] Ability to use other Endpoints
 * Grant types:
     * [x] Authorization code grant type ([RFC6749, section 4.1](https://tools.ietf.org/html/rfc6749#section-4.1))
     * [x] Implicit grant type ([RFC6749, section 4.2](https://tools.ietf.org/html/rfc6749#section-4.2))
@@ -57,6 +64,7 @@ The following components are implemented:
     * [x] Refresh token grant type ([RFC6749, section 6](https://tools.ietf.org/html/rfc6749#section-6))
     * [ ] SAML grant type ([RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
     * [x] JWT Bearer token grant type ([RFC7523](https://tools.ietf.org/html/rfc7523))
+    * [x] Ability to use other Grant Types
 
 * OpenID Connect
     * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
