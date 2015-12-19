@@ -155,11 +155,8 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->revocation_endpoint) {
             $this->revocation_endpoint = new RevocationEndpoint(
-                $this->getSimplestringAccessTokenManager(),
-                $this->getRefreshTokenManager(),
                 $this->getClientManagerSupervisor(),
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
 
             $this->revocation_endpoint->addRevocationTokenType($this->getAccessTokenType());
@@ -181,8 +178,6 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->token_introspection_endpoint) {
             $this->token_introspection_endpoint = new TokenIntrospectionEndpoint(
-                $this->getSimplestringAccessTokenManager(),
-                $this->getRefreshTokenManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getExceptionManager()
             );
