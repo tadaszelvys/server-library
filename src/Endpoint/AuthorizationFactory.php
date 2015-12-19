@@ -93,32 +93,28 @@ final class AuthorizationFactory
     {
         $params = $request->getQueryParams();
         if (isset($params['request']) && true === $this->isRequestParameterSupported()) {
-            return $this->createFromRequestParameter($params, $end_user, $is_authorized);
+            $this->createFromRequestParameter();
         } elseif (isset($params['request_uri']) && true === $this->isRequestUriParameterSupported()) {
-            return $this->createFromRequestUriParameter($params, $end_user, $is_authorized);
+            $this->createFromRequestUriParameter();
         }
 
         return $this->createFromStandardRequest($params, $end_user, $is_authorized);
     }
 
     /**
-     * @param array                            $params
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
-     * @param bool                             $is_authorized
-     *
-     * @return \OAuth2\Endpoint\Authorization
+     * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function createFromRequestParameter(array $params, EndUserInterface $end_user, $is_authorized)
+    private function createFromRequestParameter()
     {
-        $jws = $this->jwt_loader->load($params['request']);
+        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
+    }
 
-        $client = $this->getClient($jws->getClaim(''));
-
-        $this->jwt_loader->verifySignature($jws, $client);
-        //$scopes = $this->getScope($params);
-        //$authorization = new Authorization($params, $end_user, $is_authorized, $client, $scopes);
-
-        throw new \RuntimeException('Not supported');
+    /**
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function createFromRequestUriParameter()
+    {
+        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
     }
 
     /**
@@ -128,19 +124,7 @@ final class AuthorizationFactory
      *
      * @return \OAuth2\Endpoint\Authorization
      */
-    public function createFromRequestUriParameter(array $params, EndUserInterface $end_user, $is_authorized)
-    {
-        throw new \RuntimeException('Not supported');
-    }
-
-    /**
-     * @param array                            $params
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
-     * @param bool                             $is_authorized
-     *
-     * @return \OAuth2\Endpoint\Authorization
-     */
-    public function createFromStandardRequest(array $params, EndUserInterface $end_user, $is_authorized)
+    private function createFromStandardRequest(array $params, EndUserInterface $end_user, $is_authorized)
     {
         $client = $this->getClient($params);
         $scopes = $this->getScope($params);
