@@ -15,6 +15,7 @@ use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasScopeManager;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -109,6 +110,14 @@ final class AuthorizationFactory
      */
     public function createFromRequestParameter(array $params, EndUserInterface $end_user, $is_authorized)
     {
+        $jws = $this->jwt_loader->load($params['request']);
+
+        $client = $this->getClient($jws->getClaim(''));
+
+        $this->jwt_loader->verifySignature($jws, $client);
+        //$scopes = $this->getScope($params);
+        //$authorization = new Authorization($params, $end_user, $is_authorized, $client, $scopes);
+
         throw new \RuntimeException('Not supported');
     }
 
@@ -143,13 +152,17 @@ final class AuthorizationFactory
     /**
      * @param array $params
      *
-     * @return null|\OAuth2\Client\ClientInterface
+     * @return \OAuth2\Client\ClientInterface
+     * @throws \OAuth2\Exception\BaseExceptionInterface
      */
     private function getClient(array $params)
     {
-        if (array_key_exists('client_id', $params)) {
-            return $this->getClientManagerSupervisor()->getClient($params['client_id']);
+        $client = array_key_exists('client_id', $params)?$this->getClientManagerSupervisor()->getClient($params['client_id']):null;
+        if (!$client instanceof ClientInterface) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_id" missing or invalid.');
         }
+
+        return $client;
     }
 
     /**

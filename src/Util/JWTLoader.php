@@ -89,7 +89,7 @@ final class JWTLoader
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return \Jose\Object\JWSInterface|\Jose\Object\JWEInterface
+     * @return \Jose\Object\JWSInterface
      */
     public function load($assertion)
     {

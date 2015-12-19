@@ -22,30 +22,27 @@ use Zend\Diactoros\ServerRequest;
  */
 class ImplicitGrantTypeTest extends Base
 {
-    public function testRedirectUriParameterIsMissing()
+    public function testClientIdParameterIsMissing()
     {
-        $request = new ServerRequest();
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getEndUserManager()->getEndUser('user1'),
-            true
-        );
-
-        $response = new Response();
         try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+            $request = new ServerRequest();
+            $this->getAuthorizationFactory()->createFromRequest(
+                $request,
+                $this->getEndUserManager()->getEndUser('user1'),
+                true
+            );
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('The "redirect_uri" parameter is missing. Add "redirect_uri" parameter or store redirect URIs to your client', $e->getDescription());
+            $this->assertEquals('Parameter "client_id" missing or invalid.', $e->getDescription());
         }
     }
 
-    public function testRedirectUriParameterWithFragment()
+    public function testResponseTypeParameterIsMissing()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri' => 'http://example.com/test#bad',
+            'client_id'    => 'foo',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -59,7 +56,7 @@ class ImplicitGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('The "redirect_uri" must not contain fragment', $e->getDescription());
+            $this->assertEquals('Invalid "response_type" parameter or parameter is missing', $e->getDescription());
         }
     }
 
@@ -83,29 +80,6 @@ class ImplicitGrantTypeTest extends Base
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
             $this->assertEquals('The specified redirect URI is not valid', $e->getDescription());
-        }
-    }
-
-    public function testResponseTypeParameterIsMissing()
-    {
-        $request = new ServerRequest();
-        $request = $request->withQueryParams([
-            'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
-        ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getEndUserManager()->getEndUser('user1'),
-            true
-        );
-
-        $response = new Response();
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('Invalid "response_type" parameter or parameter is missing', $e->getDescription());
         }
     }
 

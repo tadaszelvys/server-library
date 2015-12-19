@@ -22,9 +22,9 @@ final class Authorization
     private $is_authorized;
 
     /**
-     * @var null|\OAuth2\Client\ClientInterface
+     * @var \OAuth2\Client\ClientInterface
      */
-    private $client = null;
+    private $client;
 
     /**
      * @var \OAuth2\EndUser\EndUserInterface
@@ -82,13 +82,18 @@ final class Authorization
     /**
      * Authorization constructor.
      *
-     * @param array                               $query_params
-     * @param \OAuth2\EndUser\EndUserInterface    $end_user
-     * @param bool                                $is_authorized
-     * @param \OAuth2\Client\ClientInterface|null $client
-     * @param array                               $scopes
+     * @param array                            $query_params
+     * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param bool                             $is_authorized
+     * @param \OAuth2\Client\ClientInterface   $client
+     * @param array                            $scopes
      */
-    public function __construct(array $query_params, EndUserInterface $end_user, $is_authorized, ClientInterface $client = null, array $scopes = [])
+    public function __construct(array $query_params,
+                                EndUserInterface $end_user,
+                                $is_authorized,
+                                ClientInterface $client,
+                                array $scopes = []
+    )
     {
         $this->query_params = $query_params;
         $this->end_user = $end_user;
@@ -109,7 +114,7 @@ final class Authorization
     }
 
     /**
-     * @return null|\OAuth2\Client\ClientInterface
+     * @return \OAuth2\Client\ClientInterface
      */
     public function getClient()
     {

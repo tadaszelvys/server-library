@@ -16,7 +16,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 trait HasExceptionManager
 {
     /**
-     * @var\OAuth2\Exception\ExceptionManagerInterface
+     * @var \OAuth2\Exception\ExceptionManagerInterface
      */
     private $exception_manager;
 
