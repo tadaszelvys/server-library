@@ -28,11 +28,6 @@ final class DigestData
     private $elements = [];
 
     /**
-     * @var string
-     */
-    private $header;
-
-    /**
      * @var int
      */
     private $nonceExpiryTime;
@@ -42,7 +37,6 @@ final class DigestData
      */
     public function __construct($header)
     {
-        $this->header = $header;
         preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
         if (!is_array($matches)) {
             throw new \InvalidArgumentException('Unable to parse header');
