@@ -154,6 +154,14 @@ final class Authorization
     }
 
     /**
+     * @param bool $is_authorized
+     */
+    public function setAuthorized($is_authorized)
+    {
+        $this->is_authorized = $is_authorized;
+    }
+
+    /**
      * @param string $param
      *
      * @return bool

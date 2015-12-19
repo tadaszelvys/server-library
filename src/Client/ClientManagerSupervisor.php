@@ -17,7 +17,7 @@ use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class ClientManagerSupervisor implements ClientManagerSupervisorInterface
+class ClientManagerSupervisor implements ClientManagerSupervisorInterface
 {
     use HasExceptionManager;
     use HasConfiguration;
