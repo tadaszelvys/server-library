@@ -136,12 +136,13 @@ final class AuthorizationFactory
     /**
      * @param array $params
      *
-     * @return \OAuth2\Client\ClientInterface
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\Client\ClientInterface
      */
     private function getClient(array $params)
     {
-        $client = array_key_exists('client_id', $params)?$this->getClientManagerSupervisor()->getClient($params['client_id']):null;
+        $client = array_key_exists('client_id', $params) ? $this->getClientManagerSupervisor()->getClient($params['client_id']) : null;
         if (!$client instanceof ClientInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_id" missing or invalid.');
         }
