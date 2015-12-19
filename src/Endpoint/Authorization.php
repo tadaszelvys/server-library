@@ -93,8 +93,7 @@ final class Authorization
                                 $is_authorized,
                                 ClientInterface $client,
                                 array $scopes = []
-    )
-    {
+    ) {
         $this->query_params = $query_params;
         $this->end_user = $end_user;
         $this->client = $client;
