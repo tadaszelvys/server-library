@@ -63,19 +63,21 @@ final class TokenEndpoint implements TokenEndpointInterface
     public function __construct(
         AccessTokenManagerInterface $access_token_manager,
         AccessTokenTypeManagerInterface $access_token_type_manager,
-        RefreshTokenManagerInterface $refresh_token_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
         EndUserManagerInterface $end_user_manager,
         ScopeManagerInterface $scope_manager,
-        ExceptionManagerInterface $exception_manager
+        ExceptionManagerInterface $exception_manager,
+        RefreshTokenManagerInterface $refresh_token_manager = null
     ) {
         $this->setAccessTokenManager($access_token_manager);
         $this->setAccessTokenTypeManager($access_token_type_manager);
-        $this->setRefreshTokenManager($refresh_token_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setEndUserManager($end_user_manager);
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
+        if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
+            $this->setRefreshTokenManager($refresh_token_manager);
+        }
     }
 
     /**

@@ -203,11 +203,11 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint = new TokenEndpoint(
                 $this->getSimplestringAccessTokenManager(),
                 $this->getAccessTokenTypeManager(),
-                $this->getRefreshTokenManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
                 $this->getScopeManager(),
-                $this->getExceptionManager()
+                $this->getExceptionManager(),
+                $this->getRefreshTokenManager()
             );
 
             $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
@@ -235,11 +235,11 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint_jwt_access_token = new TokenEndpoint(
                 $this->getJWTAccessTokenManager(),
                 $this->getAccessTokenTypeManager(),
-                $this->getRefreshTokenManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
                 $this->getScopeManager(),
-                $this->getExceptionManager()
+                $this->getExceptionManager(),
+                $this->getRefreshTokenManager()
             );
 
             $this->token_endpoint_jwt_access_token->addGrantType($this->getAuthorizationCodeGrantType());
