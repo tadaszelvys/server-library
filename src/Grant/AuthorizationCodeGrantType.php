@@ -114,9 +114,9 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             $authorization->getClient(),
             $authorization->getEndUser(),
             $authorization->getQueryParams(),
-            $authorization->has('redirect_uri')?$authorization->get('redirect_uri'):null,
+            $authorization->has('redirect_uri') ? $authorization->get('redirect_uri') : null,
             $authorization->getScopes(),
-            $authorization->has('issue_refresh_token')?$authorization->get('issue_refresh_token'):false
+            $authorization->has('issue_refresh_token') ? $authorization->get('issue_refresh_token') : false
         );
         $params = [
             'code' => $code->getToken(),
