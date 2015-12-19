@@ -78,7 +78,7 @@ final class NoneResponseType implements ResponseTypeSupportInterface
             $authorization->getScopes()
         );
 
-        foreach($this->listeners as $listener) {
+        foreach ($this->listeners as $listener) {
             $listener->call($token);
         }
 

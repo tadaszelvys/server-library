@@ -84,7 +84,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         if ($authorization->isAuthorized() === false) {
             $params = [
                 'transport_mode' => $response_mode->getName(),
-                'redirect_uri' => $authorization->get('redirect_uri'),
+                'redirect_uri'   => $authorization->get('redirect_uri'),
             ];
             if (true === $authorization->has('state')) {
                 $params['state'] = $authorization->get('state');
@@ -118,7 +118,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         $this->checkRedirectUriIfRequired($authorization);
 
-        $redirect_uri = $authorization->has('redirect_uri')?$authorization->get('redirect_uri'):null;
+        $redirect_uri = $authorization->has('redirect_uri') ? $authorization->get('redirect_uri') : null;
         $redirect_uris = $this->getClientRedirectUris($authorization);
 
         if (empty($redirect_uri) && empty($redirect_uris)) {

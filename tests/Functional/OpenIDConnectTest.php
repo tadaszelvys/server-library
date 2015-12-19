@@ -11,7 +11,6 @@
 
 namespace OAuth2\Test\Functional;
 
-use OAuth2\Endpoint\Authorization;
 use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;

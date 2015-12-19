@@ -101,7 +101,7 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param array $params
+     * @param array                            $params
      * @param \OAuth2\EndUser\EndUserInterface $end_user
      * @param bool                             $is_authorized
      *
