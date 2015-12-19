@@ -12,7 +12,6 @@
 namespace OAuth2\Test\Unit;
 
 use OAuth2\Client\PublicClient;
-use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\AuthenticateException;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
@@ -95,15 +94,5 @@ class ObjectsTest extends Base
                 'Bearer',
             ],
         ], $exception->getResponseHeaders());
-    }
-
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Unknown method "getFooBar"
-     */
-    public function testAuthorizationBadMethodCall()
-    {
-        $authorization = new Authorization();
-        $authorization->getFooBar();
     }
 }

@@ -29,6 +29,11 @@ final class NoneResponseType implements ResponseTypeSupportInterface
     use HasAccessTokenManager;
 
     /**
+     * @var \OAuth2\Grant\NoneResponseTypeListenerInterface[]
+     */
+    private $listeners = [];
+
+    /**
      * NoneResponseType constructor.
      *
      * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
@@ -36,6 +41,14 @@ final class NoneResponseType implements ResponseTypeSupportInterface
     public function __construct(AccessTokenManagerInterface $access_token_manager)
     {
         $this->setAccessTokenManager($access_token_manager);
+    }
+
+    /**
+     * @param \OAuth2\Grant\NoneResponseTypeListenerInterface $listener
+     */
+    public function addListener(NoneResponseTypeListenerInterface $listener)
+    {
+        $this->listeners[] = $listener;
     }
 
     /**
@@ -59,14 +72,16 @@ final class NoneResponseType implements ResponseTypeSupportInterface
      */
     public function grantAuthorization(Authorization $authorization)
     {
-        $token = $this->getAccessTokenManager()->createAccessToken($authorization->getClient(), $authorization->getEndUser(), $authorization->getScope());
+        $token = $this->getAccessTokenManager()->createAccessToken(
+            $authorization->getClient(),
+            $authorization->getEndUser(),
+            $authorization->getScopes()
+        );
 
-        $params = [];
-        $state = $authorization->getState();
-        if (!empty($state)) {
-            $params['state'] = $state;
+        foreach($this->listeners as $listener) {
+            $listener->call($token);
         }
 
-        return $params;
+        return [];
     }
 }

@@ -82,7 +82,7 @@ It has been successfully tested using `PHP 5.5.9`, `PHP 5.6`, `PHP 7` and `HHVM`
 The preferred way to install this library is to rely on Composer:
 
 ```sh
-composer require "spomky-labs/oauth2-server-library" "dev-master"
+composer require "spomky-labs/oauth2-server-library"
 ```
 
 # Create missing components

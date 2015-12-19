@@ -30,15 +30,19 @@ class AuthorizationFactoryTest extends Base
             'prompt'        => 'none',
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
-        $authorization = $this->getAuthorizationFactory()->createFromRequest($request);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+        true
+        );
 
-        $this->assertEquals('0123456789', $authorization->getState());
-        $this->assertEquals('foo', $authorization->getClientId());
+        $this->assertEquals('0123456789', $authorization->get('state'));
+        $this->assertEquals('foo', $authorization->get('client_id'));
         $this->assertEquals('foo', $authorization->getClient()->getPublicId());
-        $this->assertEquals('token', $authorization->getResponseType());
-        $this->assertEquals('page', $authorization->getDisplay());
-        $this->assertEquals('none', $authorization->getPrompt());
-        $this->assertEquals(['scope1', 'scope2'], $authorization->getScope());
+        $this->assertEquals('token', $authorization->get('response_type'));
+        $this->assertEquals('page', $authorization->get('display'));
+        $this->assertEquals('none', $authorization->get('prompt'));
+        $this->assertEquals('scope1 scope2', $authorization->get('scope'));
         $this->assertEquals($params, $authorization->getQueryParams());
     }
 
@@ -57,7 +61,11 @@ class AuthorizationFactoryTest extends Base
             'prompt'        => 'foo',
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
-        $this->getAuthorizationFactory()->createFromRequest($request);
+        $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
     }
 
     /**
@@ -75,16 +83,10 @@ class AuthorizationFactoryTest extends Base
             'prompt'        => 'none',
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
-        $this->getAuthorizationFactory()->createFromRequest($request);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage  Only one argument allowed
-     */
-    public function testBadParameterNumber()
-    {
-        $authorization = new Authorization();
-        $authorization->setClientId('foo', 'bar');
+        $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
     }
 }

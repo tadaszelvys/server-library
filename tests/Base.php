@@ -988,7 +988,7 @@ class Base extends \PHPUnit_Framework_TestCase
         $compression_manager->addCompressionAlgorithm(new GZip());
         $compression_manager->addCompressionAlgorithm(new ZLib());
 
-        return$compression_manager;
+        return $compression_manager;
     }
 
     /**

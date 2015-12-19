@@ -11,117 +11,30 @@
 
 namespace OAuth2\Endpoint;
 
-/**
- * @method string getClientId()
- * @method setClientId(string $client_id)
- * @method \OAuth2\Client\ClientInterface getClient()
- * @method setClient(\OAuth2\Client\ClientInterface $client)
- * @method \OAuth2\EndUser\EndUserInterface getEndUser()
- * @method setEndUser(\OAuth2\EndUser\EndUserInterface $end_user)
- * @method null|string getResponseType()
- * @method setResponseType(string $response_type)
- * @method null|string getRedirectUri()
- * @method setRedirectUri(string $redirect_uri)
- * @method string[] getScope()
- * @method setScope(array $scope)
- * @method null|string getState()
- * @method setState(string $state)
- * @method bool isAuthorized()
- * @method setAuthorized(bool $authorized)
- * @method bool getIssueRefreshToken()
- * @method setIssueRefreshToken(bool $issue_refresh_token)
- * @method null|string getResponseMode()
- * @method setResponseMode(string $response_mode)
- * @method null|string getNonce()
- * @method setNonce(string $nonce)
- * @method null|string getDisplay()
- * @method setDisplay(string $display)
- * @method null|string getPrompt()
- * @method setPrompt(string $prompt)
- * @method null|int getMaxAge()
- * @method setMaxAge(int $max_age)
- * @method null|string getUiLocales()
- * @method setUiLocales(string $ui_locales)
- * @method null|string getIdTokenHint()
- * @method setIdTokenHint(string $id_token_hint)
- * @method null|string getLoginHint()
- * @method setLoginHint(string $login_hint)
- * @method null|string getAcrValues()
- * @method setAcrValues(string $acr_values)
- * @method array getQueryParams()
- * @method setQueryParams(array $query_params)
- */
+use OAuth2\Client\ClientInterface;
+use OAuth2\EndUser\EndUserInterface;
+
 final class Authorization
 {
+    /**
+     * @var bool
+     */
+    private $is_authorized;
+
     /**
      * @var null|\OAuth2\Client\ClientInterface
      */
     private $client = null;
 
     /**
-     * @var null|string
+     * @var \OAuth2\EndUser\EndUserInterface
      */
-    private $client_id = null;
-
-    /**
-     * @var null|string
-     */
-    private $response_type = null;
-
-    /**
-     * @var null|string
-     */
-    private $redirect_uri = null;
-
-    /**
-     * @var null|\OAuth2\EndUser\EndUserInterface
-     */
-    private $end_user = null;
+    private $end_user;
 
     /**
      * @var array
      */
-    private $scope = [];
-
-    /**
-     * @var null|string
-     */
-    private $state = null;
-
-    /**
-     * @var bool
-     */
-    private $issue_refresh_token = false;
-
-    /**
-     * @var bool
-     */
-    private $authorized = false;
-
-    /**
-     * @var null|string
-     */
-    private $response_mode = null;
-
-    /**
-     * @var null|string
-     */
-    private $nonce = null;
-
-    /**
-     * @var array
-     */
-    private $claims = [];
-
-    /**
-     * @var null|int
-     */
-    private $max_age = null;
-
-    /**
-     * @var null|string
-     */
-    private $display = null;
+    private $scopes = [];
 
     const DISPLAY_PAGE = 'page';
     const DISPLAY_POPUP = 'popup';
@@ -141,11 +54,6 @@ final class Authorization
             self::DISPLAY_WAP,
         ];
     }
-
-    /**
-     * @var null|string
-     */
-    private $prompt = null;
 
     const PROMPT_NONE = 'none';
     const PROMPT_LOGIN = 'login';
@@ -167,77 +75,120 @@ final class Authorization
     }
 
     /**
-     * @var null|string
-     */
-    private $ui_locales = null;
-
-    /**
-     * @var null|string
-     */
-    private $id_token_hint = null;
-
-    /**
-     * @var null|string
-     */
-    private $login_hint = null;
-
-    /**
-     * @var null|string
-     */
-    private $acr_values = null;
-
-    /**
      * @var array
      */
     private $query_params = [];
 
     /**
-     * @param string $method
-     * @param array  $arguments
+     * Authorization constructor.
      *
-     * @return mixed
+     * @param array                               $query_params
+     * @param \OAuth2\EndUser\EndUserInterface    $end_user
+     * @param bool                                $is_authorized
+     * @param \OAuth2\Client\ClientInterface|null $client
+     * @param array                               $scopes
      */
-    public function __call($method, array $arguments)
+    public function __construct(array $query_params, EndUserInterface $end_user, $is_authorized, ClientInterface $client = null, array $scopes = [])
     {
-        if (method_exists($this, $method)) {
-            return call_user_func_array([$this, $method], $arguments);
-        }
+        $this->query_params = $query_params;
+        $this->end_user = $end_user;
+        $this->client = $client;
+        $this->is_authorized = $is_authorized;
+        $this->scopes = $scopes;
 
-        if (0 === strpos($method, 'get')) {
-            $param = $this->underscore(substr($method, 3));
-            if (property_exists($this, $param)) {
-                return $this->$param;
-            }
-        } elseif (0 === strpos($method, 'is')) {
-            $param = $this->underscore(substr($method, 2));
-            if (property_exists($this, $param)) {
-                return $this->$param;
-            }
-        } elseif (0 === strpos($method, 'set')) {
-            $param = $this->underscore(substr($method, 3));
-            if (property_exists($this, $param)) {
-                if (count($arguments) !== 1) {
-                    throw new \InvalidArgumentException('Only one argument allowed');
-                }
-                $this->$param = $arguments[0];
-
-                return;
-            }
-        }
-        throw new \BadMethodCallException(sprintf('Unknown method "%s"', $method));
+        $this->checkDisplay();
+        $this->checkPrompt();
     }
 
     /**
-     * @param string $cameled
-     *
-     * @return string
+     * @return \OAuth2\EndUser\EndUserInterface
      */
-    private function underscore($cameled)
+    public function getEndUser()
     {
-        return implode(
-            '_',
-            array_map(
-                'strtolower',
-                preg_split('/([A-Z]{1}[^A-Z]*)/', $cameled, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY)));
+        return $this->end_user;
+    }
+
+    /**
+     * @return null|\OAuth2\Client\ClientInterface
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @return array
+     */
+    public function getQueryParams()
+    {
+        return $this->query_params;
+    }
+
+    /**
+     * @return array
+     */
+    public function getScopes()
+    {
+        return $this->scopes;
+    }
+
+    /**
+     * @param array $scopes
+     */
+    public function setScopes(array $scopes)
+    {
+        $this->scopes = $scopes;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAuthorized()
+    {
+        return $this->is_authorized;
+    }
+
+    /**
+     * @param string $param
+     *
+     * @return bool
+     */
+    public function has($param)
+    {
+        return array_key_exists($param, $this->query_params);
+    }
+
+    /**
+     * @param string $param
+     *
+     * @return mixed
+     */
+    public function get($param)
+    {
+        if (!$this->has($param)) {
+            throw new \InvalidArgumentException(sprintf('Invalid parameter "%s"', $param));
+        }
+
+        return $this->query_params[$param];
+    }
+
+    /**
+     *
+     */
+    private function checkDisplay()
+    {
+        if ($this->has('display') && !in_array($this->get('display'), $this->getAllowedDisplayValues())) {
+            throw new \InvalidArgumentException('Invalid "display" parameter. Allowed values are '.json_encode($this->getAllowedDisplayValues()));
+        }
+    }
+
+    /**
+     *
+     */
+    private function checkPrompt()
+    {
+        if ($this->has('prompt') && !in_array($this->get('prompt'), $this->getAllowedPromptValues())) {
+            throw new \InvalidArgumentException('Invalid "prompt" parameter. Allowed values are '.json_encode($this->getAllowedPromptValues()));
+        }
     }
 }

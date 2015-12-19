@@ -11,10 +11,10 @@
 
 namespace OAuth2\Test\Functional;
 
-use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
 
 /**
@@ -24,7 +24,12 @@ class AuthCodeGrantTypeTest extends Base
 {
     public function testRedirectUriParameterIsMissing()
     {
-        $authorization = new Authorization();
+        $request = new ServerRequest();
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -38,8 +43,15 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testRedirectUriParameterWithFragment()
     {
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test#bad');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri' => 'http://example.com/test#bad',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -53,21 +65,16 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testRedirectUriParameterIsNotValid()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        if (null === $client) {
-            $this->fail('Should throw an Exception');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/bade.redirect?URI');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri' => 'http://example.com/bade.redirect?URI',
+            'client_id'    => 'foo',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -81,16 +88,16 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testResponseTypeParameterIsMissing()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri' => 'http://example.com/test?good=false',
+            'client_id'    => 'foo',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -104,17 +111,17 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testResponseTypeParameterIsNotSupported()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('bad_response_type');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'bad_response_type',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -128,17 +135,17 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testNonConfidentialClientMustRegisterAtLeastOneRedirectUri()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('oof');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('bad_response_type');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'oof',
+            'response_type' => 'bad_response_type',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -152,17 +159,17 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testConfidentialClientWithRegisteredRedirectUriButUnsupportedResponseType()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('bar');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('bad_response_type');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'bar',
+            'response_type' => 'bad_response_type',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -176,17 +183,17 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testConfidentialClientWithUnregisteredRedirectUri()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('bar');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('https://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('bad_response_type');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'https://example.com/test?good=false',
+            'client_id'     => 'bar',
+            'response_type' => 'bad_response_type',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -200,16 +207,17 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testConfidentialClientUsingTokenResponseTypeWithoutRedirectUriRegistered()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('baz');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setClient($client);
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setResponseType('token');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'baz',
+            'response_type' => 'token',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -223,17 +231,17 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testResponseTypeisNotAuthorizedForTheClient()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('baz');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'baz',
+            'response_type' => 'code',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -247,18 +255,17 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testResourceOwnerDeniedAccess()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setClient($client);
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setResponseType('code');
-        $authorization->setAuthorized(false);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'code',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            false
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -267,18 +274,17 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeSuccess()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'code',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -287,17 +293,16 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeSuccessWithoutRedirectUri()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setClient($client);
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setResponseType('code');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'client_id'     => 'foo',
+            'response_type' => 'code',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -306,18 +311,17 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeSuccessUsingAnotherRedirectUri()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('https://another.uri/callback');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'https://another.uri/callback',
+            'client_id'     => 'foo',
+            'response_type' => 'code',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -326,19 +330,18 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeSuccessWithState()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setState('0123456789');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'code',
+            'state'         => '0123456789',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -347,19 +350,18 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeSuccessWithStateAndUnregisteredClient()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('**UNREGISTERED**--foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setState('0123456789');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => '**UNREGISTERED**--foo',
+            'response_type' => 'code',
+            'state'         => '0123456789',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -390,23 +392,20 @@ class AuthCodeGrantTypeTest extends Base
      */
     public function testAuthcodeSuccessWithPKCEAndS256AndPublicClient()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setState('0123456789');
-        $authorization->setQueryParams([
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'code',
+            'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
-            'code_challenge_method' => 'S256'
+            'code_challenge_method' => 'S256',
         ]);
-        $authorization->setAuthorized(true);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -434,23 +433,20 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeSuccessWithPKCEAndPlainAndPublicClient()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setState('0123456789');
-        $authorization->setQueryParams([
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'code',
+            'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
-            'code_challenge_method' => 'plain'
+            'code_challenge_method' => 'plain',
         ]);
-        $authorization->setAuthorized(true);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -478,22 +474,19 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeSuccessWithPKCEAndDefaultMethodAndPublicClient()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setState('0123456789');
-        $authorization->setQueryParams([
-            'code_challenge' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'code',
+            'state'                 => '0123456789',
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
         ]);
-        $authorization->setAuthorized(true);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -521,22 +514,19 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeFailedWithBadCodeVerifier()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setState('0123456789');
-        $authorization->setQueryParams([
-            'code_challenge' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'code',
+            'state'                 => '0123456789',
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
         ]);
-        $authorization->setAuthorized(true);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -563,22 +553,19 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeFailedWithPKCEBecauseCodeVerifierIsNotSet()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setState('0123456789');
-        $authorization->setQueryParams([
-            'code_challenge' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'code',
+            'state'                 => '0123456789',
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
         ]);
-        $authorization->setAuthorized(true);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -605,23 +592,20 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeFailedWithPKCEBecauseCodeChallengeMethodIsNotSupported()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('code');
-        $authorization->setState('0123456789');
-        $authorization->setQueryParams([
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'code',
+            'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'S512',
         ]);
-        $authorization->setAuthorized(true);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);

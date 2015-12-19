@@ -11,11 +11,11 @@
 
 namespace OAuth2\Test\Functional;
 
-use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Test\Base;
 use PHPHtmlParser\Dom;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\ServerRequest;
 
 /**
  * @group ImplicitGrantType
@@ -24,7 +24,12 @@ class ImplicitGrantTypeTest extends Base
 {
     public function testRedirectUriParameterIsMissing()
     {
-        $authorization = new Authorization();
+        $request = new ServerRequest();
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -38,9 +43,15 @@ class ImplicitGrantTypeTest extends Base
 
     public function testRedirectUriParameterWithFragment()
     {
-        $authorization = new Authorization();
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setRedirectUri('http://example.com/test#bad');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri' => 'http://example.com/test#bad',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -54,16 +65,16 @@ class ImplicitGrantTypeTest extends Base
 
     public function testRedirectUriParameterIsNotValid()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=true');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=true',
+            'client_id'             => 'foo',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -77,16 +88,16 @@ class ImplicitGrantTypeTest extends Base
 
     public function testResponseTypeParameterIsMissing()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -100,17 +111,17 @@ class ImplicitGrantTypeTest extends Base
 
     public function testResponseTypeParameterIsNotSupported()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('bad_response_type');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'bad_response_type',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -124,17 +135,17 @@ class ImplicitGrantTypeTest extends Base
 
     public function testNonConfidentialClientMustRegisterAtLeastOneRedirectUri()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('oof');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('bad_response_type');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'oof',
+            'response_type'         => 'bad_response_type',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -148,17 +159,17 @@ class ImplicitGrantTypeTest extends Base
 
     public function testResponseTypeisNotAuthorizedForTheClient()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('fii');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('token');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'fii',
+            'response_type'         => 'token',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         try {
@@ -172,18 +183,17 @@ class ImplicitGrantTypeTest extends Base
 
     public function testResourceOwnerDeniedAccess()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setAuthorized(false);
-        $authorization->setResponseType('token');
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            false
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -192,18 +202,17 @@ class ImplicitGrantTypeTest extends Base
 
     public function testAccessTokenSuccess()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('token');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -212,41 +221,39 @@ class ImplicitGrantTypeTest extends Base
 
     public function testAccessTokenSuccessWithState()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('token');
-        $authorization->setState('0123456789');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token',
+            'state'                 => '0123456789',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer&state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
-    public function testAccessTokenSuccessWithStateAndForPoostResponseMode()
+    public function testAccessTokenSuccessWithStateAndForPostResponseMode()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setClient($client);
-        $authorization->setResponseType('token');
-        $authorization->setState('0123456789');
-        $authorization->setResponseMode('form_post');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token',
+            'state'                 => '0123456789',
+            'response_mode'         => 'form_post',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);

@@ -14,6 +14,7 @@ namespace OAuth2\Test\Functional;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\ServerRequest;
 
 /**
  * @group OpenIDConnect
@@ -22,18 +23,17 @@ class OpenIDConnectTest extends Base
 {
     public function testCodeTokenSuccess()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setClient($client);
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setResponseType('code token');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'code token',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -46,18 +46,17 @@ class OpenIDConnectTest extends Base
 
         return;
 
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setClient($client);
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setResponseType('code id_token token');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'code id_token token',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
@@ -67,19 +66,18 @@ class OpenIDConnectTest extends Base
 
     public function testNoneSuccess()
     {
-        $client = $this->getClientManagerSupervisor()->getClient('foo');
-        if (null === $client) {
-            $this->fail('Unable to get client');
-
-            return;
-        }
-        $authorization = new Authorization();
-        $authorization->setRedirectUri('http://example.com/test?good=false');
-        $authorization->setClient($client);
-        $authorization->setEndUser($this->getEndUserManager()->getEndUser('user1'));
-        $authorization->setResponseType('none');
-        $authorization->setState('0123456789');
-        $authorization->setAuthorized(true);
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'none',
+            'state'         => '0123456789',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
