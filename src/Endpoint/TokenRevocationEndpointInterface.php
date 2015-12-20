@@ -14,7 +14,7 @@ namespace OAuth2\Endpoint;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface RevocationEndpointInterface
+interface TokenRevocationEndpointInterface
 {
     /**
      * This method will try to:

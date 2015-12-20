@@ -16,7 +16,6 @@ use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
-use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BaseExceptionInterface;
@@ -27,7 +26,7 @@ use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class RevocationEndpoint implements RevocationEndpointInterface
+final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
 {
     use HasConfiguration;
     use HasExceptionManager;
@@ -90,14 +89,12 @@ final class RevocationEndpoint implements RevocationEndpointInterface
         $this->getParameters($request, $token, $token_type_hint, $callback);
         if (!$this->isRequestSecured($request)) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
-
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
 
             return;
         }
         if (null === $token) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
-
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
 
             return;
@@ -117,7 +114,12 @@ final class RevocationEndpoint implements RevocationEndpointInterface
             $client = null;
         }
 
-        $this->revokeToken($response, $token, $token_type_hint, $client, $callback);
+        if (!$client instanceof ClientInterface) {
+            $this->getResponseContent($response, '', $callback);
+
+            return;
+        }
+        $this->revokeToken($response, $token, $client, $token_type_hint, $callback);
     }
 
     /**
@@ -155,13 +157,13 @@ final class RevocationEndpoint implements RevocationEndpointInterface
     /**
      * @param \Psr\Http\Message\ResponseInterface $response
      * @param string                              $token
+     * @param \OAuth2\Client\ClientInterface      $client
      * @param string|null                         $token_type_hint
-     * @param \OAuth2\Client\ClientInterface|null $client
      * @param string|null                         $callback
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function revokeToken(ResponseInterface &$response, $token, $token_type_hint = null, ClientInterface $client = null, $callback = null)
+    private function revokeToken(ResponseInterface &$response, $token, ClientInterface $client, $token_type_hint = null, $callback = null)
     {
         $token_types = $this->getTokenTypes();
         if (null === $token_type_hint) {
@@ -185,15 +187,15 @@ final class RevocationEndpoint implements RevocationEndpointInterface
     /**
      * @param \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface $token_type
      * @param string                                                  $token
-     * @param \OAuth2\Client\ClientInterface|null                     $client
+     * @param \OAuth2\Client\ClientInterface                          $client
      *
      * @return bool
      */
-    private function tryRevokeToken(RevocationTokenTypeInterface $token_type, $token, ClientInterface $client = null)
+    private function tryRevokeToken(RevocationTokenTypeInterface $token_type, $token, ClientInterface $client)
     {
         $result = $token_type->getToken($token);
         if ($result instanceof TokenInterface) {
-            if ($this->isClientVerified($result, $client)) {
+            if ($result->getClientPublicId() === $client->getPublicId()) {
                 $token_type->revokeToken($result);
 
                 return true;
@@ -201,25 +203,5 @@ final class RevocationEndpoint implements RevocationEndpointInterface
         }
 
         return false;
-    }
-
-    /**
-     * @param \OAuth2\Token\TokenInterface        $token
-     * @param \OAuth2\Client\ClientInterface|null $client
-     *
-     * @return bool
-     */
-    private function isClientVerified($token, ClientInterface $client = null)
-    {
-        if (null !== $client) {
-            // The client ID of the token is the same as authenticated client
-            return $token->getClientPublicId() === $client->getPublicId();
-        } else {
-            // We try to get the client associated with the token
-            $client = $this->getClientManagerSupervisor()->getClient($token->getClientPublicId());
-
-            // Return false if the client is a confidential client (confidential client must be authenticated)
-            return !$client instanceof ConfidentialClientInterface;
-        }
     }
 }

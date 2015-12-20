@@ -20,5 +20,5 @@ interface TokenIntrospectionEndpointInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface      $response
      */
-    public function introspect(ServerRequestInterface $request, ResponseInterface &$response);
+    public function introspection(ServerRequestInterface $request, ResponseInterface &$response);
 }

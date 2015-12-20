@@ -15,7 +15,6 @@ use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
-use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BaseExceptionInterface;
@@ -71,7 +70,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     /**
      * {@inheritdoc}
      */
-    public function introspect(ServerRequestInterface $request, ResponseInterface &$response)
+    public function introspection(ServerRequestInterface $request, ResponseInterface &$response)
     {
         if (!$this->isRequestSecured($request)) {
             $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
@@ -104,18 +103,24 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
             $client = null;
         }
 
-        $this->getTokenInformation($response, $token, $token_type_hint, $client);
+        if (!$client instanceof ClientInterface) {
+            $e = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find token or client not authenticated.');
+            $e->getHttpResponse($response);
+
+            return;
+        }
+        $this->getTokenInformation($response, $token, $client, $token_type_hint);
     }
 
     /**
      * @param \Psr\Http\Message\ResponseInterface $response
      * @param string                              $token
+     * @param \OAuth2\Client\ClientInterface      $client
      * @param string|null                         $token_type_hint
-     * @param \OAuth2\Client\ClientInterface|null $client
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function getTokenInformation(ResponseInterface &$response, $token, $token_type_hint = null, ClientInterface $client = null)
+    private function getTokenInformation(ResponseInterface &$response, $token, ClientInterface $client, $token_type_hint = null)
     {
         $token_types = $this->getTokenTypes();
         if (null === $token_type_hint) {
@@ -142,15 +147,15 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
      * @param \Psr\Http\Message\ResponseInterface                        $response
      * @param \OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface $token_type
      * @param string                                                     $token
-     * @param \OAuth2\Client\ClientInterface|null                        $client
+     * @param \OAuth2\Client\ClientInterface                             $client
      *
      * @return bool
      */
-    private function tryIntrospectToken(ResponseInterface &$response, IntrospectionTokenTypeInterface $token_type, $token, ClientInterface $client = null)
+    private function tryIntrospectToken(ResponseInterface &$response, IntrospectionTokenTypeInterface $token_type, $token, ClientInterface $client)
     {
         $result = $token_type->getToken($token);
         if ($result instanceof TokenInterface) {
-            if ($this->isClientVerified($result, $client)) {
+            if ($result->getClientPublicId() === $client->getPublicId()) {
                 $data = $token_type->introspectToken($result);
                 $this->populateResponse($response, $data);
 
@@ -172,26 +177,6 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         $response = $response->withHeader('Pragma', 'no-cache');
         $response = $response->withStatus(200);
         $response->getBody()->write(json_encode($data));
-    }
-
-    /**
-     * @param \OAuth2\Token\TokenInterface        $token
-     * @param \OAuth2\Client\ClientInterface|null $client
-     *
-     * @return bool
-     */
-    private function isClientVerified($token, ClientInterface $client = null)
-    {
-        if (null !== $client) {
-            // The client ID of the token is the same as authenticated client
-            return $token->getClientPublicId() === $client->getPublicId();
-        } else {
-            // We try to get the client associated with the token
-            $client = $this->getClientManagerSupervisor()->getClient($token->getClientPublicId());
-
-            // Return false if the client is a confidential client (confidential client must be authenticated)
-            return !$client instanceof ConfidentialClientInterface;
-        }
     }
 
     /**

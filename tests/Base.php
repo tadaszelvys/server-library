@@ -37,9 +37,9 @@ use OAuth2\Endpoint\AuthorizationFactory;
 use OAuth2\Endpoint\FormPostResponseMode;
 use OAuth2\Endpoint\FragmentResponseMode;
 use OAuth2\Endpoint\QueryResponseMode;
-use OAuth2\Endpoint\RevocationEndpoint;
 use OAuth2\Endpoint\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospectionEndpoint;
+use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
 use OAuth2\Grant\AuthorizationCodeGrantType;
@@ -144,17 +144,17 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Endpoint\RevocationEndpoint
+     * @var null|\OAuth2\Endpoint\TokenRevocationEndpointInterface
      */
     private $revocation_endpoint = null;
 
     /**
-     * @return \OAuth2\Endpoint\RevocationEndpoint
+     * @return \OAuth2\Endpoint\TokenRevocationEndpointInterface
      */
     protected function getRevocationTokenEndpoint()
     {
         if (null === $this->revocation_endpoint) {
-            $this->revocation_endpoint = new RevocationEndpoint(
+            $this->revocation_endpoint = new TokenRevocationEndpoint(
                 $this->getClientManagerSupervisor(),
                 $this->getExceptionManager()
             );

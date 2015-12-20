@@ -24,7 +24,7 @@ class TokenIntrospectionEndpointTest extends Base
         $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
         $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspect($request, $response);
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
@@ -36,7 +36,7 @@ class TokenIntrospectionEndpointTest extends Base
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
         $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspect($request, $response);
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
@@ -48,7 +48,7 @@ class TokenIntrospectionEndpointTest extends Base
         $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
         $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspect($request, $response);
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -60,7 +60,7 @@ class TokenIntrospectionEndpointTest extends Base
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspect($request, $response);
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -72,7 +72,7 @@ class TokenIntrospectionEndpointTest extends Base
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'bam']);
 
         $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspect($request, $response);
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals(401, $response->getStatusCode());
@@ -81,10 +81,10 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testAccessTokenIntrospectionNotForAuthenticatedPublicClientAndTypeHint()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'access_token'], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'access_token'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspect($request, $response);
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -93,10 +93,10 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testAccessTokenNotIntrospectionNotForAuthenticatedPublicClientAndTypeHint()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'refresh_token'], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'refresh_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
         $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspect($request, $response);
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
         $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
@@ -109,7 +109,7 @@ class TokenIntrospectionEndpointTest extends Base
         $request = $this->createRequest('/', 'POST', ['token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on']);
 
         $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspect($request, $response);
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
@@ -118,10 +118,10 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testFooTokenNotSupported()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_REFRESH_TOKEN', 'token_type_hint' => 'foo_token'], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_REFRESH_TOKEN', 'token_type_hint' => 'foo_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
         $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspect($request, $response);
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('VALID_REFRESH_TOKEN'));

@@ -195,70 +195,6 @@ class GetTokenRevocationEndpointTest extends Base
         $this->assertEquals('foo.bar({"error":"invalid_client","error_description":"Client authentication failed.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FAuthenticate%2Finvalid_client"})', $response->getBody()->getContents());
     }
 
-    public function testAccessTokenRevokedForNotAuthenticatedPublicClient()
-    {
-        $this->getConfiguration()->set('revoke_refresh_token_and_access_token', false);
-        $request = $this->createRequest('/?token=EFGH', 'GET', [], ['HTTPS' => 'on']);
-
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-        $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
-        $response = new Response();
-        $this->getRevocationTokenEndpoint()->revoke($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-        $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
-        $this->getConfiguration()->set('revoke_refresh_token_and_access_token', true);
-    }
-
-    public function testAccessTokenRevokedForNotAuthenticatedPublicClientWithCallback()
-    {
-        $this->getConfiguration()->set('revoke_refresh_token_and_access_token', false);
-        $request = $this->createRequest('/?token=EFGH&callback=foo.bar', 'GET', [], ['HTTPS' => 'on']);
-
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-        $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
-        $response = new Response();
-        $this->getRevocationTokenEndpoint()->revoke($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('foo.bar()', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-        $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
-        $this->getConfiguration()->set('revoke_refresh_token_and_access_token', true);
-    }
-
-    public function testAccessTokenRevokedForNotAuthenticatedPublicClientAndTypeHint()
-    {
-        $request = $this->createRequest('/?token=EFGH&token_type_hint=access_token', 'GET', [], ['HTTPS' => 'on']);
-
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-        $response = new Response();
-        $this->getRevocationTokenEndpoint()->revoke($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-    }
-
-    public function testAccessTokenRevokedForNotAuthenticatedPublicClientWithCallbackAndTypeHint()
-    {
-        $request = $this->createRequest('/?token=EFGH&callback=foo.bar&token_type_hint=access_token', 'GET', [], ['HTTPS' => 'on']);
-
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-        $response = new Response();
-        $this->getRevocationTokenEndpoint()->revoke($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('foo.bar()', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-    }
-
     public function testAccessTokenNotRevokedForNotAuthenticatedPublicClientAndTypeHint()
     {
         $request = $this->createRequest('/?token=EFGH&token_type_hint=refresh_token', 'GET', [], ['HTTPS' => 'on']);
@@ -317,7 +253,7 @@ class GetTokenRevocationEndpointTest extends Base
 
     public function testFooTokenNotSupported()
     {
-        $request = $this->createRequest('/?token=VALID_REFRESH_TOKEN&token_type_hint=foo_token', 'GET', [], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/?token=VALID_REFRESH_TOKEN&token_type_hint=foo_token', 'GET', [], ['PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret', 'HTTPS' => 'on']);
 
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('VALID_REFRESH_TOKEN'));
         $response = new Response();
@@ -331,7 +267,7 @@ class GetTokenRevocationEndpointTest extends Base
 
     public function testFooTokenNotSupportedWithCallback()
     {
-        $request = $this->createRequest('/?token=VALID_REFRESH_TOKEN&callback=foo.bar&token_type_hint=foo_token', 'GET', [], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/?token=VALID_REFRESH_TOKEN&callback=foo.bar&token_type_hint=foo_token', 'GET', [], ['PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret', 'HTTPS' => 'on']);
 
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('VALID_REFRESH_TOKEN'));
         $response = new Response();
