@@ -184,9 +184,6 @@ class JWTAccessTokenManager extends AccessTokenManager
         $audience = $this->getConfiguration()->get('jwt_access_token_audience', null);
         $issuer = $this->getConfiguration()->get('jwt_access_token_issuer', null);
 
-        /*if (!is_string($audience)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_audience" is not set.');
-        }*/
         if (!is_string($issuer)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_issuer" is not set.');
         }
