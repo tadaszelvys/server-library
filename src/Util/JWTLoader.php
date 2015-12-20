@@ -19,6 +19,7 @@ use Jose\Object\JWSInterface;
 use Jose\VerifierInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\JWTClientInterface;
+use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
 
 final class JWTLoader
@@ -158,9 +159,11 @@ final class JWTLoader
         }
 
         try {
-            if (false === $this->verifier->verify($jws, $this->key_set)) {
+            if (false === $this->verifier->verify($jws, new JWKSet($client->getSignaturePublicKeySet()))) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid signature.');
             }
+        } catch (BaseException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }

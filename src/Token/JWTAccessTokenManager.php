@@ -111,6 +111,9 @@ class JWTAccessTokenManager extends AccessTokenManager
         $audience = $this->getConfiguration()->get('jwt_access_token_audience', null);
         $issuer = $this->getConfiguration()->get('jwt_access_token_issuer', null);
 
+        if (!is_string($issuer)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_issuer" is not set.');
+        }
         if (!is_string($key_encryption_algorithm)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_key_encryption_algorithm" is not set.');
         }
@@ -121,7 +124,6 @@ class JWTAccessTokenManager extends AccessTokenManager
         $header = array_merge(
             [
                 'iss' => $issuer,
-                'aud' => $audience,
                 'iat' => time(),
                 'nbf' => time(),
                 'exp' => time() + $this->getLifetime($client),
@@ -130,6 +132,9 @@ class JWTAccessTokenManager extends AccessTokenManager
                 'enc' => $content_encryption_algorithm,
             ]
         );
+        if (null !== $audience) {
+            $header['aud'] = $audience;
+        }
 
         $key = $this->getJWTEncrypter()->getKeyEncryptionKey();
         if ($key->has('kid')) {
@@ -179,22 +184,24 @@ class JWTAccessTokenManager extends AccessTokenManager
         $audience = $this->getConfiguration()->get('jwt_access_token_audience', null);
         $issuer = $this->getConfiguration()->get('jwt_access_token_issuer', null);
 
-        if (!is_string($audience)) {
+        /*if (!is_string($audience)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_audience" is not set.');
-        }
+        }*/
         if (!is_string($issuer)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_issuer" is not set.');
         }
 
         $payload = [
             'iss' => $issuer,
-            'aud' => $audience,
             'iat' => time(),
             'nbf' => time(),
             'exp' => time() + $this->getLifetime($client),
             'sub' => $client->getPublicId(),
             'sco' => $scope,
         ];
+        if (null !== $audience) {
+            $payload['aud'] = $audience;
+        }
         if (null !== $resource_owner) {
             $payload['r_o'] = $resource_owner->getPublicId();
         }

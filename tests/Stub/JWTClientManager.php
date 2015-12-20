@@ -34,7 +34,7 @@ class JWTClientManager extends Base
     {
         parent::__construct($jwt_loader, $exception_manager, $configuration);
 
-        $keys = ['keys' => [
+        $keys = ['keys' => [[
                 'kid' => 'JWK1',
                 'use' => 'enc',
                 'kty' => 'oct',
@@ -46,7 +46,7 @@ class JWTClientManager extends Base
                 'kty' => 'oct',
                 'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
             ],
-        ];
+        ]];
 
         $jwt1 = new JWTClient();
         $jwt1->setAllowedSignatureAlgorithms(['HS512']);
