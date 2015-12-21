@@ -42,8 +42,8 @@ The following components are implemented:
         * [x] HTTP Basic Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617)) - *Note: ([RFC7617](https://tools.ietf.org/html/rfc7617)) support is scheduled*
         * [x] HTTP Digest Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617)) - *Note: ([RFC7616](https://tools.ietf.org/html/rfc7616)) support is scheduled*
         * [x] Credentials from request body
-    * [ ] SAML clients ([RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
-    * [x] JWT clients ([RFC7523](https://tools.ietf.org/html/rfc7523))
+    * [ ] SAML clients ([RFC7521](ttps://tools.ietf.org/html/rfc7521) and [RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
+    * [x] JWT clients ([RFC7521](ttps://tools.ietf.org/html/rfc7521) and [RFC7523](https://tools.ietf.org/html/rfc7523))
     * [x] Unregistered clients ([RFC6749, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4))
     * [x] Ability to use other Client Managers
 * Endpoints:
@@ -62,18 +62,31 @@ The following components are implemented:
     * [x] Resource Owner Password Credentials grant type ([RFC6749, section 4.3](https://tools.ietf.org/html/rfc6749#section-4.3))
     * [x] Client credentials grant type ([RFC6749, section 4.4](https://tools.ietf.org/html/rfc6749#section-4.4))
     * [x] Refresh token grant type ([RFC6749, section 6](https://tools.ietf.org/html/rfc6749#section-6))
-    * [ ] SAML grant type ([RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
-    * [x] JWT Bearer token grant type ([RFC7523](https://tools.ietf.org/html/rfc7523))
+    * [ ] SAML grant type ([RFC7521](ttps://tools.ietf.org/html/rfc7521) and [RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
+    * [x] JWT Bearer token grant type ([RFC7521](ttps://tools.ietf.org/html/rfc7521) and [RFC7523](https://tools.ietf.org/html/rfc7523))
     * [x] Ability to use other Grant Types
+
+* Partial implementation
+    * [ ] Threat Model and Security Consideration ([RFC6819](https://tools.ietf.org/html/rfc6819))
 
 * OpenID Connect
     * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
     * [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
-    * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html)
+    * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html and [RFC7591](https://tools.ietf.org/html/rfc7591))
     * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
     * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
     * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
     * [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
+
+* For information only
+    * [ ] Threat Model and Security Consideration ([RFC6819](https://tools.ietf.org/html/rfc6819))
+    * [ ] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
+    * [ ] [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq-06)
+    * [ ] [Proof-of-Possession (PoP) Security Architecture](https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture-07)
+    * [ ] [Proof-of-Possession: Authorization Server to Client Key Distribution](https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution-02)
+    * [ ] [Token Exchange: An STS for the REST of Us](https://tools.ietf.org/html/draft-ietf-oauth-token-exchange-03)
+    * [ ] [A Method for Signing an HTTP Requests for OAuth](https://tools.ietf.org/html/draft-ietf-oauth-signed-http-request-01)
+    * [ ] [Proof-of-Possession Key Semantics for JSON Web Tokens (JWTs)](https://tools.ietf.org/html/draft-ietf-oauth-proof-of-possession-11)
 
 # The Release Process
 
