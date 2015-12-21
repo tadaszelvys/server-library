@@ -9,7 +9,7 @@ checks:
 tools:
     php_sim: true
     php_changetracking: true
-    php_cpd: true
+    php_cpd: false
     php_mess_detector: true
     php_code_sniffer: true
     php_analyzer: true
