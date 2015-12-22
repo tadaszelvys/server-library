@@ -36,6 +36,7 @@ final class AuthenticateException extends BaseException implements AuthenticateE
             } else {
                 $result = [];
                 foreach ($values as $key => $value) {
+                    $this->checkHeaderValue($value);
                     $result[] = sprintf('%s=%s', $key, $this->quote($value));
                 }
                 $schemes[] = $scheme.' '.implode(',', $result);
@@ -61,18 +62,12 @@ final class AuthenticateException extends BaseException implements AuthenticateE
     }
 
     /**
-     * Per RFC 7230, only VISIBLE ASCII characters, spaces, and horizontal tabs are allowed in values.
-     * 
      * @param string $text
      *
      * @return string
      */
     private function quote($text)
     {
-        $text = preg_replace("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", '', $text);
-        $text = preg_replace('/[^\x09\x0a\x0d\x20-\x7E\x80-\xFE]/', '', $text);
-        $text = addcslashes($text, '"\\');
-
         return sprintf('"%s"', $text);
     }
 }
