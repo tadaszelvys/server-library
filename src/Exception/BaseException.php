@@ -115,7 +115,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
     protected function checkHeaderValue($text)
     {
         if (preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $text) || preg_match('/[^\x09\x0a\x0d\x20-\x7E\x80-\xFE]/', $text)) {
-            throw new \InvalidArgumentException('invalid_header');
+            throw new \InvalidArgumentException(sprintf('The header value "%s" contains invalid characters.', $text));
         }
     }
 }
