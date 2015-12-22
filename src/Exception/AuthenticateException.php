@@ -36,6 +36,7 @@ final class AuthenticateException extends BaseException implements AuthenticateE
             } else {
                 $result = [];
                 foreach ($values as $key => $value) {
+                    var_dump($key);
                     $this->checkHeaderValue($value);
                     $result[] = sprintf('%s=%s', $key, $this->quote($value));
                 }
