@@ -55,7 +55,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
         $digest_params = [
             'realm'  => $this->getConfiguration()->get('realm', 'Service'),
             'nonce'  => $nonceValueBase64,
-            'opaque' => base64_decode(hash_hmac('sha512', $nonceValueBase64.$this->getConfiguration()->get('realm', 'Service'), $key, true)),
+            'opaque' => base64_encode(hash_hmac('sha512', $nonceValueBase64.$this->getConfiguration()->get('realm', 'Service'), $key, true)),
         ];
 
         $qop = $this->getConfiguration()->get('digest_authentication_scheme_quality_of_protection', 'auth,auth-int');
