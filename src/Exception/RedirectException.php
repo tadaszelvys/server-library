@@ -70,9 +70,11 @@ final class RedirectException extends BaseException implements RedirectException
             $data['error_uri'] = urldecode($data['error_uri']);
         }
         $params = [$this->transport_mode => $data];
+        $uri = Uri::buildURI($this->redirect_uri, $params);
+        $this->checkHeaderValue($uri);
 
         return [
-            'Location' => Uri::buildURI($this->redirect_uri, $params),
+            'Location' => $uri,
         ];
     }
 }
