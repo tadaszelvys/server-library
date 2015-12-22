@@ -42,7 +42,7 @@ final class AuthenticateException extends BaseException implements AuthenticateE
             }
         }
 
-        $this->header = ['www-authenticate' => $schemes];
+        $this->header = ['WWW-Authenticate' => $schemes];
     }
 
     /**
