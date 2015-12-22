@@ -61,28 +61,18 @@ final class AuthenticateException extends BaseException implements AuthenticateE
     }
 
     /**
+     * Per RFC 7230, only VISIBLE ASCII characters, spaces, and horizontal tabs are allowed in values
+     * 
      * @param string $text
      *
      * @return string
      */
     private function quote($text)
     {
-        // Reference to IETF Draft must be updated
-        // https://tools.ietf.org/html/draft-ietf-httpbis-p1-messaging-17#section-3.2.3
-        $text = preg_replace(
-            '~
-                        [^
-                            \x21-\x7E
-                            \x80-\xFF
-                            \ \t
-                        ]
-                        ~x',
-            '',
-            $text
-        );
-
+        $text = preg_replace("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", '', $value);
+        $text = preg_replace('/[^\x09\x0a\x0d\x20-\x7E\x80-\xFE]/', '', $text);
         $text = addcslashes($text, '"\\');
 
-        return '"'.$text.'"';
+        return sprintf('"%s"', $text);
     }
 }
