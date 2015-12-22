@@ -61,7 +61,7 @@ final class AuthenticateException extends BaseException implements AuthenticateE
     }
 
     /**
-     * Per RFC 7230, only VISIBLE ASCII characters, spaces, and horizontal tabs are allowed in values
+     * Per RFC 7230, only VISIBLE ASCII characters, spaces, and horizontal tabs are allowed in values.
      * 
      * @param string $text
      *
@@ -69,7 +69,7 @@ final class AuthenticateException extends BaseException implements AuthenticateE
      */
     private function quote($text)
     {
-        $text = preg_replace("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", '', $value);
+        $text = preg_replace("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", '', $text);
         $text = preg_replace('/[^\x09\x0a\x0d\x20-\x7E\x80-\xFE]/', '', $text);
         $text = addcslashes($text, '"\\');
 
