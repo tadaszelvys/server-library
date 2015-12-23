@@ -59,7 +59,7 @@ class SimpleStringAccessTokenManager extends Base
     /**
      * {@inheritdoc}
      */
-    protected function getClass()
+    protected function createEmptyAccessToken()
     {
         return new AccessToken();
     }

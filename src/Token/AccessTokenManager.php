@@ -51,14 +51,14 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     /**
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    abstract protected function getClass();
+    abstract protected function createEmptyAccessToken();
 
     /**
      * {@inheritdoc}
      */
     public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [], RefreshTokenInterface $refresh_token = null)
     {
-        $access_token = $this->getClass();
+        $access_token = $this->createEmptyAccessToken();
         $access_token->setExpiresAt(time() + $this->getLifetime($client));
         $access_token->setScope($scope);
         $access_token->setResourceOwnerPublicId($resource_owner->getPublicId());
