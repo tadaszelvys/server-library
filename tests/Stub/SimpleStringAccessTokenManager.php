@@ -55,6 +55,7 @@ class SimpleStringAccessTokenManager extends Base
         $this->saveAccessToken($abcd);
         $this->saveAccessToken($efgh);
     }
+
     /**
      * {@inheritdoc}
      */

@@ -67,12 +67,12 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
      * {@inheritdoc}
      */
     public function getAccessTokenType($token_type_name)
-   {
+    {
         if (!$this->hasAccessTokenType($token_type_name)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('Unsupported access token type "%s".', $token_type_name));
         }
 
-       return $this->access_token_types[$token_type_name];
+        return $this->access_token_types[$token_type_name];
     }
 
     /**
