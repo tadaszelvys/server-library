@@ -24,9 +24,9 @@ final class JWTEncrypter
     private $encrypter;
 
     /**
-     * @var \Jose\Object\JWKInterface
+     * @var null|\Jose\Object\JWKInterface
      */
-    private $encryption_key;
+    private $encryption_key = null;
 
     /**
      * JWTEncrypter constructor.
@@ -37,11 +37,13 @@ final class JWTEncrypter
     public function __construct(EncrypterInterface $encrypter, array $encryption_key)
     {
         $this->encrypter = $encrypter;
-        $this->encryption_key = new JWK($encryption_key);
+        if (!empty($encryption_key)) {
+            $this->encryption_key = new JWK($encryption_key);
+        }
     }
 
     /**
-     * @return \Jose\Object\JWKInterface
+     * @return null|\Jose\Object\JWKInterface
      */
     public function getKeyEncryptionKey()
     {
@@ -57,6 +59,9 @@ final class JWTEncrypter
      */
     public function encrypt($payload, array $protected_headers, array $sender_key = [])
     {
+        if (null === $this->getKeyEncryptionKey()) {
+            return $payload;
+        }
         $sender_key = empty($sender_key) ? null : new JWK($sender_key);
         $instruction = new EncryptionInstruction($this->encryption_key, $sender_key);
 
