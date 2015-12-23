@@ -12,12 +12,24 @@
 namespace OAuth2\Token;
 
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Client\AccessTokenTypeExtensionInterface;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
 {
     use HasExceptionManager;
+
+    /**
+     * @var \OAuth2\Token\AccessTokenTypeInterface[]
+     */
+    private $access_token_types = [];
+
+    /**
+     * @var null|string
+     */
+    private $default_access_token_type = null;
 
     /**
      * ClientCredentialsGrantType constructor.
@@ -30,24 +42,37 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
     }
 
     /**
-     * @var \OAuth2\Token\AccessTokenTypeInterface[]
-     */
-    private $access_token_types = [];
-
-    /**
-     * @var null|\OAuth2\Token\AccessTokenTypeInterface
-     */
-    private $default_access_token_type = null;
-
-    /**
      * {@inheritdoc}
      */
     public function addAccessTokenType(AccessTokenTypeInterface $access_token_type, $default = false)
     {
-        $this->access_token_types[] = $access_token_type;
-        if (null === $this->default_access_token_type || true === $default) {
-            $this->default_access_token_type = $access_token_type;
+        if ($this->hasAccessTokenType($access_token_type->getTokenTypeName())) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('Access token type "%s" already exist.', $access_token_type->getTokenTypeName()));
         }
+        $this->access_token_types[$access_token_type->getTokenTypeName()] = $access_token_type;
+        if (null === $this->default_access_token_type || true === $default) {
+            $this->default_access_token_type = $access_token_type->getTokenTypeName();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasAccessTokenType($token_type_name)
+    {
+        return array_key_exists($token_type_name, $this->access_token_types);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessTokenType($token_type_name)
+   {
+        if (!$this->hasAccessTokenType($token_type_name)) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('Unsupported access token type "%s".', $token_type_name));
+        }
+
+       return $this->access_token_types[$token_type_name];
     }
 
     /**
@@ -67,14 +92,16 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getDefaultAccessTokenType()
+    public function getAccessTokenTypeForClient(ClientInterface $client)
     {
+        if ($client instanceof AccessTokenTypeExtensionInterface && null !== $type = $client->getPreferredTokenType()) {
+            return $this->getAccessTokenType($type);
+        }
         if (null === $this->default_access_token_type) {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'No access token type defined or invalid access token type.');
-            throw $exception;
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'No access token type defined or invalid access token type.');
         }
 
-        return $this->default_access_token_type;
+        return $this->getAccessTokenType($this->default_access_token_type);
     }
 
     /**

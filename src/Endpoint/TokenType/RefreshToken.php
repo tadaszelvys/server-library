@@ -69,7 +69,6 @@ final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationT
         $result = [
             'active'     => !$token->hasExpired() && !$token->isUsed(),
             'client_id'  => $token->getClientPublicId(),
-            'token_type' => 'refresh_token',
         ];
         if (!empty($token->getScope())) {
             $result['scope'] = $token->getScope();

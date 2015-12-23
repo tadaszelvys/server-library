@@ -23,7 +23,7 @@ use OAuth2\Util\JWTEncrypter;
 use OAuth2\Util\JWTLoader;
 use OAuth2\Util\JWTSigner;
 
-class JWTAccessTokenManager extends AccessTokenManager
+abstract class JWTAccessTokenManager extends AccessTokenManager
 {
     use HasExceptionManager;
     use HasJWTLoader;
@@ -35,9 +35,10 @@ class JWTAccessTokenManager extends AccessTokenManager
         JWTSigner $jwt_signer,
         JWTEncrypter $jwt_encrypter,
         ExceptionManagerInterface $exception_manager,
-        ConfigurationInterface $configuration
+        ConfigurationInterface $configuration,
+        AccessTokenTypeManagerInterface $access_token_type_manager
     ) {
-        parent::__construct($configuration);
+        parent::__construct($configuration, $access_token_type_manager);
         $this->setJWTLoader($jwt_loader);
         $this->setJWTSigner($jwt_signer);
         $this->setJWTEncrypter($jwt_encrypter);
@@ -69,12 +70,10 @@ class JWTAccessTokenManager extends AccessTokenManager
 
     /**
      * {@inheritdoc}
-     +     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [], RefreshTokenInterface $refresh_token = null)
+    public function populateAccessToken(AccessTokenInterface &$access_token, ClientInterface $client, ResourceOwnerInterface $resource_owner, RefreshTokenInterface $refresh_token = null)
     {
-        $payload = $this->preparePayload($client, $scope, $resource_owner, $refresh_token);
+        $payload = $this->preparePayload($access_token);
         $signature_header = $this->prepareSignatureHeader();
 
         $jws = $this->getJWTSigner()->sign($payload, $signature_header);
@@ -86,15 +85,7 @@ class JWTAccessTokenManager extends AccessTokenManager
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'An error occured during the creation of the access token.');
         }
 
-        $access_token = new AccessToken();
-        $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
-        $access_token->setExpiresAt(time() + $this->getLifetime($client));
-        $access_token->setResourceOwnerPublicId(null === $resource_owner ? null : $resource_owner->getPublicId());
-        $access_token->setScope($scope);
         $access_token->setToken($jwe);
-        $access_token->setClientPublicId($client->getPublicId());
-
-        return $access_token;
     }
 
     /**
@@ -170,16 +161,12 @@ class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface                    $client
-     * @param array                                             $scope
-     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface|null $resource_owner
-     * @param \OAuth2\Token\RefreshTokenInterface|null          $refresh_token
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
      *
      * @return array
+     * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    protected function preparePayload(ClientInterface $client, array $scope = [], ResourceOwnerInterface $resource_owner = null, RefreshTokenInterface $refresh_token = null)
+    protected function preparePayload(AccessTokenInterface $access_token)
     {
         $audience = $this->getConfiguration()->get('jwt_access_token_audience', null);
         $issuer = $this->getConfiguration()->get('jwt_access_token_issuer', null);
@@ -192,18 +179,16 @@ class JWTAccessTokenManager extends AccessTokenManager
             'iss' => $issuer,
             'iat' => time(),
             'nbf' => time(),
-            'exp' => time() + $this->getLifetime($client),
-            'sub' => $client->getPublicId(),
-            'sco' => $scope,
+            'exp' => $access_token->getExpiresAt(),
+            'sub' => $access_token->getClientPublicId(),
+            'sco' => $access_token->getScope(),
+            'r_o' => $access_token->getResourceOwnerPublicId(),
         ];
         if (null !== $audience) {
             $payload['aud'] = $audience;
         }
-        if (null !== $resource_owner) {
-            $payload['r_o'] = $resource_owner->getPublicId();
-        }
-        if (null !== $refresh_token) {
-            $payload['ref'] = $refresh_token->getToken();
+        if (null !== $access_token->getRefreshToken()) {
+            $payload['ref'] = $access_token->getRefreshToken();
         }
 
         return $payload;
@@ -320,5 +305,13 @@ class JWTAccessTokenManager extends AccessTokenManager
         }
 
         return $content_encryption_algorithm;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function saveAccessToken(AccessTokenInterface $access_token)
+    {
+        // Nothing to do.
     }
 }

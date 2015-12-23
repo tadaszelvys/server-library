@@ -17,9 +17,7 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
 interface AccessTokenManagerInterface
 {
     /**
-     * Stores the supplied access token values to storage.
-     *
-     * We need to store access token data as we create and verify tokens.
+     * Creates an access token and stores it if necessary.
      *
      * @param \OAuth2\Client\ClientInterface               $client         The client associated with this access token.
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resource_owner Resource owner associated with the access token.

@@ -36,11 +36,9 @@ interface AccessTokenTypeInterface
      *      "custom_data":"baz", //Added by this method or by access token
      *  }.
      *
-     * @param \OAuth2\Token\AccessTokenInterface $token The access token to prepare
-     *
-     * @return array Return the access token information with optional key materials and additional information
+     * @param \OAuth2\Token\AccessTokenInterface $token The access token to update
      */
-    public function prepareAccessToken(AccessTokenInterface $token);
+    public function updateAccessToken(AccessTokenInterface &$token);
 
     /**
      * Tries to find an access token in the request.
@@ -63,7 +61,7 @@ interface AccessTokenTypeInterface
     public function isAccessTokenRequestValid(ServerRequestInterface $request, AccessTokenInterface $token);
 
     /**
-     * @return array
+     * @return string
      */
-    public function getSchemeParameters();
+    public function getTokenTypeName();
 }

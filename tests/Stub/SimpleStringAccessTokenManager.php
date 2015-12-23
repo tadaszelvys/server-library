@@ -11,12 +11,10 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\ClientInterface;
 use OAuth2\Configuration\ConfigurationInterface;
-use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
-use OAuth2\Token\RefreshTokenInterface;
+use OAuth2\Token\AccessTokenTypeManagerInterface;
 use OAuth2\Token\SimpleStringAccessTokenManager as Base;
 
 class SimpleStringAccessTokenManager extends Base
@@ -27,13 +25,14 @@ class SimpleStringAccessTokenManager extends Base
     private $access_tokens = [];
 
     /**
-     * AccessTokenManager constructor.
+     * SimpleStringAccessTokenManager constructor.
      *
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     * @param \OAuth2\Configuration\ConfigurationInterface  $configuration
+     * @param \OAuth2\Token\AccessTokenTypeManagerInterface $access_token_type_manager
      */
-    public function __construct(ConfigurationInterface $configuration)
+    public function __construct(ConfigurationInterface $configuration, AccessTokenTypeManagerInterface $access_token_type_manager)
     {
-        parent::__construct($configuration);
+        parent::__construct($configuration, $access_token_type_manager);
 
         $abcd = new AccessToken();
         $abcd->setExpiresAt(time() + 3600);
@@ -42,6 +41,7 @@ class SimpleStringAccessTokenManager extends Base
         $abcd->setClientPublicId('bar');
         $abcd->setRefreshToken(null);
         $abcd->setToken('ABCD');
+        $abcd->setTokenType('Bearer');
 
         $efgh = new AccessToken();
         $efgh->setExpiresAt(time() + 3600);
@@ -50,27 +50,25 @@ class SimpleStringAccessTokenManager extends Base
         $efgh->setClientPublicId('foo');
         $efgh->setRefreshToken('REFRESH_EFGH');
         $efgh->setToken('EFGH');
+        $efgh->setTokenType('Bearer');
 
-        $this->access_tokens['ABCD'] = $abcd;
-        $this->access_tokens['EFGH'] = $efgh;
+        $this->saveAccessToken($abcd);
+        $this->saveAccessToken($efgh);
+    }
+    /**
+     * {@inheritdoc}
+     */
+    protected function getClass()
+    {
+        return new AccessToken();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addAccessToken($token, $expiresAt, ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [], RefreshTokenInterface $refresh_token = null)
+    protected function saveAccessToken(AccessTokenInterface $access_token)
     {
-        $access_token = new AccessToken();
-        $access_token->setExpiresAt($expiresAt);
-        $access_token->setScope($scope);
-        $access_token->setResourceOwnerPublicId(null === $resourceOwner ? null : $resourceOwner->getPublicId());
-        $access_token->setClientPublicId($client->getPublicId());
-        $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
-        $access_token->setToken($token);
-
         $this->access_tokens[$access_token->getToken()] = $access_token;
-
-        return $access_token;
     }
 
     /**

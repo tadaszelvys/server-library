@@ -37,7 +37,6 @@ use Psr\Http\Message\ServerRequestInterface;
 final class TokenEndpoint implements TokenEndpointInterface
 {
     use HasEndUserManager;
-    use HasAccessTokenTypeManager;
     use HasScopeManager;
     use HasExceptionManager;
     use HasClientManagerSupervisor;
@@ -53,7 +52,6 @@ final class TokenEndpoint implements TokenEndpointInterface
      * TokenEndpoint constructor.
      *
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
-     * @param \OAuth2\Token\AccessTokenTypeManagerInterface   $access_token_type_manager
      * @param \OAuth2\Token\RefreshTokenManagerInterface      $refresh_token_manager
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
      * @param \OAuth2\EndUser\EndUserManagerInterface         $end_user_manager
@@ -62,7 +60,6 @@ final class TokenEndpoint implements TokenEndpointInterface
      */
     public function __construct(
         AccessTokenManagerInterface $access_token_manager,
-        AccessTokenTypeManagerInterface $access_token_type_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
         EndUserManagerInterface $end_user_manager,
         ScopeManagerInterface $scope_manager,
@@ -70,7 +67,6 @@ final class TokenEndpoint implements TokenEndpointInterface
         RefreshTokenManagerInterface $refresh_token_manager = null
     ) {
         $this->setAccessTokenManager($access_token_manager);
-        $this->setAccessTokenTypeManager($access_token_type_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setEndUserManager($end_user_manager);
         $this->setScopeManager($scope_manager);
@@ -170,9 +166,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         //Create and return access token (with refresh token and other information if asked) as an array
         $token = $this->createAccessToken($client, $result);
 
-        $prepared = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType()->prepareAccessToken($token);
-
-        $response->getBody()->write(json_encode($prepared));
+        $response->getBody()->write(json_encode($token));
         $response = $response->withStatus(200);
         $headers = [
             'Content-Type'  => 'application/json',

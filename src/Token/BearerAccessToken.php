@@ -99,13 +99,9 @@ class BearerAccessToken implements AccessTokenTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareAccessToken(AccessTokenInterface $token)
+    public function updateAccessToken(AccessTokenInterface &$token)
     {
-        $data = $token->jsonSerialize();
-
-        return array_merge($data, [
-            'token_type' => 'Bearer',
-        ]);
+        $token->setTokenType('Bearer');
     }
 
     /**
@@ -151,8 +147,8 @@ class BearerAccessToken implements AccessTokenTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getSchemeParameters()
+    public function getTokenTypeName()
     {
-        return ['Bearer' => []];
+        return 'bearer';
     }
 }

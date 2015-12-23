@@ -11,6 +11,7 @@
 
 namespace OAuth2\Token;
 
+use OAuth2\Client\ClientInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface AccessTokenTypeManagerInterface
@@ -37,7 +38,23 @@ interface AccessTokenTypeManagerInterface
     public function getAccessTokenTypes();
 
     /**
+     * @param string $token_type_name
+     *
+     * @return bool
+     */
+    public function hasAccessTokenType($token_type_name);
+
+    /**
+     * @param string $token_type_name
+     *
      * @return \OAuth2\Token\AccessTokenTypeInterface
      */
-    public function getDefaultAccessTokenType();
+    public function getAccessTokenType($token_type_name);
+
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     *
+     * @return \OAuth2\Token\AccessTokenTypeInterface
+     */
+    public function getAccessTokenTypeForClient(ClientInterface $client);
 }

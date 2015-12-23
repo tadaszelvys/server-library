@@ -52,7 +52,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('{"active":true,"client_id":"bar","token_type":"access_token"}', $response->getBody()->getContents());
+        $this->assertEquals('{"active":true,"client_id":"bar","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenIntrospectionAllowedForAuthenticatedPublicClient()
@@ -64,7 +64,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('{"active":true,"client_id":"foo","token_type":"access_token"}', $response->getBody()->getContents());
+        $this->assertEquals('{"active":true,"client_id":"foo","token_type":"Bearer"}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenIntrospectionRefusedForUnauthenticatedPublicClient()
@@ -81,14 +81,14 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testAccessTokenIntrospectionNotForAuthenticatedPublicClientAndTypeHint()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'access_token'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'Bearer'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('{"active":true,"client_id":"foo","token_type":"access_token"}', $response->getBody()->getContents());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported token type hint","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenNotIntrospectionNotForAuthenticatedPublicClientAndTypeHint()
@@ -114,6 +114,18 @@ class TokenIntrospectionEndpointTest extends Base
 
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+    }
+
+    public function testRefreshTokenIntrospection()
+    {
+        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+
+        $response = new Response();
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('{"active":true,"client_id":"bar","scope":["scope1","scope2","scope3"]}', $response->getBody()->getContents());
     }
 
     public function testFooTokenNotSupported()

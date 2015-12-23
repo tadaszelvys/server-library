@@ -201,7 +201,6 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->token_endpoint) {
             $this->token_endpoint = new TokenEndpoint(
                 $this->getSimplestringAccessTokenManager(),
-                $this->getAccessTokenTypeManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
                 $this->getScopeManager(),
@@ -233,7 +232,6 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->token_endpoint_jwt_access_token) {
             $this->token_endpoint_jwt_access_token = new TokenEndpoint(
                 $this->getJWTAccessTokenManager(),
-                $this->getAccessTokenTypeManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
                 $this->getScopeManager(),
@@ -606,8 +604,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->implicit_grant_type) {
             $this->implicit_grant_type = new ImplicitGrantType(
-                $this->getSimplestringAccessTokenManager(),
-                $this->getAccessTokenTypeManager()
+                $this->getSimplestringAccessTokenManager()
             );
         }
 
@@ -686,7 +683,8 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->simple_string_access_token_manager) {
             $this->simple_string_access_token_manager = new SimpleStringAccessTokenManager(
-                $this->getConfiguration()
+                $this->getConfiguration(),
+                $this->getAccessTokenTypeManager()
             );
         }
 
@@ -749,7 +747,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $jwt_signer,
                 $jwt_encrypter,
                 $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getConfiguration(),
+                $this->getAccessTokenTypeManager()
             );
         }
 

@@ -36,7 +36,7 @@ class OpenIDConnectTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=3600&scope=scope1\+scope2$/', $response->getHeader('Location')[0]);
     }
 
     public function testCodeIdTokenTokenSuccess()
@@ -60,7 +60,7 @@ class OpenIDConnectTest extends Base
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&id_token=[^"]+&access_token=[^"]+&expires_in=3600&scope=scope1\+scope2&token_type=Bearer$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&id_token=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=3600&scope=scope1\+scope2$/', $response->getHeader('Location')[0]);
     }
 
     public function testNoneSuccess()

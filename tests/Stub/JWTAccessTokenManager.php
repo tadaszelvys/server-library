@@ -11,8 +11,16 @@
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Token\AccessToken;
 use OAuth2\Token\JWTAccessTokenManager as Base;
 
 class JWTAccessTokenManager extends Base
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function getClass()
+    {
+        return new AccessToken();
+    }
 }
