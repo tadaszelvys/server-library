@@ -182,9 +182,13 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
             'nbf' => time(),
             'exp' => $access_token->getExpiresAt(),
             'sub' => $access_token->getClientPublicId(),
+            'aty' => $access_token->getTokenType(),
             'sco' => $access_token->getScope(),
             'r_o' => $access_token->getResourceOwnerPublicId(),
         ];
+        if (!empty($access_token->getParameters())) {
+            $payload['oth'] = $access_token->getParameters();
+        }
         if (null !== $audience) {
             $payload['aud'] = $audience;
         }
@@ -229,8 +233,11 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $access_token->setClientPublicId($jwt->getClaim('sub'));
         $access_token->setExpiresAt($jwt->getClaim('exp'));
         $access_token->setToken($assertion);
-        if ($jwt->hasClaim('r_o')) {
-            $access_token->setResourceOwnerPublicId($jwt->getClaim('r_o'));
+        $access_token->setTokenType($jwt->getClaim('aty'));
+        $access_token->setResourceOwnerPublicId($jwt->getClaim('r_o'));
+
+        if ($jwt->hasClaim('oth')) {
+            $access_token->setParameters($jwt->getClaim('oth'));
         }
         if ($jwt->hasClaim('sco')) {
             $access_token->setScope($jwt->getClaim('sco'));
