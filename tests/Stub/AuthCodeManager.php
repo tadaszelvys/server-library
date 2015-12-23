@@ -56,6 +56,10 @@ class AuthCodeManager extends Base
                 'scope1',
                 'scope2',
             ]);
+        $valid_auth_code2->setQueryParams([
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'plain',
+        ]);
         $valid_auth_code2->setToken('VALID_AUTH_CODE_PUBLIC_CLIENT');
 
         $expired_auth_code = new AuthCode();

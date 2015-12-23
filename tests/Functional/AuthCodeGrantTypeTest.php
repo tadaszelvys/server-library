@@ -322,7 +322,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
     }
 
-    public function testAuthcodeSuccessWithStateAndUnregisteredClient()
+    public function testAuthcodeFailWithStateAndUnregisteredClient()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
@@ -350,6 +350,46 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => '**UNREGISTERED**--foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken()], ['HTTPS' => 'on'], ['X-OAuth2-Unregistered-Client-ID' => '**UNREGISTERED**--foo']);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Non-confidential clients must set a proof key (PKCE) for code exchange.', $e->getDescription());
+        }
+    }
+
+    public function testAuthcodeSuccessWithStateAndUnregisteredClient()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => '**UNREGISTERED**--foo',
+            'response_type'         => 'code',
+            'state'                 => '0123456789',
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'plain',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+
+        $uri = new Uri($response->getHeader('Location')[0]);
+        parse_str($uri->getQuery(), $result);
+        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+
+        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
+        $this->assertEquals('**UNREGISTERED**--foo', $authcode->getClientPublicId());
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => '**UNREGISTERED**--foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Unregistered-Client-ID' => '**UNREGISTERED**--foo']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -719,7 +759,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testPublicClientGranted()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['client_id' => 'foo', 'grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE_PUBLIC_CLIENT', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['client_id' => 'foo', 'grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE_PUBLIC_CLIENT', 'redirect_uri' => 'http://example.com/redirect_uri/', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();

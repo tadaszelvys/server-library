@@ -44,7 +44,6 @@ use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
-use OAuth2\Grant\IdTokenResponseType;
 use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\JWTBearerGrantType;
 use OAuth2\Grant\NoneResponseType;
@@ -307,6 +306,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->configuration->set('jwt_access_token_content_encryption_algorithm', 'A256CBC-HS512');
             $this->configuration->set('allow_response_mode_parameter_in_authorization_request', true);
             $this->configuration->set('multiple_response_types_support_enabled', true);
+            $this->configuration->set('enforce_pkce_for_public_clients', true);
         }
 
         return $this->configuration;
@@ -487,7 +487,8 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->authorization_code_grant_type) {
             $this->authorization_code_grant_type = new AuthorizationCodeGrantType(
                 $this->getAuthCodeManager(),
-                $this->getExceptionManager()
+                $this->getExceptionManager(),
+                $this->getConfiguration()
             );
         }
 

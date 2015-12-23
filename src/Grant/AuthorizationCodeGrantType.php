@@ -11,9 +11,11 @@
 
 namespace OAuth2\Grant;
 
+use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
@@ -27,6 +29,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
 {
     use HasExceptionManager;
+    use HasConfiguration;
 
     /**
      * @var \OAuth2\Token\AuthCodeManagerInterface
@@ -41,13 +44,15 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     /**
      * AuthorizationCodeGrantType constructor.
      *
-     * @param \OAuth2\Token\AuthCodeManagerInterface      $auth_code_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\Token\AuthCodeManagerInterface       $auth_code_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
     {
         $this->auth_code_manager = $auth_code_manager;
         $this->setExceptionManager($exception_manager);
+        $this->setConfiguration($configuration);
 
         $this->addPKCEMethod(new Plain());
         $this->addPKCEMethod(new S256());
@@ -153,7 +158,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
         }
 
-        $this->checkPKCE($request, $authCode);
+        $this->checkPKCE($request, $authCode,$client);
         $this->checkAuthCode($authCode, $client);
 
         $redirect_uri = RequestBody::getParameter($request, 'redirect_uri');
@@ -206,25 +211,41 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \OAuth2\Token\AuthCodeInterface          $authCode
+     * @param \OAuth2\Client\ClientInterface           $client
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function checkPKCE(ServerRequestInterface $request, AuthCodeInterface $authCode)
+    private function checkPKCE(ServerRequestInterface $request, AuthCodeInterface $authCode, ClientInterface $client)
     {
         $params = $authCode->getQueryParams();
         if (!array_key_exists('code_challenge', $params)) {
+            if (true === $this->getConfiguration()->get('enforce_pkce_for_public_clients', false) && !$client instanceof ConfidentialClientInterface) {
+                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Non-confidential clients must set a proof key (PKCE) for code exchange.');
+            }
             return;
         }
 
         $code_challenge = $params['code_challenge'];
         $code_challenge_method = array_key_exists('code_challenge_method', $params) ? $params['code_challenge_method'] : 'plain';
+        $code_verifier = RequestBody::getParameter($request, 'code_verifier');
 
+        $this->checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier);
+    }
+
+    /**
+     * @param string $code_challenge_method
+     * @param string $code_challenge
+     * @param string $code_verifier
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier)
+    {
         if (!array_key_exists($code_challenge_method, $this->getPKCEMethods())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported code challenge method "%s".', $code_challenge_method));
         }
         $method = $this->getPKCEMethod($code_challenge_method);
 
-        $code_verifier = RequestBody::getParameter($request, 'code_verifier');
         if (null === $code_verifier) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "code_verifier" is required.');
         }
