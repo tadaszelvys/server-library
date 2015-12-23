@@ -12,7 +12,6 @@
 namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 interface AccessTokenTypeManagerInterface
 {
