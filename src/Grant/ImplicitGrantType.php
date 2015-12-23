@@ -12,10 +12,8 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
-use OAuth2\Behaviour\HasAccessTokenTypeManager;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Token\AccessTokenManagerInterface;
-use OAuth2\Token\AccessTokenTypeManagerInterface;
 
 final class ImplicitGrantType implements ResponseTypeSupportInterface
 {
@@ -24,7 +22,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
     /**
      * ImplicitGrantType constructor.
      *
-     * @param \OAuth2\Token\AccessTokenManagerInterface     $access_token_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
      */
     public function __construct(AccessTokenManagerInterface $access_token_manager)
     {
@@ -57,6 +55,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
             $authorization->getEndUser(),
             $authorization->getScopes()
         );
+
         return $token->toArray();
     }
 }

@@ -44,7 +44,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     abstract protected function populateAccessToken(AccessTokenInterface &$access_token, ClientInterface $client, ResourceOwnerInterface $resource_owner, RefreshTokenInterface $refresh_token = null);
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface           $access_token
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
      */
     abstract protected function saveAccessToken(AccessTokenInterface $access_token);
 

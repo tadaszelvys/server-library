@@ -12,7 +12,6 @@
 namespace OAuth2\Endpoint;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
-use OAuth2\Behaviour\HasAccessTokenTypeManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
@@ -27,7 +26,6 @@ use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
-use OAuth2\Token\AccessTokenTypeManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Util\RequestBody;

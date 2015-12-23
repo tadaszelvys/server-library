@@ -163,8 +163,9 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
     /**
      * @param \OAuth2\Token\AccessTokenInterface $access_token
      *
-     * @return array
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return array
      */
     protected function preparePayload(AccessTokenInterface $access_token)
     {
