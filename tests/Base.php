@@ -766,9 +766,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getBearerAccessTokenType()
     {
         if (null === $this->bearer_access_token_type) {
-            $this->bearer_access_token_type = new BearerAccessToken(
-                $this->getExceptionManager()
-            );
+            $this->bearer_access_token_type = new BearerAccessToken();
         }
 
         return $this->bearer_access_token_type;

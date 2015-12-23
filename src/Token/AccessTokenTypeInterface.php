@@ -11,8 +11,6 @@
 
 namespace OAuth2\Token;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 interface AccessTokenTypeInterface
 {
     /**
@@ -39,26 +37,6 @@ interface AccessTokenTypeInterface
      * @param \OAuth2\Token\AccessTokenInterface $token The access token to update
      */
     public function updateAccessToken(AccessTokenInterface &$token);
-
-    /**
-     * Tries to find an access token in the request.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request.
-     *
-     * @return string|null The access token
-     */
-    public function findAccessToken(ServerRequestInterface $request);
-
-    /**
-     * This method verifies the access token request is valid.
-     * Be careful: it MUST not verify the access token itself.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \OAuth2\Token\AccessTokenInterface       $token
-     *
-     * @return bool True if the access token request is valid, else false
-     */
-    public function isAccessTokenRequestValid(ServerRequestInterface $request, AccessTokenInterface $token);
 
     /**
      * @return string

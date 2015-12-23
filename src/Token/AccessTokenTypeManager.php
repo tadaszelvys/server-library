@@ -15,7 +15,6 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\AccessTokenTypeExtensionInterface;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
 {
@@ -73,20 +72,6 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
         }
 
         return $this->access_token_types[$token_type_name];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findAccessToken(ServerRequestInterface $request, AccessTokenTypeInterface &$access_token_type = null)
-    {
-        foreach ($this->access_token_types as $type) {
-            if (null !== $token = $type->findAccessToken($request)) {
-                $access_token_type = $type;
-
-                return $token;
-            }
-        }
     }
 
     /**
