@@ -158,7 +158,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
         }
 
-        $this->checkPKCE($request, $authCode,$client);
+        $this->checkPKCE($request, $authCode, $client);
         $this->checkAuthCode($authCode, $client);
 
         $redirect_uri = RequestBody::getParameter($request, 'redirect_uri');
@@ -222,6 +222,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             if (true === $this->getConfiguration()->get('enforce_pkce_for_public_clients', false) && !$client instanceof ConfidentialClientInterface) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Non-confidential clients must set a proof key (PKCE) for code exchange.');
             }
+
             return;
         }
 
