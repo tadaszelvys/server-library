@@ -68,12 +68,12 @@ interface TokenInterface
     /**
      * The resource owner associated to the token.
      *
-     * @return string|null The public ID of the resource owner associated with the token
+     * @return string The public ID of the resource owner associated with the token
      */
     public function getResourceOwnerPublicId();
 
     /**
-     * @param string|null $resource_owner_public_id
+     * @param string $resource_owner_public_id
      */
     public function setResourceOwnerPublicId($resource_owner_public_id);
 }

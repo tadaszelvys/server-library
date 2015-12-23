@@ -91,6 +91,8 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
             'active'     => !$token->hasExpired(),
             'client_id'  => $token->getClientPublicId(),
             'token_type' => $token->getTokenType(),
+            'exp'        => $token->getExpiresAt(),
+            'sub'        => $token->getResourceOwnerPublicId(),
         ];
         if (!empty($token->getScope())) {
             $result['scope'] = $token->getScope();
@@ -110,7 +112,7 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
     private function getJWTInformation(JWTInterface $token)
     {
         $result = [];
-        foreach (['exp', 'iat', 'nbf', 'sub', 'aud', 'iss', 'jti'] as $key) {
+        foreach (['iat', 'nbf', 'aud', 'iss', 'jti'] as $key) {
             if ($token->hasClaim($key)) {
                 $result[$key] = $token->getClaim($key);
             }

@@ -19,7 +19,7 @@ class RefreshToken extends Token implements RefreshTokenInterface
     protected $used = false;
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function isUsed()
     {
@@ -27,7 +27,7 @@ class RefreshToken extends Token implements RefreshTokenInterface
     }
 
     /**
-     * @param bool $used
+     * {@inheritdoc}
      */
     public function setUsed($used)
     {

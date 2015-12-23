@@ -34,7 +34,7 @@ class Token implements TokenInterface
     protected $expires_at;
 
     /**
-     * @var null|string
+     * @var string
      */
     protected $resource_owner_public_id;
 
@@ -47,7 +47,7 @@ class Token implements TokenInterface
     }
 
     /**
-     * @param string $client_public_id
+     * {@inheritdoc}
      */
     public function setClientPublicId($client_public_id)
     {
@@ -63,7 +63,7 @@ class Token implements TokenInterface
     }
 
     /**
-     * @param string $token
+     * {@inheritdoc}
      */
     public function setToken($token)
     {
@@ -79,7 +79,7 @@ class Token implements TokenInterface
     }
 
     /**
-     * @param array $scope
+     * {@inheritdoc}
      */
     public function setScope(array $scope)
     {
@@ -95,7 +95,7 @@ class Token implements TokenInterface
     }
 
     /**
-     * @param string|null $resource_owner_public_id
+     * {@inheritdoc}
      */
     public function setResourceOwnerPublicId($resource_owner_public_id)
     {
@@ -103,7 +103,7 @@ class Token implements TokenInterface
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getExpiresAt()
     {
@@ -111,7 +111,7 @@ class Token implements TokenInterface
     }
 
     /**
-     * @param int $expires_at
+     * {@inheritdoc}
      */
     public function setExpiresAt($expires_at)
     {

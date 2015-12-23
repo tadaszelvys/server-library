@@ -69,6 +69,8 @@ final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationT
         $result = [
             'active'     => !$token->hasExpired() && !$token->isUsed(),
             'client_id'  => $token->getClientPublicId(),
+            'exp'        => $token->getExpiresAt(),
+            'sub'        => $token->getResourceOwnerPublicId(),
         ];
         if (!empty($token->getScope())) {
             $result['scope'] = $token->getScope();
@@ -88,7 +90,7 @@ final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationT
     private function getJWTInformation(JWTInterface $token)
     {
         $result = [];
-        foreach (['exp', 'iat', 'nbf', 'sub', 'aud', 'iss', 'jti'] as $key) {
+        foreach (['iat', 'nbf', 'aud', 'iss', 'jti'] as $key) {
             if ($token->hasClaim($key)) {
                 $result[$key] = $token->getClaim($key);
             }

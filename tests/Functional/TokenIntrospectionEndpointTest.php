@@ -52,7 +52,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('{"active":true,"client_id":"bar","token_type":"Bearer"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"active":true,"client_id":"bar","token_type":"Bearer","exp":[0-9]+,"sub":"bar"}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenIntrospectionAllowedForAuthenticatedPublicClient()
@@ -64,7 +64,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('{"active":true,"client_id":"foo","token_type":"Bearer"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[0-9]+,"sub":"foo"}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenIntrospectionRefusedForUnauthenticatedPublicClient()
@@ -125,7 +125,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('{"active":true,"client_id":"bar","scope":["scope1","scope2","scope3"]}', $response->getBody()->getContents());
+        $this->assertRegExp('{"active":true,"client_id":"bar","exp":[0-9]+,"sub":"bar","scope":\["scope1","scope2","scope3"\]}', $response->getBody()->getContents());
     }
 
     public function testFooTokenNotSupported()

@@ -14,12 +14,12 @@ namespace OAuth2\Token;
 class AuthCode extends Token implements AuthCodeInterface
 {
     /**
-     * @var bool|false
+     * @var bool
      */
     protected $issue_refresh_token = false;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $redirect_uri = null;
 

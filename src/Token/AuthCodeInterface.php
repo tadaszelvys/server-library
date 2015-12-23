@@ -24,7 +24,7 @@ interface AuthCodeInterface extends TokenInterface
     public function setIssueRefreshToken($issue_refresh_token);
 
     /**
-     * @return string The redirect URI set in the authorization request
+     * @return string|null The redirect URI set in the authorization request
      */
     public function getRedirectUri();
 

@@ -36,7 +36,7 @@ class SimpleStringAccessTokenManager extends Base
 
         $abcd = new AccessToken();
         $abcd->setExpiresAt(time() + 3600);
-        $abcd->setResourceOwnerPublicId(null);
+        $abcd->setResourceOwnerPublicId('bar');
         $abcd->setScope([]);
         $abcd->setClientPublicId('bar');
         $abcd->setRefreshToken(null);
@@ -45,7 +45,7 @@ class SimpleStringAccessTokenManager extends Base
 
         $efgh = new AccessToken();
         $efgh->setExpiresAt(time() + 3600);
-        $efgh->setResourceOwnerPublicId(null);
+        $efgh->setResourceOwnerPublicId('foo');
         $efgh->setScope([]);
         $efgh->setClientPublicId('foo');
         $efgh->setRefreshToken('REFRESH_EFGH');
