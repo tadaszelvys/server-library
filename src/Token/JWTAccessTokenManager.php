@@ -232,6 +232,20 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
         $access_token = new JWTAccessToken();
         $access_token->setToken($assertion);
         $access_token->setJWS($jwt);
+        $access_token->setClientPublicId($jwt->getClaim('sub'));
+        $access_token->setExpiresAt($jwt->getClaim('exp'));
+        $access_token->setTokenType($jwt->getClaim('aty'));
+        $access_token->setResourceOwnerPublicId($jwt->getClaim('r_o'));
+
+        if ($jwt->hasClaim('oth')) {
+            $access_token->setParameters($jwt->getClaim('oth'));
+        }
+        if ($jwt->hasClaim('sco')) {
+            $access_token->setScope($jwt->getClaim('sco'));
+        }
+        if ($jwt->hasClaim('ref')) {
+            $access_token->setRefreshToken($jwt->getClaim('ref'));
+        }
 
         return $access_token;
     }
