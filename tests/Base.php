@@ -11,25 +11,18 @@
 
 namespace OAuth2\Test;
 
-use Jose\Algorithm\JWAManager;
 use Jose\Checker\AudienceChecker;
-use Jose\Checker\CheckerManager;
 use Jose\Checker\CriticalChecker;
 use Jose\Checker\ExpirationChecker;
 use Jose\Checker\IssuedAtChecker;
 use Jose\Checker\NotBeforeChecker;
-use Jose\Compression\CompressionManager;
-use Jose\Compression\Deflate;
-use Jose\Compression\GZip;
-use Jose\Compression\ZLib;
-use Jose\Decrypter;
-use Jose\Encrypter;
-use Jose\Loader;
+use Jose\Factory\DecrypterFactory;
+use Jose\Factory\EncrypterFactory;
+use Jose\Factory\LoaderFactory;
+use Jose\Factory\SignerFactory;
+use Jose\Factory\VerifierFactory;
 use Jose\Payload\JWKConverter;
 use Jose\Payload\JWKSetConverter;
-use Jose\Payload\PayloadConverterManager;
-use Jose\Signer;
-use Jose\Verifier;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Configuration\Configuration;
 use OAuth2\Endpoint\AuthorizationEndpoint;
@@ -895,8 +888,8 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getSigner($allowed_signature_algorithms)
     {
-        return new Signer(
-            $this->getJWAManager($allowed_signature_algorithms),
+        return SignerFactory::createSigner(
+            $allowed_signature_algorithms,
             $this->getPayloadConverterManager()
         );
     }
@@ -908,8 +901,8 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getEncrypter($allowed_encryption_algorithms)
     {
-        return new Encrypter(
-            $this->getJWAManager($allowed_encryption_algorithms),
+        return EncrypterFactory::createEncrypter(
+            $allowed_encryption_algorithms,
             $this->getPayloadConverterManager(),
             $this->getCompressionManager()
         );
@@ -922,8 +915,8 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getDecrypter($allowed_encryption_algorithms)
     {
-        return new Decrypter(
-            $this->getJWAManager($allowed_encryption_algorithms),
+        return DecrypterFactory::createDecrypter(
+            $allowed_encryption_algorithms,
             $this->getPayloadConverterManager(),
             $this->getCompressionManager(),
             $this->getCheckerManager('My Authorization Server')
@@ -937,8 +930,8 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getVerifier($allowed_encryption_algorithms)
     {
-        return new Verifier(
-            $this->getJWAManager($allowed_encryption_algorithms),
+        return VerifierFactory::createVerifier(
+            $allowed_encryption_algorithms,
             $this->getCheckerManager('My Authorization Server')
         );
     }
@@ -948,9 +941,8 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getLoader()
     {
-        return new Loader(
-            $this->getPayloadConverterManager(),
-            $this->getCheckerManager('My Authorization Server')
+        return LoaderFactory::createLoader(
+            $this->getPayloadConverterManager()
         );
     }
 
@@ -961,27 +953,25 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getCheckerManager($audience)
     {
-        $checker_manager = new CheckerManager();
-        $checker_manager->addChecker(new ExpirationChecker());
-        $checker_manager->addChecker(new NotBeforeChecker());
-        $checker_manager->addChecker(new IssuedAtChecker());
-        $checker_manager->addChecker(new CriticalChecker());
-        $checker_manager->addChecker(new AudienceChecker($audience));
-
-        return $checker_manager;
+        return [
+            new ExpirationChecker(),
+            new NotBeforeChecker(),
+            new IssuedAtChecker(),
+            new CriticalChecker(),
+            new AudienceChecker($audience),
+        ];
     }
 
     /**
-     * @return \Jose\Compression\CompressionManager
+     * @return string[]
      */
     protected function getCompressionManager()
     {
-        $compression_manager = new CompressionManager();
-        $compression_manager->addCompressionAlgorithm(new Deflate());
-        $compression_manager->addCompressionAlgorithm(new GZip());
-        $compression_manager->addCompressionAlgorithm(new ZLib());
-
-        return $compression_manager;
+        return [
+            'DEF',
+            'GZ',
+            'ZLIB',
+        ];
     }
 
     /**
@@ -1005,39 +995,14 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Jose\Payload\PayloadConverterManager
+     * @return \Jose\Payload\PayloadConverterInterface[]
      */
     protected function getPayloadConverterManager()
     {
-        $payload_converter_manager = new PayloadConverterManager();
-        $payload_converter_manager->addConverter(new JWKConverter());
-        $payload_converter_manager->addConverter(new JWKSetConverter());
-
-        return $payload_converter_manager;
-    }
-
-    /**
-     * @param string[] $algorithms
-     *
-     * @return \Jose\Algorithm\JWAManager
-     */
-    protected function getJWAManager(array $algorithms)
-    {
-        $jwa_manager = new JWAManager();
-        $available_algorithms = $this->getSupportedJWTAlgorithms();
-        foreach ($algorithms as $algorithm) {
-            if (!array_key_exists($algorithm, $available_algorithms)) {
-                throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $algorithm));
-            }
-            /*
-             * @var \Jose\Algorithm\JWAInterface $alg
-             */
-            $class = $available_algorithms[$algorithm];
-            $alg = new $class();
-            $jwa_manager->addAlgorithm($alg);
-        }
-
-        return $jwa_manager;
+        return [
+            new JWKConverter(),
+            new JWKSetConverter()
+        ];
     }
 
     protected function getSupportedJWTAlgorithms()
