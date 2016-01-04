@@ -127,11 +127,6 @@ abstract class JWTAccessTokenManager extends AccessTokenManager
             $header['aud'] = $audience;
         }
 
-        $key = $this->getJWTEncrypter()->getKeyEncryptionKey();
-        if ($key->has('kid')) {
-            $header['kid'] = $key->get('kid');
-        }
-
         return $header;
     }
 
