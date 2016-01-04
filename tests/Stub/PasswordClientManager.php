@@ -51,8 +51,16 @@ class PasswordClientManager extends Base
         $digest->setPublicId('Mufasa');
         $this->updateClientCredentials($digest);
 
+        $mac = new PasswordClient('mac');
+        $mac->setPlaintextSecret('secret');
+        $mac->setRedirectUris(['http://example.com/test?good=false']);
+        $mac->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
+        $mac->setPublicId('mac');
+        $this->updateClientCredentials($mac);
+
         $this->clients['bar'] = $bar;
         $this->clients['baz'] = $baz;
         $this->clients['Mufasa'] = $digest;
+        $this->clients['mac'] = $mac;
     }
 }

@@ -55,6 +55,7 @@ use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
 use OAuth2\Token\AccessTokenTypeManager;
 use OAuth2\Token\BearerAccessToken;
+use OAuth2\Token\MacAccessToken;
 use OAuth2\Util\JWTEncrypter;
 use OAuth2\Util\JWTLoader;
 use OAuth2\Util\JWTSigner;
@@ -766,6 +767,26 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return null|\OAuth2\Token\MacAccessToken
+     */
+    private $mac_access_token_type = null;
+
+    /**
+     * @return \OAuth2\Token\MacAccessToken
+     */
+    protected function getMacAccessTokenType()
+    {
+        if (null === $this->mac_access_token_type) {
+            $this->mac_access_token_type = new MacAccessToken(
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
+        }
+
+        return $this->mac_access_token_type;
+    }
+
+    /**
      * @return null|\OAuth2\Token\AccessTokenTypeManagerInterface
      */
     private $access_token_type_manager = null;
@@ -781,6 +802,7 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->access_token_type_manager->addAccessTokenType($this->getBearerAccessTokenType(), true);
+            $this->access_token_type_manager->addAccessTokenType($this->getMacAccessTokenType());
         }
 
         return $this->access_token_type_manager;

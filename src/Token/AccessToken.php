@@ -106,4 +106,22 @@ class AccessToken extends Token implements AccessTokenInterface
 
         return $values;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setParameter($key, $value)
+    {
+        $this->parameters[$key] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unsetParameter($key)
+    {
+        if (array_key_exists($key, $this->parameters)) {
+            unset($this->parameters[$key]);
+        }
+    }
 }

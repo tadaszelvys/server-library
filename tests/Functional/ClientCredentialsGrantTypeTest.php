@@ -131,6 +131,21 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2"}', $response->getBody()->getContents());
     }
 
+    public function testGrantTypeAuthorizedForClientWithMacAccessToken()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'mac', 'PHP_AUTH_PW' => 'secret']);
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[^"]+,"scope":"scope1 scope2","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256"}', $response->getBody()->getContents());
+    }
+
     public function testGrantTypeAuthorizedForClientUsingBadDigestAuthenticationScheme1()
     {
         $response = new Response();

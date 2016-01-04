@@ -11,11 +11,23 @@
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Client\AccessTokenTypeExtensionInterface;
 use OAuth2\Client\PasswordClient as BasePasswordClient;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 
-class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface
+class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface, AccessTokenTypeExtensionInterface
 {
+    private $preferred_access_token_type = null;
+
+    public function __construct($preferred_access_token_type = null)
+    {
+        parent::__construct();
+        $this->preferred_access_token_type = $preferred_access_token_type;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getTokenLifetime($token)
     {
         switch ($token) {
@@ -27,5 +39,13 @@ class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensio
             default:
                 return 2000;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreferredTokenType()
+    {
+        return $this->preferred_access_token_type;
     }
 }
