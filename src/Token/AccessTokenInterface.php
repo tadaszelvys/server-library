@@ -33,6 +33,20 @@ interface AccessTokenInterface extends TokenInterface, \JsonSerializable
     public function getParameters();
 
     /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function getParameter($key);
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasParameter($key);
+
+    /**
      * @param array $parameters
      */
     public function setParameters(array $parameters);

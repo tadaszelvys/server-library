@@ -118,6 +118,26 @@ class AccessToken extends Token implements AccessTokenInterface
     /**
      * {@inheritdoc}
      */
+    public function getParameter($key)
+    {
+        if (!$this->hasParameter($key)) {
+            throw new \InvalidArgumentException(sprintf('Parameter with key "%s" does not exist.', $key));
+        }
+
+        return $this->parameters[$key];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasParameter($key)
+    {
+        return array_key_exists($key, $this->parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function unsetParameter($key)
     {
         if (array_key_exists($key, $this->parameters)) {
