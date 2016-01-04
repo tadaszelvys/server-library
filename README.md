@@ -32,7 +32,7 @@ The following components are implemented:
     * [x] Ability to use other Access Token managers
 * Access Token Types:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
-    * [ ] MAC access ([IETF draft](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-05)) - *The implementation is stopped until the specification has not reach maturity*
+    * [x] MAC access ([IETF draft 02 only](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-02)) - *The implementation is stopped until the specification has not reach maturity*
     * [x] Ability to use other Access Token Types
 * [x] Exception manager
 * [x] Scope manager ([RFC6749, section 3.3](https://tools.ietf.org/html/rfc6749#section-3.3))
@@ -79,14 +79,13 @@ The following components are implemented:
     * [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
 
 * For information only
-    * [ ] Threat Model and Security Consideration ([RFC6819](https://tools.ietf.org/html/rfc6819))
-    * [ ] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
-    * [ ] [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq-06)
-    * [ ] [Proof-of-Possession (PoP) Security Architecture](https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture-07)
-    * [ ] [Proof-of-Possession: Authorization Server to Client Key Distribution](https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution-02)
-    * [ ] [Token Exchange: An STS for the REST of Us](https://tools.ietf.org/html/draft-ietf-oauth-token-exchange-03)
-    * [ ] [A Method for Signing an HTTP Requests for OAuth](https://tools.ietf.org/html/draft-ietf-oauth-signed-http-request-01)
-    * [ ] [Proof-of-Possession Key Semantics for JSON Web Tokens (JWTs)](https://tools.ietf.org/html/draft-ietf-oauth-proof-of-possession-11)
+    * Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
+    * [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq-06)
+    * [Proof-of-Possession (PoP) Security Architecture](https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture-07)
+    * [Proof-of-Possession: Authorization Server to Client Key Distribution](https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution-02)
+    * [Token Exchange: An STS for the REST of Us](https://tools.ietf.org/html/draft-ietf-oauth-token-exchange-03)
+    * [A Method for Signing an HTTP Requests for OAuth](https://tools.ietf.org/html/draft-ietf-oauth-signed-http-request-01)
+    * [Proof-of-Possession Key Semantics for JSON Web Tokens (JWTs)](https://tools.ietf.org/html/draft-ietf-oauth-proof-of-possession-11)
 
 # The Release Process
 
