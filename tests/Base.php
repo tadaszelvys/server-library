@@ -1023,7 +1023,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         return [
             new JWKConverter(),
-            new JWKSetConverter()
+            new JWKSetConverter(),
         ];
     }
 
