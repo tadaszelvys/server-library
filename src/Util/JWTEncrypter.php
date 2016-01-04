@@ -43,14 +43,6 @@ final class JWTEncrypter
     }
 
     /**
-     * @return null|\Jose\Object\JWKInterface
-     */
-    public function getKeyEncryptionKey()
-    {
-        return $this->encryption_key;
-    }
-
-    /**
      * @param string $payload
      * @param array  $protected_headers
      * @param array  $sender_key
@@ -59,7 +51,7 @@ final class JWTEncrypter
      */
     public function encrypt($payload, array $protected_headers, array $sender_key = [])
     {
-        if (null === $this->getKeyEncryptionKey()) {
+        if (null === $this->encryption_key) {
             return $payload;
         }
         $sender_key = empty($sender_key) ? null : new JWK($sender_key);
