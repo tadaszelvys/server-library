@@ -4,12 +4,12 @@ before_commands:
 checks:
     php:
         code_rating: true
-        duplication: true
+        duplication: false
 
 tools:
     php_sim: true
     php_changetracking: true
-    php_cpd: false
+    php_cpd: true
     php_mess_detector: true
     php_code_sniffer: true
     php_analyzer: true
