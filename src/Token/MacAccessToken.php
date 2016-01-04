@@ -53,9 +53,9 @@ class MacAccessToken implements AccessTokenTypeInterface
     }
 
     /**
-     * @return string
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     private function generateMacKey()
     {
