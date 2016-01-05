@@ -33,7 +33,6 @@ The following components are implemented:
 * Access Token Types:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
     * [x] MAC access token ([IETF draft 02 only](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-02)) - *The implementation is stopped until the specification has not reach maturity*
-    * [ ] POP access token ([Proof-of-Possession: Authorization Server to Client Key Distribution](https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution-02)) - *Integration planned*
     * [x] Ability to use other Access Token Types
 * [x] Exception manager
 * [x] Scope manager ([RFC6749, section 3.3](https://tools.ietf.org/html/rfc6749#section-3.3))

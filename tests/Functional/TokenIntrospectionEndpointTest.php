@@ -128,6 +128,18 @@ class TokenIntrospectionEndpointTest extends Base
         $this->assertRegExp('{"active":true,"client_id":"bar","exp":[0-9]+,"sub":"bar","scope":\["scope1","scope2","scope3"\]}', $response->getBody()->getContents());
     }
 
+    public function testTokenNotFound()
+    {
+        $request = $this->createRequest('/', 'POST', ['token' => '__BAD_TOKEN__'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+
+        $response = new Response();
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertRegExp('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+    }
+
     public function testFooTokenNotSupported()
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'VALID_REFRESH_TOKEN', 'token_type_hint' => 'foo_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
