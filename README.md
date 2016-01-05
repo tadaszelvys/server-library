@@ -1,5 +1,5 @@
-OAuth2 Server Library
-=====================
+OAuth2 Framework Library for PHP
+================================
 
 [![Join the chat at https://gitter.im/Spomky-Labs/oauth2-server-library](https://badges.gitter.im/Spomky-Labs/oauth2-server-library.svg)](https://gitter.im/Spomky-Labs/oauth2-server-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -104,10 +104,6 @@ The preferred way to install this library is to rely on Composer:
 ```sh
 composer require "spomky-labs/oauth2-server-library"
 ```
-
-# Create missing components
-
-Look at [Extend classes](doc/Extend.md) for more information and examples.
 
 # How to use
 
