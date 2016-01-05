@@ -13,6 +13,7 @@ namespace OAuth2\Test\Unit;
 
 use OAuth2\Client\PublicClient;
 use OAuth2\Exception\AuthenticateException;
+use OAuth2\Exception\BaseException;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
 use OAuth2\Token\AccessToken;
@@ -125,6 +126,15 @@ class ObjectsTest extends Base
         ]);
         $access_token->unsetParameter('foo');
         $access_token->getParameter('foo');
+    }
+
+    /**
+     * @expectedException \OAuth2\Exception\InternalServerErrorException
+     * @expectedExceptionMessage server_error
+     */
+    public function testAccessTokenTypeAlreadyExist()
+    {
+        $this->getAccessTokenTypeManager()->addAccessTokenType($this->getBearerAccessTokenType());
     }
 
     public function testAuthenticateException()
