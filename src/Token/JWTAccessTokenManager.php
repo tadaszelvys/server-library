@@ -23,7 +23,7 @@ use OAuth2\Util\JWTEncrypter;
 use OAuth2\Util\JWTLoader;
 use OAuth2\Util\JWTSigner;
 
-abstract class JWTAccessTokenManager extends AccessTokenManager
+class JWTAccessTokenManager extends AccessTokenManager
 {
     use HasExceptionManager;
     use HasJWTLoader;

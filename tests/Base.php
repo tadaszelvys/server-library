@@ -45,7 +45,6 @@ use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
-use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\JWTClientManager;
 use OAuth2\Test\Stub\PasswordClientManager;
 use OAuth2\Test\Stub\PublicClientManager;
@@ -55,6 +54,7 @@ use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
 use OAuth2\Token\AccessTokenTypeManager;
 use OAuth2\Token\BearerAccessToken;
+use OAuth2\Token\JWTAccessTokenManager;
 use OAuth2\Token\MacAccessToken;
 use OAuth2\Util\JWTEncrypter;
 use OAuth2\Util\JWTLoader;
@@ -686,12 +686,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return null|\OAuth2\Test\Stub\JWTAccessTokenManager
+     * @return null|\OAuth2\Token\JWTAccessTokenManager
      */
     private $jwt_access_token_manager = null;
 
     /**
-     * @return \OAuth2\Test\Stub\JWTAccessTokenManager
+     * @return \OAuth2\Token\JWTAccessTokenManager
      */
     protected function getJWTAccessTokenManager()
     {

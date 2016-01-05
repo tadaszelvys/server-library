@@ -35,6 +35,8 @@ interface AccessTokenInterface extends TokenInterface, \JsonSerializable
     /**
      * @param string $key
      *
+     * @throws \InvalidArgumentException
+     *
      * @return mixed
      */
     public function getParameter($key);

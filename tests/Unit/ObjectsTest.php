@@ -15,6 +15,7 @@ use OAuth2\Client\PublicClient;
 use OAuth2\Exception\AuthenticateException;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
+use OAuth2\Token\AccessToken;
 use OAuth2\Token\AuthCode;
 
 /**
@@ -79,6 +80,51 @@ class ObjectsTest extends Base
     public function testAuthenticateExceptionConstructionFailed()
     {
         new AuthenticateException('foo_error', 'foo_description', 'https://foo.com/error', []);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Parameter with key "foo" does not exist.
+     */
+    public function testAccessTokenParameterDoesNotExist()
+    {
+        $access_token = new AccessToken();
+        $access_token->getParameter('foo');
+    }
+
+    public function testAccessTokenParameterExists()
+    {
+        $access_token = new AccessToken();
+        $access_token->setParameters([
+            'foo' => 'bar',
+        ]);
+
+        $this->assertEquals('bar', $access_token->getParameter('foo'));
+    }
+
+    public function testAccessTokenToArray()
+    {
+        $access_token = new AccessToken();
+
+        $this->assertEquals([
+            'access_token' => null,
+            'token_type' => null,
+            'expires_in' => 0,
+        ], $access_token->toArray());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Parameter with key "foo" does not exist.
+     */
+    public function testAccessTokenParameterUnset()
+    {
+        $access_token = new AccessToken();
+        $access_token->setParameters([
+            'foo' => 'bar',
+        ]);
+        $access_token->unsetParameter('foo');
+        $access_token->getParameter('foo');
     }
 
     public function testAuthenticateException()

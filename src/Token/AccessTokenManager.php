@@ -51,7 +51,10 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     /**
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    abstract protected function createEmptyAccessToken();
+    protected function createEmptyAccessToken()
+    {
+        return new AccessToken();
+    }
 
     /**
      * {@inheritdoc}

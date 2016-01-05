@@ -59,14 +59,6 @@ class SimpleStringAccessTokenManager extends Base
     /**
      * {@inheritdoc}
      */
-    protected function createEmptyAccessToken()
-    {
-        return new AccessToken();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function saveAccessToken(AccessTokenInterface $access_token)
     {
         $this->access_tokens[$access_token->getToken()] = $access_token;
