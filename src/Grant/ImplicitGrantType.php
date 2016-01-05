@@ -53,6 +53,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
         $token = $this->getAccessTokenManager()->createAccessToken(
             $authorization->getClient(),
             $authorization->getEndUser(),
+            $authorization->getQueryParams(),
             $authorization->getScopes()
         );
 

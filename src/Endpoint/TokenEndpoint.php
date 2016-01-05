@@ -94,7 +94,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     {
         $server_params = $request->getServerParams();
 
-        return !empty($server_params['HTTPS']) && 'off' !== strtolower($server_params['HTTPS']);
+        return !empty($server_params['HTTPS']) && 'on' === strtolower($server_params['HTTPS']);
     }
 
     /**
@@ -162,7 +162,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         //Create and return access token (with refresh token and other information if asked) as an array
-        $token = $this->createAccessToken($client, $result);
+        $token = $this->createAccessToken($client, $result, RequestBody::getParameters($request));
 
         $response->getBody()->write(json_encode($token));
         $response = $response->withStatus(200);
@@ -202,10 +202,11 @@ final class TokenEndpoint implements TokenEndpointInterface
     /**
      * @param \OAuth2\Client\ClientInterface $client
      * @param array                          $values
+     * @param array                          $request_parameters
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    private function createAccessToken(ClientInterface $client, array $values)
+    private function createAccessToken(ClientInterface $client, array $values, array $request_parameters)
     {
         $refresh_token = null;
         $resource_owner = $this->getResourceOwner($values['resource_owner_public_id']);
@@ -219,7 +220,7 @@ final class TokenEndpoint implements TokenEndpointInterface
             }
         }
 
-        $access_token = $this->getAccessTokenManager()->createAccessToken($client, $resource_owner, $values['requested_scope'], $refresh_token);
+        $access_token = $this->getAccessTokenManager()->createAccessToken($client, $resource_owner, $request_parameters, $values['requested_scope'], $refresh_token);
 
         return $access_token;
     }

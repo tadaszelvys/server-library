@@ -15,6 +15,7 @@ use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
+use OAuth2\Client\ResourceServerInterface;
 use OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BaseExceptionInterface;
@@ -109,23 +110,24 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
 
             return;
         }
-        $this->getTokenInformation($response, $token, $client, $token_type_hint);
+        $this->getTokenInformation($request, $response, $token, $client, $token_type_hint);
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param string                              $token
-     * @param \OAuth2\Client\ClientInterface      $client
-     * @param string|null                         $token_type_hint
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface      $response
+     * @param string                                   $token
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param string|null                              $token_type_hint
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function getTokenInformation(ResponseInterface &$response, $token, ClientInterface $client, $token_type_hint = null)
+    private function getTokenInformation(ServerRequestInterface $request, ResponseInterface &$response, $token, ClientInterface $client, $token_type_hint = null)
     {
         $token_types = $this->getTokenTypes();
         if (null === $token_type_hint) {
             foreach ($token_types as $token_type) {
-                if (true === $this->tryIntrospectToken($response, $token_type, $token, $client)) {
+                if (true === $this->tryIntrospectToken($request ,$response, $token_type, $token, $client)) {
                     return;
                 }
             }
@@ -133,7 +135,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
             $exception->getHttpResponse($response);
         } elseif (array_key_exists($token_type_hint, $token_types)) {
             $token_type = $token_types[$token_type_hint];
-            if (false === $this->tryIntrospectToken($response, $token_type, $token, $client)) {
+            if (false === $this->tryIntrospectToken($request, $response, $token_type, $token, $client)) {
                 $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find token or client not authenticated.');
                 $exception->getHttpResponse($response);
             }
@@ -144,6 +146,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     }
 
     /**
+     * @param \Psr\Http\Message\ServerRequestInterface                   $request
      * @param \Psr\Http\Message\ResponseInterface                        $response
      * @param \OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface $token_type
      * @param string                                                     $token
@@ -151,11 +154,11 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
      *
      * @return bool
      */
-    private function tryIntrospectToken(ResponseInterface &$response, IntrospectionTokenTypeInterface $token_type, $token, ClientInterface $client)
+    private function tryIntrospectToken(ServerRequestInterface $request, ResponseInterface &$response, IntrospectionTokenTypeInterface $token_type, $token, ClientInterface $client)
     {
         $result = $token_type->getToken($token);
         if ($result instanceof TokenInterface) {
-            if ($result->getClientPublicId() === $client->getPublicId()) {
+            if ($result->getClientPublicId() === $client->getPublicId() || $this->isAllowedResourceServer($client, $request)) {
                 $data = $token_type->introspectToken($result);
                 $this->populateResponse($response, $data);
 
@@ -164,6 +167,23 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         }
 
         return false;
+    }
+
+    /**
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return bool
+     */
+    private function isAllowedResourceServer(ClientInterface $client, ServerRequestInterface $request)
+    {
+        if (!$client instanceof ResourceServerInterface) {
+            return false;
+        }
+
+        $params = $request->getServerParams();
+
+        return in_array($params['REMOTE_ADDR'], $client->getAllowedIpAddresses());
     }
 
     /**
@@ -188,7 +208,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     {
         $server_params = $request->getServerParams();
 
-        return !empty($server_params['HTTPS']) && 'off' !== strtolower($server_params['HTTPS']);
+        return !empty($server_params['HTTPS']) && 'on' === strtolower($server_params['HTTPS']);
     }
 
     /**

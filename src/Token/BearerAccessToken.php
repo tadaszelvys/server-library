@@ -18,7 +18,7 @@ class BearerAccessToken implements AccessTokenTypeInterface
      */
     public function updateAccessToken(AccessTokenInterface &$token)
     {
-        $token->setTokenType('Bearer');
+        $token->setTokenType($this->getTokenTypeName());
     }
 
     /**
@@ -26,6 +26,6 @@ class BearerAccessToken implements AccessTokenTypeInterface
      */
     public function getTokenTypeName()
     {
-        return 'bearer';
+        return 'Bearer';
     }
 }

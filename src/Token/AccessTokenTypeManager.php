@@ -12,8 +12,6 @@
 namespace OAuth2\Token;
 
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Client\AccessTokenTypeExtensionInterface;
-use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
 class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
@@ -68,7 +66,7 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
     public function getAccessTokenType($token_type_name)
     {
         if (!$this->hasAccessTokenType($token_type_name)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('Unsupported access token type "%s".', $token_type_name));
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported access token type "%s".', $token_type_name));
         }
 
         return $this->access_token_types[$token_type_name];
@@ -77,23 +75,16 @@ class AccessTokenTypeManager implements AccessTokenTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getAccessTokenTypeForClient(ClientInterface $client)
+    public function getAccessTokenTypes()
     {
-        if ($client instanceof AccessTokenTypeExtensionInterface && null !== $type = $client->getPreferredTokenType()) {
-            return $this->getAccessTokenType($type);
-        }
-        if (null === $this->default_access_token_type) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'No access token type defined or invalid access token type.');
-        }
-
-        return $this->getAccessTokenType($this->default_access_token_type);
+        return $this->access_token_types;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAccessTokenTypes()
+    public function getDefaultAccessTokenType()
     {
-        return $this->access_token_types;
+        return $this->getAccessTokenType($this->default_access_token_type);
     }
 }

@@ -11,8 +11,6 @@
 
 namespace OAuth2\Token;
 
-use OAuth2\Client\ClientInterface;
-
 interface AccessTokenTypeManagerInterface
 {
     /**
@@ -41,9 +39,7 @@ interface AccessTokenTypeManagerInterface
     public function getAccessTokenType($token_type_name);
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     *
      * @return \OAuth2\Token\AccessTokenTypeInterface
      */
-    public function getAccessTokenTypeForClient(ClientInterface $client);
+    public function getDefaultAccessTokenType();
 }

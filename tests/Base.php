@@ -263,7 +263,6 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->authorization_endpoint->addResponseType($this->getAuthorizationCodeGrantType());
             $this->authorization_endpoint->addResponseType($this->getImplicitGrantType());
-            //$this->authorization_endpoint->addResponseType($this->getIdTokenResponseType());
             $this->authorization_endpoint->addResponseType($this->getNoneResponseType());
 
             $this->authorization_endpoint->addResponseMode(new QueryResponseMode());
@@ -299,6 +298,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->configuration->set('allow_response_mode_parameter_in_authorization_request', true);
             $this->configuration->set('multiple_response_types_support_enabled', true);
             $this->configuration->set('enforce_pkce_for_public_clients', true);
+            $this->configuration->set('allow_access_token_type_parameter', true);
         }
 
         return $this->configuration;
@@ -546,25 +546,6 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->jwt_bearer_grant_type;
-    }
-
-    /**
-     * @var null|\OAuth2\Grant\IdTokenResponseType
-     */
-    private $id_token_response_type = null;
-
-    /**
-     * @return \OAuth2\Grant\IdTokenResponseType
-     */
-    protected function getIdTokenResponseType()
-    {
-        /*if (null === $this->id_token_response_type) {
-            $this->id_token_response_type = new IdTokenResponseType(
-
-            );
-        }*/
-
-        return $this->id_token_response_type;
     }
 
     /**

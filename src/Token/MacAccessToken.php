@@ -39,7 +39,7 @@ class MacAccessToken implements AccessTokenTypeInterface
      */
     public function updateAccessToken(AccessTokenInterface &$token)
     {
-        $token->setTokenType('MAC');
+        $token->setTokenType($this->getTokenTypeName());
         $token->setParameter('mac_key', $this->generateMacKey());
         $token->setParameter('mac_algorithm', $this->getConfiguration()->get('mac_algorithm', 'hmac-sha-256'));
     }
@@ -49,7 +49,7 @@ class MacAccessToken implements AccessTokenTypeInterface
      */
     public function getTokenTypeName()
     {
-        return 'mac';
+        return 'MAC';
     }
 
     /**

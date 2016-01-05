@@ -59,7 +59,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [], RefreshTokenInterface $refresh_token = null)
+    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null)
     {
         $access_token = $this->createEmptyAccessToken();
         $access_token->setExpiresAt(time() + $this->getLifetime($client));
@@ -68,7 +68,11 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
         $access_token->setClientPublicId($client->getPublicId());
         $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
 
-        $token_type = $this->getAccessTokenTypeManager()->getAccessTokenTypeForClient($client);
+        if (true === $this->getConfiguration()->get('allow_access_token_type_parameter', false) && array_key_exists('token_type', $request_parameters)) {
+            $token_type = $this->getAccessTokenTypeManager()->getAccessTokenType($request_parameters['token_type']);
+        } else {
+            $token_type = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType();
+        }
         $token_type->updateAccessToken($access_token);
         $this->populateAccessToken($access_token, $client, $resource_owner, $refresh_token);
         $this->saveAccessToken($access_token);
