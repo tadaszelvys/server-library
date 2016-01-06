@@ -45,6 +45,7 @@ use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
+use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTClientManager;
 use OAuth2\Test\Stub\PasswordClientManager;
 use OAuth2\Test\Stub\PublicClientManager;
@@ -725,6 +726,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getConfiguration(),
                 $this->getAccessTokenTypeManager()
             );
+            $this->jwt_access_token_manager->setEncryptionPrivateKey([]);
+            $this->jwt_access_token_manager->addTokenUpdater(new FooBarAccessTokenUpdater());
         }
 
         return $this->jwt_access_token_manager;

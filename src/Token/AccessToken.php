@@ -17,10 +17,6 @@ class AccessToken extends Token implements AccessTokenInterface
      * @var string
      */
     protected $token_type;
-    /**
-     * @var array
-     */
-    protected $parameters = [];
 
     /**
      * @var null|string
@@ -41,22 +37,6 @@ class AccessToken extends Token implements AccessTokenInterface
     public function setTokenType($token_type)
     {
         $this->token_type = $token_type;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setParameters(array $parameters)
-    {
-        $this->parameters = $parameters;
     }
 
     /**
@@ -105,43 +85,5 @@ class AccessToken extends Token implements AccessTokenInterface
         }
 
         return $values;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setParameter($key, $value)
-    {
-        $this->parameters[$key] = $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParameter($key)
-    {
-        if (!$this->hasParameter($key)) {
-            throw new \InvalidArgumentException(sprintf('Parameter with key "%s" does not exist.', $key));
-        }
-
-        return $this->parameters[$key];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasParameter($key)
-    {
-        return array_key_exists($key, $this->parameters);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unsetParameter($key)
-    {
-        if (array_key_exists($key, $this->parameters)) {
-            unset($this->parameters[$key]);
-        }
     }
 }

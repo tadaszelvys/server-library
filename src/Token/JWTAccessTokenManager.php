@@ -254,19 +254,6 @@ class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @return string[]
-     */
-    protected function getRequiredClaims()
-    {
-        return [
-            'iss',
-            'aud',
-            'sub',
-            'exp',
-        ];
-    }
-
-    /**
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return string

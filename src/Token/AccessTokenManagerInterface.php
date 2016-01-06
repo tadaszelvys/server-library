@@ -52,4 +52,9 @@ interface AccessTokenManagerInterface
      * @return bool True if the access token is valid, else false
      */
     public function isAccessTokenValid(AccessTokenInterface $token);
+
+    /**
+     * @param \OAuth2\Token\TokenUpdaterInterface $token_updater
+     */
+    public function addTokenUpdater(TokenUpdaterInterface $token_updater);
 }

@@ -76,4 +76,43 @@ interface TokenInterface
      * @param string $resource_owner_public_id
      */
     public function setResourceOwnerPublicId($resource_owner_public_id);
+
+    /**
+     * Other parameters.
+     *
+     * @return array
+     */
+    public function getParameters();
+
+    /**
+     * @param string $key
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return mixed
+     */
+    public function getParameter($key);
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasParameter($key);
+
+    /**
+     * @param array $parameters
+     */
+    public function setParameters(array $parameters);
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function setParameter($key, $value);
+
+    /**
+     * @param string $key
+     */
+    public function unsetParameter($key);
 }

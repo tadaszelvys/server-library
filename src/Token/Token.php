@@ -16,6 +16,11 @@ class Token implements TokenInterface
     /**
      * @var array
      */
+    protected $parameters = [];
+
+    /**
+     * @var array
+     */
     protected $scope;
 
     /**
@@ -132,5 +137,59 @@ class Token implements TokenInterface
     public function getExpiresIn()
     {
         return $this->expires_at - time() < 0 ? 0 : $this->expires_at - time();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setParameters(array $parameters)
+    {
+        $this->parameters = $parameters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setParameter($key, $value)
+    {
+        $this->parameters[$key] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameter($key)
+    {
+        if (!$this->hasParameter($key)) {
+            throw new \InvalidArgumentException(sprintf('Parameter with key "%s" does not exist.', $key));
+        }
+
+        return $this->parameters[$key];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasParameter($key)
+    {
+        return array_key_exists($key, $this->parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unsetParameter($key)
+    {
+        if (array_key_exists($key, $this->parameters)) {
+            unset($this->parameters[$key]);
+        }
     }
 }

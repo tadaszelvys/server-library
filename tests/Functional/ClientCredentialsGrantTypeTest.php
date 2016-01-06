@@ -285,21 +285,23 @@ class ClientCredentialsGrantTypeTest extends Base
 
         $this->getTokenEndpointJWTAccessToken()->getAccessToken($request, $response);
         $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
 
         $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9^"]+,"scope":"scope1 scope2","foo":"bar"}', $content);
 
         $response->getBody()->rewind();
-        $values = json_decode($response->getBody()->getContents(), true);
+        $values = json_decode($content, true);
         $this->assertEquals(5, count(explode('.', $values['access_token'])));
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($values['access_token']);
         $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_token);
         $this->assertEquals('bar', $access_token->getClientPublicId());
         $this->assertEquals('bar', $access_token->getResourceOwnerPublicId());
+        $this->assertInstanceOf('\Jose\Object\JWSInterface', $access_token->getJWS());
         $this->assertTrue($access_token->getExpiresIn() <= 3600);
     }
 
@@ -540,6 +542,8 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2"}', $response->getBody()->getContents());
+
+        $content = $response->getBody()->getContents();
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2"}', $content);
     }
 }

@@ -24,6 +24,11 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     use HasAccessTokenTypeManager;
 
     /**
+     * @var \OAuth2\Token\TokenUpdaterInterface[]
+     */
+    private $token_updaters = [];
+
+    /**
      * AccessTokenManager constructor.
      *
      * @param \OAuth2\Configuration\ConfigurationInterface  $configuration
@@ -33,6 +38,14 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     {
         $this->setConfiguration($configuration);
         $this->setAccessTokenTypeManager($access_token_type_manager);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addTokenUpdater(TokenUpdaterInterface $token_updater)
+    {
+        $this->token_updaters[] = $token_updater;
     }
 
     /**
@@ -75,6 +88,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
         }
         $token_type->updateAccessToken($access_token);
         $this->populateAccessToken($access_token, $client, $resource_owner, $refresh_token);
+        $this->updateAccessToken($access_token);
         $this->saveAccessToken($access_token);
 
         return $access_token;
@@ -104,5 +118,15 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     public function isAccessTokenValid(AccessTokenInterface $token)
     {
         return !$token->hasExpired();
+    }
+
+    /**
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     */
+    private function updateAccessToken(AccessTokenInterface &$access_token)
+    {
+        foreach ($this->token_updaters as $token_updater) {
+            $token_updater->updateToken($access_token);
+        }
     }
 }
