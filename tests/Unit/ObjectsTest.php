@@ -3,7 +3,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 Spomky-Labs
+ * Copyright (c) 2014-2016 Spomky-Labs
  *
  * This software may be modified and distributed under the terms
  * of the MIT license.  See the LICENSE file for details.
@@ -13,7 +13,6 @@ namespace OAuth2\Test\Unit;
 
 use OAuth2\Client\PublicClient;
 use OAuth2\Exception\AuthenticateException;
-use OAuth2\Exception\BaseException;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
 use OAuth2\Token\AccessToken;
@@ -109,8 +108,8 @@ class ObjectsTest extends Base
 
         $this->assertEquals([
             'access_token' => null,
-            'token_type' => null,
-            'expires_in' => 0,
+            'token_type'   => null,
+            'expires_in'   => 0,
         ], $access_token->toArray());
     }
 
