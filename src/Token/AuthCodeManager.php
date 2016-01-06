@@ -26,6 +26,11 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     use HasConfiguration;
 
     /**
+     * @var \OAuth2\Token\TokenUpdaterInterface[]
+     */
+    private $token_updaters = [];
+
+    /**
      * AuthCodeManager constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
@@ -35,6 +40,14 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     {
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addTokenUpdater(TokenUpdaterInterface $token_updater)
+    {
+        $this->token_updaters[] = $token_updater;
     }
 
     /**
@@ -109,5 +122,15 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     private function createException($message)
     {
         return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, $message);
+    }
+
+    /**
+     * @param \OAuth2\Token\AuthCodeInterface $auth_code
+     */
+    private function updateAuthCode(AuthCodeInterface &$auth_code)
+    {
+        foreach ($this->token_updaters as $token_updater) {
+            $token_updater->updateToken($auth_code);
+        }
     }
 }

@@ -65,4 +65,9 @@ interface RefreshTokenManagerInterface
      * @param \OAuth2\Token\RefreshTokenInterface $refreshToken The refresh token string to expire.
      */
     public function markRefreshTokenAsUsed(RefreshTokenInterface $refreshToken);
+
+    /**
+     * @param \OAuth2\Token\TokenUpdaterInterface $token_updater
+     */
+    public function addTokenUpdater(TokenUpdaterInterface $token_updater);
 }

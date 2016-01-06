@@ -53,4 +53,9 @@ interface AuthCodeManagerInterface
      * @param AuthCodeInterface $code
      */
     public function markAuthCodeAsUsed(AuthCodeInterface $code);
+
+    /**
+     * @param \OAuth2\Token\TokenUpdaterInterface $token_updater
+     */
+    public function addTokenUpdater(TokenUpdaterInterface $token_updater);
 }
