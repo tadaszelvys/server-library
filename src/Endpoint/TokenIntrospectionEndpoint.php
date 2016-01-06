@@ -3,7 +3,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 Spomky-Labs
+ * Copyright (c) 2014-2016 Spomky-Labs
  *
  * This software may be modified and distributed under the terms
  * of the MIT license.  See the LICENSE file for details.
@@ -127,7 +127,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         $token_types = $this->getTokenTypes();
         if (null === $token_type_hint) {
             foreach ($token_types as $token_type) {
-                if (true === $this->tryIntrospectToken($request ,$response, $token_type, $token, $client)) {
+                if (true === $this->tryIntrospectToken($request, $response, $token_type, $token, $client)) {
                     return;
                 }
             }

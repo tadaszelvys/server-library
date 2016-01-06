@@ -3,7 +3,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 Spomky-Labs
+ * Copyright (c) 2014-2016 Spomky-Labs
  *
  * This software may be modified and distributed under the terms
  * of the MIT license.  See the LICENSE file for details.
@@ -19,11 +19,11 @@ interface AccessTokenManagerInterface
     /**
      * Creates an access token and stores it if necessary.
      *
-     * @param \OAuth2\Client\ClientInterface               $client              The client associated with this access token.
-     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resource_owner      Resource owner associated with the access token.
-     * @param array                                        $request_parameters  The parameters of the request
-     * @param string[]                                     $scope               (optional) Scopes of the access token.
-     * @param \OAuth2\Token\RefreshTokenInterface|null     $refresh_token       (optional) Refresh token associated with the access token.
+     * @param \OAuth2\Client\ClientInterface               $client             The client associated with this access token.
+     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resource_owner     Resource owner associated with the access token.
+     * @param array                                        $request_parameters The parameters of the request
+     * @param string[]                                     $scope              (optional) Scopes of the access token.
+     * @param \OAuth2\Token\RefreshTokenInterface|null     $refresh_token      (optional) Refresh token associated with the access token.
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
