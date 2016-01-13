@@ -69,6 +69,5 @@ final class ClientCredentialsGrantType implements GrantTypeSupportInterface
         $grant_type_response->setResourceOwnerPublicId($client->getPublicId());
         $grant_type_response->setRefreshTokenIssued($issue_refresh_token);
         $grant_type_response->setRefreshTokenScope($scope);
-        $grant_type_response->setRefreshTokenRevoked(null);
     }
 }

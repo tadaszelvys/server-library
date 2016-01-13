@@ -48,7 +48,7 @@ interface GrantTypeResponseInterface
     public function getAvailableScope();
 
     /**
-     * @param string[]|string|null $available_scope
+     * @param string[]|string $available_scope
      */
     public function setAvailableScope($available_scope);
 

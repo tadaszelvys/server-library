@@ -11,14 +11,11 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\ClientInterface;
 use OAuth2\Configuration\ConfigurationInterface;
-use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AuthCode;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManager as Base;
-use Security\DefuseGenerator;
 
 class AuthCodeManager extends Base
 {
@@ -79,28 +76,17 @@ class AuthCodeManager extends Base
         $this->auth_codes['EXPIRED_AUTH_CODE'] = $expired_auth_code;
     }
 
-    protected function getGenerator()
+    /**
+     * {@inheritdoc}
+     */
+    protected function saveAuthorizationCode(AuthCodeInterface $auth_code)
     {
-        return new DefuseGenerator();
+        $this->auth_codes[$auth_code->getToken()] = $auth_code;
     }
 
-    protected function addAuthCode($code, $expiresAt, ClientInterface $client, EndUserInterface $end_user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
-    {
-        $auth_code = new AuthCode();
-        $auth_code->setIssueRefreshToken($issueRefreshToken);
-        $auth_code->setQueryParams($query_params);
-        $auth_code->setRedirectUri($redirectUri);
-        $auth_code->setClientPublicId($client->getPublicId());
-        $auth_code->setExpiresAt($expiresAt);
-        $auth_code->setResourceOwnerPublicId($end_user->getPublicId());
-        $auth_code->setScope($scope);
-        $auth_code->setToken($code);
-
-        $this->auth_codes[$code] = $auth_code;
-
-        return $auth_code;
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function getAuthCode($code)
     {
         if (isset($this->auth_codes[$code])) {
@@ -108,6 +94,9 @@ class AuthCodeManager extends Base
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function markAuthCodeAsUsed(AuthCodeInterface $code)
     {
         if (isset($this->auth_codes[$code->getToken()])) {

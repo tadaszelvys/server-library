@@ -51,25 +51,44 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     }
 
     /**
-     * Generate and add an Authorization Code using the parameters.
-     *
-     * @param string                           $code              Code
-     * @param int                              $expiresAt         Time until the code is valid
-     * @param \OAuth2\Client\ClientInterface   $client            Client
-     * @param \OAuth2\EndUser\EndUserInterface $end_user          Resource owner
-     * @param array                            $query_params      The authorization request query parameters.
-     * @param string                           $redirectUri       Redirect URI
-     * @param string[ ]                        $scope             Scope
-     * @param bool                             $issueRefreshToken Issue a refresh token with the access token
-     *
+     * @param \OAuth2\Token\AuthCodeInterface $auth_code
+     */
+    abstract protected function saveAuthorizationCode(AuthCodeInterface $auth_code);
+
+    /**
      * @return \OAuth2\Token\AuthCodeInterface
      */
-    abstract protected function addAuthCode($code, $expiresAt, ClientInterface $client, EndUserInterface $end_user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false);
-
+    protected function createEmptyAuthorizationCode()
+    {
+        return new AuthCode();
+    }
     /**
      * {@inheritdoc}
      */
-    public function createAuthCode(ClientInterface $client, EndUserInterface $end_user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
+    public function createAuthCode(ClientInterface $client, EndUserInterface $resource_owner, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
+    {
+        $auth_code = $this->createEmptyAuthorizationCode();
+        $auth_code->setScope($scope);
+        $auth_code->setResourceOwnerPublicId($resource_owner->getPublicId());
+        $auth_code->setClientPublicId($client->getPublicId());
+        $auth_code->setExpiresAt(time() + $this->getLifetime($client));
+        $auth_code->setToken($this->generateAuthorizationCode());
+        $auth_code->setIssueRefreshToken($issueRefreshToken);
+        $auth_code->setQueryParams($query_params);
+        $auth_code->setRedirectUri($redirectUri);
+
+        $this->updateAuthCode($auth_code);
+        $this->saveAuthorizationCode($auth_code);
+
+        return $auth_code;
+    }
+
+    /**
+     * @return string
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function generateAuthorizationCode()
     {
         $length = $this->getAuthCodeLength();
         $charset = $this->getConfiguration()->get('auth_code_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
@@ -82,15 +101,13 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
             throw $this->createException('An error has occurred during the creation of the authorization code.');
         }
 
-        $authcode = $this->addAuthCode($code, time() + $this->getLifetime($client), $client, $end_user, $query_params, $redirectUri, $scope, $issueRefreshToken);
-
-        return $authcode;
+        return $code;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getLifetime(ClientInterface $client)
+    private function getLifetime(ClientInterface $client)
     {
         $lifetime = $this->getConfiguration()->get('auth_code_lifetime', 30);
         if ($client instanceof TokenLifetimeExtensionInterface && ($_lifetime = $client->getTokenLifetime('authcode')) !== null) {

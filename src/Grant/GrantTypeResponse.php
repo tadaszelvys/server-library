@@ -100,7 +100,7 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function setAvailableScope($available_scope = null)
+    public function setAvailableScope($available_scope)
     {
         $this->available_scope = $available_scope;
     }

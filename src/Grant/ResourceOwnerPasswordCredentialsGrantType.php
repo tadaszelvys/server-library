@@ -78,11 +78,9 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
         $scope = RequestBody::getParameter($request, 'scope');
 
         $grant_type_response->setRequestedScope($scope);
-        $grant_type_response->setAvailableScope(null);
         $grant_type_response->setResourceOwnerPublicId($end_user->getPublicId());
         $grant_type_response->setRefreshTokenIssued($this->getIssueRefreshToken($client, $end_user));
         $grant_type_response->setRefreshTokenScope($scope);
-        $grant_type_response->setRefreshTokenRevoked(null);
     }
 
     /**

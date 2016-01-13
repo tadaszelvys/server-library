@@ -15,7 +15,6 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
-use OAuth2\Token\RefreshToken;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManager as Base;
 use OAuth2\Token\RefreshTokenManagerInterface;
@@ -79,7 +78,7 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
 
     protected function addRefreshToken($token, $expiresAt, ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [])
     {
-        $refresh_token = new RefreshToken();
+        $refresh_token = $this->createEmptyRefreshToken();
         $refresh_token->setUsed(false);
         $refresh_token->setExpiresAt($expiresAt);
         $refresh_token->setToken($token);
@@ -87,9 +86,7 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
         $refresh_token->setResourceOwnerPublicId(null === $resourceOwner ? null : $resourceOwner->getPublicId());
         $refresh_token->setScope($scope);
 
-        $this->refresh_tokens[$refresh_token->getToken()] = $refresh_token;
-
-        return $refresh_token;
+        $this->saveRefreshToken($refresh_token);
     }
 
     public function getRefreshToken($token)
@@ -112,5 +109,10 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
         }
 
         return $this;
+    }
+
+    protected function saveRefreshToken(RefreshTokenInterface $refresh_token)
+    {
+        $this->refresh_tokens[$refresh_token->getToken()] = $refresh_token;
     }
 }

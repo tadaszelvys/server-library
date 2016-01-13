@@ -162,7 +162,6 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         // Refresh Token
         $grant_type_response->setRefreshTokenIssued($authCode->getIssueRefreshToken());
         $grant_type_response->setRefreshTokenScope($authCode->getScope());
-        $grant_type_response->setRefreshTokenRevoked(null);
 
         // ID Token
         $is_openid = in_array('openid', $grant_type_response->getRequestedScope()) && in_array('openid', $grant_type_response->getAvailableScope());

@@ -23,6 +23,7 @@ use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Configuration\ConfigurationInterface;
+use OAuth2\EndUser\EndUserInterface;
 use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponse;
@@ -234,6 +235,15 @@ final class TokenEndpoint implements TokenEndpointInterface
     {
         $signature_algorithm = $this->getConfiguration()->get('id_token_signature_algorithm', null);
         $resource_owner = $this->getEndUserManager()->getEndUser($values['resource_owner_public_id']);
+
+        if (!$resource_owner instanceof EndUserInterface) {
+            throw $this->getExceptionManager()->getException(
+                ExceptionManagerInterface::INTERNAL_SERVER_ERROR,
+                'bad_grant_type_implementation',
+                'The server tried to get the resource owner associated with the Id Token, but the resource owner does not exist.'
+            );
+        }
+
         if (null !== $values['id_token']['auth_code']) {
             $c_hash = substr(
                 Base64Url::encode(hash(

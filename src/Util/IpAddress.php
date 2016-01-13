@@ -251,6 +251,6 @@ final class IpAddress
      */
     private static function isFromTrustedProxy($ip, $trustedProxies)
     {
-        return $trustedProxies && self::checkIp($ip, $trustedProxies);
+        return !empty($trustedProxies) && self::checkIp($ip, $trustedProxies);
     }
 }
