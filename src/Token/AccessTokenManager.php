@@ -87,8 +87,8 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
             $token_type = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType();
         }
         $token_type->updateAccessToken($access_token);
-        $this->populateAccessToken($access_token, $client, $resource_owner, $refresh_token);
         $this->updateAccessToken($access_token);
+        $this->populateAccessToken($access_token, $client, $resource_owner, $refresh_token);
         $this->saveAccessToken($access_token);
 
         return $access_token;

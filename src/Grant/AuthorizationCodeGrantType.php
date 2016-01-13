@@ -11,12 +11,15 @@
 
 namespace OAuth2\Grant;
 
+use OAuth2\Behaviour\HasAuthorizationCodeManager;
 use OAuth2\Behaviour\HasConfiguration;
+use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Endpoint\Authorization;
+use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
 use OAuth2\Grant\PKCEMethod\Plain;
@@ -28,13 +31,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
 {
+    use HasEndUserManager;
     use HasExceptionManager;
     use HasConfiguration;
-
-    /**
-     * @var \OAuth2\Token\AuthCodeManagerInterface
-     */
-    private $auth_code_manager;
+    use HasAuthorizationCodeManager;
 
     /**
      * @var \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]
@@ -44,15 +44,17 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     /**
      * AuthorizationCodeGrantType constructor.
      *
+     * @param \OAuth2\EndUser\EndUserManagerInterface      $end_user_manager
      * @param \OAuth2\Token\AuthCodeManagerInterface       $auth_code_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
      * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(EndUserManagerInterface $end_user_manager, AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
     {
-        $this->auth_code_manager = $auth_code_manager;
+        $this->setAuthorizationCodeManager($auth_code_manager);
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
+        $this->setEndUserManager($end_user_manager);
 
         $this->addPKCEMethod(new Plain());
         $this->addPKCEMethod(new S256());
@@ -87,14 +89,6 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     }
 
     /**
-     * @return \OAuth2\Token\AuthCodeManagerInterface
-     */
-    private function getAuthCodeManager()
-    {
-        return $this->auth_code_manager;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getResponseType()
@@ -115,7 +109,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      */
     public function grantAuthorization(Authorization $authorization)
     {
-        $code = $this->getAuthCodeManager()->createAuthCode(
+        $code = $this->getAuthorizationCodeManager()->createAuthCode(
             $authorization->getClient(),
             $authorization->getEndUser(),
             $authorization->getQueryParams(),
@@ -123,11 +117,8 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             $authorization->getScopes(),
             $authorization->has('issue_refresh_token') ? $authorization->get('issue_refresh_token') : false
         );
-        $params = [
-            'code' => $code->getToken(),
-        ];
 
-        return $params;
+        return $code->toArray();
     }
 
     /**
@@ -154,10 +145,6 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         $this->checkClient($request, $client);
         $authCode = $this->getAuthCode($request);
 
-        if (!$authCode instanceof AuthCodeInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
-        }
-
         $this->checkPKCE($request, $authCode, $client);
         $this->checkAuthCode($authCode, $client);
 
@@ -166,14 +153,21 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         // Validate the redirect URI.
         $this->checkRedirectUri($authCode, $redirect_uri);
 
-        $this->getAuthCodeManager()->markAuthCodeAsUsed($authCode);
+        $this->getAuthorizationCodeManager()->markAuthCodeAsUsed($authCode);
 
         $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $authCode->getScope());
         $grant_type_response->setAvailableScope($authCode->getScope());
         $grant_type_response->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
+
+        // Refresh Token
         $grant_type_response->setRefreshTokenIssued($authCode->getIssueRefreshToken());
         $grant_type_response->setRefreshTokenScope($authCode->getScope());
         $grant_type_response->setRefreshTokenRevoked(null);
+
+        // ID Token
+        $is_openid = in_array('openid', $grant_type_response->getRequestedScope()) && in_array('openid', $grant_type_response->getAvailableScope());
+        $grant_type_response->setIdTokenIssued($is_openid);
+        $grant_type_response->setAuthorizationCodeToHash($authCode->getToken());
     }
 
     /**
@@ -190,7 +184,13 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Missing parameter. "code" is required.');
         }
 
-        return $this->getAuthCodeManager()->getAuthCode($code);
+        $auth_code = $this->getAuthorizationCodeManager()->getAuthCode($code);
+
+        if (!$auth_code instanceof AuthCodeInterface) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
+        }
+
+        return $auth_code;
     }
 
     /**

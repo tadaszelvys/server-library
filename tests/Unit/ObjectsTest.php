@@ -12,7 +12,7 @@
 namespace OAuth2\Test\Unit;
 
 use OAuth2\Client\PublicClient;
-use OAuth2\Client\ResourceServer;
+use OAuth2\ResourceServer\ResourceServer;
 use OAuth2\Exception\AuthenticateException;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
@@ -142,13 +142,11 @@ class ObjectsTest extends Base
         $rs = new ResourceServer();
         $rs->setAllowedGrantTypes(['foo']);
         $rs->setPublicId('bar');
-        $rs->setRedirectUris(['baz']);
         $rs->setType(['plic']);
 
         $this->assertEquals([], $rs->getAllowedIpAddresses());
         $this->assertEquals([], $rs->getAllowedGrantTypes());
         $this->assertEquals('bar', $rs->getPublicId());
-        $this->assertEquals([], $rs->getRedirectUris());
         $this->assertEquals(null, $rs->getServerName());
         $this->assertEquals('resource_server', $rs->getType());
     }

@@ -46,10 +46,12 @@ use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
+use OAuth2\Test\Stub\IdTokenManager;
 use OAuth2\Test\Stub\JWTClientManager;
 use OAuth2\Test\Stub\PasswordClientManager;
 use OAuth2\Test\Stub\PublicClientManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
+use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
@@ -195,11 +197,13 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->token_endpoint) {
             $this->token_endpoint = new TokenEndpoint(
+                $this->getIdTokenManager(),
                 $this->getSimplestringAccessTokenManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
+                $this->getConfiguration(),
                 $this->getRefreshTokenManager()
             );
 
@@ -226,11 +230,13 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->token_endpoint_jwt_access_token) {
             $this->token_endpoint_jwt_access_token = new TokenEndpoint(
+                $this->getIdTokenManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
+                $this->getConfiguration(),
                 $this->getRefreshTokenManager()
             );
 
@@ -300,6 +306,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->configuration->set('multiple_response_types_support_enabled', true);
             $this->configuration->set('enforce_pkce_for_public_clients', true);
             $this->configuration->set('allow_access_token_type_parameter', true);
+            $this->configuration->set('id_token_signature_algorithm', 'HS512');
         }
 
         return $this->configuration;
@@ -361,6 +368,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_manager_supervisor->addClientManager($this->getPasswordClientManager());
             $this->client_manager_supervisor->addClientManager($this->getPublicClientManager());
             $this->client_manager_supervisor->addClientManager($this->getJWTClientManager());
+            $this->client_manager_supervisor->addClientManager($this->getResourceServerManager());
         }
 
         return $this->client_manager_supervisor;
@@ -427,6 +435,28 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @var null|\OAuth2\Test\Stub\ResourceServerManager
+     */
+    private $resource_server_manager = null;
+
+    /**
+     * @return \OAuth2\Test\Stub\ResourceServerManager
+     */
+    protected function getResourceServerManager()
+    {
+        if (null === $this->resource_server_manager) {
+            $this->resource_server_manager = new ResourceServerManager(
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
+
+            $this->resource_server_manager->createResourceServers();
+        }
+
+        return $this->resource_server_manager;
+    }
+
+    /**
      * @var null|\OAuth2\Test\Stub\JWTClientManager
      */
     private $jwt_client_manager = null;
@@ -479,6 +509,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->authorization_code_grant_type) {
             $this->authorization_code_grant_type = new AuthorizationCodeGrantType(
+                $this->getEndUserManager(),
                 $this->getAuthCodeManager(),
                 $this->getExceptionManager(),
                 $this->getConfiguration()
@@ -665,6 +696,38 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->simple_string_access_token_manager;
+    }
+
+    /**
+     * @return null|\OAuth2\Test\Stub\IdTokenManager
+     */
+    private $id_token_manager = null;
+
+    /**
+     * @return \OAuth2\Test\Stub\IdTokenManager
+     */
+    protected function getIdTokenManager()
+    {
+        if (null === $this->id_token_manager) {
+            $jwt_signer = $this->getJWTSigner(
+                ['HS512'],
+                [
+                    'kid' => 'JWK2',
+                    'use' => 'sig',
+                    'kty' => 'oct',
+                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                ]
+            );
+
+            $this->id_token_manager = new IdTokenManager(
+                $jwt_signer,
+                $this->getExceptionManager(),
+                $this->getConfiguration(),
+                $this->getAccessTokenTypeManager()
+            );
+        }
+
+        return $this->id_token_manager;
     }
 
     /**

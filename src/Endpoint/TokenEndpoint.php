@@ -11,21 +11,27 @@
 
 namespace OAuth2\Endpoint;
 
+use Base64Url\Base64Url;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
+use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasIdTokenManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponse;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
+use OAuth2\Token\IdTokenManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Util\RequestBody;
@@ -34,6 +40,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class TokenEndpoint implements TokenEndpointInterface
 {
+    use HasConfiguration;
+    use HasIdTokenManager;
     use HasEndUserManager;
     use HasScopeManager;
     use HasExceptionManager;
@@ -49,26 +57,32 @@ final class TokenEndpoint implements TokenEndpointInterface
     /**
      * TokenEndpoint constructor.
      *
+     * @param \OAuth2\Token\IdTokenManagerInterface           $id_token_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
-     * @param \OAuth2\Token\RefreshTokenManagerInterface      $refresh_token_manager
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
      * @param \OAuth2\EndUser\EndUserManagerInterface         $end_user_manager
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface    $configuration
+     * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
      */
     public function __construct(
+        IdTokenManagerInterface $id_token_manager,
         AccessTokenManagerInterface $access_token_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
         EndUserManagerInterface $end_user_manager,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
+        ConfigurationInterface $configuration,
         RefreshTokenManagerInterface $refresh_token_manager = null
     ) {
+        $this->setIdTokenManager($id_token_manager);
         $this->setAccessTokenManager($access_token_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setEndUserManager($end_user_manager);
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
+        $this->setConfiguration($configuration);
         if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
             $this->setRefreshTokenManager($refresh_token_manager);
         }
@@ -147,6 +161,10 @@ final class TokenEndpoint implements TokenEndpointInterface
                 'scope'  => $grant_type_response->getRefreshTokenScope(),
                 'used'   => $grant_type_response->getRefreshTokenRevoked(),
             ],
+            'id_token'                 => [
+                'issued'    => $grant_type_response->isIdTokenIssued(),
+                'auth_code' => $grant_type_response->getAuthorizationCodeToHash(),
+            ]
         ];
 
         foreach (['requested_scope', 'available_scope'] as $key) {
@@ -162,7 +180,12 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         //Create and return access token (with refresh token and other information if asked) as an array
-        $token = $this->createAccessToken($client, $result, RequestBody::getParameters($request));
+        $access_token = $this->createAccessToken($client, $result, RequestBody::getParameters($request));
+        $token = $access_token->toArray();
+        if (true === $grant_type_response->isIdTokenIssued()) {
+            $id_token = $this->createIdToken($access_token, $client, $result);
+            $token['id_token'] = $id_token->getToken();
+        }
 
         $response->getBody()->write(json_encode($token));
         $response = $response->withStatus(200);
@@ -197,6 +220,50 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         return $client;
+    }
+
+    /**
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     * @param \OAuth2\Client\ClientInterface     $client
+     * @param array                              $values
+     *
+     * @return \OAuth2\Token\IdTokenInterface
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function createIdToken(AccessTokenInterface $access_token, ClientInterface $client, array $values)
+    {
+        $signature_algorithm = $this->getConfiguration()->get('id_token_signature_algorithm', null);
+        $resource_owner = $this->getEndUserManager()->getEndUser($values['resource_owner_public_id']);
+        if (null !== $values['id_token']['auth_code']) {
+            $c_hash = substr(
+                Base64Url::encode(hash(
+                    $this->getAtHashMethod($signature_algorithm),
+                    $values['id_token']['auth_code'],
+                    true
+                )),
+                0,
+                $this->getAtHashSize($signature_algorithm)
+            );
+        } else {
+            $c_hash = null;
+        }
+
+        $at_hash = substr(
+            Base64Url::encode(hash(
+                $this->getAtHashMethod($signature_algorithm),
+                $access_token->getToken(),
+                true
+            )),
+            0,
+            $this->getAtHashSize($signature_algorithm)
+        );
+
+        return $this->getIdTokenManager()->createIdToken(
+            $client,
+            $resource_owner,
+            $at_hash,
+            $c_hash
+        );
     }
 
     /**
@@ -272,5 +339,59 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
+    }
+
+    private function getAtHashMethod($id_token_signature_alogrithm)
+    {
+        switch($id_token_signature_alogrithm) {
+            case 'HS256':
+            case 'ES256':
+            case 'RS256':
+            case 'PS256':
+                return 'sha256';
+            case 'HS384':
+            case 'ES384':
+            case 'RS384':
+            case 'PS384':
+                return 'sha384';
+            case 'HS512':
+            case 'ES512':
+            case 'RS512':
+            case 'PS512':
+                return 'sha512';
+            default:
+                throw $this->getExceptionManager()->getException(
+                    ExceptionManagerInterface::INTERNAL_SERVER_ERROR,
+                    '',
+                    ''
+                );
+        }
+    }
+
+    private function getAtHashSize($id_token_signature_alogrithm)
+    {
+        switch($id_token_signature_alogrithm) {
+            case 'HS256':
+            case 'ES256':
+            case 'RS256':
+            case 'PS256':
+                return 128;
+            case 'HS384':
+            case 'ES384':
+            case 'RS384':
+            case 'PS384':
+                return 192;
+            case 'HS512':
+            case 'ES512':
+            case 'RS512':
+            case 'PS512':
+                return 256;
+            default:
+                throw $this->getExceptionManager()->getException(
+                    ExceptionManagerInterface::INTERNAL_SERVER_ERROR,
+                    '',
+                    ''
+                );
+        }
     }
 }

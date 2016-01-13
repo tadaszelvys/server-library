@@ -38,7 +38,7 @@ interface GrantTypeResponseInterface
     /**
      * @param string[]|string|null $requested_scope
      */
-    public function setRequestedScope($requested_scope = null);
+    public function setRequestedScope($requested_scope);
 
     /**
      * The scope available.
@@ -50,7 +50,7 @@ interface GrantTypeResponseInterface
     /**
      * @param string[]|string|null $available_scope
      */
-    public function setAvailableScope($available_scope = null);
+    public function setAvailableScope($available_scope);
 
     /**
      * @return string
@@ -73,7 +73,7 @@ interface GrantTypeResponseInterface
     /**
      * @param string|null $resource_owner_public_id
      */
-    public function setResourceOwnerPublicId($resource_owner_public_id = null);
+    public function setResourceOwnerPublicId($resource_owner_public_id);
 
     /**
      * @return bool If true, a refresh token is requested
@@ -83,7 +83,27 @@ interface GrantTypeResponseInterface
     /**
      * @param bool $issue_refresh_token
      */
-    public function setRefreshTokenIssued($issue_refresh_token = false);
+    public function setRefreshTokenIssued($issue_refresh_token);
+
+    /**
+     * @return bool If true, an Id token will be issued with the access token
+     */
+    public function isIdTokenIssued();
+
+    /**
+     * @param bool $issue_id_token
+     */
+    public function setIdTokenIssued($issue_id_token);
+
+    /**
+     * @return string|null
+     */
+    public function getAuthorizationCodeToHash();
+
+    /**
+     * @param string $auth_code
+     */
+    public function setAuthorizationCodeToHash($auth_code);
 
     /**
      * @return string[]|string|null If not null, a refresh token will be issued using the scope returned
@@ -93,7 +113,7 @@ interface GrantTypeResponseInterface
     /**
      * @param string[]|string[]|string|null $refresh_token_scope
      */
-    public function setRefreshTokenScope($refresh_token_scope = null);
+    public function setRefreshTokenScope($refresh_token_scope);
 
     /**
      * @return \OAuth2\Token\RefreshTokenInterface|null If not null, the refresh token will be revoked
@@ -103,5 +123,5 @@ interface GrantTypeResponseInterface
     /**
      * @param \OAuth2\Token\RefreshTokenInterface|null $revoke_refresh_token
      */
-    public function setRefreshTokenRevoked(RefreshTokenInterface $revoke_refresh_token = null);
+    public function setRefreshTokenRevoked(RefreshTokenInterface $revoke_refresh_token);
 }

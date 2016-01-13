@@ -14,14 +14,49 @@ namespace OAuth2\Token;
 interface IdTokenInterface extends TokenInterface
 {
     /**
-     * The unique token string to identify the Access Token.
+     * The token type (bearer, mac...).
      *
      * @return string
      */
-    public function getToken();
+    public function getTokenType();
 
     /**
-     * @param string $token
+     * @param string $token_type
      */
-    public function setToken($token);
+    public function setTokenType($token_type);
+
+    /**
+     * @return null|string
+     */
+    public function getNonce();
+
+    /**
+     * @param string $nonce
+     */
+    public function setNonce($nonce);
+
+    /**
+     * @return null|string
+     */
+    public function getAccessTokenHash();
+
+    /**
+     * @param string $at_hash
+     */
+    public function setAccessTokenHash($at_hash);
+
+    /**
+     * @return null|string
+     */
+    public function getAuthorizationCodeHash();
+
+    /**
+     * @param string $c_hash
+     */
+    public function setAuthorizationCodeHash($c_hash);
+
+    /**
+     * @return array
+     */
+    public function toArray();
 }

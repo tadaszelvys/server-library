@@ -14,6 +14,13 @@ namespace OAuth2\Util;
 final class Uri
 {
     /**
+     * This class should not be instantiated.
+     */
+    private function __construct()
+    {
+    }
+
+    /**
      * @param string$uri    The URI
      * @param array $params Parameters added to the URI
      *

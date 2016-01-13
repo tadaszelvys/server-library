@@ -18,42 +18,52 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * @var array
      */
-    private $additional_data = [];
+    private $additional_data = null;
 
     /**
      * @var
      */
-    private $requested_scope;
+    private $requested_scope = null;
 
     /**
      * @var
      */
-    private $available_scope;
+    private $available_scope = null;
 
     /**
      * @var
      */
-    private $resource_owner_public_id;
+    private $resource_owner_public_id = null;
 
     /**
      * @var
      */
-    private $client_public_id;
+    private $client_public_id = null;
 
     /**
      * @var
      */
-    private $issue_refresh_token;
+    private $issue_refresh_token = false;
 
     /**
      * @var
      */
-    private $refresh_token_scope;
+    private $refresh_token_scope = null;
 
     /**
      * @var \OAuth2\Token\RefreshTokenInterface
      */
-    private $revoke_refresh_token;
+    private $revoke_refresh_token = null;
+
+    /**
+     * @var
+     */
+    private $issue_id_token = false;
+
+    /**
+     * @var
+     */
+    private $auth_code = null;
 
     /**
      * {@inheritdoc}
@@ -136,7 +146,7 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @param bool $issue_refresh_token
+     * {@inheritdoc}
      */
     public function setRefreshTokenIssued($issue_refresh_token = false)
     {
@@ -144,7 +154,7 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function isRefreshTokenIssued()
     {
@@ -152,11 +162,43 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     }
 
     /**
-     * @param string[]|string|null $refresh_token_scope
+     * {@inheritdoc}
      */
     public function setRefreshTokenScope($refresh_token_scope = null)
     {
         $this->refresh_token_scope = $refresh_token_scope;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIdTokenIssued($issue_id_token)
+    {
+        $this->issue_id_token = $issue_id_token;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isIdTokenIssued()
+    {
+        return $this->issue_id_token;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAuthorizationCodeToHash($auth_code)
+    {
+        $this->auth_code = $auth_code;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthorizationCodeToHash()
+    {
+        return $this->auth_code;
     }
 
     /**

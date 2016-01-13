@@ -9,12 +9,13 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Client;
+namespace OAuth2\ResourceServer;
+use OAuth2\Client\Client;
 
 /**
  * Class ResourceServer.
  */
-class ResourceServer extends RegisteredClient implements ResourceServerInterface
+class ResourceServer extends Client implements ResourceServerInterface
 {
     /**
      * @var string
@@ -63,6 +64,7 @@ class ResourceServer extends RegisteredClient implements ResourceServerInterface
      */
     public function setAllowedGrantTypes(array $grant_types)
     {
+        //Nothing to do
     }
 
     /**
@@ -77,43 +79,7 @@ class ResourceServer extends RegisteredClient implements ResourceServerInterface
      */
     public function removeAllowedGrantType($grant_type)
     {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRedirectUris()
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRedirectUris(array $redirect_uris)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasRedirectUri($redirect_uri)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addRedirectUri($redirect_uri)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function removeRedirectUri($redirect_uri)
-    {
+        //Nothing to do
     }
 
     /**
@@ -129,5 +95,30 @@ class ResourceServer extends RegisteredClient implements ResourceServerInterface
      */
     public function setType($type)
     {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isIpAddressAllowed($ip)
+    {
+        return in_array($ip, $this->getAllowedIpAddresses());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAllowedIpAddresses(array $allowed_ip_addresses)
+    {
+        $this->allowed_ip_addresses = $allowed_ip_addresses;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setServerName($server_name)
+    {
+        $this->server_name = $server_name;
     }
 }

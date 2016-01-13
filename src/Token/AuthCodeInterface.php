@@ -42,4 +42,9 @@ interface AuthCodeInterface extends TokenInterface
      * @param array $query_params
      */
     public function setQueryParams(array $query_params);
+
+    /**
+     * @return array
+     */
+    public function toArray();
 }

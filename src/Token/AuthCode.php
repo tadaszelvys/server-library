@@ -75,4 +75,14 @@ class AuthCode extends Token implements AuthCodeInterface
     {
         $this->query_params = $query_params;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray()
+    {
+        return [
+            'code' => $this->getToken(),
+        ];
+    }
 }
