@@ -22,7 +22,9 @@ final class RequestBody
      */
     public static function getParameters(ServerRequestInterface $request)
     {
-        return $request->getParsedBody();
+        $body = $request->getParsedBody();
+
+        return is_array($body)?$body:[];
     }
 
     /**
