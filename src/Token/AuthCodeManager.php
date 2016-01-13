@@ -62,6 +62,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     {
         return new AuthCode();
     }
+
     /**
      * {@inheritdoc}
      */
@@ -84,9 +85,9 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     }
 
     /**
-     * @return string
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     private function generateAuthorizationCode()
     {

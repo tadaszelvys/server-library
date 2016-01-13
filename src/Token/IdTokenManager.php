@@ -69,9 +69,9 @@ abstract class IdTokenManager implements IdTokenManagerInterface
             'sub' => $end_user->getPublicId(),
             'aud' => $client->getPublicId(),
         ];
-        if (null !== $at_hash)
-
-        $jws = $this->getJWTSigner()->sign($payload, $headers);
+        if (null !== $at_hash) {
+            $jws = $this->getJWTSigner()->sign($payload, $headers);
+        }
 
         $id_token->setExpiresAt($exp);
         $id_token->setClientPublicId($client->getPublicId());

@@ -83,9 +83,9 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     }
 
     /**
-     * @return string
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     private function generateToken()
     {

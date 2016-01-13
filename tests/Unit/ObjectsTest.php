@@ -12,8 +12,8 @@
 namespace OAuth2\Test\Unit;
 
 use OAuth2\Client\PublicClient;
-use OAuth2\ResourceServer\ResourceServer;
 use OAuth2\Exception\AuthenticateException;
+use OAuth2\ResourceServer\ResourceServer;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
 use OAuth2\Token\AccessToken;

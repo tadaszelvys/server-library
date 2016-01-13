@@ -12,8 +12,7 @@
 namespace OAuth2\ResourceServer;
 
 /**
- * Class ResourceServerManager
- * @package OAuth2\ResourceServer
+ * Class ResourceServerManager.
  */
 abstract class ResourceServerManager implements ResourceServerManagerInterface
 {
