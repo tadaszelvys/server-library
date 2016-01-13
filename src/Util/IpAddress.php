@@ -213,7 +213,7 @@ final class IpAddress
      */
     public static function checkIp6($requestIp, $ip)
     {
-        if (!((extension_loaded('sockets') && defined('AF_INET6')) || @inet_pton('::1'))) {
+        if (!((extension_loaded('sockets') && defined('AF_INET6')) || inet_pton('::1'))) {
             throw new \RuntimeException('Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".');
         }
 
