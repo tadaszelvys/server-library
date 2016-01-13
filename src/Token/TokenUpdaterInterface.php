@@ -17,5 +17,4 @@ interface TokenUpdaterInterface
      * @param \OAuth2\Token\TokenInterface $token
      */
     public function updateToken(TokenInterface &$token);
-
 }

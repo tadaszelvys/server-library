@@ -165,7 +165,7 @@ final class TokenEndpoint implements TokenEndpointInterface
             'id_token'                 => [
                 'issued'    => $grant_type_response->isIdTokenIssued(),
                 'auth_code' => $grant_type_response->getAuthorizationCodeToHash(),
-            ]
+            ],
         ];
 
         foreach (['requested_scope', 'available_scope'] as $key) {
@@ -228,8 +228,9 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Client\ClientInterface     $client
      * @param array                              $values
      *
-     * @return \OAuth2\Token\IdTokenInterface
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\Token\IdTokenInterface
      */
     private function createIdToken(AccessTokenInterface $access_token, ClientInterface $client, array $values)
     {
@@ -353,7 +354,7 @@ final class TokenEndpoint implements TokenEndpointInterface
 
     private function getAtHashMethod($id_token_signature_alogrithm)
     {
-        switch($id_token_signature_alogrithm) {
+        switch ($id_token_signature_alogrithm) {
             case 'HS256':
             case 'ES256':
             case 'RS256':
@@ -380,7 +381,7 @@ final class TokenEndpoint implements TokenEndpointInterface
 
     private function getAtHashSize($id_token_signature_alogrithm)
     {
-        switch($id_token_signature_alogrithm) {
+        switch ($id_token_signature_alogrithm) {
             case 'HS256':
             case 'ES256':
             case 'RS256':

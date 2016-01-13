@@ -26,9 +26,9 @@ class OpenIDConnectTest extends Base
 
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
-            'response_type' => 'code token',
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'code token',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
         ]);

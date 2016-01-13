@@ -15,12 +15,12 @@ use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
-use OAuth2\ResourceServer\ResourceServerInterface;
 use OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Exception\InternalServerErrorExceptionInterface;
+use OAuth2\ResourceServer\ResourceServerInterface;
 use OAuth2\Token\TokenInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
@@ -114,10 +114,10 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface      $response
-     * @param string                                   $token
-     * @param \OAuth2\Client\ClientInterface           $client
-     * @param string|null                              $token_type_hint
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param string                              $token
+     * @param \OAuth2\Client\ClientInterface      $client
+     * @param string|null                         $token_type_hint
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */

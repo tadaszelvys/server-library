@@ -51,11 +51,11 @@ final class IpAddress
      * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
      */
     private static $trustedHeaders = [
-        self::HEADER_FORWARDED => 'FORWARDED',
-        self::HEADER_CLIENT_IP => 'X-FORWARDED-FOR',
-        self::HEADER_CLIENT_HOST => 'X-FORWARDED-HOST',
+        self::HEADER_FORWARDED    => 'FORWARDED',
+        self::HEADER_CLIENT_IP    => 'X-FORWARDED-FOR',
+        self::HEADER_CLIENT_HOST  => 'X-FORWARDED-HOST',
         self::HEADER_CLIENT_PROTO => 'X-FORWARDED-PROTO',
-        self::HEADER_CLIENT_PORT => 'X-FORWARDED-PORT',
+        self::HEADER_CLIENT_PORT  => 'X-FORWARDED-PORT',
     ];
 
     /**
@@ -64,7 +64,6 @@ final class IpAddress
     private function __construct()
     {
     }
-
 
     /**
      * Returns the client IP addresses.
@@ -84,7 +83,7 @@ final class IpAddress
      */
     public static function getClientIps(ServerRequestInterface $request, array $trustedProxies = [])
     {
-        $clientIps = array();
+        $clientIps = [];
         $params = $request->getServerParams();
         $ip = $params['REMOTE_ADDR'];
 
@@ -111,7 +110,7 @@ final class IpAddress
         }
 
         // Now the IP chain contains only untrusted proxies and the client IP
-        return $clientIps ? array_reverse($clientIps) : array($ip);
+        return $clientIps ? array_reverse($clientIps) : [$ip];
     }
 
     /**
@@ -138,6 +137,7 @@ final class IpAddress
     public static function getClientIp(ServerRequestInterface $request, array $trustedProxies = [])
     {
         $ipAddresses = self::getClientIps($request, $trustedProxies);
+
         return $ipAddresses[0];
     }
 
@@ -152,7 +152,7 @@ final class IpAddress
     public static function checkIp($requestIp, $ips)
     {
         if (!is_array($ips)) {
-            $ips = array($ips);
+            $ips = [$ips];
         }
 
         $method = substr_count($requestIp, ':') > 1 ? 'checkIp6' : 'checkIp4';
@@ -207,9 +207,9 @@ final class IpAddress
      * @param string $requestIp IPv6 address to check
      * @param string $ip        IPv6 address or subnet in CIDR notation
      *
-     * @return bool Whether the IP is valid
-     *
      * @throws \RuntimeException When IPV6 support is not enabled
+     *
+     * @return bool Whether the IP is valid
      */
     public static function checkIp6($requestIp, $ip)
     {
