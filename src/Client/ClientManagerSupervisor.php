@@ -74,8 +74,11 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     public function findClient(ServerRequestInterface $request)
     {
         foreach ($this->getClientManagers() as $manager) {
-            $client = $manager->findClient($request);
+            $client = $manager->findClient($request, $client_credentials);
             if ($client instanceof ClientInterface) {
+                if (false === $manager->isClientAuthenticated($client, $client_credentials, $request, $reason)) {
+                    throw $this->buildAuthenticationException($request, $reason);
+                }
                 return $client;
             }
         }
@@ -85,49 +88,23 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     /**
      * {@inheritdoc}
      */
-    public function buildAuthenticationException(ServerRequestInterface $request)
+    public function buildAuthenticationException(ServerRequestInterface $request, $reason = null)
     {
-        $auth_scheme = $this->getAuthorizationScheme($request);
-
-        if (null === $auth_scheme) {
-            return $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Unknown client');
-        }
-
         $schemes = [];
-        $all_schemes = [];
+        $message = 'Client authentication failed.';
+        if (is_string($reason)) {
+            $message .= sprintf(' %s', $reason);
+        }
         foreach ($this->getClientManagers() as $manager) {
             $manager_schemes = $manager->getSchemesParameters();
-            $all_schemes = array_merge($all_schemes, $manager_schemes);
-            if (array_key_exists($auth_scheme, $manager_schemes)) {
-                $schemes[$auth_scheme] = $manager_schemes[$auth_scheme];
-            }
-        }
-        if (empty($schemes)) {
-            $schemes = $all_schemes;
+            $schemes = array_merge($schemes, $manager_schemes);
         }
 
-        return $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $schemes]);
-    }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return string|null
-     */
-    private function getAuthorizationScheme(ServerRequestInterface $request)
-    {
-        $authHeader = $request->getHeader('Authorization');
-        $server_params = $request->getServerParams();
-        if (array_key_exists('PHP_AUTH_USER', $server_params)) {
-            return 'Basic';
-        } elseif (array_key_exists('PHP_AUTH_DIGEST', $server_params)) {
-            return 'Digest';
-        } elseif (count($authHeader) > 0) {
-            if (false !== $pos = strpos($authHeader[0], ' ')) {
-                return substr($authHeader[0], 0, $pos);
-            } else {
-                return $authHeader[0];
-            }
-        }
+        return $this->getExceptionManager()->getException(
+            ExceptionManagerInterface::AUTHENTICATE,
+            ExceptionManagerInterface::INVALID_CLIENT,
+            $message,
+            ['schemes' => $schemes]
+        );
     }
 }

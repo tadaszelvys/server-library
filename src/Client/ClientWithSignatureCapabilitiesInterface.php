@@ -11,7 +11,7 @@
 
 namespace OAuth2\Client;
 
-interface JWTClientInterface extends ConfidentialClientInterface
+interface ClientWithSignatureCapabilitiesInterface extends ConfidentialClientInterface
 {
     /**
      * @param array $key_set

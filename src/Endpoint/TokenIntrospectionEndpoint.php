@@ -92,24 +92,14 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         $client = null;
         try {
             $client = $this->getClientManagerSupervisor()->findClient($request);
-        } catch (BaseExceptionInterface $e) {
-            if ($e instanceof InternalServerErrorExceptionInterface) {
-                throw $e;
-            }
-            if ($e instanceof AuthenticateExceptionInterface) {
-                $e->getHttpResponse($response);
-
-                return;
-            }
-            $client = null;
-        }
-
-        if (!$client instanceof ClientInterface) {
-            $e = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find token or client not authenticated.');
+        } catch (InternalServerErrorExceptionInterface $e) {
+            throw $e;
+        } catch (AuthenticateExceptionInterface $e) {
             $e->getHttpResponse($response);
 
             return;
         }
+
         $this->getTokenInformation($response, $token, $client, $token_type_hint);
     }
 

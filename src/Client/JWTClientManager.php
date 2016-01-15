@@ -15,6 +15,7 @@ use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Configuration\ConfigurationInterface;
+use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
 use OAuth2\Util\RequestBody;
@@ -63,7 +64,7 @@ abstract class JWTClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request)
+    public function findClient(ServerRequestInterface $request, &$client_credentials = null)
     {
         $methods = $this->findClientCredentialsMethods();
         $assertions = [];
@@ -75,14 +76,35 @@ abstract class JWTClientManager implements ClientManagerInterface
             }
         }
 
-        $client = $this->checkResult($assertions);
-        if (null === $client) {
-            return $client;
+        if (null === $client = $this->checkResult($assertions)) {
+            return;
         }
-
-        $this->getJWTLoader()->verifySignature($assertions[0], $client);
+        $client_credentials = $assertions[0];
 
         return $client;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    {
+        if (!$client instanceof ClientWithSignatureCapabilitiesInterface) {
+            return false;
+        }
+
+        try {
+            $this->getJWTLoader()->verifySignature($client_credentials, $client);
+            return true;
+        } catch (BaseException $e) {
+            $reason = $e->getDescription();
+
+            return false;
+        } catch (\Exception $e) {
+            $reason = $e->getMessage();
+
+            return false;
+        }
     }
 
     /**
@@ -118,7 +140,7 @@ abstract class JWTClientManager implements ClientManagerInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return \OAuth2\Client\JWTClientInterface
+     * @return \OAuth2\Client\ClientWithEncryptionCapabilitiesInterface
      */
     private function checkResult(array $result)
     {
@@ -135,8 +157,8 @@ abstract class JWTClientManager implements ClientManagerInterface
 
         $client = $this->getClient($result[0]->getClaim('sub'));
 
-        if (!$client instanceof JWTClientInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $this->getSchemesParameters()]);
+        if (!$client instanceof ClientWithSignatureCapabilitiesInterface) {
+            return;
         }
 
         return $client;

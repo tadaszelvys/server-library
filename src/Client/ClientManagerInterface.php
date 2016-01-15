@@ -19,11 +19,24 @@ interface ClientManagerInterface
      * Find a client using the request.
      * If the client is confidential, the client credentials must be checked.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request
+     * @param \Psr\Http\Message\ServerRequestInterface $request            The request
+     * @param mixed                                    $client_credentials The client credentials found in the request
      *
-     * @return null|string|\OAuth2\Client\ClientInterface Return the client if found else null. If a client tried to authenticate against the server but failed, return the public ID found
+     * @return null|\OAuth2\Client\ClientInterface Return the client if found else null.
      */
-    public function findClient(ServerRequestInterface $request);
+    public function findClient(ServerRequestInterface $request, &$client_credentials = null);
+
+    /**
+     * This method verifies the client credentials in the request.
+     *
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param mixed                                    $client_credentials
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param null|string                              $reason
+     *
+     * @return bool Returns true if the client is authenticated, else false
+     */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null);
 
     /**
      * Get a client by its ID.

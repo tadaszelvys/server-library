@@ -13,29 +13,34 @@ namespace OAuth2\Token;
 
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasJWTSigner;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Util\JWTLoader;
 use OAuth2\Util\JWTSigner;
 
-abstract class IdTokenManager implements IdTokenManagerInterface
+class IdTokenManager implements IdTokenManagerInterface
 {
     use HasJWTSigner;
+    use HasJWTLoader;
     use HasConfiguration;
     use HasExceptionManager;
 
     /**
      * IdTokenManager constructor.
      *
+     * @param \OAuth2\Util\JWTLoader                       $jwt_loader
      * @param \OAuth2\Util\JWTSigner                       $jwt_signer
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
      * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(JWTSigner $jwt_signer, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(JWTLoader $jwt_loader, JWTSigner $jwt_signer, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
     {
+        $this->setJWTLoader($jwt_loader);
         $this->setJWTSigner($jwt_signer);
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
@@ -44,7 +49,10 @@ abstract class IdTokenManager implements IdTokenManagerInterface
     /**
      * @param \OAuth2\Token\IdTokenInterface $is_token
      */
-    abstract protected function saveIdToken(IdTokenInterface $is_token);
+    protected function saveIdToken(IdTokenInterface $is_token)
+    {
+        //Nothing to do
+    }
 
     /**
      * {@inheritdoc}
@@ -70,8 +78,9 @@ abstract class IdTokenManager implements IdTokenManagerInterface
             'aud' => $client->getPublicId(),
         ];
         if (null !== $at_hash) {
-            $jws = $this->getJWTSigner()->sign($payload, $headers);
+            //$payload['at_hash'] = $this->
         }
+        $jws = $this->getJWTSigner()->sign($payload, $headers);
 
         $id_token->setExpiresAt($exp);
         $id_token->setClientPublicId($client->getPublicId());
@@ -89,6 +98,27 @@ abstract class IdTokenManager implements IdTokenManagerInterface
     public function revokeIdToken(IdTokenInterface $token)
     {
         //Not supported
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdToken($data)
+    {
+        $jws = $this->getJWTLoader()->load($data);
+        // TODO: Verify signature here
+
+        $id_token = $this->createEmptyIdToken();
+        $id_token->setToken($data);
+        $id_token->setExpiresAt($jws->getHeader('exp'));
+        $id_token->setClientPublicId($jws->getClaim('aud'));
+        $id_token->setResourceOwnerPublicId($jws->getClaim('sub'));
+        $id_token->setScope([]);
+        $id_token->setAccessTokenHash($jws->hasClaim('at_hash')?$jws->getClaim('at_hash'):null);
+        $id_token->setAuthorizationCodeHash($jws->hasClaim('c_hash')?$jws->getClaim('c_hash'):null);
+        $id_token->setNonce($jws->hasClaim('nonce')?$jws->getClaim('nonce'):null);
+
+        return $id_token;
     }
 
     /**

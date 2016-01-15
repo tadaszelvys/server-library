@@ -12,6 +12,7 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Client\UnregisteredClient;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -42,13 +43,13 @@ class UnregisteredClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request, &$client_public_id_found = null)
+    public function findClient(ServerRequestInterface $request, &$client_credentials = null)
     {
         $methods = $this->findClientMethods();
         $result = [];
 
         foreach ($methods as $method) {
-            $data = $this->$method($request, $client_public_id_found);
+            $data = $this->$method($request);
             if (null !== $data) {
                 $result[] = $data;
             }
@@ -125,24 +126,29 @@ class UnregisteredClientManager implements ClientManagerInterface
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param string|null                              $client_public_id_found
      *
      * @return string|null
      */
-    protected function findClientUsingHeader(ServerRequestInterface $request, &$client_public_id_found = null)
+    protected function findClientUsingHeader(ServerRequestInterface $request)
     {
+        if (!$request->hasHeader('X-OAuth2-Unregistered-Client-ID')) {
+            return;
+        }
+
         $header = $request->getHeader('X-OAuth2-Unregistered-Client-ID');
 
-        if (empty($header)) {
+        if (!is_array($header) || 1 !== count($header) || !is_string($header[0])) {
             return;
-        } elseif (is_array($header)) {
-            $client_public_id_found = $header[0];
-
-            return $header[0];
-        } else {
-            $client_public_id_found = $header;
-
-            return $header;
         }
+
+        return $header[0];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    {
+        return true;
     }
 }

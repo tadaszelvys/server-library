@@ -18,7 +18,7 @@ use Jose\Object\JWKSet;
 use Jose\Object\JWSInterface;
 use Jose\VerifierInterface;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Client\JWTClientInterface;
+use OAuth2\Client\ClientWithSignatureCapabilitiesInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
 
@@ -147,12 +147,12 @@ final class JWTLoader
     }
 
     /**
-     * @param \Jose\Object\JWSInterface         $jws
-     * @param \OAuth2\Client\JWTClientInterface $client
+     * @param \Jose\Object\JWSInterface                               $jws
+     * @param \OAuth2\Client\ClientWithSignatureCapabilitiesInterface $client
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function verifySignature(JWSInterface $jws, JWTClientInterface $client)
+    public function verifySignature(JWSInterface $jws, ClientWithSignatureCapabilitiesInterface $client)
     {
         if (!in_array($jws->getHeader('alg'), $client->getAllowedSignatureAlgorithms())) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($client->getAllowedSignatureAlgorithms())));

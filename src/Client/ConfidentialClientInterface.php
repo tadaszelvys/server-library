@@ -12,8 +12,11 @@
 namespace OAuth2\Client;
 
 /**
- * This interface is for confidential clients.
- * You can create confidential clients using this interface.
+ * Interface ConfidentialClientInterface
+ *
+ * This interface is for all confidential clients.
+ * Client managers that support this client type MUST authenticate the client using the request
+ * and any other client properties.
  *
  * @see http://tools.ietf.org/html/rfc6749#section-2.1
  */

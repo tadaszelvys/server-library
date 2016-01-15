@@ -16,7 +16,7 @@ use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\JWTClientInterface;
+use OAuth2\Client\ClientWithSignatureCapabilitiesInterface;
 use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
@@ -85,7 +85,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
      */
     public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
-        if (!$client instanceof JWTClientInterface) {
+        if (!$client instanceof ClientWithSignatureCapabilitiesInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a JWT client');
         }
         $jwt = $grant_type_response->getAdditionalData('jwt');

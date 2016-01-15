@@ -192,7 +192,13 @@ class GetTokenRevocationEndpointTest extends Base
         $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
         $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals('foo.bar({"error":"invalid_client","error_description":"Client authentication failed.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FAuthenticate%2Finvalid_client"})', $response->getBody()->getContents());
+        $headers = $response->getHeaders();
+        $this->assertTrue(array_key_exists('Content-Type', $headers));
+        $this->assertTrue(array_key_exists('Cache-Control', $headers));
+        $this->assertTrue(array_key_exists('Pragma', $headers));
+        $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
+        $this->assertEquals(2, count($headers['WWW-Authenticate']));
+        $this->assertEquals('', $response->getBody()->getContents());
     }
 
     public function testAccessTokenNotRevokedForNotAuthenticatedPublicClientAndTypeHint()
@@ -205,7 +211,13 @@ class GetTokenRevocationEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(401, $response->getStatusCode());
+        $headers = $response->getHeaders();
+        $this->assertTrue(array_key_exists('Content-Type', $headers));
+        $this->assertTrue(array_key_exists('Cache-Control', $headers));
+        $this->assertTrue(array_key_exists('Pragma', $headers));
+        $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
+        $this->assertEquals(2, count($headers['WWW-Authenticate']));
         $this->assertEquals('', $response->getBody()->getContents());
     }
 
@@ -219,8 +231,14 @@ class GetTokenRevocationEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('foo.bar()', $response->getBody()->getContents());
+        $this->assertEquals(401, $response->getStatusCode());
+        $headers = $response->getHeaders();
+        $this->assertTrue(array_key_exists('Content-Type', $headers));
+        $this->assertTrue(array_key_exists('Cache-Control', $headers));
+        $this->assertTrue(array_key_exists('Pragma', $headers));
+        $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
+        $this->assertEquals(2, count($headers['WWW-Authenticate']));
+        $this->assertEquals('', $response->getBody()->getContents());
     }
 
     public function testRefreshTokenRevokedForNotAuthenticatedPublicClient()
@@ -232,7 +250,13 @@ class GetTokenRevocationEndpointTest extends Base
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(401, $response->getStatusCode());
+        $headers = $response->getHeaders();
+        $this->assertTrue(array_key_exists('Content-Type', $headers));
+        $this->assertTrue(array_key_exists('Cache-Control', $headers));
+        $this->assertTrue(array_key_exists('Pragma', $headers));
+        $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
+        $this->assertEquals(2, count($headers['WWW-Authenticate']));
         $this->assertEquals('', $response->getBody()->getContents());
         $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('VALID_REFRESH_TOKEN'));
     }
@@ -246,8 +270,14 @@ class GetTokenRevocationEndpointTest extends Base
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('foo.bar()', $response->getBody()->getContents());
+        $this->assertEquals(401, $response->getStatusCode());
+        $headers = $response->getHeaders();
+        $this->assertTrue(array_key_exists('Content-Type', $headers));
+        $this->assertTrue(array_key_exists('Cache-Control', $headers));
+        $this->assertTrue(array_key_exists('Pragma', $headers));
+        $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
+        $this->assertEquals(2, count($headers['WWW-Authenticate']));
+        $this->assertEquals('', $response->getBody()->getContents());
         $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('VALID_REFRESH_TOKEN'));
     }
 

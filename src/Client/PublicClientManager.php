@@ -45,7 +45,7 @@ abstract class PublicClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request)
+    public function findClient(ServerRequestInterface $request, &$client_credentials = null)
     {
         $methods = $this->findClientMethods();
         $result = [];
@@ -66,6 +66,14 @@ abstract class PublicClientManager implements ClientManagerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    {
+        return $client instanceof PublicClientInterface;
+    }
+
+    /**
      * @param array $result
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
@@ -82,12 +90,6 @@ abstract class PublicClientManager implements ClientManagerInterface
             return;
         }
 
-        $client = $this->getClient($result[0]);
-
-        if (!$client instanceof PublicClientInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $this->getSchemesParameters()]);
-        }
-
-        return $client;
+        return $this->getClient($result[0]);
     }
 }

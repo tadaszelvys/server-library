@@ -15,7 +15,7 @@
         "php": ">=5.5.9",
         "zendframework/zend-diactoros": "^1.1.0",
         "spomky-labs/defuse-generator": "^1.0.0",
-        "spomky-labs/jose": "1.0.*@alpha"
+        "spomky-labs/jose": "1.0.*@beta"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8.0|^5.1.0",

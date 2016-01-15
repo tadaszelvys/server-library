@@ -167,12 +167,11 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
             $this->assertEquals('invalid_client', $e->getMessage());
             $this->assertEquals('Client authentication failed.', $e->getDescription());
             $this->assertEquals(401, $e->getHttpCode());
-            $this->assertEquals([
-                'Content-Type'     => 'application/json',
-                'Cache-Control'    => 'no-store',
-                'Pragma'           => 'no-cache',
-                'WWW-Authenticate' => ['Basic realm="testrealm@host.com"'],
-            ], $e->getResponseHeaders());
+            $this->assertTrue(array_key_exists('Content-Type', $e->getResponseHeaders()));
+            $this->assertTrue(array_key_exists('Cache-Control', $e->getResponseHeaders()));
+            $this->assertTrue(array_key_exists('Pragma', $e->getResponseHeaders()));
+            $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
+            $this->assertEquals(2, count($e->getResponseHeaders()['WWW-Authenticate']));
         }
     }
 

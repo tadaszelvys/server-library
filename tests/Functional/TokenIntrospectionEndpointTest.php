@@ -87,8 +87,13 @@ class TokenIntrospectionEndpointTest extends Base
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals(401, $response->getStatusCode());
+        $headers = $response->getHeaders();
+        $this->assertTrue(array_key_exists('Content-Type', $headers));
+        $this->assertTrue(array_key_exists('Cache-Control', $headers));
+        $this->assertTrue(array_key_exists('Pragma', $headers));
+        $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
+        $this->assertEquals(2, count($headers['WWW-Authenticate']));
     }
 
     public function testAccessTokenIntrospectionAllowedForResourceServerFromTrustedProxy()
@@ -112,7 +117,12 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals('', $response->getBody()->getContents());
+        $headers = $response->getHeaders();
+        $this->assertTrue(array_key_exists('Content-Type', $headers));
+        $this->assertTrue(array_key_exists('Cache-Control', $headers));
+        $this->assertTrue(array_key_exists('Pragma', $headers));
+        $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
+        $this->assertEquals(2, count($headers['WWW-Authenticate']));
     }
 
     public function testAccessTokenIntrospectionNotForAuthenticatedPublicClientAndTypeHint()
@@ -148,8 +158,13 @@ class TokenIntrospectionEndpointTest extends Base
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals(401, $response->getStatusCode());
+        $headers = $response->getHeaders();
+        $this->assertTrue(array_key_exists('Content-Type', $headers));
+        $this->assertTrue(array_key_exists('Cache-Control', $headers));
+        $this->assertTrue(array_key_exists('Pragma', $headers));
+        $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
+        $this->assertEquals(2, count($headers['WWW-Authenticate']));
     }
 
     public function testRefreshTokenIntrospection()

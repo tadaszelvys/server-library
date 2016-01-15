@@ -13,6 +13,13 @@ namespace OAuth2\Client;
 
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
+/**
+ * Interface ClientInterface
+ *
+ * This interface is used for every client types.
+ * A client is a resource owner with a set of allowed grant types and can perform requests against
+ * available endpoints.
+ */
 interface ClientInterface extends ResourceOwnerInterface
 {
     /**

@@ -76,6 +76,39 @@ abstract class PasswordClientManager implements ClientManagerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function findClient(ServerRequestInterface $request, &$client_credentials = null)
+    {
+        $methods = $this->findClientCredentialsMethods();
+        $credentials = [];
+
+        foreach ($methods as $method) {
+            $data = $this->$method($request);
+            if (null !== ($data)) {
+                $credentials[] = $data;
+            }
+        }
+        if (null === $client = $this->checkResult($credentials)) {
+            return;
+        }
+        $client_credentials = $credentials[0]['client_credentials'];
+
+        return $client;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    {
+        if (!$client instanceof PasswordClientInterface) {
+            return false;
+        }
+        return $this->checkClientCredentials($client, $client_credentials, $request);
+    }
+
+    /**
      * @return string
      */
     protected function getHashAlgorithm()
@@ -153,33 +186,6 @@ abstract class PasswordClientManager implements ClientManagerInterface
         }
 
         return $methods;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findClient(ServerRequestInterface $request)
-    {
-        $methods = $this->findClientCredentialsMethods();
-        $credentials = [];
-
-        foreach ($methods as $method) {
-            $data = $this->$method($request);
-            if (null !== ($data)) {
-                $credentials[] = $data;
-            }
-        }
-
-        $client = $this->checkResult($credentials);
-        if (null === $client) {
-            return $client;
-        }
-
-        if (!$this->checkClientCredentials($client, $credentials[0]['client_credentials'], $request)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Invalid client credentials.', ['schemes' => $this->getSchemesParameters()]);
-        }
-
-        return $client;
     }
 
     /**
@@ -270,13 +276,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
             return;
         }
 
-        $client = $this->getClient($result[0]['client_id']);
-
-        if (!$client instanceof PasswordClientInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::AUTHENTICATE, ExceptionManagerInterface::INVALID_CLIENT, 'Client authentication failed.', ['schemes' => $this->getSchemesParameters()]);
-        }
-
-        return $client;
+        return $this->getClient($result[0]['client_id']);
     }
 
     /**

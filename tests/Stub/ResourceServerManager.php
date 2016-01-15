@@ -11,6 +11,7 @@
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceServer\ResourceServer;
 use OAuth2\ResourceServer\ResourceServerInterface;
 use OAuth2\ResourceServer\ResourceServerManager as Base;
@@ -70,7 +71,7 @@ class ResourceServerManager extends Base
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request)
+    public function findClient(ServerRequestInterface $request, &$client_credentials = null)
     {
         if (!$request->hasHeader('X-OAuth2-Resource-Server')) {
             return;
@@ -81,17 +82,20 @@ class ResourceServerManager extends Base
             return;
         }
 
-        $resource_server = $this->getClient($server_name[0]);
-        if (!$resource_server instanceof ResourceServerInterface) {
+        return $this->getClient($server_name[0]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    {
+        if (!$client instanceof ResourceServerInterface) {
             return;
         }
 
         $ip = IpAddress::getClientIp($request, $this->getTrustedProxies());
 
-        if (!$resource_server->isIpAddressAllowed($ip)) {
-            return;
-        }
-
-        return $resource_server;
+        return $client->isIpAddressAllowed($ip);
     }
 }

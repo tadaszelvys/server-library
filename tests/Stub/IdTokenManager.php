@@ -17,6 +17,7 @@ use OAuth2\Token\AccessTokenTypeManagerInterface;
 use OAuth2\Token\IdToken;
 use OAuth2\Token\IdTokenInterface;
 use OAuth2\Token\IdTokenManager as Base;
+use OAuth2\Util\JWTLoader;
 use OAuth2\Util\JWTSigner;
 
 class IdTokenManager extends Base
@@ -29,14 +30,15 @@ class IdTokenManager extends Base
     /**
      * IdTokenManager constructor.
      *
+     * @param \OAuth2\Util\JWTLoader                        $jwt_loader
      * @param \OAuth2\Util\JWTSigner                        $jwt_signer
      * @param \OAuth2\Exception\ExceptionManagerInterface   $exception_manager
      * @param \OAuth2\Configuration\ConfigurationInterface  $configuration
      * @param \OAuth2\Token\AccessTokenTypeManagerInterface $access_token_type_manager
      */
-    public function __construct(JWTSigner $jwt_signer, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration, AccessTokenTypeManagerInterface $access_token_type_manager)
+    public function __construct(JWTLoader $jwt_loader, JWTSigner $jwt_signer, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration, AccessTokenTypeManagerInterface $access_token_type_manager)
     {
-        parent::__construct($jwt_signer, $exception_manager, $configuration);
+        parent::__construct($jwt_loader, $jwt_signer, $exception_manager, $configuration);
 
         $abcd = new IdToken();
         $abcd->setExpiresAt(time() + 3600);

@@ -58,7 +58,6 @@ final class TokenEndpoint implements TokenEndpointInterface
     /**
      * TokenEndpoint constructor.
      *
-     * @param \OAuth2\Token\IdTokenManagerInterface           $id_token_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
      * @param \OAuth2\EndUser\EndUserManagerInterface         $end_user_manager
@@ -66,16 +65,17 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      * @param \OAuth2\Configuration\ConfigurationInterface    $configuration
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
+     * @param \OAuth2\Token\IdTokenManagerInterface|null      $id_token_manager
      */
     public function __construct(
-        IdTokenManagerInterface $id_token_manager,
         AccessTokenManagerInterface $access_token_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
         EndUserManagerInterface $end_user_manager,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
         ConfigurationInterface $configuration,
-        RefreshTokenManagerInterface $refresh_token_manager = null
+        RefreshTokenManagerInterface $refresh_token_manager = null,
+        IdTokenManagerInterface $id_token_manager = null
     ) {
         $this->setIdTokenManager($id_token_manager);
         $this->setAccessTokenManager($access_token_manager);
@@ -84,6 +84,9 @@ final class TokenEndpoint implements TokenEndpointInterface
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
+        if ($id_token_manager instanceof IdTokenManagerInterface) {
+            $this->setIdTokenManager($id_token_manager);
+        }
         if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
             $this->setRefreshTokenManager($refresh_token_manager);
         }

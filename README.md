@@ -117,4 +117,4 @@ Requests for new features, bug fixed and all other ideas to make this library us
 
 # Licence
 
-This library is release under [MIT licence](LICENSE.txt).
+This library is release under [MIT licence](LICENSE).
