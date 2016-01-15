@@ -13,13 +13,11 @@ namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAuthorizationCodeManager;
 use OAuth2\Behaviour\HasConfiguration;
-use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Endpoint\Authorization;
-use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
 use OAuth2\Grant\PKCEMethod\Plain;
@@ -31,7 +29,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
 {
-    use HasEndUserManager;
     use HasExceptionManager;
     use HasConfiguration;
     use HasAuthorizationCodeManager;
@@ -44,17 +41,15 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     /**
      * AuthorizationCodeGrantType constructor.
      *
-     * @param \OAuth2\EndUser\EndUserManagerInterface      $end_user_manager
      * @param \OAuth2\Token\AuthCodeManagerInterface       $auth_code_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
      * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(EndUserManagerInterface $end_user_manager, AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
     {
         $this->setAuthorizationCodeManager($auth_code_manager);
         $this->setExceptionManager($exception_manager);
         $this->setConfiguration($configuration);
-        $this->setEndUserManager($end_user_manager);
 
         $this->addPKCEMethod(new Plain());
         $this->addPKCEMethod(new S256());
