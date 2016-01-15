@@ -46,7 +46,6 @@ use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
-use OAuth2\Test\Stub\IdTokenManager;
 use OAuth2\Test\Stub\JWTClientManager;
 use OAuth2\Test\Stub\PasswordClientManager;
 use OAuth2\Test\Stub\PublicClientManager;
@@ -203,8 +202,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
                 $this->getConfiguration(),
-                $this->getRefreshTokenManager(),
-                $this->getIdTokenManager()
+                $this->getRefreshTokenManager()
             );
 
             $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
@@ -236,8 +234,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
                 $this->getConfiguration(),
-                $this->getRefreshTokenManager(),
-                $this->getIdTokenManager()
+                $this->getRefreshTokenManager()
             );
 
             $this->token_endpoint_jwt_access_token->addGrantType($this->getAuthorizationCodeGrantType());
@@ -696,59 +693,6 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->simple_string_access_token_manager;
-    }
-
-    /**
-     * @return null|\OAuth2\Test\Stub\IdTokenManager
-     */
-    private $id_token_manager = null;
-
-    /**
-     * @return \OAuth2\Test\Stub\IdTokenManager
-     */
-    protected function getIdTokenManager()
-    {
-        if (null === $this->id_token_manager) {
-            $jwt_signer = $this->getJWTSigner(
-                ['HS512'],
-                [
-                    'kid' => 'JWK2',
-                    'use' => 'sig',
-                    'kty' => 'oct',
-                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ]
-            );
-
-            $jwt_loader = $this->getJWTLoader(
-                ['HS512'],
-                ['A256KW', 'A256CBC-HS512'],
-                ['keys' => [
-                    [
-                        'kid' => 'JWK1',
-                        'use' => 'enc',
-                        'kty' => 'oct',
-                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                    ],
-                    [
-                        'kid' => 'JWK2',
-                        'use' => 'sig',
-                        'kty' => 'oct',
-                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                    ],
-                ]],
-                true
-            );
-
-            $this->id_token_manager = new IdTokenManager(
-                $jwt_loader,
-                $jwt_signer,
-                $this->getExceptionManager(),
-                $this->getConfiguration(),
-                $this->getAccessTokenTypeManager()
-            );
-        }
-
-        return $this->id_token_manager;
     }
 
     /**

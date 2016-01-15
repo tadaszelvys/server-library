@@ -77,7 +77,6 @@ final class TokenEndpoint implements TokenEndpointInterface
         RefreshTokenManagerInterface $refresh_token_manager = null,
         IdTokenManagerInterface $id_token_manager = null
     ) {
-        $this->setIdTokenManager($id_token_manager);
         $this->setAccessTokenManager($access_token_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setEndUserManager($end_user_manager);
@@ -186,7 +185,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         //Create and return access token (with refresh token and other information if asked) as an array
         $access_token = $this->createAccessToken($client, $result, RequestBody::getParameters($request));
         $token = $access_token->toArray();
-        if (true === $grant_type_response->isIdTokenIssued()) {
+        if (true === $grant_type_response->isIdTokenIssued() && $this->getIdTokenManager() instanceof IdTokenManagerInterface) {
             $id_token = $this->createIdToken($access_token, $client, $result);
             $token['id_token'] = $id_token->getToken();
         }
