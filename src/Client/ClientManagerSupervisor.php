@@ -79,6 +79,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
                 if (false === $manager->isClientAuthenticated($client, $client_credentials, $request, $reason)) {
                     throw $this->buildAuthenticationException($request, $reason);
                 }
+
                 return $client;
             }
         }

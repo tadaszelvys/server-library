@@ -12,7 +12,7 @@
 namespace OAuth2\Client;
 
 /**
- * Interface ConfidentialClientInterface
+ * Interface ConfidentialClientInterface.
  *
  * This interface is for all confidential clients.
  * Client managers that support this client type MUST authenticate the client using the request

@@ -95,6 +95,7 @@ abstract class JWTClientManager implements ClientManagerInterface
 
         try {
             $this->getJWTLoader()->verifySignature($client_credentials, $client);
+
             return true;
         } catch (BaseException $e) {
             $reason = $e->getDescription();

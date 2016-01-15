@@ -24,7 +24,7 @@ final class RequestBody
     {
         $body = $request->getParsedBody();
 
-        return is_array($body)?$body:[];
+        return is_array($body) ? $body : [];
     }
 
     /**
