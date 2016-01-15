@@ -11,8 +11,19 @@
 
 namespace OAuth2\Token;
 
+use Jose\Object\JWSInterface;
+
 interface IdTokenInterface extends TokenInterface
 {
+    /**
+     * @return \Jose\Object\JWSInterface
+     */
+    public function getJWS();
+
+    /**
+     * @param \Jose\Object\JWSInterface $jws
+     */
+    public function setJWS(JWSInterface $jws);
     /**
      * The token type (bearer, mac...).
      *
