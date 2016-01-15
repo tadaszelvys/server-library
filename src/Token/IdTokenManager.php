@@ -114,9 +114,9 @@ class IdTokenManager implements IdTokenManagerInterface
         $id_token->setClientPublicId($jws->getClaim('aud'));
         $id_token->setResourceOwnerPublicId($jws->getClaim('sub'));
         $id_token->setScope([]);
-        $id_token->setAccessTokenHash($jws->hasClaim('at_hash')?$jws->getClaim('at_hash'):null);
-        $id_token->setAuthorizationCodeHash($jws->hasClaim('c_hash')?$jws->getClaim('c_hash'):null);
-        $id_token->setNonce($jws->hasClaim('nonce')?$jws->getClaim('nonce'):null);
+        $id_token->setAccessTokenHash($jws->hasClaim('at_hash') ? $jws->getClaim('at_hash') : null);
+        $id_token->setAuthorizationCodeHash($jws->hasClaim('c_hash') ? $jws->getClaim('c_hash') : null);
+        $id_token->setNonce($jws->hasClaim('nonce') ? $jws->getClaim('nonce') : null);
 
         return $id_token;
     }

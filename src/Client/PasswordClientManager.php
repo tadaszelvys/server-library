@@ -105,6 +105,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
         if (!$client instanceof PasswordClientInterface) {
             return false;
         }
+
         return $this->checkClientCredentials($client, $client_credentials, $request);
     }
 
