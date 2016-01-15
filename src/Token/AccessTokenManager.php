@@ -11,7 +11,6 @@
 
 namespace OAuth2\Token;
 
-use OAuth2\Behaviour\HasAccessTokenTypeManager;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
@@ -21,7 +20,6 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
 abstract class AccessTokenManager implements AccessTokenManagerInterface
 {
     use HasConfiguration;
-    use HasAccessTokenTypeManager;
 
     /**
      * @var \OAuth2\Token\TokenUpdaterInterface[]
@@ -32,12 +30,10 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
      * AccessTokenManager constructor.
      *
      * @param \OAuth2\Configuration\ConfigurationInterface  $configuration
-     * @param \OAuth2\Token\AccessTokenTypeManagerInterface $access_token_type_manager
      */
-    public function __construct(ConfigurationInterface $configuration, AccessTokenTypeManagerInterface $access_token_type_manager)
+    public function __construct(ConfigurationInterface $configuration)
     {
         $this->setConfiguration($configuration);
-        $this->setAccessTokenTypeManager($access_token_type_manager);
     }
 
     /**
@@ -72,7 +68,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null)
+    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null)
     {
         $access_token = $this->createEmptyAccessToken();
         $access_token->setExpiresAt(time() + $this->getLifetime($client));
@@ -81,12 +77,13 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
         $access_token->setClientPublicId($client->getPublicId());
         $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
 
-        if (true === $this->getConfiguration()->get('allow_access_token_type_parameter', false) && array_key_exists('token_type', $request_parameters)) {
-            $token_type = $this->getAccessTokenTypeManager()->getAccessTokenType($request_parameters['token_type']);
-        } else {
-            $token_type = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType();
+        foreach ($token_type_parameters as $key=>$value) {
+            if ('token_type' === $key) {
+                $access_token->setTokenType($value);
+            } else {
+                $access_token->setParameter($key, $value);
+            }
         }
-        $token_type->updateAccessToken($access_token);
         $this->updateAccessToken($access_token);
         $this->populateAccessToken($access_token, $client, $resource_owner, $refresh_token);
         $this->saveAccessToken($access_token);

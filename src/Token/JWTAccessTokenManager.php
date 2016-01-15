@@ -35,10 +35,9 @@ class JWTAccessTokenManager extends AccessTokenManager
         JWTSigner $jwt_signer,
         JWTEncrypter $jwt_encrypter,
         ExceptionManagerInterface $exception_manager,
-        ConfigurationInterface $configuration,
-        AccessTokenTypeManagerInterface $access_token_type_manager
+        ConfigurationInterface $configuration
     ) {
-        parent::__construct($configuration, $access_token_type_manager);
+        parent::__construct($configuration);
         $this->setJWTLoader($jwt_loader);
         $this->setJWTSigner($jwt_signer);
         $this->setJWTEncrypter($jwt_encrypter);

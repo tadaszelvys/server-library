@@ -14,29 +14,25 @@ namespace OAuth2\Token;
 interface AccessTokenTypeInterface
 {
     /**
-     * This function prepare the access token to be sent to the client.
-     * It adds 'token_type' value and additional information (e.g. key materials in MAC context).
+     * This function prepares access token type information to be added to the token returned to the client.
+     * It must adds 'token_type' value and should add additional information (e.g. key materials in MAC context).
      * A possible result:
      *  {
-     *      "access_token": "foo", //From access token
-     *      "refresh_token":"8xLOxBtZp8", //From access token
-     *      "expires_in":3600, //From access token
      *      "token_type":"mac", //Added by this method
      *      "kid":"22BIjxU93h/IgwEb4zCRu5WF37s=", //Added by this method
      *      "mac_key":"adijq39jdlaska9asud", //Added by this method
      *      "mac_algorithm":"hmac-sha-256" //Added by this method
      *  }
+     *
      * Another possible result:
      *  {
-     *      "access_token": "bar", //From access token
-     *      "expires_in":3600, //From access token
      *      "token_type":"Bearer", //Added by this method
      *      "custom_data":"baz", //Added by this method or by access token
      *  }.
      *
-     * @param \OAuth2\Token\AccessTokenInterface $token The access token to update
+     * @return array
      */
-    public function updateAccessToken(AccessTokenInterface &$token);
+    public function getTokenTypeInformation();
 
     /**
      * @return string

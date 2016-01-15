@@ -12,20 +12,32 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
+use OAuth2\Behaviour\HasAccessTokenTypeManager;
+use OAuth2\Behaviour\HasConfiguration;
+use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Token\AccessTokenManagerInterface;
+use OAuth2\Token\AccessTokenTypeManagerInterface;
 
 final class ImplicitGrantType implements ResponseTypeSupportInterface
 {
+    use HasConfiguration;
+    use HasAccessTokenTypeManager;
     use HasAccessTokenManager;
 
     /**
      * ImplicitGrantType constructor.
      *
-     * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface  $configuration
+     * @param \OAuth2\Token\AccessTokenTypeManagerInterface $access_token_type_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface     $access_token_manager
      */
-    public function __construct(AccessTokenManagerInterface $access_token_manager)
-    {
+    public function __construct(ConfigurationInterface $configuration,
+                                AccessTokenTypeManagerInterface $access_token_type_manager,
+                                AccessTokenManagerInterface $access_token_manager
+    ) {
+        $this->setConfiguration($configuration);
+        $this->setAccessTokenTypeManager($access_token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
     }
 
@@ -50,9 +62,16 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
      */
     public function grantAuthorization(Authorization $authorization)
     {
+        if (true === $this->getConfiguration()->get('allow_access_token_type_parameter', false) && array_key_exists('token_type', $authorization->getQueryParams())) {
+            $token_type = $this->getAccessTokenTypeManager()->getAccessTokenType($authorization->getQueryParams()['token_type']);
+        } else {
+            $token_type = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType();
+        }
+
         $token = $this->getAccessTokenManager()->createAccessToken(
             $authorization->getClient(),
             $authorization->getEndUser(),
+            $token_type->getTokenTypeInformation(),
             $authorization->getQueryParams(),
             $authorization->getScopes()
         );

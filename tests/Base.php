@@ -196,6 +196,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->token_endpoint) {
             $this->token_endpoint = new TokenEndpoint(
+                $this->getAccessTokenTypeManager(),
                 $this->getSimplestringAccessTokenManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
@@ -228,6 +229,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->token_endpoint_jwt_access_token) {
             $this->token_endpoint_jwt_access_token = new TokenEndpoint(
+                $this->getAccessTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
@@ -608,6 +610,8 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->implicit_grant_type) {
             $this->implicit_grant_type = new ImplicitGrantType(
+                $this->getConfiguration(),
+                $this->getAccessTokenTypeManager(),
                 $this->getSimplestringAccessTokenManager()
             );
         }

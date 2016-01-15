@@ -13,6 +13,7 @@ namespace OAuth2\Endpoint;
 
 use Base64Url\Base64Url;
 use OAuth2\Behaviour\HasAccessTokenManager;
+use OAuth2\Behaviour\HasAccessTokenTypeManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasEndUserManager;
@@ -32,6 +33,7 @@ use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
+use OAuth2\Token\AccessTokenTypeManagerInterface;
 use OAuth2\Token\IdTokenManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
@@ -49,6 +51,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     use HasClientManagerSupervisor;
     use HasAccessTokenManager;
     use HasRefreshTokenManager;
+    use HasAccessTokenTypeManager;
 
     /**
      * @var \OAuth2\Grant\GrantTypeSupportInterface[]
@@ -58,6 +61,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     /**
      * TokenEndpoint constructor.
      *
+     * @param \OAuth2\Token\AccessTokenTypeManagerInterface   $access_token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
      * @param \OAuth2\EndUser\EndUserManagerInterface         $end_user_manager
@@ -68,6 +72,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Token\IdTokenManagerInterface|null      $id_token_manager
      */
     public function __construct(
+        AccessTokenTypeManagerInterface $access_token_type_manager,
         AccessTokenManagerInterface $access_token_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
         EndUserManagerInterface $end_user_manager,
@@ -77,6 +82,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         RefreshTokenManagerInterface $refresh_token_manager = null,
         IdTokenManagerInterface $id_token_manager = null
     ) {
+        $this->setAccessTokenTypeManager($access_token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setEndUserManager($end_user_manager);
@@ -300,7 +306,20 @@ final class TokenEndpoint implements TokenEndpointInterface
             }
         }
 
-        $access_token = $this->getAccessTokenManager()->createAccessToken($client, $resource_owner, $request_parameters, $values['requested_scope'], $refresh_token);
+        if (true === $this->getConfiguration()->get('allow_access_token_type_parameter', false) && array_key_exists('token_type', $request_parameters)) {
+            $token_type = $this->getAccessTokenTypeManager()->getAccessTokenType($request_parameters['token_type']);
+        } else {
+            $token_type = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType();
+        }
+
+        $access_token = $this->getAccessTokenManager()->createAccessToken(
+            $client,
+            $resource_owner,
+            $token_type->getTokenTypeInformation(),
+            $request_parameters,
+            $values['requested_scope'],
+            $refresh_token
+        );
 
         return $access_token;
     }

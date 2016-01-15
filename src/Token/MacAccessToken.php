@@ -37,19 +37,21 @@ class MacAccessToken implements AccessTokenTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function updateAccessToken(AccessTokenInterface &$token)
+    public function getTokenTypeName()
     {
-        $token->setTokenType($this->getTokenTypeName());
-        $token->setParameter('mac_key', $this->generateMacKey());
-        $token->setParameter('mac_algorithm', $this->getConfiguration()->get('mac_algorithm', 'hmac-sha-256'));
+        return 'MAC';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getTokenTypeName()
+    public function getTokenTypeInformation()
     {
-        return 'MAC';
+        return [
+            'token_type'    => $this->getTokenTypeName(),
+            'mac_key'       => $this->generateMacKey(),
+            'mac_algorithm' => $this->getConfiguration()->get('mac_algorithm', 'hmac-sha-256'),
+        ];
     }
 
     /**
