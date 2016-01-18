@@ -181,7 +181,10 @@ class JWTAccessTokenManager extends AccessTokenManager
             'r_o' => $access_token->getResourceOwnerPublicId(),
         ];
         if (!empty($access_token->getParameters())) {
-            $payload['oth'] = $access_token->getParameters();
+            $parameters = $access_token->getParameters();
+            //This part should be updated to support 'cnf' (confirmation) claim (see POP).
+
+            $payload['oth'] = $parameters;
         }
         if (null !== $audience) {
             $payload['aud'] = $audience;
@@ -237,6 +240,9 @@ class JWTAccessTokenManager extends AccessTokenManager
 
         if ($jwt->hasClaim('oth')) {
             $access_token->setParameters($jwt->getClaim('oth'));
+        }
+        if ($jwt->hasClaim('cnf')) {
+            $access_token->setParameter('cnf', $jwt->getClaim('cnf'));
         }
         if ($jwt->hasClaim('sco')) {
             $access_token->setScope($jwt->getClaim('sco'));

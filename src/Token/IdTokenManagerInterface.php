@@ -19,12 +19,13 @@ interface IdTokenManagerInterface
     /**
      * @param \OAuth2\Client\ClientInterface   $client
      * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param array                            $token_type_information
      * @param null|string                      $at_hash
      * @param null|string                      $c_hash
      *
-     * @return \OAuth2\Token\IdTokenInterface
+     * @return mixed
      */
-    public function createIdToken(ClientInterface $client, EndUserInterface $end_user, $at_hash = null, $c_hash = null);
+    public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $token_type_information, $at_hash = null, $c_hash = null);
 
     /**
      * @param \OAuth2\Token\IdTokenInterface $token The ID token to revoke

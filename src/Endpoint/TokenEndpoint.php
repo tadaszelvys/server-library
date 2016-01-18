@@ -11,7 +11,6 @@
 
 namespace OAuth2\Endpoint;
 
-use Base64Url\Base64Url;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasAccessTokenTypeManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
@@ -24,14 +23,12 @@ use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Configuration\ConfigurationInterface;
-use OAuth2\EndUser\EndUserInterface;
 use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponse;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Scope\ScopeManagerInterface;
-use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\AccessTokenTypeManagerInterface;
 use OAuth2\Token\IdTokenManagerInterface;
@@ -188,15 +185,22 @@ final class TokenEndpoint implements TokenEndpointInterface
             throw $this->getExceptionManager()->getException('BadRequest', 'invalid_scope', 'An unsupported scope was requested. Available scopes are ['.implode(',', $result['available_scope']).']');
         }
 
-        //Create and return access token (with refresh token and other information if asked) as an array
-        $access_token = $this->createAccessToken($client, $result, RequestBody::getParameters($request));
-        $token = $access_token->toArray();
-        if (true === $grant_type_response->isIdTokenIssued() && $this->getIdTokenManager() instanceof IdTokenManagerInterface) {
-            $id_token = $this->createIdToken($access_token, $client, $result);
-            $token['id_token'] = $id_token->getToken();
+        $request_parameters = RequestBody::getParameters($request);
+        if (true === $this->getConfiguration()->get('allow_access_token_type_parameter', false) && array_key_exists('token_type', $request_parameters)) {
+            $token_type = $this->getAccessTokenTypeManager()->getAccessTokenType($request_parameters['token_type']);
+        } else {
+            $token_type = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType();
         }
+        $token_type_information = $token_type->getTokenTypeInformation();
 
-        $response->getBody()->write(json_encode($token));
+        $access_token = $this->createAccessToken(
+            $client,
+            $result,
+            $request_parameters,
+            $token_type_information
+        );
+
+        $response->getBody()->write(json_encode($access_token));
         $response = $response->withStatus(200);
         $headers = [
             'Content-Type'  => 'application/json',
@@ -232,67 +236,16 @@ final class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface $access_token
-     * @param \OAuth2\Client\ClientInterface     $client
-     * @param array                              $values
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return \OAuth2\Token\IdTokenInterface
-     */
-    private function createIdToken(AccessTokenInterface $access_token, ClientInterface $client, array $values)
-    {
-        $signature_algorithm = $this->getConfiguration()->get('id_token_signature_algorithm', null);
-        $resource_owner = $this->getEndUserManager()->getEndUser($values['resource_owner_public_id']);
-
-        if (!$resource_owner instanceof EndUserInterface) {
-            throw $this->getExceptionManager()->getException(
-                ExceptionManagerInterface::INTERNAL_SERVER_ERROR,
-                'bad_grant_type_implementation',
-                'The server tried to get the resource owner associated with the Id Token, but the resource owner does not exist.'
-            );
-        }
-
-        if (null !== $values['id_token']['auth_code']) {
-            $c_hash = substr(
-                Base64Url::encode(hash(
-                    $this->getAtHashMethod($signature_algorithm),
-                    $values['id_token']['auth_code'],
-                    true
-                )),
-                0,
-                $this->getAtHashSize($signature_algorithm)
-            );
-        } else {
-            $c_hash = null;
-        }
-
-        $at_hash = substr(
-            Base64Url::encode(hash(
-                $this->getAtHashMethod($signature_algorithm),
-                $access_token->getToken(),
-                true
-            )),
-            0,
-            $this->getAtHashSize($signature_algorithm)
-        );
-
-        return $this->getIdTokenManager()->createIdToken(
-            $client,
-            $resource_owner,
-            $at_hash,
-            $c_hash
-        );
-    }
-
-    /**
      * @param \OAuth2\Client\ClientInterface $client
      * @param array                          $values
      * @param array                          $request_parameters
+     * @param array                          $token_type_information
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    private function createAccessToken(ClientInterface $client, array $values, array $request_parameters)
+    private function createAccessToken(ClientInterface $client, array $values, array $request_parameters, array $token_type_information)
     {
         $refresh_token = null;
         $resource_owner = $this->getResourceOwner($values['resource_owner_public_id']);
@@ -306,16 +259,10 @@ final class TokenEndpoint implements TokenEndpointInterface
             }
         }
 
-        if (true === $this->getConfiguration()->get('allow_access_token_type_parameter', false) && array_key_exists('token_type', $request_parameters)) {
-            $token_type = $this->getAccessTokenTypeManager()->getAccessTokenType($request_parameters['token_type']);
-        } else {
-            $token_type = $this->getAccessTokenTypeManager()->getDefaultAccessTokenType();
-        }
-
         $access_token = $this->getAccessTokenManager()->createAccessToken(
             $client,
             $resource_owner,
-            $token_type->getTokenTypeInformation(),
+            $token_type_information,
             $request_parameters,
             $values['requested_scope'],
             $refresh_token
@@ -371,59 +318,5 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
-    }
-
-    private function getAtHashMethod($id_token_signature_alogrithm)
-    {
-        switch ($id_token_signature_alogrithm) {
-            case 'HS256':
-            case 'ES256':
-            case 'RS256':
-            case 'PS256':
-                return 'sha256';
-            case 'HS384':
-            case 'ES384':
-            case 'RS384':
-            case 'PS384':
-                return 'sha384';
-            case 'HS512':
-            case 'ES512':
-            case 'RS512':
-            case 'PS512':
-                return 'sha512';
-            default:
-                throw $this->getExceptionManager()->getException(
-                    ExceptionManagerInterface::INTERNAL_SERVER_ERROR,
-                    '',
-                    ''
-                );
-        }
-    }
-
-    private function getAtHashSize($id_token_signature_alogrithm)
-    {
-        switch ($id_token_signature_alogrithm) {
-            case 'HS256':
-            case 'ES256':
-            case 'RS256':
-            case 'PS256':
-                return 128;
-            case 'HS384':
-            case 'ES384':
-            case 'RS384':
-            case 'PS384':
-                return 192;
-            case 'HS512':
-            case 'ES512':
-            case 'RS512':
-            case 'PS512':
-                return 256;
-            default:
-                throw $this->getExceptionManager()->getException(
-                    ExceptionManagerInterface::INTERNAL_SERVER_ERROR,
-                    '',
-                    ''
-                );
-        }
     }
 }

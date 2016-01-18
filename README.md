@@ -27,7 +27,6 @@ This library provides components to build an authorization server based on the O
 The following components are implemented:
 
 * Access Token Managers:
-    * [x] Simple string access token
     * [x] JWT access token
     * [x] Ability to use other Access Token managers
 * Access Token Types:
