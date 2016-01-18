@@ -22,7 +22,7 @@ interface AccessTokenTypeInterface
      *      "kid":"22BIjxU93h/IgwEb4zCRu5WF37s=", //Added by this method
      *      "mac_key":"adijq39jdlaska9asud", //Added by this method
      *      "mac_algorithm":"hmac-sha-256" //Added by this method
-     *  }
+     *  }.
      *
      * Another possible result:
      *  {

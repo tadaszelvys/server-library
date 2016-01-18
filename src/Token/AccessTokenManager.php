@@ -29,7 +29,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     /**
      * AccessTokenManager constructor.
      *
-     * @param \OAuth2\Configuration\ConfigurationInterface  $configuration
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
     public function __construct(ConfigurationInterface $configuration)
     {
@@ -77,7 +77,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
         $access_token->setClientPublicId($client->getPublicId());
         $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
 
-        foreach ($token_type_parameters as $key=>$value) {
+        foreach ($token_type_parameters as $key => $value) {
             if ('token_type' === $key) {
                 $access_token->setTokenType($value);
             } else {

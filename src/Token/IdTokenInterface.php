@@ -24,6 +24,7 @@ interface IdTokenInterface extends TokenInterface
      * @param \Jose\Object\JWSInterface $jws
      */
     public function setJWS(JWSInterface $jws);
+
     /**
      * The token type (bearer, mac...).
      *
