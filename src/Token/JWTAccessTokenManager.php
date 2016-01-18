@@ -227,7 +227,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         try {
             $jwt = $this->getJWTLoader()->load($assertion);
         } catch (\Exception $e) {
-            return null;
+            return;
         }
 
         $access_token = new JWTAccessToken();
