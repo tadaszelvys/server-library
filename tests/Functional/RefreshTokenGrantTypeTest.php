@@ -122,7 +122,7 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2 scope3","foo":"bar","refresh_token":"[^"]+"}', $response->getBody()->getContents());
     }
 
     public function testRefreshTokenParameterIsMissing()
@@ -182,7 +182,7 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2 scope3","foo":"bar","refresh_token":"[^"]+"}', $response->getBody()->getContents());
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -206,6 +206,6 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope2","refresh_token":"[^"]+"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope2","foo":"bar","refresh_token":"[^"]+"}', $response->getBody()->getContents());
     }
 }

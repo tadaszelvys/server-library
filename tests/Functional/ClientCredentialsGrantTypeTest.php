@@ -283,7 +283,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $response = new Response();
         $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->getTokenEndpointJWTAccessToken()->getAccessToken($request, $response);
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -298,7 +298,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals(5, count(explode('.', $values['access_token'])));
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($values['access_token']);
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_token);
+        $this->assertInstanceOf('\OAuth2\Token\JWTAccessTokenInterface', $access_token);
         $this->assertEquals('bar', $access_token->getClientPublicId());
         $this->assertEquals('bar', $access_token->getResourceOwnerPublicId());
         $this->assertInstanceOf('\Jose\Object\JWSInterface', $access_token->getJWS());

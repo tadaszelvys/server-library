@@ -46,17 +46,16 @@ use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
+use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\JWTClientManager;
 use OAuth2\Test\Stub\PasswordClientManager;
 use OAuth2\Test\Stub\PublicClientManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
-use OAuth2\Test\Stub\SimpleStringAccessTokenManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
 use OAuth2\Token\AccessTokenTypeManager;
 use OAuth2\Token\BearerAccessToken;
-use OAuth2\Token\JWTAccessTokenManager;
 use OAuth2\Token\MacAccessToken;
 use OAuth2\Util\JWTEncrypter;
 use OAuth2\Util\JWTLoader;
@@ -197,7 +196,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->token_endpoint) {
             $this->token_endpoint = new TokenEndpoint(
                 $this->getAccessTokenTypeManager(),
-                $this->getSimplestringAccessTokenManager(),
+                $this->getJWTAccessTokenManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
                 $this->getScopeManager(),
@@ -215,39 +214,6 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->token_endpoint;
-    }
-
-    /**
-     * @var null|\OAuth2\Endpoint\TokenEndpoint
-     */
-    private $token_endpoint_jwt_access_token = null;
-
-    /**
-     * @return \OAuth2\Endpoint\TokenEndpoint
-     */
-    protected function getTokenEndpointJWTAccessToken()
-    {
-        if (null === $this->token_endpoint_jwt_access_token) {
-            $this->token_endpoint_jwt_access_token = new TokenEndpoint(
-                $this->getAccessTokenTypeManager(),
-                $this->getJWTAccessTokenManager(),
-                $this->getClientManagerSupervisor(),
-                $this->getEndUserManager(),
-                $this->getScopeManager(),
-                $this->getExceptionManager(),
-                $this->getConfiguration(),
-                $this->getRefreshTokenManager()
-            );
-
-            $this->token_endpoint_jwt_access_token->addGrantType($this->getAuthorizationCodeGrantType());
-            $this->token_endpoint_jwt_access_token->addGrantType($this->getAuthorizationCodeGrantType());
-            $this->token_endpoint_jwt_access_token->addGrantType($this->getClientCredentialsGrantType());
-            $this->token_endpoint_jwt_access_token->addGrantType($this->getRefreshTokenGrantType());
-            $this->token_endpoint_jwt_access_token->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
-            $this->token_endpoint_jwt_access_token->addGrantType($this->getJWTBearerGrantType());
-        }
-
-        return $this->token_endpoint_jwt_access_token;
     }
 
     /**
@@ -590,7 +556,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->none_response_type) {
             $this->none_response_type = new NoneResponseType(
-                $this->getSimpleStringAccessTokenManager()
+                $this->getJWTAccessTokenManager()
             );
         }
 
@@ -611,7 +577,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->implicit_grant_type = new ImplicitGrantType(
                 $this->getConfiguration(),
                 $this->getAccessTokenTypeManager(),
-                $this->getSimplestringAccessTokenManager()
+                $this->getJWTAccessTokenManager()
             );
         }
 
@@ -676,26 +642,6 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->scope_manager;
-    }
-
-    /**
-     * @return null|\OAuth2\Test\Stub\SimpleStringAccessTokenManager
-     */
-    private $simple_string_access_token_manager = null;
-
-    /**
-     * @return \OAuth2\Test\Stub\SimpleStringAccessTokenManager
-     */
-    protected function getSimpleStringAccessTokenManager()
-    {
-        if (null === $this->simple_string_access_token_manager) {
-            $this->simple_string_access_token_manager = new SimpleStringAccessTokenManager(
-                $this->getConfiguration(),
-                $this->getAccessTokenTypeManager()
-            );
-        }
-
-        return $this->simple_string_access_token_manager;
     }
 
     /**
@@ -1018,7 +964,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         return new AccessToken(
             $this->getConfiguration(),
-            $this->getSimpleStringAccessTokenManager(),
+            $this->getJWTAccessTokenManager(),
             $this->getRefreshTokenManager()
         );
     }

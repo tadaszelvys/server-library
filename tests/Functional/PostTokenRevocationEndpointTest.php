@@ -23,12 +23,12 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('', $response->getBody()->getContents());
     }
@@ -37,12 +37,12 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'ABCD', 'callback' => 'foo.bar'], ['PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"Request must be secured","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"})', $response->getBody()->getContents());
     }
@@ -51,12 +51,12 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('', $response->getBody()->getContents());
     }
@@ -65,12 +65,12 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['callback' => 'foo.bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"Parameter \"token\" is missing","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"})', $response->getBody()->getContents());
     }
@@ -79,12 +79,12 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('', $response->getBody()->getContents());
     }
@@ -93,12 +93,12 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['callback' => 'foo.bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"Parameter \"token\" is missing","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"})', $response->getBody()->getContents());
     }
@@ -107,35 +107,35 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertNull($this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
     }
 
     public function testAccessTokenRevokedForAuthenticatedConfidentialClientWithCallback()
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'ABCD', 'callback' => 'foo.bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('foo.bar()', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('ABCD'));
+        $this->assertNull($this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
     }
 
     public function testAccessTokenRevokedForAuthenticatedPublicClient()
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
@@ -143,7 +143,7 @@ class PostTokenRevocationEndpointTest extends Base
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertNull($this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertNull($this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
     }
 
@@ -151,7 +151,7 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'callback' => 'foo.bar'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
@@ -159,7 +159,7 @@ class PostTokenRevocationEndpointTest extends Base
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('foo.bar()', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertNull($this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertNull($this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
     }
 
@@ -167,13 +167,13 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'bam']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
         $this->assertEquals(401, $response->getStatusCode());
         $this->assertEquals('', $response->getBody()->getContents());
@@ -183,13 +183,13 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'callback' => 'foo.bar'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'bam']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
@@ -205,12 +205,12 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'refresh_token'], ['HTTPS' => 'on']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
         $this->assertTrue(array_key_exists('Content-Type', $headers));
@@ -225,12 +225,12 @@ class PostTokenRevocationEndpointTest extends Base
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'callback' => 'foo.bar', 'token_type_hint' => 'refresh_token'], ['HTTPS' => 'on']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $response = new Response();
         $this->getRevocationTokenEndpoint()->revoke($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
         $this->assertTrue(array_key_exists('Content-Type', $headers));
@@ -258,7 +258,7 @@ class PostTokenRevocationEndpointTest extends Base
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
         $this->assertEquals(2, count($headers['WWW-Authenticate']));
         $this->assertEquals('', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('VALID_REFRESH_TOKEN'));
+        $this->assertNull($this->getJWTAccessTokenManager()->getAccessToken('VALID_REFRESH_TOKEN'));
     }
 
     public function testRefreshRevokedForNotAuthenticatedPublicClientWithCallback()
@@ -278,7 +278,7 @@ class PostTokenRevocationEndpointTest extends Base
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
         $this->assertEquals(2, count($headers['WWW-Authenticate']));
         $this->assertEquals('', $response->getBody()->getContents());
-        $this->assertNull($this->getSimplestringAccessTokenManager()->getAccessToken('VALID_REFRESH_TOKEN'));
+        $this->assertNull($this->getJWTAccessTokenManager()->getAccessToken('VALID_REFRESH_TOKEN'));
     }
 
     public function testFooTokenNotSupported()

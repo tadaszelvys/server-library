@@ -145,7 +145,7 @@ class TokenIntrospectionEndpointTest extends Base
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getSimplestringAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
     }

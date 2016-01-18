@@ -12,12 +12,15 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Configuration\ConfigurationInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
-use OAuth2\Token\AccessTokenTypeManagerInterface;
-use OAuth2\Token\SimpleStringAccessTokenManager as Base;
+use OAuth2\Token\JWTAccessTokenManager as Base;
+use OAuth2\Util\JWTEncrypter;
+use OAuth2\Util\JWTLoader;
+use OAuth2\Util\JWTSigner;
 
-class SimpleStringAccessTokenManager extends Base
+class JWTAccessTokenManager extends Base
 {
     /**
      * @var \OAuth2\Token\AccessTokenInterface[]
@@ -25,14 +28,28 @@ class SimpleStringAccessTokenManager extends Base
     private $access_tokens = [];
 
     /**
-     * SimpleStringAccessTokenManager constructor.
+     * JWTAccessTokenManager constructor.
      *
-     * @param \OAuth2\Configuration\ConfigurationInterface  $configuration
-     * @param \OAuth2\Token\AccessTokenTypeManagerInterface $access_token_type_manager
+     * @param \OAuth2\Util\JWTLoader                       $jwt_loader
+     * @param \OAuth2\Util\JWTSigner                       $jwt_signer
+     * @param \OAuth2\Util\JWTEncrypter                    $jwt_encrypter
+     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(ConfigurationInterface $configuration, AccessTokenTypeManagerInterface $access_token_type_manager)
-    {
-        parent::__construct($configuration, $access_token_type_manager);
+    public function __construct(
+        JWTLoader $jwt_loader,
+        JWTSigner $jwt_signer,
+        JWTEncrypter $jwt_encrypter,
+        ExceptionManagerInterface $exception_manager,
+        ConfigurationInterface $configuration
+    ) {
+        parent::__construct(
+            $jwt_loader,
+            $jwt_signer,
+            $jwt_encrypter,
+            $exception_manager,
+            $configuration
+        );
 
         $abcd = new AccessToken();
         $abcd->setExpiresAt(time() + 3600);
@@ -52,16 +69,8 @@ class SimpleStringAccessTokenManager extends Base
         $efgh->setToken('EFGH');
         $efgh->setTokenType('Bearer');
 
-        $this->saveAccessToken($abcd);
-        $this->saveAccessToken($efgh);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function saveAccessToken(AccessTokenInterface $access_token)
-    {
-        $this->access_tokens[$access_token->getToken()] = $access_token;
+        $this->access_tokens[$abcd->getToken()] = $abcd;
+        $this->access_tokens[$efgh->getToken()] = $efgh;
     }
 
     /**
@@ -81,6 +90,6 @@ class SimpleStringAccessTokenManager extends Base
      */
     public function getAccessToken($token)
     {
-        return isset($this->access_tokens[$token]) ? $this->access_tokens[$token] : null;
+        return array_key_exists($token, $this->access_tokens) ? $this->access_tokens[$token] : parent::getAccessToken($token);
     }
 }
