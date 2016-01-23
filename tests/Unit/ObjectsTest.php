@@ -134,7 +134,7 @@ class ObjectsTest extends Base
      */
     public function testAccessTokenTypeAlreadyExist()
     {
-        $this->getAccessTokenTypeManager()->addAccessTokenType($this->getBearerAccessTokenType());
+        $this->getTokenTypeManager()->addTokenType($this->getBearerAccessTokenType());
     }
 
     public function testResourceServer()

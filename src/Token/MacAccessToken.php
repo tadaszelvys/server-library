@@ -17,7 +17,7 @@ use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Security\DefuseGenerator;
 
-class MacAccessToken implements AccessTokenTypeInterface
+class MacAccessToken implements TokenTypeInterface
 {
     use HasConfiguration;
     use HasExceptionManager;

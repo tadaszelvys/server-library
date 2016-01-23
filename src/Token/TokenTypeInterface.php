@@ -11,10 +11,10 @@
 
 namespace OAuth2\Token;
 
-interface AccessTokenTypeInterface
+interface TokenTypeInterface
 {
     /**
-     * This function prepares access token type information to be added to the token returned to the client.
+     * This function prepares token type information to be added to the token returned to the client.
      * It must adds 'token_type' value and should add additional information (e.g. key materials in MAC context).
      * A possible result:
      *  {

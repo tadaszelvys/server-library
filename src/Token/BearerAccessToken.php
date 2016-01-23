@@ -11,7 +11,7 @@
 
 namespace OAuth2\Token;
 
-class BearerAccessToken implements AccessTokenTypeInterface
+class BearerAccessToken implements TokenTypeInterface
 {
     /**
      * {@inheritdoc}

@@ -54,7 +54,7 @@ use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
-use OAuth2\Token\AccessTokenTypeManager;
+use OAuth2\Token\TokenTypeManager;
 use OAuth2\Token\BearerAccessToken;
 use OAuth2\Token\MacAccessToken;
 use OAuth2\Util\JWTEncrypter;
@@ -195,7 +195,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->token_endpoint) {
             $this->token_endpoint = new TokenEndpoint(
-                $this->getAccessTokenTypeManager(),
+                $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getEndUserManager(),
@@ -573,7 +573,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->implicit_grant_type) {
             $this->implicit_grant_type = new ImplicitGrantType(
                 $this->getConfiguration(),
-                $this->getAccessTokenTypeManager(),
+                $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager()
             );
         }
@@ -698,7 +698,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $jwt_encrypter,
                 $this->getExceptionManager(),
                 $this->getConfiguration(),
-                $this->getAccessTokenTypeManager()
+                $this->getTokenTypeManager()
             );
             $this->jwt_access_token_manager->setEncryptionPrivateKey([]);
             $this->jwt_access_token_manager->addTokenUpdater(new FooBarAccessTokenUpdater());
@@ -745,25 +745,25 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return null|\OAuth2\Token\AccessTokenTypeManagerInterface
+     * @return null|\OAuth2\Token\TokenTypeManagerInterface
      */
-    private $access_token_type_manager = null;
+    private $token_type_manager = null;
 
     /**
-     * @return \OAuth2\Token\AccessTokenTypeManagerInterface
+     * @return \OAuth2\Token\TokenTypeManagerInterface
      */
-    protected function getAccessTokenTypeManager()
+    protected function getTokenTypeManager()
     {
-        if (null === $this->access_token_type_manager) {
-            $this->access_token_type_manager = new AccessTokenTypeManager(
+        if (null === $this->token_type_manager) {
+            $this->token_type_manager = new TokenTypeManager(
                 $this->getExceptionManager()
             );
 
-            $this->access_token_type_manager->addAccessTokenType($this->getBearerAccessTokenType(), true);
-            $this->access_token_type_manager->addAccessTokenType($this->getMacAccessTokenType());
+            $this->token_type_manager->addTokenType($this->getBearerAccessTokenType(), true);
+            $this->token_type_manager->addTokenType($this->getMacAccessTokenType());
         }
 
-        return $this->access_token_type_manager;
+        return $this->token_type_manager;
     }
 
     /**
