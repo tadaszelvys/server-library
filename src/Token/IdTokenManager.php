@@ -56,30 +56,28 @@ class  IdTokenManager implements IdTokenManagerInterface
     public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $token_type_information, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null)
     {
         $id_token = $this->createEmptyIdToken();
-        $at_hash = null === $access_token?null:$this->getHash($access_token);
-        $c_hash = null === $auth_code?null:$this->getHash($auth_code);
-
         $exp = time() + $this->getLifetime($client);
 
         $headers = [
             'typ'       => 'JWT',
-            'iat'       => time(),
-            'nbf'       => time(),
-            'exp'       => $exp,
             'alg'       => $this->getSignatureAlgorithm(),
-            'auth_time' => $end_user->getLastLoginAt(),
         ];
 
         $payload = [
-            'iss' => 'My server',
-            'sub' => $end_user->getPublicId(),
-            'aud' => $client->getPublicId(),
+            'iss'       => $this->getConfiguration()->get('id_token_issuer', 'IdToken Server'),
+            'sub'       => $end_user->getPublicId(),
+            'aud'       => $client->getPublicId(),
+            'iat'       => time(),
+            'nbf'       => time(),
+            'exp'       => $exp,
+            'auth_time' => $end_user->getLastLoginAt(),
         ];
-        if (null !== $at_hash) {
-            $payload['at_hash'] = $at_hash;
+
+        if (null !== $access_token) {
+            $payload['at_hash'] = $this->getHash($access_token);
         }
-        if (null !== $c_hash) {
-            $payload['c_hash'] = $c_hash;
+        if (null !== $auth_code) {
+            $payload['c_hash'] = $this->getHash($auth_code);
         }
         if (!empty($id_token_claims)) {
             $payload = array_merge($payload, $id_token_claims);
@@ -109,7 +107,21 @@ class  IdTokenManager implements IdTokenManagerInterface
      */
     public function getIdToken($id_token)
     {
-        // TODO: Implement getIdToken() method.
+        $jws = $this->getJWTLoader()->load($id_token);
+        //$this->getJWTLoader()->verifySignature($jws, );
+
+        $id_token = $this->createEmptyIdToken();
+        $id_token->setToken($id_token);
+        $id_token->setJWS($jws);
+        $id_token->setExpiresAt($jws->getClaim('exp'));
+        $id_token->setClientPublicId($jws->getClaim('aud'));
+        $id_token->setResourceOwnerPublicId($jws->getClaim('sub'));
+        $id_token->setScope([]);
+        $id_token->setAccessTokenHash($jws->hasClaim('at_hash') ? $jws->getClaim('at_hash') : null);
+        $id_token->setAuthorizationCodeHash($jws->hasClaim('c_hash') ? $jws->getClaim('c_hash') : null);
+        $id_token->setNonce($jws->hasClaim('nonce') ? $jws->getClaim('nonce') : null);
+
+        return $id_token;
     }
 
     /**

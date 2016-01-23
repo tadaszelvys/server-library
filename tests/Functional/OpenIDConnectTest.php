@@ -63,6 +63,24 @@ class OpenIDConnectTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"openid","foo":"bar","id_token":"[^"]+"}', $response->getBody()->getContents());
+
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $id_token = $this->getIdTokenManager()->getIdToken($json['id_token']);
+
+        $this->assertInstanceOf('\OAuth2\Token\IdTokenInterface', $id_token);
+
+        $this->assertEquals('My Authorization Server', $id_token->getJWS()->getClaim('iss'));
+        $this->assertEquals('**UNREGISTERED**--foo', $id_token->getJWS()->getClaim('aud'));
+        $this->assertEquals('user1', $id_token->getJWS()->getClaim('sub'));
+        $this->assertEquals('foo/bar', $id_token->getJWS()->getClaim('nonce'));
+        $this->assertTrue($id_token->getJWS()->hasClaim('iat'));
+        $this->assertTrue($id_token->getJWS()->hasClaim('nbf'));
+        $this->assertTrue($id_token->getJWS()->hasClaim('exp'));
+        $this->assertTrue($id_token->getJWS()->hasClaim('auth_time'));
+        $this->assertTrue($id_token->getJWS()->hasClaim('at_hash'));
+        $this->assertTrue($id_token->getJWS()->hasClaim('c_hash'));
     }
 
     public function testCodeTokenSuccess()
@@ -104,10 +122,10 @@ class OpenIDConnectTest extends Base
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);
 
-        $access_token = $this->getSimpleStringAccessTokenManager()->getAccessToken($json['access_token']);
+        $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
 
         $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_token);
-        $this->assertTrue($this->getSimpleStringAccessTokenManager()->isAccessTokenValid($access_token));
+        $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
     }
 
     public function testCodeIdTokenTokenSuccess()

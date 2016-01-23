@@ -262,6 +262,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->configuration->set('realm', 'testrealm@host.com');
             $this->configuration->set('jwt_access_token_audience', 'My Authorization Server');
             $this->configuration->set('jwt_access_token_issuer', 'My Authorization Server');
+            $this->configuration->set('id_token_issuer', 'My Authorization Server');
             $this->configuration->set('jwt_access_token_signature_algorithm', 'HS512');
             $this->configuration->set('jwt_access_token_encrypted', true);
             $this->configuration->set('jwt_access_token_key_encryption_algorithm', 'A256KW');
@@ -846,7 +847,7 @@ class Base extends \PHPUnit_Framework_TestCase
                         'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                     ],
                 ]],
-                true
+                false
             );
 
             $this->id_token_manager = new IdTokenManager(
