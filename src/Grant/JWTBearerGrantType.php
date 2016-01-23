@@ -93,12 +93,12 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         $this->getJWTLoader()->verifySignature($jwt, $client);
 
         $issue_refresh_token = $this->getConfiguration()->get('issue_refresh_token_with_client_credentials_grant_type', false);
-        $scope = RequestBody::getParameter($request, 'scope');
+        //$scope = RequestBody::getParameter($request, 'scope');
 
-        $grant_type_response->setRequestedScope($scope);
-        $grant_type_response->setAvailableScope(null);
+        //$grant_type_response->setRequestedScope($scope);
+        //$grant_type_response->setAvailableScope(null);
         $grant_type_response->setResourceOwnerPublicId($client->getPublicId());
         $grant_type_response->setRefreshTokenIssued($issue_refresh_token);
-        $grant_type_response->setRefreshTokenScope($scope);
+        $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
     }
 }

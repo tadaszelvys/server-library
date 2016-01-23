@@ -45,6 +45,7 @@ class ScopeManager extends Base
             'scope2',
             'scope3',
             'scope4',
+            'openid',
         ];
         $this->default_scopes = [
             'scope1',

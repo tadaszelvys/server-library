@@ -156,10 +156,17 @@ final class TokenEndpoint implements TokenEndpointInterface
 
         $grant_type_response->setClientPublicId($client->getPublicId());
 
+        $scope = RequestBody::getParameter($request, 'scope');
+
+        if (null !== $scope) {
+            $scope = $this->getScopeManager()->convertToArray($scope);
+            $grant_type_response->setRequestedScope($scope);
+        }
+
         $type->grantAccessToken($request, $client, $grant_type_response);
 
         $result = [
-            'requested_scope'          => $grant_type_response->getRequestedScope() ?: $this->getScopeManager()->getDefaultScopes($client),
+            'requested_scope'          => $grant_type_response->getRequestedScope()/* ?: $this->getScopeManager()->getDefaultScopes($client)*/,
             'available_scope'          => $grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopes($client),
             'resource_owner_public_id' => $grant_type_response->getResourceOwnerPublicid(),
             'refresh_token'            => [
@@ -172,10 +179,6 @@ final class TokenEndpoint implements TokenEndpointInterface
                 'auth_code' => $grant_type_response->getAuthorizationCodeToHash(),
             ],
         ];
-
-        foreach (['requested_scope', 'available_scope'] as $key) {
-            $result[$key] = $this->getScopeManager()->convertToScope($result[$key]);
-        }
 
         //Modify the scope according to the scope policy
         $result['requested_scope'] = $this->getScopeManager()->checkScopePolicy($client, $result['requested_scope'], $request);
@@ -200,7 +203,22 @@ final class TokenEndpoint implements TokenEndpointInterface
             $token_type_information
         );
 
-        $response->getBody()->write(json_encode($access_token));
+        $data = $access_token->toArray();
+
+        if ($this->getIdTokenManager() instanceof IdTokenManagerInterface && $grant_type_response->isIdTokenIssued()) {
+            $id_token = $this->getIdTokenManager()->createIdToken(
+                $client,
+                $this->getEndUserManager()->getEndUser($grant_type_response->getResourceOwnerPublicId()),
+                $token_type_information,
+                $grant_type_response->getIdTokenClaims(),
+                $access_token,
+                $grant_type_response->getAuthorizationCodeToHash()
+            );
+
+            $data = array_merge($data, $id_token->toArray());
+        }
+
+        $response->getBody()->write(json_encode($data));
         $response = $response->withStatus(200);
         $headers = [
             'Content-Type'  => 'application/json',
@@ -251,7 +269,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         $resource_owner = $this->getResourceOwner($values['resource_owner_public_id']);
         if (null !== $this->getRefreshTokenManager()) {
             if (true === $values['refresh_token']['issued']) {
-                $values['refresh_token']['scope'] = $this->getScopeManager()->convertToScope($values['refresh_token']['scope']);
+                //$values['refresh_token']['scope'] = null === $values['refresh_token']['scope']? [] : $values['refresh_token']['scope'];
                 $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $resource_owner, $values['refresh_token']['scope']);
             }
             if ($values['refresh_token']['used'] instanceof RefreshTokenInterface) {

@@ -128,7 +128,7 @@ final class AuthorizationFactory
     {
         $client = $this->getClient($params);
         $scopes = $this->getScope($params);
-        $authorization = new Authorization($params, $end_user, $is_authorized, $client, $scopes);
+        $authorization =new Authorization($params, $end_user, $is_authorized, $client, $scopes);
 
         return $authorization;
     }
@@ -158,7 +158,8 @@ final class AuthorizationFactory
     private function getScope(array $params)
     {
         if (array_key_exists('scope', $params)) {
-            return $this->getScopeManager()->convertToScope($params['scope']);
+
+            return $this->getScopeManager()->convertToArray($params['scope']);
         }
 
         return [];

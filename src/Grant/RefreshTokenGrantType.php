@@ -71,7 +71,9 @@ final class RefreshTokenGrantType implements GrantTypeSupportInterface
 
         $this->checkRefreshToken($token, $client);
 
-        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $token->getScope());
+        if (empty($grant_type_response->getRequestedScope())) {
+            $grant_type_response->setRequestedScope($token->getScope());
+        }
         $grant_type_response->setAvailableScope($token->getScope());
         $grant_type_response->setResourceOwnerPublicId($token->getResourceOwnerPublicId());
         $grant_type_response->setRefreshTokenIssued(true);

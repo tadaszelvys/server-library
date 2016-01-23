@@ -159,8 +159,17 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         $grant_type_response->setRefreshTokenScope($authCode->getScope());
 
         // ID Token
-        $grant_type_response->setIdTokenIssued(false);
-        $grant_type_response->setAuthorizationCodeToHash($authCode->getToken());
+        if (array_key_exists('nonce', $params = $authCode->getQueryParams())) {
+            $grant_type_response->setIdTokenClaims(array_merge(
+                $grant_type_response->getIdTokenClaims(),
+                ['nonce' => $params['nonce']]
+            ));
+        }
+        $grant_type_response->setIdTokenIssued(
+            is_array($grant_type_response->getRequestedScope()) &&
+            in_array('openid', $grant_type_response->getRequestedScope())
+        );
+        $grant_type_response->setAuthorizationCodeToHash($authCode);
     }
 
     /**

@@ -137,6 +137,16 @@ final class Authorization
     }
 
     /**
+     * @param string $scope
+     *
+     * @return bool
+     */
+    public function hasScope($scope)
+    {
+        return null !== $this->scopes && in_array($scope, $this->scopes);
+    }
+
+    /**
      * @param array $scopes
      */
     public function setScopes(array $scopes)

@@ -42,9 +42,9 @@ abstract class PasswordClientManager implements ClientManagerInterface
      */
     public function getSchemesParameters()
     {
-        $headers[] = sprintf('Basic realm="%s",charset=UTF-8', $this->getConfiguration()->get('realm', 'Service'));
-
-        return $headers;
+        return [
+            sprintf('Basic realm="%s",charset=UTF-8', $this->getConfiguration()->get('realm', 'Service'))
+        ];
     }
 
     /**
@@ -61,10 +61,11 @@ abstract class PasswordClientManager implements ClientManagerInterface
                 $credentials[] = $data;
             }
         }
-        if (null === $client = $this->checkResult($credentials)) {
-            return;
+
+        $client = $this->checkResult($credentials);
+        if ($client instanceof PasswordClientInterface) {
+            $client_credentials = $credentials[0]['client_credentials'];
         }
-        $client_credentials = $credentials[0]['client_credentials'];
 
         return $client;
     }
@@ -78,7 +79,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
             return false;
         }
 
-        return $this->checkClientCredentials($client, $client_credentials, $request, $reason);
+        return hash($this->getHashAlgorithm(), $client->getSalt().$client_credentials) === $client->getSecret();
     }
 
     /**
@@ -102,25 +103,6 @@ abstract class PasswordClientManager implements ClientManagerInterface
 
             $client->clearCredentials();
         }
-    }
-
-    /**
-     * @param \OAuth2\Client\PasswordClientInterface   $client
-     * @param string|array                             $client_credentials
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param null|string                              $reason
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return bool
-     */
-    protected function checkClientCredentials(PasswordClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
-    {
-        if (is_string($client_credentials)) {
-            return hash($this->getHashAlgorithm(), $client->getSalt().$client_credentials) === $client->getSecret();
-        }
-
-        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Client credentials type not supported');
     }
 
     /**

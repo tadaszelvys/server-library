@@ -75,12 +75,9 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, 'Invalid username and password combination');
         }
 
-        $scope = RequestBody::getParameter($request, 'scope');
-
-        $grant_type_response->setRequestedScope($scope);
         $grant_type_response->setResourceOwnerPublicId($end_user->getPublicId());
         $grant_type_response->setRefreshTokenIssued($this->getIssueRefreshToken($client, $end_user));
-        $grant_type_response->setRefreshTokenScope($scope);
+        $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
     }
 
     /**

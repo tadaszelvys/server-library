@@ -54,6 +54,7 @@ use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
+use OAuth2\Token\IdTokenManager;
 use OAuth2\Token\TokenTypeManager;
 use OAuth2\Token\BearerAccessToken;
 use OAuth2\Token\MacAccessToken;
@@ -202,7 +203,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
                 $this->getConfiguration(),
-                $this->getRefreshTokenManager()
+                $this->getRefreshTokenManager(),
+                $this->getIdTokenManager()
             );
 
             $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
@@ -804,6 +806,58 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->auth_code_manager;
+    }
+
+    /**
+     * @return null|\\OAuth2\Token\IdTokenManager
+     */
+    private $id_token_manager = null;
+
+    /**
+     * @return \OAuth2\Token\IdTokenManager
+     */
+    protected function getIdTokenManager()
+    {
+        if (null === $this->id_token_manager) {
+            $jwt_signer = $this->getJWTSigner(
+                ['HS512'],
+                [
+                    'kid' => 'JWK2',
+                    'use' => 'sig',
+                    'kty' => 'oct',
+                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                ]
+            );
+
+            $jwt_loader = $this->getJWTLoader(
+                ['HS512'],
+                ['A256KW', 'A256CBC-HS512'],
+                ['keys' => [
+                    [
+                        'kid' => 'JWK1',
+                        'use' => 'enc',
+                        'kty' => 'oct',
+                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                    ],
+                    [
+                        'kid' => 'JWK2',
+                        'use' => 'sig',
+                        'kty' => 'oct',
+                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                    ],
+                ]],
+                true
+            );
+
+            $this->id_token_manager = new IdTokenManager(
+                $jwt_loader,
+                $jwt_signer,
+                $this->getExceptionManager(),
+                $this->getConfiguration()
+            );
+        }
+
+        return $this->id_token_manager;
     }
 
     /**

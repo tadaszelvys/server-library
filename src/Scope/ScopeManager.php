@@ -109,25 +109,44 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function convertToScope($scopes)
+    public function getScope($scope)
     {
-        if (empty($scopes)) {
-            return [];
-        } elseif (is_array($scopes)) {
-            return $scopes;
-        } elseif (!is_string($scopes)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The parameter must be null,a string or an array of strings.');
-        }
-        $scopes = explode(' ', $scopes);
+        $scope = new Scope($scope);
 
+        return $scope;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertToScope(array $scopes)
+    {
         $result = [];
         foreach ($scopes as $scope) {
-            $this->checkScopeCharset($scope);
-            $this->checkScopeUsedOnce($scope, $scopes);
-            $result[] = $scope;
+
+            $object = $this->getScope($scope);
+            if (!$scope instanceof ScopeInterface) {
+                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('Unable to find scope with name "%".', $scope));
+            }
+            $result[] = $object;
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertToArray($scopes)
+    {
+        $scopes = explode(' ', $scopes);
+
+        foreach ($scopes as $scope) {
+            $this->checkScopeCharset($scope);
+            $this->checkScopeUsedOnce($scope, $scopes);
+        }
+
+        return $scopes;
     }
 
     /**

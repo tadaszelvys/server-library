@@ -11,6 +11,7 @@
 
 namespace OAuth2\Grant;
 
+use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\RefreshTokenInterface;
 
 interface GrantTypeResponseInterface
@@ -31,26 +32,26 @@ interface GrantTypeResponseInterface
     /**
      * The scope requested.
      *
-     * @return string[]|string|null
+     * @return string[]
      */
     public function getRequestedScope();
 
     /**
-     * @param string[]|string|null $requested_scope
+     * @param string[] $requested_scope
      */
-    public function setRequestedScope($requested_scope);
+    public function setRequestedScope(array $requested_scope);
 
     /**
      * The scope available.
      *
-     * @return string[]|string|null
+     * @return null|string[]
      */
     public function getAvailableScope();
 
     /**
-     * @param string[]|string $available_scope
+     * @param string[] $available_scope
      */
-    public function setAvailableScope($available_scope);
+    public function setAvailableScope(array $available_scope);
 
     /**
      * @return string
@@ -66,12 +67,12 @@ interface GrantTypeResponseInterface
      * The resource owner associated with the access token.
      * It could be a user (for Implicit grant type or Resource Owner Password Credentials grant type) or a client_public_id (for Client Credentials grant type).
      *
-     * @return string|null
+     * @return string
      */
     public function getResourceOwnerPublicId();
 
     /**
-     * @param string|null $resource_owner_public_id
+     * @param string $resource_owner_public_id
      */
     public function setResourceOwnerPublicId($resource_owner_public_id);
 
@@ -96,24 +97,24 @@ interface GrantTypeResponseInterface
     public function setIdTokenIssued($issue_id_token);
 
     /**
-     * @return string|null
+     * @return \OAuth2\Token\AuthCodeInterface|null
      */
     public function getAuthorizationCodeToHash();
 
     /**
-     * @param string $auth_code
+     * @param \OAuth2\Token\AuthCodeInterface $auth_code
      */
-    public function setAuthorizationCodeToHash($auth_code);
+    public function setAuthorizationCodeToHash(AuthCodeInterface $auth_code);
 
     /**
-     * @return string[]|string|null If not null, a refresh token will be issued using the scope returned
+     * @return string[]
      */
     public function getRefreshTokenScope();
 
     /**
-     * @param string[]|string[]|string|null $refresh_token_scope
+     * @param string[] $refresh_token_scope
      */
-    public function setRefreshTokenScope($refresh_token_scope);
+    public function setRefreshTokenScope(array $refresh_token_scope);
 
     /**
      * @return \OAuth2\Token\RefreshTokenInterface|null If not null, the refresh token will be revoked
@@ -121,7 +122,17 @@ interface GrantTypeResponseInterface
     public function getRefreshTokenRevoked();
 
     /**
-     * @param \OAuth2\Token\RefreshTokenInterface|null $revoke_refresh_token
+     * @param \OAuth2\Token\RefreshTokenInterface $revoke_refresh_token
      */
     public function setRefreshTokenRevoked(RefreshTokenInterface $revoke_refresh_token);
+
+    /**
+     * @return array
+     */
+    public function getIdTokenClaims();
+
+    /**
+     * @param array $id_token_claims
+     */
+    public function setIdTokenClaims($id_token_claims);
 }

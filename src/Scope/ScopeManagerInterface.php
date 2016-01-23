@@ -72,13 +72,29 @@ interface ScopeManagerInterface
     public function checkScopes(array $requestedScopes, array $availableScopes);
 
     /**
+     * @param string $scope The name of the scope
+     *
+     * @return null|\OAuth2\Scope\ScopeInterface A scope object or null
+     */
+    public function getScope($scope);
+
+    /**
+     * Convert a list of scope into a list of scope objects.
+     *
+     * @param string[] $scope The string to convert
+     *
+     * @throws \InvalidArgumentException If a scope does not exists
+     *
+     * @return \OAuth2\Scope\ScopeInterface An array of scopes
+     */
+    public function convertToScope(array $scope);
+
+    /**
      * Convert a string that contains at least one scope to an array of scopes.
      *
-     * @param null|string|string[] $scope The string to convert
-     *
-     * @throws \Exception If the string contains forbidden characters or if the scope is unknown.
+     * @param string $scope The string to convert
      *
      * @return string[] An array of scopes
      */
-    public function convertToScope($scope);
+    public function convertToArray($scope);
 }

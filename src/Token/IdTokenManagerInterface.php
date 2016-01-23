@@ -17,15 +17,16 @@ use OAuth2\EndUser\EndUserInterface;
 interface IdTokenManagerInterface
 {
     /**
-     * @param \OAuth2\Client\ClientInterface   $client
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
-     * @param array                            $token_type_information
-     * @param null|string                      $at_hash
-     * @param null|string                      $c_hash
+     * @param \OAuth2\Client\ClientInterface          $client
+     * @param \OAuth2\EndUser\EndUserInterface        $end_user
+     * @param array                                   $token_type_information
+     * @param array                                   $id_token_claims
+     * @param \OAuth2\Token\AccessTokenInterface|null $access_token
+     * @param \OAuth2\Token\AuthCodeInterface|null    $auth_code
      *
      * @return mixed
      */
-    public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $token_type_information, $at_hash = null, $c_hash = null);
+    public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $token_type_information, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null);
 
     /**
      * @param \OAuth2\Token\IdTokenInterface $token The ID token to revoke

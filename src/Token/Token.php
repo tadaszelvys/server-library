@@ -21,7 +21,7 @@ class Token implements TokenInterface
     /**
      * @var array
      */
-    protected $scope;
+    protected $scope = [];
 
     /**
      * @var string

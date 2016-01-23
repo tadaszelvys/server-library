@@ -11,44 +11,45 @@
 
 namespace OAuth2\Grant;
 
+use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\RefreshTokenInterface;
 
 final class GrantTypeResponse implements GrantTypeResponseInterface
 {
     /**
-     * @var array
+     * @var array|null
      */
     private $additional_data = null;
 
     /**
-     * @var
+     * @var string[]
      */
-    private $requested_scope = null;
+    private $requested_scope = [];
 
     /**
-     * @var
+     * @var null|string[]
      */
     private $available_scope = null;
 
     /**
-     * @var
+     * @var string
      */
-    private $resource_owner_public_id = null;
+    private $resource_owner_public_id;
 
     /**
-     * @var
+     * @var string
      */
-    private $client_public_id = null;
+    private $client_public_id;
 
     /**
-     * @var
+     * @var bool
      */
     private $issue_refresh_token = false;
 
     /**
-     * @var
+     * @var null|string[]
      */
-    private $refresh_token_scope = null;
+    private $refresh_token_scope = [];
 
     /**
      * @var \OAuth2\Token\RefreshTokenInterface
@@ -56,14 +57,19 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     private $revoke_refresh_token = null;
 
     /**
-     * @var
+     * @var bool
      */
     private $issue_id_token = false;
 
     /**
-     * @var
+     * @var \OAuth2\Token\AuthCodeInterface|null
      */
     private $auth_code = null;
+
+    /**
+     * @var array
+     */
+    private $id_token_claims = [];
 
     /**
      * {@inheritdoc}
@@ -84,7 +90,7 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function setRequestedScope($requested_scope = null)
+    public function setRequestedScope(array $requested_scope)
     {
         $this->requested_scope = $requested_scope;
     }
@@ -100,7 +106,7 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function setAvailableScope($available_scope)
+    public function setAvailableScope(array $available_scope)
     {
         $this->available_scope = $available_scope;
     }
@@ -164,7 +170,7 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function setRefreshTokenScope($refresh_token_scope = null)
+    public function setRefreshTokenScope(array $refresh_token_scope)
     {
         $this->refresh_token_scope = $refresh_token_scope;
     }
@@ -188,7 +194,7 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function setAuthorizationCodeToHash($auth_code)
+    public function setAuthorizationCodeToHash(AuthCodeInterface $auth_code)
     {
         $this->auth_code = $auth_code;
     }
@@ -223,5 +229,21 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function getRefreshTokenRevoked()
     {
         return $this->revoke_refresh_token;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdTokenClaims()
+    {
+        return $this->id_token_claims;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIdTokenClaims($id_token_claims)
+    {
+        $this->id_token_claims = $id_token_claims;
     }
 }
