@@ -26,7 +26,17 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     /**
      * @var string
      */
-    protected $ha1;
+    protected $ha1_md5;
+
+    /**
+     * @var string
+     */
+    protected $ha1_sha256;
+
+    /**
+     * @var string
+     */
+    protected $ha1_sha512;
 
     /**
      * @var string
@@ -94,21 +104,5 @@ class PasswordClient extends ConfidentialClient implements PasswordClientInterfa
     public function clearCredentials()
     {
         $this->plaintext_secret = null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getA1Hash()
-    {
-        return $this->ha1;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setA1Hash($ha1)
-    {
-        $this->ha1 = $ha1;
     }
 }

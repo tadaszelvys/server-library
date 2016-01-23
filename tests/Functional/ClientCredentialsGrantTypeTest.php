@@ -15,7 +15,6 @@ use Jose\JSONSerializationModes;
 use Jose\Object\EncryptionInstruction;
 use Jose\Object\JWK;
 use Jose\Object\SignatureInstruction;
-use OAuth2\Exception\BaseException;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Test\Base;
@@ -144,82 +143,6 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[^"]+,"scope":"scope1 scope2","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256"}', $response->getBody()->getContents());
-    }
-
-    public function testGrantTypeAuthorizedForClientUsingBadDigestAuthenticationScheme1()
-    {
-        $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => '0123456789']);
-
-        try {
-            $this->getTokenEndpoint()->getAccessToken($request, $response);
-        } catch (BaseException $e) {
-            $this->assertEquals('invalid_client', $e->getMessage());
-            $this->assertEquals('Missing mandatory digest value(s): username, realm, nonce, uri, response, opaque.', $e->getDescription());
-            $this->assertEquals(401, $e->getHttpCode());
-            $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
-        }
-    }
-
-    public function testGrantTypeAuthorizedForClientUsingBadDigestAuthenticationScheme2()
-    {
-        $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createHttpDigestWithBadRealm('POST', '/', 'Mufasa', 'Circle Of Life', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))]);
-
-        try {
-            $this->getTokenEndpoint()->getAccessToken($request, $response);
-        } catch (BaseException $e) {
-            $this->assertEquals('invalid_client', $e->getMessage());
-            $this->assertEquals('Response realm name "Foo Bar Service" does not match system realm name of "testrealm@host.com".', $e->getDescription());
-            $this->assertEquals(401, $e->getHttpCode());
-            $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
-        }
-    }
-
-    public function testGrantTypeAuthorizedForClientUsingBadDigestAuthenticationScheme3()
-    {
-        $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createHttpDigestWithoutCNonce('POST', '/', 'Mufasa', 'Circle Of Life', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))]);
-
-        try {
-            $this->getTokenEndpoint()->getAccessToken($request, $response);
-        } catch (BaseException $e) {
-            $this->assertEquals('invalid_client', $e->getMessage());
-            $this->assertEquals('Missing mandatory digest value "nc" or "cnonce".', $e->getDescription());
-            $this->assertEquals(401, $e->getHttpCode());
-            $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
-        }
-    }
-
-    public function testGrantTypeAuthorizedForClientUsingDigestAuthenticationScheme()
-    {
-        $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Circle Of Life', 'auth', http_build_query(['grant_type' => 'client_credentials']))]);
-
-        $this->getTokenEndpoint()->getAccessToken($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
-        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2"}', $response->getBody()->getContents());
-    }
-
-    public function testGrantTypeNotAuthorizedForClientUsingDigestAuthenticationScheme()
-    {
-        $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_DIGEST' => $this->createValidDigest('POST', '/', 'Mufasa', 'Bad secret', 'auth-int', http_build_query(['grant_type' => 'client_credentials']))]);
-
-        try {
-            $this->getTokenEndpoint()->getAccessToken($request, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_client', $e->getMessage());
-            $this->assertEquals('Client authentication failed.', $e->getDescription());
-            $this->assertEquals(401, $e->getHttpCode());
-            $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
-        }
     }
 
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeader()

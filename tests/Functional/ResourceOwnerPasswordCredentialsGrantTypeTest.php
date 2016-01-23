@@ -171,7 +171,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
             $this->assertTrue(array_key_exists('Cache-Control', $e->getResponseHeaders()));
             $this->assertTrue(array_key_exists('Pragma', $e->getResponseHeaders()));
             $this->assertTrue(array_key_exists('WWW-Authenticate', $e->getResponseHeaders()));
-            $this->assertEquals(2, count($e->getResponseHeaders()['WWW-Authenticate']));
+            $this->assertEquals(1, count($e->getResponseHeaders()['WWW-Authenticate']));
         }
     }
 

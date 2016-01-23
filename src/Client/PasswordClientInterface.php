@@ -46,14 +46,4 @@ interface PasswordClientInterface extends ConfidentialClientInterface
     /**
      */
     public function clearCredentials();
-
-    /**
-     * @return string
-     */
-    public function getA1Hash();
-
-    /**
-     * @param string $ha1
-     */
-    public function setA1Hash($ha1);
 }

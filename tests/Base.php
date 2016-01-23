@@ -1155,43 +1155,6 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param        $method
-     * @param        $uri
-     * @param        $client_id
-     * @param        $client_secret
-     * @param string $qop
-     * @param null   $content
-     *
-     * @return string
-     */
-    protected function createValidDigest($method, $uri, $client_id, $client_secret, $qop = 'auth', $content = null)
-    {
-        $expiryTime = microtime(true) + $this->getConfiguration()->get('digest_authentication_nonce_lifetime', 300) * 1000;
-        $signatureValue = hash_hmac('sha512', $expiryTime.$this->getConfiguration()->get('digest_authentication_key'), $this->getConfiguration()->get('digest_authentication_key'));
-        $nonceValue = $expiryTime.':'.$signatureValue;
-        $nonceValueBase64 = base64_encode($nonceValue);
-        $realm = $this->getConfiguration()->get('realm', 'Service');
-
-        $cnonce = uniqid();
-
-        $ha1 = $this->computeHA1($client_id, $realm, $client_secret, $nonceValueBase64, $cnonce);
-        $ha2 = $this->computeHA2($method, $uri, $qop, $content);
-        $response = $this->computeResponse($ha1, $nonceValueBase64, $cnonce, $qop, $ha2);
-
-        return $this->createHttpDigest(
-            $client_id,
-            $realm,
-            $nonceValueBase64,
-            $uri,
-            $qop,
-            '00000001',
-            $cnonce,
-            $response,
-            base64_encode(hash_hmac('sha512', $nonceValueBase64.$realm, $this->getConfiguration()->get('digest_authentication_key'), true))
-        );
-    }
-
-    /**
      * @param $ha1
      * @param $nonceValueBase64
      * @param $cnonce

@@ -29,21 +29,7 @@ final class AuthenticateException extends BaseException implements AuthenticateE
             throw new \InvalidArgumentException('schemes_not_defined');
         }
 
-        $schemes = [];
-        foreach ($data['schemes'] as $scheme => $values) {
-            if (empty($values)) {
-                $schemes[] = $scheme;
-            } else {
-                $result = [];
-                foreach ($values as $key => $value) {
-                    $this->checkHeaderValue($value);
-                    $result[] = sprintf('%s=%s', $key, $this->quote($value));
-                }
-                $schemes[] = $scheme.' '.implode(',', $result);
-            }
-        }
-
-        $this->header = ['WWW-Authenticate' => $schemes];
+        $this->header = ['WWW-Authenticate' => $data['schemes']];
     }
 
     /**
@@ -59,15 +45,5 @@ final class AuthenticateException extends BaseException implements AuthenticateE
      */
     public function getResponseBody()
     {
-    }
-
-    /**
-     * @param string $text
-     *
-     * @return string
-     */
-    private function quote($text)
-    {
-        return sprintf('"%s"', $text);
     }
 }

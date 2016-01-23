@@ -93,7 +93,7 @@ class TokenIntrospectionEndpointTest extends Base
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
-        $this->assertEquals(2, count($headers['WWW-Authenticate']));
+        $this->assertEquals(1, count($headers['WWW-Authenticate']));
     }
 
     public function testAccessTokenIntrospectionAllowedForResourceServerFromTrustedProxy()
@@ -122,7 +122,7 @@ class TokenIntrospectionEndpointTest extends Base
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
-        $this->assertEquals(2, count($headers['WWW-Authenticate']));
+        $this->assertEquals(1, count($headers['WWW-Authenticate']));
     }
 
     public function testAccessTokenIntrospectionNotForAuthenticatedPublicClientAndTypeHint()
@@ -164,7 +164,7 @@ class TokenIntrospectionEndpointTest extends Base
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
-        $this->assertEquals(2, count($headers['WWW-Authenticate']));
+        $this->assertEquals(1, count($headers['WWW-Authenticate']));
     }
 
     public function testRefreshTokenIntrospection()

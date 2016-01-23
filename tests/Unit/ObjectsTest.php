@@ -153,7 +153,7 @@ class ObjectsTest extends Base
 
     public function testAuthenticateException()
     {
-        $exception = new AuthenticateException('foo_error', 'foo_description', 'https://foo.com/error', ['schemes' => ['Bearer' => []]]);
+        $exception = new AuthenticateException('foo_error', 'foo_description', 'https://foo.com/error', ['schemes' => ['Bearer realm="foo",charset=UTF-8']]);
 
         $this->assertNull($exception->getResponseBody());
         $this->assertEquals([
@@ -161,7 +161,7 @@ class ObjectsTest extends Base
             'Cache-Control'    => 'no-store',
             'Pragma'           => 'no-cache',
             'WWW-Authenticate' => [
-                'Bearer',
+                'Bearer realm="foo",charset=UTF-8',
             ],
         ], $exception->getResponseHeaders());
     }
