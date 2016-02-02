@@ -11,13 +11,12 @@
 
 namespace OAuth2\Endpoint;
 
-use OAuth2\Behaviour\HasConfiguration;
+use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasResponseModeSupport;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Client\RegisteredClientInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\ResponseTypeSupportInterface;
@@ -27,7 +26,6 @@ use Psr\Http\Message\ResponseInterface;
 
 final class AuthorizationEndpoint implements AuthorizationEndpointInterface
 {
-    use HasConfiguration;
     use HasExceptionManager;
     use HasScopeManager;
     use HasResponseModeSupport;
@@ -38,19 +36,36 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private $response_types = [];
 
     /**
+     * @var bool
+     */
+    private $redirect_uri_enforced = false;
+
+    /**
+     * @var bool
+     */
+    private $secured_redirect_uri_enforced = false;
+
+    /**
+     * @var bool
+     */
+    private $state_parameter_enforced = false;
+
+    /**
+     * @var bool
+     */
+    private $redirect_uri_required_for_registered_client = false;
+
+    /**
      * AuthorizationEndpoint constructor.
      *
      * @param \OAuth2\Scope\ScopeManagerInterface          $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
     public function __construct(
         ScopeManagerInterface $scope_manager,
-        ExceptionManagerInterface $exception_manager,
-        ConfigurationInterface $configuration
+        ExceptionManagerInterface $exception_manager
     ) {
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
         $this->setScopeManager($scope_manager);
     }
 
@@ -138,7 +153,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkRedirectUriIfRequired(Authorization $authorization)
     {
         //If the redirect URI is not set and the configuration requires it, throws an exception
-        if (true === $this->getConfiguration()->get('enforce_redirect_uri', false) && false === $authorization->has('redirect_uri')) {
+        if (true === $this->isRedirectUriEnforced() && false === $authorization->has('redirect_uri')) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is mandatory');
         }
     }
@@ -171,7 +186,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     private function checkSecuredRedirectUri($redirect_uri)
     {
-        if (true === $this->getConfiguration()->get('enforce_secured_redirect_uri', false) && 'https' !== substr($redirect_uri, 0, 5)) {
+        if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== substr($redirect_uri, 0, 5)) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must be secured');
         }
     }
@@ -212,7 +227,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     private function checkRedirectUriIfRequiredForRegisteredClients()
     {
-        if (true === $this->getConfiguration()->get('enforce_registered_client_redirect_uris', false)) {
+        if (true === $this->isRedirectUriRequiredForRegisteredClients()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Registered clients must register at least one redirect URI');
         }
     }
@@ -251,7 +266,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     private function checkState(Authorization $authorization)
     {
-        if (!$authorization->has('state') && $this->getConfiguration()->get('enforce_state', false)) {
+        if (!$authorization->has('state') && $this->isStateParameterEnforced()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "state" parameter is mandatory');
         }
     }
@@ -299,5 +314,73 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         }
 
         return $this->response_types[$type];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRedirectUriEnforced()
+    {
+        return $this->redirect_uri_enforced;
+    }
+
+    /**
+     * @param bool $redirect_uri_enforced
+     */
+    public function setRedirectUriEnforced($redirect_uri_enforced)
+    {
+        Assertion::boolean($redirect_uri_enforced);
+        $this->redirect_uri_enforced = $redirect_uri_enforced;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSecuredRedirectUriEnforced()
+    {
+        return $this->secured_redirect_uri_enforced;
+    }
+
+    /**
+     * @param bool $secured_redirect_uri_enforced
+     */
+    public function setSecuredRedirectUriEnforced($secured_redirect_uri_enforced)
+    {
+        Assertion::boolean($secured_redirect_uri_enforced);
+        $this->secured_redirect_uri_enforced = $secured_redirect_uri_enforced;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRedirectUriRequiredForRegisteredClients()
+    {
+        return $this->redirect_uri_required_for_registered_client;
+    }
+
+    /**
+     * @param bool $redirect_uri_required_for_registered_client
+     */
+    public function setRedirectUriRequiredForRegisteredClients($redirect_uri_required_for_registered_client)
+    {
+        Assertion::boolean($redirect_uri_required_for_registered_client);
+        $this->$redirect_uri_required_for_registered_client = $redirect_uri_required_for_registered_client;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStateParameterEnforced()
+    {
+        return $this->state_parameter_enforced;
+    }
+
+    /**
+     * @param bool $state_parameter_enforced
+     */
+    public function setStateParameterEnforced($state_parameter_enforced)
+    {
+        Assertion::boolean($state_parameter_enforced);
+        $this->$state_parameter_enforced = $state_parameter_enforced;
     }
 }

@@ -11,11 +11,10 @@
 
 namespace OAuth2\Endpoint\TokenType;
 
+use Assert\Assertion;
 use Jose\Object\JWTInterface;
 use OAuth2\Behaviour\HasAccessTokenManager;
-use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasRefreshTokenManager;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
@@ -26,18 +25,20 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
 {
     use HasAccessTokenManager;
     use HasRefreshTokenManager;
-    use HasConfiguration;
+
+    /**
+     * @var bool
+     */
+    private $refresh_tokens_revoked_with_access_tokens = true;
 
     /**
      * AccessToken constructor.
      *
-     * @param \OAuth2\Configuration\ConfigurationInterface    $configuration
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
      */
-    public function __construct(ConfigurationInterface $configuration, AccessTokenManagerInterface $access_token_manager, RefreshTokenManagerInterface $refresh_token_manager = null)
+    public function __construct(AccessTokenManagerInterface $access_token_manager, RefreshTokenManagerInterface $refresh_token_manager = null)
     {
-        $this->setConfiguration($configuration);
         $this->setAccessTokenManager($access_token_manager);
         if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
             $this->setRefreshTokenManager($refresh_token_manager);
@@ -66,7 +67,7 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
     public function revokeToken(TokenInterface $token)
     {
         if ($token instanceof AccessTokenInterface) {
-            if (true === $this->getConfiguration()->get('revoke_refresh_token_and_access_token', true)
+            if (true === $this->areRefreshTokensRevokedWithAccessTokens()
                 && null !== $token->getRefreshToken()
                 && $this->getRefreshTokenManager() instanceof RefreshTokenManagerInterface) {
                 $refresh_token = $this->getRefreshTokenManager()->getRefreshToken($token->getRefreshToken());
@@ -119,5 +120,19 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
         }
 
         return $result;
+    }
+
+    public function areRefreshTokensRevokedWithAccessTokens()
+    {
+        return $this->refresh_tokens_revoked_with_access_tokens;
+    }
+
+    /**
+     * @param bool $refresh_tokens_revoked_with_access_tokens
+     */
+    public function setRefreshTokensRevokedWithAccessTokens($refresh_tokens_revoked_with_access_tokens)
+    {
+        Assertion::boolean($refresh_tokens_revoked_with_access_tokens);
+        $this->refresh_tokens_revoked_with_access_tokens = $refresh_tokens_revoked_with_access_tokens;
     }
 }

@@ -13,7 +13,6 @@ namespace OAuth2\Test\Stub;
 
 use Jose\Object\JWKSet;
 use OAuth2\Client\JWTClientManager as Base;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
 
@@ -29,11 +28,10 @@ class JWTClientManager extends Base
      *
      * @param \OAuth2\Util\JWTLoader                       $jwt_loader
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager)
     {
-        parent::__construct($jwt_loader, $exception_manager, $configuration);
+        parent::__construct($jwt_loader, $exception_manager);
 
         $keys = ['keys' => [[
                 'kid' => 'JWK1',

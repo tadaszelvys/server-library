@@ -11,11 +11,10 @@
 
 namespace OAuth2\Token;
 
-use OAuth2\Behaviour\HasConfiguration;
+use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Security\DefuseGenerator;
@@ -23,7 +22,6 @@ use Security\DefuseGenerator;
 abstract class AuthCodeManager implements AuthCodeManagerInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
 
     /**
      * @var \OAuth2\Token\TokenUpdaterInterface[]
@@ -31,15 +29,33 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     private $token_updaters = [];
 
     /**
+     * @var string
+     */
+    private $authorization_code_charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/';
+
+    /**
+     * @var int
+     */
+    private $authorization_code_lifetime = 30;
+
+    /**
+     * @var int
+     */
+    private $authorization_code_min_length = 20;
+
+    /**
+     * @var int
+     */
+    private $authorization_code_max_length = 50;
+
+    /**
      * AuthCodeManager constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(ExceptionManagerInterface $exception_manager)
     {
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
     }
 
     /**
@@ -92,7 +108,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     private function generateAuthorizationCode()
     {
         $length = $this->getAuthCodeLength();
-        $charset = $this->getConfiguration()->get('auth_code_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
+        $charset = $this->getAuthorizationCodeCharset();
         try {
             $code = DefuseGenerator::getRandomString($length, $charset);
         } catch (\Exception $e) {
@@ -110,7 +126,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
      */
     private function getLifetime(ClientInterface $client)
     {
-        $lifetime = $this->getConfiguration()->get('auth_code_lifetime', 30);
+        $lifetime = $this->getAuthorizationCodeLifetime();
         if ($client instanceof TokenLifetimeExtensionInterface && ($_lifetime = $client->getTokenLifetime('authcode')) !== null) {
             return $_lifetime;
         }
@@ -125,11 +141,11 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
      */
     private function getAuthCodeLength()
     {
-        $min_length = $this->getConfiguration()->get('auth_code_min_length', 20);
-        $max_length = $this->getConfiguration()->get('auth_code_max_length', 30);
+        $min_length = $this->getAuthorizationCodeMinLength();
+        $max_length = $this->getAuthorizationCodeMaxLength();
         srand();
 
-        return rand(min($min_length, $max_length), max($min_length, $max_length));
+        return rand($min_length, $max_length);
     }
 
     /**
@@ -150,5 +166,75 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
         foreach ($this->token_updaters as $token_updater) {
             $token_updater->updateToken($auth_code);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthorizationCodeCharset()
+    {
+        return $this->authorization_code_charset;
+    }
+
+    /**
+     * @param string $authorization_code_charset
+     */
+    public function setAuthorizationCodeCharset($authorization_code_charset)
+    {
+        Assertion::string($authorization_code_charset);
+        $this->authorization_code_charset = $authorization_code_charset;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAuthorizationCodeLifetime()
+    {
+        return $this->authorization_code_lifetime;
+    }
+
+    /**
+     * @param int $authorization_code_lifetime
+     */
+    public function setAuthorizationCodeLifetime($authorization_code_lifetime)
+    {
+        Assertion::integer($authorization_code_lifetime);
+        $this->authorization_code_lifetime = $authorization_code_lifetime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAuthorizationCodeMinLength()
+    {
+        return $this->authorization_code_min_length;
+    }
+
+    /**
+     * @param int $authorization_code_min_length
+     */
+    public function setAuthorizationCodeMinLength($authorization_code_min_length)
+    {
+        Assertion::integer($authorization_code_min_length);
+        Assertion::lessThan($authorization_code_min_length, $this->getAuthorizationCodeMaxLength());
+        $this->authorization_code_min_length = $authorization_code_min_length;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAuthorizationCodeMaxLength()
+    {
+        return $this->authorization_code_max_length;
+    }
+
+    /**
+     * @param int $authorization_code_max_length
+     */
+    public function setAuthorizationCodeMaxLength($authorization_code_max_length)
+    {
+        Assertion::integer($authorization_code_max_length);
+        Assertion::greaterThan($authorization_code_max_length, $this->getAuthorizationCodeMinLength());
+        $this->authorization_code_max_length = $authorization_code_max_length;
     }
 }

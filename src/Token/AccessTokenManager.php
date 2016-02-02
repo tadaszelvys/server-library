@@ -11,30 +11,22 @@
 
 namespace OAuth2\Token;
 
-use OAuth2\Behaviour\HasConfiguration;
+use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
 abstract class AccessTokenManager implements AccessTokenManagerInterface
 {
-    use HasConfiguration;
-
     /**
      * @var \OAuth2\Token\TokenUpdaterInterface[]
      */
     private $token_updaters = [];
 
     /**
-     * AccessTokenManager constructor.
-     *
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     * @var int
      */
-    public function __construct(ConfigurationInterface $configuration)
-    {
-        $this->setConfiguration($configuration);
-    }
+    private $access_token_lifetime = 3600;
 
     /**
      * {@inheritdoc}
@@ -98,7 +90,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
      */
     protected function getLifetime(ClientInterface $client)
     {
-        $lifetime = $this->getConfiguration()->get('access_token_lifetime', 3600);
+        $lifetime = $this->getAccessTokenLifetime();
         if ($client instanceof TokenLifetimeExtensionInterface && is_int($_lifetime = $client->getTokenLifetime('access_token'))) {
             return $_lifetime;
         }
@@ -125,5 +117,22 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
         foreach ($this->token_updaters as $token_updater) {
             $token_updater->updateToken($access_token);
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getAccessTokenLifetime()
+    {
+        return $this->access_token_lifetime;
+    }
+
+    /**
+     * @param int $access_token_lifetime
+     */
+    public function setAccessTokenLifetime($access_token_lifetime)
+    {
+        Assertion::integer($access_token_lifetime);
+        $this->access_token_lifetime = $access_token_lifetime;
     }
 }

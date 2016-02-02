@@ -11,11 +11,10 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasConfiguration;
+use Assert\Assertion;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
@@ -26,24 +25,25 @@ use Psr\Http\Message\ServerRequestInterface;
 final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
     use HasEndUserManager;
+
+    /**
+     * @var bool
+     */
+    private $issue_refresh_token_with_access_token = true;
 
     /**
      * ResourceOwnerPasswordCredentialsGrantType constructor.
      *
      * @param \OAuth2\EndUser\EndUserManagerInterface      $end_user_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
     public function __construct(
         EndUserManagerInterface $end_user_manager,
-        ExceptionManagerInterface $exception_manager,
-        ConfigurationInterface $configuration
+        ExceptionManagerInterface $exception_manager
     ) {
         $this->setEndUserManager($end_user_manager);
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
     }
 
     /**
@@ -92,6 +92,23 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
             return false;
         }
 
-        return $this->getConfiguration()->get('allow_refresh_token_with_resource_owner_grant_type', true);
+        return $this->isRefreshTokenIssuedWithAccessToken();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRefreshTokenIssuedWithAccessToken()
+    {
+        return $this->issue_refresh_token_with_access_token;
+    }
+
+    /**
+     * @param bool $issue_refresh_token_with_access_token
+     */
+    public function setRefreshTokenIssuedWithAccessToken($issue_refresh_token_with_access_token)
+    {
+        Assertion::boolean($issue_refresh_token_with_access_token);
+        $this->issue_refresh_token_with_access_token = $issue_refresh_token_with_access_token;
     }
 }

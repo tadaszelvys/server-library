@@ -12,7 +12,6 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Token\RefreshTokenInterface;
@@ -30,11 +29,10 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
      * ClientCredentialsGrantType constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(ExceptionManagerInterface $exception_manager)
     {
-        parent::__construct($exception_manager, $configuration);
+        parent::__construct($exception_manager);
 
         $bar = new PasswordClient();
         $bar->setSecret('secret');

@@ -11,9 +11,9 @@
 
 namespace OAuth2\Endpoint;
 
+use Assert\Assertion;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
-use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasIdTokenManager;
@@ -22,7 +22,6 @@ use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponse;
@@ -40,7 +39,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class TokenEndpoint implements TokenEndpointInterface
 {
-    use HasConfiguration;
     use HasIdTokenManager;
     use HasEndUserManager;
     use HasScopeManager;
@@ -53,7 +51,12 @@ final class TokenEndpoint implements TokenEndpointInterface
     /**
      * @var \OAuth2\Grant\GrantTypeSupportInterface[]
      */
-    protected $grant_types = [];
+    private $grant_types = [];
+
+    /**
+     * @var bool
+     */
+    private $access_token_type_parameter_allowed = false;
 
     /**
      * TokenEndpoint constructor.
@@ -64,7 +67,6 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\EndUser\EndUserManagerInterface         $end_user_manager
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface    $configuration
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
      * @param \OAuth2\Token\IdTokenManagerInterface|null      $id_token_manager
      */
@@ -75,7 +77,6 @@ final class TokenEndpoint implements TokenEndpointInterface
         EndUserManagerInterface $end_user_manager,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
-        ConfigurationInterface $configuration,
         RefreshTokenManagerInterface $refresh_token_manager = null,
         IdTokenManagerInterface $id_token_manager = null
     ) {
@@ -85,7 +86,6 @@ final class TokenEndpoint implements TokenEndpointInterface
         $this->setEndUserManager($end_user_manager);
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
         if ($id_token_manager instanceof IdTokenManagerInterface) {
             $this->setIdTokenManager($id_token_manager);
         }
@@ -189,7 +189,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         $request_parameters = RequestBody::getParameters($request);
-        if (true === $this->getConfiguration()->get('allow_access_token_type_parameter', false) && array_key_exists('token_type', $request_parameters)) {
+        if (true === $this->isAccessTokenTypeParameterAllowed() && array_key_exists('token_type', $request_parameters)) {
             $token_type = $this->getTokenTypeManager()->getTokenType($request_parameters['token_type']);
         } else {
             $token_type = $this->getTokenTypeManager()->getDefaultTokenType();
@@ -336,5 +336,19 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
+    }
+
+    public function isAccessTokenTypeParameterAllowed()
+    {
+        return $this->access_token_type_parameter_allowed;
+    }
+
+    /**
+     * @param bool $access_token_type_parameter_allowed
+     */
+    public function setAccessTokenTypeParameterAllowed($access_token_type_parameter_allowed)
+    {
+        Assertion::boolean($access_token_type_parameter_allowed);
+        $this->access_token_type_parameter_allowed = $access_token_type_parameter_allowed;
     }
 }

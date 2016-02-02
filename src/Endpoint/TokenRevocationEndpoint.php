@@ -12,7 +12,6 @@
 namespace OAuth2\Endpoint;
 
 use OAuth2\Behaviour\HasClientManagerSupervisor;
-use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
@@ -27,7 +26,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
 {
-    use HasConfiguration;
     use HasExceptionManager;
     use HasClientManagerSupervisor;
 

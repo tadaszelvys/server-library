@@ -11,12 +11,11 @@
 
 namespace OAuth2\Grant;
 
+use Assert\Assertion;
 use OAuth2\Behaviour\HasAuthorizationCodeManager;
-use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
@@ -30,7 +29,6 @@ use Psr\Http\Message\ServerRequestInterface;
 final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
     use HasAuthorizationCodeManager;
 
     /**
@@ -39,17 +37,20 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     private $pkce_methods = [];
 
     /**
+     * @var bool
+     */
+    private $pkce_for_public_clients_enforced = false;
+
+    /**
      * AuthorizationCodeGrantType constructor.
      *
      * @param \OAuth2\Token\AuthCodeManagerInterface       $auth_code_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager)
     {
         $this->setAuthorizationCodeManager($auth_code_manager);
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
 
         $this->addPKCEMethod(new Plain());
         $this->addPKCEMethod(new S256());
@@ -221,7 +222,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     {
         $params = $authCode->getQueryParams();
         if (!array_key_exists('code_challenge', $params)) {
-            if (true === $this->getConfiguration()->get('enforce_pkce_for_public_clients', false) && !$client instanceof ConfidentialClientInterface) {
+            if (true === $this->isPKCEForPublicClientsEnforced() && !$client instanceof ConfidentialClientInterface) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Non-confidential clients must set a proof key (PKCE) for code exchange.');
             }
 
@@ -285,5 +286,22 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         if ($authCode->hasExpired()) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, 'The authorization code has expired.');
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPKCEForPublicClientsEnforced()
+    {
+        return $this->pkce_for_public_clients_enforced;
+    }
+
+    /**
+     * @param bool $pkce_for_public_clients_enforced
+     */
+    public function setPKCEForPublicClientsEnforced($pkce_for_public_clients_enforced)
+    {
+        Assertion::boolean($pkce_for_public_clients_enforced);
+        $this->pkce_for_public_clients_enforced = $pkce_for_public_clients_enforced;
     }
 }

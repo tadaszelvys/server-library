@@ -11,7 +11,6 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
@@ -30,25 +29,40 @@ class JWTAccessTokenManager extends Base
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader                       $jwt_loader
-     * @param \OAuth2\Util\JWTSigner                       $jwt_signer
-     * @param \OAuth2\Util\JWTEncrypter                    $jwt_encrypter
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     * @param \OAuth2\Util\JWTLoader                      $jwt_loader
+     * @param \OAuth2\Util\JWTSigner                      $jwt_signer
+     * @param \OAuth2\Util\JWTEncrypter                   $jwt_encrypter
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param string                                      $issuer
+     * @param string                                      $audience
+     * @param string                                      $signature_algorithm
+     * @param bool                                        $encrypted_access_token
+     * @param null|string                                 $key_encryption_algorithm
+     * @param null|string                                 $content_encryption_algorithm
      */
     public function __construct(
         JWTLoader $jwt_loader,
         JWTSigner $jwt_signer,
         JWTEncrypter $jwt_encrypter,
         ExceptionManagerInterface $exception_manager,
-        ConfigurationInterface $configuration
+        $issuer,
+        $audience,
+        $signature_algorithm,
+        $encrypted_access_token = false,
+        $key_encryption_algorithm = null,
+        $content_encryption_algorithm = null
     ) {
         parent::__construct(
             $jwt_loader,
             $jwt_signer,
             $jwt_encrypter,
             $exception_manager,
-            $configuration
+            $issuer,
+            $audience,
+            $signature_algorithm,
+            $encrypted_access_token,
+            $key_encryption_algorithm,
+            $content_encryption_algorithm
         );
 
         $abcd = new AccessToken();

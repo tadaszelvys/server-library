@@ -11,14 +11,13 @@
 
 namespace OAuth2\Token;
 
+use Assert\Assertion;
 use Base64Url\Base64Url;
-use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasJWTSigner;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
@@ -27,9 +26,23 @@ use OAuth2\Util\JWTSigner;
 class IdTokenManager implements IdTokenManagerInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
     use HasJWTLoader;
     use HasJWTSigner;
+
+    /**
+     * @var int
+     */
+    private $id_token_lifetime = 3600;
+
+    /**
+     * @var string
+     */
+    private $issuer;
+
+    /**
+     * @var string
+     */
+    private $signature_algorithm;
 
     /**
      * IdTokenManager constructor.
@@ -37,17 +50,22 @@ class IdTokenManager implements IdTokenManagerInterface
      * @param \OAuth2\Util\JWTLoader                       $loader
      * @param \OAuth2\Util\JWTSigner                       $signer
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     * @param \string                                      $issuer
+     * @param \string                                      $signature_algorithm
      */
     public function __construct(JWTLoader $loader,
                                 JWTSigner $signer,
                                 ExceptionManagerInterface $exception_manager,
-                                ConfigurationInterface $configuration
+                                $issuer,
+                                $signature_algorithm
     ) {
+        Assertion::string($issuer);
+        Assertion::string($signature_algorithm);
+        $this->issuer = $issuer;
+        $this->signature_algorithm = $signature_algorithm;
         $this->setJWTLoader($loader);
         $this->setJWTSigner($signer);
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
     }
 
     /**
@@ -64,7 +82,7 @@ class IdTokenManager implements IdTokenManagerInterface
         ];
 
         $payload = [
-            'iss'       => $this->getConfiguration()->get('id_token_issuer', 'IdToken Server'),
+            'iss'       => $this->issuer,
             'sub'       => $end_user->getPublicId(),
             'aud'       => $client->getPublicId(),
             'iat'       => time(),
@@ -147,22 +165,25 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     private function getHash(TokenInterface $token)
     {
-        $signature_algorithm = $this->getConfiguration()->get('id_token_signature_algorithm', null);
-
         return substr(
             Base64Url::encode(hash(
-                $this->getHashMethod($signature_algorithm),
+                $this->getHashMethod(),
                 $token->getToken(),
                 true
             )),
             0,
-            $this->getHashSize($signature_algorithm)
+            $this->getHashSize()
         );
     }
 
-    private function getHashMethod($id_token_signature_alogrithm)
+    /**
+     * @return string
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function getHashMethod()
     {
-        switch ($id_token_signature_alogrithm) {
+        switch ($this->signature_algorithm) {
             case 'HS256':
             case 'ES256':
             case 'RS256':
@@ -187,9 +208,14 @@ class IdTokenManager implements IdTokenManagerInterface
         }
     }
 
-    private function getHashSize($id_token_signature_alogrithm)
+    /**
+     * @return int
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function getHashSize()
     {
-        switch ($id_token_signature_alogrithm) {
+        switch ($this->signature_algorithm) {
             case 'HS256':
             case 'ES256':
             case 'RS256':
@@ -221,7 +247,7 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     private function getLifetime(ClientInterface $client)
     {
-        $lifetime = $this->getConfiguration()->get('id_token_lifetime', 3600);
+        $lifetime = $this->getIdTokenLifetime();
         if ($client instanceof TokenLifetimeExtensionInterface && is_int($_lifetime = $client->getTokenLifetime('id_token'))) {
             return $_lifetime;
         }
@@ -236,11 +262,23 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     private function getSignatureAlgorithm()
     {
-        $signature_algorithm = $this->getConfiguration()->get('id_token_signature_algorithm', null);
-        if (!is_string($signature_algorithm)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The signature algorithm used to sign ID tokens is not set.');
-        }
+        return $this->signature_algorithm;
+    }
 
-        return $signature_algorithm;
+    /**
+     * @return int
+     */
+    public function getIdTokenLifetime()
+    {
+        return $this->id_token_lifetime;
+    }
+
+    /**
+     * @param int $id_token_lifetime
+     */
+    public function setIdTokenLifetime($id_token_lifetime)
+    {
+        Assertion::integer($id_token_lifetime);
+        $this->$id_token_lifetime = $id_token_lifetime;
     }
 }

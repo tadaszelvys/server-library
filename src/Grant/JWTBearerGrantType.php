@@ -11,13 +11,12 @@
 
 namespace OAuth2\Grant;
 
+use Assert\Assertion;
 use Jose\Object\JWSInterface;
-use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientWithSignatureCapabilitiesInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
 use OAuth2\Util\RequestBody;
@@ -26,24 +25,25 @@ use Psr\Http\Message\ServerRequestInterface;
 final class JWTBearerGrantType implements GrantTypeSupportInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
     use HasJWTLoader;
+
+    /**
+     * @var bool
+     */
+    private $issue_refresh_token_with_access_token = false;
 
     /**
      * JWTBearerGrantType constructor.
      *
      * @param \OAuth2\Util\JWTLoader                       $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
     public function __construct(
         JWTLoader $loader,
-        ExceptionManagerInterface $exception_manager,
-        ConfigurationInterface $configuration
+        ExceptionManagerInterface $exception_manager
     ) {
         $this->setJWTLoader($loader);
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
     }
 
     /**
@@ -92,13 +92,27 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
 
         $this->getJWTLoader()->verifySignature($jwt, $client);
 
-        $issue_refresh_token = $this->getConfiguration()->get('issue_refresh_token_with_client_credentials_grant_type', false);
-        //$scope = RequestBody::getParameter($request, 'scope');
+        $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
 
-        //$grant_type_response->setRequestedScope($scope);
-        //$grant_type_response->setAvailableScope(null);
         $grant_type_response->setResourceOwnerPublicId($client->getPublicId());
         $grant_type_response->setRefreshTokenIssued($issue_refresh_token);
         $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRefreshTokenIssuedWithAccessToken()
+    {
+        return $this->issue_refresh_token_with_access_token;
+    }
+
+    /**
+     * @param bool $issue_refresh_token_with_access_token
+     */
+    public function setRefreshTokenIssuedWithAccessToken($issue_refresh_token_with_access_token)
+    {
+        Assertion::boolean($issue_refresh_token_with_access_token);
+        $this->issue_refresh_token_with_access_token = $issue_refresh_token_with_access_token;
     }
 }

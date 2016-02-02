@@ -11,7 +11,6 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AuthCode;
 use OAuth2\Token\AuthCodeInterface;
@@ -25,11 +24,10 @@ class AuthCodeManager extends Base
      * AuthCodeManager constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(ExceptionManagerInterface $exception_manager)
     {
-        parent::__construct($exception_manager, $configuration);
+        parent::__construct($exception_manager);
 
         $valid_auth_code1 = new AuthCode();
         $valid_auth_code1->setIssueRefreshToken(true);

@@ -11,6 +11,7 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Endpoint\ResponseModeInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -24,14 +25,14 @@ trait HasResponseModeSupport
     abstract public function getExceptionManager();
 
     /**
-     * @return \OAuth2\Configuration\ConfigurationInterface
-     */
-    abstract public function getConfiguration();
-
-    /**
      * @var \OAuth2\Endpoint\ResponseModeInterface[]
      */
     private $response_modes = [];
+
+    /**
+     * @var bool
+     */
+    private $response_mode_parameter_in_authorization_request_allowed = false;
 
     /**
      * @param \OAuth2\Grant\ResponseTypeSupportInterface $type
@@ -44,7 +45,7 @@ trait HasResponseModeSupport
     public function getResponseMode(ResponseTypeSupportInterface $type, Authorization $authorization)
     {
         if ($authorization->has('response_mode')) {
-            if ($this->getConfiguration()->get('allow_response_mode_parameter_in_authorization_request', false)) {
+            if ($this->isResponseModeParameterInAuthorizationRequestAllowed()) {
                 return $this->getResponseModeService($authorization->get('response_mode'));
             }
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The response mode parameter is not authorized.');
@@ -83,5 +84,22 @@ trait HasResponseModeSupport
     public function addResponseMode(ResponseModeInterface $response_mode)
     {
         $this->response_modes[$response_mode->getName()] = $response_mode;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isResponseModeParameterInAuthorizationRequestAllowed()
+    {
+        return $this->response_mode_parameter_in_authorization_request_allowed;
+    }
+
+    /**
+     * @param bool $response_mode_parameter_in_authorization_request_allowed
+     */
+    public function setResponseModeParameterInAuthorizationRequestAllowed($response_mode_parameter_in_authorization_request_allowed)
+    {
+        Assertion::boolean($response_mode_parameter_in_authorization_request_allowed);
+        $this->response_mode_parameter_in_authorization_request_allowed = $response_mode_parameter_in_authorization_request_allowed;
     }
 }

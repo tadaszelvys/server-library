@@ -24,18 +24,6 @@ use OAuth2\Token\AuthCode;
  */
 class ObjectsTest extends Base
 {
-    public function testConfiguration()
-    {
-        $this->assertNull($this->getConfiguration()->get('foo'));
-
-        $this->assertEquals('bar', $this->getConfiguration()->get('foo', 'bar'));
-
-        $this->getConfiguration()->set('foo', 'baz');
-        $this->assertEquals('baz', $this->getConfiguration()->get('foo'));
-
-        $this->getConfiguration()->delete('foo');
-        $this->assertNull($this->getConfiguration()->get('foo'));
-    }
 
     public function testClient()
     {

@@ -11,9 +11,8 @@
 
 namespace OAuth2\Client;
 
-use OAuth2\Behaviour\HasConfiguration;
+use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,20 +20,30 @@ use Psr\Http\Message\ServerRequestInterface;
 abstract class PasswordClientManager implements ClientManagerInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
+
+    /**
+     * @var string
+     */
+    private $realm;
+
+    /**
+     * @var bool
+     */
+    private $password_client_credentials_in_body_request_allowed = false;
 
     /**
      * PasswordClientManager constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(ExceptionManagerInterface $exception_manager, $realm)
     {
+        Assertion::string($realm);
+
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
+        $this->realm = $realm;
     }
 
     /**
@@ -43,7 +52,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
     public function getSchemesParameters()
     {
         return [
-            sprintf('Basic realm="%s",charset=UTF-8', $this->getConfiguration()->get('realm', 'Service')),
+            sprintf('Basic realm="%s",charset=UTF-8', $this->getRealm()),
         ];
     }
 
@@ -114,9 +123,10 @@ abstract class PasswordClientManager implements ClientManagerInterface
             'findCredentialsFromBasicAuthenticationScheme',
         ];
 
-        // This authentication method is not recommended by the RFC6749. This option allows to disable this authentication method.
+        // This authentication method is not recommended by the RFC6749.
+        // This option allows to enable this authentication method (not recommended).
         // See http://tools.ietf.org/html/rfc6749#section-2.3.1
-        if ($this->getConfiguration()->get('allow_password_client_credentials_in_body_request', true)) {
+        if ($this->arePasswordClientCredentialsInBodyRequestAllowed()) {
             $methods[] = 'findCredentialsFromRequestBody';
         }
 
@@ -185,5 +195,39 @@ abstract class PasswordClientManager implements ClientManagerInterface
         }
 
         return $this->getClient($result[0]['client_id']);
+    }
+
+    /**
+     * @return string
+     */
+    private function getRealm()
+    {
+        return $this->realm;
+    }
+
+    /**
+     * @return bool
+     */
+    public function arePasswordClientCredentialsInBodyRequestAllowed()
+    {
+        return $this->password_client_credentials_in_body_request_allowed;
+    }
+
+    /**
+     * @param bool $password_client_credentials_in_body_request_allowed
+     */
+    public function setPasswordClientCredentialsInBodyRequestAllowed($password_client_credentials_in_body_request_allowed)
+    {
+        Assertion::boolean($password_client_credentials_in_body_request_allowed);
+        $this->password_client_credentials_in_body_request_allowed = $password_client_credentials_in_body_request_allowed;
+    }
+
+    /**
+     * @param bool $password_client_credentials_in_body_request_allowed
+     */
+    public function setRealm($password_client_credentials_in_body_request_allowed)
+    {
+        Assertion::boolean($password_client_credentials_in_body_request_allowed);
+        $this->password_client_credentials_in_body_request_allowed = $password_client_credentials_in_body_request_allowed;
     }
 }

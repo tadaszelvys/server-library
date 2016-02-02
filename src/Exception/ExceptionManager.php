@@ -10,25 +10,27 @@
  */
 
 namespace OAuth2\Exception;
-
-use OAuth2\Behaviour\HasConfiguration;
-use OAuth2\Configuration\ConfigurationInterface;
+use Assert\Assertion;
 
 /**
  * An exception manager.
  */
 class ExceptionManager implements ExceptionManagerInterface
 {
-    use HasConfiguration;
+    /**
+     * @var string
+     */
+    private $realm;
 
     /**
      * ExceptionManager constructor.
      *
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
+     * @param string $realm
      */
-    public function __construct(ConfigurationInterface $configuration)
+    public function __construct($realm)
     {
-        $this->setConfiguration($configuration);
+        Assertion::string($realm);
+        $this->realm = $realm;
     }
 
     /**
@@ -44,7 +46,7 @@ class ExceptionManager implements ExceptionManagerInterface
     public function getException($type, $error, $error_description = null, array $data = [])
     {
         if ($type === self::AUTHENTICATE && !isset($data['realm'])) {
-            $data['realm'] = $this->getConfiguration()->get('realm', 'Service');
+            $data['realm'] = $this->realm;
         }
 
         $error_uri = $this->getUri($type, $error, $error_description, $data);

@@ -11,27 +11,43 @@
 
 namespace OAuth2\Token;
 
-use OAuth2\Behaviour\HasConfiguration;
+use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Security\DefuseGenerator;
 
 class MacAccessToken implements TokenTypeInterface
 {
-    use HasConfiguration;
     use HasExceptionManager;
+
+    /**
+     * @var string
+     */
+    private $mac_key_charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/';
+
+    /**
+     * @var string
+     */
+    private $mac_algorithm = 'hmac-sha-256';
+
+    /**
+     * @var int
+     */
+    private $mac_key_min_length = 20;
+
+    /**
+     * @var int
+     */
+    private $mac_key_max_length = 50;
 
     /**
      * AuthCodeManager constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(ExceptionManagerInterface $exception_manager)
     {
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
     }
 
     /**
@@ -50,7 +66,7 @@ class MacAccessToken implements TokenTypeInterface
         return [
             'token_type'    => $this->getTokenTypeName(),
             'mac_key'       => $this->generateMacKey(),
-            'mac_algorithm' => $this->getConfiguration()->get('mac_algorithm', 'hmac-sha-256'),
+            'mac_algorithm' => $this->getMacAlgorithm(),
         ];
     }
 
@@ -62,7 +78,7 @@ class MacAccessToken implements TokenTypeInterface
     private function generateMacKey()
     {
         $length = $this->getMacKeyLength();
-        $charset = $this->getConfiguration()->get('mac_key_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
+        $charset = $this->getMacKeyCharset();
         try {
             $mac_key = DefuseGenerator::getRandomString($length, $charset);
         } catch (\Exception $e) {
@@ -80,11 +96,11 @@ class MacAccessToken implements TokenTypeInterface
      */
     private function getMacKeyLength()
     {
-        $min_length = $this->getConfiguration()->get('mac_key_min_length', 20);
-        $max_length = $this->getConfiguration()->get('mac_key_max_length', 30);
+        $min_length = $this->getMacKeyMinLength();
+        $max_length = $this->getMacKeyMaxLength();
         srand();
 
-        return rand(min($min_length, $max_length), max($min_length, $max_length));
+        return rand($min_length, $max_length);
     }
 
     /**
@@ -95,5 +111,75 @@ class MacAccessToken implements TokenTypeInterface
     private function createException($message)
     {
         return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, $message);
+    }
+
+    /**
+     * @return string
+     */
+    public function getMacKeyCharset()
+    {
+        return $this->mac_key_charset;
+    }
+
+    /**
+     * @param string $mac_key_charset
+     */
+    public function setMacKeyCharset($mac_key_charset)
+    {
+        Assertion::string($mac_key_charset);
+        $this->$mac_key_charset = $mac_key_charset;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMacKeyMinLength()
+    {
+        return $this->mac_key_min_length;
+    }
+
+    /**
+     * @param int $mac_key_min_length
+     */
+    public function setMacKeyMinLength($mac_key_min_length)
+    {
+        Assertion::integer($mac_key_min_length);
+        Assertion::lessThan($mac_key_min_length, $this->getMacKeyMaxLength());
+        $this->mac_key_min_length = $mac_key_min_length;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMacKeyMaxLength()
+    {
+        return $this->mac_key_max_length;
+    }
+
+    /**
+     * @param int $mac_key_max_length
+     */
+    public function setMacKeyMaxLength($mac_key_max_length)
+    {
+        Assertion::integer($mac_key_max_length);
+        Assertion::greaterThan($mac_key_max_length, $this->getMacKeyMinLength());
+        $this->mac_key_max_length = $mac_key_max_length;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMacAlgorithm()
+    {
+        return $this->mac_algorithm;
+    }
+
+    /**
+     * @param int $mac_algorithm
+     */
+    public function setMacAlgorithm($mac_algorithm)
+    {
+        Assertion::string($mac_algorithm);
+        $this->mac_algorithm = $mac_algorithm;
     }
 }

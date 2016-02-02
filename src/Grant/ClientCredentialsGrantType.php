@@ -11,29 +11,30 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasConfiguration;
+use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class ClientCredentialsGrantType implements GrantTypeSupportInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
+
+    /**
+     * @var bool
+     */
+    private $issue_refresh_token_with_access_token = false;
 
     /**
      * ClientCredentialsGrantType constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(ExceptionManagerInterface $exception_manager)
     {
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
     }
 
     /**
@@ -60,10 +61,27 @@ final class ClientCredentialsGrantType implements GrantTypeSupportInterface
         if (!$client instanceof ConfidentialClientInterface) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a confidential client');
         }
-        $issue_refresh_token = $this->getConfiguration()->get('issue_refresh_token_with_client_credentials_grant_type', false);
+        $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
 
         $grant_type_response->setResourceOwnerPublicId($client->getPublicId());
         $grant_type_response->setRefreshTokenIssued($issue_refresh_token);
         $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRefreshTokenIssuedWithAccessToken()
+    {
+        return $this->issue_refresh_token_with_access_token;
+    }
+
+    /**
+     * @param bool $issue_refresh_token_with_access_token
+     */
+    public function setRefreshTokenIssuedWithAccessToken($issue_refresh_token_with_access_token)
+    {
+        Assertion::boolean($issue_refresh_token_with_access_token);
+        $this->issue_refresh_token_with_access_token = $issue_refresh_token_with_access_token;
     }
 }

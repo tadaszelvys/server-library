@@ -11,10 +11,8 @@
 
 namespace OAuth2\Client;
 
-use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
@@ -24,7 +22,6 @@ use Psr\Http\Message\ServerRequestInterface;
 abstract class JWTClientManager implements ClientManagerInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
     use HasJWTLoader;
 
     /**
@@ -32,13 +29,11 @@ abstract class JWTClientManager implements ClientManagerInterface
      *
      * @param \OAuth2\Util\JWTLoader                       $jwt_loader
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager)
     {
         $this->setJWTLoader($jwt_loader);
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
     }
 
     /**

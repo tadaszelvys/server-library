@@ -22,7 +22,6 @@ use Jose\Factory\VerifierFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
-use OAuth2\Configuration\Configuration;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\AuthorizationFactory;
 use OAuth2\Endpoint\FormPostResponseMode;
@@ -64,6 +63,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Base extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var string
+     */
+    private $realm = 'testrealm@host.com';
+
     protected function setUp()
     {
         //To fix HHVM tests on Travis-CI
@@ -200,7 +204,6 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getEndUserManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
-                $this->getConfiguration(),
                 $this->getRefreshTokenManager(),
                 $this->getIdTokenManager()
             );
@@ -211,6 +214,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->addGrantType($this->getRefreshTokenGrantType());
             $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
             $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
+
+            $this->token_endpoint->setAccessTokenTypeParameterAllowed(true);
         }
 
         return $this->token_endpoint;
@@ -229,8 +234,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->authorization_endpoint) {
             $this->authorization_endpoint = new AuthorizationEndpoint(
                 $this->getScopeManager(),
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
 
             $this->authorization_endpoint->addResponseType($this->getAuthorizationCodeGrantType());
@@ -240,39 +244,12 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_endpoint->addResponseMode(new QueryResponseMode());
             $this->authorization_endpoint->addResponseMode(new FragmentResponseMode());
             $this->authorization_endpoint->addResponseMode(new FormPostResponseMode());
+
+            $this->authorization_endpoint->setResponseModeParameterInAuthorizationRequestAllowed(true);
+            $this->authorization_endpoint->setStateParameterEnforced(true);
         }
 
         return $this->authorization_endpoint;
-    }
-
-    /**
-     * @var null|\OAuth2\Configuration\Configuration
-     */
-    private $configuration = null;
-
-    /**
-     * @return \OAuth2\Configuration\Configuration
-     */
-    protected function getConfiguration()
-    {
-        if (null === $this->configuration) {
-            $this->configuration = new Configuration();
-            $this->configuration->set('realm', 'testrealm@host.com');
-            $this->configuration->set('jwt_access_token_audience', 'My Authorization Server');
-            $this->configuration->set('jwt_access_token_issuer', 'My Authorization Server');
-            $this->configuration->set('id_token_issuer', 'My Authorization Server');
-            $this->configuration->set('jwt_access_token_signature_algorithm', 'HS512');
-            $this->configuration->set('jwt_access_token_encrypted', true);
-            $this->configuration->set('jwt_access_token_key_encryption_algorithm', 'A256KW');
-            $this->configuration->set('jwt_access_token_content_encryption_algorithm', 'A256CBC-HS512');
-            $this->configuration->set('allow_response_mode_parameter_in_authorization_request', true);
-            $this->configuration->set('multiple_response_types_support_enabled', true);
-            $this->configuration->set('enforce_pkce_for_public_clients', true);
-            $this->configuration->set('allow_access_token_type_parameter', true);
-            $this->configuration->set('id_token_signature_algorithm', 'HS512');
-        }
-
-        return $this->configuration;
     }
 
     /**
@@ -286,9 +263,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getExceptionManager()
     {
         if (null === $this->exception_manager) {
-            $this->exception_manager = new ExceptionManager(
-                $this->getConfiguration()
-            );
+            $this->exception_manager = new ExceptionManager($this->realm);
         }
 
         return $this->exception_manager;
@@ -323,8 +298,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->client_manager_supervisor) {
             $this->client_manager_supervisor = new ClientManagerSupervisor(
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
 
             $this->client_manager_supervisor->addClientManager($this->getUnregisteredClientManager());
@@ -388,10 +362,11 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->password_client_manager) {
             $this->password_client_manager = new PasswordClientManager(
                 $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->realm
             );
 
             $this->password_client_manager->createClients();
+            $this->password_client_manager->setPasswordClientCredentialsInBodyRequestAllowed(true);
         }
 
         return $this->password_client_manager;
@@ -408,10 +383,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getResourceServerManager()
     {
         if (null === $this->resource_server_manager) {
-            $this->resource_server_manager = new ResourceServerManager(
-                $this->getExceptionManager(),
-                $this->getConfiguration()
-            );
+            $this->resource_server_manager = new ResourceServerManager();
 
             $this->resource_server_manager->createResourceServers();
         }
@@ -452,8 +424,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->jwt_client_manager = new JWTClientManager(
                 $jwt_loader,
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
         }
 
@@ -473,9 +444,10 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->authorization_code_grant_type) {
             $this->authorization_code_grant_type = new AuthorizationCodeGrantType(
                 $this->getAuthCodeManager(),
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
+
+            $this->authorization_code_grant_type->setPKCEForPublicClientsEnforced(true);
         }
 
         return $this->authorization_code_grant_type;
@@ -493,8 +465,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->client_credentials_grant_type) {
             $this->client_credentials_grant_type = new ClientCredentialsGrantType(
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
         }
 
@@ -534,8 +505,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->jwt_bearer_grant_type = new JWTBearerGrantType(
                 $jwt_loader,
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
         }
 
@@ -573,7 +543,6 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->implicit_grant_type) {
             $this->implicit_grant_type = new ImplicitGrantType(
-                $this->getConfiguration(),
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager()
             );
@@ -615,8 +584,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->resource_owner_password_credentials_grant_type) {
             $this->resource_owner_password_credentials_grant_type = new ResourceOwnerPasswordCredentialsGrantType(
                 $this->getEndUserManager(),
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
         }
 
@@ -698,8 +666,12 @@ class Base extends \PHPUnit_Framework_TestCase
                 $jwt_signer,
                 $jwt_encrypter,
                 $this->getExceptionManager(),
-                $this->getConfiguration(),
-                $this->getTokenTypeManager()
+                'Foo',
+                'Bar',
+                'HS512',
+                true,
+                'A256KW',
+                'A256CBC-HS512'
             );
             $this->jwt_access_token_manager->setEncryptionPrivateKey(new JWK([
                 'kid' => 'JWK1',
@@ -742,8 +714,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->mac_access_token_type) {
             $this->mac_access_token_type = new MacAccessToken(
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
         }
 
@@ -784,8 +755,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->refresh_token_manager) {
             $this->refresh_token_manager = new RefreshTokenManager(
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
         }
 
@@ -804,8 +774,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->auth_code_manager) {
             $this->auth_code_manager = new AuthCodeManager(
-                $this->getExceptionManager(),
-                $this->getConfiguration()
+                $this->getExceptionManager()
             );
         }
 
@@ -857,7 +826,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $jwt_loader,
                 $jwt_signer,
                 $this->getExceptionManager(),
-                $this->getConfiguration()
+                'My Authorization Server',
+                'HS512'
             );
         }
 
@@ -1003,7 +973,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAccessTokenType()
     {
         return new AccessToken(
-            $this->getConfiguration(),
             $this->getJWTAccessTokenManager(),
             $this->getRefreshTokenManager()
         );

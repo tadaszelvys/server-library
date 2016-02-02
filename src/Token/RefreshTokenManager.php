@@ -11,11 +11,10 @@
 
 namespace OAuth2\Token;
 
-use OAuth2\Behaviour\HasConfiguration;
+use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use Security\DefuseGenerator;
@@ -23,7 +22,6 @@ use Security\DefuseGenerator;
 abstract class RefreshTokenManager implements RefreshTokenManagerInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
 
     /**
      * @var \OAuth2\Token\TokenUpdaterInterface[]
@@ -31,15 +29,33 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     private $token_updaters = [];
 
     /**
+     * @var string
+     */
+    private $refresh_token_charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/';
+
+    /**
+     * @var int
+     */
+    private $refresh_token_lifetime = 1209600;
+
+    /**
+     * @var int
+     */
+    private $refresh_token_min_length = 20;
+
+    /**
+     * @var int
+     */
+    private $refresh_token_max_length = 50;
+
+    /**
      * ClientCredentialsGrantType constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(ExceptionManagerInterface $exception_manager)
     {
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
     }
 
     /**
@@ -90,7 +106,7 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     private function generateToken()
     {
         $length = $this->getRefreshTokenLength();
-        $charset = $this->getConfiguration()->get('refresh_token_charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/');
+        $charset = $this->getRefreshTokenCharset();
         try {
             $token = DefuseGenerator::getRandomString($length, $charset);
         } catch (\Exception $e) {
@@ -114,7 +130,7 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
             return $lifetime;
         }
 
-        return  $this->getConfiguration()->get('refresh_token_lifetime', 1209600);
+        return  $this->getRefreshTokenLifetime();
     }
 
     /**
@@ -124,11 +140,11 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
      */
     private function getRefreshTokenLength()
     {
-        $min_length = $this->getConfiguration()->get('refresh_token_min_length', 20);
-        $max_length = $this->getConfiguration()->get('refresh_token_max_length', 30);
+        $min_length = $this->getRefreshTokenMinLength();
+        $max_length = $this->getRefreshTokenMaxLength();
         srand();
 
-        return rand(min($min_length, $max_length), max($min_length, $max_length));
+        return rand($min_length, $max_length);
     }
 
     /**
@@ -149,5 +165,75 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
         foreach ($this->token_updaters as $token_updater) {
             $token_updater->updateToken($refresh_token);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getRefreshTokenCharset()
+    {
+        return $this->refresh_token_charset;
+    }
+
+    /**
+     * @param string $refresh_token_charset
+     */
+    public function setRefreshTokenCharset($refresh_token_charset)
+    {
+        Assertion::string($refresh_token_charset);
+        $this->refresh_token_charset = $refresh_token_charset;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRefreshTokenLifetime()
+    {
+        return $this->refresh_token_lifetime;
+    }
+
+    /**
+     * @param int $refresh_token_lifetime
+     */
+    public function setRefreshTokenLifetime($refresh_token_lifetime)
+    {
+        Assertion::integer($refresh_token_lifetime);
+        $this->refresh_token_lifetime = $refresh_token_lifetime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRefreshTokenMinLength()
+    {
+        return $this->refresh_token_min_length;
+    }
+
+    /**
+     * @param int $refresh_token_min_length
+     */
+    public function setRefreshTokenMinLength($refresh_token_min_length)
+    {
+        Assertion::integer($refresh_token_min_length);
+        Assertion::lessThan($refresh_token_min_length, $this->getRefreshTokenMaxLength());
+        $this->refresh_token_min_length = $refresh_token_min_length;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRefreshTokenMaxLength()
+    {
+        return $this->refresh_token_max_length;
+    }
+
+    /**
+     * @param int $refresh_token_max_length
+     */
+    public function setRefreshTokenMaxLength($refresh_token_max_length)
+    {
+        Assertion::integer($refresh_token_max_length);
+        Assertion::greaterThan($refresh_token_max_length, $this->getRefreshTokenMinLength());
+        $this->refresh_token_max_length = $refresh_token_max_length;
     }
 }

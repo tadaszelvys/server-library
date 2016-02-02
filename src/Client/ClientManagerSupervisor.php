@@ -11,16 +11,13 @@
 
 namespace OAuth2\Client;
 
-use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ClientManagerSupervisor implements ClientManagerSupervisorInterface
 {
     use HasExceptionManager;
-    use HasConfiguration;
 
     /**
      * @var \OAuth2\Client\ClientManagerInterface[]
@@ -31,12 +28,10 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
      * ClientManagerSupervisor constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \OAuth2\Configuration\ConfigurationInterface $configuration
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, ConfigurationInterface $configuration)
+    public function __construct(ExceptionManagerInterface $exception_manager)
     {
         $this->setExceptionManager($exception_manager);
-        $this->setConfiguration($configuration);
     }
 
     /**
