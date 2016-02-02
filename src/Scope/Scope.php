@@ -11,9 +11,6 @@
 
 namespace OAuth2\Scope;
 
-use OAuth2\Client\ClientInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
 class Scope implements ScopeInterface
 {
     /**

@@ -12,8 +12,8 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
-use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Behaviour\HasConfiguration;
+use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Token\AccessTokenManagerInterface;

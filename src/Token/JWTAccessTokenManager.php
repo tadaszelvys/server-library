@@ -11,7 +11,6 @@
 
 namespace OAuth2\Token;
 
-use Assert\Assertion;
 use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTEncrypter;

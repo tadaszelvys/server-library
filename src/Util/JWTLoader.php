@@ -14,7 +14,6 @@ namespace OAuth2\Util;
 use Jose\DecrypterInterface;
 use Jose\Loader;
 use Jose\Object\JWEInterface;
-use Jose\Object\JWKSet;
 use Jose\Object\JWKSetInterface;
 use Jose\Object\JWSInterface;
 use Jose\VerifierInterface;
@@ -165,7 +164,5 @@ final class JWTLoader
         } catch (\Exception $e) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
-
-
     }
 }
