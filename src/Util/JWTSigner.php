@@ -11,9 +11,8 @@
 
 namespace OAuth2\Util;
 
-use Jose\JSONSerializationModes;
-use Jose\Object\JWK;
-use Jose\Object\SignatureInstruction;
+use Jose\Factory\JWSFactory;
+use Jose\Object\JWKInterface;
 use Jose\SignerInterface;
 
 final class JWTSigner
@@ -31,13 +30,13 @@ final class JWTSigner
     /**
      * JWTSigner constructor.
      *
-     * @param \Jose\SignerInterface $signer
-     * @param array                 $signature_key
+     * @param \Jose\SignerInterface     $signer
+     * @param \Jose\Object\JWKInterface $signature_key
      */
-    public function __construct(SignerInterface $signer, array $signature_key)
+    public function __construct(SignerInterface $signer, JWKInterface $signature_key)
     {
         $this->signer = $signer;
-        $this->signature_key = new JWK($signature_key);
+        $this->signature_key = $signature_key;
     }
 
     /**
@@ -56,12 +55,14 @@ final class JWTSigner
      */
     public function sign(array $claims, array $protected_headers)
     {
-        $instruction = new SignatureInstruction($this->signature_key, $protected_headers);
+        $jws = JWSFactory::createJWS($claims);
 
-        return $this->signer->sign(
-            $claims,
-            [$instruction],
-            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
+        $this->signer->addSignature(
+            $jws,
+            $this->signature_key,
+            $protected_headers
         );
+
+        return $jws->toCompactJSON(0);
     }
 }

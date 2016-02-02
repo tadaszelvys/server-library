@@ -11,10 +11,9 @@
 
 namespace OAuth2\Test\Functional;
 
-use Jose\JSONSerializationModes;
-use Jose\Object\EncryptionInstruction;
+use Jose\Factory\JWEFactory;
+use Jose\Factory\JWSFactory;
 use Jose\Object\JWK;
-use Jose\Object\SignatureInstruction;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Test\Base;
@@ -41,7 +40,16 @@ class JWTBearerGrantTypeTest extends Base
             'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
         ]);
 
-        $signature_instruction = new SignatureInstruction(
+        $jws = JWSFactory::createJWS([
+            'exp' => time() + 3600,
+            'aud' => 'Bad audience',
+            'iss' => 'My JWT issuer',
+            'sub' => 'jwt1',
+        ]);
+
+        $signer = $this->getSigner(['HS512']);
+        $signer->addSignature(
+            $jws,
             $jwk2,
             [
                 'kid' => 'JWK2',
@@ -49,25 +57,9 @@ class JWTBearerGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $signer = $this->getSigner(['HS512']);
-        $jws = $signer->sign(
-            [
-                'exp' => time() + 3600,
-                'aud' => 'Bad audience',
-                'iss' => 'My JWT issuer',
-                'sub' => 'jwt1',
-            ],
-            [$signature_instruction],
-            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
-        );
 
-        $encryption_instruction = new EncryptionInstruction($jwk1);
-
-        $encrypter = $this->getEncrypter(['A256KW', 'A256CBC-HS512']);
-        $jwe = $encrypter->encrypt(
-            $jws,
-            [$encryption_instruction],
-            JSONSerializationModes::JSON_COMPACT_SERIALIZATION,
+        $jwe = JWEFactory::createJWE(
+            $jws->toCompactJSON(0),
             [
                 'kid' => 'JWK1',
                 'cty' => 'JWT',
@@ -80,12 +72,18 @@ class JWTBearerGrantTypeTest extends Base
             ]
         );
 
+        $encrypter = $this->getEncrypter(['A256KW', 'A256CBC-HS512']);
+        $encrypter->addRecipient(
+            $jwe,
+            $jwk1
+        );
+
         $request = $this->createRequest(
             '/',
             'POST',
             [
                 'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion'  => $jwe,
+                'assertion'  => $jwe->toCompactJSON(0),
             ],
             ['HTTPS' => 'on']
         );
@@ -108,7 +106,16 @@ class JWTBearerGrantTypeTest extends Base
             'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
         ]);
 
-        $signature_instruction = new SignatureInstruction(
+        $jws = JWSFactory::createJWS([
+            'exp' => time() + 3600,
+            'aud' => 'My Authorization Server',
+            'iss' => 'My JWT issuer',
+            'sub' => 'jwt1',
+        ]);
+
+        $signer = $this->getSigner(['HS512']);
+        $signer->addSignature(
+            $jws,
             $jwk2,
             [
                 'kid' => 'JWK2',
@@ -116,24 +123,13 @@ class JWTBearerGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $signer = $this->getSigner(['HS512']);
-        $jws = $signer->sign(
-            [
-                'exp' => time() + 3600,
-                'aud' => 'My Authorization Server',
-                'iss' => 'My JWT issuer',
-                'sub' => 'jwt1',
-            ],
-            [$signature_instruction],
-            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
-        );
 
         $request = $this->createRequest(
             '/',
             'POST',
             [
                 'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion'  => $jws,
+                'assertion'  => $jws->toCompactJSON(0),
             ],
             ['HTTPS' => 'on']
         );
@@ -162,7 +158,16 @@ class JWTBearerGrantTypeTest extends Base
             'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
         ]);
 
-        $signature_instruction = new SignatureInstruction(
+        $jws = JWSFactory::createJWS([
+            'exp' => time() + 3600,
+            'aud' => 'My Authorization Server',
+            'iss' => 'My JWT issuer',
+            'sub' => 'jwt1',
+        ]);
+
+        $signer = $this->getSigner(['HS512']);
+        $signer->addSignature(
+            $jws,
             $jwk2,
             [
                 'kid' => 'JWK2',
@@ -170,25 +175,9 @@ class JWTBearerGrantTypeTest extends Base
                 'alg' => 'HS512',
             ]
         );
-        $signer = $this->getSigner(['HS512']);
-        $jws = $signer->sign(
-            [
-                'exp' => time() + 3600,
-                'aud' => 'My Authorization Server',
-                'iss' => 'My JWT issuer',
-                'sub' => 'jwt1',
-            ],
-            [$signature_instruction],
-            JSONSerializationModes::JSON_COMPACT_SERIALIZATION
-        );
 
-        $encryption_instruction = new EncryptionInstruction($jwk1);
-
-        $encrypter = $this->getEncrypter(['A256KW', 'A256CBC-HS512']);
-        $jwe = $encrypter->encrypt(
-            $jws,
-            [$encryption_instruction],
-            JSONSerializationModes::JSON_COMPACT_SERIALIZATION,
+        $jwe = JWEFactory::createJWE(
+            $jws->toCompactJSON(0),
             [
                 'kid' => 'JWK1',
                 'alg' => 'A256KW',
@@ -200,12 +189,18 @@ class JWTBearerGrantTypeTest extends Base
             ]
         );
 
+        $encrypter = $this->getEncrypter(['A256KW', 'A256CBC-HS512']);
+        $encrypter->addRecipient(
+            $jwe,
+            $jwk1
+        );
+
         $request = $this->createRequest(
             '/',
             'POST',
             [
                 'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion'  => $jwe,
+                'assertion'  => $jwe->toCompactJSON(0),
             ],
             ['HTTPS' => 'on']
         );

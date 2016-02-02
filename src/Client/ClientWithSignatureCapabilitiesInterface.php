@@ -11,15 +11,19 @@
 
 namespace OAuth2\Client;
 
+use Jose\Object\JWKSetInterface;
+
 interface ClientWithSignatureCapabilitiesInterface extends ConfidentialClientInterface
 {
     /**
-     * @param array $key_set
+     * @param \Jose\Object\JWKSetInterface $key_set
+     *
+     * @return mixed
      */
-    public function setSignaturePublicKeySet(array $key_set);
+    public function setSignaturePublicKeySet(JWKSetInterface $key_set);
 
     /**
-     * @return array
+     * @return \Jose\Object\JWKSetInterface
      */
     public function getSignaturePublicKeySet();
 

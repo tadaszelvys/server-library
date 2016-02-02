@@ -12,17 +12,15 @@
 namespace OAuth2\Test;
 
 use Jose\Checker\AudienceChecker;
-use Jose\Checker\CriticalChecker;
 use Jose\Checker\ExpirationChecker;
 use Jose\Checker\IssuedAtChecker;
 use Jose\Checker\NotBeforeChecker;
 use Jose\Factory\DecrypterFactory;
 use Jose\Factory\EncrypterFactory;
-use Jose\Factory\LoaderFactory;
 use Jose\Factory\SignerFactory;
 use Jose\Factory\VerifierFactory;
-use Jose\Payload\JWKConverter;
-use Jose\Payload\JWKSetConverter;
+use Jose\Object\JWK;
+use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Configuration\Configuration;
 use OAuth2\Endpoint\AuthorizationEndpoint;
@@ -703,7 +701,12 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getConfiguration(),
                 $this->getTokenTypeManager()
             );
-            $this->jwt_access_token_manager->setEncryptionPrivateKey([]);
+            $this->jwt_access_token_manager->setEncryptionPrivateKey(new JWK([
+                'kid' => 'JWK1',
+                'use' => 'enc',
+                'kty' => 'oct',
+                'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+            ]));
             $this->jwt_access_token_manager->addTokenUpdater(new FooBarAccessTokenUpdater());
         }
 
@@ -872,12 +875,11 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTLoader(array $allowed_signature_algorithms, array $allowed_encryption_algorithms, array $key_set, $is_encryption_required = false)
     {
         $jwt_loader = new JWTLoader(
-            $this->getLoader(),
             $this->getVerifier($allowed_signature_algorithms),
             $this->getDecrypter($allowed_encryption_algorithms),
             $this->getExceptionManager(),
+            new JWKSet($key_set),
             $allowed_encryption_algorithms,
-            $key_set,
             $is_encryption_required
         );
 
@@ -894,7 +896,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         $jwt_signer = new JWTSigner(
             $this->getSigner($allowed_signature_algorithms),
-            $signature_key
+            new JWK($signature_key)
         );
 
         return $jwt_signer;
@@ -910,7 +912,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         $jwt_encrypter = new JWTEncrypter(
             $this->getEncrypter($allowed_encryption_algorithms),
-            $encryption_key
+            new JWK($encryption_key)
         );
 
         return $jwt_encrypter;
@@ -924,8 +926,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getSigner($allowed_signature_algorithms)
     {
         return SignerFactory::createSigner(
-            $allowed_signature_algorithms,
-            $this->getPayloadConverterManager()
+            $allowed_signature_algorithms
         );
     }
 
@@ -938,7 +939,6 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         return EncrypterFactory::createEncrypter(
             $allowed_encryption_algorithms,
-            $this->getPayloadConverterManager(),
             $this->getCompressionManager()
         );
     }
@@ -952,7 +952,6 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         return DecrypterFactory::createDecrypter(
             $allowed_encryption_algorithms,
-            $this->getPayloadConverterManager(),
             $this->getCompressionManager(),
             $this->getCheckerManager('My Authorization Server')
         );
@@ -972,16 +971,6 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Jose\LoaderInterface
-     */
-    protected function getLoader()
-    {
-        return LoaderFactory::createLoader(
-            $this->getPayloadConverterManager()
-        );
-    }
-
-    /**
      * @param string|string[] $audience
      *
      * @return \Jose\Checker\CheckerManager
@@ -992,7 +981,6 @@ class Base extends \PHPUnit_Framework_TestCase
             new ExpirationChecker(),
             new NotBeforeChecker(),
             new IssuedAtChecker(),
-            new CriticalChecker(),
             new AudienceChecker($audience),
         ];
     }
@@ -1027,17 +1015,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRefreshTokenType()
     {
         return new RefreshToken($this->getRefreshTokenManager());
-    }
-
-    /**
-     * @return \Jose\Payload\PayloadConverterInterface[]
-     */
-    protected function getPayloadConverterManager()
-    {
-        return [
-            new JWKConverter(),
-            new JWKSetConverter(),
-        ];
     }
 
     protected function getSupportedJWTAlgorithms()

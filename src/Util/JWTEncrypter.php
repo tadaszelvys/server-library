@@ -12,9 +12,8 @@
 namespace OAuth2\Util;
 
 use Jose\EncrypterInterface;
-use Jose\JSONSerializationModes;
-use Jose\Object\EncryptionInstruction;
-use Jose\Object\JWK;
+use Jose\Factory\JWEFactory;
+use Jose\Object\JWKInterface;
 
 final class JWTEncrypter
 {
@@ -31,37 +30,36 @@ final class JWTEncrypter
     /**
      * JWTEncrypter constructor.
      *
-     * @param \Jose\EncrypterInterface $encrypter
-     * @param array                    $encryption_key
+     * @param \Jose\EncrypterInterface       $encrypter
+     * @param null|\Jose\Object\JWKInterface $encryption_key
      */
-    public function __construct(EncrypterInterface $encrypter, array $encryption_key)
+    public function __construct(EncrypterInterface $encrypter, JWKInterface $encryption_key = null)
     {
         $this->encrypter = $encrypter;
-        if (!empty($encryption_key)) {
-            $this->encryption_key = new JWK($encryption_key);
-        }
+        $this->encryption_key = $encryption_key;
     }
 
     /**
-     * @param string $payload
-     * @param array  $protected_headers
-     * @param array  $sender_key
+     * @param string                    $payload
+     * @param array                     $protected_headers
+     * @param \Jose\Object\JWKInterface $sender_key
      *
      * @return string
      */
-    public function encrypt($payload, array $protected_headers, array $sender_key = [])
+    public function encrypt($payload, array $protected_headers, JWKInterface $sender_key = null)
     {
         if (null === $this->encryption_key) {
             return $payload;
         }
-        $sender_key = empty($sender_key) ? null : new JWK($sender_key);
-        $instruction = new EncryptionInstruction($this->encryption_key, $sender_key);
 
-        return $this->encrypter->encrypt(
-            $payload,
-            [$instruction],
-            JSONSerializationModes::JSON_COMPACT_SERIALIZATION,
-            $protected_headers
+        $jwe = JWEFactory::createJWE($payload, $protected_headers);
+
+        $this->encrypter->addRecipient(
+            $jwe,
+            $this->encryption_key,
+            $sender_key
         );
+
+        return $jwe->toCompactJSON(0);
     }
 }

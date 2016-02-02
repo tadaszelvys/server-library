@@ -11,6 +11,8 @@
 
 namespace OAuth2\Client;
 
+use Jose\Object\JWKSetInterface;
+
 class JWTClient extends ConfidentialClient implements ClientWithSignatureCapabilitiesInterface
 {
     /**
@@ -19,7 +21,7 @@ class JWTClient extends ConfidentialClient implements ClientWithSignatureCapabil
     protected $allowed_signature_algorithms = [];
 
     /**
-     * @var array
+     * @var \Jose\Object\JWKSetInterface
      */
     protected $signature_public_key_set = [];
 
@@ -32,7 +34,7 @@ class JWTClient extends ConfidentialClient implements ClientWithSignatureCapabil
     /**
      * {@inheritdoc}
      */
-    public function setSignaturePublicKeySet(array $key_set)
+    public function setSignaturePublicKeySet(JWKSetInterface $key_set)
     {
         $this->signature_public_key_set = $key_set;
     }

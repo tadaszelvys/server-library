@@ -11,6 +11,8 @@
 
 namespace OAuth2\Token;
 
+use Assert\Assertion;
+use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTEncrypter;
 use OAuth2\Behaviour\HasJWTLoader;
@@ -45,12 +47,12 @@ class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @var array
+     * @var null|\Jose\Object\JWKSetInterface
      */
-    protected $encryption_private_key = [];
+    private $encryption_private_key;
 
     /**
-     * @return array
+     * @return null|\Jose\Object\JWKSetInterface
      */
     public function getEncryptionPrivateKey()
     {
@@ -58,11 +60,11 @@ class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @param array $encryption_private_key
+     * @param \Jose\Object\JWKInterface $encryption_private_key
      *
      * @return $this
      */
-    public function setEncryptionPrivateKey(array $encryption_private_key)
+    public function setEncryptionPrivateKey(JWKInterface $encryption_private_key)
     {
         $this->encryption_private_key = $encryption_private_key;
     }
@@ -210,13 +212,18 @@ class JWTAccessTokenManager extends AccessTokenManager
             return $payload;
         }
 
+        $key = $this->getEncryptionPrivateKey();
+
+        if (!$key instanceof JWKInterface) {
+            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Encryption is enabled but encryption key is not set.');
+        }
         if (!$this->getJWTEncrypter() instanceof JWTEncrypter) {
             throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'Encrypter is not defined.');
         }
 
         $header = $this->prepareEncryptionHeader($client);
 
-        return $this->getJWTEncrypter()->encrypt($payload, $header, $this->getEncryptionPrivateKey());
+        return $this->getJWTEncrypter()->encrypt($payload, $header, $key);
     }
 
     /**
