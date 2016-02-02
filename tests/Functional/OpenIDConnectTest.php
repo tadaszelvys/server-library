@@ -21,7 +21,6 @@ use Zend\Diactoros\Uri;
  */
 class OpenIDConnectTest extends Base
 {
-
     public function testAuthcodeSuccessWithIdToken()
     {
         $request = new ServerRequest();

@@ -123,7 +123,6 @@ abstract class ScopeManager implements ScopeManagerInterface
     {
         $result = [];
         foreach ($scopes as $scope) {
-
             $object = $this->getScope($scope);
             if (!$scope instanceof ScopeInterface) {
                 throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('Unable to find scope with name "%".', $scope));

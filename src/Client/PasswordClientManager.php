@@ -43,7 +43,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
     public function getSchemesParameters()
     {
         return [
-            sprintf('Basic realm="%s",charset=UTF-8', $this->getConfiguration()->get('realm', 'Service'))
+            sprintf('Basic realm="%s",charset=UTF-8', $this->getConfiguration()->get('realm', 'Service')),
         ];
     }
 

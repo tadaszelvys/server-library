@@ -24,7 +24,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
 use OAuth2\Util\JWTSigner;
 
-class  IdTokenManager implements IdTokenManagerInterface
+class IdTokenManager implements IdTokenManagerInterface
 {
     use HasExceptionManager;
     use HasConfiguration;

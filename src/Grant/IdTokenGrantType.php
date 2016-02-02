@@ -11,13 +11,13 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Behaviour\HasConfiguration;
 use OAuth2\Behaviour\HasIdTokenManager;
+use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Configuration\ConfigurationInterface;
 use OAuth2\Endpoint\Authorization;
-use OAuth2\Token\TokenTypeManagerInterface;
 use OAuth2\Token\IdTokenManagerInterface;
+use OAuth2\Token\TokenTypeManagerInterface;
 
 final class IdTokenGrantType implements ResponseTypeSupportInterface
 {
