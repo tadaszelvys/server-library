@@ -85,7 +85,7 @@ interface ScopeManagerInterface
      *
      * @throws \InvalidArgumentException If a scope does not exists
      *
-     * @return \OAuth2\Scope\ScopeInterface An array of scopes
+     * @return \OAuth2\Scope\ScopeInterface[] An array of scopes
      */
     public function convertToScope(array $scope);
 
