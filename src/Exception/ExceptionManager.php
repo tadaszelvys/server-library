@@ -51,20 +51,28 @@ class ExceptionManager implements ExceptionManagerInterface
 
         $error_uri = $this->getUri($type, $error, $error_description, $data);
 
-        $supported_types = [
-            self::AUTHENTICATE,
-            self::BAD_REQUEST,
-            self::NOT_IMPLEMENTED,
-            self::REDIRECT,
-            self::INTERNAL_SERVER_ERROR,
-        ];
+        $supported_types = $this->getExceptionTypeMap();
 
-        if (in_array($type, $supported_types)) {
-            $exception = sprintf('OAuth2\Exception\%sException', $type);
+        if (array_key_exists($type, $supported_types)) {
+            $class = $supported_types[$type];
 
-            return new $exception($error, $error_description, $error_uri, $data);
+            return new $class($error, $error_description, $error_uri, $data);
         }
 
         throw new \InvalidArgumentException('Unsupported type');
+    }
+    
+    /**
+     * @return array
+     */
+    protected function getExceptionTypeMap()
+    {
+        return [
+            self::AUTHENTICATE          => 'OAuth2\Exception\AuthenticateException',
+            self::BAD_REQUEST           => 'OAuth2\Exception\BadRequestException',
+            self::NOT_IMPLEMENTED       => 'OAuth2\Exception\NotImplementedException',
+            self::REDIRECT              => 'OAuth2\Exception\RedirectException',
+            self::INTERNAL_SERVER_ERROR => 'OAuth2\Exception\InternalServerErrorException',
+        ];
     }
 }
