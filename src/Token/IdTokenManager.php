@@ -50,8 +50,8 @@ class IdTokenManager implements IdTokenManagerInterface
      * @param \OAuth2\Util\JWTLoader                       $loader
      * @param \OAuth2\Util\JWTSigner                       $signer
      * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     * @param \string                                      $issuer
-     * @param \string                                      $signature_algorithm
+     * @param string                                       $issuer
+     * @param string                                       $signature_algorithm
      */
     public function __construct(JWTLoader $loader,
                                 JWTSigner $signer,
@@ -128,16 +128,16 @@ class IdTokenManager implements IdTokenManagerInterface
         $jws = $this->getJWTLoader()->load($id_token);
         //$this->getJWTLoader()->verifySignature($jws, );
 
-        $id_token = $this->createEmptyIdToken();
-        $id_token->setToken($id_token);
-        $id_token->setJWS($jws);
-        $id_token->setExpiresAt($jws->getClaim('exp'));
-        $id_token->setClientPublicId($jws->getClaim('aud'));
-        $id_token->setResourceOwnerPublicId($jws->getClaim('sub'));
-        $id_token->setScope([]);
-        $id_token->setAccessTokenHash($jws->hasClaim('at_hash') ? $jws->getClaim('at_hash') : null);
-        $id_token->setAuthorizationCodeHash($jws->hasClaim('c_hash') ? $jws->getClaim('c_hash') : null);
-        $id_token->setNonce($jws->hasClaim('nonce') ? $jws->getClaim('nonce') : null);
+        $token = $this->createEmptyIdToken();
+        $token->setToken($id_token);
+        $token->setJWS($jws);
+        $token->setExpiresAt($jws->getClaim('exp'));
+        $token->setClientPublicId($jws->getClaim('aud'));
+        $token->setResourceOwnerPublicId($jws->getClaim('sub'));
+        $token->setScope([]);
+        $token->setAccessTokenHash($jws->hasClaim('at_hash') ? $jws->getClaim('at_hash') : null);
+        $token->setAuthorizationCodeHash($jws->hasClaim('c_hash') ? $jws->getClaim('c_hash') : null);
+        $token->setNonce($jws->hasClaim('nonce') ? $jws->getClaim('nonce') : null);
 
         return $id_token;
     }
