@@ -167,7 +167,7 @@ class MacAccessToken implements TokenTypeInterface
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getMacAlgorithm()
     {
