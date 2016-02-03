@@ -131,10 +131,11 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getScopeManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getExceptionManager(),
-                $jwt_loader,
-                true,
-                true
+                $jwt_loader
             );
+
+            $this->authorization_factory->setRequestParameterSupported(true);
+            $this->authorization_factory->setRequestUriParameterSupported(true);
         }
 
         return $this->authorization_factory;

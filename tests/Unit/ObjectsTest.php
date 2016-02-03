@@ -14,6 +14,7 @@ namespace OAuth2\Test\Unit;
 use OAuth2\Client\PublicClient;
 use OAuth2\Exception\AuthenticateException;
 use OAuth2\ResourceServer\ResourceServer;
+use OAuth2\Scope\Scope;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
 use OAuth2\Token\AccessToken;
@@ -42,6 +43,35 @@ class ObjectsTest extends Base
         $this->assertFalse($client->hasRedirectUri('https://bar.com'));
         $this->assertTrue($client->isAllowedGrantType('foo'));
         $this->assertFalse($client->isAllowedGrantType('baz'));
+    }
+
+    public function testScope()
+    {
+        $scope = new Scope('foo');
+
+        $this->assertEquals('foo', $scope->getName());
+    }
+
+    public function testScopeThroughScopeManager()
+    {
+        $scope = $this->getScopeManager()->getScope('foo');
+
+        $this->assertEquals('foo', $scope->getName());
+    }
+
+    public function testScopesThroughScopeManager()
+    {
+        $scopes = $this->getScopeManager()->convertToScope(['foo']);
+
+        $this->assertTrue(is_array($scopes));
+        $this->assertEquals(1, count($scopes));
+        $this->assertEquals('foo', $scopes[0]->getName());
+    }
+
+    public function testAuthorizationFactory()
+    {
+        $this->assertTrue($this->getAuthorizationFactory()->isRequestParameterSupported());
+        $this->assertTrue($this->getAuthorizationFactory()->isRequestUriParameterSupported());
     }
 
     public function testEndUser()
@@ -131,11 +161,17 @@ class ObjectsTest extends Base
         $rs->setAllowedGrantTypes(['foo']);
         $rs->setPublicId('bar');
         $rs->setType(['plic']);
+        $rs->addAllowedGrantType('foo');
+        $rs->removeAllowedGrantType('bar');
+        $rs->setAllowedIpAddresses(['127.0.0.1']);
 
-        $this->assertEquals([], $rs->getAllowedIpAddresses());
+        $this->assertFalse($rs->isAllowedGrantType('foo'));
+        $this->assertFalse($rs->isAllowedGrantType('bar'));
+        $this->assertEquals([], $rs->getAllowedGrantTypes());
+        $this->assertEquals(['127.0.0.1'], $rs->getAllowedIpAddresses());
         $this->assertEquals([], $rs->getAllowedGrantTypes());
         $this->assertEquals('bar', $rs->getPublicId());
-        $this->assertEquals(null, $rs->getServerName());
+        $this->assertNull($rs->getServerName());
         $this->assertEquals('resource_server', $rs->getType());
     }
 

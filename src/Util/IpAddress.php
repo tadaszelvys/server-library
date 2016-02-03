@@ -59,13 +59,6 @@ final class IpAddress
     ];
 
     /**
-     * This class should not be instantiated.
-     */
-    private function __construct()
-    {
-    }
-
-    /**
      * Returns the client IP addresses.
      *
      * In the returned array the most trusted IP address is first, and the

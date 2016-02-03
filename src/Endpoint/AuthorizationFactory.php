@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint;
 
+use Assert\Assertion;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
@@ -33,12 +34,12 @@ final class AuthorizationFactory
     /**
      * @var bool
      */
-    private $is_request_parameter_supported = false;
+    private $request_parameter_supported = false;
 
     /**
      * @var bool
      */
-    private $is_request_uri_parameter_supported = false;
+    private $request_uri_parameter_supported = false;
 
     /**
      * AuthorizationFactory constructor.
@@ -47,23 +48,17 @@ final class AuthorizationFactory
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      * @param \OAuth2\Util\JWTLoader                          $jwt_loader
-     * @param bool                                            $is_request_parameter_supported
-     * @param bool                                            $is_request_uri_parameter_supported
      */
     public function __construct(
         ScopeManagerInterface $scope_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
         ExceptionManagerInterface $exception_manager,
-        JWTLoader $jwt_loader,
-        $is_request_parameter_supported,
-        $is_request_uri_parameter_supported
+        JWTLoader $jwt_loader
     ) {
         $this->setJWTLoader($jwt_loader);
         $this->setScopeManager($scope_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setExceptionManager($exception_manager);
-        $this->is_request_parameter_supported = $is_request_parameter_supported;
-        $this->is_request_uri_parameter_supported = $is_request_uri_parameter_supported;
     }
 
     /**
@@ -71,7 +66,16 @@ final class AuthorizationFactory
      */
     public function isRequestParameterSupported()
     {
-        return $this->is_request_parameter_supported;
+        return $this->request_parameter_supported;
+    }
+
+    /**
+     * @param bool $request_parameter_supported
+     */
+    public function setRequestParameterSupported($request_parameter_supported)
+    {
+        Assertion::boolean($request_parameter_supported);
+        $this->request_parameter_supported = $request_parameter_supported;
     }
 
     /**
@@ -79,7 +83,16 @@ final class AuthorizationFactory
      */
     public function isRequestUriParameterSupported()
     {
-        return $this->is_request_uri_parameter_supported;
+        return $this->request_uri_parameter_supported;
+    }
+
+    /**
+     * @param bool $request_uri_parameter_supported
+     */
+    public function setRequestUriParameterSupported($request_uri_parameter_supported)
+    {
+        Assertion::boolean($request_uri_parameter_supported);
+        $this->request_uri_parameter_supported = $request_uri_parameter_supported;
     }
 
     /**
@@ -92,9 +105,9 @@ final class AuthorizationFactory
     public function createFromRequest(ServerRequestInterface $request, EndUserInterface $end_user, $is_authorized)
     {
         $params = $request->getQueryParams();
-        if (isset($params['request']) && true === $this->isRequestParameterSupported()) {
+        if (array_key_exists('request', $params)) {
             $this->createFromRequestParameter();
-        } elseif (isset($params['request_uri']) && true === $this->isRequestUriParameterSupported()) {
+        } elseif (array_key_exists('request_uri', $params)) {
             $this->createFromRequestUriParameter();
         }
 
@@ -106,6 +119,9 @@ final class AuthorizationFactory
      */
     private function createFromRequestParameter()
     {
+        if (false === $this->isRequestParameterSupported()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "request" is not supported');
+        }
         throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
     }
 
@@ -114,6 +130,9 @@ final class AuthorizationFactory
      */
     private function createFromRequestUriParameter()
     {
+        if (false === $this->isRequestUriParameterSupported()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "request_uri" is not supported');
+        }
         throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
     }
 
