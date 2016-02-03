@@ -107,12 +107,12 @@ class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @var null|\Jose\Object\JWKSetInterface
+     * @var null|\Jose\Object\JWKInterface
      */
     private $encryption_private_key;
 
     /**
-     * @return null|\Jose\Object\JWKSetInterface
+     * @return null|\Jose\Object\JWKInterface
      */
     public function getEncryptionPrivateKey()
     {
