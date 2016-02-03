@@ -45,6 +45,7 @@ use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\JWTClientManager;
+use OAuth2\Test\Stub\NoneListener;
 use OAuth2\Test\Stub\PasswordClientManager;
 use OAuth2\Test\Stub\PublicClientManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
@@ -518,6 +519,23 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @var null|\OAuth2\Test\Stub\NoneListener
+     */
+    private $none_listener = null;
+
+    /**
+     * @return \OAuth2\Test\Stub\NoneListener
+     */
+    public function getNoneListener()
+    {
+        if (null === $this->none_listener) {
+            $this->none_listener =  new NoneListener();
+        }
+
+        return $this->none_listener;
+    }
+
+    /**
      * @var null|\OAuth2\Grant\NoneResponseType
      */
     private $none_response_type = null;
@@ -529,8 +547,11 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->none_response_type) {
             $this->none_response_type = new NoneResponseType(
+                $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager()
             );
+
+            $this->none_response_type->addListener($this->getNoneListener());
         }
 
         return $this->none_response_type;

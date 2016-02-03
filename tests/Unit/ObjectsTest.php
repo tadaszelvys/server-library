@@ -80,6 +80,7 @@ class ObjectsTest extends Base
         $id_token->setParameters(['foo'=>'bar']);
         $id_token->setResourceOwnerPublicId('resource_owner');
         $id_token->setScope([]);
+        $id_token->setTokenType('type');
 
         $this->assertEquals('foo', $id_token->getAccessTokenHash());
         $this->assertEquals('bar', $id_token->getAuthorizationCodeHash());
@@ -88,6 +89,7 @@ class ObjectsTest extends Base
         $this->assertEquals('bar', $id_token->getParameter('foo'));
         $this->assertEquals('resource_owner', $id_token->getResourceOwnerPublicId());
         $this->assertEquals([], $id_token->getScope());
+        $this->assertEquals('type', $id_token->getTokenType());
     }
 
     public function testAuthorizationFactory()

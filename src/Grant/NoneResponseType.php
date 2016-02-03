@@ -11,9 +11,12 @@
 
 namespace OAuth2\Grant;
 
+use Assert\Assertion;
 use OAuth2\Behaviour\HasAccessTokenManager;
+use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Token\AccessTokenManagerInterface;
+use OAuth2\Token\TokenTypeManagerInterface;
 
 /**
  * This response type has been introduced by OpenID Connect
@@ -26,6 +29,7 @@ use OAuth2\Token\AccessTokenManagerInterface;
  */
 final class NoneResponseType implements ResponseTypeSupportInterface
 {
+    use HasTokenTypeManager;
     use HasAccessTokenManager;
 
     /**
@@ -34,12 +38,20 @@ final class NoneResponseType implements ResponseTypeSupportInterface
     private $listeners = [];
 
     /**
+     * @var bool
+     */
+    private $access_token_type_parameter_allowed = false;
+
+    /**
      * NoneResponseType constructor.
      *
+     * @param \OAuth2\Token\TokenTypeManagerInterface   $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
      */
-    public function __construct(AccessTokenManagerInterface $access_token_manager)
-    {
+    public function __construct(TokenTypeManagerInterface $token_type_manager,
+                                AccessTokenManagerInterface $access_token_manager
+    ) {
+        $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
     }
 
@@ -72,10 +84,16 @@ final class NoneResponseType implements ResponseTypeSupportInterface
      */
     public function grantAuthorization(Authorization $authorization)
     {
+        if (true === $this->isAccessTokenTypeParameterAllowed() && array_key_exists('token_type', $authorization->getQueryParams())) {
+            $token_type = $this->getTokenTypeManager()->getTokenType($authorization->getQueryParams()['token_type']);
+        } else {
+            $token_type = $this->getTokenTypeManager()->getDefaultTokenType();
+        }
+
         $token = $this->getAccessTokenManager()->createAccessToken(
             $authorization->getClient(),
             $authorization->getEndUser(),
-            [],
+            $token_type->getTokenTypeInformation(),
             $authorization->getScopes()
         );
 
@@ -84,5 +102,22 @@ final class NoneResponseType implements ResponseTypeSupportInterface
         }
 
         return [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAccessTokenTypeParameterAllowed()
+    {
+        return $this->access_token_type_parameter_allowed;
+    }
+
+    /**
+     * @param bool $access_token_type_parameter_allowed
+     */
+    public function setAccessTokenTypeParameterAllowed($access_token_type_parameter_allowed)
+    {
+        Assertion::boolean($access_token_type_parameter_allowed);
+        $this->access_token_type_parameter_allowed = $access_token_type_parameter_allowed;
     }
 }

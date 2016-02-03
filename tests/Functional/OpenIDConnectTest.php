@@ -168,5 +168,9 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
 
         $this->assertEquals('http://example.com/test?good=false&state=0123456789', $response->getHeader('Location')[0]);
+        $this->assertEquals(1, count($this->getNoneListener()->getAccessTokens()));
+
+        $access_tokens = $this->getNoneListener()->getAccessTokens();
+        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_tokens[0]);
     }
 }
