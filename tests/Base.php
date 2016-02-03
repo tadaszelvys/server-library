@@ -716,6 +716,11 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->mac_access_token_type = new MacAccessToken(
                 $this->getExceptionManager()
             );
+            
+            $this->mac_access_token_type->setMacKeyCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+            $this->mac_access_token_type->setMacKeyMinLength(10);
+            $this->mac_access_token_type->setMacKeyMaxLength(20);
+            $this->mac_access_token_type->setMacAlgorithm('hmac-sha-256');
         }
 
         return $this->mac_access_token_type;
@@ -757,6 +762,11 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->refresh_token_manager = new RefreshTokenManager(
                 $this->getExceptionManager()
             );
+            
+            $this->refresh_token_manager->setRefreshTokenCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+            $this->refresh_token_manager->setRefreshTokenMinLength(10);
+            $this->refresh_token_manager->setRefreshTokenMaxLength(20);
+            $this->refresh_token_manager->setRefreshTokenLifetime(36000);
         }
 
         return $this->refresh_token_manager;
@@ -776,6 +786,11 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->auth_code_manager = new AuthCodeManager(
                 $this->getExceptionManager()
             );
+            
+            $this->auth_code_manager->setAuthorizationCodeCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+            $this->auth_code_manager->setAuthorizationCodeMinLength(10);
+            $this->auth_code_manager->setAuthorizationCodeMaxLength(20);
+            $this->auth_code_manager->setAuthorizationCodeLifetime(15);
         }
 
         return $this->auth_code_manager;
@@ -972,10 +987,14 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getAccessTokenType()
     {
-        return new AccessToken(
+        $access_token_type =  new AccessToken(
             $this->getJWTAccessTokenManager(),
             $this->getRefreshTokenManager()
         );
+        
+        $access_token_type->setRefreshTokensRevokedWithAccessTokens(true);
+        
+        return $access_token_type;
     }
 
     /**
