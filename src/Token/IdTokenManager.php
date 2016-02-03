@@ -139,7 +139,7 @@ class IdTokenManager implements IdTokenManagerInterface
         $token->setAuthorizationCodeHash($jws->hasClaim('c_hash') ? $jws->getClaim('c_hash') : null);
         $token->setNonce($jws->hasClaim('nonce') ? $jws->getClaim('nonce') : null);
 
-        return $id_token;
+        return $token;
     }
 
     /**
