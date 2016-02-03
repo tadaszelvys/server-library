@@ -510,7 +510,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $jwt_loader,
                 $this->getExceptionManager()
             );
-            $this->setRefreshTokenIssuedWithAccessToken(false);
+            $this->jwt_bearer_grant_type->setRefreshTokenIssuedWithAccessToken(false);
         }
 
         return $this->jwt_bearer_grant_type;
