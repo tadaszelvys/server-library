@@ -85,13 +85,13 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
     {
         $this->getParameters($request, $token, $token_type_hint, $callback);
         if (!$this->isRequestSecured($request)) {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
 
             return;
         }
         if (null === $token) {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
 
             return;
@@ -175,7 +175,7 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
             $token_type = $token_types[$token_type_hint];
             $this->tryRevokeToken($token_type, $token, $client);
         } else {
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::NOT_IMPLEMENTED, 'unsupported_token_type', sprintf('Token type "%s" not supported', $token_type_hint));
+            $exception = $this->getExceptionManager()->getNotImplementedException('unsupported_token_type', sprintf('Token type "%s" not supported', $token_type_hint));
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
 
             return;

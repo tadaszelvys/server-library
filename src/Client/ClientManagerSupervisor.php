@@ -96,8 +96,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
             $schemes = array_merge($schemes, $manager_schemes);
         }
 
-        return $this->getExceptionManager()->getException(
-            ExceptionManagerInterface::AUTHENTICATE,
+        return $this->getExceptionManager()->getAuthenticateException(
             ExceptionManagerInterface::INVALID_CLIENT,
             $message,
             ['schemes' => $schemes]

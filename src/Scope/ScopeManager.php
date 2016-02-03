@@ -82,12 +82,12 @@ abstract class ScopeManager implements ScopeManagerInterface
     {
         $policy = $this->getScopePolicy($client, $request);
         if (!in_array($policy, self::supportedPolicies(), true)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, 'The policy must be one of these values: '.json_encode(self::supportedPolicies()));
+            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'The policy must be one of these values: '.json_encode(self::supportedPolicies()));
         }
 
         // If Scopes Policy is set to "error" and no scope is set, then throws an error
         if (empty($scope) && self::POLICY_MODE_ERROR === $policy) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_SCOPE, 'No scope was requested.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'No scope was requested.');
         }
 
         // If Scopes Policy is set to "default" and no scope is set, then application or client defaults are set
@@ -125,7 +125,7 @@ abstract class ScopeManager implements ScopeManagerInterface
         foreach ($scopes as $scope) {
             $object = $this->getScope($scope);
             if (!$scope instanceof ScopeInterface) {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('Unable to find scope with name "%".', $scope));
+                throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, sprintf('Unable to find scope with name "%".', $scope));
             }
             $result[] = $object;
         }
@@ -157,7 +157,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     private function checkScopeUsedOnce($scope, array $scopes)
     {
         if (1 < count(array_keys($scopes, $scope))) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_SCOPE, sprintf('Scope "%s" appears more than once.', $scope));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, sprintf('Scope "%s" appears more than once.', $scope));
         }
     }
 
@@ -169,7 +169,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     private function checkScopeCharset($scope)
     {
         if (1 !== preg_match('/^[\x21\x23-\x5B\x5D-\x7E]+$/', $scope)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_SCOPE, 'Scope contains illegal characters.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'Scope contains illegal characters.');
         }
     }
 }

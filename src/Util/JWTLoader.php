@@ -91,7 +91,7 @@ final class JWTLoader
         if ($jwt instanceof JWEInterface) {
             $jwt = $this->decryptAssertion($jwt);
         } elseif (true === $this->is_encryption_required) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The assertion must be encrypted.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The assertion must be encrypted.');
         }
 
         return $jwt;
@@ -108,7 +108,7 @@ final class JWTLoader
     {
         $jwt = Loader::load($assertion);
         if (!$jwt instanceof JWEInterface && !$jwt instanceof JWSInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The assertion does not contain a single JWS or a single JWE.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The assertion does not contain a single JWS or a single JWE.');
         }
 
         return $jwt;
@@ -128,11 +128,11 @@ final class JWTLoader
         }*/
         $this->decrypter->decryptUsingKeySet($jwe, $this->key_set);
         if (null === $jwe->getPayload()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to decrypt the payload. Please verify keys used for encryption.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to decrypt the payload. Please verify keys used for encryption.');
         }
         $jws = Loader::load($jwe->getPayload());
         if (!$jws instanceof JWSInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The encrypted assertion does not contain a single JWS.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The encrypted assertion does not contain a single JWS.');
         }
 
         return $jws;
@@ -147,22 +147,22 @@ final class JWTLoader
     public function verifySignature(JWSInterface $jws, ClientWithSignatureCapabilitiesInterface $client)
     {
         if (0 === $jws->countSignatures()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The JWS is not signed.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The JWS is not signed.');
         }
 
         try {
             if (false === $signature_id = $this->verifier->verifyWithKeySet($jws, $client->getSignaturePublicKeySet())) {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid signature.');
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid signature.');
             }
             $signature = $jws->getSignature($signature_id);
             $headers = $signature->getAllHeaders();
             if (!in_array($headers['alg'], $client->getAllowedSignatureAlgorithms())) {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($client->getAllowedSignatureAlgorithms())));
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Algorithm not allowed. Authorized algorithms: %s.', json_encode($client->getAllowedSignatureAlgorithms())));
             }
         } catch (BaseException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
     }
 }

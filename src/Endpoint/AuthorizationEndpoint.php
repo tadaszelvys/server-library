@@ -104,7 +104,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
             if (true === $authorization->has('state')) {
                 $params['state'] = $authorization->get('state');
             }
-            $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', $params);
+            $exception = $this->getExceptionManager()->getRedirectException(ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client', $params);
             $exception->getHttpResponse($response);
 
             return;
@@ -133,10 +133,10 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $redirect_uris = $this->getClientRedirectUris($authorization);
 
         if (empty($redirect_uri) && empty($redirect_uris)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is missing. Add "redirect_uri" parameter or store redirect URIs to your client');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is missing. Add "redirect_uri" parameter or store redirect URIs to your client');
         }
         if (!empty($redirect_uri) && !empty($redirect_uris) && false === Uri::isRedirectUriAllowed($redirect_uri, $redirect_uris)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The specified redirect URI is not valid');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The specified redirect URI is not valid');
         }
         if (!empty($redirect_uri)) {
             return $redirect_uri;
@@ -154,7 +154,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         //If the redirect URI is not set and the configuration requires it, throws an exception
         if (true === $this->isRedirectUriEnforced() && false === $authorization->has('redirect_uri')) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is mandatory');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is mandatory');
         }
     }
 
@@ -171,7 +171,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         $uri = parse_url($redirect_uri);
         if (isset($uri['fragment'])) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must not contain fragment');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must not contain fragment');
         }
     }
 
@@ -187,7 +187,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkSecuredRedirectUri($redirect_uri)
     {
         if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== substr($redirect_uri, 0, 5)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must be secured');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must be secured');
         }
     }
 
@@ -228,7 +228,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkRedirectUriIfRequiredForRegisteredClients()
     {
         if (true === $this->isRedirectUriRequiredForRegisteredClients()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Registered clients must register at least one redirect URI');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Registered clients must register at least one redirect URI');
         }
     }
 
@@ -240,7 +240,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkRedirectUriForNonConfidentialClient(RegisteredClientInterface $client)
     {
         if (!$client instanceof ConfidentialClientInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Non-confidential clients must register at least one redirect URI');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Non-confidential clients must register at least one redirect URI');
         }
     }
 
@@ -253,7 +253,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkRedirectUriForConfidentialClient(RegisteredClientInterface $client, Authorization $authorization)
     {
         if ($client instanceof ConfidentialClientInterface && $authorization->has('response_type') && $authorization->get('response_type') === 'token') {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients must register at least one redirect URI when using "token" response type');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients must register at least one redirect URI when using "token" response type');
         }
     }
 
@@ -267,7 +267,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkState(Authorization $authorization)
     {
         if (!$authorization->has('state') && $this->isStateParameterEnforced()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The "state" parameter is mandatory');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "state" parameter is mandatory');
         }
     }
 
@@ -279,12 +279,12 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         } catch (BaseExceptionInterface $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, $e->getMessage());
+            throw $this->getExceptionManager()->getBadRequestException($e->getMessage());
         }
 
         $availableScopes = $this->getScopeManager()->getAvailableScopes($authorization->getClient());
         if (!$this->getScopeManager()->checkScopes($scope, $availableScopes)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_SCOPE, 'An unsupported scope was requested. Available scopes for the client are ['.implode(',', $availableScopes).']');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'An unsupported scope was requested. Available scopes for the client are ['.implode(',', $availableScopes).']');
         }
     }
 
@@ -301,16 +301,16 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.1
          */
         if (!$authorization->has('response_type')) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing');
         }
 
         $type = $authorization->get('response_type');
         if (!array_key_exists($type, $this->response_types)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Response type "'.$type.'" is not supported by this server');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Response type "'.$type.'" is not supported by this server');
         }
 
         if (!$authorization->getClient()->isAllowedGrantType($type)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$authorization->get('response_type').'" is unauthorized for this client.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$authorization->get('response_type').'" is unauthorized for this client.');
         }
 
         return $this->response_types[$type];

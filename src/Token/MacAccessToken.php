@@ -110,7 +110,7 @@ class MacAccessToken implements TokenTypeInterface
      */
     private function createException($message)
     {
-        return $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, $message);
+        return $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, $message);
     }
 
     /**

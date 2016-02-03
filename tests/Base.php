@@ -265,7 +265,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getExceptionManager()
     {
         if (null === $this->exception_manager) {
-            $this->exception_manager = new ExceptionManager($this->realm);
+            $this->exception_manager = new ExceptionManager();
         }
 
         return $this->exception_manager;

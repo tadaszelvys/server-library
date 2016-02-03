@@ -184,13 +184,13 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     {
         $code = RequestBody::getParameter($request, 'code');
         if (null === $code) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Missing parameter. "code" is required.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Missing parameter. "code" is required.');
         }
 
         $auth_code = $this->getAuthorizationCodeManager()->getAuthCode($code);
 
         if (!$auth_code instanceof AuthCodeInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
         }
 
         return $auth_code;
@@ -206,7 +206,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     {
         if (!$client instanceof ConfidentialClientInterface) {
             if (null === ($client_id = RequestBody::getParameter($request, 'client_id')) || $client_id !== $client->getPublicId()) {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The client_id parameter is required for non-confidential clients.');
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The client_id parameter is required for non-confidential clients.');
             }
         }
     }
@@ -223,7 +223,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         $params = $authCode->getQueryParams();
         if (!array_key_exists('code_challenge', $params)) {
             if (true === $this->isPKCEForPublicClientsEnforced() && !$client instanceof ConfidentialClientInterface) {
-                throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Non-confidential clients must set a proof key (PKCE) for code exchange.');
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Non-confidential clients must set a proof key (PKCE) for code exchange.');
             }
 
             return;
@@ -246,15 +246,15 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     private function checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier)
     {
         if (!array_key_exists($code_challenge_method, $this->getPKCEMethods())) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported code challenge method "%s".', $code_challenge_method));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported code challenge method "%s".', $code_challenge_method));
         }
         $method = $this->getPKCEMethod($code_challenge_method);
 
         if (null === $code_verifier) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "code_verifier" is required.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "code_verifier" is required.');
         }
         if (!$method->isChallengeVerified($code_verifier, $code_challenge)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Invalid parameter "code_verifier".');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid parameter "code_verifier".');
         }
     }
 
@@ -267,7 +267,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     private function checkRedirectUri(AuthCodeInterface $authCode, $redirect_uri)
     {
         if (null !== $authCode->getRedirectUri() && $redirect_uri !== $authCode->getRedirectUri()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The redirect URI is missing or does not match.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The redirect URI is missing or does not match.');
         }
     }
 
@@ -280,11 +280,11 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     private function checkAuthCode(AuthCodeInterface $authCode, ClientInterface $client)
     {
         if ($client->getPublicId() !== $authCode->getClientPublicId()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
         }
 
         if ($authCode->hasExpired()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, 'The authorization code has expired.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'The authorization code has expired.');
         }
     }
 

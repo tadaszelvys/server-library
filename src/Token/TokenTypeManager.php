@@ -44,7 +44,7 @@ class TokenTypeManager implements TokenTypeManagerInterface
     public function addTokenType(TokenTypeInterface $token_type, $default = false)
     {
         if ($this->hasTokenType($token_type->getTokenTypeName())) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, ExceptionManagerInterface::SERVER_ERROR, sprintf('Token type "%s" already exist.', $token_type->getTokenTypeName()));
+            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, sprintf('Token type "%s" already exist.', $token_type->getTokenTypeName()));
         }
         $this->token_types[$token_type->getTokenTypeName()] = $token_type;
         if (null === $this->default_token_type || true === $default) {
@@ -66,7 +66,7 @@ class TokenTypeManager implements TokenTypeManagerInterface
     public function getTokenType($token_type_name)
     {
         if (!$this->hasTokenType($token_type_name)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported token type "%s".', $token_type_name));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported token type "%s".', $token_type_name));
         }
 
         return $this->token_types[$token_type_name];

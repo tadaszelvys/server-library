@@ -14,23 +14,35 @@ use Assert\Assertion;
 
 /**
  * An exception manager.
+ *
+ * @method getAuthenticateException(string $error, null $error_description, array $data)
+ * @method getBadRequestException(string $error, null $error_description, array $data)
+ * @method getNotImplementedException(string $error, null $error_description, array $data)
+ * @method getRedirectException(string $error, null $error_description, array $data)
+ * @method getInternalServerErrorException(string $error, null $error_description, array $data)
  */
 class ExceptionManager implements ExceptionManagerInterface
 {
     /**
-     * @var string
-     */
-    private $realm;
-
-    /**
-     * ExceptionManager constructor.
+     * @param string $name
+     * @param $arguments
      *
-     * @param string $realm
+     * @return mixed
      */
-    public function __construct($realm)
+    public function __call($name, array $arguments)
     {
-        Assertion::string($realm);
-        $this->realm = $realm;
+        if (method_exists($this, $name)) {
+            return call_user_func([$this, $name], $arguments);
+        }
+        if (0 === strpos($name, 'get') && 'Exception' === substr($name, -9)) {
+            $arguments = array_merge(
+                [substr($name, 3, strlen($name)-12)],
+                $arguments
+            );
+
+            return call_user_func_array([$this, 'getException'], $arguments);
+        }
+        throw new \BadMethodCallException(sprintf('Method "%s" does not exists.', $name));
     }
 
     /**
@@ -45,9 +57,9 @@ class ExceptionManager implements ExceptionManagerInterface
      */
     public function getException($type, $error, $error_description = null, array $data = [])
     {
-        if ($type === self::AUTHENTICATE && !isset($data['realm'])) {
-            $data['realm'] = $this->realm;
-        }
+        Assertion::string($type);
+        Assertion::string($error);
+        Assertion::nullOrString($error_description);
 
         $error_uri = $this->getUri($type, $error, $error_description, $data);
 

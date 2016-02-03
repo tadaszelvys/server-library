@@ -200,8 +200,7 @@ class IdTokenManager implements IdTokenManagerInterface
             case 'PS512':
                 return 'sha512';
             default:
-                throw $this->getExceptionManager()->getException(
-                    ExceptionManagerInterface::INTERNAL_SERVER_ERROR,
+                throw $this->getExceptionManager()->getInternalServerErrorException(
                     '',
                     ''
                 );
@@ -232,8 +231,7 @@ class IdTokenManager implements IdTokenManagerInterface
             case 'PS512':
                 return 256;
             default:
-                throw $this->getExceptionManager()->getException(
-                    ExceptionManagerInterface::INTERNAL_SERVER_ERROR,
+                throw $this->getExceptionManager()->getInternalServerErrorException(
                     '',
                     ''
                 );

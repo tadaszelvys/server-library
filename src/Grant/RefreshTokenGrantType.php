@@ -60,13 +60,13 @@ final class RefreshTokenGrantType implements GrantTypeSupportInterface
     {
         $refresh_token = RequestBody::getParameter($request, 'refresh_token');
         if (null === $refresh_token) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'No "refresh_token" parameter found');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'No "refresh_token" parameter found');
         }
 
         $token = $this->getRefreshTokenManager()->getRefreshToken($refresh_token);
 
         if (!$token instanceof RefreshTokenInterface || $token->isUsed()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, 'Invalid refresh token');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Invalid refresh token');
         }
 
         $this->checkRefreshToken($token, $client);
@@ -87,11 +87,11 @@ final class RefreshTokenGrantType implements GrantTypeSupportInterface
     public function checkRefreshToken(RefreshTokenInterface $token, ClientInterface $client)
     {
         if ($client->getPublicId() !== $token->getClientPublicId()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, 'Invalid refresh token');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Invalid refresh token');
         }
 
         if ($token->hasExpired()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, 'Refresh token has expired');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Refresh token has expired');
         }
     }
 }

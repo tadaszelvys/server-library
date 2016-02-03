@@ -48,7 +48,7 @@ trait HasResponseModeSupport
             if ($this->isResponseModeParameterInAuthorizationRequestAllowed()) {
                 return $this->getResponseModeService($authorization->get('response_mode'));
             }
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The response mode parameter is not authorized.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The response mode parameter is not authorized.');
         }
 
         return $this->getResponseModeService($type->getResponseMode());
@@ -64,7 +64,7 @@ trait HasResponseModeSupport
     private function getResponseModeService($mode)
     {
         if (!array_key_exists($mode, $this->response_modes)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported response mode "%s".', $mode));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported response mode "%s".', $mode));
         }
 
         return $this->response_modes[$mode];

@@ -122,7 +122,7 @@ abstract class JWTClientManager implements ClientManagerInterface
         $client_assertion = RequestBody::getParameter($request, 'client_assertion');
         //We verify the client assertion exists
         if (null === $client_assertion) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_assertion" is missing.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_assertion" is missing.');
         }
 
         //We load the assertion
@@ -141,14 +141,14 @@ abstract class JWTClientManager implements ClientManagerInterface
     private function checkResult(array $result)
     {
         if (count($result) > 1) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Only one authentication method may be used to authenticate the client.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Only one authentication method may be used to authenticate the client.');
         }
 
         if (count($result) < 1) {
             return;
         }
         if (!$result[0]->hasClaim('sub')) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "sub" is missing.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "sub" is missing.');
         }
 
         $client = $this->getClient($result[0]->getClaim('sub'));

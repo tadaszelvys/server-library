@@ -61,16 +61,16 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     {
         $assertion = RequestBody::getParameter($request, 'assertion');
         if (null === $assertion) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "assertion" is missing.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "assertion" is missing.');
         }
 
         $jwt = $this->getJWTLoader()->load($assertion);
         if (!$jwt instanceof JWSInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain signed claims.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain signed claims.');
         }
 
         if (!$jwt->hasClaim('sub')) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain "sub" claims.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain "sub" claims.');
         }
 
         //We modify the response:
@@ -86,7 +86,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         if (!$client instanceof ClientWithSignatureCapabilitiesInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a JWT client');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a JWT client');
         }
         $jwt = $grant_type_response->getAdditionalData('jwt');
 

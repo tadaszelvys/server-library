@@ -123,15 +123,15 @@ final class TokenEndpoint implements TokenEndpointInterface
     public function getAccessToken(ServerRequestInterface $request, ResponseInterface &$response)
     {
         if (!$this->isRequestSecured($request)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
         }
 
         if ('POST' !== $request->getMethod()) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Method must be POST.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Method must be POST.');
         }
 
         if (null === RequestBody::getParameter($request, 'grant_type')) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "grant_type" parameter is missing.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "grant_type" parameter is missing.');
         }
 
         $this->handleRequest($request, $response);
@@ -185,7 +185,7 @@ final class TokenEndpoint implements TokenEndpointInterface
 
         //Check if scope requested are within the available scope
         if (!$this->getScopeManager()->checkScopes($result['requested_scope'], $result['available_scope'])) {
-            throw $this->getExceptionManager()->getException('BadRequest', 'invalid_scope', 'An unsupported scope was requested. Available scopes are ['.implode(',', $result['available_scope']).']');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'An unsupported scope was requested. Available scopes are ['.implode(',', $result['available_scope']).']');
         }
 
         $request_parameters = RequestBody::getParameters($request);
@@ -301,7 +301,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         if (array_key_exists($grant_type, $this->grant_types)) {
             return $this->grant_types[$grant_type];
         }
-        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::NOT_IMPLEMENTED, ExceptionManagerInterface::UNSUPPORTED_GRANT_TYPE, 'The grant type "'.$grant_type.'" is not supported by this server');
+        throw $this->getExceptionManager()->getNotImplementedException(ExceptionManagerInterface::UNSUPPORTED_GRANT_TYPE, 'The grant type "'.$grant_type.'" is not supported by this server');
     }
 
     /**
@@ -313,7 +313,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     private function checkGrantType(ClientInterface $client, $grant_type)
     {
         if (!$client->isAllowedGrantType($grant_type)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The grant type "'.$grant_type.'" is unauthorized for this client_id');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The grant type "'.$grant_type.'" is unauthorized for this client_id');
         }
     }
 
@@ -335,7 +335,7 @@ final class TokenEndpoint implements TokenEndpointInterface
             return $end_user;
         }
 
-        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
+        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
     }
 
     public function isAccessTokenTypeParameterAllowed()

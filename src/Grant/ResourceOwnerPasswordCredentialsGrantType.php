@@ -72,7 +72,7 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
 
         $end_user = $this->getEndUserManager()->getEndUser($username);
         if (null === $end_user || !$this->getEndUserManager()->checkEndUserPasswordCredentials($end_user, $password)) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_GRANT, 'Invalid username and password combination');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Invalid username and password combination');
         }
 
         $grant_type_response->setResourceOwnerPublicId($end_user->getPublicId());

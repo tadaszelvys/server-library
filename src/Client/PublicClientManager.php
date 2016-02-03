@@ -83,7 +83,7 @@ abstract class PublicClientManager implements ClientManagerInterface
     private function checkResult(array $result)
     {
         if (count($result) > 1) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Only one authentication method may be used to authenticate the client.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Only one authentication method may be used to authenticate the client.');
         }
 
         if (count($result) < 1) {

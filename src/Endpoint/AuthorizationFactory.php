@@ -106,7 +106,7 @@ final class AuthorizationFactory
      */
     private function createFromRequestParameter()
     {
-        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
+        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
     }
 
     /**
@@ -114,7 +114,7 @@ final class AuthorizationFactory
      */
     private function createFromRequestUriParameter()
     {
-        throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
+        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
     }
 
     /**
@@ -144,7 +144,7 @@ final class AuthorizationFactory
     {
         $client = array_key_exists('client_id', $params) ? $this->getClientManagerSupervisor()->getClient($params['client_id']) : null;
         if (!$client instanceof ClientInterface) {
-            throw $this->getExceptionManager()->getException(ExceptionManagerInterface::BAD_REQUEST, ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_id" missing or invalid.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_id" missing or invalid.');
         }
 
         return $client;
