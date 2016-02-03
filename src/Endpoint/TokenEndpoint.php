@@ -166,7 +166,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         $type->grantAccessToken($request, $client, $grant_type_response);
 
         $result = [
-            'requested_scope'          => $grant_type_response->getRequestedScope()/* ?: $this->getScopeManager()->getDefaultScopes($client)*/,
+            'requested_scope'          => $grant_type_response->getRequestedScope(),
             'available_scope'          => $grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopes($client),
             'resource_owner_public_id' => $grant_type_response->getResourceOwnerPublicid(),
             'refresh_token'            => [
@@ -269,7 +269,6 @@ final class TokenEndpoint implements TokenEndpointInterface
         $resource_owner = $this->getResourceOwner($values['resource_owner_public_id']);
         if (null !== $this->getRefreshTokenManager()) {
             if (true === $values['refresh_token']['issued']) {
-                //$values['refresh_token']['scope'] = null === $values['refresh_token']['scope']? [] : $values['refresh_token']['scope'];
                 $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $resource_owner, $values['refresh_token']['scope']);
             }
             if ($values['refresh_token']['used'] instanceof RefreshTokenInterface) {

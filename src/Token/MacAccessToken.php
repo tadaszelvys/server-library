@@ -175,7 +175,7 @@ class MacAccessToken implements TokenTypeInterface
     }
 
     /**
-     * @param int $mac_algorithm
+     * @param string $mac_algorithm
      */
     public function setMacAlgorithm($mac_algorithm)
     {
