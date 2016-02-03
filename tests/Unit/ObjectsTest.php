@@ -19,6 +19,7 @@ use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AuthCode;
+use OAuth2\Token\IdToken;
 
 /**
  * @group Objects
@@ -66,6 +67,27 @@ class ObjectsTest extends Base
         $this->assertTrue(is_array($scopes));
         $this->assertEquals(1, count($scopes));
         $this->assertEquals('foo', $scopes[0]->getName());
+    }
+
+    public function testIdToken()
+    {
+        $id_token = new IdToken();
+        $id_token->setAccessTokenHash('foo');
+        $id_token->setAuthorizationCodeHash('bar');
+        $id_token->setClientPublicId('012');
+        $id_token->setExpiresAt(time()+3600);
+        $id_token->setNonce('nonce');
+        $id_token->setParameters(['foo'=>'bar']);
+        $id_token->setResourceOwnerPublicId('resource_owner');
+        $id_token->setScope([]);
+
+        $this->assertEquals('foo', $id_token->getAccessTokenHash());
+        $this->assertEquals('bar', $id_token->getAuthorizationCodeHash());
+        $this->assertEquals('012', $id_token->getClientPublicId());
+        $this->assertEquals('nonce', $id_token->getNonce());
+        $this->assertEquals('bar', $id_token->getParameter('foo'));
+        $this->assertEquals('resource_owner', $id_token->getResourceOwnerPublicId());
+        $this->assertEquals([], $id_token->getScope());
     }
 
     public function testAuthorizationFactory()
