@@ -216,6 +216,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
 
             $this->token_endpoint->setAccessTokenTypeParameterAllowed(true);
+
+
         }
 
         return $this->token_endpoint;
@@ -467,6 +469,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_credentials_grant_type = new ClientCredentialsGrantType(
                 $this->getExceptionManager()
             );
+            $this->client_credentials_grant_type->setRefreshTokenIssuedWithAccessToken(false);
         }
 
         return $this->client_credentials_grant_type;
@@ -507,6 +510,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $jwt_loader,
                 $this->getExceptionManager()
             );
+            $this->setRefreshTokenIssuedWithAccessToken(false);
         }
 
         return $this->jwt_bearer_grant_type;
@@ -546,6 +550,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager()
             );
+            $this->implicit_grant_type->setAccessTokenTypeParameterAllowed(false);
         }
 
         return $this->implicit_grant_type;
