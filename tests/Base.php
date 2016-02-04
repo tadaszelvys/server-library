@@ -552,6 +552,7 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->none_response_type->addListener($this->getNoneListener());
+            $this->none_response_type->setAccessTokenTypeParameterAllowed(true);
         }
 
         return $this->none_response_type;

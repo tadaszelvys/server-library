@@ -11,7 +11,7 @@
 
 namespace OAuth2\Scope;
 
-interface ScopeInterface
+interface ScopeInterface extends \JsonSerializable
 {
     /**
      * @return string The name of the scope

@@ -282,7 +282,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
             throw $this->getExceptionManager()->getBadRequestException($e->getMessage());
         }
 
-        $availableScopes = $this->getScopeManager()->getAvailableScopes($authorization->getClient());
+        $availableScopes = $this->getScopeManager()->getAvailableScopesForClient($authorization->getClient());
         if (!$this->getScopeManager()->checkScopes($scope, $availableScopes)) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'An unsupported scope was requested. Available scopes for the client are ['.implode(',', $availableScopes).']');
         }

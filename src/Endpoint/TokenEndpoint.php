@@ -167,7 +167,7 @@ final class TokenEndpoint implements TokenEndpointInterface
 
         $result = [
             'requested_scope'          => $grant_type_response->getRequestedScope(),
-            'available_scope'          => $grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopes($client),
+            'available_scope'          => $grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopesForClient($client),
             'resource_owner_public_id' => $grant_type_response->getResourceOwnerPublicid(),
             'refresh_token'            => [
                 'issued' => $grant_type_response->isRefreshTokenIssued(),

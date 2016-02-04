@@ -48,13 +48,17 @@ abstract class ScopeManager implements ScopeManagerInterface
 
     protected static function supportedPolicies()
     {
-        return [null, self::POLICY_MODE_DEFAULT, self::POLICY_MODE_ERROR];
+        return [
+            self::POLICY_MODE_NONE,
+            self::POLICY_MODE_DEFAULT,
+            self::POLICY_MODE_ERROR,
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAvailableScopes(ClientInterface $client = null, ServerRequestInterface $request = null)
+    public function getAvailableScopesForClient(ClientInterface $client = null, ServerRequestInterface $request = null)
     {
         return ($client instanceof ScopeExtensionInterface && null !== $client->getAvailableScopes($request)) ? $client->getAvailableScopes($request) : $this->getScopes();
     }
@@ -62,7 +66,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getDefaultScopes(ClientInterface $client = null, ServerRequestInterface $request = null)
+    public function getDefaultScopesForClient(ClientInterface $client = null, ServerRequestInterface $request = null)
     {
         return ($client instanceof ScopeExtensionInterface && null !== $client->getDefaultScopes($request)) ? $client->getDefaultScopes($request) : $this->getDefault();
     }
@@ -70,7 +74,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getScopePolicy(ClientInterface $client = null, ServerRequestInterface $request = null)
+    public function getScopePolicyForClient(ClientInterface $client = null, ServerRequestInterface $request = null)
     {
         return ($client instanceof ScopeExtensionInterface && null !== $client->getScopePolicy($request)) ? $client->getScopePolicy($request) : $this->getPolicy();
     }
@@ -80,7 +84,7 @@ abstract class ScopeManager implements ScopeManagerInterface
      */
     public function checkScopePolicy(ClientInterface $client, array $scope, ServerRequestInterface $request = null)
     {
-        $policy = $this->getScopePolicy($client, $request);
+        $policy = $this->getScopePolicyForClient($client, $request);
         if (!in_array($policy, self::supportedPolicies(), true)) {
             throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'The policy must be one of these values: '.json_encode(self::supportedPolicies()));
         }
@@ -92,7 +96,7 @@ abstract class ScopeManager implements ScopeManagerInterface
 
         // If Scopes Policy is set to "default" and no scope is set, then application or client defaults are set
         if (empty($scope) && self::POLICY_MODE_DEFAULT === $policy) {
-            return $this->getDefaultScopes($client, $request);
+            return $this->getDefaultScopesForClient($client, $request);
         }
 
         return $scope;
@@ -138,10 +142,10 @@ abstract class ScopeManager implements ScopeManagerInterface
      */
     public function convertToArray($scopes)
     {
+        $this->checkScopeCharset($scopes);
         $scopes = explode(' ', $scopes);
 
         foreach ($scopes as $scope) {
-            $this->checkScopeCharset($scope);
             $this->checkScopeUsedOnce($scope, $scopes);
         }
 
@@ -168,7 +172,7 @@ abstract class ScopeManager implements ScopeManagerInterface
      */
     private function checkScopeCharset($scope)
     {
-        if (1 !== preg_match('/^[\x21\x23-\x5B\x5D-\x7E]+$/', $scope)) {
+        if (1 !== preg_match('/^[\x20\x23-\x5B\x5D-\x7E]+$/', $scope)) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'Scope contains illegal characters.');
         }
     }
