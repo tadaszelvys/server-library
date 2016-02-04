@@ -11,6 +11,7 @@
 
 namespace OAuth2\Scope;
 
+use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ScopeExtensionInterface;
@@ -22,29 +23,65 @@ abstract class ScopeManager implements ScopeManagerInterface
     use HasExceptionManager;
 
     /**
-     * ClientCredentialsGrantType constructor.
+     * @var string[]
+     */
+    private $available_scopes;
+
+    /**
+     * @var string[]
+     */
+    private $default_scopes;
+
+    /**
+     * @var string
+     */
+    private $scope_policy = self::POLICY_MODE_NONE;
+
+    /**
+     * ScopeManager constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param array                                       $available_scopes
+     * @param array                                       $default_scopes
+     * @param null                                        $scope_policy
      */
-    public function __construct(ExceptionManagerInterface $exception_manager)
-    {
+    public function __construct(
+        ExceptionManagerInterface $exception_manager,
+        array $available_scopes,
+        array $default_scopes = [],
+        $scope_policy = self::POLICY_MODE_NONE
+    ) {
+        Assertion::nullOrString($scope_policy);
+
+        $this->available_scopes = $available_scopes;
+        $this->default_scopes = $default_scopes;
+        $this->scope_policy = $scope_policy;
         $this->setExceptionManager($exception_manager);
     }
 
     /**
      * @return string[]
      */
-    abstract public function getScopes();
+    private function getScopes()
+    {
+        return $this->available_scopes;
+    }
 
     /**
      * @return string[]
      */
-    abstract public function getDefault();
+    private function getDefault()
+    {
+        return $this->default_scopes;
+    }
 
     /**
      * @return string
      */
-    abstract public function getPolicy();
+    private function getPolicy()
+    {
+        return $this->scope_policy;
+    }
 
     protected static function supportedPolicies()
     {
