@@ -62,7 +62,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * @return string[]
      */
-    private function getScopes()
+    private function getAvailableScopes()
     {
         return $this->available_scopes;
     }
@@ -70,7 +70,7 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * @return string[]
      */
-    private function getDefault()
+    private function getDefaultScopes()
     {
         return $this->default_scopes;
     }
@@ -78,12 +78,12 @@ abstract class ScopeManager implements ScopeManagerInterface
     /**
      * @return string
      */
-    private function getPolicy()
+    private function getScopePolicy()
     {
         return $this->scope_policy;
     }
 
-    protected static function supportedPolicies()
+    private static function supportedPolicies()
     {
         return [
             self::POLICY_MODE_NONE,
@@ -97,7 +97,7 @@ abstract class ScopeManager implements ScopeManagerInterface
      */
     public function getAvailableScopesForClient(ClientInterface $client = null, ServerRequestInterface $request = null)
     {
-        return ($client instanceof ScopeExtensionInterface && null !== $client->getAvailableScopes($request)) ? $client->getAvailableScopes($request) : $this->getScopes();
+        return ($client instanceof ScopeExtensionInterface && null !== $client->getAvailableScopes($request)) ? $client->getAvailableScopes($request) : $this->getAvailableScopes();
     }
 
     /**
@@ -105,7 +105,7 @@ abstract class ScopeManager implements ScopeManagerInterface
      */
     public function getDefaultScopesForClient(ClientInterface $client = null, ServerRequestInterface $request = null)
     {
-        return ($client instanceof ScopeExtensionInterface && null !== $client->getDefaultScopes($request)) ? $client->getDefaultScopes($request) : $this->getDefault();
+        return ($client instanceof ScopeExtensionInterface && null !== $client->getDefaultScopes($request)) ? $client->getDefaultScopes($request) : $this->getDefaultScopes();
     }
 
     /**
@@ -113,7 +113,7 @@ abstract class ScopeManager implements ScopeManagerInterface
      */
     public function getScopePolicyForClient(ClientInterface $client = null, ServerRequestInterface $request = null)
     {
-        return ($client instanceof ScopeExtensionInterface && null !== $client->getScopePolicy($request)) ? $client->getScopePolicy($request) : $this->getPolicy();
+        return ($client instanceof ScopeExtensionInterface && null !== $client->getScopePolicy($request)) ? $client->getScopePolicy($request) : $this->getScopePolicy();
     }
 
     /**
