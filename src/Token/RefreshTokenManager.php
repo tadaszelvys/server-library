@@ -12,17 +12,13 @@
 namespace OAuth2\Token;
 
 use Assert\Assertion;
-use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use Security\DefuseGenerator;
 
 abstract class RefreshTokenManager implements RefreshTokenManagerInterface
 {
-    use HasExceptionManager;
-
     /**
      * @var \OAuth2\Token\TokenUpdaterInterface[]
      */
@@ -47,16 +43,6 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
      * @var int
      */
     private $refresh_token_max_length = 50;
-
-    /**
-     * ClientCredentialsGrantType constructor.
-     *
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     */
-    public function __construct(ExceptionManagerInterface $exception_manager)
-    {
-        $this->setExceptionManager($exception_manager);
-    }
 
     /**
      * {@inheritdoc}
@@ -107,16 +93,7 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     {
         $length = $this->getRefreshTokenLength();
         $charset = $this->getRefreshTokenCharset();
-        try {
-            $token = DefuseGenerator::getRandomString($length, $charset);
-        } catch (\Exception $e) {
-            throw $this->createException($e->getMessage());
-        }
-        if (!is_string($token) || strlen($token) !== $length) {
-            throw $this->createException('An error has occurred during the creation of the refresh token.');
-        }
-
-        return $token;
+        return DefuseGenerator::getRandomString($length, $charset);
     }
 
     /**
@@ -145,16 +122,6 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
         srand();
 
         return rand($min_length, $max_length);
-    }
-
-    /**
-     * @param $message
-     *
-     * @return \OAuth2\Exception\BaseExceptionInterface
-     */
-    private function createException($message)
-    {
-        return $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, $message);
     }
 
     /**

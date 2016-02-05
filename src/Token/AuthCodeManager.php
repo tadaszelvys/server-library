@@ -12,17 +12,13 @@
 namespace OAuth2\Token;
 
 use Assert\Assertion;
-use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\EndUser\EndUserInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use Security\DefuseGenerator;
 
 abstract class AuthCodeManager implements AuthCodeManagerInterface
 {
-    use HasExceptionManager;
-
     /**
      * @var \OAuth2\Token\TokenUpdaterInterface[]
      */
@@ -47,16 +43,6 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
      * @var int
      */
     private $authorization_code_max_length = 50;
-
-    /**
-     * AuthCodeManager constructor.
-     *
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     */
-    public function __construct(ExceptionManagerInterface $exception_manager)
-    {
-        $this->setExceptionManager($exception_manager);
-    }
 
     /**
      * {@inheritdoc}
@@ -109,16 +95,8 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     {
         $length = $this->getAuthCodeLength();
         $charset = $this->getAuthorizationCodeCharset();
-        try {
-            $code = DefuseGenerator::getRandomString($length, $charset);
-        } catch (\Exception $e) {
-            throw $this->createException($e->getMessage());
-        }
-        if (!is_string($code) || strlen($code) !== $length) {
-            throw $this->createException('An error has occurred during the creation of the authorization code.');
-        }
 
-        return $code;
+        return DefuseGenerator::getRandomString($length, $charset);
     }
 
     /**
@@ -146,16 +124,6 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
         srand();
 
         return rand($min_length, $max_length);
-    }
-
-    /**
-     * @param string $message
-     *
-     * @return \OAuth2\Exception\BaseExceptionInterface
-     */
-    private function createException($message)
-    {
-        return $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, $message);
     }
 
     /**

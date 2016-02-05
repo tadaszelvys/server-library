@@ -27,13 +27,9 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
 
     /**
      * ClientCredentialsGrantType constructor.
-     *
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
      */
-    public function __construct(ExceptionManagerInterface $exception_manager)
+    public function __construct()
     {
-        parent::__construct($exception_manager);
-
         $bar = new PasswordClient();
         $bar->setSecret('secret');
         $bar->setRedirectUris(['http://example.com/test?good=false']);

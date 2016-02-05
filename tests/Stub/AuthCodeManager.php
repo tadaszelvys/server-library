@@ -22,13 +22,9 @@ class AuthCodeManager extends Base
 
     /**
      * AuthCodeManager constructor.
-     *
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
      */
-    public function __construct(ExceptionManagerInterface $exception_manager)
+    public function __construct()
     {
-        parent::__construct($exception_manager);
-
         $valid_auth_code1 = new AuthCode();
         $valid_auth_code1->setIssueRefreshToken(true);
         $valid_auth_code1->setRedirectUri('http://example.com/redirect_uri/');

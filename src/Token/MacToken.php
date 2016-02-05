@@ -12,8 +12,6 @@
 namespace OAuth2\Token;
 
 use Assert\Assertion;
-use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Exception\ExceptionManagerInterface;
 use Security\DefuseGenerator;
 
 class MacToken implements TokenTypeInterface
