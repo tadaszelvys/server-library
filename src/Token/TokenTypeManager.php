@@ -44,7 +44,7 @@ class TokenTypeManager implements TokenTypeManagerInterface
     public function addTokenType(TokenTypeInterface $token_type, $default = false)
     {
         if ($this->hasTokenType($token_type->getTokenTypeName())) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, sprintf('Token type "%s" already exist.', $token_type->getTokenTypeName()));
+            return;
         }
         $this->token_types[$token_type->getTokenTypeName()] = $token_type;
         if (null === $this->default_token_type || true === $default) {

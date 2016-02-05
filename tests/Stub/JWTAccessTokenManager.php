@@ -11,7 +11,6 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\JWTAccessTokenManager as Base;
@@ -32,7 +31,6 @@ class JWTAccessTokenManager extends Base
      * @param \OAuth2\Util\JWTLoader                      $jwt_loader
      * @param \OAuth2\Util\JWTSigner                      $jwt_signer
      * @param \OAuth2\Util\JWTEncrypter                   $jwt_encrypter
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      * @param string                                      $issuer
      * @param string                                      $audience
      * @param string                                      $signature_algorithm
@@ -44,7 +42,6 @@ class JWTAccessTokenManager extends Base
         JWTLoader $jwt_loader,
         JWTSigner $jwt_signer,
         JWTEncrypter $jwt_encrypter,
-        ExceptionManagerInterface $exception_manager,
         $issuer,
         $audience,
         $signature_algorithm,
@@ -56,7 +53,6 @@ class JWTAccessTokenManager extends Base
             $jwt_loader,
             $jwt_signer,
             $jwt_encrypter,
-            $exception_manager,
             $issuer,
             $audience,
             $signature_algorithm,

@@ -693,7 +693,6 @@ class Base extends \PHPUnit_Framework_TestCase
                 $jwt_loader,
                 $jwt_signer,
                 $jwt_encrypter,
-                $this->getExceptionManager(),
                 'Foo',
                 'Bar',
                 'HS512',
@@ -862,7 +861,6 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->id_token_manager = new IdTokenManager(
                 $jwt_loader,
                 $jwt_signer,
-                $this->getExceptionManager(),
                 'My Authorization Server',
                 'HS512'
             );

@@ -170,15 +170,6 @@ class ObjectsTest extends Base
         $access_token->getParameter('foo');
     }
 
-    /**
-     * @expectedException \OAuth2\Exception\InternalServerErrorException
-     * @expectedExceptionMessage server_error
-     */
-    public function testAccessTokenTypeAlreadyExist()
-    {
-        $this->getTokenTypeManager()->addTokenType($this->getBearerTokenType());
-    }
-
     public function testResourceServer()
     {
         $rs = new ResourceServer();
