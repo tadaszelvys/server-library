@@ -79,7 +79,6 @@ class JWTAccessTokenManager extends AccessTokenManager
         JWTLoader $jwt_loader,
         JWTSigner $jwt_signer,
         JWTEncrypter $jwt_encrypter,
-        ExceptionManagerInterface $exception_manager,
         $issuer,
         $audience,
         $signature_algorithm,
@@ -97,7 +96,6 @@ class JWTAccessTokenManager extends AccessTokenManager
         $this->setJWTLoader($jwt_loader);
         $this->setJWTSigner($jwt_signer);
         $this->setJWTEncrypter($jwt_encrypter);
-        $this->setExceptionManager($exception_manager);
         $this->issuer = $issuer;
         $this->audience = $audience;
         $this->signature_algorithm = $signature_algorithm;
@@ -138,13 +136,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         $signature_header = $this->prepareSignatureHeader();
 
         $jws = $this->getJWTSigner()->sign($payload, $signature_header);
-        if (!is_string($jws)) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'An error occured during the creation of the access token.');
-        }
         $jwe = $this->encrypt($jws, $client);
-        if (!is_string($jwe)) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'An error occured during the creation of the access token.');
-        }
 
         $access_token->setToken($jwe);
     }
@@ -187,9 +179,6 @@ class JWTAccessTokenManager extends AccessTokenManager
     protected function prepareSignatureHeader()
     {
         $signature_algorithm = $this->getSignatureAlgorithm();
-        if (!is_string($signature_algorithm)) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'The configuration option "jwt_access_token_signature_algorithm" is not set.');
-        }
 
         $header = [
             'typ' => 'JWT',
@@ -254,14 +243,6 @@ class JWTAccessTokenManager extends AccessTokenManager
         }
 
         $key = $this->getEncryptionPrivateKey();
-
-        if (!$key instanceof JWKInterface) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'Encryption is enabled but encryption key is not set.');
-        }
-        if (!$this->getJWTEncrypter() instanceof JWTEncrypter) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'Encrypter is not defined.');
-        }
-
         $header = $this->prepareEncryptionHeader($client);
 
         return $this->getJWTEncrypter()->encrypt($payload, $header, $key);
@@ -317,10 +298,6 @@ class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function getSignatureAlgorithm()
     {
-        if (!is_string($this->signature_algorithm)) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'The signature algorithm used to sign access tokens is not set.');
-        }
-
         return $this->signature_algorithm;
     }
 
@@ -331,10 +308,6 @@ class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function getKeyEncryptionAlgorithm()
     {
-        if (!is_string($this->key_encryption_algorithm)) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'The key encryption algorithm used to encrypt access tokens is not set.');
-        }
-
         return $this->key_encryption_algorithm;
     }
 
@@ -345,10 +318,6 @@ class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function getContentEncryptionAlgorithm()
     {
-        if (!is_string($this->content_encryption_algorithm)) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'The content encryption algorithm used to encrypt access tokens is not set.');
-        }
-
         return $this->content_encryption_algorithm;
     }
 

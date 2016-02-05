@@ -122,9 +122,6 @@ abstract class ScopeManager implements ScopeManagerInterface
     public function checkScopePolicy(ClientInterface $client, array $scope, ServerRequestInterface $request = null)
     {
         $policy = $this->getScopePolicyForClient($client, $request);
-        if (!in_array($policy, self::supportedPolicies(), true)) {
-            throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, 'The policy must be one of these values: '.json_encode(self::supportedPolicies()));
-        }
 
         // If Scopes Policy is set to "error" and no scope is set, then throws an error
         if (empty($scope) && self::POLICY_MODE_ERROR === $policy) {
@@ -165,9 +162,6 @@ abstract class ScopeManager implements ScopeManagerInterface
         $result = [];
         foreach ($scopes as $scope) {
             $object = $this->getScope($scope);
-            if (!$object instanceof ScopeInterface) {
-                throw $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, sprintf('Unable to find scope with name "%".', $scope));
-            }
             $result[] = $object;
         }
 

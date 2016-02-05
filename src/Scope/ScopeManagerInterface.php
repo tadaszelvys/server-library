@@ -75,7 +75,7 @@ interface ScopeManagerInterface
     /**
      * @param string $scope The name of the scope
      *
-     * @return null|\OAuth2\Scope\ScopeInterface A scope object or null
+     * @return \OAuth2\Scope\ScopeInterface A scope object or null
      */
     public function getScope($scope);
 

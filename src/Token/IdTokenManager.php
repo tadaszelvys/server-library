@@ -13,19 +13,16 @@ namespace OAuth2\Token;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
-use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasJWTSigner;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\EndUser\EndUserInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
 use OAuth2\Util\JWTSigner;
 
 class IdTokenManager implements IdTokenManagerInterface
 {
-    use HasExceptionManager;
     use HasJWTLoader;
     use HasJWTSigner;
 
@@ -49,13 +46,11 @@ class IdTokenManager implements IdTokenManagerInterface
      *
      * @param \OAuth2\Util\JWTLoader                       $loader
      * @param \OAuth2\Util\JWTSigner                       $signer
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
      * @param string                                       $issuer
      * @param string                                       $signature_algorithm
      */
     public function __construct(JWTLoader $loader,
                                 JWTSigner $signer,
-                                ExceptionManagerInterface $exception_manager,
                                 $issuer,
                                 $signature_algorithm
     ) {
@@ -65,7 +60,6 @@ class IdTokenManager implements IdTokenManagerInterface
         $this->signature_algorithm = $signature_algorithm;
         $this->setJWTLoader($loader);
         $this->setJWTSigner($signer);
-        $this->setExceptionManager($exception_manager);
     }
 
     /**
@@ -200,10 +194,7 @@ class IdTokenManager implements IdTokenManagerInterface
             case 'PS512':
                 return 'sha512';
             default:
-                throw $this->getExceptionManager()->getInternalServerErrorException(
-                    '',
-                    ''
-                );
+                throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
         }
     }
 
@@ -231,10 +222,7 @@ class IdTokenManager implements IdTokenManagerInterface
             case 'PS512':
                 return 256;
             default:
-                throw $this->getExceptionManager()->getInternalServerErrorException(
-                    '',
-                    ''
-                );
+                throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
         }
     }
 
