@@ -12,8 +12,8 @@
 namespace OAuth2\Util;
 
 use Jose\Factory\JWSFactory;
+use Jose\Factory\SignerFactory;
 use Jose\Object\JWKInterface;
-use Jose\SignerInterface;
 
 final class JWTSigner
 {
@@ -30,12 +30,12 @@ final class JWTSigner
     /**
      * JWTSigner constructor.
      *
-     * @param \Jose\SignerInterface     $signer
+     * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
      */
-    public function __construct(SignerInterface $signer, JWKInterface $signature_key)
+    public function __construct($signature_algorithm, JWKInterface $signature_key)
     {
-        $this->signer = $signer;
+        $this->signer = SignerFactory::createSigner([$signature_algorithm]);
         $this->signature_key = $signature_key;
     }
 

@@ -11,7 +11,7 @@
 
 namespace OAuth2\Util;
 
-use Jose\EncrypterInterface;
+use Jose\Factory\EncrypterFactory;
 use Jose\Factory\JWEFactory;
 use Jose\Object\JWKInterface;
 
@@ -23,19 +23,20 @@ final class JWTEncrypter
     private $encrypter;
 
     /**
-     * @var null|\Jose\Object\JWKInterface
+     * @var \Jose\Object\JWKInterface
      */
     private $encryption_key = null;
 
     /**
      * JWTEncrypter constructor.
      *
-     * @param \Jose\EncrypterInterface       $encrypter
-     * @param null|\Jose\Object\JWKInterface $encryption_key
+     * @param string                    $key_encryption_algorithm
+     * @param string                    $content_encryption_algorithm
+     * @param \Jose\Object\JWKInterface $encryption_key
      */
-    public function __construct(EncrypterInterface $encrypter, JWKInterface $encryption_key = null)
+    public function __construct($key_encryption_algorithm, $content_encryption_algorithm, JWKInterface $encryption_key)
     {
-        $this->encrypter = $encrypter;
+        $this->encrypter = EncrypterFactory::createEncrypter([$key_encryption_algorithm, $content_encryption_algorithm]);
         $this->encryption_key = $encryption_key;
     }
 

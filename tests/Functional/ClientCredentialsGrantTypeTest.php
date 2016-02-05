@@ -11,8 +11,10 @@
 
 namespace OAuth2\Test\Functional;
 
+use Jose\Factory\EncrypterFactory;
 use Jose\Factory\JWEFactory;
 use Jose\Factory\JWSFactory;
+use Jose\Factory\SignerFactory;
 use Jose\Object\JWK;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -259,7 +261,7 @@ class ClientCredentialsGrantTypeTest extends Base
             'sub' => 'jwt1',
         ]);
 
-        $signer = $this->getSigner(['HS512']);
+        $signer = SignerFactory::createSigner(['HS512']);
         $signer->addSignature(
             $jws,
             $jwk2,
@@ -306,7 +308,7 @@ class ClientCredentialsGrantTypeTest extends Base
             'sub' => 'jwt1',
         ]);
 
-        $signer = $this->getSigner(['HS512']);
+        $signer = SignerFactory::createSigner(['HS512']);
         $signer->addSignature(
             $jws,
             $jwk2,
@@ -353,7 +355,7 @@ class ClientCredentialsGrantTypeTest extends Base
             'sub' => 'jwt1',
         ]);
 
-        $signer = $this->getSigner(['HS512']);
+        $signer = SignerFactory::createSigner(['HS512']);
         $signer->addSignature(
             $jws,
             $jwk2,
@@ -408,7 +410,7 @@ class ClientCredentialsGrantTypeTest extends Base
             'sub' => 'jwt1',
         ]);
 
-        $signer = $this->getSigner(['HS512']);
+        $signer = SignerFactory::createSigner(['HS512']);
         $signer->addSignature(
             $jws,
             $jwk2,
@@ -433,7 +435,7 @@ class ClientCredentialsGrantTypeTest extends Base
             ]
         );
 
-        $encrypter = $this->getEncrypter(['A256KW', 'A256CBC-HS512']);
+        $encrypter = EncrypterFactory::createEncrypter(['A256KW', 'A256CBC-HS512']);
         $encrypter->addRecipient(
             $jwe,
             $jwk1

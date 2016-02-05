@@ -16,8 +16,6 @@ use Jose\Checker\ExpirationChecker;
 use Jose\Checker\IssuedAtChecker;
 use Jose\Checker\NotBeforeChecker;
 use Jose\Factory\DecrypterFactory;
-use Jose\Factory\EncrypterFactory;
-use Jose\Factory\SignerFactory;
 use Jose\Factory\VerifierFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
@@ -649,24 +647,26 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTAccessTokenManager()
     {
         if (null === $this->jwt_access_token_manager) {
-            $jwt_encrypter = $this->getJWTEncrypter(
-                ['A256KW', 'A256CBC-HS512'],
-                [
+
+            $jwt_encrypter = new JWTEncrypter(
+                'A256KW',
+                'A256CBC-HS512',
+                new JWK([
                     'kid' => 'JWK1',
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ]
+                ])
             );
 
-            $jwt_signer = $this->getJWTSigner(
-                ['HS512'],
-                [
+            $jwt_signer = new JWTSigner(
+                'HS512',
+                new JWK([
                     'kid' => 'JWK2',
                     'use' => 'sig',
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ]
+                ])
             );
 
             $jwt_loader = $this->getJWTLoader(
@@ -828,14 +828,14 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getIdTokenManager()
     {
         if (null === $this->id_token_manager) {
-            $jwt_signer = $this->getJWTSigner(
-                ['HS512'],
-                [
+            $jwt_signer = new JWTSigner(
+                'HS512',
+                new JWK([
                     'kid' => 'JWK2',
                     'use' => 'sig',
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ]
+                ])
             );
 
             $jwt_loader = $this->getJWTLoader(
@@ -889,63 +889,6 @@ class Base extends \PHPUnit_Framework_TestCase
         );
 
         return $jwt_loader;
-    }
-
-    /**
-     * @param string[] $allowed_signature_algorithms
-     * @param array    $signature_key
-     *
-     * @return \OAuth2\Util\JWTSigner
-     */
-    protected function getJWTSigner($allowed_signature_algorithms, array $signature_key)
-    {
-        $jwt_signer = new JWTSigner(
-            $this->getSigner($allowed_signature_algorithms),
-            new JWK($signature_key)
-        );
-
-        return $jwt_signer;
-    }
-
-    /**
-     * @param string[] $allowed_encryption_algorithms
-     * @param array    $encryption_key
-     *
-     * @return \OAuth2\Util\JWTEncrypter
-     */
-    protected function getJWTEncrypter($allowed_encryption_algorithms, array $encryption_key)
-    {
-        $jwt_encrypter = new JWTEncrypter(
-            $this->getEncrypter($allowed_encryption_algorithms),
-            new JWK($encryption_key)
-        );
-
-        return $jwt_encrypter;
-    }
-
-    /**
-     * @param string[] $allowed_signature_algorithms
-     *
-     * @return \Jose\SignerInterface
-     */
-    protected function getSigner($allowed_signature_algorithms)
-    {
-        return SignerFactory::createSigner(
-            $allowed_signature_algorithms
-        );
-    }
-
-    /**
-     * @param string[] $allowed_encryption_algorithms
-     *
-     * @return \Jose\EncrypterInterface
-     */
-    protected function getEncrypter($allowed_encryption_algorithms)
-    {
-        return EncrypterFactory::createEncrypter(
-            $allowed_encryption_algorithms,
-            $this->getCompressionManager()
-        );
     }
 
     /**
