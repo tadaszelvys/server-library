@@ -1,5 +1,0 @@
-{
-    "require": {
-        "spomky-labs/oauth2-server-library": "*@dev"
-    }
-}

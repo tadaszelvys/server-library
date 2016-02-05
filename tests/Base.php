@@ -52,9 +52,9 @@ use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
-use OAuth2\Token\BearerAccessToken;
+use OAuth2\Token\BearerToken;
 use OAuth2\Token\IdTokenManager;
-use OAuth2\Token\MacAccessToken;
+use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
 use OAuth2\Util\JWTEncrypter;
 use OAuth2\Util\JWTLoader;
@@ -714,44 +714,44 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return null|\OAuth2\Token\BearerAccessToken
+     * @return null|\OAuth2\Token\BearerToken
      */
-    private $bearer_access_token_type = null;
+    private $bearer_token_type = null;
 
     /**
-     * @return \OAuth2\Token\BearerAccessToken
+     * @return \OAuth2\Token\BearerToken
      */
-    protected function getBearerAccessTokenType()
+    protected function getBearerTokenType()
     {
-        if (null === $this->bearer_access_token_type) {
-            $this->bearer_access_token_type = new BearerAccessToken();
+        if (null === $this->bearer_token_type) {
+            $this->bearer_token_type = new BearerToken();
         }
 
-        return $this->bearer_access_token_type;
+        return $this->bearer_token_type;
     }
 
     /**
-     * @return null|\OAuth2\Token\MacAccessToken
+     * @return null|\OAuth2\Token\MacToken
      */
-    private $mac_access_token_type = null;
+    private $mac_token_type = null;
 
     /**
-     * @return \OAuth2\Token\MacAccessToken
+     * @return \OAuth2\Token\MacToken
      */
-    protected function getMacAccessTokenType()
+    protected function getMacTokenType()
     {
-        if (null === $this->mac_access_token_type) {
-            $this->mac_access_token_type = new MacAccessToken(
+        if (null === $this->mac_token_type) {
+            $this->mac_token_type = new MacToken(
                 $this->getExceptionManager()
             );
             
-            $this->mac_access_token_type->setMacKeyCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-            $this->mac_access_token_type->setMacKeyMinLength(10);
-            $this->mac_access_token_type->setMacKeyMaxLength(20);
-            $this->mac_access_token_type->setMacAlgorithm('hmac-sha-256');
+            $this->mac_token_type->setMacKeyCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+            $this->mac_token_type->setMacKeyMinLength(10);
+            $this->mac_token_type->setMacKeyMaxLength(20);
+            $this->mac_token_type->setMacAlgorithm('hmac-sha-256');
         }
 
-        return $this->mac_access_token_type;
+        return $this->mac_token_type;
     }
 
     /**
@@ -769,8 +769,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager()
             );
 
-            $this->token_type_manager->addTokenType($this->getBearerAccessTokenType(), true);
-            $this->token_type_manager->addTokenType($this->getMacAccessTokenType());
+            $this->token_type_manager->addTokenType($this->getBearerTokenType(), true);
+            $this->token_type_manager->addTokenType($this->getMacTokenType());
         }
 
         return $this->token_type_manager;

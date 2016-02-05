@@ -16,10 +16,8 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Security\DefuseGenerator;
 
-class MacAccessToken implements TokenTypeInterface
+class MacToken implements TokenTypeInterface
 {
-    use HasExceptionManager;
-
     /**
      * @var string
      */
@@ -39,17 +37,6 @@ class MacAccessToken implements TokenTypeInterface
      * @var int
      */
     private $mac_key_max_length = 50;
-
-    /**
-     * AuthCodeManager constructor.
-     *
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     */
-    public function __construct(ExceptionManagerInterface $exception_manager)
-    {
-        $this->setExceptionManager($exception_manager);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -71,24 +58,14 @@ class MacAccessToken implements TokenTypeInterface
     }
 
     /**
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
      * @return string
      */
     private function generateMacKey()
     {
         $length = $this->getMacKeyLength();
         $charset = $this->getMacKeyCharset();
-        try {
-            $mac_key = DefuseGenerator::getRandomString($length, $charset);
-        } catch (\Exception $e) {
-            throw $this->createException($e->getMessage());
-        }
-        if (!is_string($mac_key) || strlen($mac_key) !== $length) {
-            throw $this->createException('An error has occurred during the creation of the authorization code.');
-        }
 
-        return $mac_key;
+        return DefuseGenerator::getRandomString($length, $charset);
     }
 
     /**
@@ -101,16 +78,6 @@ class MacAccessToken implements TokenTypeInterface
         srand();
 
         return rand($min_length, $max_length);
-    }
-
-    /**
-     * @param string $message
-     *
-     * @return \OAuth2\Exception\BaseExceptionInterface
-     */
-    private function createException($message)
-    {
-        return $this->getExceptionManager()->getInternalServerErrorException(ExceptionManagerInterface::SERVER_ERROR, $message);
     }
 
     /**
