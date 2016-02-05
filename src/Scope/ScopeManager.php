@@ -83,7 +83,10 @@ abstract class ScopeManager implements ScopeManagerInterface
         return $this->scope_policy;
     }
 
-    private static function supportedPolicies()
+    /**
+     * {@inheritdoc}
+     */
+    public static function supportedPolicies()
     {
         return [
             self::POLICY_MODE_NONE,

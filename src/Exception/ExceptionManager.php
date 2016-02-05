@@ -84,7 +84,6 @@ class ExceptionManager implements ExceptionManagerInterface
             self::BAD_REQUEST           => 'OAuth2\Exception\BadRequestException',
             self::NOT_IMPLEMENTED       => 'OAuth2\Exception\NotImplementedException',
             self::REDIRECT              => 'OAuth2\Exception\RedirectException',
-            self::INTERNAL_SERVER_ERROR => 'OAuth2\Exception\InternalServerErrorException',
         ];
     }
 }

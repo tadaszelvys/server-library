@@ -19,16 +19,6 @@ use OAuth2\Test\Base;
  */
 class ExceptionManagerTest extends Base
 {
-    public function testInternalServerError()
-    {
-        $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::INTERNAL_SERVER_ERROR, 'foo', 'bar');
-
-        $this->assertEquals('bar', $exception->getDescription());
-        $this->assertEquals(500, $exception->getHttpCode());
-        $this->assertEquals('{"error":"foo","error_description":"bar","error_uri":"https%3A%2F%2Ffoo.test%2FInternal%2FInternalServerError%2Ffoo"}', $exception->getResponseBody());
-        $this->assertEquals('https://foo.test/Internal/InternalServerError/foo', $exception->getUri());
-    }
-
     public function testRedirectButRedirectUriNotDefined()
     {
         try {
