@@ -47,7 +47,7 @@ class Scope implements ScopeInterface
     /**
      * {@inheritdoc}
      */
-    function jsonSerialize()
+    public function jsonSerialize()
     {
         return $this->getName();
     }

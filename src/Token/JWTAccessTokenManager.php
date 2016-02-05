@@ -67,7 +67,6 @@ class JWTAccessTokenManager extends AccessTokenManager
      * @param \OAuth2\Util\JWTLoader                      $jwt_loader
      * @param \OAuth2\Util\JWTSigner                      $jwt_signer
      * @param \OAuth2\Util\JWTEncrypter                   $jwt_encrypter
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      * @param string                                      $issuer
      * @param string                                      $audience
      * @param string                                      $signature_algorithm
