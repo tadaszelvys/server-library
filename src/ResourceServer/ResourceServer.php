@@ -11,6 +11,7 @@
 
 namespace OAuth2\ResourceServer;
 
+use Assert\Assertion;
 use OAuth2\Client\Client;
 
 /**
@@ -27,6 +28,11 @@ class ResourceServer extends Client implements ResourceServerInterface
      * @var string[]
      */
     protected $allowed_ip_addresses = [];
+
+    /**
+     * @var null|\Jose\Object\JWKInterface
+     */
+    protected $public_encryption_key;
 
     /**
      * {@inheritdoc}
@@ -108,7 +114,7 @@ class ResourceServer extends Client implements ResourceServerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string[] $allowed_ip_addresses
      */
     public function setAllowedIpAddresses(array $allowed_ip_addresses)
     {
@@ -116,10 +122,19 @@ class ResourceServer extends Client implements ResourceServerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $server_name
      */
     public function setServerName($server_name)
     {
+        Assertion::string($server_name);
         $this->server_name = $server_name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublicEncryptionKey()
+    {
+        return $this->public_encryption_key;
     }
 }

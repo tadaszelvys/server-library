@@ -15,6 +15,7 @@ use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use OAuth2\ResourceServer\ResourceServerInterface;
 
 abstract class AccessTokenManager implements AccessTokenManagerInterface
 {
@@ -37,12 +38,13 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface           $access_token
-     * @param \OAuth2\Client\ClientInterface               $client
-     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resource_owner
-     * @param \OAuth2\Token\RefreshTokenInterface|null     $refresh_token
+     * @param \OAuth2\Token\AccessTokenInterface                  $access_token
+     * @param \OAuth2\Client\ClientInterface                      $client
+     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface        $resource_owner
+     * @param \OAuth2\Token\RefreshTokenInterface|null            $refresh_token
+     * @param \OAuth2\ResourceServer\ResourceServerInterface|null $resource_server
      */
-    abstract protected function populateAccessToken(AccessTokenInterface &$access_token, ClientInterface $client, ResourceOwnerInterface $resource_owner, RefreshTokenInterface $refresh_token = null);
+    abstract protected function populateAccessToken(AccessTokenInterface &$access_token, ClientInterface $client, ResourceOwnerInterface $resource_owner, RefreshTokenInterface $refresh_token = null, ResourceServerInterface $resource_server = null);
 
     /**
      * @param \OAuth2\Token\AccessTokenInterface $access_token
@@ -60,7 +62,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null)
+    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null, ResourceServerInterface $resource_server = null)
     {
         $access_token = $this->createEmptyAccessToken();
         $access_token->setExpiresAt(time() + $this->getLifetime($client));
@@ -77,7 +79,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
             }
         }
         $this->updateAccessToken($access_token);
-        $this->populateAccessToken($access_token, $client, $resource_owner, $refresh_token);
+        $this->populateAccessToken($access_token, $client, $resource_owner, $refresh_token, $resource_server);
         $this->saveAccessToken($access_token);
 
         return $access_token;

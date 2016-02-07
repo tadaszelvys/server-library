@@ -14,9 +14,8 @@ namespace OAuth2\Test\Stub;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\JWTAccessTokenManager as Base;
-use OAuth2\Util\JWTEncrypter;
+use OAuth2\Util\JWTCreator;
 use OAuth2\Util\JWTLoader;
-use OAuth2\Util\JWTSigner;
 
 class JWTAccessTokenManager extends Base
 {
@@ -28,37 +27,19 @@ class JWTAccessTokenManager extends Base
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader                      $jwt_loader
-     * @param \OAuth2\Util\JWTSigner                      $jwt_signer
-     * @param \OAuth2\Util\JWTEncrypter                   $jwt_encrypter
-     * @param string                                      $issuer
-     * @param string                                      $audience
-     * @param string                                      $signature_algorithm
-     * @param bool                                        $encrypted_access_token
-     * @param null|string                                 $key_encryption_algorithm
-     * @param null|string                                 $content_encryption_algorithm
+     * @param \OAuth2\Util\JWTLoader  $jwt_loader
+     * @param \OAuth2\Util\JWTCreator $jwt_creator
+     * @param string                  $issuer
      */
     public function __construct(
         JWTLoader $jwt_loader,
-        JWTSigner $jwt_signer,
-        JWTEncrypter $jwt_encrypter,
-        $issuer,
-        $audience,
-        $signature_algorithm,
-        $encrypted_access_token = false,
-        $key_encryption_algorithm = null,
-        $content_encryption_algorithm = null
+        JWTCreator $jwt_creator,
+        $issuer
     ) {
         parent::__construct(
             $jwt_loader,
-            $jwt_signer,
-            $jwt_encrypter,
-            $issuer,
-            $audience,
-            $signature_algorithm,
-            $encrypted_access_token,
-            $key_encryption_algorithm,
-            $content_encryption_algorithm
+            $jwt_creator,
+            $issuer
         );
 
         $abcd = new AccessToken();

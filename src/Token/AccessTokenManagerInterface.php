@@ -13,6 +13,7 @@ namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use OAuth2\ResourceServer\ResourceServerInterface;
 
 interface AccessTokenManagerInterface
 {
@@ -28,7 +29,7 @@ interface AccessTokenManagerInterface
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null);
+    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null, ResourceServerInterface $resource_server = null);
 
     /**
      * This function revoke an access token.

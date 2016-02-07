@@ -19,11 +19,6 @@ use OAuth2\Client\ClientInterface;
 interface ResourceServerInterface extends ClientInterface
 {
     /**
-     * @param string[] $allowed_ip_address
-     */
-    public function setAllowedIpAddresses(array $allowed_ip_address);
-
-    /**
      * @return string[]
      */
     public function getAllowedIpAddresses();
@@ -41,7 +36,7 @@ interface ResourceServerInterface extends ClientInterface
     public function getServerName();
 
     /**
-     * @param string $server_name
+     * @return null|\Jose\Object\JWKInterface
      */
-    public function setServerName($server_name);
+    public function getPublicEncryptionKey();
 }
