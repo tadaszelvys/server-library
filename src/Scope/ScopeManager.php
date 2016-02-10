@@ -47,7 +47,7 @@ class ScopeManager implements ScopeManagerInterface
      */
     public function __construct(
         ExceptionManagerInterface $exception_manager,
-        array $available_scopes,
+        array $available_scopes = [],
         array $default_scopes = [],
         $scope_policy = self::POLICY_MODE_NONE
     ) {
