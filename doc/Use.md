@@ -15,13 +15,36 @@ The scope is used by the resource servers
 
 Please read [this page](component/scope.md) to know how to create and use this component.
 
-# JWT Access Token Manager
+# Access Token Manager
 
-#  Bearer Access Token Type
+Access tokens are one of the most important components in the OAuth2.
+They are issued by the authorization server to the clients.
 
-#  MAC Access Token Type
+## JWT Access Token Manager
 
-# Client Managers
+This manager will produce access tokens JSON Web Token (JWT) based.
+The tokens do not need a database and are digitaly signed by the authorization server.
+They can also be encrypted in order to protect confidential information leak.
+
+Please read [this page](component/jwt_access_token_manager.md) to know how to create and use this component.
+
+# Token Types
+
+## Token Type Manager
+
+##  Bearer Token Type
+
+##  MAC Token Type
+
+##  POP Token Type
+
+This token type is not supported at the moment.
+
+# End User Manager
+
+# Client Manager Supervisor and Client Managers
+
+## Client Manager Supervisor
 
 ## Public Client Manager
 
@@ -30,6 +53,8 @@ Please read [this page](component/scope.md) to know how to create and use this c
 ## JWT Client Manager
 
 ## Unregistered Client Manager
+
+# Resource Servers
 
 # Endpoints
 
@@ -60,3 +85,7 @@ Please read [this page](component/scope.md) to know how to create and use this c
 ## Refresh Token Code Grant Type
 
 ## JWT Bearer Token Code Grant Type
+
+# OpenID Connect
+
+
