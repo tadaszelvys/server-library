@@ -18,7 +18,6 @@ use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Exception\InternalServerErrorExceptionInterface;
 use OAuth2\ResourceServer\ResourceServerInterface;
 use OAuth2\Token\TokenInterface;
 use OAuth2\Util\RequestBody;
@@ -91,8 +90,6 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         $client = null;
         try {
             $client = $this->getClientManagerSupervisor()->findClient($request);
-        } catch (InternalServerErrorExceptionInterface $e) {
-            throw $e;
         } catch (AuthenticateExceptionInterface $e) {
             $e->getHttpResponse($response);
 

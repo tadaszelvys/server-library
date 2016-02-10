@@ -12,6 +12,7 @@
 namespace OAuth2\Token;
 
 use Assert\Assertion;
+use Psr\Http\Message\ServerRequestInterface;
 use Security\DefuseGenerator;
 
 class MacToken implements TokenTypeInterface
@@ -146,5 +147,18 @@ class MacToken implements TokenTypeInterface
     {
         Assertion::string($mac_algorithm);
         $this->mac_algorithm = $mac_algorithm;
+    }
+
+    public function findToken(ServerRequestInterface $request)
+    {
+        // TODO: Implement findToken() method.
+    }
+
+    public function isTokenRequestValid(AccessTokenInterface $access_token, ServerRequestInterface $request)
+    {
+        if ($access_token->getTokenType() !== $this->getTokenTypeName()) {
+            return false;
+        }
+        return false;
     }
 }

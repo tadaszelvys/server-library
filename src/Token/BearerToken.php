@@ -11,6 +11,8 @@
 
 namespace OAuth2\Token;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 class BearerToken implements TokenTypeInterface
 {
     /**
@@ -29,5 +31,34 @@ class BearerToken implements TokenTypeInterface
         return [
             'token_type' => $this->getTokenTypeName(),
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findToken(ServerRequestInterface $request)
+    {
+        $header = $request->getHeader('AUTHORIZATION');
+
+        if (0 === count($header)) {
+            return;
+        }
+
+        if (!preg_match('/'.preg_quote('Bearer', '/').'\s([a-zA-Z0-9\-_\+~\/\.]+)/', $header[0], $matches)) {
+            return;
+        }
+
+        return $matches[1];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isTokenRequestValid(AccessTokenInterface $access_token, ServerRequestInterface $request)
+    {
+        if ($access_token->getTokenType() !== $this->getTokenTypeName()) {
+            return false;
+        }
+        return true;
     }
 }

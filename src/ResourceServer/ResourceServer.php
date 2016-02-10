@@ -25,11 +25,6 @@ class ResourceServer extends Client implements ResourceServerInterface
     protected $server_name;
 
     /**
-     * @var string[]
-     */
-    protected $allowed_ip_addresses = [];
-
-    /**
      * @var null|\Jose\Object\JWKInterface
      */
     protected $public_encryption_key;
@@ -40,14 +35,6 @@ class ResourceServer extends Client implements ResourceServerInterface
     public function getServerName()
     {
         return $this->server_name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedIpAddresses()
-    {
-        return $this->allowed_ip_addresses;
     }
 
     /**
@@ -103,22 +90,6 @@ class ResourceServer extends Client implements ResourceServerInterface
     public function setType($type)
     {
         //Nothing to do
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isIpAddressAllowed($ip)
-    {
-        return in_array($ip, $this->getAllowedIpAddresses());
-    }
-
-    /**
-     * @param string[] $allowed_ip_addresses
-     */
-    public function setAllowedIpAddresses(array $allowed_ip_addresses)
-    {
-        $this->allowed_ip_addresses = $allowed_ip_addresses;
     }
 
     /**

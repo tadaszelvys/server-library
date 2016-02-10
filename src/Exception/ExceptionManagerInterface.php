@@ -28,6 +28,7 @@ interface ExceptionManagerInterface
     const INVALID_CLIENT = 'invalid_client';
     const INVALID_GRANT = 'invalid_grant';
     const INVALID_SCOPE = 'invalid_scope';
+    const INVALID_TOKEN = 'invalid_token';
     const UNAUTHORIZED_CLIENT = 'unauthorized_client';
     const UNSUPPORTED_GRANT_TYPE = 'unsupported_grant_type';
     const ACCESS_DENIED = 'access_denied';

@@ -64,7 +64,12 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "assertion" is missing.');
         }
 
-        $jwt = $this->getJWTLoader()->load($assertion);
+        try {
+            $jwt = $this->getJWTLoader()->load($assertion);
+        } catch (\Exception $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+        }
+
         if (!$jwt instanceof JWSInterface) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain signed claims.');
         }

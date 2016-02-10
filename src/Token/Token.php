@@ -78,6 +78,14 @@ class Token implements TokenInterface
     /**
      * {@inheritdoc}
      */
+    public function hasScope($scope)
+    {
+        return in_array($scope, $this->getScope());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getScope()
     {
         return $this->scope;

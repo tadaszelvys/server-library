@@ -11,6 +11,8 @@
 
 namespace OAuth2\Token;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 interface TokenTypeManagerInterface
 {
     /**
@@ -42,4 +44,16 @@ interface TokenTypeManagerInterface
      * @return \OAuth2\Token\TokenTypeInterface
      */
     public function getDefaultTokenType();
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return array|null
+     */
+    public function findToken(ServerRequestInterface $request);
+
+    /**
+     * @return array
+     */
+    public function getTokenTypeSchemes();
 }

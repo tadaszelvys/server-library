@@ -60,8 +60,17 @@ class JWTAccessTokenManager extends Base
         $efgh->setToken('EFGH');
         $efgh->setTokenType('Bearer');
 
+        $user_info = new AccessToken();
+        $user_info->setExpiresAt(time() + 3600);
+        $user_info->setResourceOwnerPublicId('user1');
+        $user_info->setScope(['openid', 'profile', 'email', 'address', 'phone']);
+        $user_info->setClientPublicId('foo');
+        $user_info->setToken('USER_INFO');
+        $user_info->setTokenType('Bearer');
+
         $this->access_tokens[$abcd->getToken()] = $abcd;
         $this->access_tokens[$efgh->getToken()] = $efgh;
+        $this->access_tokens[$user_info->getToken()] = $user_info;
     }
 
     /**

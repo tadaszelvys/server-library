@@ -13,6 +13,7 @@ namespace OAuth2\Token;
 
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Exception\ExceptionManagerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class TokenTypeManager implements TokenTypeManagerInterface
 {
@@ -86,5 +87,30 @@ class TokenTypeManager implements TokenTypeManagerInterface
     public function getDefaultTokenType()
     {
         return $this->getTokenType($this->default_token_type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findToken(ServerRequestInterface $request)
+    {
+        foreach ($this->getTokenTypes() as $type) {
+            if (null !== $token = $type->findToken($request)) {
+                return ['type' => $type, 'token' => $token];
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTokenTypeSchemes()
+    {
+        $schemes = [];
+        foreach ($this->getTokenTypes() as $type) {
+            $schemes[] = $type->getTokenTypeName();
+        }
+
+        return $schemes;
     }
 }

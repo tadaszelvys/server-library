@@ -11,10 +11,6 @@
 
 namespace OAuth2\Test;
 
-use Jose\Checker\AudienceChecker;
-use Jose\Checker\ExpirationChecker;
-use Jose\Checker\IssuedAtChecker;
-use Jose\Checker\NotBeforeChecker;
 use Jose\Factory\DecrypterFactory;
 use Jose\Factory\VerifierFactory;
 use Jose\Object\JWK;
@@ -31,6 +27,7 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
+use OAuth2\Endpoint\UserInfoEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
@@ -39,6 +36,7 @@ use OAuth2\Grant\NoneResponseType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Test\Stub\AuthCodeManager;
+use OAuth2\Test\Stub\ClaimCheckerManager;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
@@ -67,6 +65,11 @@ class Base extends \PHPUnit_Framework_TestCase
      * @var string
      */
     private $realm = 'testrealm@host.com';
+
+    /**
+     * @var string
+     */
+    private $audience = 'My Authorization Server';
 
     protected function setUp()
     {
@@ -162,6 +165,28 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->revocation_endpoint;
+    }
+
+    /**
+     * @var null|\OAuth2\Endpoint\UserInfoEndpointInterface
+     */
+    private $user_info_endpoint = null;
+
+    /**
+     * @return \OAuth2\Endpoint\UserInfoEndpointInterface
+     */
+    protected function getUserInfoEndpoint()
+    {
+        if (null === $this->user_info_endpoint) {
+            $this->user_info_endpoint = new UserInfoEndpoint(
+                $this->getTokenTypeManager(),
+                $this->getJWTAccessTokenManager(),
+                $this->getEndUserManager(),
+                $this->getExceptionManager()
+            );
+        }
+
+        return $this->user_info_endpoint;
     }
 
     /**
@@ -690,7 +715,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->jwt_access_token_manager = new JWTAccessTokenManager(
                 $jwt_loader,
                 $jwt_creator,
-                'Foo'
+                $this->audience
             );
             $this->jwt_access_token_manager->addTokenUpdater(new FooBarAccessTokenUpdater());
         }
@@ -847,7 +872,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->id_token_manager = new IdTokenManager(
                 $jwt_loader,
                 $jwt_signer,
-                'My Authorization Server',
+                $this->audience,
                 'HS512'
             );
         }
@@ -866,6 +891,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTLoader(array $allowed_signature_algorithms, array $allowed_encryption_algorithms, array $key_set, $is_encryption_required = false)
     {
         $jwt_loader = new JWTLoader(
+            $this->getClaimCheckerManager(),
             $this->getVerifier($allowed_signature_algorithms),
             $this->getDecrypter($allowed_encryption_algorithms),
             $this->getExceptionManager(),
@@ -908,8 +934,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         return DecrypterFactory::createDecrypter(
             $allowed_encryption_algorithms,
-            $this->getCompressionManager(),
-            $this->getCheckerManager('My Authorization Server')
+            $this->getCompressionManager()
         );
     }
 
@@ -921,24 +946,26 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getVerifier($allowed_encryption_algorithms)
     {
         return VerifierFactory::createVerifier(
-            $allowed_encryption_algorithms,
-            $this->getCheckerManager('My Authorization Server')
+            $allowed_encryption_algorithms
         );
     }
 
     /**
-     * @param string|string[] $audience
-     *
-     * @return \Jose\Checker\CheckerManager
+     * @var null|\Jose\ClaimChecker\ClaimCheckerManagerInterface
      */
-    protected function getCheckerManager($audience)
+    private $claim_checker_manager = null;
+
+    /**
+     * @return \Jose\ClaimChecker\ClaimCheckerManagerInterface
+     */
+    protected function getClaimCheckerManager()
     {
-        return [
-            new ExpirationChecker(),
-            new NotBeforeChecker(),
-            new IssuedAtChecker(),
-            new AudienceChecker($audience),
-        ];
+        if (null === $this->claim_checker_manager) {
+
+            $this->claim_checker_manager = new ClaimCheckerManager($this->audience);
+        }
+
+        return $this->claim_checker_manager;
     }
 
     /**

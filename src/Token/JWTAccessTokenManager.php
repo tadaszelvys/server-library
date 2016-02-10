@@ -111,9 +111,8 @@ class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface $access_token
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @param \OAuth2\Token\AccessTokenInterface                  $access_token
+     * @param \OAuth2\ResourceServer\ResourceServerInterface|null $resource_server
      *
      * @return array
      */
@@ -121,6 +120,7 @@ class JWTAccessTokenManager extends AccessTokenManager
     {
         $payload = [
             'iss' => $this->issuer,
+            'aud' => null === $resource_server?$this->issuer:$resource_server->getServerName(),
             'iat' => time(),
             'nbf' => time(),
             'exp' => $access_token->getExpiresAt(),
@@ -129,7 +129,6 @@ class JWTAccessTokenManager extends AccessTokenManager
             'sco' => $access_token->getScope(),
             'r_o' => $access_token->getResourceOwnerPublicId(),
         ];
-        $header['aud'] = null === $resource_server?$this->issuer:$resource_server->getServerName();
         if (!empty($access_token->getParameters())) {
             $parameters = $access_token->getParameters();
             //This part should be updated to support 'cnf' (confirmation) claim (see POP).

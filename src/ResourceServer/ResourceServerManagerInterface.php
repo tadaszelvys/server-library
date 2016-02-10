@@ -18,13 +18,4 @@ use OAuth2\Client\ClientManagerInterface;
  */
 interface ResourceServerManagerInterface extends ClientManagerInterface
 {
-    /**
-     * @param string[] $trusted_proxies
-     */
-    public function setTrustedProxies(array $trusted_proxies);
-
-    /**
-     * @return string[]
-     */
-    public function getTrustedProxies();
 }

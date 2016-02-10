@@ -54,6 +54,13 @@ interface TokenInterface
     public function getExpiresIn();
 
     /**
+     * @param string $scope
+     *
+     * @return bool
+     */
+    public function hasScope($scope);
+
+    /**
      * The scopes associated with the token.
      *
      * @return string[] An array of scope

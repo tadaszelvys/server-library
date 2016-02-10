@@ -12,8 +12,6 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\ResourceServer\ResourceServer;
-use OAuth2\ResourceServer\ResourceServerInterface;
 use OAuth2\ResourceServer\ResourceServerManager as Base;
 use OAuth2\Util\IpAddress;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,11 +24,32 @@ class ResourceServerManager extends Base
     private $resource_servers = [];
 
     /**
+     * @var string[]
+     */
+    private $trusted_proxies = [];
+
+    /**
      * ResourceServerManager constructor.
      */
     public function __construct()
     {
         $this->setTrustedProxies(['127.0.0.1']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTrustedProxies()
+    {
+        return $this->trusted_proxies;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTrustedProxies(array $trusted_proxies)
+    {
+        $this->trusted_proxies = $trusted_proxies;
     }
 
     /**
@@ -90,7 +109,7 @@ class ResourceServerManager extends Base
      */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
     {
-        if (!$client instanceof ResourceServerInterface) {
+        if (!$client instanceof ResourceServer) {
             return;
         }
 

@@ -16,24 +16,4 @@ namespace OAuth2\ResourceServer;
  */
 abstract class ResourceServerManager implements ResourceServerManagerInterface
 {
-    /**
-     * @var string[]
-     */
-    private $trusted_proxies = [];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTrustedProxies()
-    {
-        return $this->trusted_proxies;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setTrustedProxies(array $trusted_proxies)
-    {
-        $this->trusted_proxies = $trusted_proxies;
-    }
 }

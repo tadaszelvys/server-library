@@ -19,18 +19,6 @@ use OAuth2\Client\ClientInterface;
 interface ResourceServerInterface extends ClientInterface
 {
     /**
-     * @return string[]
-     */
-    public function getAllowedIpAddresses();
-
-    /**
-     * @param string $ip
-     *
-     * @return bool
-     */
-    public function isIpAddressAllowed($ip);
-
-    /**
      * @return string
      */
     public function getServerName();

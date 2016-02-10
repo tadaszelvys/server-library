@@ -11,6 +11,8 @@
 
 namespace OAuth2\Token;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 interface TokenTypeInterface
 {
     /**
@@ -38,4 +40,19 @@ interface TokenTypeInterface
      * @return string
      */
     public function getTokenTypeName();
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return string|null
+     */
+    public function findToken(ServerRequestInterface $request);
+
+    /**
+     * @param \OAuth2\Token\AccessTokenInterface       $access_token
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return bool
+     */
+    public function isTokenRequestValid(AccessTokenInterface $access_token, ServerRequestInterface $request);
 }

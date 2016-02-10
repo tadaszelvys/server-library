@@ -126,7 +126,11 @@ abstract class JWTClientManager implements ClientManagerInterface
         }
 
         //We load the assertion
-        $jwt = $this->getJWTLoader()->load($client_assertion);
+        try {
+            $jwt = $this->getJWTLoader()->load($client_assertion);
+        } catch (\Exception $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+        }
 
         return $jwt;
     }

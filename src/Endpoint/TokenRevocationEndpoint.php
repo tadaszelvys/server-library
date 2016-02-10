@@ -18,7 +18,6 @@ use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Exception\InternalServerErrorExceptionInterface;
 use OAuth2\Token\TokenInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
@@ -99,10 +98,6 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
         $client = null;
         try {
             $client = $this->getClientManagerSupervisor()->findClient($request);
-        } catch (InternalServerErrorExceptionInterface $e) {
-            $this->getResponseContent($response, json_encode($e->getResponseData()), $callback, $e->getHttpCode());
-
-            return;
         } catch (AuthenticateExceptionInterface $e) {
             $e->getHttpResponse($response);
 
