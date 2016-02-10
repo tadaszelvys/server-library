@@ -16,13 +16,13 @@ Now the variable `$exception_manager` can be injected to all other components th
 
 # Advanced
 
-## Error Redirect Uri
+## Error Uri Parameter
 
-Your authorization server may provide pages containing error descriptions.
-You can add an `error_uri` parameter for all returned error or a certain type of them.
+Your authorization server may provide pages containing human readable error descriptions.
+You can add the `error_uri` parameter for all returned error or a certain type of them.
 
 To do so, you just have to extend the class `OAuth2\Exception\ExceptionManager` and override the method `getUri`.
-If this method returns an URI, the `error_uri` parameter will be set.
+If this method returns a string, the `error_uri` parameter will be set.
 
 The following example shows you how to define an error URI for bad request errors only:
 
@@ -54,7 +54,7 @@ class MyExceptionManager extends ExceptionManager
 When you create a new endpoint, grant type or any other component, you may need to return a custom exception.
 The exception manager is able to support new exception types.
 
-Let say you want to limit access token issuance for some clients. You could need to create an error that returns a HTTP 429 error (Too Many Requests)
+Let say you want to limit requests from some clients. You could need to create an error that returns a HTTP 429 error (Too Many Requests)
 
 ```php
 namespace Acme;
@@ -73,7 +73,7 @@ class TooManyRequestsException extends BaseException
 }
 ```
 
-> Please note that the constructor signature MUST be `public function __construct($code, $error, $error_description = null, $error_uri = null)`.
+> Please note that the constructor signature MUST be `public function __construct($error, $error_description = null, $error_uri = null, array $data = [])`.
 
 Then, you have to extend the class `OAuth2\Exception\ExceptionManager` and add your new exception type:
 
