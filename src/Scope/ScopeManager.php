@@ -18,7 +18,7 @@ use OAuth2\Client\ScopeExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class ScopeManager implements ScopeManagerInterface
+class ScopeManager implements ScopeManagerInterface
 {
     use HasExceptionManager;
 
