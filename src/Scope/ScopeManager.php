@@ -150,30 +150,6 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getScope($scope)
-    {
-        $scope = new Scope($scope);
-
-        return $scope;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function convertToScope(array $scopes)
-    {
-        $result = [];
-        foreach ($scopes as $scope) {
-            $object = $this->getScope($scope);
-            $result[] = $object;
-        }
-
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function convertToArray($scopes)
     {
         $this->checkScopeCharset($scopes);
