@@ -55,7 +55,6 @@ use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
 use OAuth2\Util\JWTCreator;
 use OAuth2\Util\JWTLoader;
-use OAuth2\Util\JWTSigner;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -839,41 +838,16 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getIdTokenManager()
     {
         if (null === $this->id_token_manager) {
-            $jwt_signer = new JWTSigner(
+            $this->id_token_manager = new IdTokenManager(
+                $this->getExceptionManager(),
                 'HS512',
                 new JWK([
                     'kid' => 'JWK2',
                     'use' => 'sig',
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ])
-            );
-
-            $jwt_loader = $this->getJWTLoader(
-                ['HS512'],
-                ['A256KW', 'A256CBC-HS512'],
-                ['keys' => [
-                    [
-                        'kid' => 'JWK1',
-                        'use' => 'enc',
-                        'kty' => 'oct',
-                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                    ],
-                    [
-                        'kid' => 'JWK2',
-                        'use' => 'sig',
-                        'kty' => 'oct',
-                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                    ],
-                ]],
-                false
-            );
-
-            $this->id_token_manager = new IdTokenManager(
-                $jwt_loader,
-                $jwt_signer,
-                $this->audience,
-                'HS512'
+                ]),
+                $this->audience
             );
         }
 

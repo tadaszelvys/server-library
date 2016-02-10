@@ -13,18 +13,24 @@ namespace OAuth2\Token;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
+use Jose\ClaimChecker\ClaimCheckerManager;
+use Jose\Factory\DecrypterFactory;
+use Jose\Factory\VerifierFactory;
+use Jose\Object\JWKInterface;
+use Jose\Object\JWKSet;
+use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
-use OAuth2\Behaviour\HasJWTSigner;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\EndUser\EndUserInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Util\JWTCreator;
 use OAuth2\Util\JWTLoader;
-use OAuth2\Util\JWTSigner;
 
 class IdTokenManager implements IdTokenManagerInterface
 {
     use HasJWTLoader;
-    use HasJWTSigner;
+    use HasJWTCreator;
 
     /**
      * @var int
@@ -44,22 +50,34 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * IdTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader                       $loader
-     * @param \OAuth2\Util\JWTSigner                       $signer
-     * @param string                                       $issuer
-     * @param string                                       $signature_algorithm
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param string                                      $signature_algorithm
+     * @param \Jose\Object\JWKInterface                   $signature_key
+     * @param string                                      $issuer
      */
-    public function __construct(JWTLoader $loader,
-                                JWTSigner $signer,
-                                $issuer,
-                                $signature_algorithm
+    public function __construct(ExceptionManagerInterface $exception_manager,
+                                $signature_algorithm,
+                                JWKInterface $signature_key,
+                                $issuer
     ) {
-        Assertion::string($issuer);
         Assertion::string($signature_algorithm);
+        Assertion::string($issuer);
         $this->issuer = $issuer;
         $this->signature_algorithm = $signature_algorithm;
-        $this->setJWTLoader($loader);
-        $this->setJWTSigner($signer);
+
+        $key_set = new JWKSet();
+        $key_set = $key_set->addKey($signature_key);
+        $this->setJWTLoader(new JWTLoader(
+            new ClaimCheckerManager(),
+            VerifierFactory::createVerifier([$signature_algorithm]),
+            DecrypterFactory::createDecrypter([]),
+            $exception_manager,
+            $key_set
+        ));
+        $this->setJWTCreator(new JWTCreator(
+            $signature_algorithm,
+            $signature_key
+        ));
     }
 
     /**
@@ -94,7 +112,7 @@ class IdTokenManager implements IdTokenManagerInterface
         if (!empty($id_token_claims)) {
             $payload = array_merge($payload, $id_token_claims);
         }
-        $jws = $this->getJWTSigner()->sign($payload, $headers);
+        $jws = $this->getJWTCreator()->createJWT($payload, $headers, false);
 
         $id_token->setExpiresAt($exp);
         $id_token->setClientPublicId($client->getPublicId());
