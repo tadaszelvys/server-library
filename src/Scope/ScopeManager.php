@@ -33,9 +33,9 @@ class ScopeManager implements ScopeManagerInterface
     private $default_scopes;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $scope_policy = self::POLICY_MODE_NONE;
+    private $scope_policy;
 
     /**
      * ScopeManager constructor.
