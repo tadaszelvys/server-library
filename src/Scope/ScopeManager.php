@@ -18,7 +18,7 @@ use OAuth2\Client\ScopeExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class ScopeManager implements ScopeManagerInterface
+class ScopeManager implements ScopeManagerInterface
 {
     use HasExceptionManager;
 
@@ -33,9 +33,9 @@ abstract class ScopeManager implements ScopeManagerInterface
     private $default_scopes;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $scope_policy = self::POLICY_MODE_NONE;
+    private $scope_policy;
 
     /**
      * ScopeManager constructor.
@@ -47,7 +47,7 @@ abstract class ScopeManager implements ScopeManagerInterface
      */
     public function __construct(
         ExceptionManagerInterface $exception_manager,
-        array $available_scopes,
+        array $available_scopes = [],
         array $default_scopes = [],
         $scope_policy = self::POLICY_MODE_NONE
     ) {
@@ -145,30 +145,6 @@ abstract class ScopeManager implements ScopeManagerInterface
     public function checkScopes(array $requestedScopes, array $availableScopes)
     {
         return 0 === count(array_diff($requestedScopes, $availableScopes));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getScope($scope)
-    {
-        $scope = new Scope($scope);
-
-        return $scope;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function convertToScope(array $scopes)
-    {
-        $result = [];
-        foreach ($scopes as $scope) {
-            $object = $this->getScope($scope);
-            $result[] = $object;
-        }
-
-        return $result;
     }
 
     /**

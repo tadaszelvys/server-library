@@ -20,6 +20,11 @@ Please read [this page](component/scope.md) to know how to create and use this c
 Access tokens are one of the most important components in the OAuth2.
 They are issued by the authorization server to the clients.
 
+This library is able to support any kind of access token managers.
+You can create your own access token manager. It just has to implement `OAuth2\Token\AccessTokenManagerInterface`.
+
+Or you can use the following implementation.
+
 ## JWT Access Token Manager
 
 This manager will produce access tokens JSON Web Token (JWT) based.

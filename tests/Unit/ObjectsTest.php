@@ -13,7 +13,6 @@ namespace OAuth2\Test\Unit;
 
 use OAuth2\Client\PublicClient;
 use OAuth2\Exception\AuthenticateException;
-use OAuth2\Scope\Scope;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
 use OAuth2\Test\Stub\ResourceServer;
@@ -44,29 +43,6 @@ class ObjectsTest extends Base
         $this->assertFalse($client->hasRedirectUri('https://bar.com'));
         $this->assertTrue($client->isAllowedGrantType('foo'));
         $this->assertFalse($client->isAllowedGrantType('baz'));
-    }
-
-    public function testScope()
-    {
-        $scope = new Scope('foo');
-
-        $this->assertEquals('foo', $scope->getName());
-    }
-
-    public function testScopeThroughScopeManager()
-    {
-        $scope = $this->getScopeManager()->getScope('foo');
-
-        $this->assertEquals('foo', $scope->getName());
-    }
-
-    public function testScopesThroughScopeManager()
-    {
-        $scopes = $this->getScopeManager()->convertToScope(['foo']);
-
-        $this->assertTrue(is_array($scopes));
-        $this->assertEquals(1, count($scopes));
-        $this->assertEquals('foo', $scopes[0]->getName());
     }
 
     public function testIdToken()
