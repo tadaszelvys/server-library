@@ -39,21 +39,6 @@ class JWTAccessTokenManager extends AccessTokenManager
     private $issuer;
 
     /**
-     * @var string
-     */
-    private $signature_algorithm;
-
-    /**
-     * @var string
-     */
-    private $key_encryption_algorithm;
-
-    /**
-     * @var string
-     */
-    private $content_encryption_algorithm;
-
-    /**
      * JWTAccessTokenManager constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
@@ -78,9 +63,6 @@ class JWTAccessTokenManager extends AccessTokenManager
         Assertion::string($issuer);
 
         $this->issuer = $issuer;
-        $this->signature_algorithm = $signature_algorithm;
-        $this->key_encryption_algorithm = $key_encryption_algorithm;
-        $this->content_encryption_algorithm = $content_encryption_algorithm;
 
         $key_set = new JWKSet();
         $key_set = $key_set->addKey($signature_key);
@@ -92,7 +74,6 @@ class JWTAccessTokenManager extends AccessTokenManager
             DecrypterFactory::createDecrypter([$key_encryption_algorithm, $content_encryption_algorithm]),
             $exception_manager,
             $key_set,
-            [$key_encryption_key, $content_encryption_algorithm],
             true
         ));
         $this->setJWTCreator(new JWTCreator(

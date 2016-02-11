@@ -72,7 +72,8 @@ class IdTokenManager implements IdTokenManagerInterface
             VerifierFactory::createVerifier([$signature_algorithm]),
             DecrypterFactory::createDecrypter([]),
             $exception_manager,
-            $key_set
+            $key_set,
+            false
         ));
         $this->setJWTCreator(new JWTCreator(
             $signature_algorithm,

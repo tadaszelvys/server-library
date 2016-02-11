@@ -113,7 +113,7 @@ class BearerToken implements TokenTypeInterface
         foreach ($authorization_headers as $authorization_header) {
 
             if (1 === preg_match('/'.preg_quote('Bearer', '/').'\s([a-zA-Z0-9\-_\+~\/\.]+)/', $authorization_header, $matches)) {
-                return $token = $matches[1];
+                return $matches[1];
             }
         }
     }
