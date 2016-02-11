@@ -11,6 +11,8 @@
 
 namespace OAuth2\Test\Stub;
 
+use Jose\Object\JWKInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\JWTAccessTokenManager as Base;
@@ -27,18 +29,29 @@ class JWTAccessTokenManager extends Base
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader  $jwt_loader
-     * @param \OAuth2\Util\JWTCreator $jwt_creator
-     * @param string                  $issuer
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param string                                      $signature_algorithm
+     * @param \Jose\Object\JWKInterface                   $signature_key
+     * @param string                                      $key_encryption_algorithm
+     * @param string                                      $content_encryption_algorithm
+     * @param \Jose\Object\JWKInterface                   $key_encryption_key
+     * @param string                                      $issuer
      */
-    public function __construct(
-        JWTLoader $jwt_loader,
-        JWTCreator $jwt_creator,
-        $issuer
+    public function __construct(ExceptionManagerInterface $exception_manager,
+                                $signature_algorithm,
+                                JWKInterface $signature_key,
+                                $key_encryption_algorithm,
+                                $content_encryption_algorithm,
+                                JWKInterface $key_encryption_key,
+                                $issuer
     ) {
         parent::__construct(
-            $jwt_loader,
-            $jwt_creator,
+            $exception_manager,
+            $signature_algorithm,
+            $signature_key,
+            $key_encryption_algorithm,
+            $content_encryption_algorithm,
+            $key_encryption_key,
             $issuer
         );
 

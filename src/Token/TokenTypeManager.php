@@ -95,8 +95,9 @@ class TokenTypeManager implements TokenTypeManagerInterface
     public function findToken(ServerRequestInterface $request)
     {
         foreach ($this->getTokenTypes() as $type) {
-            if (null !== $token = $type->findToken($request)) {
-                return ['type' => $type, 'token' => $token];
+            $additional_credential_values = [];
+            if (null !== $token = $type->findToken($request, $additional_credential_values)) {
+                return ['type' => $type, 'token' => $token, 'additional_credential_values' => $additional_credential_values];
             }
         }
     }
@@ -108,7 +109,7 @@ class TokenTypeManager implements TokenTypeManagerInterface
     {
         $schemes = [];
         foreach ($this->getTokenTypes() as $type) {
-            $schemes[] = $type->getTokenTypeName();
+            $schemes[] = $type->getTokenTypeScheme();
         }
 
         return $schemes;

@@ -14,7 +14,6 @@ namespace OAuth2\Test;
 use Jose\Factory\DecrypterFactory;
 use Jose\Factory\VerifierFactory;
 use Jose\Object\JWK;
-use Jose\Object\JWKInterface;
 use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Endpoint\AuthorizationEndpoint;
@@ -53,7 +52,6 @@ use OAuth2\Token\BearerToken;
 use OAuth2\Token\IdTokenManager;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
-use OAuth2\Util\JWTCreator;
 use OAuth2\Util\JWTLoader;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -673,7 +671,8 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->jwt_access_token_manager) {
 
-            $jwt_creator = $this->getJWTCreator(
+            $this->jwt_access_token_manager = new JWTAccessTokenManager(
+                $this->getExceptionManager(),
                 'HS512',
                 new JWK([
                     'kid' => 'JWK2',
@@ -688,32 +687,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ])
-            );
-
-            $jwt_loader = $this->getJWTLoader(
-                ['HS512'],
-                ['A256KW', 'A256CBC-HS512'],
-                ['keys' => [
-                    [
-                        'kid' => 'JWK1',
-                        'use' => 'enc',
-                        'kty' => 'oct',
-                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                    ],
-                    [
-                        'kid' => 'JWK2',
-                        'use' => 'sig',
-                        'kty' => 'oct',
-                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                    ],
-                ]],
-                true
-            );
-
-            $this->jwt_access_token_manager = new JWTAccessTokenManager(
-                $jwt_loader,
-                $jwt_creator,
+                ]),
                 $this->audience
             );
             $this->jwt_access_token_manager->addTokenUpdater(new FooBarAccessTokenUpdater());
@@ -875,28 +849,6 @@ class Base extends \PHPUnit_Framework_TestCase
         );
 
         return $jwt_loader;
-    }
-
-    /**
-     * @param string                          $signature_algorithm
-     * @param \Jose\Object\JWKInterface      $signature_key
-     * @param null|string                    $key_encryption_algorithm
-     * @param null|string                    $content_encryption_algorithm
-     * @param \Jose\Object\JWKInterface|null $sender_key
-     *
-     * @return \OAuth2\Util\JWTCreator
-     */
-    protected function getJWTCreator($signature_algorithm, JWKInterface $signature_key, $key_encryption_algorithm = null, $content_encryption_algorithm = null, JWKInterface $sender_key = null)
-    {
-        $jwt_creator = new JWTCreator(
-            $signature_algorithm,
-            $signature_key,
-            $key_encryption_algorithm,
-            $content_encryption_algorithm,
-            $sender_key
-        );
-
-        return $jwt_creator;
     }
 
     /**

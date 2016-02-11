@@ -42,17 +42,24 @@ interface TokenTypeInterface
     public function getTokenTypeName();
 
     /**
+     * @return string
+     */
+    public function getTokenTypeScheme();
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param array                                    $additional_credential_values
      *
      * @return string|null
      */
-    public function findToken(ServerRequestInterface $request);
+    public function findToken(ServerRequestInterface $request, array &$additional_credential_values);
 
     /**
      * @param \OAuth2\Token\AccessTokenInterface       $access_token
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param array                                    $additional_credential_values
      *
      * @return bool
      */
-    public function isTokenRequestValid(AccessTokenInterface $access_token, ServerRequestInterface $request);
+    public function isTokenRequestValid(AccessTokenInterface $access_token, ServerRequestInterface $request, array $additional_credential_values);
 }

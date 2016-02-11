@@ -12,10 +12,16 @@
 namespace OAuth2\Token;
 
 use Assert\Assertion;
+use Jose\ClaimChecker\ClaimCheckerManager;
+use Jose\Factory\DecrypterFactory;
+use Jose\Factory\VerifierFactory;
+use Jose\Object\JWKInterface;
+use Jose\Object\JWKSet;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\ResourceServer\ResourceServerInterface;
 use OAuth2\Util\JWTCreator;
@@ -33,22 +39,69 @@ class JWTAccessTokenManager extends AccessTokenManager
     private $issuer;
 
     /**
+     * @var string
+     */
+    private $signature_algorithm;
+
+    /**
+     * @var string
+     */
+    private $key_encryption_algorithm;
+
+    /**
+     * @var string
+     */
+    private $content_encryption_algorithm;
+
+    /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader  $jwt_loader
-     * @param \OAuth2\Util\JWTCreator $jwt_creator
-     * @param string                  $issuer
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param string                                      $signature_algorithm
+     * @param \Jose\Object\JWKInterface                   $signature_key
+     * @param string                                      $key_encryption_algorithm
+     * @param string                                      $content_encryption_algorithm
+     * @param \Jose\Object\JWKInterface                   $key_encryption_key
+     * @param string                                      $issuer
      */
-    public function __construct(
-        JWTLoader $jwt_loader,
-        JWTCreator $jwt_creator,
-        $issuer
+    public function __construct(ExceptionManagerInterface $exception_manager,
+                                $signature_algorithm,
+                                JWKInterface $signature_key,
+                                $key_encryption_algorithm,
+                                $content_encryption_algorithm,
+                                JWKInterface $key_encryption_key,
+                                $issuer
     ) {
+        Assertion::string($signature_algorithm);
+        Assertion::string($key_encryption_algorithm);
+        Assertion::string($content_encryption_algorithm);
         Assertion::string($issuer);
 
-        $this->setJWTLoader($jwt_loader);
-        $this->setJWTCreator($jwt_creator);
         $this->issuer = $issuer;
+        $this->signature_algorithm = $signature_algorithm;
+        $this->key_encryption_algorithm = $key_encryption_algorithm;
+        $this->content_encryption_algorithm = $content_encryption_algorithm;
+
+        $key_set = new JWKSet();
+        $key_set = $key_set->addKey($signature_key);
+        $key_set = $key_set->addKey($key_encryption_key);
+
+        $this->setJWTLoader(new JWTLoader(
+            new ClaimCheckerManager(),
+            VerifierFactory::createVerifier([$signature_algorithm]),
+            DecrypterFactory::createDecrypter([$key_encryption_algorithm, $content_encryption_algorithm]),
+            $exception_manager,
+            $key_set,
+            [$key_encryption_key, $content_encryption_algorithm],
+            true
+        ));
+        $this->setJWTCreator(new JWTCreator(
+            $signature_algorithm,
+            $signature_key,
+            $key_encryption_algorithm,
+            $content_encryption_algorithm,
+            $key_encryption_key
+        ));
     }
 
     /**

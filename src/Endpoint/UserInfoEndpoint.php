@@ -75,7 +75,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
         }
 
         $access_token = $this->getAccessTokenManager()->getAccessToken($token['token']);
-        if (null === $access_token || false === $token['type']->isTokenRequestValid($access_token, $request)) {
+        if (null === $access_token || false === $token['type']->isTokenRequestValid($access_token, $request, $token['additional_credential_values'])) {
             $exception = $this->getExceptionManager()->getAuthenticateException(
                 ExceptionManagerInterface::INVALID_TOKEN,
                 'Access token does not exist or is not valid.',
