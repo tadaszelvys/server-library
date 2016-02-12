@@ -20,4 +20,14 @@ interface AuthorizationEndpointInterface
      * @param \Psr\Http\Message\ResponseInterface $response
      */
     public function authorize(Authorization $authorization, ResponseInterface &$response);
+
+    /**
+     * @return string[]
+     */
+    public function getResponseTypesSupported();
+
+    /**
+     * @return string[]
+     */
+    public function getResponseModesSupported();
 }

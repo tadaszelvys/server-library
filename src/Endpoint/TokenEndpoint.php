@@ -105,6 +105,14 @@ final class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getGrantTypesSupported()
+    {
+        return array_keys($this->grant_types);
+    }
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return bool
@@ -164,27 +172,15 @@ final class TokenEndpoint implements TokenEndpointInterface
 
         $type->grantAccessToken($request, $client, $grant_type_response);
 
-        $result = [
-            'requested_scope'          => $grant_type_response->getRequestedScope(),
-            'available_scope'          => $grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopesForClient($client),
-            'resource_owner_public_id' => $grant_type_response->getResourceOwnerPublicid(),
-            'refresh_token'            => [
-                'issued' => $grant_type_response->isRefreshTokenIssued(),
-                'scope'  => $grant_type_response->getRefreshTokenScope(),
-                'used'   => $grant_type_response->getRefreshTokenRevoked(),
-            ],
-            'id_token'                 => [
-                'issued'    => $grant_type_response->isIdTokenIssued(),
-                'auth_code' => $grant_type_response->getAuthorizationCodeToHash(),
-            ],
-        ];
+        $grant_type_response->setAvailableScope($grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopesForClient($client));
+        $grant_type_response->setRequestedScope($this->getScopeManager()->checkScopePolicy($client, $grant_type_response->getRequestedScope(), $request));
 
         //Modify the scope according to the scope policy
-        $result['requested_scope'] = $this->getScopeManager()->checkScopePolicy($client, $result['requested_scope'], $request);
+        //$result['requested_scope'] = $this->getScopeManager()->checkScopePolicy($client, $result['requested_scope'], $request);
 
         //Check if scope requested are within the available scope
-        if (!$this->getScopeManager()->checkScopes($result['requested_scope'], $result['available_scope'])) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'An unsupported scope was requested. Available scopes are ['.implode(',', $result['available_scope']).']');
+        if (!$this->getScopeManager()->checkScopes($grant_type_response->getRequestedScope(), $grant_type_response->getAvailableScope())) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'An unsupported scope was requested. Available scopes are ['.implode(',', $grant_type_response->getAvailableScope()).']');
         }
 
         $request_parameters = RequestBody::getParameters($request);
@@ -197,7 +193,7 @@ final class TokenEndpoint implements TokenEndpointInterface
 
         $access_token = $this->createAccessToken(
             $client,
-            $result,
+            $grant_type_response,
             $request_parameters,
             $token_type_information
         );
@@ -253,25 +249,25 @@ final class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param array                          $values
-     * @param array                          $request_parameters
-     * @param array                          $token_type_information
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
+     * @param array                                    $request_parameters
+     * @param array                                    $token_type_information
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    private function createAccessToken(ClientInterface $client, array $values, array $request_parameters, array $token_type_information)
+    private function createAccessToken(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $request_parameters, array $token_type_information)
     {
         $refresh_token = null;
-        $resource_owner = $this->getResourceOwner($values['resource_owner_public_id']);
+        $resource_owner = $this->getResourceOwner($grant_type_response->getResourceOwnerPublicId());
         if (null !== $this->getRefreshTokenManager()) {
-            if (true === $values['refresh_token']['issued']) {
-                $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $resource_owner, $values['refresh_token']['scope']);
+            if (true === $grant_type_response->isRefreshTokenIssued()) {
+                $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $resource_owner, $grant_type_response->getRefreshTokenScope());
             }
-            if ($values['refresh_token']['used'] instanceof RefreshTokenInterface) {
-                $this->getRefreshTokenManager()->markRefreshTokenAsUsed($values['refresh_token']['used']);
+            if ($grant_type_response->getRefreshTokenRevoked() instanceof RefreshTokenInterface) {
+                $this->getRefreshTokenManager()->markRefreshTokenAsUsed($grant_type_response->getRefreshTokenRevoked());
             }
         }
 
@@ -280,7 +276,7 @@ final class TokenEndpoint implements TokenEndpointInterface
             $resource_owner,
             $token_type_information,
             $request_parameters,
-            $values['requested_scope'],
+            $grant_type_response->getRequestedScope(),
             $refresh_token
         );
 

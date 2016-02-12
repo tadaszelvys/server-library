@@ -169,6 +169,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             is_array($grant_type_response->getRequestedScope()) &&
             in_array('openid', $grant_type_response->getRequestedScope())
         );
+        $grant_type_response->setAdditionalData('auth_code', $authCode);
         $grant_type_response->setAuthorizationCodeToHash($authCode);
     }
 

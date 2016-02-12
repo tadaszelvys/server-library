@@ -82,6 +82,22 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * {@inheritdoc}
      */
+    public function getResponseTypesSupported()
+    {
+        return array_keys($this->response_types);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseModesSupported()
+    {
+        return array_keys($this->getResponseModes());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function authorize(Authorization $authorization, ResponseInterface &$response)
     {
         $redirect_uri = $this->checkRedirectUri($authorization);

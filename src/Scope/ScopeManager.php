@@ -62,7 +62,7 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * @return string[]
      */
-    private function getAvailableScopes()
+    public function getAvailableScopes()
     {
         return $this->available_scopes;
     }
@@ -70,7 +70,7 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * @return string[]
      */
-    private function getDefaultScopes()
+    public function getDefaultScopes()
     {
         return $this->default_scopes;
     }
@@ -78,7 +78,7 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * @return string
      */
-    private function getScopePolicy()
+    public function getScopePolicy()
     {
         return $this->scope_policy;
     }
@@ -98,7 +98,7 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getAvailableScopesForClient(ClientInterface $client = null, ServerRequestInterface $request = null)
+    public function getAvailableScopesForClient(ClientInterface $client, ServerRequestInterface $request = null)
     {
         return ($client instanceof ScopeExtensionInterface && null !== $client->getAvailableScopes($request)) ? $client->getAvailableScopes($request) : $this->getAvailableScopes();
     }
@@ -106,7 +106,7 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getDefaultScopesForClient(ClientInterface $client = null, ServerRequestInterface $request = null)
+    public function getDefaultScopesForClient(ClientInterface $client, ServerRequestInterface $request = null)
     {
         return ($client instanceof ScopeExtensionInterface && null !== $client->getDefaultScopes($request)) ? $client->getDefaultScopes($request) : $this->getDefaultScopes();
     }
@@ -114,7 +114,7 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getScopePolicyForClient(ClientInterface $client = null, ServerRequestInterface $request = null)
+    public function getScopePolicyForClient(ClientInterface $client, ServerRequestInterface $request = null)
     {
         return ($client instanceof ScopeExtensionInterface && null !== $client->getScopePolicy($request)) ? $client->getScopePolicy($request) : $this->getScopePolicy();
     }

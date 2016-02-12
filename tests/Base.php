@@ -26,6 +26,7 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
+use OAuth2\OpenIDConnect\Metadata;
 use OAuth2\OpenIDConnect\UserInfoEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
@@ -36,7 +37,6 @@ use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\ClaimCheckerManager;
-use OAuth2\Test\Stub\Configuration;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
@@ -70,52 +70,14 @@ class Base extends \PHPUnit_Framework_TestCase
     private $issuer = 'My Authorization Server';
 
     /**
-     * @var \OAuth2\Test\Stub\Configuration
+     * @var \OAuth2\OpenIDConnect\Metadata
      */
-    private $configuration;
+    private $metadata;
 
     protected function setUp()
     {
         //To fix HHVM tests on Travis-CI
         date_default_timezone_set('UTC');
-
-        $this->configuration = new Configuration();
-
-        $this->configuration->set('issuer', 'My Authorization Server');
-        $this->configuration->set('authorization_endpoint', 'https://my.server.com/authorize');
-        $this->configuration->set('token_endpoint', 'https://my.server.com/authorize');
-        $this->configuration->set('userinfo_endpoint', 'https://my.server.com/authorize');
-        $this->configuration->set('jwks_uri', 'https://my.server.com/authorize');
-        $this->configuration->set('registration_endpoint', 'https://my.server.com/authorize');
-        $this->configuration->set('scopes_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('response_types_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('response_modes_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('grant_types_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('acr_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('subject_types_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('id_token_signing_alg_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('id_token_encryption_alg_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('id_token_encryption_enc_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('userinfo_signing_alg_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('userinfo_encryption_alg_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('userinfo_encryption_enc_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('request_object_signing_alg_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('request_object_encryption_alg_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('request_object_encryption_enc_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('token_endpoint_auth_methods_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('token_endpoint_auth_signing_alg_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('display_values_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('claim_types_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('claims_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('service_documentation', 'https://my.server.com/authorize');
-        $this->configuration->set('claims_locales_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('ui_locales_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('claims_parameter_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('request_parameter_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('request_uri_parameter_supported', 'https://my.server.com/authorize');
-        $this->configuration->set('require_request_uri_registration', 'https://my.server.com/authorize');
-        $this->configuration->set('op_policy_uri', 'https://my.server.com/authorize');
-        $this->configuration->set('op_tos_uri', 'https://my.server.com/authorize');
     }
 
     /**

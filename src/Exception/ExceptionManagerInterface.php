@@ -13,6 +13,12 @@ namespace OAuth2\Exception;
 
 /**
  * An exception manager.
+ *
+ * @method getAuthenticateException(string $error, null $error_description, array $data = [])
+ * @method getBadRequestException(string $error, null $error_description, array $data = [])
+ * @method getNotImplementedException(string $error, null $error_description, array $data = [])
+ * @method getRedirectException(string $error, null $error_description, array $data = [])
+ * @method getInternalServerErrorException(string $error, null $error_description, array $data = [])
  */
 interface ExceptionManagerInterface
 {

@@ -23,4 +23,9 @@ interface TokenEndpointInterface
      * @throws \OAuth2\Exception\BaseExceptionInterface If an error occurred
      */
     public function getAccessToken(ServerRequestInterface $request, ResponseInterface &$response);
+
+    /**
+     * @return string[]
+     */
+    public function getGrantTypesSupported();
 }

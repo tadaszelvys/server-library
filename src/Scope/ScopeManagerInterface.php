@@ -34,7 +34,9 @@ interface ScopeManagerInterface
      *
      * @return string[] Return an array scope
      */
-    public function getAvailableScopesForClient(ClientInterface $client = null, ServerRequestInterface $request = null);
+    public function getAvailableScopesForClient(ClientInterface $client, ServerRequestInterface $request = null);
+
+    public function getAvailableScopes();
 
     /**
      * This function returns the default scopes. If a valid ClientInterface object is set as parameter, the function will return default scopes for the client.
@@ -45,7 +47,9 @@ interface ScopeManagerInterface
      *
      * @return string[] Return an array scope
      */
-    public function getDefaultScopesForClient(ClientInterface $client = null, ServerRequestInterface $request = null);
+    public function getDefaultScopesForClient(ClientInterface $client, ServerRequestInterface $request = null);
+
+    public function getDefaultScopes();
 
     /**
      * This function returns the scope policy. If a valid ClientInterface object is set as parameter, the function will return scope policy for the client.
@@ -56,7 +60,9 @@ interface ScopeManagerInterface
      *
      * @return string Return "default" or "error" depending on the configuration
      */
-    public function getScopePolicyForClient(ClientInterface $client = null, ServerRequestInterface $request = null);
+    public function getScopePolicyForClient(ClientInterface $client, ServerRequestInterface $request = null);
+
+    public function getScopePolicy();
 
     /**
      * This function check if the scopes respect the scope policy for the client.
