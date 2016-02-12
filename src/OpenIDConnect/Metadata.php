@@ -87,7 +87,7 @@ final class Metadata implements \JsonSerializable
      * @return string
      */
     private function decamelize($word) {
-        return $word = preg_replace_callback(
+        return preg_replace_callback(
             "/(^|[a-z])([A-Z])/",
             function($m) { return strtolower(strlen($m[1]) ? "$m[1]_$m[2]" : "$m[2]"); },
             $word
@@ -98,7 +98,7 @@ final class Metadata implements \JsonSerializable
     /**
      * {@inheritdoc}
      */
-    function jsonSerialize()
+    public function jsonSerialize()
     {
         return $this->values;
     }

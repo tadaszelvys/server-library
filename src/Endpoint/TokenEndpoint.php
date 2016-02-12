@@ -178,10 +178,9 @@ final class TokenEndpoint implements TokenEndpointInterface
         $type->grantAccessToken($request, $client, $grant_type_response);
 
         $grant_type_response->setAvailableScope($grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopesForClient($client));
-        $grant_type_response->setRequestedScope($this->getScopeManager()->checkScopePolicy($client, $grant_type_response->getRequestedScope(), $request));
 
         //Modify the scope according to the scope policy
-        //$result['requested_scope'] = $this->getScopeManager()->checkScopePolicy($client, $result['requested_scope'], $request);
+        $grant_type_response->setRequestedScope($this->getScopeManager()->checkScopePolicy($client, $grant_type_response->getRequestedScope(), $request));
 
         //Check if scope requested are within the available scope
         if (!$this->getScopeManager()->checkScopes($grant_type_response->getRequestedScope(), $grant_type_response->getAvailableScope())) {
