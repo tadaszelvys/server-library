@@ -27,7 +27,6 @@ use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
-use OAuth2\OpenIDConnect\IdTokenManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
@@ -70,7 +69,6 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
-     * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface|null      $id_token_manager
      */
     public function __construct(
         TokenTypeManagerInterface $token_type_manager,
@@ -79,8 +77,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         EndUserManagerInterface $end_user_manager,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
-        RefreshTokenManagerInterface $refresh_token_manager = null,
-        IdTokenManagerInterface $id_token_manager = null
+        RefreshTokenManagerInterface $refresh_token_manager = null
     ) {
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);

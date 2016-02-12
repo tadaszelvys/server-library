@@ -225,8 +225,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getEndUserManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
-                $this->getRefreshTokenManager(),
-                $this->getIdTokenManager()
+                $this->getRefreshTokenManager()
             );
 
             $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
