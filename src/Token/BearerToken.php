@@ -55,7 +55,7 @@ class BearerToken implements TokenTypeInterface
      */
     public function isAccessTokenFromQueryStringAllowed()
     {
-        return $this->token_from_request_body_allowed;
+        return $this->token_from_query_string_allowed;
     }
 
     /**
