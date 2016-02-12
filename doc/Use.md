@@ -1,6 +1,9 @@
 How to use
 ==========
 
+This library provides all components to build an authorization server base on the OAuth2 Framework protocol.
+The following components must be created, configured to create a fully featured authorization server.
+
 # Exceptions and Exception Manager
 
 The exception manager manages all exception types thrown during the authorization process.
@@ -72,7 +75,9 @@ For more information, please follow the links hereafter:
 * https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution-02
 * https://tools.ietf.org/html/draft-ietf-oauth-proof-of-possession-11
 
-# End User Manager
+# User Manager
+
+Please read [this page](component/user_manager.md) to know how to create and use this component.
 
 # Client Manager Supervisor and Client Managers
 
