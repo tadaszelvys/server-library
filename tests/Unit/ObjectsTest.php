@@ -25,7 +25,6 @@ use OAuth2\Token\IdToken;
  */
 class ObjectsTest extends Base
 {
-
     public function testClient()
     {
         $client = new PublicClient();
@@ -51,9 +50,9 @@ class ObjectsTest extends Base
         $id_token->setAccessTokenHash('foo');
         $id_token->setAuthorizationCodeHash('bar');
         $id_token->setClientPublicId('012');
-        $id_token->setExpiresAt(time()+3600);
+        $id_token->setExpiresAt(time() + 3600);
         $id_token->setNonce('nonce');
-        $id_token->setParameters(['foo'=>'bar']);
+        $id_token->setParameters(['foo' => 'bar']);
         $id_token->setResourceOwnerPublicId('resource_owner');
         $id_token->setScope([]);
         $id_token->setTokenType('type');

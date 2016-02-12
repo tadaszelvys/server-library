@@ -35,8 +35,8 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     /**
      * JWTBearerGrantType constructor.
      *
-     * @param \OAuth2\Util\JWTLoader                       $loader
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Util\JWTLoader                      $loader
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(
         JWTLoader $loader,

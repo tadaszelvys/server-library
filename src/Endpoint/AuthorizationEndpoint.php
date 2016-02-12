@@ -57,8 +57,8 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * AuthorizationEndpoint constructor.
      *
-     * @param \OAuth2\Scope\ScopeManagerInterface          $scope_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Scope\ScopeManagerInterface         $scope_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(
         ScopeManagerInterface $scope_manager,

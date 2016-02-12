@@ -11,7 +11,6 @@
 
 namespace OAuth2\Grant;
 
-use Assert\Assertion;
 use OAuth2\Behaviour\HasAuthorizationCodeManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
@@ -44,8 +43,8 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     /**
      * AuthorizationCodeGrantType constructor.
      *
-     * @param \OAuth2\Token\AuthCodeManagerInterface       $auth_code_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Token\AuthCodeManagerInterface      $auth_code_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager)
     {

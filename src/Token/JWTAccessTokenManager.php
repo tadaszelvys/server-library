@@ -93,7 +93,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         $payload = $this->preparePayload($access_token, $resource_server);
         $signature_header = $this->prepareSignatureHeader();
         $encryption_header = $this->prepareEncryptionHeader($client, $resource_server);
-        $recipient_key = null === $resource_server || null === $resource_server->getPublicEncryptionKey()?$this->getJWTCreator()->getSenderKey():$resource_server->getPublicEncryptionKey();
+        $recipient_key = null === $resource_server || null === $resource_server->getPublicEncryptionKey() ? $this->getJWTCreator()->getSenderKey() : $resource_server->getPublicEncryptionKey();
 
         $jwt = $this->getJWTCreator()->createJWT($payload, $signature_header, true, $encryption_header, $recipient_key);
 
@@ -122,7 +122,7 @@ class JWTAccessTokenManager extends AccessTokenManager
                 'enc' => $content_encryption_algorithm,
             ]
         );
-        $header['aud'] = null === $resource_server?$this->issuer:$resource_server->getServerName();
+        $header['aud'] = null === $resource_server ? $this->issuer : $resource_server->getServerName();
 
         return $header;
     }
@@ -154,7 +154,7 @@ class JWTAccessTokenManager extends AccessTokenManager
     {
         $payload = [
             'iss' => $this->issuer,
-            'aud' => null === $resource_server?$this->issuer:$resource_server->getServerName(),
+            'aud' => null === $resource_server ? $this->issuer : $resource_server->getServerName(),
             'iat' => time(),
             'nbf' => time(),
             'exp' => $access_token->getExpiresAt(),

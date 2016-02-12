@@ -11,7 +11,6 @@
 
 namespace OAuth2\Grant;
 
-use Assert\Assertion;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Endpoint\Authorization;
@@ -117,7 +116,7 @@ final class NoneResponseType implements ResponseTypeSupportInterface
      */
     public function allowAccessTokenTypeParameter()
     {
-        $this->access_token_type_parameter_allowed = true;;
+        $this->access_token_type_parameter_allowed = true;
     }
 
     /**
@@ -125,6 +124,6 @@ final class NoneResponseType implements ResponseTypeSupportInterface
      */
     public function disallowAccessTokenTypeParameter()
     {
-        $this->access_token_type_parameter_allowed = true;;
+        $this->access_token_type_parameter_allowed = true;
     }
 }

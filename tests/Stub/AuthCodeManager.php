@@ -11,7 +11,6 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AuthCode;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManager as Base;

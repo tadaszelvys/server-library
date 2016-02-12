@@ -107,7 +107,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthorizationFactory()
     {
         if (null === $this->authorization_factory) {
-
             $this->authorization_factory = new AuthorizationFactory(
                 $this->getScopeManager(),
                 $this->getClientManagerSupervisor(),
@@ -237,8 +236,6 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
 
             $this->token_endpoint->allowAccessTokenTypeParameter();
-
-
         }
 
         return $this->token_endpoint;
@@ -548,7 +545,7 @@ class Base extends \PHPUnit_Framework_TestCase
     public function getNoneListener()
     {
         if (null === $this->none_listener) {
-            $this->none_listener =  new NoneListener();
+            $this->none_listener = new NoneListener();
         }
 
         return $this->none_listener;
@@ -668,7 +665,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTAccessTokenManager()
     {
         if (null === $this->jwt_access_token_manager) {
-
             $this->jwt_access_token_manager = new JWTAccessTokenManager(
                 $this->getExceptionManager(),
                 'HS512',
@@ -723,7 +719,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->mac_token_type) {
             $this->mac_token_type = new MacToken();
-            
+
             $this->mac_token_type->setMacKeyCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             $this->mac_token_type->setMacKeyMinLength(10);
             $this->mac_token_type->setMacKeyMaxLength(20);
@@ -767,7 +763,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->refresh_token_manager) {
             $this->refresh_token_manager = new RefreshTokenManager();
-            
+
             $this->refresh_token_manager->setRefreshTokenCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             $this->refresh_token_manager->setRefreshTokenMinLength(10);
             $this->refresh_token_manager->setRefreshTokenMaxLength(20);
@@ -789,7 +785,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->auth_code_manager) {
             $this->auth_code_manager = new AuthCodeManager();
-            
+
             $this->auth_code_manager->setAuthorizationCodeCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             $this->auth_code_manager->setAuthorizationCodeMinLength(10);
             $this->auth_code_manager->setAuthorizationCodeMaxLength(20);
@@ -885,7 +881,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getClaimCheckerManager()
     {
         if (null === $this->claim_checker_manager) {
-
             $this->claim_checker_manager = new ClaimCheckerManager($this->issuer);
         }
 
@@ -909,13 +904,13 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getAccessTokenType()
     {
-        $access_token_type =  new AccessToken(
+        $access_token_type = new AccessToken(
             $this->getJWTAccessTokenManager(),
             $this->getRefreshTokenManager()
         );
-        
+
         $access_token_type->enableRefreshTokensRevocationWithAccessTokens();
-        
+
         return $access_token_type;
     }
 

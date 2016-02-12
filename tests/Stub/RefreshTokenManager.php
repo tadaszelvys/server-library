@@ -12,7 +12,6 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManager as Base;

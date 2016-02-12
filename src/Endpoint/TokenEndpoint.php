@@ -11,7 +11,6 @@
 
 namespace OAuth2\Endpoint;
 
-use Assert\Assertion;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasEndUserManager;

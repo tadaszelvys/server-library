@@ -93,6 +93,7 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     {
         $length = $this->getRefreshTokenLength();
         $charset = $this->getRefreshTokenCharset();
+
         return DefuseGenerator::getRandomString($length, $charset);
     }
 

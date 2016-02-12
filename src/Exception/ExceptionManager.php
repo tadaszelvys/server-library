@@ -10,6 +10,7 @@
  */
 
 namespace OAuth2\Exception;
+
 use Assert\Assertion;
 
 /**
@@ -36,7 +37,7 @@ class ExceptionManager implements ExceptionManagerInterface
         }
         if (0 === strpos($name, 'get') && 'Exception' === substr($name, -9)) {
             $arguments = array_merge(
-                [substr($name, 3, strlen($name)-12)],
+                [substr($name, 3, strlen($name) - 12)],
                 $arguments
             );
 
@@ -73,7 +74,7 @@ class ExceptionManager implements ExceptionManagerInterface
 
         throw new \InvalidArgumentException('Unsupported type');
     }
-    
+
     /**
      * @return array
      */

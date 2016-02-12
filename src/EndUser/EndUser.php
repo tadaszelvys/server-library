@@ -47,8 +47,8 @@ class EndUser extends ResourceOwner implements EndUserInterface
     {
         return [
             'profile' => 'getProfileInfo',
-            'email' => 'getEmailInfo',
-            'phone' => 'getPhoneInfo',
+            'email'   => 'getEmailInfo',
+            'phone'   => 'getPhoneInfo',
             'address' => 'getAddressInfo',
         ];
     }
@@ -60,7 +60,7 @@ class EndUser extends ResourceOwner implements EndUserInterface
     {
         $claims = [];
         $supported_scopes = $this->getSupportedUserInfoScopes();
-        foreach ($supported_scopes as $scope=>$method) {
+        foreach ($supported_scopes as $scope => $method) {
             if ($access_token->hasScope($scope)) {
                 $claims = array_merge(
                     $claims,
@@ -69,7 +69,7 @@ class EndUser extends ResourceOwner implements EndUserInterface
             }
         }
 
-        foreach ($claims as $key=>$value) {
+        foreach ($claims as $key => $value) {
             if (null === $value) {
                 unset($claims[$key]);
             }
@@ -84,21 +84,21 @@ class EndUser extends ResourceOwner implements EndUserInterface
     protected function getProfileInfo()
     {
         return [
-            "sub"=> $this->getPublicId(),
-            "name"=> $this->getDisplayName(),
-            "given_name"=> $this->getGivenName(),
-            "middle_name"=> $this->getMiddleName(),
-            "family_name"=> $this->getFamilyName(),
-            "nickname"=> $this->getNickname(),
-            "preferred_username"=> $this->getPreferredUsername(),
-            "profile"=> $this->getProfile(),
-            "picture"=> $this->getPicture(),
-            "website"=> $this->getWebsite(),
-            "gender"=> $this->getGender(),
-            "birthdate"=> $this->getBirthdate(),
-            "zoneinfo"=> $this->getZoneInfo(),
-            "locale"=> $this->getLocale(),
-            "updated_at"=> $this->getUpdatedAt(),
+            'sub'                => $this->getPublicId(),
+            'name'               => $this->getDisplayName(),
+            'given_name'         => $this->getGivenName(),
+            'middle_name'        => $this->getMiddleName(),
+            'family_name'        => $this->getFamilyName(),
+            'nickname'           => $this->getNickname(),
+            'preferred_username' => $this->getPreferredUsername(),
+            'profile'            => $this->getProfile(),
+            'picture'            => $this->getPicture(),
+            'website'            => $this->getWebsite(),
+            'gender'             => $this->getGender(),
+            'birthdate'          => $this->getBirthdate(),
+            'zoneinfo'           => $this->getZoneInfo(),
+            'locale'             => $this->getLocale(),
+            'updated_at'         => $this->getUpdatedAt(),
         ];
     }
 
@@ -108,8 +108,8 @@ class EndUser extends ResourceOwner implements EndUserInterface
     protected function getEmailInfo()
     {
         return [
-            "email"=> $this->getEmail(),
-            "email_verified"=> $this->isEmailVerified(),
+            'email'          => $this->getEmail(),
+            'email_verified' => $this->isEmailVerified(),
         ];
     }
 
@@ -119,8 +119,8 @@ class EndUser extends ResourceOwner implements EndUserInterface
     protected function getPhoneInfo()
     {
         return [
-            "phone_number"=> $this->getPhoneNumber(),
-            "phone_number_verified"=> $this->isPhoneNumberVerified(),
+            'phone_number'          => $this->getPhoneNumber(),
+            'phone_number_verified' => $this->isPhoneNumberVerified(),
         ];
     }
 
@@ -130,7 +130,7 @@ class EndUser extends ResourceOwner implements EndUserInterface
     protected function getAddressInfo()
     {
         return [
-            "address"=> $this->getAddress(),
+            'address' => $this->getAddress(),
         ];
     }
 
