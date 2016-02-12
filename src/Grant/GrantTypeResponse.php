@@ -11,7 +11,6 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\RefreshTokenInterface;
 
 final class GrantTypeResponse implements GrantTypeResponseInterface
@@ -19,7 +18,7 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * @var array|null
      */
-    private $additional_data = null;
+    private $additional_data = [];
 
     /**
      * @var string[]
@@ -55,21 +54,6 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
      * @var \OAuth2\Token\RefreshTokenInterface
      */
     private $revoke_refresh_token = null;
-
-    /**
-     * @var bool
-     */
-    private $issue_id_token = false;
-
-    /**
-     * @var \OAuth2\Token\AuthCodeInterface|null
-     */
-    private $auth_code = null;
-
-    /**
-     * @var array
-     */
-    private $id_token_claims = [];
 
     /**
      * {@inheritdoc}
@@ -178,38 +162,6 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function setIdTokenIssued($issue_id_token)
-    {
-        $this->issue_id_token = $issue_id_token;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isIdTokenIssued()
-    {
-        return $this->issue_id_token;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAuthorizationCodeToHash(AuthCodeInterface $auth_code)
-    {
-        $this->auth_code = $auth_code;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthorizationCodeToHash()
-    {
-        return $this->auth_code;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getRefreshTokenScope()
     {
         return $this->refresh_token_scope;
@@ -229,21 +181,5 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function getRefreshTokenRevoked()
     {
         return $this->revoke_refresh_token;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdTokenClaims()
-    {
-        return $this->id_token_claims;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setIdTokenClaims($id_token_claims)
-    {
-        $this->id_token_claims = $id_token_claims;
     }
 }

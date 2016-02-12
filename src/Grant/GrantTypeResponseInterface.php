@@ -87,26 +87,6 @@ interface GrantTypeResponseInterface
     public function setRefreshTokenIssued($issue_refresh_token);
 
     /**
-     * @return bool If true, an Id token will be issued with the access token
-     */
-    public function isIdTokenIssued();
-
-    /**
-     * @param bool $issue_id_token
-     */
-    public function setIdTokenIssued($issue_id_token);
-
-    /**
-     * @return \OAuth2\Token\AuthCodeInterface|null
-     */
-    public function getAuthorizationCodeToHash();
-
-    /**
-     * @param \OAuth2\Token\AuthCodeInterface $auth_code
-     */
-    public function setAuthorizationCodeToHash(AuthCodeInterface $auth_code);
-
-    /**
      * @return string[]
      */
     public function getRefreshTokenScope();
@@ -125,14 +105,4 @@ interface GrantTypeResponseInterface
      * @param \OAuth2\Token\RefreshTokenInterface $revoke_refresh_token
      */
     public function setRefreshTokenRevoked(RefreshTokenInterface $revoke_refresh_token);
-
-    /**
-     * @return array
-     */
-    public function getIdTokenClaims();
-
-    /**
-     * @param array $id_token_claims
-     */
-    public function setIdTokenClaims($id_token_claims);
 }

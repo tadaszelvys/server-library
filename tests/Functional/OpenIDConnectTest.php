@@ -11,12 +11,14 @@
 
 namespace OAuth2\Test\Functional;
 
+use Jose\Loader;
 use OAuth2\Test\Base;
 use OAuth2\OpenIDConnect\IdTokenInterface;
 use OAuth2\Token\AccessTokenInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
+use Jose\Object\JWSInterface;
 
 /**
  * @group OpenIDConnect
@@ -127,6 +129,38 @@ class OpenIDConnectTest extends Base
 
         $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
         $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
+    }
+
+    public function testIdTokenSuccess()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'id_token',
+            'nonce'                 => '0123456789',
+            'state'                 => 'ABCDEF',
+            'scope'                 => 'openid',
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'plain',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#id_token=[^"]+&token_type=Bearer&state=ABCDEF$/', $response->getHeader('Location')[0]);
+        $values = parse_url($response->getHeader('Location')[0]);
+        parse_str($values['fragment'], $params);
+
+        $id_token = Loader::load($params['id_token']);
+
+        $this->assertInstanceOf(JWSInterface::class, $id_token);
+        $this->assertTrue($id_token->hasClaim('nonce'));
+        $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
     }
 
     public function testCodeIdTokenTokenSuccess()

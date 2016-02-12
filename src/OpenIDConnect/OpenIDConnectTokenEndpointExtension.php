@@ -17,6 +17,7 @@ use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Token\AuthCodeInterface;
 
 /**
  * Class OpenIDConnectTokenEndpointExtension
@@ -59,17 +60,41 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
      */
     public function process(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information, AccessTokenInterface $access_token)
     {
-        if (true === $grant_type_response->isIdTokenIssued()) {
-            $id_token = $this->id_token_manager->createIdToken(
-                $client,
-                $this->end_user_manager->getEndUser($grant_type_response->getResourceOwnerPublicId()),
-                $token_type_information,
-                $grant_type_response->getIdTokenClaims(),
-                $access_token,
-                $grant_type_response->getAuthorizationCodeToHash()
-            );
-
-            return $id_token->toArray();
+        if (false === $this->issueIdToken($grant_type_response)) {
+            return;
         }
+
+        $claims = [];
+        $auth_code = $grant_type_response->getAdditionalData('auth_code');
+
+        if ($auth_code instanceof AuthCodeInterface && array_key_exists('nonce', $params = $auth_code->getQueryParams())) {
+            $claims = array_merge(
+                $claims,
+                ['nonce' => $params['nonce']]
+            );
+        }
+
+        $id_token = $this->id_token_manager->createIdToken(
+            $client,
+            $this->end_user_manager->getEndUser($grant_type_response->getResourceOwnerPublicId()),
+            $token_type_information,
+            $claims,
+            $access_token,
+            $auth_code
+        );
+
+        return $id_token->toArray();
+    }
+
+    /**
+     * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
+     *
+     * @return bool
+     */
+    private function issueIdToken(GrantTypeResponseInterface $grant_type_response)
+    {
+        $scope = $grant_type_response->getRequestedScope();
+
+        return is_array($scope) && in_array('openid', $scope);
     }
 }
