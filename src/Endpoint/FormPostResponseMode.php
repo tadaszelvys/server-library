@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint;
 
+use OAuth2\Grant\ResponseTypeSupportInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class FormPostResponseMode implements ResponseModeInterface
@@ -20,7 +21,7 @@ class FormPostResponseMode implements ResponseModeInterface
      */
     public function getName()
     {
-        return 'form_post';
+        return ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_FORM_POST;
     }
 
     /**

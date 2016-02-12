@@ -96,7 +96,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      */
     public function getResponseMode()
     {
-        return 'query';
+        return self::RESPONSE_TYPE_MODE_QUERY;
     }
 
     /**

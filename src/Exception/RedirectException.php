@@ -11,6 +11,7 @@
 
 namespace OAuth2\Exception;
 
+use OAuth2\Grant\ResponseTypeSupportInterface;
 use OAuth2\Util\Uri;
 
 final class RedirectException extends BaseException implements RedirectExceptionInterface
@@ -41,7 +42,7 @@ final class RedirectException extends BaseException implements RedirectException
             throw new \InvalidArgumentException('redirect_uri_not_defined');
         }
 
-        if (!array_key_exists('transport_mode', $data) || !in_array($data['transport_mode'], ['query', 'fragment'])) {
+        if (!array_key_exists('transport_mode', $data) || !in_array($data['transport_mode'], [ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_FRAGMENT, ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_QUERY])) {
             throw new \InvalidArgumentException('invalid_transport_mode');
         }
         $this->transport_mode = $data['transport_mode'];

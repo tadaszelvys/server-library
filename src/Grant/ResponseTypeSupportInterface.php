@@ -15,6 +15,10 @@ use OAuth2\Endpoint\Authorization;
 
 interface ResponseTypeSupportInterface
 {
+    const RESPONSE_TYPE_MODE_FRAGMENT = 'fragment';
+    const RESPONSE_TYPE_MODE_QUERY = 'query';
+    const RESPONSE_TYPE_MODE_FORM_POST = 'form_post';
+
     /**
      * This function returns the supported response type.
      *
@@ -37,7 +41,7 @@ interface ResponseTypeSupportInterface
 
     /**
      * Returns the response mode of the response type or the error returned.
-     * Possible values are 'query' (in the query string) or 'fragment' (in the fragment URI).
+     * For possible values, see constants above.
      *
      * @return string
      */

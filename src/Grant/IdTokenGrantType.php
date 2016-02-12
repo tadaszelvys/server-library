@@ -53,7 +53,7 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
      */
     public function getResponseMode()
     {
-        return 'fragment';
+        return self::RESPONSE_TYPE_MODE_FRAGMENT;
     }
 
     /**

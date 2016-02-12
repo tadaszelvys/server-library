@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint;
 
+use OAuth2\Grant\ResponseTypeSupportInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
 
@@ -21,7 +22,7 @@ final class FragmentResponseMode implements ResponseModeInterface
      */
     public function getName()
     {
-        return 'fragment';
+        return ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_FRAGMENT;
     }
 
     /**
