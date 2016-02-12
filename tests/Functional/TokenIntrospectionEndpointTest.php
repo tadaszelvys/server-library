@@ -13,6 +13,8 @@ namespace OAuth2\Test\Functional;
 
 use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
+use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Token\RefreshTokenInterface;
 
 /**
  * @group TokenIntrospection
@@ -145,7 +147,7 @@ class TokenIntrospectionEndpointTest extends Base
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
+        $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
     }
@@ -199,7 +201,7 @@ class TokenIntrospectionEndpointTest extends Base
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertInstanceOf('\OAuth2\Token\RefreshTokenInterface', $this->getRefreshTokenManager()->getRefreshToken('VALID_REFRESH_TOKEN'));
+        $this->assertInstanceOf(RefreshTokenInterface::class, $this->getRefreshTokenManager()->getRefreshToken('VALID_REFRESH_TOKEN'));
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported token type hint","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
     }

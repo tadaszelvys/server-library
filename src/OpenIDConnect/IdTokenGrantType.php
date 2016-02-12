@@ -9,12 +9,11 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\OpenIDConnect;
 
-use OAuth2\Behaviour\HasIdTokenManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Endpoint\Authorization;
-use OAuth2\Token\IdTokenManagerInterface;
+use OAuth2\Grant\ResponseTypeSupportInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 
 final class IdTokenGrantType implements ResponseTypeSupportInterface
@@ -31,7 +30,7 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
      * IdTokenGrantType constructor.
      *
      * @param \OAuth2\Token\TokenTypeManagerInterface $token_type_manager
-     * @param \OAuth2\Token\IdTokenManagerInterface   $id_token_manager
+     * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface   $id_token_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
                                 IdTokenManagerInterface $id_token_manager

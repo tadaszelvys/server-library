@@ -16,6 +16,7 @@ use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
+use OAuth2\Token\AccessTokenInterface;
 
 /**
  * @group AuthorizationCodeGrantType
@@ -783,7 +784,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_token);
+        $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
         $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
     }
 
@@ -806,7 +807,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_token);
+        $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
         $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
     }
 }

@@ -20,6 +20,8 @@ use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
+use OAuth2\Token\JWTAccessTokenInterface;
+use Jose\Object\JWSInterface;
 
 /**
  * @group ClientCredentialsGrantType
@@ -222,10 +224,10 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals(5, count(explode('.', $values['access_token'])));
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($values['access_token']);
-        $this->assertInstanceOf('\OAuth2\Token\JWTAccessTokenInterface', $access_token);
+        $this->assertInstanceOf(JWTAccessTokenInterface::class, $access_token);
         $this->assertEquals('bar', $access_token->getClientPublicId());
         $this->assertEquals('bar', $access_token->getResourceOwnerPublicId());
-        $this->assertInstanceOf('\Jose\Object\JWSInterface', $access_token->getJWS());
+        $this->assertInstanceOf(JWSInterface::class, $access_token->getJWS());
         $this->assertTrue($access_token->getExpiresIn() <= 3600);
     }
 

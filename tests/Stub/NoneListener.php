@@ -11,7 +11,7 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Grant\NoneResponseTypeListenerInterface;
+use OAuth2\OpenIDConnect\NoneResponseTypeListenerInterface;
 use OAuth2\Token\AccessTokenInterface;
 
 class NoneListener implements NoneResponseTypeListenerInterface

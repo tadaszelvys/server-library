@@ -18,7 +18,7 @@ use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\AuthorizationFactory;
-use OAuth2\Endpoint\FormPostResponseMode;
+use OAuth2\OpenIDConnect\FormPostResponseMode;
 use OAuth2\Endpoint\FragmentResponseMode;
 use OAuth2\Endpoint\QueryResponseMode;
 use OAuth2\Endpoint\TokenEndpoint;
@@ -26,16 +26,17 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
-use OAuth2\Endpoint\UserInfoEndpoint;
+use OAuth2\OpenIDConnect\UserInfoEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\JWTBearerGrantType;
-use OAuth2\Grant\NoneResponseType;
+use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\ClaimCheckerManager;
+use OAuth2\Test\Stub\Configuration;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
@@ -49,7 +50,7 @@ use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
 use OAuth2\Token\BearerToken;
-use OAuth2\Token\IdTokenManager;
+use OAuth2\OpenIDConnect\IdTokenManager;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
 use OAuth2\Util\JWTLoader;
@@ -68,10 +69,53 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     private $issuer = 'My Authorization Server';
 
+    /**
+     * @var \OAuth2\Test\Stub\Configuration
+     */
+    private $configuration;
+
     protected function setUp()
     {
         //To fix HHVM tests on Travis-CI
         date_default_timezone_set('UTC');
+
+        $this->configuration = new Configuration();
+
+        $this->configuration->set('issuer', 'My Authorization Server');
+        $this->configuration->set('authorization_endpoint', 'https://my.server.com/authorize');
+        $this->configuration->set('token_endpoint', 'https://my.server.com/authorize');
+        $this->configuration->set('userinfo_endpoint', 'https://my.server.com/authorize');
+        $this->configuration->set('jwks_uri', 'https://my.server.com/authorize');
+        $this->configuration->set('registration_endpoint', 'https://my.server.com/authorize');
+        $this->configuration->set('scopes_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('response_types_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('response_modes_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('grant_types_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('acr_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('subject_types_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('id_token_signing_alg_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('id_token_encryption_alg_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('id_token_encryption_enc_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('userinfo_signing_alg_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('userinfo_encryption_alg_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('userinfo_encryption_enc_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('request_object_signing_alg_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('request_object_encryption_alg_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('request_object_encryption_enc_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('token_endpoint_auth_methods_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('token_endpoint_auth_signing_alg_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('display_values_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('claim_types_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('claims_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('service_documentation', 'https://my.server.com/authorize');
+        $this->configuration->set('claims_locales_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('ui_locales_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('claims_parameter_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('request_parameter_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('request_uri_parameter_supported', 'https://my.server.com/authorize');
+        $this->configuration->set('require_request_uri_registration', 'https://my.server.com/authorize');
+        $this->configuration->set('op_policy_uri', 'https://my.server.com/authorize');
+        $this->configuration->set('op_tos_uri', 'https://my.server.com/authorize');
     }
 
     /**
@@ -162,12 +206,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Endpoint\UserInfoEndpointInterface
+     * @var null|\OAuth2\OpenIDConnect\UserInfoEndpointInterface
      */
     private $user_info_endpoint = null;
 
     /**
-     * @return \OAuth2\Endpoint\UserInfoEndpointInterface
+     * @return \OAuth2\OpenIDConnect\UserInfoEndpointInterface
      */
     protected function getUserInfoEndpoint()
     {
@@ -552,12 +596,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Grant\NoneResponseType
+     * @var null|\OAuth2\OpenIDConnect\NoneResponseType
      */
     private $none_response_type = null;
 
     /**
-     * @return \OAuth2\Grant\NoneResponseType
+     * @return \OAuth2\OpenIDConnect\NoneResponseType
      */
     protected function getNoneResponseType()
     {
@@ -796,12 +840,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return null|\\OAuth2\Token\IdTokenManager
+     * @return null|\\OAuth2\OpenIDConnect\IdTokenManager
      */
     private $id_token_manager = null;
 
     /**
-     * @return \OAuth2\Token\IdTokenManager
+     * @return \OAuth2\OpenIDConnect\IdTokenManager
      */
     protected function getIdTokenManager()
     {

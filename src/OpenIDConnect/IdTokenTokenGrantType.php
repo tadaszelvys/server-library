@@ -9,32 +9,20 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Endpoint\Authorization;
+use OAuth2\Grant\ResponseTypeSupportInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 
-/**
- * This response type has been introduced by OpenID Connect
- * It creates an access token, but does not returns anything.
- *
- * At this time, this response type is not complete, because it always redirect the client.
- * But if no redirect URI is specified, no redirection should occurred as per OpenID Connect specification.
- *
- * @see http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#none
- */
-final class NoneResponseType implements ResponseTypeSupportInterface
+final class IdTokenTokenGrantType implements ResponseTypeSupportInterface
 {
     use HasTokenTypeManager;
+    use HasIdTokenManager;
     use HasAccessTokenManager;
-
-    /**
-     * @var \OAuth2\Grant\NoneResponseTypeListenerInterface[]
-     */
-    private $listeners = [];
 
     /**
      * @var bool
@@ -42,24 +30,19 @@ final class NoneResponseType implements ResponseTypeSupportInterface
     private $access_token_type_parameter_allowed = false;
 
     /**
-     * NoneResponseType constructor.
+     * IdTokenTokenGrantType constructor.
      *
      * @param \OAuth2\Token\TokenTypeManagerInterface   $token_type_manager
+     * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface     $id_token_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
+                                IdTokenManagerInterface $id_token_manager,
                                 AccessTokenManagerInterface $access_token_manager
     ) {
         $this->setTokenTypeManager($token_type_manager);
+        $this->setIdTokenManager($id_token_manager);
         $this->setAccessTokenManager($access_token_manager);
-    }
-
-    /**
-     * @param \OAuth2\Grant\NoneResponseTypeListenerInterface $listener
-     */
-    public function addListener(NoneResponseTypeListenerInterface $listener)
-    {
-        $this->listeners[] = $listener;
     }
 
     /**
@@ -67,7 +50,7 @@ final class NoneResponseType implements ResponseTypeSupportInterface
      */
     public function getResponseType()
     {
-        return 'none';
+        return 'id_token token';
     }
 
     /**
@@ -75,7 +58,7 @@ final class NoneResponseType implements ResponseTypeSupportInterface
      */
     public function getResponseMode()
     {
-        return self::RESPONSE_TYPE_MODE_QUERY;
+        return self::RESPONSE_TYPE_MODE_FRAGMENT;
     }
 
     /**
@@ -83,24 +66,35 @@ final class NoneResponseType implements ResponseTypeSupportInterface
      */
     public function grantAuthorization(Authorization $authorization)
     {
+        //OpenId Connect checks here
+
         if (true === $this->isAccessTokenTypeParameterAllowed() && array_key_exists('token_type', $authorization->getQueryParams())) {
             $token_type = $this->getTokenTypeManager()->getTokenType($authorization->getQueryParams()['token_type']);
         } else {
             $token_type = $this->getTokenTypeManager()->getDefaultTokenType();
         }
 
-        $token = $this->getAccessTokenManager()->createAccessToken(
+        $access_token = $this->getAccessTokenManager()->createAccessToken(
             $authorization->getClient(),
             $authorization->getEndUser(),
             $token_type->getTokenTypeInformation(),
+            $authorization->getQueryParams(),
             $authorization->getScopes()
         );
 
-        foreach ($this->listeners as $listener) {
-            $listener->call($token);
-        }
+        $id_token = $this->getIdTokenManager()->createIdToken(
+            $authorization->getClient(),
+            $authorization->getEndUser(),
+            $token_type->getTokenTypeInformation(),
+            [],
+            $access_token,
+            null
+        );
 
-        return [];
+        return array_merge(
+            $access_token->toArray(),
+            $id_token->toArray()
+        );
     }
 
     /**

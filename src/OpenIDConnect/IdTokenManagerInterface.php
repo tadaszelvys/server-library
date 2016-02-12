@@ -9,10 +9,12 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Token;
+namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\EndUser\EndUserInterface;
+use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Token\AuthCodeInterface;
 
 interface IdTokenManagerInterface
 {
@@ -29,14 +31,14 @@ interface IdTokenManagerInterface
     public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $token_type_information, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null);
 
     /**
-     * @param \OAuth2\Token\IdTokenInterface $token The ID token to revoke
+     * @param \OAuth2\OpenIDConnect\IdTokenInterface $token The ID token to revoke
      */
     public function revokeIdToken(IdTokenInterface $token);
 
     /**
      * @param string $id_token The ID token
      *
-     * @return \OAuth2\Token\IdTokenInterface|null Return the ID token or null
+     * @return \OAuth2\OpenIDConnect\IdTokenInterface|null Return the ID token or null
      */
     public function getIdToken($id_token);
 }

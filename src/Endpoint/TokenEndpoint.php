@@ -15,7 +15,7 @@ use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasIdTokenManager;
+use OAuth2\OpenIDConnect\HasIdTokenManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
@@ -28,7 +28,7 @@ use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
-use OAuth2\Token\IdTokenManagerInterface;
+use OAuth2\OpenIDConnect\IdTokenManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
@@ -67,7 +67,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
-     * @param \OAuth2\Token\IdTokenManagerInterface|null      $id_token_manager
+     * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface|null      $id_token_manager
      */
     public function __construct(
         TokenTypeManagerInterface $token_type_manager,

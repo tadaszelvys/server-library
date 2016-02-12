@@ -9,9 +9,10 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Token;
+namespace OAuth2\OpenIDConnect;
 
 use Jose\Object\JWSInterface;
+use OAuth2\Token\TokenInterface;
 
 interface IdTokenInterface extends TokenInterface
 {

@@ -9,19 +9,18 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Behaviour;
+namespace OAuth2\OpenIDConnect;
 
-use OAuth2\Token\IdTokenManagerInterface;
 
 trait HasIdTokenManager
 {
     /**
-     * @var \OAuth2\Token\IdTokenManagerInterface
+     * @var \OAuth2\OpenIDConnect\IdTokenManagerInterface
      */
     private $id_token_manager;
 
     /**
-     * @return \OAuth2\Token\IdTokenManagerInterface
+     * @return \OAuth2\OpenIDConnect\IdTokenManagerInterface
      */
     protected function getIdTokenManager()
     {
@@ -29,7 +28,7 @@ trait HasIdTokenManager
     }
 
     /**
-     * @param \OAuth2\Token\IdTokenManagerInterface $id_token_manager
+     * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface $id_token_manager
      */
     private function setIdTokenManager(IdTokenManagerInterface $id_token_manager)
     {

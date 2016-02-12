@@ -12,6 +12,8 @@
 namespace OAuth2\Test\Functional;
 
 use OAuth2\Test\Base;
+use OAuth2\OpenIDConnect\IdTokenInterface;
+use OAuth2\Token\AccessTokenInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
@@ -68,7 +70,7 @@ class OpenIDConnectTest extends Base
 
         $id_token = $this->getIdTokenManager()->getIdToken($json['id_token']);
 
-        $this->assertInstanceOf('\OAuth2\Token\IdTokenInterface', $id_token);
+        $this->assertInstanceOf(IdTokenInterface::class, $id_token);
 
         $this->assertEquals('My Authorization Server', $id_token->getJWS()->getClaim('iss'));
         $this->assertEquals('**UNREGISTERED**--foo', $id_token->getJWS()->getClaim('aud'));
@@ -123,7 +125,7 @@ class OpenIDConnectTest extends Base
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
 
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_token);
+        $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
         $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
     }
 
@@ -171,7 +173,7 @@ class OpenIDConnectTest extends Base
         $this->assertEquals(1, count($this->getNoneListener()->getAccessTokens()));
 
         $access_tokens = $this->getNoneListener()->getAccessTokens();
-        $this->assertInstanceOf('\OAuth2\Token\AccessTokenInterface', $access_tokens[0]);
+        $this->assertInstanceOf(AccessTokenInterface::class, $access_tokens[0]);
     }
 
     public function testUserInfoSuccess()

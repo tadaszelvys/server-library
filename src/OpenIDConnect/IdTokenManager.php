@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Token;
+namespace OAuth2\OpenIDConnect;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
@@ -24,6 +24,9 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Token\AuthCodeInterface;
+use OAuth2\Token\TokenInterface;
 use OAuth2\Util\JWTCreator;
 use OAuth2\Util\JWTLoader;
 
@@ -156,7 +159,7 @@ class IdTokenManager implements IdTokenManagerInterface
     }
 
     /**
-     * @return \OAuth2\Token\IdTokenInterface
+     * @return \OAuth2\OpenIDConnect\IdTokenInterface
      */
     protected function createEmptyIdToken()
     {
@@ -164,9 +167,9 @@ class IdTokenManager implements IdTokenManagerInterface
     }
 
     /**
-     * @param \OAuth2\Token\IdTokenInterface $is_token
+     * @param \OAuth2\OpenIDConnect\IdTokenInterface $id_token
      */
-    protected function saveIdToken(IdTokenInterface $is_token)
+    protected function saveIdToken(IdTokenInterface $id_token)
     {
         //Nothing to do
     }
