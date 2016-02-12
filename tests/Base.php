@@ -26,7 +26,7 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
-use OAuth2\OpenIDConnect\Metadata;
+use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
 use OAuth2\OpenIDConnect\UserInfoEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
@@ -68,11 +68,6 @@ class Base extends \PHPUnit_Framework_TestCase
      * @var string
      */
     private $issuer = 'My Authorization Server';
-
-    /**
-     * @var \OAuth2\OpenIDConnect\Metadata
-     */
-    private $metadata;
 
     protected function setUp()
     {
@@ -241,10 +236,35 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
             $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
 
+
+            $this->token_endpoint->addTokenEndpointExtension($this->getOpenIDConnectTokenEndpointExtension());
+
             $this->token_endpoint->allowAccessTokenTypeParameter();
         }
 
         return $this->token_endpoint;
+    }
+
+    /**
+     * @var null|\OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension
+     */
+    private $openid_connect_token_endpoint_extension = null;
+
+
+    /**
+     * @return \OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension
+     */
+    protected function getOpenIDConnectTokenEndpointExtension()
+    {
+        if (null === $this->openid_connect_token_endpoint_extension) {
+            $this->openid_connect_token_endpoint_extension = new OpenIDConnectTokenEndpointExtension(
+                $this->getIdTokenManager(),
+                $this->getEndUserManager(),
+                $this->getExceptionManager()
+            );
+        }
+
+        return $this->openid_connect_token_endpoint_extension;
     }
 
     /**

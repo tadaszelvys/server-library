@@ -15,7 +15,6 @@ use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\OpenIDConnect\HasIdTokenManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
@@ -38,7 +37,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class TokenEndpoint implements TokenEndpointInterface
 {
-    use HasIdTokenManager;
     use HasEndUserManager;
     use HasScopeManager;
     use HasExceptionManager;
@@ -51,6 +49,11 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @var \OAuth2\Grant\GrantTypeSupportInterface[]
      */
     private $grant_types = [];
+
+    /**
+     * @var \OAuth2\Endpoint\TokenEndpointExtensionInterface[]
+     */
+    private $token_endpoint_extensions = [];
 
     /**
      * @var bool
@@ -85,12 +88,17 @@ final class TokenEndpoint implements TokenEndpointInterface
         $this->setEndUserManager($end_user_manager);
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
-        if ($id_token_manager instanceof IdTokenManagerInterface) {
-            $this->setIdTokenManager($id_token_manager);
-        }
         if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
             $this->setRefreshTokenManager($refresh_token_manager);
         }
+    }
+
+    /**
+     * @param \OAuth2\Endpoint\TokenEndpointExtensionInterface $token_endpoint_extension
+     */
+    public function addTokenEndpointExtension(TokenEndpointExtensionInterface $token_endpoint_extension)
+    {
+        $this->token_endpoint_extensions[] = $token_endpoint_extension;
     }
 
     /**
@@ -200,17 +208,18 @@ final class TokenEndpoint implements TokenEndpointInterface
 
         $data = $access_token->toArray();
 
-        if ($this->getIdTokenManager() instanceof IdTokenManagerInterface && $grant_type_response->isIdTokenIssued()) {
-            $id_token = $this->getIdTokenManager()->createIdToken(
+        foreach ($this->token_endpoint_extensions as $token_endpoint_extension) {
+            $result = $token_endpoint_extension->process(
                 $client,
-                $this->getEndUserManager()->getEndUser($grant_type_response->getResourceOwnerPublicId()),
+                $grant_type_response,
                 $token_type_information,
-                $grant_type_response->getIdTokenClaims(),
-                $access_token,
-                $grant_type_response->getAuthorizationCodeToHash()
+                $access_token
             );
 
-            $data = array_merge($data, $id_token->toArray());
+            if (!empty($result)) {
+
+                $data = array_merge($data, $result);
+            }
         }
 
         $response->getBody()->write(json_encode($data));
