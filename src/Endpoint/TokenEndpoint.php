@@ -317,7 +317,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param $resource_owner_public_id
+     * @param string $resource_owner_public_id
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
