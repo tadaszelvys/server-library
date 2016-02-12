@@ -22,7 +22,7 @@ class NoneListener implements NoneResponseTypeListenerInterface
     private $access_tokens = [];
 
     /**
-     * [@inheritdoc}
+     * [@inheritdoc}.
      */
     public function call(AccessTokenInterface $access_token)
     {

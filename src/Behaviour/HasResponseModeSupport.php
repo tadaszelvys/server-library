@@ -11,7 +11,6 @@
 
 namespace OAuth2\Behaviour;
 
-use Assert\Assertion;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Endpoint\ResponseModeInterface;
 use OAuth2\Exception\ExceptionManagerInterface;

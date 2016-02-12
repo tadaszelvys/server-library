@@ -190,9 +190,9 @@ class IdTokenManager implements IdTokenManagerInterface
     }
 
     /**
-     * @return string
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
      */
     private function getHashMethod()
     {
@@ -218,9 +218,9 @@ class IdTokenManager implements IdTokenManagerInterface
     }
 
     /**
-     * @return int
-     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return int
      */
     private function getHashSize()
     {

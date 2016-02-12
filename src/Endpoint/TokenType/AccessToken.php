@@ -11,7 +11,6 @@
 
 namespace OAuth2\Endpoint\TokenType;
 
-use Assert\Assertion;
 use Jose\Object\JWTInterface;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;

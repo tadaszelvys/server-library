@@ -11,7 +11,6 @@
 
 namespace OAuth2\Endpoint;
 
-use Assert\Assertion;
 use Jose\ClaimChecker\ClaimCheckerManagerInterface;
 use Jose\Factory\DecrypterFactory;
 use Jose\Factory\VerifierFactory;
@@ -61,9 +60,9 @@ final class AuthorizationFactory
         ScopeManagerInterface $scope_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
         ExceptionManagerInterface $exception_manager,
-        $signature_algorithm = null,
-        $key_encryption_algorithm = null,
-        $content_encryption_algorithm = null,
+        $signature_algorithm,
+        $key_encryption_algorithm,
+        $content_encryption_algorithm,
         JWKSetInterface $jwk_set = null,
         ClaimCheckerManagerInterface $claim_checker_manager
     ) {

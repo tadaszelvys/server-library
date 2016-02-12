@@ -41,6 +41,7 @@ class MacToken implements TokenTypeInterface
      * @var int
      */
     private $mac_key_max_length = 50;
+
     /**
      * {@inheritdoc}
      */
@@ -191,9 +192,7 @@ class MacToken implements TokenTypeInterface
         }
 
         foreach ($authorization_headers as $authorization_header) {
-
             if ('MAC ' === substr($authorization_header, 0, 4) && 1 === preg_match('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', substr($authorization_header, 4), $matches)) {
-
                 preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', substr($authorization_header, 4), $matches, PREG_SET_ORDER);
 
                 $values = [];
@@ -208,7 +207,6 @@ class MacToken implements TokenTypeInterface
                 }
             }
         }
-
     }
 
     public function isTokenRequestValid(AccessTokenInterface $access_token, ServerRequestInterface $request, array $additional_credential_values)

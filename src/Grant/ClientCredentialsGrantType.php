@@ -11,7 +11,6 @@
 
 namespace OAuth2\Grant;
 
-use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
@@ -30,7 +29,7 @@ final class ClientCredentialsGrantType implements GrantTypeSupportInterface
     /**
      * ClientCredentialsGrantType constructor.
      *
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(ExceptionManagerInterface $exception_manager)
     {

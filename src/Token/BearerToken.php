@@ -110,11 +110,11 @@ class BearerToken implements TokenTypeInterface
         ];
 
         if (true === $this->isAccessTokenFromQueryStringAllowed()) {
-            $methods[] ='getTokenFromQuery';
+            $methods[] = 'getTokenFromQuery';
         }
 
         if (true === $this->isTokenFromRequestBodyAllowed()) {
-            $methods[] ='getTokenFromRequestBody';
+            $methods[] = 'getTokenFromRequestBody';
         }
 
         foreach ($methods as $method) {
@@ -132,6 +132,7 @@ class BearerToken implements TokenTypeInterface
         if ($access_token->getTokenType() !== $this->getTokenTypeName()) {
             return false;
         }
+
         return true;
     }
 
@@ -151,7 +152,6 @@ class BearerToken implements TokenTypeInterface
         }
 
         foreach ($authorization_headers as $authorization_header) {
-
             if (1 === preg_match('/'.preg_quote('Bearer', '/').'\s([a-zA-Z0-9\-_\+~\/\.]+)/', $authorization_header, $matches)) {
                 return $matches[1];
             }

@@ -27,8 +27,8 @@ abstract class JWTClientManager implements ClientManagerInterface
     /**
      * JWTClientManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader                       $jwt_loader
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
+     * @param \OAuth2\Util\JWTLoader                      $jwt_loader
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager)
     {

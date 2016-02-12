@@ -11,7 +11,6 @@
 
 namespace OAuth2\Grant;
 
-use Assert\Assertion;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasIdTokenManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
@@ -34,9 +33,9 @@ final class IdTokenTokenGrantType implements ResponseTypeSupportInterface
     /**
      * IdTokenTokenGrantType constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface      $token_type_manager
-     * @param \OAuth2\Token\IdTokenManagerInterface        $id_token_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface    $access_token_manager
+     * @param \OAuth2\Token\TokenTypeManagerInterface   $token_type_manager
+     * @param \OAuth2\Token\IdTokenManagerInterface     $id_token_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
                                 IdTokenManagerInterface $id_token_manager,
@@ -112,7 +111,7 @@ final class IdTokenTokenGrantType implements ResponseTypeSupportInterface
      */
     public function allowAccessTokenTypeParameter()
     {
-        $this->access_token_type_parameter_allowed = true;;
+        $this->access_token_type_parameter_allowed = true;
     }
 
     /**
@@ -120,6 +119,6 @@ final class IdTokenTokenGrantType implements ResponseTypeSupportInterface
      */
     public function disallowAccessTokenTypeParameter()
     {
-        $this->access_token_type_parameter_allowed = true;;
+        $this->access_token_type_parameter_allowed = true;
     }
 }

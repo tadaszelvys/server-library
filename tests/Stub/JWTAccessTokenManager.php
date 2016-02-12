@@ -16,8 +16,6 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\JWTAccessTokenManager as Base;
-use OAuth2\Util\JWTCreator;
-use OAuth2\Util\JWTLoader;
 
 class JWTAccessTokenManager extends Base
 {
