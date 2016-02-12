@@ -167,6 +167,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     public function setAuthorizationCodeLifetime($authorization_code_lifetime)
     {
         Assertion::integer($authorization_code_lifetime);
+        Assertion::greaterThan($authorization_code_lifetime, 0);
         $this->authorization_code_lifetime = $authorization_code_lifetime;
     }
 
@@ -184,6 +185,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     public function setAuthorizationCodeMinLength($authorization_code_min_length)
     {
         Assertion::integer($authorization_code_min_length);
+        Assertion::greaterThan($authorization_code_min_length, 0);
         Assertion::lessThan($authorization_code_min_length, $this->getAuthorizationCodeMaxLength());
         $this->authorization_code_min_length = $authorization_code_min_length;
     }

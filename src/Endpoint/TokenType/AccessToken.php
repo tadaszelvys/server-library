@@ -128,11 +128,18 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
     }
 
     /**
-     * @param bool $refresh_tokens_revoked_with_access_tokens
+     *
      */
-    public function setRefreshTokensRevokedWithAccessTokens($refresh_tokens_revoked_with_access_tokens)
+    public function enableRefreshTokensRevocationWithAccessTokens()
     {
-        Assertion::boolean($refresh_tokens_revoked_with_access_tokens);
-        $this->refresh_tokens_revoked_with_access_tokens = $refresh_tokens_revoked_with_access_tokens;
+        $this->refresh_tokens_revoked_with_access_tokens = true;
+    }
+
+    /**
+     *
+     */
+    public function disableRefreshTokensRevocationWithAccessTokens()
+    {
+        $this->refresh_tokens_revoked_with_access_tokens = false;
     }
 }

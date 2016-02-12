@@ -77,11 +77,18 @@ final class ClientCredentialsGrantType implements GrantTypeSupportInterface
     }
 
     /**
-     * @param bool $issue_refresh_token_with_access_token
+     *
      */
-    public function setRefreshTokenIssuedWithAccessToken($issue_refresh_token_with_access_token)
+    public function enableRefreshTokenIssuanceWithAccessToken()
     {
-        Assertion::boolean($issue_refresh_token_with_access_token);
-        $this->issue_refresh_token_with_access_token = $issue_refresh_token_with_access_token;
+        $this->issue_refresh_token_with_access_token = true;
+    }
+
+    /**
+     *
+     */
+    public function disableRefreshTokenIssuanceWithAccessToken()
+    {
+        $this->issue_refresh_token_with_access_token = false;
     }
 }

@@ -88,11 +88,18 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
     }
 
     /**
-     * @param bool $access_token_type_parameter_allowed
+     *
      */
-    public function setAccessTokenTypeParameterAllowed($access_token_type_parameter_allowed)
+    public function allowAccessTokenTypeParameter()
     {
-        Assertion::boolean($access_token_type_parameter_allowed);
-        $this->access_token_type_parameter_allowed = $access_token_type_parameter_allowed;
+        $this->access_token_type_parameter_allowed = true;;
+    }
+
+    /**
+     *
+     */
+    public function disallowAccessTokenTypeParameter()
+    {
+        $this->access_token_type_parameter_allowed = true;;
     }
 }

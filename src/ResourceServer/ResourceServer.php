@@ -12,6 +12,7 @@
 namespace OAuth2\ResourceServer;
 
 use Assert\Assertion;
+use Jose\Object\JWKSetInterface;
 use OAuth2\Client\Client;
 
 /**
@@ -25,9 +26,19 @@ class ResourceServer extends Client implements ResourceServerInterface
     protected $server_name;
 
     /**
-     * @var null|\Jose\Object\JWKInterface
+     * @var string[]
      */
-    protected $public_encryption_key;
+    protected $supported_key_encryption_algorithms;
+
+    /**
+     * @var string[]
+     */
+    protected $supported_content_encryption_algorithms;
+
+    /**
+     * @var null|\Jose\Object\JWKSetInterface
+     */
+    protected $public_key_encryption_keyset;
 
     /**
      * {@inheritdoc}
@@ -104,8 +115,48 @@ class ResourceServer extends Client implements ResourceServerInterface
     /**
      * {@inheritdoc}
      */
-    public function getPublicEncryptionKey()
+    public function getPublicKeyEncryptionKey()
     {
-        return $this->public_encryption_key;
+        return $this->public_key_encryption_keyset;
+    }
+
+    /**
+     * @param \Jose\Object\JWKSetInterface $public_key_encryption_keyset
+     */
+    public function setPublicKeyEncryptionKey(JWKSetInterface $public_key_encryption_keyset)
+    {
+        $this->public_key_encryption_keyset = $public_key_encryption_keyset;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedKeyEncryptionAlgorithms()
+    {
+        return $this->supported_key_encryption_algorithms;
+    }
+
+    /**
+     * @param string[] $supported_key_encryption_algorithms
+     */
+    public function setSupportedKeyEncryptionAlgorithms($supported_key_encryption_algorithms)
+    {
+        $this->supported_key_encryption_algorithms = $supported_key_encryption_algorithms;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedContentEncryptionAlgorithms()
+    {
+        return $this->supported_content_encryption_algorithms;
+    }
+
+    /**
+     * @param string[] $supported_content_encryption_algorithms
+     */
+    public function setSupportedContentEncryptionAlgorithms($supported_content_encryption_algorithms)
+    {
+        $this->supported_content_encryption_algorithms = $supported_content_encryption_algorithms;
     }
 }

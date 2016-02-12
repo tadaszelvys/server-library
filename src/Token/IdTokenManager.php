@@ -284,6 +284,7 @@ class IdTokenManager implements IdTokenManagerInterface
     public function setIdTokenLifetime($id_token_lifetime)
     {
         Assertion::integer($id_token_lifetime);
-        $this->$id_token_lifetime = $id_token_lifetime;
+        Assertion::greaterThan($id_token_lifetime, 0);
+        $this->id_token_lifetime = $id_token_lifetime;
     }
 }

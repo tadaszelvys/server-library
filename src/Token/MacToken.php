@@ -94,7 +94,7 @@ class MacToken implements TokenTypeInterface
     public function setTimestampLifetime($timestamp_lifetime)
     {
         Assertion::integer($timestamp_lifetime);
-        Assertion::greaterOrEqualThan($timestamp_lifetime, 0);
+        Assertion::greaterThan($timestamp_lifetime, 0);
         $this->timestamp_lifetime = $timestamp_lifetime;
     }
 
@@ -141,6 +141,7 @@ class MacToken implements TokenTypeInterface
     public function setMacKeyMinLength($mac_key_min_length)
     {
         Assertion::integer($mac_key_min_length);
+        Assertion::greaterThan($mac_key_min_length, 0);
         Assertion::lessThan($mac_key_min_length, $this->getMacKeyMaxLength());
         $this->mac_key_min_length = $mac_key_min_length;
     }

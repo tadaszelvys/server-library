@@ -165,6 +165,7 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     public function setRefreshTokenLifetime($refresh_token_lifetime)
     {
         Assertion::integer($refresh_token_lifetime);
+        Assertion::greaterThan($refresh_token_lifetime, 0);
         $this->refresh_token_lifetime = $refresh_token_lifetime;
     }
 
@@ -182,6 +183,7 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     public function setRefreshTokenMinLength($refresh_token_min_length)
     {
         Assertion::integer($refresh_token_min_length);
+        Assertion::greaterThan($refresh_token_min_length, 0);
         Assertion::lessThan($refresh_token_min_length, $this->getRefreshTokenMaxLength());
         $this->refresh_token_min_length = $refresh_token_min_length;
     }

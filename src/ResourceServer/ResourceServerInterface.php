@@ -24,7 +24,17 @@ interface ResourceServerInterface extends ClientInterface
     public function getServerName();
 
     /**
-     * @return null|\Jose\Object\JWKInterface
+     * @return string[]
      */
-    public function getPublicEncryptionKey();
+    public function getSupportedKeyEncryptionAlgorithms();
+
+    /**
+     * @return string[]
+     */
+    public function getSupportedContentEncryptionAlgorithms();
+
+    /**
+     * @return null|\Jose\Object\JWKSetInterface
+     */
+    public function getPublicKeyEncryptionKey();
 }

@@ -11,7 +11,6 @@
 
 namespace OAuth2\Endpoint;
 
-use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasResponseModeSupport;
 use OAuth2\Behaviour\HasScopeManager;
@@ -325,12 +324,19 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param bool $redirect_uri_enforced
+     *
      */
-    public function setRedirectUriEnforced($redirect_uri_enforced)
+    public function enabledRedirectUriEnforcement()
     {
-        Assertion::boolean($redirect_uri_enforced);
-        $this->redirect_uri_enforced = $redirect_uri_enforced;
+        $this->redirect_uri_enforced = true;
+    }
+
+    /**
+     *
+     */
+    public function disableRedirectUriEnforcement()
+    {
+        $this->redirect_uri_enforced = false;
     }
 
     /**
@@ -342,12 +348,19 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param bool $secured_redirect_uri_enforced
+     *
      */
-    public function setSecuredRedirectUriEnforced($secured_redirect_uri_enforced)
+    public function enableSecuredRedirectUriEnforcement()
     {
-        Assertion::boolean($secured_redirect_uri_enforced);
-        $this->secured_redirect_uri_enforced = $secured_redirect_uri_enforced;
+        $this->secured_redirect_uri_enforced = true;
+    }
+
+    /**
+     *
+     */
+    public function disableSecuredRedirectUriEnforcement()
+    {
+        $this->secured_redirect_uri_enforced = false;
     }
 
     /**
@@ -359,12 +372,19 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param bool $redirect_uri_required_for_registered_client
+     *
      */
-    public function setRedirectUriRequiredForRegisteredClients($redirect_uri_required_for_registered_client)
+    public function enableRedirectUriForRegisteredClientsRequirement()
     {
-        Assertion::boolean($redirect_uri_required_for_registered_client);
-        $this->$redirect_uri_required_for_registered_client = $redirect_uri_required_for_registered_client;
+        $this->redirect_uri_required_for_registered_client = true;
+    }
+
+    /**
+     *
+     */
+    public function disableRedirectUriForRegisteredClientsRequirement()
+    {
+        $this->redirect_uri_required_for_registered_client = false;
     }
 
     /**
@@ -376,11 +396,18 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param bool $state_parameter_enforced
+     *
      */
-    public function setStateParameterEnforced($state_parameter_enforced)
+    public function enableStateParameterEnforcement()
     {
-        Assertion::boolean($state_parameter_enforced);
-        $this->$state_parameter_enforced = $state_parameter_enforced;
+        $this->state_parameter_enforced = true;
+    }
+
+    /**
+     *
+     */
+    public function disableStateParameterEnforcement()
+    {
+        $this->state_parameter_enforced = false;
     }
 }

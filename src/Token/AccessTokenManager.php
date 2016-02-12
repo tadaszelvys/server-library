@@ -135,6 +135,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     public function setAccessTokenLifetime($access_token_lifetime)
     {
         Assertion::integer($access_token_lifetime);
+        Assertion::greaterThan($access_token_lifetime, 0);
         $this->access_token_lifetime = $access_token_lifetime;
     }
 }

@@ -22,6 +22,11 @@ class BearerToken implements TokenTypeInterface
     private $token_from_request_body_allowed = false;
 
     /**
+     * @var bool
+     */
+    private $token_from_query_string_allowed = false;
+
+    /**
      * @return bool
      */
     public function isTokenFromRequestBodyAllowed()
@@ -30,11 +35,43 @@ class BearerToken implements TokenTypeInterface
     }
 
     /**
-     * @param bool $token_from_request_body_allowed
+     *
      */
-    public function setTokenFromRequestBodyAllowed($token_from_request_body_allowed)
+    public function allowTokenFromRequestBody()
     {
-        $this->token_from_request_body_allowed = $token_from_request_body_allowed;
+        $this->token_from_request_body_allowed = true;
+    }
+
+    /**
+     *
+     */
+    public function disallowAccessTokenFromRequestBody()
+    {
+        $this->token_from_query_string_allowed = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAccessTokenFromQueryStringAllowed()
+    {
+        return $this->token_from_request_body_allowed;
+    }
+
+    /**
+     *
+     */
+    public function allowAccessTokenFromQueryString()
+    {
+        $this->token_from_query_string_allowed = true;
+    }
+
+    /**
+     *
+     */
+    public function disallowAccessTokenFromQueryString()
+    {
+        $this->token_from_query_string_allowed = false;
     }
 
     /**
@@ -70,8 +107,11 @@ class BearerToken implements TokenTypeInterface
     {
         $methods = [
             'getTokenFromAuthorizationHeaders',
-            'getTokenFromQuery',
         ];
+
+        if (true === $this->isAccessTokenFromQueryStringAllowed()) {
+            $methods[] ='getTokenFromQuery';
+        }
 
         if (true === $this->isTokenFromRequestBodyAllowed()) {
             $methods[] ='getTokenFromRequestBody';

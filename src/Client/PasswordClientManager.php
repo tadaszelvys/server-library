@@ -34,9 +34,8 @@ abstract class PasswordClientManager implements ClientManagerInterface
     /**
      * PasswordClientManager constructor.
      *
-     * @param \OAuth2\Exception\ExceptionManagerInterface  $exception_manager
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param                                             $realm
      */
     public function __construct(ExceptionManagerInterface $exception_manager, $realm)
     {
@@ -214,20 +213,18 @@ abstract class PasswordClientManager implements ClientManagerInterface
     }
 
     /**
-     * @param bool $password_client_credentials_in_body_request_allowed
+     *
      */
-    public function setPasswordClientCredentialsInBodyRequestAllowed($password_client_credentials_in_body_request_allowed)
+    public function enablePasswordClientCredentialsInBodyRequest()
     {
-        Assertion::boolean($password_client_credentials_in_body_request_allowed);
-        $this->password_client_credentials_in_body_request_allowed = $password_client_credentials_in_body_request_allowed;
+        $this->password_client_credentials_in_body_request_allowed = true;
     }
 
     /**
-     * @param bool $password_client_credentials_in_body_request_allowed
+     *
      */
-    public function setRealm($password_client_credentials_in_body_request_allowed)
+    public function disablePasswordClientCredentialsInBodyRequest()
     {
-        Assertion::boolean($password_client_credentials_in_body_request_allowed);
-        $this->password_client_credentials_in_body_request_allowed = $password_client_credentials_in_body_request_allowed;
+        $this->password_client_credentials_in_body_request_allowed = false;
     }
 }

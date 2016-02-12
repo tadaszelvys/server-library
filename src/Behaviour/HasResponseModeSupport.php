@@ -95,11 +95,18 @@ trait HasResponseModeSupport
     }
 
     /**
-     * @param bool $response_mode_parameter_in_authorization_request_allowed
+     *
      */
-    public function setResponseModeParameterInAuthorizationRequestAllowed($response_mode_parameter_in_authorization_request_allowed)
+    public function allowResponseModeParameterInAuthorizationRequest()
     {
-        Assertion::boolean($response_mode_parameter_in_authorization_request_allowed);
-        $this->response_mode_parameter_in_authorization_request_allowed = $response_mode_parameter_in_authorization_request_allowed;
+        $this->response_mode_parameter_in_authorization_request_allowed = true;
+    }
+
+    /**
+     *
+     */
+    public function disallowResponseModeParameterInAuthorizationRequest()
+    {
+        $this->response_mode_parameter_in_authorization_request_allowed = false;
     }
 }

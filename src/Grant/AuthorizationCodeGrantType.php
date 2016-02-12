@@ -297,11 +297,18 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     }
 
     /**
-     * @param bool $pkce_for_public_clients_enforced
+     *
      */
-    public function setPKCEForPublicClientsEnforced($pkce_for_public_clients_enforced)
+    public function enablePKCEForPublicClientsEnforcement()
     {
-        Assertion::boolean($pkce_for_public_clients_enforced);
-        $this->pkce_for_public_clients_enforced = $pkce_for_public_clients_enforced;
+        $this->pkce_for_public_clients_enforced = true;
+    }
+
+    /**
+     *
+     */
+    public function disablePKCEForPublicClientsEnforcement()
+    {
+        $this->pkce_for_public_clients_enforced = false;
     }
 }

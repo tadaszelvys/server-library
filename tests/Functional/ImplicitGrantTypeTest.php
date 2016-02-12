@@ -42,7 +42,8 @@ class ImplicitGrantTypeTest extends Base
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'client_id'    => 'foo',
+            'client_id' => 'foo',
+            'state'     => '012345679',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -87,9 +88,10 @@ class ImplicitGrantTypeTest extends Base
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
-            'response_type'         => 'bad_response_type',
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'bad_response_type',
+            'state'         => '012345679',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -135,9 +137,10 @@ class ImplicitGrantTypeTest extends Base
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'fii',
-            'response_type'         => 'token',
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'fii',
+            'response_type' => 'token',
+            'state'         => '012345679',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -159,9 +162,10 @@ class ImplicitGrantTypeTest extends Base
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
-            'response_type'         => 'token',
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'token',
+            'state'         => '012345679',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -171,16 +175,17 @@ class ImplicitGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertEquals('http://example.com/test?good=false#error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied', $response->getHeader('Location')[0]);
+        $this->assertEquals('http://example.com/test?good=false#error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied&state=012345679', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccess()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
-            'response_type'         => 'token',
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'token',
+            'state'         => '012345679',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -190,7 +195,7 @@ class ImplicitGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=scope1\+scope2$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=scope1\+scope2&state=012345679$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithState()
