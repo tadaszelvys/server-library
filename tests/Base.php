@@ -66,7 +66,7 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    private $audience = 'My Authorization Server';
+    private $issuer = 'My Authorization Server';
 
     protected function setUp()
     {
@@ -107,10 +107,15 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthorizationFactory()
     {
         if (null === $this->authorization_factory) {
-            $jwt_loader = $this->getJWTLoader(
-                ['HS512'],
-                ['A256KW', 'A256CBC-HS512'],
-                ['keys' => [
+
+            $this->authorization_factory = new AuthorizationFactory(
+                $this->getScopeManager(),
+                $this->getClientManagerSupervisor(),
+                $this->getExceptionManager(),
+                'HS512',
+                'A256KW',
+                'A256CBC-HS512',
+                new JWKSet(['keys' => [
                     [
                         'kid' => 'JWK1',
                         'use' => 'enc',
@@ -123,19 +128,12 @@ class Base extends \PHPUnit_Framework_TestCase
                         'kty' => 'oct',
                         'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                     ],
-                ]],
-                false
+                ]]),
+                $this->getClaimCheckerManager()
             );
 
-            $this->authorization_factory = new AuthorizationFactory(
-                $this->getScopeManager(),
-                $this->getClientManagerSupervisor(),
-                $this->getExceptionManager(),
-                $jwt_loader
-            );
-
-            $this->authorization_factory->setRequestParameterSupported(true);
-            $this->authorization_factory->setRequestUriParameterSupported(true);
+            $this->authorization_factory->enableRequestParameterSupport();
+            $this->authorization_factory->enableRequestUriParameterSupport();
         }
 
         return $this->authorization_factory;
@@ -238,7 +236,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
             $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
 
-            $this->token_endpoint->setAccessTokenTypeParameterAllowed(true);
+            $this->token_endpoint->allowAccessTokenTypeParameter();
 
 
         }
@@ -270,8 +268,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_endpoint->addResponseMode(new FragmentResponseMode());
             $this->authorization_endpoint->addResponseMode(new FormPostResponseMode());
 
-            $this->authorization_endpoint->setResponseModeParameterInAuthorizationRequestAllowed(true);
-            $this->authorization_endpoint->setStateParameterEnforced(true);
+            $this->authorization_endpoint->allowResponseModeParameterInAuthorizationRequest();
+            $this->authorization_endpoint->enableStateParameterEnforcement();
         }
 
         return $this->authorization_endpoint;
@@ -391,7 +389,7 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->password_client_manager->createClients();
-            $this->password_client_manager->setPasswordClientCredentialsInBodyRequestAllowed(true);
+            $this->password_client_manager->enablePasswordClientCredentialsInBodyRequest();
         }
 
         return $this->password_client_manager;
@@ -472,7 +470,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager()
             );
 
-            $this->authorization_code_grant_type->setPKCEForPublicClientsEnforced(true);
+            $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
         }
 
         return $this->authorization_code_grant_type;
@@ -492,7 +490,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_credentials_grant_type = new ClientCredentialsGrantType(
                 $this->getExceptionManager()
             );
-            $this->client_credentials_grant_type->setRefreshTokenIssuedWithAccessToken(false);
+            $this->client_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
         }
 
         return $this->client_credentials_grant_type;
@@ -533,7 +531,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $jwt_loader,
                 $this->getExceptionManager()
             );
-            $this->jwt_bearer_grant_type->setRefreshTokenIssuedWithAccessToken(false);
+            $this->jwt_bearer_grant_type->disableRefreshTokenIssuanceWithAccessToken();
         }
 
         return $this->jwt_bearer_grant_type;
@@ -573,7 +571,7 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->none_response_type->addListener($this->getNoneListener());
-            $this->none_response_type->setAccessTokenTypeParameterAllowed(true);
+            $this->none_response_type->allowAccessTokenTypeParameter();
         }
 
         return $this->none_response_type;
@@ -594,7 +592,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager()
             );
-            $this->implicit_grant_type->setAccessTokenTypeParameterAllowed(false);
+            $this->implicit_grant_type->disallowAccessTokenTypeParameter();
         }
 
         return $this->implicit_grant_type;
@@ -688,7 +686,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
                 ]),
-                $this->audience
+                $this->issuer
             );
             $this->jwt_access_token_manager->addTokenUpdater(new FooBarAccessTokenUpdater());
         }
@@ -821,7 +819,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ]),
-                $this->audience
+                $this->issuer
             );
         }
 
@@ -888,7 +886,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->claim_checker_manager) {
 
-            $this->claim_checker_manager = new ClaimCheckerManager($this->audience);
+            $this->claim_checker_manager = new ClaimCheckerManager($this->issuer);
         }
 
         return $this->claim_checker_manager;
@@ -916,7 +914,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->getRefreshTokenManager()
         );
         
-        $access_token_type->setRefreshTokensRevokedWithAccessTokens(true);
+        $access_token_type->enableRefreshTokensRevocationWithAccessTokens();
         
         return $access_token_type;
     }
