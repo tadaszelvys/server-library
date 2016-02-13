@@ -27,7 +27,6 @@ use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
 use OAuth2\OpenIDConnect\IdTokenGrantType;
-//use OAuth2\OpenIDConnect\IdTokenTokenGrantType;
 use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
 use OAuth2\OpenIDConnect\UserInfoEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
@@ -623,28 +622,6 @@ class Base extends \PHPUnit_Framework_TestCase
 
         return $this->id_token_type;
     }
-
-    /**
-     * @var null|\OAuth2\OpenIDConnect\IdTokenTokenGrantType
-     */
-    //private $id_token_token_type = null;
-
-    /**
-     * @return \OAuth2\OpenIDConnect\IdTokenTokenGrantType
-     */
-    /*protected function getIdTokenTokenGrantType()
-    {
-        if (null === $this->id_token_token_type) {
-            $this->id_token_token_type = new IdTokenTokenGrantType(
-                $this->getTokenTypeManager(),
-                $this->getIdTokenManager(),
-                $this->getJWTAccessTokenManager(),
-                $this->getExceptionManager()
-            );
-        }
-
-        return $this->id_token_token_type;
-    }*/
 
     /**
      * @var null|\OAuth2\Grant\ImplicitGrantType
