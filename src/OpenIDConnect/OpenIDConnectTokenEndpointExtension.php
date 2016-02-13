@@ -20,7 +20,7 @@ use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
 
 /**
- * Class OpenIDConnectTokenEndpointExtension
+ * Class OpenIDConnectTokenEndpointExtension.
  */
 final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensionInterface
 {
@@ -56,7 +56,7 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
     }
 
     /**
-     * {@inheritdoc]
+     * {@inheritdoc].
      */
     public function process(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information, AccessTokenInterface $access_token)
     {
@@ -79,7 +79,7 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
             $this->end_user_manager->getEndUser($grant_type_response->getResourceOwnerPublicId()),
             $claims,
             $access_token->getToken(),
-            $auth_code instanceof AuthCodeInterface?$auth_code->getToken():null
+            $auth_code instanceof AuthCodeInterface ? $auth_code->getToken() : null
         );
 
         return $id_token->toArray();

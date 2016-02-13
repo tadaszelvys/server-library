@@ -72,6 +72,7 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
         if (!array_key_exists('nonce', $authorization->getQueryParams())) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "nonce" is mandatory using "id_token" response type.');
         }
+
         return [];
     }
 
@@ -86,8 +87,8 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
             $authorization->getClient(),
             $authorization->getEndUser(),
             ['nonce' => $params['nonce']],
-            array_key_exists('access_token', $response_parameters)?$response_parameters['access_token']:null,
-            array_key_exists('code', $response_parameters)?$response_parameters['code']:null
+            array_key_exists('access_token', $response_parameters) ? $response_parameters['access_token'] : null,
+            array_key_exists('code', $response_parameters) ? $response_parameters['code'] : null
         );
 
         $response_parameters = array_merge(

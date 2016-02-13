@@ -11,7 +11,6 @@
 
 namespace OAuth2\Endpoint;
 
-
 use OAuth2\Client\ClientInterface;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Token\AccessTokenInterface;

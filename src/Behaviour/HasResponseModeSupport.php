@@ -14,7 +14,6 @@ namespace OAuth2\Behaviour;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Endpoint\ResponseModeInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Grant\ResponseTypeSupportInterface;
 
 trait HasResponseModeSupport
 {
@@ -73,12 +72,11 @@ trait HasResponseModeSupport
             case 'code id_token token':
                 return 'fragment';
             default:
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('The multiple response types "%s" are not supported.', $response_type));;
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('The multiple response types "%s" are not supported.', $response_type));
         }
     }
 
-
-        /**
+    /**
      * @param string $mode
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface

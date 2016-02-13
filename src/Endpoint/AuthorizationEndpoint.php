@@ -127,7 +127,6 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
         $result = [];
         foreach ($types as $type) {
-
             $result = array_merge(
                 $result,
                 $type->prepareAuthorization($authorization)
@@ -336,7 +335,6 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
         $types = [];
         foreach ($response_types as $response_type) {
-
             if (!array_key_exists($response_type, $this->response_types)) {
                 throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Response type "%s" is not supported by this server', $response_type));
             }
@@ -346,7 +344,6 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
             }
             $types[] = $type;
         }
-
 
         return $types;
     }

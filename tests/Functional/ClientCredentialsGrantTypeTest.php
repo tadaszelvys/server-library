@@ -16,12 +16,12 @@ use Jose\Factory\JWEFactory;
 use Jose\Factory\JWSFactory;
 use Jose\Factory\SignerFactory;
 use Jose\Object\JWK;
+use Jose\Object\JWSInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Test\Base;
-use Zend\Diactoros\Response;
 use OAuth2\Token\JWTAccessTokenInterface;
-use Jose\Object\JWSInterface;
+use Zend\Diactoros\Response;
 
 /**
  * @group ClientCredentialsGrantType

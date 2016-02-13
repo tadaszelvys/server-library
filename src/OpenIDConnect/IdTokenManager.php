@@ -220,17 +220,17 @@ class IdTokenManager implements IdTokenManagerInterface
             case 'ES256':
             case 'RS256':
             case 'PS256':
-                return 128/8;
+                return 128 / 8;
             case 'HS384':
             case 'ES384':
             case 'RS384':
             case 'PS384':
-                return 192/8;
+                return 192 / 8;
             case 'HS512':
             case 'ES512':
             case 'RS512':
             case 'PS512':
-                return 256/8;
+                return 256 / 8;
             default:
                 throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
         }

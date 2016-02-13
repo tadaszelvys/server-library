@@ -213,7 +213,6 @@ final class TokenEndpoint implements TokenEndpointInterface
             );
 
             if (!empty($result)) {
-
                 $data = array_merge($data, $result);
             }
         }
