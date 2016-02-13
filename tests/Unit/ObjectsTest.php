@@ -13,12 +13,12 @@ namespace OAuth2\Test\Unit;
 
 use OAuth2\Client\PublicClient;
 use OAuth2\Exception\AuthenticateException;
+use OAuth2\OpenIDConnect\IdToken;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
 use OAuth2\Test\Stub\ResourceServer;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AuthCode;
-use OAuth2\OpenIDConnect\IdToken;
 
 /**
  * @group Objects

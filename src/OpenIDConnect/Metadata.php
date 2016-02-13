@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014-2016 Spomky-Labs
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ */
+
 namespace OAuth2\OpenIDConnect;
 
 use Assert\Assertion;
@@ -25,12 +34,12 @@ final class Metadata implements \JsonSerializable
 
         $method = substr($name, 0, 3);
         if (in_array($method, ['get', 'set'])) {
-
             $key = $this->decamelize(substr($name, 3));
             $arguments = array_merge(
                 [$key],
                 $arguments
             );
+
             return call_user_func_array([$this, $method], $arguments);
         }
         throw new \BadMethodCallException(sprintf('Method "%s" does not exists.', $name));
@@ -44,6 +53,7 @@ final class Metadata implements \JsonSerializable
     public function has($key)
     {
         Assertion::string($key);
+
         return array_key_exists($key, $this->values);
     }
 
@@ -86,13 +96,13 @@ final class Metadata implements \JsonSerializable
      *
      * @return string
      */
-    private function decamelize($word) {
+    private function decamelize($word)
+    {
         return preg_replace_callback(
-            "/(^|[a-z])([A-Z])/",
-            function($m) { return strtolower(strlen($m[1]) ? "$m[1]_$m[2]" : "$m[2]"); },
+            '/(^|[a-z])([A-Z])/',
+            function ($m) { return strtolower(strlen($m[1]) ? "$m[1]_$m[2]" : "$m[2]"); },
             $word
         );
-
     }
 
     /**

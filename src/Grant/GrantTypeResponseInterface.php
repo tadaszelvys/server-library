@@ -11,7 +11,6 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\RefreshTokenInterface;
 
 interface GrantTypeResponseInterface

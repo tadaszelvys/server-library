@@ -12,9 +12,9 @@
 namespace OAuth2\Test\Functional;
 
 use OAuth2\Test\Base;
-use Zend\Diactoros\Response;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\RefreshTokenInterface;
+use Zend\Diactoros\Response;
 
 /**
  * @group TokenRevocation
