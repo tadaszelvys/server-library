@@ -195,6 +195,9 @@ class MacToken implements TokenTypeInterface
             if ('MAC ' === substr($authorization_header, 0, 4) && 1 === preg_match('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', substr($authorization_header, 4), $matches)) {
                 preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', substr($authorization_header, 4), $matches, PREG_SET_ORDER);
 
+                if (!is_array($matches)) {
+                    return;
+                }
                 $values = [];
                 foreach ($matches as $match) {
                     $values[$match[1]] = $match[3];
