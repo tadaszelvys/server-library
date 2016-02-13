@@ -68,7 +68,7 @@ interface TokenInterface
     public function getScope();
 
     /**
-     * @param array $scope
+     * @param string[] $scope
      */
     public function setScope(array $scope);
 

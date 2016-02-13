@@ -63,6 +63,10 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
         if (false === $this->issueIdToken($grant_type_response)) {
             return;
         }
+        $end_user = $this->end_user_manager->getEndUser($grant_type_response->getResourceOwnerPublicId());
+        if (null === $end_user) {
+            return;
+        }
 
         $claims = [];
         $auth_code = $grant_type_response->getAdditionalData('auth_code');
@@ -76,7 +80,7 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
 
         $id_token = $this->id_token_manager->createIdToken(
             $client,
-            $this->end_user_manager->getEndUser($grant_type_response->getResourceOwnerPublicId()),
+            $end_user,
             $claims,
             $access_token->getToken(),
             $auth_code instanceof AuthCodeInterface ? $auth_code->getToken() : null

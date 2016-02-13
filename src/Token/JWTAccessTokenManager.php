@@ -93,7 +93,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         $payload = $this->preparePayload($access_token, $resource_server);
         $signature_header = $this->prepareSignatureHeader();
         $encryption_header = $this->prepareEncryptionHeader($client, $resource_server);
-        $recipient_key = null === $resource_server || null === $resource_server->getPublicEncryptionKey() ? $this->getJWTCreator()->getSenderKey() : $resource_server->getPublicEncryptionKey();
+        $recipient_key = null === $resource_server || null === $resource_server->getPublicKeyEncryptionKey() ? $this->getJWTCreator()->getSenderKey() : $resource_server->getPublicKeyEncryptionKey();
 
         $jwt = $this->getJWTCreator()->createJWT($payload, $signature_header, true, $encryption_header, $recipient_key);
 
