@@ -18,7 +18,6 @@ use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\AuthorizationFactory;
-use OAuth2\OpenIDConnect\FormPostResponseMode;
 use OAuth2\Endpoint\FragmentResponseMode;
 use OAuth2\Endpoint\QueryResponseMode;
 use OAuth2\Endpoint\TokenEndpoint;
@@ -33,9 +32,11 @@ use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\JWTBearerGrantType;
-use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
+use OAuth2\OpenIDConnect\FormPostResponseMode;
+use OAuth2\OpenIDConnect\IdTokenManager;
+use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\ClaimCheckerManager;
 use OAuth2\Test\Stub\EndUserManager;
@@ -51,7 +52,6 @@ use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\UnregisteredClientManager;
 use OAuth2\Token\BearerToken;
-use OAuth2\OpenIDConnect\IdTokenManager;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
 use OAuth2\Util\JWTLoader;
@@ -236,7 +236,6 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
             $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
 
-
             $this->token_endpoint->addTokenEndpointExtension($this->getOpenIDConnectTokenEndpointExtension());
 
             $this->token_endpoint->allowAccessTokenTypeParameter();
@@ -249,7 +248,6 @@ class Base extends \PHPUnit_Framework_TestCase
      * @var null|\OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension
      */
     private $openid_connect_token_endpoint_extension = null;
-
 
     /**
      * @return \OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension

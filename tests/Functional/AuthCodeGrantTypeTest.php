@@ -13,10 +13,10 @@ namespace OAuth2\Test\Functional;
 
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Test\Base;
+use OAuth2\Token\AccessTokenInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
-use OAuth2\Token\AccessTokenInterface;
 
 /**
  * @group AuthorizationCodeGrantType

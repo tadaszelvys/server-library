@@ -12,13 +12,13 @@
 namespace OAuth2\Test\Functional;
 
 use Jose\Loader;
-use OAuth2\Test\Base;
+use Jose\Object\JWSInterface;
 use OAuth2\OpenIDConnect\IdTokenInterface;
+use OAuth2\Test\Base;
 use OAuth2\Token\AccessTokenInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
-use Jose\Object\JWSInterface;
 
 /**
  * @group OpenIDConnect
@@ -201,9 +201,9 @@ class OpenIDConnectTest extends Base
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
-            'response_type' => 'code id_token token',
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'code id_token token',
             'state'                 => 'ABCDEF',
             'scope'                 => 'openid',
             'nonce'                 => '0123456789',
@@ -264,9 +264,9 @@ class OpenIDConnectTest extends Base
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
-            'response_type' => 'code id_token',
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'code id_token',
             'state'                 => 'ABCDEF',
             'scope'                 => 'openid',
             'nonce'                 => '0123456789',
