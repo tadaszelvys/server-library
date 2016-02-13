@@ -42,6 +42,17 @@ interface ExceptionManagerInterface
     const SERVER_ERROR = 'server_error';
     const TEMPORARILY_UNAVAILABLE = 'temporarily_unavailable';
 
+    //Error messages from OpenID Connect specifications
+    const INTERACTION_REQUIRED = 'interaction_required';
+    const LOGIN_REQUIRED = 'login_required';
+    const ACCOUNT_SELECTION_REQUIRED = 'account_selection_required';
+    const CONSENT_REQUIRED = 'consent_required';
+    const INVALID_REQUEST_URI = 'invalid_request_uri';
+    const INVALID_REQUEST_OBJECT = 'invalid_request_object';
+    const REQUEST_NOT_SUPPORTED = 'request_not_supported';
+    const REQUEST_URI_NOT_SUPPORTED = 'request_uri_not_supported';
+    const REGISTRATION_NOT_SUPPORTED = 'registration_not_supported';
+
     /**
      * This function will try to get the URI to a human readable page according to the type, error and description of the exception.
      *

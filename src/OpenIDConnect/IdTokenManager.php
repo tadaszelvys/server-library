@@ -139,7 +139,6 @@ class IdTokenManager implements IdTokenManagerInterface
     public function getIdToken($id_token)
     {
         $jws = $this->getJWTLoader()->load($id_token);
-        //$this->getJWTLoader()->verifySignature($jws, );
 
         $token = $this->createEmptyIdToken();
         $token->setToken($id_token);

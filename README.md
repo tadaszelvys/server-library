@@ -69,7 +69,96 @@ The following components are implemented:
     * [ ] Threat Model and Security Consideration ([RFC6819](https://tools.ietf.org/html/rfc6819))
 
 * OpenID Connect
-    * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
+    * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html) - *Partial Support*
+        *  ID Token claims:
+            * [x] `iss`
+            * [x] `sub`
+            * [x] `aud`
+            * [x] `exp`
+            * [x] `iat`
+            * [x] `auth_time`
+            * [x] `nonce`
+            * [ ] `acr`
+            * [ ] `amr`
+            * [ ] `azp`
+            * [x] `at_hash`
+            * [x] `c_hash`
+        * Response types:
+            * [x] `code`: Authorization Code Flow
+            * [x] `id_token`: Implicit Flow
+            * [x] `id_token token`: Implicit Flow
+            * [x] `code id_token`: Hybrid Flow
+            * [x] `code token`: Hybrid Flow
+            * [x] `code id_token token`: Hybrid Flow
+        * Request parameters:
+            * [x] `scope`
+            * [x] `response_type`
+            * [x] `client_id`
+            * [x] `redirect_uri`
+            * [x] `state`
+            * [x] `response_mode`
+            * [x] `nonce`
+            * [ ] `display`
+                * [ ] `page`
+                * [ ] `popup`
+                * [ ] `touch`
+                * [ ] `wap`
+            * [ ] `prompt`
+                * [ ] `none`
+                * [ ] `login`
+                * [ ] `consent`
+                * [ ] `select_account`
+            * [ ] `max_age`
+            * [ ] `ui_locales`
+            * [ ] `id_token_hint`
+            * [ ] `login_hint`
+            * [ ] `acr_values`
+            * [ ] `claims`
+            * [ ] `request`
+            * [ ] `request_uri`
+        * [ ] Login from third party
+            * [ ] `iss`
+            * [ ] `login_hint`
+            * [ ] `target_link_uri`
+        * [x] UserInfo Endpoint
+        * [x] UserInfo Claims
+            * [x] Scope `profile`:
+                * [x] `sub`
+                * [x] `name`
+                * [x] `given_name`
+                * [x] `middle_name`
+                * [x] `family_name`
+                * [x] `nickname`
+                * [x] `preferred_username`
+                * [x] `profile`
+                * [x] `picture`
+                * [x] `website`
+                * [x] `gender`
+                * [x] `birthdate`
+                * [x] `zoneinfo`
+                * [x] `locale`
+                * [x] `updated_at`
+            * [x] Scope `email`:
+                * [x] `email`
+                * [x] `email_verified`
+            * [x] Scope `phone`:
+                * [x] `phone`
+                * [x] `phone_verified`
+            * [x] Scope `address`:
+                * [x] `address`
+                * [x] `address_verified`
+        * [ ] Claims Languages and Scripts
+        * [ ] Aggregated and Distributed Claims
+        * [ ] Self-Issued OpenID Provider Registration
+        *  Client Authentication
+            * Authentication Methods:
+                * [x] `client_secret_basic`
+                * [x] `client_secret_post` (disabled by default)
+                * [ ] `client_secret_jwt`
+                * [x] `private_key_jwt`
+                * [x] `none` (public and unregistered clients supported)
+            * [ ] Rotation of Asymmetric Signing Keys
+        * [ ] Offline Access
     * [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
     * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html and [RFC7591](https://tools.ietf.org/html/rfc7591))
     * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)

@@ -51,14 +51,19 @@ class FormPostResponseMode implements ResponseModeInterface
         return <<<'EOT'
 <!doctype html>
 <html>
-<head>
-<title>Authorization form</title>
-</head>
-<body>
-<form method="post" action="{{redirect_uri}}">
-{{input}}
-</form>
-</body>
+    <head>
+    <title>Authorization form</title>
+    <script type="text/javascript">
+        function submitform() {
+            document.forms[0].submit();
+        }
+    </script>
+    </head>
+    <body onload='submitform();'>
+        <form method="post" action="{{redirect_uri}}">
+        {{input}}
+    </form>
+    </body>
 </html>
 EOT;
     }
