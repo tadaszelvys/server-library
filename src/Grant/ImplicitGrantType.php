@@ -59,7 +59,15 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAuthorization(Authorization $authorization)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepareAuthorization(Authorization $authorization)
     {
         if (true === $this->isAccessTokenTypeParameterAllowed() && array_key_exists('token_type', $authorization->getQueryParams())) {
             $token_type = $this->getTokenTypeManager()->getTokenType($authorization->getQueryParams()['token_type']);

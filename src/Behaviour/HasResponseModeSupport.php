@@ -34,14 +34,14 @@ trait HasResponseModeSupport
     private $response_mode_parameter_in_authorization_request_allowed = false;
 
     /**
-     * @param \OAuth2\Grant\ResponseTypeSupportInterface $type
-     * @param \OAuth2\Endpoint\Authorization             $authorization
+     * @param \OAuth2\Grant\ResponseTypeSupportInterface[] $types
+     * @param \OAuth2\Endpoint\Authorization               $authorization
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return \OAuth2\Endpoint\ResponseModeInterface
      */
-    public function getResponseMode(ResponseTypeSupportInterface $type, Authorization $authorization)
+    public function getResponseMode(array $types, Authorization $authorization)
     {
         if ($authorization->has('response_mode')) {
             if ($this->isResponseModeParameterInAuthorizationRequestAllowed()) {
@@ -50,10 +50,35 @@ trait HasResponseModeSupport
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The response mode parameter is not authorized.');
         }
 
-        return $this->getResponseModeService($type->getResponseMode());
+        // There is only one type (OAuth2 request)
+        if (1 === count($types)) {
+            return $this->getResponseModeService($types[0]->getResponseMode());
+        }
+
+        //There are multiple response types
+        return $this->getResponseModeService($this->getResponseModeIfMultipleResponseTypes($authorization->get('response_type')));
     }
 
     /**
+     * @param string $response_type
+     *
+     * @return null|string
+     */
+    public function getResponseModeIfMultipleResponseTypes($response_type)
+    {
+        switch ($response_type) {
+            case 'code token':
+            case 'code id_token':
+            case 'id_token token':
+            case 'code id_token token':
+                return 'fragment';
+            default:
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('The multiple response types "%s" are not supported.', $response_type));;
+        }
+    }
+
+
+        /**
      * @param string $mode
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface

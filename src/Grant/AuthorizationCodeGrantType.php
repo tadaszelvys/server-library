@@ -102,7 +102,15 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     /**
      * {@inheritdoc}
      */
-    public function grantAuthorization(Authorization $authorization)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepareAuthorization(Authorization $authorization)
     {
         $code = $this->getAuthorizationCodeManager()->createAuthCode(
             $authorization->getClient(),

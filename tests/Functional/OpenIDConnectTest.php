@@ -88,8 +88,6 @@ class OpenIDConnectTest extends Base
 
     public function testCodeTokenSuccess()
     {
-        $this->markTestIncomplete('ID Token not yet implemented');
-
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -97,6 +95,9 @@ class OpenIDConnectTest extends Base
             'response_type'         => 'code token',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
+            'state'                 => 'ABCDEF',
+            'scope'                 => 'openid',
+            'nonce'                 => '0123456789',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -106,7 +107,7 @@ class OpenIDConnectTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&code=[^"]+&id_token=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=openid&state=ABCDEF$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -120,7 +121,7 @@ class OpenIDConnectTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"refresh_token":"[^"]+","scope":"scope1 scope2"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[\d]+,"foo":"bar","scope":"openid","id_token":"[^"]+"}', $response->getBody()->getContents());
 
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);
@@ -152,7 +153,7 @@ class OpenIDConnectTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#id_token=[^"]+&token_type=Bearer&state=ABCDEF$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#state=ABCDEF&id_token=[^"]+$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -184,7 +185,7 @@ class OpenIDConnectTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=openid&id_token=[^"]+&state=ABCDEF$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=openid&state=ABCDEF&id_token=[^"]+$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -198,13 +199,16 @@ class OpenIDConnectTest extends Base
 
     public function testCodeIdTokenTokenSuccess()
     {
-        $this->markTestIncomplete('ID Token not yet implemented');
-
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
             'client_id'     => 'foo',
             'response_type' => 'code id_token token',
+            'state'                 => 'ABCDEF',
+            'scope'                 => 'openid',
+            'nonce'                 => '0123456789',
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'plain',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -214,8 +218,46 @@ class OpenIDConnectTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=openid&state=ABCDEF&id_token=[^"]+$/', $response->getHeader('Location')[0]);
+        $values = parse_url($response->getHeader('Location')[0]);
+        parse_str($values['fragment'], $params);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&id_token=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2$/', $response->getHeader('Location')[0]);
+        $id_token = Loader::load($params['id_token']);
+
+        $this->assertInstanceOf(JWSInterface::class, $id_token);
+        $this->assertTrue($id_token->hasClaim('nonce'));
+        $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
+        $this->assertTrue($id_token->hasClaim('at_hash'));
+        $this->assertTrue($id_token->hasClaim('c_hash'));
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['client_id' => 'foo', 'grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[\d]+,"foo":"bar","scope":"openid","id_token":"[^"]+"}', $response->getBody()->getContents());
+
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
+
+        $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
+        $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
+
+        $id_token2 = Loader::load($json['id_token']);
+
+        $this->assertInstanceOf(JWSInterface::class, $id_token2);
+        $this->assertTrue($id_token2->hasClaim('nonce'));
+        $this->assertEquals('0123456789', $id_token2->getClaim('nonce'));
+        $this->assertTrue($id_token2->hasClaim('at_hash'));
+        $this->assertTrue($id_token2->hasClaim('c_hash'));
+        $this->assertTrue($id_token->getClaim('c_hash') === $id_token2->getClaim('c_hash'));
     }
 
     public function testNoneSuccess()

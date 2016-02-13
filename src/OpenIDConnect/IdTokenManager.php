@@ -24,9 +24,6 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Token\AccessTokenInterface;
-use OAuth2\Token\AuthCodeInterface;
-use OAuth2\Token\TokenInterface;
 use OAuth2\Util\JWTCreator;
 use OAuth2\Util\JWTLoader;
 
@@ -87,7 +84,7 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $token_type_information, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null)
+    public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $id_token_claims = [], $access_token = null, $auth_code = null)
     {
         $id_token = $this->createEmptyIdToken();
         $exp = time() + $this->getLifetime($client);
@@ -175,13 +172,13 @@ class IdTokenManager implements IdTokenManagerInterface
     }
 
     /**
-     * @param \OAuth2\Token\TokenInterface $token
+     * @param string $token
      *
      * @return string
      */
-    private function getHash(TokenInterface $token)
+    private function getHash($token)
     {
-        return Base64Url::encode(substr(hash($this->getHashMethod(), $token->getToken(), true), 0, $this->getHashSize()));
+        return Base64Url::encode(substr(hash($this->getHashMethod(), $token, true), 0, $this->getHashSize()));
     }
 
     /**

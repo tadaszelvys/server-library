@@ -28,8 +28,15 @@ interface ResponseTypeSupportInterface
     public function getResponseType();
 
     /**
-     * This is the authorization endpoint of the grant type
-     * This function checks the request and returns authorize or not the client.
+     * Returns the response mode of the response type or the error returned.
+     * For possible values, see constants above.
+     *
+     * @return string
+     */
+    public function getResponseMode();
+
+    /**
+     * This function checks the request and prepare the authorization response.
      *
      * @param \OAuth2\Endpoint\Authorization $authorization The authorization object
      *
@@ -37,13 +44,17 @@ interface ResponseTypeSupportInterface
      *
      * @return array
      */
-    public function grantAuthorization(Authorization $authorization);
+    public function prepareAuthorization(Authorization $authorization);
 
     /**
-     * Returns the response mode of the response type or the error returned.
-     * For possible values, see constants above.
+     * This function finish the authorization response.
      *
-     * @return string
+     * @param \OAuth2\Endpoint\Authorization $authorization       The authorization object
+     * @param array                          $response_parameters The parameters to send to the client
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return array
      */
-    public function getResponseMode();
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization);
 }

@@ -86,11 +86,22 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
             return;
         }
 
+        if (!in_array('openid', $access_token->getScope())) {
+            $exception = $this->getExceptionManager()->getAuthenticateException(
+                ExceptionManagerInterface::INVALID_TOKEN,
+                'Access token does not exist or is not valid.',
+                ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes()]
+            );
+            $exception->getHttpResponse($response);
+
+            return;
+        }
+
         $end_user = $this->getEndUserManager()->getEndUser($access_token->getResourceOwnerPublicId());
         if (null === $end_user) {
             $exception = $this->getExceptionManager()->getAuthenticateException(
                 ExceptionManagerInterface::INVALID_TOKEN,
-                'Access token does not exist or is not valid.',
+                'Access token does not contain the "openid" scope.',
                 ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes()]
             );
             $exception->getHttpResponse($response);

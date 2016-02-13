@@ -58,7 +58,7 @@ class AuthCodeGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('Invalid "response_type" parameter or parameter is missing', $e->getDescription());
+            $this->assertEquals('Invalid "response_type" parameter or parameter is missing.', $e->getDescription());
         }
     }
 

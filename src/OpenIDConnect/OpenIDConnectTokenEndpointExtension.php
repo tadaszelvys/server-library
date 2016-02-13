@@ -77,10 +77,9 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
         $id_token = $this->id_token_manager->createIdToken(
             $client,
             $this->end_user_manager->getEndUser($grant_type_response->getResourceOwnerPublicId()),
-            $token_type_information,
             $claims,
-            $access_token,
-            $auth_code
+            $access_token->getToken(),
+            $auth_code instanceof AuthCodeInterface?$auth_code->getToken():null
         );
 
         return $id_token->toArray();

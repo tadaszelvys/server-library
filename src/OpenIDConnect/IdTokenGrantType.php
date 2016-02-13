@@ -64,36 +64,35 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAuthorization(Authorization $authorization)
+    public function prepareAuthorization(Authorization $authorization)
     {
         if (!in_array('openid', $authorization->getScopes())) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The scope "openid" is mandatory with response type "id_token".');
+            return [];
         }
+        if (!array_key_exists('nonce', $authorization->getQueryParams())) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "nonce" is mandatory using "id_token" response type.');
+        }
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization)
+    {
         $params = $authorization->getQueryParams();
-        if (!array_key_exists('nonce', $params)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "nonce" is missing.');
-        }
-
-        if (true === $this->isAccessTokenTypeParameterAllowed() && array_key_exists('token_type', $authorization->getQueryParams())) {
-            $token_type = $this->getTokenTypeManager()->getTokenType($authorization->getQueryParams()['token_type']);
-        } else {
-            $token_type = $this->getTokenTypeManager()->getDefaultTokenType();
-        }
-
-        $token_type_information = $token_type->getTokenTypeInformation();
 
         $id_token = $this->getIdTokenManager()->createIdToken(
             $authorization->getClient(),
             $authorization->getEndUser(),
-            $token_type_information,
             ['nonce' => $params['nonce']],
-            null,
-            null
+            array_key_exists('access_token', $response_parameters)?$response_parameters['access_token']:null,
+            array_key_exists('code', $response_parameters)?$response_parameters['code']:null
         );
 
-        return array_merge(
-            $id_token->toArray(),
-            $token_type_information
+        $response_parameters = array_merge(
+            $response_parameters,
+            $id_token->toArray()
         );
     }
 
