@@ -181,15 +181,7 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     private function getHash(TokenInterface $token)
     {
-        return substr(
-            Base64Url::encode(hash(
-                $this->getHashMethod(),
-                $token->getToken(),
-                true
-            )),
-            0,
-            $this->getHashSize()
-        );
+        return Base64Url::encode(substr(hash($this->getHashMethod(), $token->getToken(), true), 0, $this->getHashSize()));
     }
 
     /**
@@ -232,17 +224,17 @@ class IdTokenManager implements IdTokenManagerInterface
             case 'ES256':
             case 'RS256':
             case 'PS256':
-                return 128;
+                return 128/8;
             case 'HS384':
             case 'ES384':
             case 'RS384':
             case 'PS384':
-                return 192;
+                return 192/8;
             case 'HS512':
             case 'ES512':
             case 'RS512':
             case 'PS512':
-                return 256;
+                return 256/8;
             default:
                 throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
         }

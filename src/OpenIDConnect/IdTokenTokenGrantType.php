@@ -12,8 +12,10 @@
 namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
+use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Endpoint\Authorization;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\ResponseTypeSupportInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
@@ -23,6 +25,7 @@ final class IdTokenTokenGrantType implements ResponseTypeSupportInterface
     use HasTokenTypeManager;
     use HasIdTokenManager;
     use HasAccessTokenManager;
+    use HasExceptionManager;
 
     /**
      * @var bool
@@ -32,17 +35,20 @@ final class IdTokenTokenGrantType implements ResponseTypeSupportInterface
     /**
      * IdTokenTokenGrantType constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface   $token_type_manager
-     * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface     $id_token_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
+     * @param \OAuth2\Token\TokenTypeManagerInterface       $token_type_manager
+     * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface $id_token_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface     $access_token_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface   $exception_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
                                 IdTokenManagerInterface $id_token_manager,
-                                AccessTokenManagerInterface $access_token_manager
+                                AccessTokenManagerInterface $access_token_manager,
+                                ExceptionManagerInterface $exception_manager
     ) {
         $this->setTokenTypeManager($token_type_manager);
         $this->setIdTokenManager($id_token_manager);
         $this->setAccessTokenManager($access_token_manager);
+        $this->setExceptionManager($exception_manager);
     }
 
     /**
@@ -66,7 +72,10 @@ final class IdTokenTokenGrantType implements ResponseTypeSupportInterface
      */
     public function grantAuthorization(Authorization $authorization)
     {
-        //OpenId Connect checks here
+        $params = $authorization->getQueryParams();
+        if (!array_key_exists('nonce', $params)) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "nonce" is missing.');
+        }
 
         if (true === $this->isAccessTokenTypeParameterAllowed() && array_key_exists('token_type', $authorization->getQueryParams())) {
             $token_type = $this->getTokenTypeManager()->getTokenType($authorization->getQueryParams()['token_type']);
@@ -86,7 +95,7 @@ final class IdTokenTokenGrantType implements ResponseTypeSupportInterface
             $authorization->getClient(),
             $authorization->getEndUser(),
             $token_type->getTokenTypeInformation(),
-            [],
+            ['nonce' => $params['nonce']],
             $access_token,
             null
         );

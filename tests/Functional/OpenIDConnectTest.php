@@ -163,6 +163,39 @@ class OpenIDConnectTest extends Base
         $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
     }
 
+    public function testIdTokenTokenSuccess()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'id_token token',
+            'nonce'                 => '0123456789',
+            'state'                 => 'ABCDEF',
+            'scope'                 => 'openid',
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'plain',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=openid&id_token=[^"]+&state=ABCDEF$/', $response->getHeader('Location')[0]);
+        $values = parse_url($response->getHeader('Location')[0]);
+        parse_str($values['fragment'], $params);
+
+        $id_token = Loader::load($params['id_token']);
+
+        $this->assertInstanceOf(JWSInterface::class, $id_token);
+        $this->assertTrue($id_token->hasClaim('nonce'));
+        $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
+        $this->assertTrue($id_token->hasClaim('at_hash'));
+    }
+
     public function testCodeIdTokenTokenSuccess()
     {
         $this->markTestIncomplete('ID Token not yet implemented');
