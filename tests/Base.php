@@ -490,7 +490,8 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->authorization_code_grant_type) {
             $this->authorization_code_grant_type = new AuthorizationCodeGrantType(
                 $this->getAuthCodeManager(),
-                $this->getExceptionManager()
+                $this->getExceptionManager(),
+                $this->getScopeManager()
             );
 
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();

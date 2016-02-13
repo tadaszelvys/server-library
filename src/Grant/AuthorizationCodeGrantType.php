@@ -13,6 +13,7 @@ namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAuthorizationCodeManager;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Endpoint\Authorization;
@@ -20,6 +21,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
 use OAuth2\Grant\PKCEMethod\Plain;
 use OAuth2\Grant\PKCEMethod\S256;
+use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
 use OAuth2\Util\RequestBody;
@@ -29,6 +31,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
 {
     use HasExceptionManager;
     use HasAuthorizationCodeManager;
+    use HasScopeManager;
 
     /**
      * @var \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]
@@ -45,11 +48,15 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      *
      * @param \OAuth2\Token\AuthCodeManagerInterface      $auth_code_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\Scope\ScopeManagerInterface         $scope_manager
      */
-    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager)
-    {
+    public function __construct(AuthCodeManagerInterface $auth_code_manager,
+                                ExceptionManagerInterface $exception_manager,
+                                ScopeManagerInterface $scope_manager
+    ) {
         $this->setAuthorizationCodeManager($auth_code_manager);
         $this->setExceptionManager($exception_manager);
+        $this->setScopeManager($scope_manager);
 
         $this->addPKCEMethod(new Plain());
         $this->addPKCEMethod(new S256());
@@ -158,7 +165,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
 
         $this->getAuthorizationCodeManager()->markAuthCodeAsUsed($authCode);
 
-        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?: $authCode->getScope());
+        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?$this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')): $authCode->getScope());
         $grant_type_response->setAvailableScope($authCode->getScope());
         $grant_type_response->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
 
