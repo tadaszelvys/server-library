@@ -11,8 +11,6 @@
 
 namespace OAuth2\Client;
 
-use Jose\Object\JWKSetInterface;
-
 trait JWTClientTrait
 {
     /**
@@ -23,7 +21,17 @@ trait JWTClientTrait
     /**
      * @var \Jose\Object\JWKSetInterface
      */
-    protected $signature_public_key_set = [];
+    protected $signature_public_key_set;
+
+    /**
+     * @var string[]
+     */
+    protected $supported_encryption_algorithms = [];
+
+    /**
+     * @var \Jose\Object\JWKSetInterface
+     */
+    protected $encryption_public_key_set;
 
     /**
      * {@inheritdoc}
@@ -39,5 +47,21 @@ trait JWTClientTrait
     public function getAllowedSignatureAlgorithms()
     {
         return $this->allowed_signature_algorithms;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEncryptionPublicKeySet()
+    {
+        return $this->encryption_public_key_set;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedEncryptionAlgorithms()
+    {
+        return $this->supported_encryption_algorithms;
     }
 }

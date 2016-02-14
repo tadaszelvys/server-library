@@ -11,15 +11,15 @@
 
 namespace OAuth2\Client;
 
-interface ClientWithEncryptionCapabilitiesInterface extends RegisteredClientInterface
+interface EncryptionCapabilitiesInterface
 {
     /**
-     * @return array
+     * @return \Jose\Object\JWKSetInterface
      */
-    public function getSignaturePublicKey();
+    public function getEncryptionPublicKeySet();
 
     /**
-     * @return string
+     * @return string[]
      */
-    public function getEncryptionAlgorithm();
+    public function getSupportedEncryptionAlgorithms();
 }

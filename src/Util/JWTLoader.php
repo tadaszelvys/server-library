@@ -20,7 +20,7 @@ use Jose\Object\JWKSetInterface;
 use Jose\Object\JWSInterface;
 use Jose\VerifierInterface;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Client\ClientWithSignatureCapabilitiesInterface;
+use OAuth2\Client\SignatureCapabilitiesInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
 final class JWTLoader
@@ -139,12 +139,12 @@ final class JWTLoader
     }
 
     /**
-     * @param \Jose\Object\JWSInterface                               $jws
-     * @param \OAuth2\Client\ClientWithSignatureCapabilitiesInterface $client
+     * @param \Jose\Object\JWSInterface                     $jws
+     * @param \OAuth2\Client\SignatureCapabilitiesInterface $client
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    public function verifySignature(JWSInterface $jws, ClientWithSignatureCapabilitiesInterface $client)
+    public function verifySignature(JWSInterface $jws, SignatureCapabilitiesInterface $client)
     {
         if (0 === $jws->countSignatures()) {
             throw new \InvalidArgumentException('The JWS does not contain any signature.');

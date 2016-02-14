@@ -12,7 +12,7 @@
 namespace OAuth2\Client;
 
 
-interface ClientWithSignatureCapabilitiesInterface extends ConfidentialClientInterface
+interface SignatureCapabilitiesInterface
 {
     /**
      * @return \Jose\Object\JWKSetInterface

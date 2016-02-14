@@ -84,7 +84,7 @@ abstract class JWTClientManager implements ClientManagerInterface
      */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
     {
-        if (!$client instanceof ClientWithSignatureCapabilitiesInterface) {
+        if (!$client instanceof SignatureCapabilitiesInterface) {
             return false;
         }
 
@@ -140,7 +140,7 @@ abstract class JWTClientManager implements ClientManagerInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return \OAuth2\Client\ClientWithEncryptionCapabilitiesInterface
+     * @return \OAuth2\Client\SignatureCapabilitiesInterface
      */
     private function checkResult(array $result)
     {
@@ -157,7 +157,7 @@ abstract class JWTClientManager implements ClientManagerInterface
 
         $client = $this->getClient($result[0]->getClaim('sub'));
 
-        if (!$client instanceof ClientWithSignatureCapabilitiesInterface) {
+        if (!$client instanceof SignatureCapabilitiesInterface) {
             return;
         }
 
