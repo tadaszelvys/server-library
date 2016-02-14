@@ -23,7 +23,19 @@ class EndUserManager implements EndUserManagerInterface
 
     public function __construct()
     {
+        $address1 = new Address();
+        $address1->setCountry('France');
+        $address1->setLocality('Paris');
+        $address1->setPostalCode('75001');
+        $address1->setRegion('Île de France');
+        $address1->setStreetAddress('5 rue Sainte Anne');
+
         $user1 = new EndUser('user1', 'password1');
+        $user1->setAddress($address1);
+        $user1->setAuthenticationMethodsReferences(['password', 'otp']);
+        $user1->setBirthdate('1950-01-01');
+        $user1->setEmail('root@localhost.com');
+        $user1->setEmailVerified(false);
         $user1->setLastLoginAt(time() - 100);
 
         $user2 = new EndUser('user2', 'password2');

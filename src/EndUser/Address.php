@@ -114,7 +114,7 @@ class Address implements AddressInterface
         foreach ($claims as $key=>$method) {
             $claim = $this->$method();
             if (!empty($claim)) {
-                $claims[$key] = $claim;
+                $result[$key] = $claim;
             }
         }
 

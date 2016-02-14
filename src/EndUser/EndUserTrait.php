@@ -86,7 +86,7 @@ trait EndUserTrait
     protected $locale = null;
 
     /**
-     * @var string|null
+     * @var int|null
      */
     protected $updated_at = null;
 
@@ -237,7 +237,16 @@ trait EndUserTrait
      */
     public function getDisplayName()
     {
-        return $this->display_name;
+        if (null !== $this->display_name) {
+            return $this->display_name;
+        }
+        $name = implode(' ', [
+            $this->getGivenName(),
+            $this->getMiddleName(),
+            $this->getFamilyName(),
+        ]);
+
+        return empty(trim($name,' '))?null:$name;
     }
 
     /**

@@ -355,6 +355,6 @@ class OpenIDConnectTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
-        $this->assertEquals('{"sub":"user1"}', $response->getBody()->getContents());
+        $this->assertEquals('{"sub":"user1","birthdate":"1950-01-01","email":"root@localhost.com","email_verified":false,"address":{"street_address":"5 rue Sainte Anne","locality":"Paris","region":"\u00cele de France","postal_code":"75001","country":"France"}}', $response->getBody()->getContents());
     }
 }
