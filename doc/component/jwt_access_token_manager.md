@@ -2,7 +2,7 @@ JWT Access Token Manager
 ========================
 
 This access token manager will create access tokens base of JSON Web Token (JWT).
-It does not need a database as they contain digitaly signed claims.
+It does not need a database as they contain digitally signed claims.
 The Authorization and Resource servers can directly verify signature using key materials.
 
 These tokens can also be encrypted to prevent leak of sensitive data.
@@ -22,7 +22,7 @@ Thanks to [spomky-labs/jose](https://github.com/Spomky-Labs/jose), this library 
 * RS256, RS384, RS512 (require private RSA key)
 * PS256, PS384, PS512 (require private RSA key)
 
-We recommend you to use `RS512` algorithm as it is quite fast and uses a public/private RSA key pair.
+We recommend you to use `RS512` algorithm as it is quite fast, secured and uses a public/private (RSA) key pair.
 
 ## Keys
 

@@ -14,7 +14,6 @@ namespace OAuth2\Test\Stub;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
-use OAuth2\Client\UnregisteredClient;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

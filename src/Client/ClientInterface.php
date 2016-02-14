@@ -35,19 +35,4 @@ interface ClientInterface extends ResourceOwnerInterface
      * @return string[]
      */
     public function getAllowedGrantTypes();
-
-    /**
-     * @param string[] $grant_types
-     */
-    public function setAllowedGrantTypes(array $grant_types);
-
-    /**
-     * @param $grant_type
-     */
-    public function addAllowedGrantType($grant_type);
-
-    /**
-     * @param string $grant_type
-     */
-    public function removeAllowedGrantType($grant_type);
 }

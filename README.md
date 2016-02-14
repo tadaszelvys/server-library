@@ -78,8 +78,8 @@ The following components are implemented:
             * [x] `iat`
             * [x] `auth_time`
             * [x] `nonce`
-            * [ ] `acr`
-            * [ ] `amr`
+            * [x] `acr`
+            * [x] `amr`
             * [ ] `azp`
             * [x] `at_hash`
             * [x] `c_hash`

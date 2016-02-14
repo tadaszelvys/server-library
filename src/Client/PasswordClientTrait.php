@@ -11,16 +11,18 @@
 
 namespace OAuth2\Client;
 
-
-interface ClientWithSignatureCapabilitiesInterface extends ConfidentialClientInterface
+trait PasswordClientTrait
 {
     /**
-     * @return \Jose\Object\JWKSetInterface
+     * @var string
      */
-    public function getSignaturePublicKeySet();
+    protected $secret;
 
     /**
-     * @return string[]
+     * {@inheritdoc}
      */
-    public function getAllowedSignatureAlgorithms();
+    public function getSecret()
+    {
+        return $this->secret;
+    }
 }

@@ -32,11 +32,6 @@ interface EndUserInterface extends ResourceOwnerInterface
     public function getLastLoginAt();
 
     /**
-     * @param null|int $last_login_at
-     */
-    public function setLastLoginAt($last_login_at);
-
-    /**
      * @return string|null
      */
     public function getDisplayName();
@@ -127,7 +122,17 @@ interface EndUserInterface extends ResourceOwnerInterface
     public function isPhoneNumberVerified();
 
     /**
-     * @return array|null
+     * @return \OAuth2\EndUser\AddressInterface|null
      */
     public function getAddress();
+
+    /**
+     * @return string[]
+     */
+    public function getAuthenticationMethodsReferences();
+
+    /**
+     * @return string[]
+     */
+    public function getAuthenticationContextClassReference();
 }

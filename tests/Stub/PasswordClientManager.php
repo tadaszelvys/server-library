@@ -31,32 +31,28 @@ class PasswordClientManager extends Base
     public function createClients()
     {
         $bar = new PasswordClient();
-        $bar->setPlaintextSecret('secret');
+        $bar->setSecret('secret');
         $bar->setRedirectUris(['http://example.com/test?good=false']);
         $bar->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
         $bar->setPublicId('bar');
-        $this->updateClientCredentials($bar);
 
         $baz = new PasswordClient();
-        $baz->setPlaintextSecret('secret');
+        $baz->setSecret('secret');
         $baz->setRedirectUris([]);
         $baz->setAllowedGrantTypes(['authorization_code']);
         $baz->setPublicId('baz');
-        $this->updateClientCredentials($baz);
 
         $digest = new PasswordClient();
-        $digest->setPlaintextSecret('Circle Of Life');
+        $digest->setSecret('Circle Of Life');
         $digest->setRedirectUris([]);
         $digest->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
         $digest->setPublicId('Mufasa');
-        $this->updateClientCredentials($digest);
 
         $mac = new PasswordClient();
-        $mac->setPlaintextSecret('secret');
+        $mac->setSecret('secret');
         $mac->setRedirectUris(['http://example.com/test?good=false']);
         $mac->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
         $mac->setPublicId('mac');
-        $this->updateClientCredentials($mac);
 
         $this->clients['bar'] = $bar;
         $this->clients['baz'] = $baz;

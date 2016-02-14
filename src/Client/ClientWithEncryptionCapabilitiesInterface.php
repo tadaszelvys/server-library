@@ -14,19 +14,9 @@ namespace OAuth2\Client;
 interface ClientWithEncryptionCapabilitiesInterface extends RegisteredClientInterface
 {
     /**
-     * @param array $key
-     */
-    public function setEncryptionPublicKey(array $key);
-
-    /**
      * @return array
      */
     public function getSignaturePublicKey();
-
-    /**
-     * @param string $encryption_algorithm
-     */
-    public function setEncryptionAlgorithm($encryption_algorithm);
 
     /**
      * @return string

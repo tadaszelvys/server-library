@@ -31,24 +31,9 @@ interface RegisteredClientInterface extends ClientInterface
     public function getRedirectUris();
 
     /**
-     * @param string[] $redirect_uris
-     */
-    public function setRedirectUris(array $redirect_uris);
-
-    /**
      * @param string $redirect_uri
      *
      * @return bool
      */
     public function hasRedirectUri($redirect_uri);
-
-    /**
-     * @param string $redirect_uri
-     */
-    public function addRedirectUri($redirect_uri);
-
-    /**
-     * @param string $redirect_uri
-     */
-    public function removeRedirectUri($redirect_uri);
 }

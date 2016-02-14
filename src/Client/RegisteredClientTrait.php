@@ -17,7 +17,26 @@ namespace OAuth2\Client;
  *
  * @see http://tools.ietf.org/html/rfc6749#section-2.1
  */
-class RegisteredClient extends Client implements RegisteredClientInterface
+trait RegisteredClientTrait
 {
-    use RegisteredClientTrait;
+    /**
+     * @var string[]
+     */
+    protected $redirect_uris = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRedirectUris()
+    {
+        return $this->redirect_uris;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasRedirectUri($redirect_uri)
+    {
+        return in_array($redirect_uri, $this->redirect_uris);
+    }
 }

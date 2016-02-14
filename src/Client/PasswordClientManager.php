@@ -60,7 +60,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
      */
     public function findClient(ServerRequestInterface $request, &$client_credentials = null)
     {
-        $methods = $this->findClientCredentialsMethods();
+        $methods = $this->getClientCredentialsMethods();
         $credentials = [];
 
         foreach ($methods as $method) {
@@ -87,36 +87,13 @@ abstract class PasswordClientManager implements ClientManagerInterface
             return false;
         }
 
-        return hash($this->getHashAlgorithm(), $client->getSalt().$client_credentials) === $client->getSecret();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getHashAlgorithm()
-    {
-        return 'sha512';
-    }
-
-    /**
-     * @param \OAuth2\Client\PasswordClientInterface $client
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    protected function updateClientCredentials(PasswordClientInterface $client)
-    {
-        if (null !== ($client->getPlaintextSecret())) {
-            $secret = hash($this->getHashAlgorithm(), $client->getSalt().$client->getPlaintextSecret());
-            $client->setSecret($secret);
-
-            $client->clearCredentials();
-        }
+        return $client_credentials === $client->getSecret();
     }
 
     /**
      * @return string[]
      */
-    protected function findClientCredentialsMethods()
+    protected function getClientCredentialsMethods()
     {
         $methods = [
             'findCredentialsFromBasicAuthenticationScheme',
