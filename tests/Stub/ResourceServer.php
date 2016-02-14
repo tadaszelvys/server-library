@@ -11,6 +11,8 @@
 
 namespace OAuth2\Test\Stub;
 
+use Assert\Assertion;
+use Jose\Object\JWKSetInterface;
 use OAuth2\ResourceServer\ResourceServer as Base;
 
 class ResourceServer extends Base
@@ -39,5 +41,22 @@ class ResourceServer extends Base
     public function setAllowedIpAddresses(array $allowed_ip_addresses)
     {
         $this->allowed_ip_addresses = $allowed_ip_addresses;
+    }
+
+    /**
+     * @param string $server_name
+     */
+    public function setServerName($server_name)
+    {
+        Assertion::string($server_name);
+        $this->server_name = $server_name;
+    }
+
+    /**
+     * @param \Jose\Object\JWKSetInterface $public_key_encryption_keyset
+     */
+    public function setPublicKeyEncryptionKey(JWKSetInterface $public_key_encryption_keyset)
+    {
+        $this->public_key_encryption_keyset = $public_key_encryption_keyset;
     }
 }

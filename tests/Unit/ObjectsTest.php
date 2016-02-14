@@ -148,11 +148,8 @@ class ObjectsTest extends Base
     public function testResourceServer()
     {
         $rs = new ResourceServer();
-        $rs->setAllowedGrantTypes(['foo']);
         $rs->setPublicId('bar');
         $rs->setType(['plic']);
-        $rs->addAllowedGrantType('foo');
-        $rs->removeAllowedGrantType('bar');
         $rs->setAllowedIpAddresses(['127.0.0.1']);
 
         $this->assertFalse($rs->isAllowedGrantType('foo'));

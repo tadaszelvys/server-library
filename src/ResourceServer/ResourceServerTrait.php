@@ -67,49 +67,9 @@ trait ResourceServerTrait
     /**
      * {@inheritdoc}
      */
-    public function setAllowedGrantTypes(array $grant_types)
-    {
-        //Nothing to do
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addAllowedGrantType($grant_type)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function removeAllowedGrantType($grant_type)
-    {
-        //Nothing to do
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getType()
     {
         return 'resource_server';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setType($type)
-    {
-        //Nothing to do
-    }
-
-    /**
-     * @param string $server_name
-     */
-    public function setServerName($server_name)
-    {
-        Assertion::string($server_name);
-        $this->server_name = $server_name;
     }
 
     /**
@@ -121,14 +81,6 @@ trait ResourceServerTrait
     }
 
     /**
-     * @param \Jose\Object\JWKSetInterface $public_key_encryption_keyset
-     */
-    public function setPublicKeyEncryptionKey(JWKSetInterface $public_key_encryption_keyset)
-    {
-        $this->public_key_encryption_keyset = $public_key_encryption_keyset;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getSupportedKeyEncryptionAlgorithms()
@@ -137,26 +89,10 @@ trait ResourceServerTrait
     }
 
     /**
-     * @param string[] $supported_key_encryption_algorithms
-     */
-    public function setSupportedKeyEncryptionAlgorithms($supported_key_encryption_algorithms)
-    {
-        $this->supported_key_encryption_algorithms = $supported_key_encryption_algorithms;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getSupportedContentEncryptionAlgorithms()
     {
         return $this->supported_content_encryption_algorithms;
-    }
-
-    /**
-     * @param string[] $supported_content_encryption_algorithms
-     */
-    public function setSupportedContentEncryptionAlgorithms($supported_content_encryption_algorithms)
-    {
-        $this->supported_content_encryption_algorithms = $supported_content_encryption_algorithms;
     }
 }
