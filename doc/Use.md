@@ -43,37 +43,9 @@ To do so, each issued access token has a token type. The demonstration made by t
 
 This library supports this token type and is able to support any kind of token type through a `Token Type Manager`.
 
-## Token Type Manager
-
 This manager will handle token types enabled in your authorization server.
 
-You must add at least one token type.
-
 Please read [this page](component/token_type_manager.md) to know how to create and use this component.
-
-##  Bearer Token Type
-
-The `Bearer Token Type` (see [RFC6750](https://tools.ietf.org/html/rfc6750)) is most common token type.
-
-Please read [this page](component/bearer_token_type.md) to know how to create and use this component.
-
-##  MAC Token Type
-
-The `MAC Token Type` is an authentication scheme that uses a message authentication code (MAC) algorithm to provide cryptographic verification of the HTTP requests.
-
-Please note that this specification is not yet stable. This library provides a MAC Token Type support, but it is limited to the [revision 2 of the specification](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-02). No update will be made until this specifition has not reach maturity.
-
-Please read [this page](component/mac_token_type.md) to know how to create and use this component.
-
-##  POP Token Type
-
-This token type is not supported at the moment.
-
-For more information, please follow the links hereafter:
-
-* https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture
-* https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution-02
-* https://tools.ietf.org/html/draft-ietf-oauth-proof-of-possession-11
 
 # User Manager
 
