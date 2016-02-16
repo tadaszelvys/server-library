@@ -12,10 +12,11 @@
 namespace OAuth2\Test\Stub;
 
 use Jose\Object\JWKInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\JWTAccessTokenManager as Base;
+use OAuth2\Util\JWTCreator;
+use OAuth2\Util\JWTLoader;
 
 class JWTAccessTokenManager extends Base
 {
@@ -27,29 +28,23 @@ class JWTAccessTokenManager extends Base
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param string                                      $signature_algorithm
-     * @param \Jose\Object\JWKInterface                   $signature_key
-     * @param string                                      $key_encryption_algorithm
-     * @param string                                      $content_encryption_algorithm
-     * @param \Jose\Object\JWKInterface                   $key_encryption_key
-     * @param string                                      $issuer
+     * @param \OAuth2\Util\JWTCreator   $jwt_creator
+     * @param \OAuth2\Util\JWTLoader    $jwt_loader
+     * @param string                    $signature_algorithm
+     * @param \Jose\Object\JWKInterface $signature_key
+     * @param string                    $issuer
      */
-    public function __construct(ExceptionManagerInterface $exception_manager,
+    public function __construct(JWTCreator $jwt_creator,
+                                JWTLoader $jwt_loader,
                                 $signature_algorithm,
                                 JWKInterface $signature_key,
-                                $key_encryption_algorithm,
-                                $content_encryption_algorithm,
-                                JWKInterface $key_encryption_key,
                                 $issuer
     ) {
         parent::__construct(
-            $exception_manager,
+            $jwt_creator,
+            $jwt_loader,
             $signature_algorithm,
             $signature_key,
-            $key_encryption_algorithm,
-            $content_encryption_algorithm,
-            $key_encryption_key,
             $issuer
         );
 

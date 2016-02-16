@@ -26,7 +26,12 @@ trait JWTClientTrait
     /**
      * @var string[]
      */
-    protected $supported_encryption_algorithms = [];
+    protected $supported_key_encryption_algorithms = [];
+
+    /**
+     * @var string[]
+     */
+    protected $supported_content_encryption_algorithms = [];
 
     /**
      * @var \Jose\Object\JWKSetInterface
@@ -60,8 +65,16 @@ trait JWTClientTrait
     /**
      * {@inheritdoc}
      */
-    public function getSupportedEncryptionAlgorithms()
+    public function getSupportedKeyEncryptionAlgorithms()
     {
-        return $this->supported_encryption_algorithms;
+        return $this->supported_key_encryption_algorithms;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedContentEncryptionAlgorithms()
+    {
+        return $this->supported_content_encryption_algorithms;
     }
 }

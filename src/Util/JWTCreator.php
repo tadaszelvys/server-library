@@ -11,7 +11,6 @@
 
 namespace OAuth2\Util;
 
-use Assert\Assertion;
 use Jose\Factory\EncrypterFactory;
 use Jose\Factory\JWEFactory;
 use Jose\Factory\JWSFactory;
@@ -31,124 +30,53 @@ final class JWTCreator
     private $signer;
 
     /**
-     * @var string
+     * @var string[]
      */
-    private $signature_algorithm;
+    private $signature_algorithms;
 
     /**
-     * @var \Jose\Object\JWKInterface
+     * @var string[]
      */
-    private $signature_key;
+    private $key_encryption_algorithms;
 
     /**
-     * @var string|null
+     * @var string[]
      */
-    private $key_encryption_algorithm;
-
-    /**
-     * @var string|null
-     */
-    private $content_encryption_algorithm;
-
-    /**
-     * @var \Jose\Object\JWKInterface
-     */
-    private $sender_key = null;
+    private $content_encryption_algorithms;
 
     /**
      * JWTCreator constructor.
      *
-     * @param string                         $signature_algorithm
-     * @param \Jose\Object\JWKInterface      $signature_key
-     * @param string|null                    $key_encryption_algorithm
-     * @param string|null                    $content_encryption_algorithm
-     * @param \Jose\Object\JWKInterface|null $sender_key
+     * @param string[]                       $signature_algorithms
+     * @param string[]                       $key_encryption_algorithms
+     * @param string[]                       $content_encryption_algorithms
      */
-    public function __construct($signature_algorithm, JWKInterface $signature_key, $key_encryption_algorithm = null, $content_encryption_algorithm = null, JWKInterface $sender_key = null)
-    {
-        Assertion::string($signature_algorithm);
-        Assertion::nullOrString($key_encryption_algorithm);
-        Assertion::nullOrString($content_encryption_algorithm);
-        $this->signature_key = $signature_key;
-        $this->signature_algorithm = $signature_algorithm;
-        $this->key_encryption_algorithm = $key_encryption_algorithm;
-        $this->content_encryption_algorithm = $content_encryption_algorithm;
+    public function __construct(array $signature_algorithms,
+                                array $key_encryption_algorithms = [],
+                                array $content_encryption_algorithms = []
+    ) {
+        $this->signature_algorithms = $signature_algorithms;
+        $this->key_encryption_algorithms = $key_encryption_algorithms;
+        $this->content_encryption_algorithms = $content_encryption_algorithms;
 
-        $this->signer = SignerFactory::createSigner([$signature_algorithm]);
-
-        if (null !== $key_encryption_algorithm && null !== $content_encryption_algorithm) {
-            $this->encrypter = EncrypterFactory::createEncrypter([$key_encryption_algorithm, $content_encryption_algorithm]);
-            $this->sender_key = $sender_key;
-        }
+        $this->signer = SignerFactory::createSigner($signature_algorithms);
+        $this->encrypter = EncrypterFactory::createEncrypter(array_merge($key_encryption_algorithms, $content_encryption_algorithms));
     }
 
     /**
-     * @param array                     $claims
+     * @param mixed                     $payload
      * @param array                     $signature_protected_headers
-     * @param bool                      $encryption_required
-     * @param array                     $encryption_protected_headers
-     * @param \Jose\Object\JWKInterface $encryption_key
+     * @param \Jose\Object\JWKInterface $signature_key
      *
      * @return string
      */
-    public function createJWT(array $claims, array $signature_protected_headers, $encryption_required, array $encryption_protected_headers = [], JWKInterface $encryption_key = null)
+    public function sign($payload, array $signature_protected_headers, JWKInterface $signature_key)
     {
-        Assertion::boolean($encryption_required);
-
-        $data = $this->createJWS($claims, $signature_protected_headers);
-
-        if (null !== $this->encrypter && null !== $encryption_key) {
-            $data = $this->createJWE($data, $encryption_protected_headers, $encryption_key);
-        }
-
-        return $data;
-    }
-
-    /**
-     * @return \Jose\Object\JWKInterface|null
-     */
-    public function getSenderKey()
-    {
-        return $this->sender_key;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSignatureAlgorithm()
-    {
-        return $this->signature_algorithm;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getKeyEncryptionAlgorithm()
-    {
-        return $this->key_encryption_algorithm;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getContentEncryptionAlgorithm()
-    {
-        return $this->content_encryption_algorithm;
-    }
-
-    /**
-     * @param array $claims
-     * @param array $signature_protected_headers
-     *
-     * @return string
-     */
-    private function createJWS(array $claims, array $signature_protected_headers)
-    {
-        $jws = JWSFactory::createJWS($claims);
+        $jws = JWSFactory::createJWS($payload);
 
         $this->signer->addSignature(
             $jws,
-            $this->signature_key,
+            $signature_key,
             $signature_protected_headers
         );
 
@@ -156,22 +84,47 @@ final class JWTCreator
     }
 
     /**
-     * @param string                    $payload
-     * @param array                     $encryption_protected_headers
-     * @param \Jose\Object\JWKInterface $encryption_key
+     * @param string                         $payload
+     * @param array                          $encryption_protected_headers
+     * @param \Jose\Object\JWKInterface      $encryption_key
+     * @param \Jose\Object\JWKInterface|null $sender_key
      *
      * @return string
      */
-    private function createJWE($payload, array $encryption_protected_headers, JWKInterface $encryption_key)
+    public function encrypt($payload, array $encryption_protected_headers, JWKInterface $encryption_key, JWKInterface $sender_key = null)
     {
         $jwe = JWEFactory::createJWE($payload, $encryption_protected_headers);
 
         $this->encrypter->addRecipient(
             $jwe,
             $encryption_key,
-            $this->sender_key
+            $sender_key
         );
 
         return $jwe->toCompactJSON(0);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSignatureAlgorithms()
+    {
+        return $this->signature_algorithms;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getKeyEncryptionAlgorithms()
+    {
+        return $this->key_encryption_algorithms;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getContentEncryptionAlgorithms()
+    {
+        return $this->content_encryption_algorithms;
     }
 }

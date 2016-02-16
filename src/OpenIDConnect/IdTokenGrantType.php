@@ -25,11 +25,6 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
     use HasExceptionManager;
 
     /**
-     * @var bool
-     */
-    private $access_token_type_parameter_allowed = false;
-
-    /**
      * IdTokenGrantType constructor.
      *
      * @param \OAuth2\Token\TokenTypeManagerInterface       $token_type_manager
@@ -95,29 +90,5 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
             $response_parameters,
             $id_token->toArray()
         );
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAccessTokenTypeParameterAllowed()
-    {
-        return $this->access_token_type_parameter_allowed;
-    }
-
-    /**
-     *
-     */
-    public function allowAccessTokenTypeParameter()
-    {
-        $this->access_token_type_parameter_allowed = true;
-    }
-
-    /**
-     *
-     */
-    public function disallowAccessTokenTypeParameter()
-    {
-        $this->access_token_type_parameter_allowed = true;
     }
 }

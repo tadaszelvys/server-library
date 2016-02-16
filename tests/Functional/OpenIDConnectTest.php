@@ -13,7 +13,6 @@ namespace OAuth2\Test\Functional;
 
 use Jose\Loader;
 use Jose\Object\JWSInterface;
-use OAuth2\OpenIDConnect\IdTokenInterface;
 use OAuth2\Test\Base;
 use OAuth2\Token\AccessTokenInterface;
 use Zend\Diactoros\Response;
@@ -70,20 +69,20 @@ class OpenIDConnectTest extends Base
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);
 
-        $id_token = $this->getIdTokenManager()->getIdToken($json['id_token']);
+        $id_token = Loader::load($json['id_token']);
 
-        $this->assertInstanceOf(IdTokenInterface::class, $id_token);
+        $this->assertInstanceOf(JWSInterface::class, $id_token);
 
-        $this->assertEquals('My Authorization Server', $id_token->getJWS()->getClaim('iss'));
-        $this->assertEquals('**UNREGISTERED**--foo', $id_token->getJWS()->getClaim('aud'));
-        $this->assertEquals('user1', $id_token->getJWS()->getClaim('sub'));
-        $this->assertEquals('foo/bar', $id_token->getJWS()->getClaim('nonce'));
-        $this->assertTrue($id_token->getJWS()->hasClaim('iat'));
-        $this->assertTrue($id_token->getJWS()->hasClaim('nbf'));
-        $this->assertTrue($id_token->getJWS()->hasClaim('exp'));
-        $this->assertTrue($id_token->getJWS()->hasClaim('auth_time'));
-        $this->assertTrue($id_token->getJWS()->hasClaim('at_hash'));
-        $this->assertTrue($id_token->getJWS()->hasClaim('c_hash'));
+        $this->assertEquals('My Authorization Server', $id_token->getClaim('iss'));
+        $this->assertEquals('**UNREGISTERED**--foo', $id_token->getClaim('aud'));
+        $this->assertEquals('user1', $id_token->getClaim('sub'));
+        $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
+        $this->assertTrue($id_token->hasClaim('iat'));
+        $this->assertTrue($id_token->hasClaim('nbf'));
+        $this->assertTrue($id_token->hasClaim('exp'));
+        $this->assertTrue($id_token->hasClaim('auth_time'));
+        $this->assertTrue($id_token->hasClaim('at_hash'));
+        $this->assertTrue($id_token->hasClaim('c_hash'));
     }
 
     public function testCodeTokenSuccess()

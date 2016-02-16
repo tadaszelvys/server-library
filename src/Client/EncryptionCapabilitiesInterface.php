@@ -21,5 +21,10 @@ interface EncryptionCapabilitiesInterface
     /**
      * @return string[]
      */
-    public function getSupportedEncryptionAlgorithms();
+    public function getSupportedKeyEncryptionAlgorithms();
+
+    /**
+     * @return string[]
+     */
+    public function getSupportedContentEncryptionAlgorithms();
 }

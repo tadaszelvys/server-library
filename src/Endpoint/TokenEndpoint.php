@@ -18,6 +18,7 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
+use OAuth2\Behaviour\HasTokenTypeParameterSupport;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\EndUser\EndUserManagerInterface;
@@ -43,6 +44,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     use HasAccessTokenManager;
     use HasRefreshTokenManager;
     use HasTokenTypeManager;
+    use HasTokenTypeParameterSupport;
 
     /**
      * @var \OAuth2\Grant\GrantTypeSupportInterface[]
@@ -53,11 +55,6 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @var \OAuth2\Endpoint\TokenEndpointExtensionInterface[]
      */
     private $token_endpoint_extensions = [];
-
-    /**
-     * @var bool
-     */
-    private $access_token_type_parameter_allowed = false;
 
     /**
      * TokenEndpoint constructor.
@@ -188,11 +185,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         $request_parameters = RequestBody::getParameters($request);
-        if (true === $this->isAccessTokenTypeParameterAllowed() && array_key_exists('token_type', $request_parameters)) {
-            $token_type = $this->getTokenTypeManager()->getTokenType($request_parameters['token_type']);
-        } else {
-            $token_type = $this->getTokenTypeManager()->getDefaultTokenType();
-        }
+        $token_type = $this->getTokenTypeFromRequest($request_parameters);
         $token_type_information = $token_type->getTokenTypeInformation();
 
         $access_token = $this->createAccessToken(
@@ -218,7 +211,6 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         $response->getBody()->write(json_encode($data));
-        $response = $response->withStatus(200);
         $headers = [
             'Content-Type'  => 'application/json',
             'Cache-Control' => 'no-store, private',
@@ -227,6 +219,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         foreach ($headers as $key => $value) {
             $response = $response->withHeader($key, $value);
         }
+        $response = $response->withStatus(200);
     }
 
     /**
@@ -334,26 +327,5 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
-    }
-
-    public function isAccessTokenTypeParameterAllowed()
-    {
-        return $this->access_token_type_parameter_allowed;
-    }
-
-    /**
-     *
-     */
-    public function allowAccessTokenTypeParameter()
-    {
-        $this->access_token_type_parameter_allowed = true;
-    }
-
-    /**
-     *
-     */
-    public function disallowAccessTokenTypeParameter()
-    {
-        $this->access_token_type_parameter_allowed = false;
     }
 }

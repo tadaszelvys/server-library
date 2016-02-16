@@ -66,14 +66,14 @@ final class AuthorizationFactory
         JWKSetInterface $jwk_set = null,
         ClaimCheckerManagerInterface $claim_checker_manager
     ) {
-        $this->setJWTLoader(new JWTLoader(
+        /*$this->setJWTLoader(new JWTLoader(
             $claim_checker_manager,
             VerifierFactory::createVerifier([$signature_algorithm]),
             DecrypterFactory::createDecrypter([$key_encryption_algorithm, $content_encryption_algorithm]),
             $exception_manager,
             $jwk_set,
             false
-        ));
+        ));*/
         $this->setScopeManager($scope_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setExceptionManager($exception_manager);

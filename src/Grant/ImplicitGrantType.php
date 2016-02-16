@@ -13,6 +13,7 @@ namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
+use OAuth2\Behaviour\HasTokenTypeParameterSupport;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
@@ -21,11 +22,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
 {
     use HasTokenTypeManager;
     use HasAccessTokenManager;
-
-    /**
-     * @var bool
-     */
-    private $access_token_type_parameter_allowed = false;
+    use HasTokenTypeParameterSupport;
 
     /**
      * ImplicitGrantType constructor.
@@ -69,11 +66,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
      */
     public function prepareAuthorization(Authorization $authorization)
     {
-        if (true === $this->isAccessTokenTypeParameterAllowed() && array_key_exists('token_type', $authorization->getQueryParams())) {
-            $token_type = $this->getTokenTypeManager()->getTokenType($authorization->getQueryParams()['token_type']);
-        } else {
-            $token_type = $this->getTokenTypeManager()->getDefaultTokenType();
-        }
+        $token_type = $this->getTokenTypeFromRequest($authorization->getQueryParams());
 
         $token = $this->getAccessTokenManager()->createAccessToken(
             $authorization->getClient(),
@@ -84,29 +77,5 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
         );
 
         return $token->toArray();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAccessTokenTypeParameterAllowed()
-    {
-        return $this->access_token_type_parameter_allowed;
-    }
-
-    /**
-     *
-     */
-    public function allowAccessTokenTypeParameter()
-    {
-        $this->access_token_type_parameter_allowed = true;
-    }
-
-    /**
-     *
-     */
-    public function disallowAccessTokenTypeParameter()
-    {
-        $this->access_token_type_parameter_allowed = true;
     }
 }

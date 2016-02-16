@@ -11,6 +11,8 @@
 
 namespace OAuth2\Grant;
 
+use Assert\Assertion;
+use Jose\Object\JWKSetInterface;
 use Jose\Object\JWSInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
@@ -27,6 +29,36 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     use HasJWTLoader;
 
     /**
+     * @var \Jose\Object\JWKSetInterface
+     */
+    private $signature_key_set;
+
+    /**
+     * @var string[]
+     */
+    private $allowed_signature_algorithms;
+
+    /**
+     * @var bool
+     */
+    private $encryption_required = false;
+
+    /**
+     * @var \Jose\Object\JWKSetInterface|null
+     */
+    private $key_encryption_key_set = null;
+
+    /**
+     * @var string[]
+     */
+    private $allowed_key_encryption_algorithms = [];
+
+    /**
+     * @var string[]
+     */
+    private $allowed_content_encryption_algorithms = [];
+
+    /**
      * @var bool
      */
     private $issue_refresh_token_with_access_token = false;
@@ -36,13 +68,45 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
      *
      * @param \OAuth2\Util\JWTLoader                      $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param string[]                                    $allowed_signature_algorithms
+     * @param \Jose\Object\JWKSetInterface                $signature_key_set
      */
     public function __construct(
         JWTLoader $loader,
-        ExceptionManagerInterface $exception_manager
+        ExceptionManagerInterface $exception_manager,
+        array $allowed_signature_algorithms,
+        JWKSetInterface $signature_key_set
     ) {
+        Assertion::notEmpty($allowed_signature_algorithms);
+        Assertion::true(empty(array_diff($allowed_signature_algorithms, $loader->getSupportedSignatureAlgorithms())));
         $this->setJWTLoader($loader);
         $this->setExceptionManager($exception_manager);
+
+        $this->signature_key_set = $signature_key_set;
+        $this->allowed_signature_algorithms = $allowed_signature_algorithms;
+    }
+
+    /**
+     * @param bool                         $encryption_required
+     * @param string[]                     $allowed_key_encryption_algorithms
+     * @param string[]                     $allowed_content_encryption_algorithms
+     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
+     */
+    public function enableEncryptedAssertions($encryption_required,
+                                              array $allowed_key_encryption_algorithms,
+                                              array $allowed_content_encryption_algorithms,
+                                              JWKSetInterface $key_encryption_key_set)
+    {
+        Assertion::boolean($encryption_required);
+        Assertion::notEmpty($allowed_key_encryption_algorithms);
+        Assertion::notEmpty($allowed_content_encryption_algorithms);
+        Assertion::true(empty(array_diff($allowed_key_encryption_algorithms, $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms())));
+        Assertion::true(empty(array_diff($allowed_content_encryption_algorithms, $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms())));
+
+        $this->encryption_required = $encryption_required;
+        $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;
+        $this->allowed_content_encryption_algorithms = $allowed_content_encryption_algorithms;
+        $this->key_encryption_key_set = $key_encryption_key_set;
     }
 
     /**
@@ -64,7 +128,13 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         }
 
         try {
-            $jwt = $this->getJWTLoader()->load($assertion);
+            $jwt = $this->getJWTLoader()->load(
+                $assertion,
+                $this->allowed_key_encryption_algorithms,
+                $this->allowed_content_encryption_algorithms,
+                $this->key_encryption_key_set,
+                $this->encryption_required
+            );
         } catch (\Exception $e) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
@@ -94,7 +164,11 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         }
         $jwt = $grant_type_response->getAdditionalData('jwt');
 
-        $this->getJWTLoader()->verifySignature($jwt, $client);
+        $this->getJWTLoader()->verifySignature(
+            $jwt,
+            $client->getSignaturePublicKeySet(),
+            $client->getAllowedSignatureAlgorithms()
+        );
 
         $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
 
