@@ -71,6 +71,7 @@ The following components are implemented:
 * OpenID Connect
     * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html) - *Partial Support*
         *  ID Token claims:
+            * [x] `jti`
             * [x] `iss`
             * [x] `sub`
             * [x] `aud`

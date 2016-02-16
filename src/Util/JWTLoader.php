@@ -112,9 +112,10 @@ final class JWTLoader
     {
         Assertion::string($assertion);
         Assertion::boolean($is_encryption_required);
-        $jwt = $this->loadAssertion($assertion);
+        $jwt = Loader::load($assertion);
         if ($jwt instanceof JWEInterface) {
-            Assertion::same(1, $jwt->countRecipients(), 'The assertion does not contain a single JWS or a single JWE.');
+            Assertion::true($this->isEncryptedJotSupportEnabled($allowed_key_encryption_algorithms, $allowed_content_encryption_algorithms, $encryption_key_set), 'Encrypted JWT support is not enabled.');
+            Assertion::eq(1, $jwt->countRecipients(), 'The assertion does not contain a single JWS or a single JWE.');
             Assertion::inArray($jwt->getSharedProtectedHeader('alg'), $allowed_key_encryption_algorithms, sprintf('The key encryption algorithm "%s" is not allowed.', $jwt->getSharedProtectedHeader('alg')));
             Assertion::inArray($jwt->getSharedProtectedHeader('enc'), $allowed_content_encryption_algorithms, sprintf('The content encryption algorithm "%s" is not allowed.', $jwt->getSharedProtectedHeader('enc')));
             $this->claim_checker_manager->checkClaims($jwt);
@@ -122,27 +123,22 @@ final class JWTLoader
         } elseif (true === $is_encryption_required) {
             throw new \InvalidArgumentException('The assertion must be encrypted.');
         }
-        Assertion::same(1, $jwt->countSignatures(), 'The assertion does not contain a single JWS or a single JWE.');
+        Assertion::eq(1, $jwt->countSignatures(), 'The assertion does not contain a single JWS or a single JWE.');
         $this->claim_checker_manager->checkClaims($jwt);
 
         return $jwt;
     }
 
     /**
-     * @param string $assertion
+     * @param string[]                          $allowed_key_encryption_algorithms
+     * @param string[]                          $allowed_content_encryption_algorithms
+     * @param \Jose\Object\JWKSetInterface|null $encryption_key_set
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return \Jose\Object\JWSInterface|\Jose\Object\JWEInterface
+     * @return bool
      */
-    protected function loadAssertion($assertion)
+    private function isEncryptedJotSupportEnabled(array $allowed_key_encryption_algorithms, array $allowed_content_encryption_algorithms, JWKSetInterface $encryption_key_set = null)
     {
-        $jwt = Loader::load($assertion);
-        if (!$jwt instanceof JWEInterface && !$jwt instanceof JWSInterface) {
-            throw new \InvalidArgumentException('The assertion does not contain a single JWS or a single JWE.');
-        }
-
-        return $jwt;
+        return !empty($allowed_key_encryption_algorithms) && !empty($allowed_content_encryption_algorithms) && null !== $encryption_key_set;
     }
 
     /**

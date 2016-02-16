@@ -11,9 +11,7 @@
 
 namespace OAuth2\Endpoint;
 
-use Jose\ClaimChecker\ClaimCheckerManagerInterface;
-use Jose\Factory\DecrypterFactory;
-use Jose\Factory\VerifierFactory;
+use Assert\Assertion;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
@@ -35,6 +33,36 @@ final class AuthorizationFactory
     use HasExceptionManager;
 
     /**
+     * @var \Jose\Object\JWKSetInterface|null
+     */
+    private $signature_key_set = null;
+
+    /**
+     * @var string[]
+     */
+    private $allowed_signature_algorithms = [];
+
+    /**
+     * @var bool
+     */
+    private $encryption_required = false;
+
+    /**
+     * @var \Jose\Object\JWKSetInterface|null
+     */
+    private $key_encryption_key_set = null;
+
+    /**
+     * @var string[]
+     */
+    private $allowed_key_encryption_algorithms = [];
+
+    /**
+     * @var string[]
+     */
+    private $allowed_content_encryption_algorithms = [];
+
+    /**
      * @var bool
      */
     private $request_parameter_supported = false;
@@ -50,33 +78,60 @@ final class AuthorizationFactory
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
-     * @param string|null                                     $signature_algorithm
-     * @param string|null                                     $key_encryption_algorithm
-     * @param string|null                                     $content_encryption_algorithm
-     * @param \Jose\Object\JWKSetInterface|null               $jwk_set
-     * @param \Jose\ClaimChecker\ClaimCheckerManagerInterface $claim_checker_manager
      */
     public function __construct(
         ScopeManagerInterface $scope_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
-        ExceptionManagerInterface $exception_manager,
-        $signature_algorithm,
-        $key_encryption_algorithm,
-        $content_encryption_algorithm,
-        JWKSetInterface $jwk_set = null,
-        ClaimCheckerManagerInterface $claim_checker_manager
+        ExceptionManagerInterface $exception_manager
     ) {
-        /*$this->setJWTLoader(new JWTLoader(
-            $claim_checker_manager,
-            VerifierFactory::createVerifier([$signature_algorithm]),
-            DecrypterFactory::createDecrypter([$key_encryption_algorithm, $content_encryption_algorithm]),
-            $exception_manager,
-            $jwk_set,
-            false
-        ));*/
         $this->setScopeManager($scope_manager);
-        $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setExceptionManager($exception_manager);
+        $this->setClientManagerSupervisor($client_manager_supervisor);
+    }
+
+    /**
+     * @param \OAuth2\Util\JWTLoader       $jwt_loader
+     * @param array                        $allowed_signature_algorithms
+     * @param \Jose\Object\JWKSetInterface $signature_key_set
+     */
+    public function enableSignedRequestsSupport(JWTLoader $jwt_loader,
+                                                array $allowed_signature_algorithms,
+                                                JWKSetInterface $signature_key_set
+    ) {
+        Assertion::notEmpty($allowed_signature_algorithms);
+        Assertion::true(empty(array_diff($allowed_signature_algorithms, $jwt_loader->getSupportedSignatureAlgorithms())));
+        $this->setJWTLoader($jwt_loader);
+
+        $this->signature_key_set = $signature_key_set;
+        $this->allowed_signature_algorithms = $allowed_signature_algorithms;
+    }
+
+    public function isSignedRequestsSupportEnabled()
+    {
+        return null !== $this->getJWTLoader() && null !== $this->signature_key_set && !empty($this->allowed_signature_algorithms);
+    }
+
+    /**
+     * @param bool                         $encryption_required
+     * @param string[]                     $allowed_key_encryption_algorithms
+     * @param string[]                     $allowed_content_encryption_algorithms
+     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
+     */
+    public function enableEncryptedRequestsSupport($encryption_required,
+                                              array $allowed_key_encryption_algorithms,
+                                              array $allowed_content_encryption_algorithms,
+                                              JWKSetInterface $key_encryption_key_set)
+    {
+        Assertion::boolean($encryption_required);
+        Assertion::notEmpty($allowed_key_encryption_algorithms);
+        Assertion::notEmpty($allowed_content_encryption_algorithms);
+        Assertion::true(empty(array_diff($allowed_key_encryption_algorithms, $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms())));
+        Assertion::true(empty(array_diff($allowed_content_encryption_algorithms, $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms())));
+
+        $this->encryption_required = $encryption_required;
+        $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;
+        $this->allowed_content_encryption_algorithms = $allowed_content_encryption_algorithms;
+        $this->key_encryption_key_set = $key_encryption_key_set;
     }
 
     /**
@@ -92,6 +147,7 @@ final class AuthorizationFactory
      */
     public function enableRequestParameterSupport()
     {
+        Assertion::true($this->isSignedRequestsSupportEnabled(), 'Signed requests support must be enable to support request parameters');
         $this->request_parameter_supported = true;
     }
 
@@ -116,6 +172,7 @@ final class AuthorizationFactory
      */
     public function enableRequestUriParameterSupport()
     {
+        Assertion::true($this->isSignedRequestsSupportEnabled(), 'Signed requests support must be enable to support request parameters');
         $this->request_uri_parameter_supported = true;
     }
 

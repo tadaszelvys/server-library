@@ -113,25 +113,34 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_factory = new AuthorizationFactory(
                 $this->getScopeManager(),
                 $this->getClientManagerSupervisor(),
-                $this->getExceptionManager(),
-                'HS512',
-                'A256KW',
-                'A256CBC-HS512',
+                $this->getExceptionManager()
+            );
+
+            $this->authorization_factory->enableSignedRequestsSupport(
+                $this->getJWTLoader(),
+                ['HS512'],
                 new JWKSet(['keys' => [
-                    [
-                        'kid' => 'JWK1',
-                        'use' => 'enc',
-                        'kty' => 'oct',
-                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                    ],
                     [
                         'kid' => 'JWK2',
                         'use' => 'sig',
                         'kty' => 'oct',
                         'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                     ],
-                ]]),
-                $this->getClaimCheckerManager()
+                ]])
+            );
+
+            $this->authorization_factory->enableEncryptedRequestsSupport(
+                false,
+                ['A256KW'],
+                ['A256CBC-HS512'],
+                new JWKSet(['keys' => [
+                    [
+                        'kid' => 'JWK1',
+                        'use' => 'enc',
+                        'kty' => 'oct',
+                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                    ]
+                ]])
             );
 
             $this->authorization_factory->enableRequestParameterSupport();
