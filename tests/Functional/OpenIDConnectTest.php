@@ -129,6 +129,16 @@ class OpenIDConnectTest extends Base
 
         $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
         $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
+
+
+        $introspection_request = $this->createRequest('/', 'POST', ['token' => $json['access_token']], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        $introspection_response = new Response();
+        $this->getTokenIntrospectionEndpoint()->introspection($introspection_request, $introspection_response);
+        $introspection_response->getBody()->rewind();
+
+        $this->assertEquals(200, $introspection_response->getStatusCode());
+        $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[\d]+,"sub":"user1","scope":\["openid"\]}', $introspection_response->getBody()->getContents());
     }
 
     public function testIdTokenSuccess()

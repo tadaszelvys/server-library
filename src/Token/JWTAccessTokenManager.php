@@ -130,6 +130,8 @@ class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function prepareEncryptionHeader(ClientInterface $client, ResourceServerInterface $resource_server = null)
     {
+        $key_encryption_algorithm = null === $resource_server?$this->key_encryption_algorithm:$resource_server->getKeyEncryptionAlgorithm();
+        $content_encryption_algorithm = null === $resource_server?$this->content_encryption_algorithm:$resource_server->getContentEncryptionAlgorithm();
         $header = array_merge(
             [
                 'jti' => Base64Url::encode(StringUtil::generateRandomBytes(25)),
@@ -138,8 +140,8 @@ class JWTAccessTokenManager extends AccessTokenManager
                 'nbf' => time(),
                 'exp' => time() + $this->getLifetime($client),
                 'typ' => 'JWT',
-                'alg' => $this->key_encryption_algorithm,
-                'enc' => $this->content_encryption_algorithm,
+                'alg' => $key_encryption_algorithm,
+                'enc' => $content_encryption_algorithm,
             ]
         );
         $header['aud'] = null === $resource_server ? $this->issuer : $resource_server->getServerName();
@@ -217,6 +219,10 @@ class JWTAccessTokenManager extends AccessTokenManager
         } catch (\Exception $e) {
             return;
         }
+
+        $jwk_set = new JWKSet();
+        $jwk_set = $jwk_set->addKey($this->signature_key);
+        $this->jwt_loader->verifySignature($jwt, $jwk_set, [$this->signature_algorithm]);
 
         $access_token = new JWTAccessToken();
         $access_token->setToken($assertion);

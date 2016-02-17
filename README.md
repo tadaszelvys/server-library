@@ -1,5 +1,5 @@
-OAuth2 Framework Library for PHP
-================================
+OAuth2 And OpenID Connect Framework Library for PHP
+===================================================
 
 [![Join the chat at https://gitter.im/Spomky-Labs/oauth2-server-library](https://badges.gitter.im/Spomky-Labs/oauth2-server-library.svg)](https://gitter.im/Spomky-Labs/oauth2-server-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 

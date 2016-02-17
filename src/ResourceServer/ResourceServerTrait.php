@@ -11,10 +11,6 @@
 
 namespace OAuth2\ResourceServer;
 
-use Assert\Assertion;
-use Jose\Object\JWKSetInterface;
-use OAuth2\Client\Client;
-
 /**
  * Class ResourceServer.
  */
@@ -28,12 +24,12 @@ trait ResourceServerTrait
     /**
      * @var string[]
      */
-    protected $supported_key_encryption_algorithms;
+    protected $key_encryption_algorithm;
 
     /**
      * @var string[]
      */
-    protected $supported_content_encryption_algorithms;
+    protected $content_encryption_algorithm;
 
     /**
      * @var null|\Jose\Object\JWKSetInterface
@@ -83,16 +79,16 @@ trait ResourceServerTrait
     /**
      * {@inheritdoc}
      */
-    public function getSupportedKeyEncryptionAlgorithms()
+    public function getKeyEncryptionAlgorithm()
     {
-        return $this->supported_key_encryption_algorithms;
+        return $this->key_encryption_algorithm;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedContentEncryptionAlgorithms()
+    public function getContentEncryptionAlgorithm()
     {
-        return $this->supported_content_encryption_algorithms;
+        return $this->content_encryption_algorithm;
     }
 }

@@ -11,8 +11,8 @@
 
 namespace OAuth2\Test;
 
-use Jose\Factory\DecrypterFactory;
-use Jose\Factory\VerifierFactory;
+use Jose\ClaimChecker\AudienceChecker;
+use Jose\ClaimChecker\ClaimCheckerManager;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
@@ -38,7 +38,6 @@ use OAuth2\OpenIDConnect\FormPostResponseMode;
 use OAuth2\OpenIDConnect\IdTokenManager;
 use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\Test\Stub\AuthCodeManager;
-use OAuth2\Test\Stub\ClaimCheckerManager;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
@@ -946,31 +945,6 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string[] $allowed_encryption_algorithms
-     *
-     * @return \Jose\DecrypterInterface
-     */
-    protected function getDecrypter($allowed_encryption_algorithms)
-    {
-        return DecrypterFactory::createDecrypter(
-            $allowed_encryption_algorithms,
-            $this->getCompressionManager()
-        );
-    }
-
-    /**
-     * @param string[] $allowed_encryption_algorithms
-     *
-     * @return \Jose\VerifierInterface
-     */
-    protected function getVerifier($allowed_encryption_algorithms)
-    {
-        return VerifierFactory::createVerifier(
-            $allowed_encryption_algorithms
-        );
-    }
-
-    /**
      * @var null|\Jose\ClaimChecker\ClaimCheckerManagerInterface
      */
     private $claim_checker_manager = null;
@@ -981,22 +955,12 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getClaimCheckerManager()
     {
         if (null === $this->claim_checker_manager) {
-            $this->claim_checker_manager = new ClaimCheckerManager($this->issuer);
+            $this->claim_checker_manager = new ClaimCheckerManager();
+
+            $this->claim_checker_manager->addClaimChecker(new AudienceChecker($this->issuer));
         }
 
         return $this->claim_checker_manager;
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getCompressionManager()
-    {
-        return [
-            'DEF',
-            'GZ',
-            'ZLIB',
-        ];
     }
 
     /**

@@ -55,20 +55,22 @@ final class JWTLoader
     /**
      * JWTLoader constructor.
      *
-     * @param \Jose\ClaimChecker\ClaimCheckerManagerInterface $claim_checker_manager
-     * @param string[]                                        $supported_signature_algorithms
-     * @param string[]                                        $supported_key_encryption_algorithms
-     * @param string[]                                        $supported_content_encryption_algorithms
+     * @param \Jose\ClaimChecker\ClaimCheckerManagerInterface   $claim_checker_manager
+     * @param string[]                                          $supported_signature_algorithms
+     * @param string[]                                          $supported_key_encryption_algorithms
+     * @param string[]                                          $supported_content_encryption_algorithms
+     * @param string[]|\Jose\Compression\CompressionInterface[] $compression_methods
      */
     public function __construct(
         ClaimCheckerManagerInterface $claim_checker_manager,
         array $supported_signature_algorithms,
         array $supported_key_encryption_algorithms = [],
-        array $supported_content_encryption_algorithms = []
+        array $supported_content_encryption_algorithms = [],
+        array $compression_methods = ['DEF']
     ) {
         $this->claim_checker_manager = $claim_checker_manager;
         $this->verifier = VerifierFactory::createVerifier($supported_signature_algorithms);
-        $this->decrypter = DecrypterFactory::createDecrypter(array_merge($supported_key_encryption_algorithms, $supported_content_encryption_algorithms));
+        $this->decrypter = DecrypterFactory::createDecrypter(array_merge($supported_key_encryption_algorithms, $supported_content_encryption_algorithms), $compression_methods);
 
         $this->supported_signature_algorithms = $supported_signature_algorithms;
         $this->supported_key_encryption_algorithms = $supported_key_encryption_algorithms;

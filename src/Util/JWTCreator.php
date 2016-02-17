@@ -47,20 +47,22 @@ final class JWTCreator
     /**
      * JWTCreator constructor.
      *
-     * @param string[]                       $signature_algorithms
-     * @param string[]                       $key_encryption_algorithms
-     * @param string[]                       $content_encryption_algorithms
+     * @param string[]                                          $signature_algorithms
+     * @param string[]                                          $key_encryption_algorithms
+     * @param string[]                                          $content_encryption_algorithms
+     * @param string[]|\Jose\Compression\CompressionInterface[] $compression_methods
      */
     public function __construct(array $signature_algorithms,
                                 array $key_encryption_algorithms = [],
-                                array $content_encryption_algorithms = []
+                                array $content_encryption_algorithms = [],
+                                array $compression_methods = ['DEF']
     ) {
         $this->signature_algorithms = $signature_algorithms;
         $this->key_encryption_algorithms = $key_encryption_algorithms;
         $this->content_encryption_algorithms = $content_encryption_algorithms;
 
         $this->signer = SignerFactory::createSigner($signature_algorithms);
-        $this->encrypter = EncrypterFactory::createEncrypter(array_merge($key_encryption_algorithms, $content_encryption_algorithms));
+        $this->encrypter = EncrypterFactory::createEncrypter(array_merge($key_encryption_algorithms, $content_encryption_algorithms), $compression_methods);
     }
 
     /**

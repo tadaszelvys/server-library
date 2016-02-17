@@ -11,6 +11,15 @@ It is used by almost all other components.
 
 Please read [this page](component/exception.md) to know how to create and use this component.
 
+# JWTLoader And JWTCreator
+
+For components that need to create JWT or to load them, you will have to inject a `JWTLoader` or a `JWTCreator` object.
+
+In general, you do not need to use them as they are directly used by components. You just have to indicate algorithms you want to support
+and claims you want to check.
+
+Please read [this page](component/jwt_loader_and_creator.md) to know how to create and use these components.
+
 # Scope And Scope manager
 
 Access tokens issued by this library may have a limited scope.
@@ -55,6 +64,11 @@ Please read [this page](component/user_manager.md) to know how to create and use
 
 ## Client Manager Supervisor
 
+The role of the client manager supervisor is to manager all client managers you need.
+It will handle requests and try to identify which client is sending requests against the authorization server.
+
+Please read [this page](component/client_manager_supervisor.md) to know how to create and use this component.
+
 ## Public Client Manager
 
 ## Password Client Manager
@@ -64,6 +78,8 @@ Please read [this page](component/user_manager.md) to know how to create and use
 ## Unregistered Client Manager
 
 # Resource Servers
+
+Resource servers are not yet fully supported.
 
 # Endpoints
 
