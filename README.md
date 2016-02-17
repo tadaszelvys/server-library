@@ -46,10 +46,12 @@ The following components are implemented:
     * [x] Unregistered clients ([RFC6749, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4))
     * [x] Ability to use other Client Managers
 * Endpoints:
-    * [x] Authorization endpoint ([RFC6749, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
-    * [x] Token endpoint ([RFC6749, section 3.2](https://tools.ietf.org/html/rfc6749#section-3.2))
-    * [x] Token revocation endpoint ([RFC7009](https://tools.ietf.org/html/rfc7009))
-    * [x] Token introspection endpoint ([RFC7662](https://tools.ietf.org/html/rfc7662))
+    * [x] Authorization ([RFC6749, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
+    * [x] Token ([RFC6749, section 3.2](https://tools.ietf.org/html/rfc6749#section-3.2))
+    * [x] Token Revocation ([RFC7009](https://tools.ietf.org/html/rfc7009))
+    * [x] Token Introspection ([RFC7662](https://tools.ietf.org/html/rfc7662))
+    * [ ] Dynamic Client Registration Protocol ([RFC7591](hhttps://tools.ietf.org/html/rfc7591))
+    * [ ] Dynamic Client Registration Management Protocol ([RFC7592](hhttps://tools.ietf.org/html/rfc7592))
     * [x] Ability to use other Endpoints
 * Grant types:
     * [x] Authorization code grant type ([RFC6749, section 4.1](https://tools.ietf.org/html/rfc6749#section-4.1))
@@ -70,20 +72,7 @@ The following components are implemented:
 
 * OpenID Connect
     * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html) - *Partial Support*
-        *  ID Token claims:
-            * [x] `jti`
-            * [x] `iss`
-            * [x] `sub`
-            * [x] `aud`
-            * [x] `exp`
-            * [x] `iat`
-            * [x] `auth_time`
-            * [x] `nonce`
-            * [x] `acr`
-            * [x] `amr`
-            * [ ] `azp`
-            * [x] `at_hash`
-            * [x] `c_hash`
+        *  [x] ID Token - *Partial support*
         * Response types:
             * [x] `code`: Authorization Code Flow
             * [x] `id_token`: Implicit Flow
@@ -91,63 +80,14 @@ The following components are implemented:
             * [x] `code id_token`: Hybrid Flow
             * [x] `code token`: Hybrid Flow
             * [x] `code id_token token`: Hybrid Flow
-        * Request parameters:
-            * [x] `scope`
-            * [x] `response_type`
-            * [x] `client_id`
-            * [x] `redirect_uri`
-            * [x] `state`
-            * [x] `response_mode`
-            * [x] `nonce`
-            * [ ] `display`
-                * [ ] `page`
-                * [ ] `popup`
-                * [ ] `touch`
-                * [ ] `wap`
-            * [ ] `prompt`
-                * [ ] `none`
-                * [ ] `login`
-                * [ ] `consent`
-                * [ ] `select_account`
-            * [ ] `max_age`
-            * [ ] `ui_locales`
-            * [ ] `id_token_hint`
-            * [ ] `login_hint`
-            * [ ] `acr_values`
-            * [ ] `claims`
-            * [ ] `request`
-            * [ ] `request_uri`
         * [ ] Login from third party
-            * [ ] `iss`
-            * [ ] `login_hint`
-            * [ ] `target_link_uri`
         * [x] UserInfo Endpoint
         * [x] UserInfo Claims
-            * [x] Scope `profile`:
-                * [x] `sub`
-                * [x] `name`
-                * [x] `given_name`
-                * [x] `middle_name`
-                * [x] `family_name`
-                * [x] `nickname`
-                * [x] `preferred_username`
-                * [x] `profile`
-                * [x] `picture`
-                * [x] `website`
-                * [x] `gender`
-                * [x] `birthdate`
-                * [x] `zoneinfo`
-                * [x] `locale`
-                * [x] `updated_at`
-            * [x] Scope `email`:
-                * [x] `email`
-                * [x] `email_verified`
-            * [x] Scope `phone`:
-                * [x] `phone`
-                * [x] `phone_verified`
-            * [x] Scope `address`:
-                * [x] `address`
-                * [x] `address_verified`
+            * [x] Scope `profile`
+            * [x] Scope `email`
+            * [x] Scope `phone`
+            * [x] Scope `address`
+            * [x] Custom Scope
         * [ ] Claims Languages and Scripts
         * [ ] Aggregated and Distributed Claims
         * [ ] Self-Issued OpenID Provider Registration
@@ -168,15 +108,14 @@ The following components are implemented:
     * [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
 
 * Integration planned
-    * [Proof-of-Possession (PoP) Security Architecture](https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture-07)
-    * [Proof-of-Possession: Authorization Server to Client Key Distribution](https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution-02)
-    * [Proof-of-Possession Key Semantics for JSON Web Tokens (JWTs)](https://tools.ietf.org/html/draft-ietf-oauth-proof-of-possession-11)
+    * [Proof-of-Possession (PoP) Security Architecture](https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture)
+    * [Proof-of-Possession: Authorization Server to Client Key Distribution](https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution)
+    * [Proof-of-Possession Key Semantics for JSON Web Tokens (JWTs)](https://tools.ietf.org/html/draft-ietf-oauth-proof-of-possession)
 
 * For information only
-    * Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
-    * [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq-06)
-    * [A Method for Signing an HTTP Requests for OAuth](https://tools.ietf.org/html/draft-ietf-oauth-signed-http-request-01)
-    * [Token Exchange: An STS for the REST of Us](https://tools.ietf.org/html/draft-ietf-oauth-token-exchange-03)
+    * [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq)
+    * [A Method for Signing an HTTP Requests for OAuth](https://tools.ietf.org/html/draft-ietf-oauth-signed-http-request)
+    * [Token Exchange: An STS for the REST of Us](https://tools.ietf.org/html/draft-ietf-oauth-token-exchange)
 
 # The Release Process
 
