@@ -120,7 +120,7 @@ class OpenIDConnectTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[\d]+,"foo":"bar","scope":"openid","id_token":"[^"]+"}', $response->getBody()->getContents());
+        $this->assertRegExp('/^{"access_token":"[^"]+","token_type":"Bearer","expires_in":[\d]+,"foo":"bar","scope":"openid","id_token":"[^"]+"}$/', $response->getBody()->getContents());
 
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);
@@ -138,7 +138,7 @@ class OpenIDConnectTest extends Base
         $introspection_response->getBody()->rewind();
 
         $this->assertEquals(200, $introspection_response->getStatusCode());
-        $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[\d]+,"sub":"user1","scope":\["openid"\]}', $introspection_response->getBody()->getContents());
+        $this->assertRegExp('/^{"active":true,"client_id":"foo","token_type":"Bearer","exp":[\d]+,"sub":"user1","scope":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"My Authorization Server","iss":"My Authorization Server"}$/', $introspection_response->getBody()->getContents());
     }
 
     public function testIdTokenSuccess()

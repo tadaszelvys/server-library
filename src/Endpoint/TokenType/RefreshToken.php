@@ -75,26 +75,6 @@ final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationT
         if (!empty($token->getScope())) {
             $result['scope'] = $token->getScope();
         }
-        if ($token instanceof JWTInterface) {
-            $result = array_merge($result, $this->getJWTInformation($token));
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param \Jose\Object\JWTInterface $token
-     *
-     * @return array
-     */
-    private function getJWTInformation(JWTInterface $token)
-    {
-        $result = [];
-        foreach (['iat', 'nbf', 'aud', 'iss', 'jti'] as $key) {
-            if ($token->hasClaim($key)) {
-                $result[$key] = $token->getClaim($key);
-            }
-        }
 
         return $result;
     }

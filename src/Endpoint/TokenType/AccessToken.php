@@ -16,6 +16,7 @@ use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
+use OAuth2\Token\JWTAccessTokenInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\TokenInterface;
@@ -97,8 +98,8 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
         if (!empty($token->getScope())) {
             $result['scope'] = $token->getScope();
         }
-        if ($token instanceof JWTInterface) {
-            $result = array_merge($result, $this->getJWTInformation($token));
+        if ($token instanceof JWTAccessTokenInterface) {
+            $result = array_merge($result, $this->getJWTInformation($token->getJWS()));
         }
 
         return $result;
@@ -109,10 +110,10 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
      *
      * @return array
      */
-    private function getJWTInformation(JWTInterface $token)
+    protected function getJWTInformation(JWTInterface $token)
     {
         $result = [];
-        foreach (['iat', 'nbf', 'aud', 'iss', 'jti'] as $key) {
+        foreach (['jti', 'iat', 'nbf', 'aud', 'iss', 'jti'] as $key) {
             if ($token->hasClaim($key)) {
                 $result[$key] = $token->getClaim($key);
             }
