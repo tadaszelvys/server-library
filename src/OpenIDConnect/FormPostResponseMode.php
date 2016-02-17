@@ -53,6 +53,7 @@ class FormPostResponseMode implements ResponseModeInterface
 <html>
     <head>
     <title>Authorization form</title>
+    <meta name="referrer" content="origin"/>
     <script type="text/javascript">
         function submitform() {
             document.forms[0].submit();

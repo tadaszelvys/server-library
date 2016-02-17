@@ -21,4 +21,19 @@ interface UserInfoEndpointInterface
      * @param \Psr\Http\Message\ResponseInterface      $response The response
      */
     public function getUserInfo(ServerRequestInterface $request, ResponseInterface &$response);
+
+    /**
+     * @return string[]
+     */
+    public function getSignatureAlgorithms();
+
+    /**
+     * @return string[]
+     */
+    public function getKeyEncryptionAlgorithms();
+
+    /**
+     * @return string[]
+     */
+    public function getContentEncryptionAlgorithms();
 }

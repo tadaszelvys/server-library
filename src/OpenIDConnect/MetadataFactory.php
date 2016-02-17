@@ -44,9 +44,9 @@ final class MetadataFactory
     private $user_info_endpoint;
 
     /**
-     * @var \OAuth2\Util\JWTCreator
+     * @var \OAuth2\Endpoint\AuthorizationFactory
      */
-    private $jwt_creator;
+    private $authorization_factory;
 
     /**
      * MetadataFactory constructor.
@@ -89,17 +89,17 @@ final class MetadataFactory
         $metadata->setGrantTypesSupported($this->token_endpoint->getGrantTypesSupported());
         //$metadata->setAcrValuesSupported('https://my.server.com/authorize');
         //$metadata->setSubjectTypesSupported('https://my.server.com/authorize');
-        $metadata->setIdTokenSigningAlgValuesSupported($this->jwt_creator->getSignatureAlgorithms());
-        $metadata->setIdTokenEncryptionAlgValuesSupported($this->jwt_creator->getKeyEncryptionAlgorithms());
-        $metadata->setIdTokenEncryptionEncValuesSupported($this->jwt_creator->getContentEncryptionAlgorithms());
-        $metadata->setUserinfoSigningAlgValuesSupported($this->jwt_creator->getSignatureAlgorithms());
-        $metadata->setUserinfoEncryptionAlgValuesSupported($this->jwt_creator->getKeyEncryptionAlgorithms());
-        $metadata->setUserinfoEncryptionEncValuesSupported($this->jwt_creator->getContentEncryptionAlgorithms());
-        $metadata->setRequestObjectSigningAlgValuesSupported($this->jwt_creator->getSignatureAlgorithms());
-        $metadata->setRequestObjectEncryptionAlgValuesSupported($this->jwt_creator->getKeyEncryptionAlgorithms());
-        $metadata->setRequestObjectEncryptionEncValuesSupported($this->jwt_creator->getContentEncryptionAlgorithms());
+        $metadata->setIdTokenSigningAlgValuesSupported($this->id_token_manager->getSignatureAlgorithms());
+        $metadata->setIdTokenEncryptionAlgValuesSupported($this->id_token_manager->getKeyEncryptionAlgorithms());
+        $metadata->setIdTokenEncryptionEncValuesSupported($this->id_token_manager->getContentEncryptionAlgorithms());
+        $metadata->setUserinfoSigningAlgValuesSupported($this->user_info_endpoint->getSignatureAlgorithms());
+        $metadata->setUserinfoEncryptionAlgValuesSupported($this->user_info_endpoint->getKeyEncryptionAlgorithms());
+        $metadata->setUserinfoEncryptionEncValuesSupported($this->user_info_endpoint->getContentEncryptionAlgorithms());
+        $metadata->setRequestObjectSigningAlgValuesSupported($this->authorization_factory->getSignatureAlgorithms());
+        $metadata->setRequestObjectEncryptionAlgValuesSupported($this->authorization_factory->getKeyEncryptionAlgorithms());
+        $metadata->setRequestObjectEncryptionEncValuesSupported($this->authorization_factory->getContentEncryptionAlgorithms());
         $metadata->setTokenEndpointAuthMethodsSupported('https://my.server.com/authorize');
-        $metadata->setTokenEndpointAuthSigningAlgValuesSupported($this->jwt_creator->getSignatureAlgorithms());
+        $metadata->setTokenEndpointAuthSigningAlgValuesSupported($this->token_endpoint->getSignatureAlgorithms());
         $metadata->setDisplayValuesSupported('https://my.server.com/authorize');
         $metadata->setClaimTypesSupported('https://my.server.com/authorize');
         $metadata->setClaimsSupported('https://my.server.com/authorize');
@@ -107,11 +107,11 @@ final class MetadataFactory
         $metadata->setClaimsLocalesSupported('https://my.server.com/authorize');
         $metadata->setUiLocalesSupported('https://my.server.com/authorize');
         $metadata->setClaimsParameterSupported('https://my.server.com/authorize');
-        $metadata->setRequestParameterSupported('https://my.server.com/authorize');
-        $metadata->setRequestUriParameterSupported('https://my.server.com/authorize');
+        $metadata->setRequestParameterSupported($this->authorization_factory->isRequestParameterSupported());
+        $metadata->setRequestUriParameterSupported($this->authorization_factory->isRequestUriParameterSupported());
         $metadata->setRequireRequestUriRegistration('https://my.server.com/authorize');
-        $metadata->setOpPolicyUri('https://my.server.com/authorize');
-        $metadata->setOpTosUri('https://my.server.com/authorize');
+        //$metadata->setOpPolicyUri('https://my.server.com/authorize');
+        //$metadata->setOpTosUri('https://my.server.com/authorize');
 
         return $metadata;
     }

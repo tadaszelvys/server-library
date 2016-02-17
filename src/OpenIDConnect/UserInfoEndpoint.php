@@ -11,14 +11,22 @@
 
 namespace OAuth2\OpenIDConnect;
 
+use Assert\Assertion;
+use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasAccessTokenManager;
+use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasEndUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasTokenTypeManager;
+use OAuth2\Client\ClientInterface;
+use OAuth2\Client\ClientManagerSupervisorInterface;
+use OAuth2\Client\EncryptionCapabilitiesInterface;
 use OAuth2\EndUser\EndUserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
+use OAuth2\Util\JWTCreator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -28,25 +36,87 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     use HasTokenTypeManager;
     use HasAccessTokenManager;
     use HasEndUserManager;
+    use HasClientManagerSupervisor;
+    use HasJWTCreator;
+
+    /**
+     * @var \Jose\Object\JWKInterface|null
+     */
+    private $signature_key = null;
+
+    /**
+     * @var string|null
+     */
+    private $signature_algorithm = null;
 
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface     $token_type_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface   $access_token_manager
-     * @param \OAuth2\EndUser\EndUserManagerInterface     $end_user_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
+     * @param \OAuth2\EndUser\EndUserManagerInterface         $end_user_manager
+     * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
+     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      */
-    public function __construct(
-        TokenTypeManagerInterface $token_type_manager,
-        AccessTokenManagerInterface $access_token_manager,
-        EndUserManagerInterface $end_user_manager,
-        ExceptionManagerInterface $exception_manager
+    public function __construct(TokenTypeManagerInterface $token_type_manager,
+                                AccessTokenManagerInterface $access_token_manager,
+                                EndUserManagerInterface $end_user_manager,
+                                ClientManagerSupervisorInterface $client_manager_supervisor,
+                                ExceptionManagerInterface $exception_manager
     ) {
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
         $this->setEndUserManager($end_user_manager);
+        $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setExceptionManager($exception_manager);
+    }
+
+    /**
+     * @param \OAuth2\Util\JWTCreator   $jwt_creator
+     * @param string                    $signature_algorithm
+     * @param \Jose\Object\JWKInterface $signature_key
+     */
+    public function enableSignedAndEncryptedResponsesSupport(JWTCreator $jwt_creator,
+                                                             $signature_algorithm,
+                                                             JWKInterface $signature_key
+    ) {
+        Assertion::inArray($signature_algorithm, $jwt_creator->getSignatureAlgorithms());
+        $this->setJWTCreator($jwt_creator);
+
+        $this->signature_algorithm = $signature_algorithm;
+        $this->signature_key = $signature_key;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSignedAndEncryptedResponsesSupportEnabled()
+    {
+        return null !== $this->getJWTCreator() && null !== $this->signature_algorithm  && null !== $this->signature_key;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSignatureAlgorithms()
+    {
+        return $this->getJWTCreator()->getSignatureAlgorithms();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getKeyEncryptionAlgorithms()
+    {
+        return $this->getJWTCreator()->getKeyEncryptionAlgorithms();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContentEncryptionAlgorithms()
+    {
+        return $this->getJWTCreator()->getContentEncryptionAlgorithms();
     }
 
     /**
@@ -89,7 +159,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
         if (!in_array('openid', $access_token->getScope())) {
             $exception = $this->getExceptionManager()->getAuthenticateException(
                 ExceptionManagerInterface::INVALID_TOKEN,
-                'Access token does not exist or is not valid.',
+                'Access token does not contain the "openid" scope.',
                 ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes()]
             );
             $exception->getHttpResponse($response);
@@ -101,7 +171,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
         if (null === $end_user) {
             $exception = $this->getExceptionManager()->getAuthenticateException(
                 ExceptionManagerInterface::INVALID_TOKEN,
-                'Access token does not contain the "openid" scope.',
+                'Unable to find the resource owner.',
                 ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes()]
             );
             $exception->getHttpResponse($response);
@@ -109,20 +179,52 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
             return;
         }
 
-        $this->populateResponse($response, $end_user->getUserInfo($access_token));
+        $client = $this->getClientManagerSupervisor()->getClient($access_token->getClientPublicId());
+        if (null === $client) {
+            $exception = $this->getExceptionManager()->getAuthenticateException(
+                ExceptionManagerInterface::INVALID_TOKEN,
+                'Unable to find the client.',
+                ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes()]
+            );
+            $exception->getHttpResponse($response);
+
+            return;
+        }
+
+        $this->populateResponse($response, $end_user->getUserInfo($access_token), $client);
     }
 
     /**
      * @param \Psr\Http\Message\ResponseInterface $response
      * @param array                               $data
+     * @param \OAuth2\Client\ClientInterface      $client
      */
-    private function populateResponse(ResponseInterface &$response, array $data)
+    private function populateResponse(ResponseInterface &$response, array $data, ClientInterface $client)
     {
+        $this->signAndEncrypt($data, $client);
         $response = $response->withHeader('Content-Type', 'application/json');
         $response = $response->withHeader('Cache-Control', 'no-store');
         $response = $response->withHeader('Pragma', 'no-cache');
         $response = $response->withStatus(200);
-        $response->getBody()->write(json_encode($data));
+        $response->getBody()->write(is_array($data)?json_encode($data):$data);
+    }
+
+    private function signAndEncrypt(&$data, ClientInterface $client)
+    {
+        if (true === $this->isSignedAndEncryptedResponsesSupportEnabled()) {
+            $data = $this->getJWTCreator()->sign(
+                $data,
+                [
+                    'typ'       => 'JWT',
+                    'alg' => $this->signature_algorithm
+                ],
+                $this->signature_key
+            );
+        }
+
+        /*if ($client instanceof EncryptionCapabilitiesInterface) {
+            $data = $this->getJWTCreator()->encrypt($data, [], $client->getEncryptionPublicKeySet()[0], $this->key_encryption_key);
+        }*/
     }
 
     /**

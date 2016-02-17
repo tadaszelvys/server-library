@@ -92,9 +92,28 @@ class IdTokenManager implements IdTokenManagerInterface
     }
 
     /**
-     * @var \Jose\Object\JWKInterface
+     * {@inheritdoc}
      */
-    private $encryption_key;
+    public function getSignatureAlgorithms()
+    {
+        return $this->getJWTLoader()->getSupportedSignatureAlgorithms();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getKeyEncryptionAlgorithms()
+    {
+        return $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContentEncryptionAlgorithms()
+    {
+        return $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms();
+    }
 
     /**
      * {@inheritdoc}

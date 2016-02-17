@@ -187,7 +187,19 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getEndUserManager(),
+                $this->getClientManagerSupervisor(),
                 $this->getExceptionManager()
+            );
+
+            $this->user_info_endpoint->enableSignedAndEncryptedResponsesSupport(
+                $this->getJWTCreator(),
+                'HS512',
+                new JWK([
+                    'kid' => 'JWK2',
+                    'use' => 'sig',
+                    'kty' => 'oct',
+                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                ])
             );
         }
 

@@ -90,6 +90,30 @@ final class AuthorizationFactory
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getSignatureAlgorithms()
+    {
+        return $this->allowed_signature_algorithms;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getKeyEncryptionAlgorithms()
+    {
+        return $this->allowed_key_encryption_algorithms;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContentEncryptionAlgorithms()
+    {
+        return $this->allowed_content_encryption_algorithms;
+    }
+
+    /**
      * @param \OAuth2\Util\JWTLoader       $jwt_loader
      * @param array                        $allowed_signature_algorithms
      * @param \Jose\Object\JWKSetInterface $signature_key_set

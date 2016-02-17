@@ -113,7 +113,7 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
     protected function getJWTInformation(JWTInterface $token)
     {
         $result = [];
-        foreach (['jti', 'iat', 'nbf', 'aud', 'iss', 'jti'] as $key) {
+        foreach (['jti', 'iat', 'nbf', 'aud', 'iss'] as $key) {
             if ($token->hasClaim($key)) {
                 $result[$key] = $token->getClaim($key);
             }

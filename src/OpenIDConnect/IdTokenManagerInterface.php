@@ -31,4 +31,19 @@ interface IdTokenManagerInterface
      * @param \OAuth2\OpenIDConnect\IdTokenInterface $token The ID token to revoke
      */
     public function revokeIdToken(IdTokenInterface $token);
+
+    /**
+     * @return string[]
+     */
+    public function getSignatureAlgorithms();
+
+    /**
+     * @return string[]
+     */
+    public function getKeyEncryptionAlgorithms();
+
+    /**
+     * @return string[]
+     */
+    public function getContentEncryptionAlgorithms();
 }
