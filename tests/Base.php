@@ -193,6 +193,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->user_info_endpoint->enableSignedAndEncryptedResponsesSupport(
                 $this->getJWTCreator(),
+                $this->issuer,
                 'HS512',
                 new JWK([
                     'kid' => 'JWK2',

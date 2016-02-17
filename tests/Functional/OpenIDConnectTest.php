@@ -363,11 +363,11 @@ class OpenIDConnectTest extends Base
         $this->getUserInfoEndpoint()->getUserInfo($request, $response);
         $response->getBody()->rewind();
 
-        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('application/jwt', $response->getHeader('Content-Type')[0]);
 
         $jwt = Loader::load($response->getBody()->getContents());
         $expected_claims = json_decode('{"sub":"user1","birthdate":"1950-01-01","email":"root@localhost.com","email_verified":false,"address":{"street_address":"5 rue Sainte Anne","locality":"Paris","region":"\u00cele de France","postal_code":"75001","country":"France"}}', true);
-        
+
         $this->assertEquals($expected_claims, $jwt->getClaims());
     }
 }

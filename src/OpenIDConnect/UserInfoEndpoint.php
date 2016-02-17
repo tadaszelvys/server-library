@@ -40,9 +40,19 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     use HasJWTCreator;
 
     /**
+     * @var string|null
+     */
+    private $issuer = null;
+
+    /**
      * @var \Jose\Object\JWKInterface|null
      */
     private $signature_key = null;
+
+    /**
+     * @var \Jose\Object\JWKInterface|null
+     */
+    private $key_encryption_key = null;
 
     /**
      * @var string|null
@@ -72,19 +82,26 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Util\JWTCreator   $jwt_creator
-     * @param string                    $signature_algorithm
-     * @param \Jose\Object\JWKInterface $signature_key
+     * @param \OAuth2\Util\JWTCreator        $jwt_creator
+     * @param string                         $issuer
+     * @param string                         $signature_algorithm
+     * @param \Jose\Object\JWKInterface      $signature_key
+     * @param \Jose\Object\JWKInterface|null $key_encryption_key
      */
     public function enableSignedAndEncryptedResponsesSupport(JWTCreator $jwt_creator,
+                                                             $issuer,
                                                              $signature_algorithm,
-                                                             JWKInterface $signature_key
+                                                             JWKInterface $signature_key,
+                                                             JWKInterface $key_encryption_key = null
     ) {
+        Assertion::string($issuer);
         Assertion::inArray($signature_algorithm, $jwt_creator->getSignatureAlgorithms());
         $this->setJWTCreator($jwt_creator);
 
-        $this->signature_algorithm = $signature_algorithm;
+        $this->issuer = $issuer;
         $this->signature_key = $signature_key;
+        $this->signature_algorithm = $signature_algorithm;
+        $this->key_encryption_key = $key_encryption_key;
     }
 
     /**
@@ -202,7 +219,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     private function populateResponse(ResponseInterface &$response, array $data, ClientInterface $client)
     {
         $this->signAndEncrypt($data, $client);
-        $response = $response->withHeader('Content-Type', 'application/json');
+        $response = $response->withHeader('Content-Type', sprintf('application/%s',(is_array($data)?'json':'jwt')));
         $response = $response->withHeader('Cache-Control', 'no-store');
         $response = $response->withHeader('Pragma', 'no-cache');
         $response = $response->withStatus(200);
@@ -215,16 +232,28 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
             $data = $this->getJWTCreator()->sign(
                 $data,
                 [
-                    'typ'       => 'JWT',
+                    'typ' => 'JWT',
                     'alg' => $this->signature_algorithm
                 ],
                 $this->signature_key
             );
         }
 
-        /*if ($client instanceof EncryptionCapabilitiesInterface) {
-            $data = $this->getJWTCreator()->encrypt($data, [], $client->getEncryptionPublicKeySet()[0], $this->key_encryption_key);
-        }*/
+        if ($client instanceof EncryptionCapabilitiesInterface) {
+            $data = $this->getJWTCreator()->encrypt(
+                $data,
+                [
+                    'aud' => $client->getPublicId(),
+                    'iss' => $this->issuer,
+                    'iat' => time(),
+                    'nbf' => time(),
+                    'alg' => $client->getSupportedKeyEncryptionAlgorithms()[0],
+                    'enc' => $client->getSupportedContentEncryptionAlgorithms()[0],
+                ],
+                $client->getEncryptionPublicKeySet()[0],
+                $this->key_encryption_key
+            );
+        }
     }
 
     /**
