@@ -19,7 +19,7 @@ You must add at least one token type
 
 The `Bearer Token Type` (see [RFC6750](https://tools.ietf.org/html/rfc6750)) is most common token type.
 
-Please read [this page](component/bearer_token_type.md) to know how to create and use this component.
+Please read [this page](bearer_token_type.md) to know how to create and use this component.
 
 ##  MAC Token Type
 
@@ -27,7 +27,7 @@ The `MAC Token Type` is an authentication scheme that uses a message authenticat
 
 Please note that this specification is not yet stable. This library provides a MAC Token Type support, but it is limited to the [revision 2 of the specification](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-02). No update will be made until this specifition has not reach maturity.
 
-Please read [this page](component/mac_token_type.md) to know how to create and use this component.
+Please read [this page](mac_token_type.md) to know how to create and use this component.
 
 ##  POP Token Type
 
