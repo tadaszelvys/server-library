@@ -100,7 +100,7 @@ final class Uri
      */
     private static function buildPath(array $parse_url)
     {
-        return isset($parse_url['path']) ? $parse_url['path'] : '';
+        return isset($parse_url['path']) ? $parse_url['path'] : '/';
     }
 
     /**

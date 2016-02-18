@@ -73,16 +73,37 @@ class OpenIDConnectTest extends Base
 
         $this->assertInstanceOf(JWSInterface::class, $id_token);
 
+        $this->assertEquals(
+            [
+                'code',
+                'token',
+                'none',
+                'id_token',
+                'code id_token',
+                'id_token token',
+                'code id_token token',
+
+            ],
+            $this->getAuthorizationEndpoint()->getResponseTypesSupported()
+        );
+        $this->assertTrue($id_token->hasClaim('iss'));
+        $this->assertTrue($id_token->hasClaim('sub'));
+        $this->assertTrue($id_token->hasClaim('aud'));
+        $this->assertTrue($id_token->hasClaim('exp'));
+        $this->assertTrue($id_token->hasClaim('iat'));
+
+        $this->assertTrue($id_token->hasClaim('nonce'));
+        $this->assertTrue($id_token->hasClaim('nbf'));
+        $this->assertTrue($id_token->hasClaim('amr'));
+        $this->assertFalse($id_token->hasClaim('acr'));
+        $this->assertTrue($id_token->hasClaim('auth_time'));
+        $this->assertTrue($id_token->hasClaim('at_hash'));
+        $this->assertTrue($id_token->hasClaim('c_hash'));
+
         $this->assertEquals('My Authorization Server', $id_token->getClaim('iss'));
         $this->assertEquals('**UNREGISTERED**--foo', $id_token->getClaim('aud'));
         $this->assertEquals('user1', $id_token->getClaim('sub'));
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
-        $this->assertTrue($id_token->hasClaim('iat'));
-        $this->assertTrue($id_token->hasClaim('nbf'));
-        $this->assertTrue($id_token->hasClaim('exp'));
-        $this->assertTrue($id_token->hasClaim('auth_time'));
-        $this->assertTrue($id_token->hasClaim('at_hash'));
-        $this->assertTrue($id_token->hasClaim('c_hash'));
     }
 
     public function testCodeTokenSuccess()

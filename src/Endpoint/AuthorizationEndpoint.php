@@ -84,7 +84,24 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     public function getResponseTypesSupported()
     {
-        return array_keys($this->response_types);
+        $types = array_keys($this->response_types);
+        if (in_array('id_token', $types)) {
+            if (in_array('code', $types)) {
+                $types[] = 'code id_token';
+            }
+            if (in_array('token', $types)) {
+                $types[] = 'id_token token';
+            }
+            if (in_array('code', $types) && in_array('token', $types)) {
+                $types[] = 'code id_token token';
+            }
+        } else {
+            if (in_array('code', $types) && in_array('token', $types)) {
+                $types[] = 'code token';
+            }
+        }
+
+        return $types;
     }
 
     /**
@@ -211,8 +228,29 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkSecuredRedirectUri($redirect_uri)
     {
         if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== substr($redirect_uri, 0, 5)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must be secured');
+            if (!$this->isALocalUriOrAnUrn($redirect_uri)) {
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must be secured');
+            }
         }
+    }
+
+    /**
+     * Redirection to an URN or a local host is allowed.
+     *
+     * @param string $redirect_uri
+     *
+     * @return bool
+     */
+    private function isALocalUriOrAnUrn($redirect_uri)
+    {
+        $parsed = parse_url($redirect_uri);
+        if (array_key_exists('scheme', $parsed) && array_key_exists('host', $parsed) &&
+            'http' === $parsed['scheme'] && in_array($parsed['host'], ['localhost', '127.0.0.1'])
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
