@@ -42,3 +42,6 @@ For more information, please follow the links hereafter:
 # Token Type Per Client
 
 This feature is not yet available.
+
+However, in some cases, clients can ask for a specific token type on access token requests using the parameter `token_type`.
+This feature is described on grant type pages.
