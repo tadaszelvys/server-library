@@ -33,7 +33,7 @@ This library support these policies.
 
 ## No Scope Policy
 
-If the policy is not defined, nothing will append. This is the default behaviour.
+If the policy is not defined, the scope parameter (if passed as an argument) is not changed. This is the default behaviour.
 
 ```php
 use OAuth2\Scope\ScopeManager;
@@ -46,6 +46,14 @@ $scope_manager = new ScopeManager(
     ScopeManagerInterface::POLICY_MODE_NONE  // Scope policy
 );
 ```
+
+Example #1:
+
+> A client sends a request without scope parameter. If an access token is issued, no scope is associated to the access token.
+
+Example #2:
+
+> A client sends a request with scope parameter `read_write delete`. If an access token is issued, the scope `read_write delete` are associated to the access token.
 
 ## Scope Policy 'Default'
 
