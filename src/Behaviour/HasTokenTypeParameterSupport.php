@@ -11,9 +11,6 @@
 
 namespace OAuth2\Behaviour;
 
-use OAuth2\Util\RequestBody;
-use Psr\Http\Message\ServerRequestInterface;
-
 trait HasTokenTypeParameterSupport
 {
     /**

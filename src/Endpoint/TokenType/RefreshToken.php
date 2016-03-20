@@ -11,7 +11,6 @@
 
 namespace OAuth2\Endpoint\TokenType;
 
-use Jose\Object\JWTInterface;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;

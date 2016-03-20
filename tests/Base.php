@@ -11,8 +11,8 @@
 
 namespace OAuth2\Test;
 
-use Jose\ClaimChecker\AudienceChecker;
-use Jose\ClaimChecker\ClaimCheckerManager;
+use Jose\Checker\AudienceChecker;
+use Jose\Checker\CheckerManager;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
@@ -958,17 +958,17 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\Jose\ClaimChecker\ClaimCheckerManagerInterface
+     * @var null|\Jose\Checker\CheckerManagerInterface
      */
     private $claim_checker_manager = null;
 
     /**
-     * @return \Jose\ClaimChecker\ClaimCheckerManagerInterface
+     * @return \Jose\Checker\CheckerManagerInterface
      */
     protected function getClaimCheckerManager()
     {
         if (null === $this->claim_checker_manager) {
-            $this->claim_checker_manager = new ClaimCheckerManager();
+            $this->claim_checker_manager = new CheckerManager();
 
             $this->claim_checker_manager->addClaimChecker(new AudienceChecker($this->issuer));
         }

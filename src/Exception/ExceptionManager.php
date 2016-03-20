@@ -15,6 +15,12 @@ use Assert\Assertion;
 
 /**
  * An exception manager.
+ *
+ * @method getAuthenticateException(string $error, string $error_description = null, array $data = [])
+ * @method getBadRequestException(string $error, string $error_description = null, array $data = [])
+ * @method getNotImplementedException(string $error, string $error_description = null, array $data = [])
+ * @method getRedirectException(string $error, string $error_description = null, array $data = [])
+ * @method getInternalServerErrorException(string $error, string $error_description = null, array $data = [])
  */
 class ExceptionManager implements ExceptionManagerInterface
 {

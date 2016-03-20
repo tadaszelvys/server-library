@@ -12,7 +12,7 @@
 namespace OAuth2\Util;
 
 use Assert\Assertion;
-use Jose\ClaimChecker\ClaimCheckerManagerInterface;
+use Jose\Checker\CheckerManagerInterface;
 use Jose\Factory\DecrypterFactory;
 use Jose\Factory\VerifierFactory;
 use Jose\Loader;
@@ -23,9 +23,9 @@ use Jose\Object\JWSInterface;
 final class JWTLoader
 {
     /**
-     * @var \Jose\ClaimChecker\ClaimCheckerManagerInterface
+     * @var \Jose\Checker\CheckerManagerInterface
      */
-    private $claim_checker_manager;
+    private $checker_manager;
 
     /**
      * @var \Jose\DecrypterInterface
@@ -55,20 +55,20 @@ final class JWTLoader
     /**
      * JWTLoader constructor.
      *
-     * @param \Jose\ClaimChecker\ClaimCheckerManagerInterface   $claim_checker_manager
+     * @param \Jose\Checker\CheckerManagerInterface             $checker_manager
      * @param string[]                                          $supported_signature_algorithms
      * @param string[]                                          $supported_key_encryption_algorithms
      * @param string[]                                          $supported_content_encryption_algorithms
      * @param string[]|\Jose\Compression\CompressionInterface[] $compression_methods
      */
     public function __construct(
-        ClaimCheckerManagerInterface $claim_checker_manager,
+        CheckerManagerInterface $checker_manager,
         array $supported_signature_algorithms,
         array $supported_key_encryption_algorithms = [],
         array $supported_content_encryption_algorithms = [],
         array $compression_methods = ['DEF']
     ) {
-        $this->claim_checker_manager = $claim_checker_manager;
+        $this->checker_manager = $checker_manager;
         $this->verifier = VerifierFactory::createVerifier($supported_signature_algorithms);
         $this->decrypter = DecrypterFactory::createDecrypter(array_merge($supported_key_encryption_algorithms, $supported_content_encryption_algorithms), $compression_methods);
 
@@ -120,13 +120,12 @@ final class JWTLoader
             Assertion::eq(1, $jwt->countRecipients(), 'The assertion does not contain a single JWS or a single JWE.');
             Assertion::inArray($jwt->getSharedProtectedHeader('alg'), $allowed_key_encryption_algorithms, sprintf('The key encryption algorithm "%s" is not allowed.', $jwt->getSharedProtectedHeader('alg')));
             Assertion::inArray($jwt->getSharedProtectedHeader('enc'), $allowed_content_encryption_algorithms, sprintf('The content encryption algorithm "%s" is not allowed.', $jwt->getSharedProtectedHeader('enc')));
-            $this->claim_checker_manager->checkClaims($jwt);
             $jwt = $this->decryptAssertion($jwt, $encryption_key_set);
         } elseif (true === $is_encryption_required) {
             throw new \InvalidArgumentException('The assertion must be encrypted.');
         }
         Assertion::eq(1, $jwt->countSignatures(), 'The assertion does not contain a single JWS or a single JWE.');
-        $this->claim_checker_manager->checkClaims($jwt);
+        $this->checker_manager->checkJWS($jwt, 0);
 
         return $jwt;
     }

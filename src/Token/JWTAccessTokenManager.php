@@ -15,7 +15,6 @@ use Assert\Assertion;
 use Base64Url\Base64Url;
 use Jose\Object\JWKInterface;
 use Jose\Object\JWKSet;
-use Jose\Util\StringUtil;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
@@ -134,7 +133,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         $content_encryption_algorithm = null === $resource_server?$this->content_encryption_algorithm:$resource_server->getContentEncryptionAlgorithm();
         $header = array_merge(
             [
-                'jti' => Base64Url::encode(StringUtil::generateRandomBytes(25)),
+                'jti' => Base64Url::encode(random_bytes(25)),
                 'iss' => $this->issuer,
                 'iat' => time(),
                 'nbf' => time(),
@@ -173,7 +172,7 @@ class JWTAccessTokenManager extends AccessTokenManager
     protected function preparePayload(AccessTokenInterface $access_token, ResourceServerInterface $resource_server = null)
     {
         $payload = [
-            'jti' => Base64Url::encode(StringUtil::generateRandomBytes(25)),
+            'jti' => Base64Url::encode(random_bytes(25)),
             'iss' => $this->issuer,
             'aud' => null === $resource_server ? $this->issuer : $resource_server->getServerName(),
             'iat' => time(),

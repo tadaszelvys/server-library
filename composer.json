@@ -15,8 +15,7 @@
         "php": ">=5.5.9",
         "psr/http-message": "~1.0",
         "spomky-labs/defuse-generator": "^1.0.0",
-        "spomky-labs/jose": "2.0.*@dev",
-        "beberlei/assert": "^2.0"
+        "spomky-labs/jose": "dev-develop"
     },
     "require-dev": {
         "zendframework/zend-diactoros": "^1.1.0",

@@ -14,11 +14,9 @@ namespace OAuth2\OpenIDConnect;
 use Assert\Assertion;
 use Base64Url\Base64Url;
 use Jose\Object\JWKInterface;
-use Jose\Util\StringUtil;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\EncryptionCapabilitiesInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Util\JWTCreator;
@@ -142,7 +140,7 @@ class IdTokenManager implements IdTokenManagerInterface
         ];
 
         $payload = [
-            'jti'       => Base64Url::encode(StringUtil::generateRandomBytes(25)),
+            'jti'       => Base64Url::encode(random_bytes(25)),
             'iss'       => $this->issuer,
             'sub'       => $end_user->getPublicId(),
             'aud'       => $client->getPublicId(),

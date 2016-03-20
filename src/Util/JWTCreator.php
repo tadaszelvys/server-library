@@ -74,36 +74,19 @@ final class JWTCreator
      */
     public function sign($payload, array $signature_protected_headers, JWKInterface $signature_key)
     {
-        $jws = JWSFactory::createJWS($payload);
-
-        $this->signer->addSignature(
-            $jws,
-            $signature_key,
-            $signature_protected_headers
-        );
-
-        return $jws->toCompactJSON(0);
+        return JWSFactory::createJWSToCompactJSON($payload, $signature_key, $signature_protected_headers);
     }
 
     /**
      * @param string                         $payload
      * @param array                          $encryption_protected_headers
      * @param \Jose\Object\JWKInterface      $encryption_key
-     * @param \Jose\Object\JWKInterface|null $sender_key
      *
      * @return string
      */
-    public function encrypt($payload, array $encryption_protected_headers, JWKInterface $encryption_key, JWKInterface $sender_key = null)
+    public function encrypt($payload, array $encryption_protected_headers, JWKInterface $encryption_key)
     {
-        $jwe = JWEFactory::createJWE($payload, $encryption_protected_headers);
-
-        $this->encrypter->addRecipient(
-            $jwe,
-            $encryption_key,
-            $sender_key
-        );
-
-        return $jwe->toCompactJSON(0);
+        return JWEFactory::createJWEToCompactJSON($payload, $encryption_key, $encryption_protected_headers);
     }
 
     /**

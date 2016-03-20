@@ -33,6 +33,6 @@ final class FragmentResponseMode implements ResponseModeInterface
         $params = empty($data) ? [] : [$this->getName() => $data];
 
         $response = $response->withStatus(302)
-            ->withHeader('Location', Uri::buildUri($redirect_uri, $params));
+            ->withHeader('Location', Uri::buildURI($redirect_uri, $params));
     }
 }

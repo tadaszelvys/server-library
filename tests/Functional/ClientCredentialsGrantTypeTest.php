@@ -11,10 +11,8 @@
 
 namespace OAuth2\Test\Functional;
 
-use Jose\Factory\EncrypterFactory;
 use Jose\Factory\JWEFactory;
 use Jose\Factory\JWSFactory;
-use Jose\Factory\SignerFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWSInterface;
 use OAuth2\Exception\BaseExceptionInterface;
@@ -256,16 +254,12 @@ class ClientCredentialsGrantTypeTest extends Base
             'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
         ]);
 
-        $jws = JWSFactory::createJWS([
-            'exp' => time() - 1,
-            'aud' => 'My Authorization Server',
-            'iss' => 'My JWT issuer',
-            'sub' => 'jwt1',
-        ]);
-
-        $signer = SignerFactory::createSigner(['HS512']);
-        $signer->addSignature(
-            $jws,
+        $jws = JWSFactory::createJWSToCompactJSON([
+                'exp' => time() - 1,
+                'aud' => 'My Authorization Server',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
+            ],
             $jwk2,
             [
                 'kid' => 'JWK2',
@@ -280,7 +274,7 @@ class ClientCredentialsGrantTypeTest extends Base
             [
                 'grant_type'            => 'client_credentials',
                 'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                'client_assertion'      => $jws->toCompactJSON(0),
+                'client_assertion'      => $jws,
             ],
             ['HTTPS' => 'on']
         );
@@ -303,16 +297,12 @@ class ClientCredentialsGrantTypeTest extends Base
             'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
         ]);
 
-        $jws = JWSFactory::createJWS([
-            'exp' => time() + 3600,
-            'aud' => 'Bad Audience',
-            'iss' => 'My JWT issuer',
-            'sub' => 'jwt1',
-        ]);
-
-        $signer = SignerFactory::createSigner(['HS512']);
-        $signer->addSignature(
-            $jws,
+        $jws = JWSFactory::createJWSToCompactJSON([
+                'exp' => time() + 3600,
+                'aud' => 'Bad Audience',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
+            ],
             $jwk2,
             [
                 'kid' => 'JWK2',
@@ -327,7 +317,7 @@ class ClientCredentialsGrantTypeTest extends Base
             [
                 'grant_type'            => 'client_credentials',
                 'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                'client_assertion'      => $jws->toCompactJSON(0),
+                'client_assertion'      => $jws,
             ],
             ['HTTPS' => 'on']
         );
@@ -350,16 +340,12 @@ class ClientCredentialsGrantTypeTest extends Base
             'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
         ]);
 
-        $jws = JWSFactory::createJWS([
-            'exp' => time() + 3600,
-            'aud' => 'My Authorization Server',
-            'iss' => 'My JWT issuer',
-            'sub' => 'jwt1',
-        ]);
-
-        $signer = SignerFactory::createSigner(['HS512']);
-        $signer->addSignature(
-            $jws,
+        $jws = JWSFactory::createJWSToCompactJSON([
+                'exp' => time() + 3600,
+                'aud' => 'My Authorization Server',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
+            ],
             $jwk2,
             [
                 'kid' => 'JWK2',
@@ -374,7 +360,7 @@ class ClientCredentialsGrantTypeTest extends Base
             [
                 'grant_type'            => 'client_credentials',
                 'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                'client_assertion'      => $jws->toCompactJSON(0),
+                'client_assertion'      => $jws,
             ],
             ['HTTPS' => 'on']
         );
@@ -405,16 +391,12 @@ class ClientCredentialsGrantTypeTest extends Base
             'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
         ]);
 
-        $jws = JWSFactory::createJWS([
-            'exp' => time() + 3600,
-            'aud' => 'My Authorization Server',
-            'iss' => 'My JWT issuer',
-            'sub' => 'jwt1',
-        ]);
-
-        $signer = SignerFactory::createSigner(['HS512']);
-        $signer->addSignature(
-            $jws,
+        $jws = JWSFactory::createJWSToCompactJSON([
+                'exp' => time() + 3600,
+                'aud' => 'My Authorization Server',
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
+            ],
             $jwk2,
             [
                 'kid' => 'JWK2',
@@ -423,8 +405,9 @@ class ClientCredentialsGrantTypeTest extends Base
             ]
         );
 
-        $jwe = JWEFactory::createJWE(
-            $jws->toCompactJSON(0),
+        $jwe = JWEFactory::createJWEToCompactJSON(
+            $jws,
+            $jwk1,
             [
                 'kid' => 'JWK1',
                 'cty' => 'JWT',
@@ -437,19 +420,13 @@ class ClientCredentialsGrantTypeTest extends Base
             ]
         );
 
-        $encrypter = EncrypterFactory::createEncrypter(['A256KW', 'A256CBC-HS512']);
-        $encrypter->addRecipient(
-            $jwe,
-            $jwk1
-        );
-
         $request = $this->createRequest(
             '/',
             'POST',
             [
                 'grant_type'            => 'client_credentials',
                 'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                'client_assertion'      => $jwe->toCompactJSON(0),
+                'client_assertion'      => $jwe,
             ],
             ['HTTPS' => 'on']
         );
