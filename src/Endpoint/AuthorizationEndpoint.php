@@ -296,7 +296,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
     /**
      * @param \OAuth2\Client\RegisteredClientInterface $client
-     * 
+     *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
     private function checkRedirectUriForNonConfidentialClient(RegisteredClientInterface $client)
@@ -394,17 +394,11 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         return $this->redirect_uri_enforced;
     }
 
-    /**
-     *
-     */
     public function enabledRedirectUriEnforcement()
     {
         $this->redirect_uri_enforced = true;
     }
 
-    /**
-     *
-     */
     public function disableRedirectUriEnforcement()
     {
         $this->redirect_uri_enforced = false;
@@ -418,17 +412,11 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         return $this->secured_redirect_uri_enforced;
     }
 
-    /**
-     *
-     */
     public function enableSecuredRedirectUriEnforcement()
     {
         $this->secured_redirect_uri_enforced = true;
     }
 
-    /**
-     *
-     */
     public function disableSecuredRedirectUriEnforcement()
     {
         $this->secured_redirect_uri_enforced = false;
@@ -442,17 +430,11 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         return $this->redirect_uri_required_for_registered_client;
     }
 
-    /**
-     *
-     */
     public function enableRedirectUriForRegisteredClientsRequirement()
     {
         $this->redirect_uri_required_for_registered_client = true;
     }
 
-    /**
-     *
-     */
     public function disableRedirectUriForRegisteredClientsRequirement()
     {
         $this->redirect_uri_required_for_registered_client = false;
@@ -466,17 +448,11 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         return $this->state_parameter_enforced;
     }
 
-    /**
-     *
-     */
     public function enableStateParameterEnforcement()
     {
         $this->state_parameter_enforced = true;
     }
 
-    /**
-     *
-     */
     public function disableStateParameterEnforcement()
     {
         $this->state_parameter_enforced = false;

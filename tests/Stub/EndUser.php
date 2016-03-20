@@ -187,7 +187,7 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
     }
 
     /**
-     * @param null|integer $updated_at
+     * @param null|int $updated_at
      */
     public function setUpdatedAt($updated_at)
     {

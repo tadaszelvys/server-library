@@ -246,7 +246,7 @@ trait EndUserTrait
             $this->getFamilyName(),
         ]);
 
-        return empty(trim($name,' '))?null:$name;
+        return empty(trim($name, ' ')) ? null : $name;
     }
 
     /**

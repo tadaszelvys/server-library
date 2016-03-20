@@ -45,17 +45,11 @@ trait HasTokenTypeParameterSupport
         return $this->token_type_parameter_allowed;
     }
 
-    /**
-     *
-     */
     public function allowAccessTokenTypeParameter()
     {
         $this->token_type_parameter_allowed = true;
     }
 
-    /**
-     *
-     */
     public function disallowAccessTokenTypeParameter()
     {
         $this->token_type_parameter_allowed = false;

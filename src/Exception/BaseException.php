@@ -107,7 +107,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
 
     /**
      * Per RFC 7230, only VISIBLE ASCII characters, spaces, and horizontal tabs are allowed in values.
-     * 
+     *
      * @param string $text
      *
      * @return string

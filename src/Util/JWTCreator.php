@@ -78,9 +78,9 @@ final class JWTCreator
     }
 
     /**
-     * @param string                         $payload
-     * @param array                          $encryption_protected_headers
-     * @param \Jose\Object\JWKInterface      $encryption_key
+     * @param string                    $payload
+     * @param array                     $encryption_protected_headers
+     * @param \Jose\Object\JWKInterface $encryption_key
      *
      * @return string
      */

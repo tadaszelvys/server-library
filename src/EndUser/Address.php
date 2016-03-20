@@ -12,7 +12,7 @@
 namespace OAuth2\EndUser;
 
 /**
- * Class Address
+ * Class Address.
  *
  * @see http://openid.net/specs/openid-connect-core-1_0.html#AddressClaim
  */
@@ -102,16 +102,16 @@ class Address implements AddressInterface
     public function jsonSerialize()
     {
         $claims = [
-            'formatted' => 'getFormatted',
+            'formatted'      => 'getFormatted',
             'street_address' => 'getStreetAddress',
-            'locality' => 'getLocality',
-            'region' => 'getRegion',
-            'postal_code' => 'getPostalCode',
-            'country' => 'getCountry',
+            'locality'       => 'getLocality',
+            'region'         => 'getRegion',
+            'postal_code'    => 'getPostalCode',
+            'country'        => 'getCountry',
         ];
 
         $result = [];
-        foreach ($claims as $key=>$method) {
+        foreach ($claims as $key => $method) {
             $claim = $this->$method();
             if (!empty($claim)) {
                 $result[$key] = $claim;

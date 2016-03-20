@@ -151,7 +151,6 @@ class OpenIDConnectTest extends Base
         $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
         $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
 
-
         $introspection_request = $this->createRequest('/', 'POST', ['token' => $json['access_token']], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         $introspection_response = new Response();

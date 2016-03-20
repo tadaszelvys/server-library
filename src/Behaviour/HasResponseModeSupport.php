@@ -116,17 +116,11 @@ trait HasResponseModeSupport
         return $this->response_mode_parameter_in_authorization_request_allowed;
     }
 
-    /**
-     *
-     */
     public function allowResponseModeParameterInAuthorizationRequest()
     {
         $this->response_mode_parameter_in_authorization_request_allowed = true;
     }
 
-    /**
-     *
-     */
     public function disallowResponseModeParameterInAuthorizationRequest()
     {
         $this->response_mode_parameter_in_authorization_request_allowed = false;
