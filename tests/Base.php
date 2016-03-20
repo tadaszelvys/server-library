@@ -25,9 +25,6 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
-use OAuth2\OpenIDConnect\IdTokenGrantType;
-use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
-use OAuth2\OpenIDConnect\UserInfoEndpoint;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
@@ -35,8 +32,11 @@ use OAuth2\Grant\JWTBearerGrantType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\OpenIDConnect\FormPostResponseMode;
+use OAuth2\OpenIDConnect\IdTokenGrantType;
 use OAuth2\OpenIDConnect\IdTokenManager;
 use OAuth2\OpenIDConnect\NoneResponseType;
+use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
+use OAuth2\OpenIDConnect\UserInfoEndpoint;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
@@ -138,7 +138,7 @@ class Base extends \PHPUnit_Framework_TestCase
                         'use' => 'enc',
                         'kty' => 'oct',
                         'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                    ]
+                    ],
                 ]])
             );
 
@@ -483,7 +483,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ]
+                ],
             ]]);
 
             $this->jwt_client_manager = new JWTClientManager(
@@ -571,7 +571,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ]
+                ],
             ]]);
 
             $this->jwt_bearer_grant_type = new JWTBearerGrantType(
@@ -927,9 +927,9 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->jwt_loader) {
             $this->jwt_loader = new JWTLoader(
                 $this->getClaimCheckerManager(),
-                ['HS256','HS384','HS512','ES256','ES384','ES512','none','RS256','RS384','RS512','PS256','PS384','PS512',],
-                ['A128KW', 'A192KW', 'A256KW', 'A128GCMKW' , 'A192GCMKW' , 'A256GCMKW' , 'dir' , 'ECDH-ES' , 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW', 'PBES2-HS256+A128KW', 'PBES2-HS384+A192KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256',],
-                ['A128GCM', 'A192GCM', 'A256GCM', 'A128CBC-HS256', 'A192CBC-HS384', 'A256CBC-HS512',]
+                ['HS256', 'HS384', 'HS512', 'ES256', 'ES384', 'ES512', 'none', 'RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'],
+                ['A128KW', 'A192KW', 'A256KW', 'A128GCMKW', 'A192GCMKW', 'A256GCMKW', 'dir', 'ECDH-ES', 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW', 'PBES2-HS256+A128KW', 'PBES2-HS384+A192KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
+                ['A128GCM', 'A192GCM', 'A256GCM', 'A128CBC-HS256', 'A192CBC-HS384', 'A256CBC-HS512']
             );
         }
 
@@ -948,9 +948,9 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->jwt_creator) {
             $this->jwt_creator = new JWTCreator(
-                ['HS256','HS384','HS512','ES256','ES384','ES512','none','RS256','RS384','RS512','PS256','PS384','PS512',],
-                ['A128KW', 'A192KW', 'A256KW', 'A128GCMKW' , 'A192GCMKW' , 'A256GCMKW' , 'dir' , 'ECDH-ES' , 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW', 'PBES2-HS256+A128KW', 'PBES2-HS384+A192KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256',],
-                ['A128GCM', 'A192GCM', 'A256GCM', 'A128CBC-HS256', 'A192CBC-HS384', 'A256CBC-HS512',]
+                ['HS256', 'HS384', 'HS512', 'ES256', 'ES384', 'ES512', 'none', 'RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'],
+                ['A128KW', 'A192KW', 'A256KW', 'A128GCMKW', 'A192GCMKW', 'A256GCMKW', 'dir', 'ECDH-ES', 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW', 'PBES2-HS256+A128KW', 'PBES2-HS384+A192KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
+                ['A128GCM', 'A192GCM', 'A256GCM', 'A128CBC-HS256', 'A192CBC-HS384', 'A256CBC-HS512']
             );
         }
 

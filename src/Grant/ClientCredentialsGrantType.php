@@ -75,17 +75,11 @@ final class ClientCredentialsGrantType implements GrantTypeSupportInterface
         return $this->issue_refresh_token_with_access_token;
     }
 
-    /**
-     *
-     */
     public function enableRefreshTokenIssuanceWithAccessToken()
     {
         $this->issue_refresh_token_with_access_token = true;
     }
 
-    /**
-     *
-     */
     public function disableRefreshTokenIssuanceWithAccessToken()
     {
         $this->issue_refresh_token_with_access_token = false;

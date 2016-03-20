@@ -11,7 +11,6 @@
 
 namespace OAuth2\ResourceOwner;
 
-
 class ResourceOwner implements ResourceOwnerInterface
 {
     use ResourceOwnerTrait;
