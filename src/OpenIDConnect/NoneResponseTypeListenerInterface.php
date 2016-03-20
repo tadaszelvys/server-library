@@ -13,8 +13,6 @@ namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Token\AccessTokenInterface;
 
-/**
- */
 interface NoneResponseTypeListenerInterface
 {
     public function call(AccessTokenInterface $access_token);

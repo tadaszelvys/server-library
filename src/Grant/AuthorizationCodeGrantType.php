@@ -165,7 +165,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
 
         $this->getAuthorizationCodeManager()->markAuthCodeAsUsed($authCode);
 
-        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ?$this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')): $authCode->getScope());
+        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
         $grant_type_response->setAvailableScope($authCode->getScope());
         $grant_type_response->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
 
@@ -298,17 +298,11 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         return $this->pkce_for_public_clients_enforced;
     }
 
-    /**
-     *
-     */
     public function enablePKCEForPublicClientsEnforcement()
     {
         $this->pkce_for_public_clients_enforced = true;
     }
 
-    /**
-     *
-     */
     public function disablePKCEForPublicClientsEnforcement()
     {
         $this->pkce_for_public_clients_enforced = false;

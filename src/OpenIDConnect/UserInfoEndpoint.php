@@ -219,11 +219,11 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     private function populateResponse(ResponseInterface &$response, array $data, ClientInterface $client)
     {
         $this->signAndEncrypt($data, $client);
-        $response = $response->withHeader('Content-Type', sprintf('application/%s',(is_array($data)?'json':'jwt')));
+        $response = $response->withHeader('Content-Type', sprintf('application/%s', (is_array($data) ? 'json' : 'jwt')));
         $response = $response->withHeader('Cache-Control', 'no-store');
         $response = $response->withHeader('Pragma', 'no-cache');
         $response = $response->withStatus(200);
-        $response->getBody()->write(is_array($data)?json_encode($data):$data);
+        $response->getBody()->write(is_array($data) ? json_encode($data) : $data);
     }
 
     private function signAndEncrypt(&$data, ClientInterface $client)
@@ -233,7 +233,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
                 $data,
                 [
                     'typ' => 'JWT',
-                    'alg' => $this->signature_algorithm
+                    'alg' => $this->signature_algorithm,
                 ],
                 $this->signature_key
             );

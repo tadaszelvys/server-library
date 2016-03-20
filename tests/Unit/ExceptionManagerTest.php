@@ -45,8 +45,8 @@ class ExceptionManagerTest extends Base
         $this->assertEquals(302, $exception->getHttpCode());
         $this->assertEquals(
             [
-                'Location' => 'https://foo.bar/?error=foo&error_description=bar&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Ffoo',
-                'Content-Security-Policy' => 'referrer origin;'
+                'Location'                => 'https://foo.bar/?error=foo&error_description=bar&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Ffoo',
+                'Content-Security-Policy' => 'referrer origin;',
             ],
             $exception->getResponseHeaders());
     }

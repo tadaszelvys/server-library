@@ -11,7 +11,6 @@
 
 namespace OAuth2\OpenIDConnect;
 
-
 use OAuth2\Client\ClientInterface;
 use OAuth2\EndUser\EndUserInterface;
 
