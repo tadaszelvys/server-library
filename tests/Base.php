@@ -34,6 +34,7 @@ use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\OpenIDConnect\FormPostResponseMode;
 use OAuth2\OpenIDConnect\IdTokenGrantType;
 use OAuth2\OpenIDConnect\IdTokenManager;
+use OAuth2\OpenIDConnect\Metadata;
 use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
 use OAuth2\OpenIDConnect\UserInfoEndpoint;
@@ -958,6 +959,59 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @var null|\OAuth2\OpenIDConnect\Metadata
+     */
+    private $metadata = null;
+
+    /**
+     * @return \OAuth2\OpenIDConnect\Metadata
+     */
+    protected function getMetadata()
+    {
+        if (null === $this->metadata) {
+            $this->metadata = new Metadata();
+
+            $this->metadata->setIssuer($this->issuer);
+            $this->metadata->setAuthorizationEndpoint('https://my.server.com/authorize');
+            $this->metadata->setTokenEndpoint('https://my.server.com/token');
+            $this->metadata->setUserinfoEndpoint('https://my.server.com/user_info');
+            $this->metadata->setJwksUri('https://my.server.com/jwks');
+            $this->metadata->setRegistrationEndpoint('https://my.server.com/register');
+            $this->metadata->setScopesSupported($this->getScopeManager()->getAvailableScopes());
+            $this->metadata->setResponseTypesSupported($this->getAuthorizationEndpoint()->getResponseTypesSupported());
+            $this->metadata->setResponseModesSupported($this->getAuthorizationEndpoint()->getResponseModesSupported());
+            $this->metadata->setGrantTypesSupported($this->getTokenEndpoint()->getGrantTypesSupported());
+            //$this->metadata->setAcrValuesSupported('https://my.server.com/authorize');
+            //$this->metadata->setSubjectTypesSupported('https://my.server.com/authorize');
+            $this->metadata->setIdTokenSigningAlgValuesSupported($this->getIdTokenManager()->getSignatureAlgorithms());
+            $this->metadata->setIdTokenEncryptionAlgValuesSupported($this->getIdTokenManager()->getKeyEncryptionAlgorithms());
+            $this->metadata->setIdTokenEncryptionEncValuesSupported($this->getIdTokenManager()->getContentEncryptionAlgorithms());
+            $this->metadata->setUserinfoSigningAlgValuesSupported($this->getUserInfoEndpoint()->getSignatureAlgorithms());
+            $this->metadata->setUserinfoEncryptionAlgValuesSupported($this->getUserInfoEndpoint()->getKeyEncryptionAlgorithms());
+            $this->metadata->setUserinfoEncryptionEncValuesSupported($this->getUserInfoEndpoint()->getContentEncryptionAlgorithms());
+            $this->metadata->setRequestObjectSigningAlgValuesSupported($this->getAuthorizationFactory()->getSignatureAlgorithms());
+            $this->metadata->setRequestObjectEncryptionAlgValuesSupported($this->getAuthorizationFactory()->getKeyEncryptionAlgorithms());
+            $this->metadata->setRequestObjectEncryptionEncValuesSupported($this->getAuthorizationFactory()->getContentEncryptionAlgorithms());
+            //$this->metadata->setTokenEndpointAuthMethodsSupported('https://my.server.com/authorize');
+            //$this->metadata->setTokenEndpointAuthSigningAlgValuesSupported($this->getTokenEndpoint()->getSignatureAlgorithms());
+            //$this->metadata->setDisplayValuesSupported('https://my.server.com/authorize');
+            //$this->metadata->setClaimTypesSupported('https://my.server.com/authorize');
+            //$this->metadata->setClaimsSupported('https://my.server.com/authorize');
+            //$this->metadata->setServiceDocumentation('https://my.server.com/authorize');
+            //$this->metadata->setClaimsLocalesSupported('https://my.server.com/authorize');
+            //$this->metadata->setUiLocalesSupported('https://my.server.com/authorize');
+            //$this->metadata->setClaimsParameterSupported('https://my.server.com/authorize');
+            //$this->metadata->setRequestParameterSupported($this->getAuthorizationFactory()->isRequestParameterSupported());
+            //$this->metadata->setRequestUriParameterSupported($this->getAuthorizationFactory()->isRequestUriParameterSupported());
+            //$this->metadata->setRequireRequestUriRegistration('https://my.server.com/authorize');
+            //$this->metadata->setOpPolicyUri('https://my.server.com/authorize');
+            //$this->metadata->setOpTosUri('https://my.server.com/authorize');
+        }
+
+        return $this->metadata;
+    }
+
+    /**
      * @return \OAuth2\Endpoint\TokenType\AccessToken
      */
     protected function getAccessTokenType()
@@ -978,47 +1032,5 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRefreshTokenType()
     {
         return new RefreshToken($this->getRefreshTokenManager());
-    }
-
-    protected function getSupportedJWTAlgorithms()
-    {
-        return [
-            'HS256'              => '\Jose\Algorithm\Signature\HS256',
-            'HS384'              => '\Jose\Algorithm\Signature\HS384',
-            'HS512'              => '\Jose\Algorithm\Signature\HS512',
-            'ES256'              => '\Jose\Algorithm\Signature\ES256',
-            'ES384'              => '\Jose\Algorithm\Signature\ES384',
-            'ES512'              => '\Jose\Algorithm\Signature\ES512',
-            'none'               => '\Jose\Algorithm\Signature\None',
-            'RS256'              => '\Jose\Algorithm\Signature\RS256',
-            'RS384'              => '\Jose\Algorithm\Signature\RS384',
-            'RS512'              => '\Jose\Algorithm\Signature\RS512',
-            'PS256'              => '\Jose\Algorithm\Signature\PS256',
-            'PS384'              => '\Jose\Algorithm\Signature\PS384',
-            'PS512'              => '\Jose\Algorithm\Signature\PS512',
-            'A128GCM'            => '\Jose\Algorithm\ContentEncryption\A128GCM',
-            'A192GCM'            => '\Jose\Algorithm\ContentEncryption\A192GCM',
-            'A256GCM'            => '\Jose\Algorithm\ContentEncryption\A256GCM',
-            'A128CBC-HS256'      => '\Jose\Algorithm\ContentEncryption\A128CBCHS256',
-            'A192CBC-HS384'      => '\Jose\Algorithm\ContentEncryption\A192CBCHS384',
-            'A256CBC-HS512'      => '\Jose\Algorithm\ContentEncryption\A256CBCHS512',
-            'A128KW'             => '\Jose\Algorithm\KeyEncryption\A128KW',
-            'A192KW'             => '\Jose\Algorithm\KeyEncryption\A192KW',
-            'A256KW'             => '\Jose\Algorithm\KeyEncryption\A256KW',
-            'A128GCMKW'          => '\Jose\Algorithm\KeyEncryption\A128GCMKW',
-            'A192GCMKW'          => '\Jose\Algorithm\KeyEncryption\A192GCMKW',
-            'A256GCMKW'          => '\Jose\Algorithm\KeyEncryption\A256GCMKW',
-            'dir'                => '\Jose\Algorithm\KeyEncryption\Dir',
-            'ECDH-ES'            => '\Jose\Algorithm\KeyEncryption\ECDHES',
-            'ECDH-ES+A128KW'     => '\Jose\Algorithm\KeyEncryption\ECDHESA128KW',
-            'ECDH-ES+A192KW'     => '\Jose\Algorithm\KeyEncryption\ECDHESA192KW',
-            'ECDH-ES+A256KW'     => '\Jose\Algorithm\KeyEncryption\ECDHESA256KW',
-            'PBES2-HS256+A128KW' => '\Jose\Algorithm\KeyEncryption\PBES2HS256A128KW',
-            'PBES2-HS384+A192KW' => '\Jose\Algorithm\KeyEncryption\PBES2HS384A192KW',
-            'PBES2-HS512+A256KW' => '\Jose\Algorithm\KeyEncryption\PBES2HS512A256KW',
-            'RSA1_5'             => '\Jose\Algorithm\KeyEncryption\RSA15',
-            'RSA-OAEP'           => '\Jose\Algorithm\KeyEncryption\RSAOAEP',
-            'RSA-OAEP-256'       => '\Jose\Algorithm\KeyEncryption\RSAOAEP256',
-        ];
     }
 }

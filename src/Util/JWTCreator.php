@@ -11,24 +11,12 @@
 
 namespace OAuth2\Util;
 
-use Jose\Factory\EncrypterFactory;
 use Jose\Factory\JWEFactory;
 use Jose\Factory\JWSFactory;
-use Jose\Factory\SignerFactory;
 use Jose\Object\JWKInterface;
 
 final class JWTCreator
 {
-    /**
-     * @var \Jose\EncrypterInterface
-     */
-    private $encrypter;
-
-    /**
-     * @var \Jose\SignerInterface
-     */
-    private $signer;
-
     /**
      * @var string[]
      */
@@ -60,9 +48,6 @@ final class JWTCreator
         $this->signature_algorithms = $signature_algorithms;
         $this->key_encryption_algorithms = $key_encryption_algorithms;
         $this->content_encryption_algorithms = $content_encryption_algorithms;
-
-        $this->signer = SignerFactory::createSigner($signature_algorithms);
-        $this->encrypter = EncrypterFactory::createEncrypter(array_merge($key_encryption_algorithms, $content_encryption_algorithms), $compression_methods);
     }
 
     /**
