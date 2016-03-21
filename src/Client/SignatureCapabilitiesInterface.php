@@ -11,7 +11,6 @@
 
 namespace OAuth2\Client;
 
-
 interface SignatureCapabilitiesInterface
 {
     /**

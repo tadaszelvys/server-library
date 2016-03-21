@@ -15,7 +15,6 @@ use OAuth2\Client\PublicClient as BasePublicClient;
 
 class PublicClient extends BasePublicClient
 {
-
     /**
      * @param string $grant_type
      */

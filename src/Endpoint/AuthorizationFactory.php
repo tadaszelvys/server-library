@@ -166,18 +166,12 @@ final class AuthorizationFactory
         return $this->request_parameter_supported;
     }
 
-    /**
-     *
-     */
     public function enableRequestParameterSupport()
     {
         Assertion::true($this->isSignedRequestsSupportEnabled(), 'Signed requests support must be enable to support request parameters');
         $this->request_parameter_supported = true;
     }
 
-    /**
-     *
-     */
     public function disableRequestParameterSupport()
     {
         $this->request_parameter_supported = false;
@@ -191,18 +185,12 @@ final class AuthorizationFactory
         return $this->request_uri_parameter_supported;
     }
 
-    /**
-     *
-     */
     public function enableRequestUriParameterSupport()
     {
         Assertion::true($this->isSignedRequestsSupportEnabled(), 'Signed requests support must be enable to support request parameters');
         $this->request_uri_parameter_supported = true;
     }
 
-    /**
-     *
-     */
     public function disableRequestUriParameterSupport()
     {
         $this->request_uri_parameter_supported = false;

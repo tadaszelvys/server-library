@@ -129,8 +129,8 @@ class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function prepareEncryptionHeader(ClientInterface $client, ResourceServerInterface $resource_server = null)
     {
-        $key_encryption_algorithm = null === $resource_server?$this->key_encryption_algorithm:$resource_server->getKeyEncryptionAlgorithm();
-        $content_encryption_algorithm = null === $resource_server?$this->content_encryption_algorithm:$resource_server->getContentEncryptionAlgorithm();
+        $key_encryption_algorithm = null === $resource_server ? $this->key_encryption_algorithm : $resource_server->getKeyEncryptionAlgorithm();
+        $content_encryption_algorithm = null === $resource_server ? $this->content_encryption_algorithm : $resource_server->getContentEncryptionAlgorithm();
         $header = array_merge(
             [
                 'jti' => Base64Url::encode(random_bytes(25)),
@@ -202,8 +202,8 @@ class JWTAccessTokenManager extends AccessTokenManager
     public function getAccessToken($assertion)
     {
         try {
-            $allowed_key_encryption_algorithms = $this->isEncryptionEnabled()?[$this->key_encryption_algorithm]:[];
-            $allowed_content_encryption_algorithms = $this->isEncryptionEnabled()?[$this->content_encryption_algorithm]:[];
+            $allowed_key_encryption_algorithms = $this->isEncryptionEnabled() ? [$this->key_encryption_algorithm] : [];
+            $allowed_content_encryption_algorithms = $this->isEncryptionEnabled() ? [$this->content_encryption_algorithm] : [];
             $jwk_set = new JWKSet();
             if (true === $this->isEncryptionEnabled()) {
                 $jwk_set = $jwk_set->addKey($this->key_encryption_key);

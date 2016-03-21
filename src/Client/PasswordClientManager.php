@@ -189,17 +189,11 @@ abstract class PasswordClientManager implements ClientManagerInterface
         return $this->password_client_credentials_in_body_request_allowed;
     }
 
-    /**
-     *
-     */
     public function enablePasswordClientCredentialsInBodyRequest()
     {
         $this->password_client_credentials_in_body_request_allowed = true;
     }
 
-    /**
-     *
-     */
     public function disablePasswordClientCredentialsInBodyRequest()
     {
         $this->password_client_credentials_in_body_request_allowed = false;
