@@ -61,22 +61,18 @@ class IdTokenManager implements IdTokenManagerInterface
      * @param                                $issuer
      * @param                                $signature_algorithm
      * @param \Jose\Object\JWKInterface      $signature_key
-     * @param bool                           $encrypt_if_possible
      */
     public function __construct(JWTLoader $jwt_loader,
                                 JWTCreator $jwt_creator,
                                 $issuer,
                                 $signature_algorithm,
-                                JWKInterface $signature_key,
-                                $encrypt_if_possible = false
+                                JWKInterface $signature_key
     ) {
         Assertion::string($signature_algorithm);
         Assertion::string($issuer);
-        Assertion::boolean($encrypt_if_possible);
         $this->issuer = $issuer;
         $this->signature_algorithm = $signature_algorithm;
         $this->signature_key = $signature_key;
-        $this->encrypt_if_possible = $encrypt_if_possible;
 
         $this->setJWTLoader($jwt_loader);
         $this->setJWTCreator($jwt_creator);

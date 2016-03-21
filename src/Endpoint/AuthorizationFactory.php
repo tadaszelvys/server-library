@@ -12,22 +12,25 @@
 namespace OAuth2\Endpoint;
 
 use Assert\Assertion;
+use Jose\Checker\CheckerManagerInterface;
+use Jose\Factory\DecrypterFactory;
+use Jose\Factory\VerifierFactory;
+use Jose\Loader;
+use Jose\Object\JWEInterface;
 use Jose\Object\JWKSetInterface;
+use Jose\Object\JWSInterface;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
-use OAuth2\Util\JWTLoader;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationFactory
 {
-    use HasJWTLoader;
     use HasScopeManager;
     use HasClientManagerSupervisor;
     use HasExceptionManager;
@@ -41,11 +44,6 @@ final class AuthorizationFactory
      * @var string[]
      */
     private $allowed_signature_algorithms = [];
-
-    /**
-     * @var bool
-     */
-    private $encryption_required = false;
 
     /**
      * @var \Jose\Object\JWKSetInterface|null
@@ -63,14 +61,9 @@ final class AuthorizationFactory
     private $allowed_content_encryption_algorithms = [];
 
     /**
-     * @var bool
+     * @var \Jose\Checker\CheckerManagerInterface
      */
-    private $request_parameter_supported = false;
-
-    /**
-     * @var bool
-     */
-    private $request_uri_parameter_supported = false;
+    private $checker_manager;
 
     /**
      * AuthorizationFactory constructor.
@@ -94,7 +87,11 @@ final class AuthorizationFactory
      */
     public function getSignatureAlgorithms()
     {
-        return $this->allowed_signature_algorithms;
+        if ($this->isSignedRequestsSupportEnabled()) {
+            return $this->allowed_signature_algorithms;
+        }
+        
+        return [];
     }
 
     /**
@@ -102,7 +99,11 @@ final class AuthorizationFactory
      */
     public function getKeyEncryptionAlgorithms()
     {
-        return $this->allowed_key_encryption_algorithms;
+        if ($this->isEncryptedRequestsSupportEnabled()) {
+            return $this->allowed_key_encryption_algorithms;
+        }
+
+        return [];
     }
 
     /**
@@ -110,49 +111,47 @@ final class AuthorizationFactory
      */
     public function getContentEncryptionAlgorithms()
     {
-        return $this->allowed_content_encryption_algorithms;
+        if ($this->isEncryptedRequestsSupportEnabled()) {
+            return $this->allowed_content_encryption_algorithms;
+        }
+
+        return [];
     }
 
     /**
-     * @param \OAuth2\Util\JWTLoader       $jwt_loader
-     * @param array                        $allowed_signature_algorithms
-     * @param \Jose\Object\JWKSetInterface $signature_key_set
+     * @param array                                 $allowed_signature_algorithms
+     * @param \Jose\Object\JWKSetInterface          $signature_key_set
+     * @param \Jose\Checker\CheckerManagerInterface $checker_manager
      */
-    public function enableSignedRequestsSupport(JWTLoader $jwt_loader,
-                                                array $allowed_signature_algorithms,
-                                                JWKSetInterface $signature_key_set
+    public function enableSignedRequestsSupport(array $allowed_signature_algorithms,
+                                                JWKSetInterface $signature_key_set,
+                                                CheckerManagerInterface $checker_manager
     ) {
         Assertion::notEmpty($allowed_signature_algorithms);
-        Assertion::true(empty(array_diff($allowed_signature_algorithms, $jwt_loader->getSupportedSignatureAlgorithms())));
-        $this->setJWTLoader($jwt_loader);
 
         $this->signature_key_set = $signature_key_set;
         $this->allowed_signature_algorithms = $allowed_signature_algorithms;
+        $this->checker_manager = $checker_manager;
     }
 
     public function isSignedRequestsSupportEnabled()
     {
-        return null !== $this->getJWTLoader() && null !== $this->signature_key_set && !empty($this->allowed_signature_algorithms);
+        return null !== $this->signature_key_set && !empty($this->allowed_signature_algorithms);
     }
 
     /**
-     * @param bool                         $encryption_required
      * @param string[]                     $allowed_key_encryption_algorithms
      * @param string[]                     $allowed_content_encryption_algorithms
      * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
      */
-    public function enableEncryptedRequestsSupport($encryption_required,
-                                              array $allowed_key_encryption_algorithms,
-                                              array $allowed_content_encryption_algorithms,
-                                              JWKSetInterface $key_encryption_key_set)
+    public function enableEncryptedRequestsSupport(array $allowed_key_encryption_algorithms,
+                                                   array $allowed_content_encryption_algorithms,
+                                                   JWKSetInterface $key_encryption_key_set)
     {
-        Assertion::boolean($encryption_required);
+        Assertion::true($this->isSignedRequestsSupportEnabled(), 'Signed requests support must be enable to support encrypted requests.');
         Assertion::notEmpty($allowed_key_encryption_algorithms);
         Assertion::notEmpty($allowed_content_encryption_algorithms);
-        Assertion::true(empty(array_diff($allowed_key_encryption_algorithms, $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms())));
-        Assertion::true(empty(array_diff($allowed_content_encryption_algorithms, $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms())));
 
-        $this->encryption_required = $encryption_required;
         $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;
         $this->allowed_content_encryption_algorithms = $allowed_content_encryption_algorithms;
         $this->key_encryption_key_set = $key_encryption_key_set;
@@ -161,39 +160,12 @@ final class AuthorizationFactory
     /**
      * @return bool
      */
-    public function isRequestParameterSupported()
+    public function isEncryptedRequestsSupportEnabled()
     {
-        return $this->request_parameter_supported;
-    }
-
-    public function enableRequestParameterSupport()
-    {
-        Assertion::true($this->isSignedRequestsSupportEnabled(), 'Signed requests support must be enable to support request parameters');
-        $this->request_parameter_supported = true;
-    }
-
-    public function disableRequestParameterSupport()
-    {
-        $this->request_parameter_supported = false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRequestUriParameterSupported()
-    {
-        return $this->request_uri_parameter_supported;
-    }
-
-    public function enableRequestUriParameterSupport()
-    {
-        Assertion::true($this->isSignedRequestsSupportEnabled(), 'Signed requests support must be enable to support request parameters');
-        $this->request_uri_parameter_supported = true;
-    }
-
-    public function disableRequestUriParameterSupport()
-    {
-        $this->request_uri_parameter_supported = false;
+        return $this->isSignedRequestsSupportEnabled() &&
+               null !== $this->key_encryption_key_set &&
+               !empty($this->allowed_content_encryption_algorithms) &&
+               !empty($this->allowed_key_encryption_algorithms);
     }
 
     /**
@@ -207,34 +179,101 @@ final class AuthorizationFactory
     {
         $params = $request->getQueryParams();
         if (array_key_exists('request', $params)) {
-            $this->createFromRequestParameter();
+            return $this->createFromRequestParameter($params['request'], $end_user, $is_authorized);
         } elseif (array_key_exists('request_uri', $params)) {
-            $this->createFromRequestUriParameter();
+            return $this->createFromRequestUriParameter($params['request_uri'], $end_user, $is_authorized);
         }
 
         return $this->createFromStandardRequest($params, $end_user, $is_authorized);
     }
 
     /**
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @param string                           $request
+     * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param bool                             $is_authorized
+     *
+     * @return \OAuth2\Endpoint\Authorization
      */
-    private function createFromRequestParameter()
+    private function createFromRequestParameter($request, EndUserInterface $end_user, $is_authorized)
     {
-        if (false === $this->isRequestParameterSupported()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "request" is not supported');
+        if (false === $this->isSignedRequestsSupportEnabled()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "request" is not supported.');
         }
-        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
+        Assertion::string($request);
+
+        $jws = $this->loadRequest($request);
+
+        return $this->createFromStandardRequest($jws->getClaims(), $end_user, $is_authorized);
     }
 
     /**
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @param string $request
+     *
+     * @return \Jose\Object\JWSInterface
      */
-    private function createFromRequestUriParameter()
+    private function loadRequest($request)
     {
-        if (false === $this->isRequestUriParameterSupported()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "request_uri" is not supported');
+        $jwt = Loader::load($request);
+        if ($jwt instanceof JWEInterface) {
+            $jwt = $this->decryptRequest($jwt);
         }
-        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Not supported');
+
+        if (!$jwt instanceof JWSInterface) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "request" must contain a JWS or an encrypted JWS.');
+        }
+
+        $verifier = VerifierFactory::createVerifier($this->allowed_signature_algorithms);
+        $verifier->verifyWithKeySet($jwt, $this->signature_key_set, null, $index);
+        try {
+            $this->checker_manager->checkJWS($jwt, $index);
+        } catch (\Exception $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+        }
+
+        return $jwt;
+    }
+
+    /**
+     * @param \Jose\Object\JWEInterface $jwt
+     *
+     * @return \Jose\Object\JWEInterface|\Jose\Object\JWSInterface
+     */
+    private function decryptRequest(JWEInterface $jwt)
+    {
+        if (false === $this->isEncryptedRequestsSupportEnabled()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Encrypted requests are not supported.');
+        }
+        $decrypter = DecrypterFactory::createDecrypter(array_merge(
+            $this->getKeyEncryptionAlgorithms(),
+            $this->getContentEncryptionAlgorithms()
+        ));
+        try {
+            $decrypter->decryptUsingKeySet($jwt, $this->key_encryption_key_set);
+        } catch (\Exception $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+        }
+
+        return Loader::load($jwt->getPayload());
+    }
+
+    /**
+     * @param string                           $request_uri
+     * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param bool                             $is_authorized
+     *
+     * @return \OAuth2\Endpoint\Authorization
+     */
+    private function createFromRequestUriParameter($request_uri, EndUserInterface $end_user, $is_authorized)
+    {
+        if (false === $this->isSignedRequestsSupportEnabled()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "request" is not supported.');
+        }
+        Assertion::url($request_uri, 'Invalid URL.');
+        
+        $content = $this->downloadContent($request_uri);
+        $jws = $this->loadRequest($content);
+
+        return $this->createFromStandardRequest($jws->getClaims(), $end_user, $is_authorized);
     }
 
     /**
@@ -282,5 +321,38 @@ final class AuthorizationFactory
         }
 
         return [];
+    }
+
+    /**
+     * @param string $url
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
+     */
+    private static function downloadContent($url)
+    {
+        // The URL must be a valid URL and scheme must be https
+        Assertion::false(
+            false === filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED),
+            'Invalid URL.'
+        );
+        Assertion::false('https://' !==  mb_substr($url, 0, 8, '8bit'), 'Unsecured connection.');
+
+        $params = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_URL            => $url,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ];
+
+        $ch = curl_init();
+        curl_setopt_array($ch, $params);
+        $content = curl_exec($ch);
+        curl_close($ch);
+
+        Assertion::notEmpty($content, 'Unable to get content.');
+
+        return $content;
     }
 }

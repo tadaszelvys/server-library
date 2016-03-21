@@ -11,6 +11,9 @@
 
 namespace OAuth2\Test\Functional;
 
+use Jose\Factory\JWEFactory;
+use Jose\Factory\JWSFactory;
+use Jose\Object\JWK;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Test\Base;
 use PHPHtmlParser\Dom;
@@ -196,6 +199,156 @@ class ImplicitGrantTypeTest extends Base
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=scope1\+scope2&state=012345679$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAccessTokenSuccessUsingSignedRequest()
+    {
+        $jwk2 = new JWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $claims = [
+            'iat' => time(),
+            'nbf' => time(),
+            'exp' => time() + 120,
+            "iss" => "jwt1",
+            "aud" => "https://server.example.com",
+            "response_type" => "token",
+            "client_id" => "jwt1",
+            "redirect_uri" =>'http://example.com/test?good=false',
+            "scope" => "openid scope1 scope2",
+            "state" => "012345679",
+            "nonce" => "n-0S6_WzA2Mj",
+        ];
+
+        $jws = JWSFactory::createJWSToCompactJSON(
+            $claims,
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'request' => $jws,
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=openid\+scope1\+scope2&state=012345679$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAccessTokenSuccessUsingSignedAndEncryptedRequest()
+    {
+        $jwk1 = new JWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]);
+        $jwk2 = new JWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $claims = [
+            'iat' => time(),
+            'nbf' => time(),
+            'exp' => time() + 120,
+            "iss" => "jwt1",
+            "aud" => "https://server.example.com",
+            "response_type" => "token",
+            "client_id" => "jwt1",
+            "redirect_uri" =>'http://example.com/test?good=false',
+            "scope" => "openid scope1 scope2",
+            "state" => "012345679",
+            "nonce" => "n-0S6_WzA2Mj",
+        ];
+
+        $jws = JWSFactory::createJWSToCompactJSON(
+            $claims,
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+
+        $jwe = JWEFactory::createJWEToCompactJSON(
+            $jws,
+            $jwk1,
+            [
+                'kid' => 'JWK1',
+                'cty' => 'JWT',
+                'alg' => 'A256KW',
+                'enc' => 'A256CBC-HS512',
+                'exp' => time() + 120,
+                'aud' => 'My Authorization Server',
+                'iss' => 'jwt1',
+            ]
+        );
+
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'request' => $jwe,
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=openid\+scope1\+scope2&state=012345679$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAccessTokenSuccessUsingSignedRequestUri()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'request_uri' => 'https://gist.githubusercontent.com/Spomky/23ca2a645f97584aaa22/raw/e9ff926a07940db9033c0ed7b8d623afee5f144a/signed.jwt',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=openid\+scope1\+scope2&state=012345679$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAccessTokenSuccessUsingSignedAndEncryptedRequestUri()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'request_uri' => 'https://gist.githubusercontent.com/Spomky/3f22bbdc279a05aaac62/raw/7bc47a71eb48b37296dc69c70ec81a2d782f8055/encrypted.jwt',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=openid\+scope1\+scope2&state=012345679$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithState()

@@ -67,12 +67,6 @@ class ObjectsTest extends Base
         $this->assertEquals('type', $id_token->getTokenType());
     }
 
-    public function testAuthorizationFactory()
-    {
-        $this->assertTrue($this->getAuthorizationFactory()->isRequestParameterSupported());
-        $this->assertTrue($this->getAuthorizationFactory()->isRequestUriParameterSupported());
-    }
-
     public function testEndUser()
     {
         $user = new EndUser('user1', 'pass');

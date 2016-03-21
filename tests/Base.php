@@ -13,6 +13,7 @@ namespace OAuth2\Test;
 
 use Jose\Checker\AudienceChecker;
 use Jose\Checker\CheckerManager;
+use Jose\Factory\CheckerManagerFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
@@ -117,7 +118,6 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->authorization_factory->enableSignedRequestsSupport(
-                $this->getJWTLoader(),
                 ['HS512'],
                 new JWKSet(['keys' => [
                     [
@@ -126,11 +126,11 @@ class Base extends \PHPUnit_Framework_TestCase
                         'kty' => 'oct',
                         'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                     ],
-                ]])
+                ]]),
+                CheckerManagerFactory::createClaimCheckerManager()
             );
 
             $this->authorization_factory->enableEncryptedRequestsSupport(
-                false,
                 ['A256KW'],
                 ['A256CBC-HS512'],
                 new JWKSet(['keys' => [
@@ -142,9 +142,6 @@ class Base extends \PHPUnit_Framework_TestCase
                     ],
                 ]])
             );
-
-            $this->authorization_factory->enableRequestParameterSupport();
-            $this->authorization_factory->enableRequestUriParameterSupport();
         }
 
         return $this->authorization_factory;
@@ -882,13 +879,6 @@ class Base extends \PHPUnit_Framework_TestCase
                     'use' => 'sig',
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ]),
-                false,
-                new JWK([
-                    'kid' => 'JWK1',
-                    'use' => 'enc',
-                    'kty' => 'oct',
-                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
                 ])
             );
         }
