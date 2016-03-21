@@ -12,7 +12,6 @@
 namespace OAuth2\Test\Stub;
 
 use Jose\Object\JWKSet;
-use Jose\Object\JWKSetInterface;
 use OAuth2\Client\JWTClientManager as Base;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
@@ -29,20 +28,14 @@ class JWTClientManager extends Base
      *
      * @param \OAuth2\Util\JWTLoader                      $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param string[]                                    $allowed_signature_algorithms
-     * @param \Jose\Object\JWKSetInterface                $signature_key_set
      */
     public function __construct(
         JWTLoader $loader,
-        ExceptionManagerInterface $exception_manager,
-        array $allowed_signature_algorithms,
-        JWKSetInterface $signature_key_set
+        ExceptionManagerInterface $exception_manager
     ) {
         parent::__construct(
             $loader,
-            $exception_manager,
-            $allowed_signature_algorithms,
-            $signature_key_set
+            $exception_manager
         );
 
         $keys = ['keys' => [[

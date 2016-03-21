@@ -11,6 +11,8 @@
 
 namespace OAuth2\Exception;
 
+use Assert\Assertion;
+
 final class AuthenticateException extends BaseException implements AuthenticateExceptionInterface
 {
     private $header = [];
@@ -25,9 +27,7 @@ final class AuthenticateException extends BaseException implements AuthenticateE
     {
         parent::__construct(401, $error, $error_description, $error_uri);
 
-        if (!isset($data['schemes'])) {
-            throw new \InvalidArgumentException('schemes_not_defined');
-        }
+        Assertion::keyExists($data, 'schemes', 'schemes_not_defined');
 
         $this->header = ['WWW-Authenticate' => $data['schemes']];
     }

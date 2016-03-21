@@ -21,6 +21,7 @@ namespace OAuth2\Util;
  * file that was distributed with this source code of the original package.
  */
 
+use Assert\Assertion;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class IpAddress
@@ -206,9 +207,10 @@ final class IpAddress
      */
     public static function checkIp6($requestIp, $ip)
     {
-        if (!((extension_loaded('sockets') && defined('AF_INET6')) || inet_pton('::1'))) {
-            throw new \RuntimeException('Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".');
-        }
+        Assertion::false(
+            !((extension_loaded('sockets') && defined('AF_INET6')) || inet_pton('::1')),
+            'Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".'
+        );
 
         if (false !== strpos($ip, '/')) {
             list($address, $netmask) = explode('/', $ip, 2);

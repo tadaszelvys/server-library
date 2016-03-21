@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint;
 
+use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\EndUser\EndUserInterface;
 
@@ -187,24 +188,24 @@ final class Authorization
      */
     public function get($param)
     {
-        if (!$this->has($param)) {
-            throw new \InvalidArgumentException(sprintf('Invalid parameter "%s"', $param));
-        }
+        Assertion::true($this->has($param), sprintf('Invalid parameter "%s"', $param));
 
         return $this->query_params[$param];
     }
 
     private function checkDisplay()
     {
-        if ($this->has('display') && !in_array($this->get('display'), $this->getAllowedDisplayValues())) {
-            throw new \InvalidArgumentException('Invalid "display" parameter. Allowed values are '.json_encode($this->getAllowedDisplayValues()));
-        }
+        Assertion::false(
+            $this->has('display') && !in_array($this->get('display'), $this->getAllowedDisplayValues()),
+            'Invalid "display" parameter. Allowed values are '.json_encode($this->getAllowedDisplayValues())
+        );
     }
 
     private function checkPrompt()
     {
-        if ($this->has('prompt') && !in_array($this->get('prompt'), $this->getAllowedPromptValues())) {
-            throw new \InvalidArgumentException('Invalid "prompt" parameter. Allowed values are '.json_encode($this->getAllowedPromptValues()));
-        }
+        Assertion::false(
+            $this->has('prompt') && !in_array($this->get('prompt'), $this->getAllowedPromptValues()),
+            'Invalid "prompt" parameter. Allowed values are '.json_encode($this->getAllowedPromptValues())
+        );
     }
 }

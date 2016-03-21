@@ -136,11 +136,9 @@ final class Metadata implements \JsonSerializable
      */
     public function get($key)
     {
-        if (true === $this->has($key)) {
-            return $this->values[$key];
-        }
+        Assertion::true($this->has($key), sprintf('Configuration value with key "%s" does not exist.', $key));
 
-        throw new \InvalidArgumentException(sprintf('Configuration value with key "%s" does not exist.', $key));
+        return $this->values[$key];
     }
 
     /**

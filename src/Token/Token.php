@@ -11,6 +11,8 @@
 
 namespace OAuth2\Token;
 
+use Assert\Assertion;
+
 class Token implements TokenInterface
 {
     /**
@@ -176,9 +178,7 @@ class Token implements TokenInterface
      */
     public function getParameter($key)
     {
-        if (!$this->hasParameter($key)) {
-            throw new \InvalidArgumentException(sprintf('Parameter with key "%s" does not exist.', $key));
-        }
+        Assertion::true($this->hasParameter($key), sprintf('Parameter with key "%s" does not exist.', $key));
 
         return $this->parameters[$key];
     }

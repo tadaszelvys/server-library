@@ -17,6 +17,7 @@ use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
+use OAuth2\Client\EncryptionCapabilitiesInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Util\JWTCreator;
@@ -48,16 +49,6 @@ class IdTokenManager implements IdTokenManagerInterface
     private $signature_key;
 
     /**
-     * @var bool
-     */
-    private $encrypt_if_possible;
-
-    /**
-     * @var \Jose\Object\JWKInterface|null
-     */
-    private $key_encryption_key;
-
-    /**
      * @var \OAuth2\OpenIDConnect\IdTokenClaimManagerInterface[]
      */
     private $id_token_claim_managers = [];
@@ -71,15 +62,13 @@ class IdTokenManager implements IdTokenManagerInterface
      * @param                                $signature_algorithm
      * @param \Jose\Object\JWKInterface      $signature_key
      * @param bool                           $encrypt_if_possible
-     * @param \Jose\Object\JWKInterface|null $key_encryption_key
      */
     public function __construct(JWTLoader $jwt_loader,
                                 JWTCreator $jwt_creator,
                                 $issuer,
                                 $signature_algorithm,
                                 JWKInterface $signature_key,
-                                $encrypt_if_possible = false,
-                                JWKInterface $key_encryption_key = null
+                                $encrypt_if_possible = false
     ) {
         Assertion::string($signature_algorithm);
         Assertion::string($issuer);
@@ -88,7 +77,6 @@ class IdTokenManager implements IdTokenManagerInterface
         $this->signature_algorithm = $signature_algorithm;
         $this->signature_key = $signature_key;
         $this->encrypt_if_possible = $encrypt_if_possible;
-        $this->key_encryption_key = $key_encryption_key;
 
         $this->setJWTLoader($jwt_loader);
         $this->setJWTCreator($jwt_creator);
@@ -172,19 +160,13 @@ class IdTokenManager implements IdTokenManagerInterface
 
         $jwt = $this->jwt_creator->sign($payload, $headers, $this->signature_key);
 
-        /*if (true === $this->encrypt_if_possible || $client instanceof EncryptionCapabilitiesInterface) {
+        if ($client instanceof EncryptionCapabilitiesInterface) {
             // TODO: Fix the selection of the algorithms
             $headers = [
                 'typ'       => 'JWT',
-                'jti'       => Base64Url::encode(StringUtil::generateRandomBytes(25)),
+                'jti'       => Base64Url::encode(random_bytes(25)),
                 'alg'       => $client->getSupportedKeyEncryptionAlgorithms()[0],
                 'enc'       => $client->getSupportedContentEncryptionAlgorithms()[0],
-                'iss'       => $this->issuer,
-                'sub'       => $end_user->getPublicId(),
-                'aud'       => $client->getPublicId(),
-                'iat'       => time(),
-                'nbf'       => time(),
-                'exp'       => $exp,
             ];
 
             // TODO: Fix the selection of the public key
@@ -193,7 +175,7 @@ class IdTokenManager implements IdTokenManagerInterface
                 $headers,
                 $client->getEncryptionPublicKeySet()->getKey(0)
             );
-        }*/
+        }
         $id_token->setToken($jwt);
 
         $id_token->setExpiresAt($exp);

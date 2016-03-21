@@ -11,6 +11,7 @@
 
 namespace OAuth2\Exception;
 
+use Assert\Assertion;
 use OAuth2\Grant\ResponseTypeSupportInterface;
 use OAuth2\Util\Uri;
 
@@ -38,13 +39,11 @@ final class RedirectException extends BaseException implements RedirectException
     {
         parent::__construct(302, $error, $error_description, $error_uri);
 
-        if (!array_key_exists('redirect_uri', $data)) {
-            throw new \InvalidArgumentException('redirect_uri_not_defined');
-        }
-
-        if (!array_key_exists('transport_mode', $data) || !in_array($data['transport_mode'], [ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_FRAGMENT, ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_QUERY])) {
-            throw new \InvalidArgumentException('invalid_transport_mode');
-        }
+        Assertion::keyExists($data, 'redirect_uri', 'redirect_uri_not_defined');
+        Assertion::false(
+            !array_key_exists('transport_mode', $data) || !in_array($data['transport_mode'], [ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_FRAGMENT, ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_QUERY]),
+            'invalid_transport_mode'
+        );
         $this->transport_mode = $data['transport_mode'];
 
         $this->redirect_uri = $data['redirect_uri'];

@@ -29,16 +29,6 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     use HasJWTLoader;
 
     /**
-     * @var \Jose\Object\JWKSetInterface
-     */
-    private $signature_key_set;
-
-    /**
-     * @var string[]
-     */
-    private $allowed_signature_algorithms;
-
-    /**
      * @var bool
      */
     private $encryption_required = false;
@@ -68,22 +58,13 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
      *
      * @param \OAuth2\Util\JWTLoader                      $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param string[]                                    $allowed_signature_algorithms
-     * @param \Jose\Object\JWKSetInterface                $signature_key_set
      */
     public function __construct(
         JWTLoader $loader,
-        ExceptionManagerInterface $exception_manager,
-        array $allowed_signature_algorithms,
-        JWKSetInterface $signature_key_set
+        ExceptionManagerInterface $exception_manager
     ) {
-        Assertion::notEmpty($allowed_signature_algorithms);
-        Assertion::true(empty(array_diff($allowed_signature_algorithms, $loader->getSupportedSignatureAlgorithms())));
         $this->setJWTLoader($loader);
         $this->setExceptionManager($exception_manager);
-
-        $this->signature_key_set = $signature_key_set;
-        $this->allowed_signature_algorithms = $allowed_signature_algorithms;
     }
 
     /**

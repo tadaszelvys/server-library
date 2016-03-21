@@ -279,8 +279,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->openid_connect_token_endpoint_extension) {
             $this->openid_connect_token_endpoint_extension = new OpenIDConnectTokenEndpointExtension(
                 $this->getIdTokenManager(),
-                $this->getEndUserManager(),
-                $this->getExceptionManager()
+                $this->getEndUserManager()
             );
         }
 
@@ -470,13 +469,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTClientManager()
     {
         if (null === $this->jwt_client_manager) {
-            $signature_key_set = new JWKSet(['keys' => [[
-                'kid' => 'JWK2',
-                'use' => 'sig',
-                'kty' => 'oct',
-                'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-            ],
-            ]]);
             $key_encryption_key_set = new JWKSet(['keys' => [
                 [
                     'kid' => 'JWK1',
@@ -488,9 +480,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->jwt_client_manager = new JWTClientManager(
                 $this->getJWTLoader(),
-                $this->getExceptionManager(),
-                ['HS512'],
-                $signature_key_set
+                $this->getExceptionManager()
 
             );
             $this->jwt_client_manager->enableEncryptedAssertions(
@@ -558,13 +548,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTBearerGrantType()
     {
         if (null === $this->jwt_bearer_grant_type) {
-            $signature_key_set = new JWKSet(['keys' => [[
-                    'kid' => 'JWK2',
-                    'use' => 'sig',
-                    'kty' => 'oct',
-                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ],
-            ]]);
             $key_encryption_key_set = new JWKSet(['keys' => [
                 [
                     'kid' => 'JWK1',
@@ -576,9 +559,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->jwt_bearer_grant_type = new JWTBearerGrantType(
                 $this->getJWTLoader(),
-                $this->getExceptionManager(),
-                ['HS512'],
-                $signature_key_set
+                $this->getExceptionManager()
 
             );
             $this->jwt_bearer_grant_type->enableEncryptedAssertions(

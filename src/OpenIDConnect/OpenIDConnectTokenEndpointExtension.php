@@ -14,7 +14,6 @@ namespace OAuth2\OpenIDConnect;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\TokenEndpointExtensionInterface;
 use OAuth2\EndUser\EndUserManagerInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
@@ -35,24 +34,16 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
     private $end_user_manager;
 
     /**
-     * @var \OAuth2\Exception\ExceptionManagerInterface
-     */
-    private $exception_manager;
-
-    /**
      * OpenIDConnectTokenEndpointExtension constructor.
      *
      * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface $id_token_manager
      * @param \OAuth2\EndUser\EndUserManagerInterface       $end_user_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface   $exception_manager
      */
     public function __construct(IdTokenManagerInterface $id_token_manager,
-                                EndUserManagerInterface $end_user_manager,
-                                ExceptionManagerInterface $exception_manager
+                                EndUserManagerInterface $end_user_manager
     ) {
         $this->id_token_manager = $id_token_manager;
         $this->end_user_manager = $end_user_manager;
-        $this->exception_manager = $exception_manager;
     }
 
     /**
