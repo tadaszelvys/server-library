@@ -12,7 +12,7 @@
 namespace OAuth2\EndUser;
 
 /**
- * Class Address
+ * Class Address.
  *
  * @see http://openid.net/specs/openid-connect-core-1_0.html#AddressClaim
  */

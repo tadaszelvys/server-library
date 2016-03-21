@@ -194,9 +194,6 @@ final class Authorization
         return $this->query_params[$param];
     }
 
-    /**
-     *
-     */
     private function checkDisplay()
     {
         if ($this->has('display') && !in_array($this->get('display'), $this->getAllowedDisplayValues())) {
@@ -204,9 +201,6 @@ final class Authorization
         }
     }
 
-    /**
-     *
-     */
     private function checkPrompt()
     {
         if ($this->has('prompt') && !in_array($this->get('prompt'), $this->getAllowedPromptValues())) {

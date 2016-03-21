@@ -76,7 +76,7 @@ final class RedirectException extends BaseException implements RedirectException
 
         return [
             'Location'                => $uri,
-            'Content-Security-Policy' => 'referrer origin;'
+            'Content-Security-Policy' => 'referrer origin;',
         ];
     }
 }

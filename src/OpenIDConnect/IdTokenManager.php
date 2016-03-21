@@ -150,13 +150,12 @@ class IdTokenManager implements IdTokenManagerInterface
             'auth_time' => $end_user->getLastLoginAt(),
         ];
 
-        foreach (['at_hash' =>$access_token, 'c_hash'=> $auth_code] as $key => $token) {
-
+        foreach (['at_hash' => $access_token, 'c_hash' => $auth_code] as $key => $token) {
             if (null !== $token) {
                 $payload[$key] = $this->getHash($token);
             }
         }
-        foreach(['amr' => 'getAuthenticationMethodsReferences', 'acr' => 'getAuthenticationContextClassReference'] as $claims=>$method) {
+        foreach (['amr' => 'getAuthenticationMethodsReferences', 'acr' => 'getAuthenticationContextClassReference'] as $claims => $method) {
             $value = $end_user->$method();
             if (!empty($value)) {
                 $payload[$claims] = $value;
@@ -200,8 +199,6 @@ class IdTokenManager implements IdTokenManagerInterface
         $id_token->setExpiresAt($exp);
         $id_token->setClientPublicId($client->getPublicId());
         $id_token->setResourceOwnerPublicId($end_user->getPublicId());
-
-
 
         return $id_token;
     }
