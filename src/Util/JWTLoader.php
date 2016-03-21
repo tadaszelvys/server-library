@@ -150,13 +150,10 @@ final class JWTLoader
      */
     protected function decryptAssertion(JWEInterface $jwe, JWKSetInterface $encryption_key_set)
     {
-        if (false === $this->decrypter->decryptUsingKeySet($jwe, $encryption_key_set)) {
-            throw new \InvalidArgumentException('Unable to decrypt the payload. Please verify keys used for encryption.');
-        }
+        $this->decrypter->decryptUsingKeySet($jwe, $encryption_key_set);
+
         $jws = Loader::load($jwe->getPayload());
-        if (!$jws instanceof JWSInterface) {
-            throw new \InvalidArgumentException('The encrypted assertion does not contain a single JWS.');
-        }
+        Assertion::isInstanceOf($jws, JWSInterface::class, 'The encrypted assertion does not contain a single JWS.');
 
         return $jws;
     }
@@ -168,14 +165,9 @@ final class JWTLoader
      */
     public function verifySignature(JWSInterface $jws, JWKSetInterface $signature_key_set, array $allowed_signature_algorithms)
     {
-        if (1 !== $jws->countSignatures()) {
-            throw new \InvalidArgumentException('The JWS must not contain only one signature.');
-        }
-
+        Assertion::eq(1, $jws->countSignatures(), 'The JWS must not contain only one signature.');
         Assertion::inArray($jws->getSignature(0)->getProtectedHeader('alg'), $allowed_signature_algorithms, sprintf('The signature algorithm "%s" is not allowed.', $jws->getSignature(0)->getProtectedHeader('alg')));
 
-        if (false === $this->verifier->verifyWithKeySet($jws, $signature_key_set)) {
-            throw new \InvalidArgumentException('Invalid signature.');
-        }
+        $this->verifier->verifyWithKeySet($jws, $signature_key_set);
     }
 }
