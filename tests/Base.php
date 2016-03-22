@@ -70,12 +70,20 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    private $issuer = 'My Authorization Server';
+    private $issuer = 'https://server.example.com';
 
     protected function setUp()
     {
         //To fix HHVM tests on Travis-CI
         date_default_timezone_set('UTC');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getIssuer()
+    {
+        return $this->issuer;
     }
 
     /**
@@ -118,6 +126,7 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->authorization_factory->enableRequestObjectSupport(
+                $this->getJWTLoader(),
                 ['HS256', 'HS512'],
                 CheckerManagerFactory::createClaimCheckerManager()
             );
@@ -422,6 +431,22 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getJWTLoader(),
                 $this->getExceptionManager(),
                 $this->realm
+            );
+
+            $key_encryption_key_set = new JWKSet(['keys' => [
+                [
+                    'kid' => 'JWK1',
+                    'use' => 'enc',
+                    'kty' => 'oct',
+                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                ],
+            ]]);
+
+            $this->password_client_manager->enableEncryptedAssertions(
+                false,
+                ['A256KW'],
+                ['A256CBC-HS512'],
+                $key_encryption_key_set
             );
 
             $this->password_client_manager->createClients();

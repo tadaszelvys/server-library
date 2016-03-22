@@ -100,7 +100,7 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->hasClaim('at_hash'));
         $this->assertTrue($id_token->hasClaim('c_hash'));
 
-        $this->assertEquals('My Authorization Server', $id_token->getClaim('iss'));
+        $this->assertEquals('https://server.example.com', $id_token->getClaim('iss'));
         $this->assertEquals('**UNREGISTERED**--foo', $id_token->getClaim('aud'));
         $this->assertEquals('user1', $id_token->getClaim('sub'));
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
@@ -158,7 +158,7 @@ class OpenIDConnectTest extends Base
         $introspection_response->getBody()->rewind();
 
         $this->assertEquals(200, $introspection_response->getStatusCode());
-        $this->assertRegExp('/^{"active":true,"client_id":"foo","token_type":"Bearer","exp":[\d]+,"sub":"user1","scope":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"My Authorization Server","iss":"My Authorization Server"}$/', $introspection_response->getBody()->getContents());
+        $this->assertRegExp('/^{"active":true,"client_id":"foo","token_type":"Bearer","exp":[\d]+,"sub":"user1","scope":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
     }
 
     public function testIdTokenSuccess()

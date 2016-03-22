@@ -88,12 +88,7 @@ trait ClientAssertionTrait
             );
 
             return true;
-        } catch (BaseException $e) {
-            $reason = $e->getDescription();
-
-            return false;
         } catch (\Exception $e) {
-            $reason = $e->getMessage();
 
             return false;
         }

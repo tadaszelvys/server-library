@@ -297,7 +297,7 @@ class ImplicitGrantTypeTest extends Base
                 'alg' => 'A256KW',
                 'enc' => 'A256CBC-HS512',
                 'exp' => time() + 120,
-                'aud' => 'My Authorization Server',
+                'aud' => 'https://server.example.com',
                 'iss' => 'jwt1',
             ]
         );

@@ -13,12 +13,7 @@ namespace OAuth2\Endpoint;
 
 use Assert\Assertion;
 use Jose\Checker\CheckerManagerInterface;
-use Jose\Factory\DecrypterFactory;
-use Jose\Factory\VerifierFactory;
-use Jose\Loader;
-use Jose\Object\JWEInterface;
 use Jose\Object\JWKSetInterface;
-use Jose\Object\JWSInterface;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
@@ -38,11 +33,6 @@ final class AuthorizationFactory
     use HasScopeManager;
     use HasClientManagerSupervisor;
     use HasExceptionManager;
-
-    /**
-     * @var \OAuth2\Util\JWTLoader|null
-     */
-    private $jwt_loader = null;
 
     /**
      * @var bool
@@ -137,14 +127,17 @@ final class AuthorizationFactory
     }
 
     /**
+     * @param \OAuth2\Util\JWTLoader                $jwt_loader
      * @param string[]                              $supported_signature_algorithms
      * @param \Jose\Checker\CheckerManagerInterface $checker_manager
      */
-    public function enableRequestObjectSupport(array $supported_signature_algorithms,
+    public function enableRequestObjectSupport(JWTLoader $jwt_loader,
+                                               array $supported_signature_algorithms,
                                                CheckerManagerInterface $checker_manager
     ) {
         Assertion::notEmpty($supported_signature_algorithms);
 
+        $this->setJWTLoader($jwt_loader);
         $this->request_object_allowed = true;
         $this->supported_signature_algorithms = $supported_signature_algorithms;
         $this->checker_manager = $checker_manager;
@@ -234,56 +227,33 @@ final class AuthorizationFactory
      */
     private function loadRequest($request, array &$scope, ClientInterface &$client = null)
     {
-        $jwt = Loader::load($request);
-        if ($jwt instanceof JWEInterface) {
-            $jwt = $this->decryptRequest($jwt);
-        }
-
-        if (!$jwt instanceof JWSInterface) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_OBJECT, 'The parameter "request" must contain a JWS or an encrypted JWS.');
-        }
+        $jwt = $this->getJWTLoader()->load(
+            $request,
+            $this->supported_key_encryption_algorithms,
+            $this->supported_content_encryption_algorithms,
+            $this->key_encryption_key_set,
+            false
+        );
 
         try {
             Assertion::true($jwt->hasClaims(), 'The request object does not contain claims.');
             $client = $this->getClient($jwt->getClaims());
             Assertion::isInstanceOf($client, ClientInterface::class, 'Invalid client.');
             Assertion::isInstanceOf($client, SignatureCapabilitiesInterface::class, 'The client does not have signature capabilities.');
-            $allowed_signature_algorithms = array_intersect(
-                $client->getAllowedSignatureAlgorithms(),
-                $this->getSupportedSignatureAlgorithms()
+
+            $this->getJWTLoader()->verifySignature(
+                $jwt,
+                $client->getSignaturePublicKeySet(),
+                $this->supported_signature_algorithms
             );
-            $verifier = VerifierFactory::createVerifier($allowed_signature_algorithms);
-            $verifier->verifyWithKeySet($jwt, $client->getSignaturePublicKeySet(), null, $index);
-            $this->checker_manager->checkJWS($jwt, $index);
             $scope = $this->getScope($jwt->getClaims());
         } catch (\Exception $e) {
+            var_dump($e->getMessage());
+            var_dump($jwt->getClaims('aud'));
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_OBJECT, $e->getMessage());
         }
 
         return $jwt;
-    }
-
-    /**
-     * @param \Jose\Object\JWEInterface $jwt
-     *
-     * @return \Jose\Object\JWEInterface|\Jose\Object\JWSInterface
-     */
-    private function decryptRequest(JWEInterface $jwt)
-    {
-        if (false === $this->isEncryptedRequestsSupportEnabled()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_OBJECT, 'Encrypted requests are not supported.');
-        }
-        $decrypter = DecrypterFactory::createDecrypter(array_merge(
-            $this->getSupportedKeyEncryptionAlgorithms(),
-            $this->getSupportedContentEncryptionAlgorithms()
-        ));
-        try {
-            $decrypter->decryptUsingKeySet($jwt, $this->key_encryption_key_set);
-        } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_OBJECT, $e->getMessage());
-        }
-
-        return Loader::load($jwt->getPayload());
     }
 
     /**
