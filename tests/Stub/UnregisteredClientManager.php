@@ -146,7 +146,7 @@ class UnregisteredClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
         return true;
     }

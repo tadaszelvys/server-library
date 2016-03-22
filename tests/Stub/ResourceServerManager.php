@@ -107,7 +107,7 @@ class ResourceServerManager extends Base
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
         if (!$client instanceof ResourceServer) {
             return;
