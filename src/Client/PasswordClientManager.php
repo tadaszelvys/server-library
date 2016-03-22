@@ -12,14 +12,19 @@
 namespace OAuth2\Client;
 
 use Assert\Assertion;
+use Jose\Object\JWSInterface;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Util\JWTLoader;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class PasswordClientManager implements ClientManagerInterface
 {
+    use HasJWTLoader;
     use HasExceptionManager;
+    use ClientAssertionTrait;
 
     /**
      * @var string
@@ -34,13 +39,15 @@ abstract class PasswordClientManager implements ClientManagerInterface
     /**
      * PasswordClientManager constructor.
      *
+     * @param \OAuth2\Util\JWTLoader                      $jwt_loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param                                             $realm
+     * @param string                                      $realm
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, $realm)
+    public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager, $realm)
     {
         Assertion::string($realm);
 
+        $this->setJWTLoader($jwt_loader);
         $this->setExceptionManager($exception_manager);
         $this->realm = $realm;
     }
@@ -81,13 +88,16 @@ abstract class PasswordClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
         if (!$client instanceof PasswordClientInterface) {
             return false;
         }
 
-        return $client_credentials === $client->getSecret();
+        if ($client_credentials instanceof JWSInterface) {
+            return $this->verifyClientAssertion($client, $client_credentials);
+        }
+        return hash_equals($client->getSecret(), $client_credentials);
     }
 
     /**
@@ -97,6 +107,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
     {
         $methods = [
             'findCredentialsFromBasicAuthenticationScheme',
+            'findCredentialsFromClientAssertion',
         ];
 
         // This authentication method is not recommended by the RFC6749.

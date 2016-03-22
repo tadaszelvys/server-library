@@ -70,11 +70,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     {
         foreach ($this->getClientManagers() as $manager) {
             $client = $manager->findClient($request, $client_credentials);
-            if ($client instanceof ClientInterface) {
-                if (false === $manager->isClientAuthenticated($client, $client_credentials, $request, $reason)) {
-                    throw $this->buildAuthenticationException($request, $reason);
-                }
-
+            if ($client instanceof ClientInterface && true === $manager->isClientAuthenticated($client, $client_credentials, $request)) {
                 return $client;
             }
         }

@@ -419,6 +419,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->password_client_manager) {
             $this->password_client_manager = new PasswordClientManager(
+                $this->getJWTLoader(),
                 $this->getExceptionManager(),
                 $this->realm
             );

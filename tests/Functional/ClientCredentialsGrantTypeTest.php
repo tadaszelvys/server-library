@@ -326,7 +326,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
-            $this->assertEquals('Client authentication failed. Bad audience.', $e->getDescription());
+            $this->assertEquals('Client authentication failed.', $e->getDescription());
         }
     }
 
@@ -345,6 +345,51 @@ class ClientCredentialsGrantTypeTest extends Base
                 'aud' => 'My Authorization Server',
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
+            ],
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+
+        $request = $this->createRequest(
+            '/',
+            'POST',
+            [
+                'grant_type'            => 'client_credentials',
+                'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+                'client_assertion'      => $jws,
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"foo":"bar","scope":"scope1 scope2"}', $response->getBody()->getContents());
+    }
+
+    public function testSignedAssertionForPasswordClientWithJWTBearerAuthentication()
+    {
+        $response = new Response();
+        $jwk2 = new JWK([
+            'kid' => 'PasswordClientBarSecret',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'secret',
+        ]);
+
+        $jws = JWSFactory::createJWSToCompactJSON([
+                'exp' => time() + 3600,
+                'aud' => 'My Authorization Server',
+                'iss' => 'My JWT issuer',
+                'sub' => 'bar',
             ],
             $jwk2,
             [

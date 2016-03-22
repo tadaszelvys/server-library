@@ -35,6 +35,7 @@ class PasswordClientManager extends Base
         $bar->setRedirectUris(['http://example.com/test?good=false']);
         $bar->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
         $bar->setPublicId('bar');
+        $bar->setAllowedSignatureAlgorithms(['HS256', 'HS512']);
 
         $baz = new PasswordClient();
         $baz->setSecret('secret');
