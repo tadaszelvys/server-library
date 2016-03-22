@@ -117,20 +117,13 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager()
             );
 
-            $this->authorization_factory->enableSignedRequestsSupport(
-                ['HS512'],
-                new JWKSet(['keys' => [
-                    [
-                        'kid' => 'JWK2',
-                        'use' => 'sig',
-                        'kty' => 'oct',
-                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                    ],
-                ]]),
+            $this->authorization_factory->enableRequestObjectSupport(
+                ['HS256', 'HS512'],
                 CheckerManagerFactory::createClaimCheckerManager()
             );
+            $this->authorization_factory->enableRequestObjectReferenceSupport();
 
-            $this->authorization_factory->enableEncryptedRequestsSupport(
+            $this->authorization_factory->enableEncryptedRequestObjectSupport(
                 ['A256KW'],
                 ['A256CBC-HS512'],
                 new JWKSet(['keys' => [
@@ -979,9 +972,9 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->setUserinfoSigningAlgValuesSupported($this->getUserInfoEndpoint()->getSignatureAlgorithms());
             $this->metadata->setUserinfoEncryptionAlgValuesSupported($this->getUserInfoEndpoint()->getKeyEncryptionAlgorithms());
             $this->metadata->setUserinfoEncryptionEncValuesSupported($this->getUserInfoEndpoint()->getContentEncryptionAlgorithms());
-            $this->metadata->setRequestObjectSigningAlgValuesSupported($this->getAuthorizationFactory()->getSignatureAlgorithms());
-            $this->metadata->setRequestObjectEncryptionAlgValuesSupported($this->getAuthorizationFactory()->getKeyEncryptionAlgorithms());
-            $this->metadata->setRequestObjectEncryptionEncValuesSupported($this->getAuthorizationFactory()->getContentEncryptionAlgorithms());
+            $this->metadata->setRequestObjectSigningAlgValuesSupported($this->getAuthorizationFactory()->getSupportedSignatureAlgorithms());
+            $this->metadata->setRequestObjectEncryptionAlgValuesSupported($this->getAuthorizationFactory()->getSupportedKeyEncryptionAlgorithms());
+            $this->metadata->setRequestObjectEncryptionEncValuesSupported($this->getAuthorizationFactory()->getSupportedContentEncryptionAlgorithms());
             //$this->metadata->setTokenEndpointAuthMethodsSupported('https://my.server.com/authorize');
             //$this->metadata->setTokenEndpointAuthSigningAlgValuesSupported($this->getTokenEndpoint()->getSignatureAlgorithms());
             //$this->metadata->setDisplayValuesSupported('https://my.server.com/authorize');

@@ -106,14 +106,15 @@ The following components are implemented:
     * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
     * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
     * [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
+    * [x] [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq) (experimental)
+        * [x] Request Objects support (this feature is disabled by default)
+        * [x] Request Object References support (this feature is disabled by default)
+        * [x] Encrypted Request Objects support (this feature is disabled by default)
 
 * Integration planned
     * [Proof-of-Possession (PoP) Security Architecture](https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture)
     * [Proof-of-Possession: Authorization Server to Client Key Distribution](https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution)
     * [Proof-of-Possession Key Semantics for JSON Web Tokens (JWTs)](https://tools.ietf.org/html/draft-ietf-oauth-proof-of-possession)
-
-* For information only
-    * [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq)
     * [A Method for Signing an HTTP Requests for OAuth](https://tools.ietf.org/html/draft-ietf-oauth-signed-http-request)
     * [Token Exchange: An STS for the REST of Us](https://tools.ietf.org/html/draft-ietf-oauth-token-exchange)
 
