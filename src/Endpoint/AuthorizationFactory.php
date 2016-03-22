@@ -248,8 +248,6 @@ final class AuthorizationFactory
             );
             $scope = $this->getScope($jwt->getClaims());
         } catch (\Exception $e) {
-            var_dump($e->getMessage());
-            var_dump($jwt->getClaims('aud'));
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_OBJECT, $e->getMessage());
         }
 
