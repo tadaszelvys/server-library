@@ -139,7 +139,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         if (!$client instanceof SignatureCapabilitiesInterface) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a JWT client');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a client with signature capabilities.');
         }
         $jwt = $grant_type_response->getAdditionalData('jwt');
 

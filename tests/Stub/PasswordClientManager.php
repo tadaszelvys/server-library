@@ -33,7 +33,7 @@ class PasswordClientManager extends Base
         $bar = new PasswordClient();
         $bar->setSecret('secret');
         $bar->setRedirectUris(['http://example.com/test?good=false']);
-        $bar->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
+        $bar->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
         $bar->setPublicId('bar');
         $bar->setAllowedSignatureAlgorithms(['HS256', 'HS512']);
 

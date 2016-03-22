@@ -192,4 +192,61 @@ class JWTBearerGrantTypeTest extends Base
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"foo":"bar","scope":"scope1 scope2"}', $response->getBody()->getContents());
     }
+
+    public function testEncryptedAndSignedAssertionForPasswordClient()
+    {
+        $response = new Response();
+        $jwk1 = new JWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]);
+        $jwk2 = new JWK([
+            'kty' => 'oct',
+            'k'   => 'secret',
+        ]);
+
+        $jws = JWSFactory::createJWSToCompactJSON([
+                'exp' => time() + 3600,
+                'aud' => 'My Authorization Server',
+                'iss' => 'My JWT issuer',
+                'sub' => 'bar',
+            ],
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+
+        $jwe = JWEFactory::createJWEToCompactJSON(
+            $jws,
+            $jwk1,
+            [
+                'alg' => 'A256KW',
+                'enc' => 'A256CBC-HS512',
+            ]
+        );
+
+        $request = $this->createRequest(
+            '/',
+            'POST',
+            [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion'  => $jwe,
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"foo":"bar","scope":"scope1 scope2"}', $response->getBody()->getContents());
+    }
 }
