@@ -892,9 +892,11 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->jwt_loader) {
             $this->jwt_loader = new JWTLoader(
                 $this->getClaimCheckerManager(),
-                ['HS256', 'HS384', 'HS512', 'ES256', 'ES384', 'ES512', 'none', 'RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'],
-                ['A128KW', 'A192KW', 'A256KW', 'A128GCMKW', 'A192GCMKW', 'A256GCMKW', 'dir', 'ECDH-ES', 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW', 'PBES2-HS256+A128KW', 'PBES2-HS384+A192KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
-                ['A128GCM', 'A192GCM', 'A256GCM', 'A128CBC-HS256', 'A192CBC-HS384', 'A256CBC-HS512']
+                ['HS256', 'HS512', 'RS256', 'RS512']
+            );
+            $this->jwt_loader->enableEncryptionSupport(
+                ['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
+                ['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512']
             );
         }
 
@@ -913,9 +915,11 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->jwt_creator) {
             $this->jwt_creator = new JWTCreator(
-                ['HS256', 'HS384', 'HS512', 'ES256', 'ES384', 'ES512', 'none', 'RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'],
-                ['A128KW', 'A192KW', 'A256KW', 'A128GCMKW', 'A192GCMKW', 'A256GCMKW', 'dir', 'ECDH-ES', 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW', 'PBES2-HS256+A128KW', 'PBES2-HS384+A192KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
-                ['A128GCM', 'A192GCM', 'A256GCM', 'A128CBC-HS256', 'A192CBC-HS384', 'A256CBC-HS512']
+                ['HS256', 'HS512', 'RS256', 'RS512']
+            );
+            $this->jwt_creator->enableEncryptionSupport(
+                ['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
+                ['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512']
             );
         }
 

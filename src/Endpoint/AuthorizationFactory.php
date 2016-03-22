@@ -21,6 +21,7 @@ use Jose\Object\JWKSetInterface;
 use Jose\Object\JWSInterface;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
@@ -28,13 +29,20 @@ use OAuth2\Client\SignatureCapabilitiesInterface;
 use OAuth2\EndUser\EndUserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\Util\JWTLoader;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationFactory
 {
+    use HasJWTLoader;
     use HasScopeManager;
     use HasClientManagerSupervisor;
     use HasExceptionManager;
+
+    /**
+     * @var \OAuth2\Util\JWTLoader|null
+     */
+    private $jwt_loader = null;
 
     /**
      * @var bool
@@ -129,11 +137,11 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param array                                 $supported_signature_algorithms
+     * @param string[]                              $supported_signature_algorithms
      * @param \Jose\Checker\CheckerManagerInterface $checker_manager
      */
     public function enableRequestObjectSupport(array $supported_signature_algorithms,
-                                                CheckerManagerInterface $checker_manager
+                                               CheckerManagerInterface $checker_manager
     ) {
         Assertion::notEmpty($supported_signature_algorithms);
 

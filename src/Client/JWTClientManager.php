@@ -74,8 +74,6 @@ abstract class JWTClientManager implements ClientManagerInterface
         Assertion::boolean($encryption_required);
         Assertion::notEmpty($allowed_key_encryption_algorithms);
         Assertion::notEmpty($allowed_content_encryption_algorithms);
-        Assertion::true(empty(array_diff($allowed_key_encryption_algorithms, $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms())));
-        Assertion::true(empty(array_diff($allowed_content_encryption_algorithms, $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms())));
 
         $this->encryption_required = $encryption_required;
         $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;

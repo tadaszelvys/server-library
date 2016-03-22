@@ -215,13 +215,13 @@ class JWTAccessTokenManager extends AccessTokenManager
                 $jwk_set,
                 $this->isEncryptionEnabled()
             );
+
+            $jwk_set = new JWKSet();
+            $jwk_set = $jwk_set->addKey($this->signature_key);
+            $this->jwt_loader->verifySignature($jwt, $jwk_set, [$this->signature_algorithm]);
         } catch (\Exception $e) {
             return;
         }
-
-        $jwk_set = new JWKSet();
-        $jwk_set = $jwk_set->addKey($this->signature_key);
-        $this->jwt_loader->verifySignature($jwt, $jwk_set, [$this->signature_algorithm]);
 
         $access_token = new JWTAccessToken();
         $access_token->setToken($assertion);

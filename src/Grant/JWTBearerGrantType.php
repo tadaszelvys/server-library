@@ -81,9 +81,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         Assertion::boolean($encryption_required);
         Assertion::notEmpty($allowed_key_encryption_algorithms);
         Assertion::notEmpty($allowed_content_encryption_algorithms);
-        Assertion::true(empty(array_diff($allowed_key_encryption_algorithms, $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms())));
-        Assertion::true(empty(array_diff($allowed_content_encryption_algorithms, $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms())));
-
+        
         $this->encryption_required = $encryption_required;
         $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;
         $this->allowed_content_encryption_algorithms = $allowed_content_encryption_algorithms;
@@ -145,11 +143,15 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         }
         $jwt = $grant_type_response->getAdditionalData('jwt');
 
-        $this->getJWTLoader()->verifySignature(
-            $jwt,
-            $client->getSignaturePublicKeySet(),
-            $client->getAllowedSignatureAlgorithms()
-        );
+        try {
+            $this->getJWTLoader()->verifySignature(
+                $jwt,
+                $client->getSignaturePublicKeySet(),
+                $client->getAllowedSignatureAlgorithms()
+            );
+        } catch (\Exception $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+        }
 
         $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
 
