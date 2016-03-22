@@ -12,7 +12,6 @@
 namespace OAuth2\Endpoint;
 
 use Assert\Assertion;
-use Jose\Checker\CheckerManagerInterface;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
 use OAuth2\Behaviour\HasExceptionManager;
@@ -63,11 +62,6 @@ final class AuthorizationFactory
      * @var string[]
      */
     private $supported_content_encryption_algorithms = [];
-
-    /**
-     * @var \Jose\Checker\CheckerManagerInterface|null
-     */
-    private $checker_manager = null;
 
     /**
      * AuthorizationFactory constructor.
@@ -127,20 +121,17 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param \OAuth2\Util\JWTLoader                $jwt_loader
-     * @param string[]                              $supported_signature_algorithms
-     * @param \Jose\Checker\CheckerManagerInterface $checker_manager
+     * @param \OAuth2\Util\JWTLoader $jwt_loader
+     * @param string[]               $supported_signature_algorithms
      */
     public function enableRequestObjectSupport(JWTLoader $jwt_loader,
-                                               array $supported_signature_algorithms,
-                                               CheckerManagerInterface $checker_manager
+                                               array $supported_signature_algorithms
     ) {
         Assertion::notEmpty($supported_signature_algorithms);
 
         $this->setJWTLoader($jwt_loader);
         $this->request_object_allowed = true;
         $this->supported_signature_algorithms = $supported_signature_algorithms;
-        $this->checker_manager = $checker_manager;
     }
 
     /**

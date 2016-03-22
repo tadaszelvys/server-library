@@ -13,7 +13,6 @@ namespace OAuth2\Client;
 
 use Assert\Assertion;
 use Jose\Object\JWKSetInterface;
-use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;

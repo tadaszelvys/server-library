@@ -13,7 +13,6 @@ namespace OAuth2\Test;
 
 use Jose\Checker\AudienceChecker;
 use Jose\Checker\CheckerManager;
-use Jose\Factory\CheckerManagerFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
@@ -127,8 +126,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->authorization_factory->enableRequestObjectSupport(
                 $this->getJWTLoader(),
-                ['HS256', 'HS512'],
-                CheckerManagerFactory::createClaimCheckerManager()
+                ['HS256', 'HS512']
             );
             $this->authorization_factory->enableRequestObjectReferenceSupport();
 
