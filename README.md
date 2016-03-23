@@ -142,7 +142,9 @@ Have a look at [How to use](doc/Use.md) to use OAuth2 server and handle your fir
 
 # Contributing
 
-Requests for new features, bug fixed and all other ideas to make this library useful are welcome. [Please follow these best practices](doc/Contributing.md).
+Requests for new features, bug fixed and all other ideas to make this library useful are welcome. The best contribution you could provide is by fixing the [opened issues where help is wanted](https://github.com/Spomky-Labs/oauth2-server-library/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
+
+Please make sure to [follow these best practices](doc/Contributing.md).
 
 # Licence
 
