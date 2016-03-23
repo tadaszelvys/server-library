@@ -98,4 +98,20 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
             ['schemes' => $schemes]
         );
     }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        $methods = [];
+        foreach ($this->getClientManagers() as $manager) {
+            $methods = array_merge(
+                $manager->getSupportedAuthenticationMethods(),
+                $methods
+            );
+        }
+        
+        return array_unique($methods);
+    }
 }

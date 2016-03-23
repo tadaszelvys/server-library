@@ -117,4 +117,11 @@ class ResourceServerManager extends Base
 
         return $client->isIpAddressAllowed($ip);
     }
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return ['resource_server_custom_auth'];
+    }
 }

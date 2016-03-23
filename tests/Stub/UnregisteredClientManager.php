@@ -150,4 +150,12 @@ class UnregisteredClientManager implements ClientManagerInterface
     {
         return true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return ['none'];
+    }
 }

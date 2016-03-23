@@ -50,4 +50,9 @@ interface ClientManagerInterface
      * @return array
      */
     public function getSchemesParameters();
+
+    /**
+     * @return string[]
+     */
+    public function getSupportedAuthenticationMethods();
 }

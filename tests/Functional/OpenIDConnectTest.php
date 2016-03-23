@@ -100,7 +100,7 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->hasClaim('at_hash'));
         $this->assertTrue($id_token->hasClaim('c_hash'));
 
-        $this->assertEquals('https://server.example.com', $id_token->getClaim('iss'));
+        $this->assertEquals($this->getIssuer(), $id_token->getClaim('iss'));
         $this->assertEquals('**UNREGISTERED**--foo', $id_token->getClaim('aud'));
         $this->assertEquals('user1', $id_token->getClaim('sub'));
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));

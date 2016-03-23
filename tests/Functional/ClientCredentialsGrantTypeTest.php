@@ -256,7 +256,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
         $jws = JWSFactory::createJWSToCompactJSON([
                 'exp' => time() - 1,
-                'aud' => 'https://server.example.com',
+                'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
             ],
@@ -342,7 +342,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
         $jws = JWSFactory::createJWSToCompactJSON([
                 'exp' => time() + 3600,
-                'aud' => 'https://server.example.com',
+                'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
             ],
@@ -387,7 +387,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
         $jws = JWSFactory::createJWSToCompactJSON([
                 'exp' => time() + 3600,
-                'aud' => 'https://server.example.com',
+                'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
                 'sub' => 'bar',
             ],
@@ -438,7 +438,7 @@ class ClientCredentialsGrantTypeTest extends Base
 
         $jws = JWSFactory::createJWSToCompactJSON([
                 'exp' => time() + 3600,
-                'aud' => 'https://server.example.com',
+                'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
             ],
@@ -459,7 +459,7 @@ class ClientCredentialsGrantTypeTest extends Base
                 'alg' => 'A256KW',
                 'enc' => 'A256CBC-HS512',
                 'exp' => time() + 3600,
-                'aud' => 'https://server.example.com',
+                'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
                 'sub' => 'jwt1',
             ]

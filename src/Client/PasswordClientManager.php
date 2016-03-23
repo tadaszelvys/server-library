@@ -106,15 +106,15 @@ abstract class PasswordClientManager implements ClientManagerInterface
     protected function getClientCredentialsMethods()
     {
         $methods = [
-            'findCredentialsFromBasicAuthenticationScheme',
-            'findCredentialsFromClientAssertion',
+            'client_secret_basic' => 'findCredentialsFromBasicAuthenticationScheme',
+            'client_secret_jwt' => 'findCredentialsFromClientAssertion',
         ];
 
         // This authentication method is not recommended by the RFC6749.
         // This option allows to enable this authentication method (not recommended).
         // See http://tools.ietf.org/html/rfc6749#section-2.3.1
         if ($this->arePasswordClientCredentialsInBodyRequestAllowed()) {
-            $methods[] = 'findCredentialsFromRequestBody';
+            $methods['client_secret_post'] = 'findCredentialsFromRequestBody';
         }
 
         return $methods;
@@ -208,5 +208,13 @@ abstract class PasswordClientManager implements ClientManagerInterface
     public function disablePasswordClientCredentialsInBodyRequest()
     {
         $this->password_client_credentials_in_body_request_allowed = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return array_keys($this->getClientCredentialsMethods());
     }
 }

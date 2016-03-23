@@ -36,14 +36,14 @@ The following components are implemented:
 * [x] Exception manager
 * [x] Scope manager ([RFC6749, section 3.3](https://tools.ietf.org/html/rfc6749#section-3.3))
 * Clients Managers:
-    * [x] Public clients ([RFC6749, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1))
+    * [x] Public clients ([RFC6749, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1)) - See `none` authentication method
     * [x] Password clients ([RFC6749, section 2.3.1](https://tools.ietf.org/html/rfc6749#section-2.3.1))
-        * [x] HTTP Basic Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617) and [RFC7617](https://tools.ietf.org/html/rfc7617))
-        * [ ] HTTP Digest Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617) and [RFC7617](https://tools.ietf.org/html/rfc7616)) - *Note: This authentication scheme has been removed since it does not provide real security improvements*
-        * [x] Credentials from request body
+        * [x] HTTP Basic Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617) and [RFC7617](https://tools.ietf.org/html/rfc7617)) - See `client_secret_basic` authentication method
+        * [x] JWT Assertion using password as shared key ([OpenID Connect Code](http://openid.net/specs/openid-connect-core-1_0.html#Signing)) - See `client_secret_jwt` authentication method
+        * [x] Credentials from request body - See `client_secret_post` authentication method
     * [ ] SAML clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
-    * [x] JWT clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7523](https://tools.ietf.org/html/rfc7523))
-    * [x] Unregistered clients ([RFC6749, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4))
+    * [x] JWT clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7523](https://tools.ietf.org/html/rfc7523)) - See `private_key_jwt` authentication method
+    * [x] Unregistered clients ([RFC6749, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4)) - See `none` authentication method
     * [x] Ability to use other Client Managers
 * Endpoints:
     * [x] Authorization ([RFC6749, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
@@ -95,7 +95,7 @@ The following components are implemented:
             * Authentication Methods:
                 * [x] `client_secret_basic`
                 * [x] `client_secret_post` (disabled by default)
-                * [ ] `client_secret_jwt`
+                * [x] `client_secret_jwt`
                 * [x] `private_key_jwt`
                 * [x] `none` (public and unregistered clients supported)
             * [ ] Rotation of Asymmetric Signing Keys

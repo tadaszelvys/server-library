@@ -48,10 +48,10 @@ abstract class JWTClientManager implements ClientManagerInterface
     /**
      * @return string[]
      */
-    protected function findClientCredentialsMethods()
+    protected function getClientCredentialsMethods()
     {
         $methods = [
-            'findCredentialsFromClientAssertion',
+            'private_key_jwt' => 'findCredentialsFromClientAssertion',
         ];
 
         return $methods;
@@ -62,7 +62,7 @@ abstract class JWTClientManager implements ClientManagerInterface
      */
     public function findClient(ServerRequestInterface $request, &$client_credentials = null)
     {
-        $methods = $this->findClientCredentialsMethods();
+        $methods = $this->getClientCredentialsMethods();
         $assertions = [];
 
         foreach ($methods as $method) {
@@ -112,5 +112,13 @@ abstract class JWTClientManager implements ClientManagerInterface
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
         return $this->verifyClientAssertion($client, $client_credentials);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return array_keys($this->getClientCredentialsMethods());
     }
 }

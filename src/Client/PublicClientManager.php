@@ -92,4 +92,14 @@ abstract class PublicClientManager implements ClientManagerInterface
 
         return $this->getClient($result[0]);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return ['none'];
+    }
+
+
 }

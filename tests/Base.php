@@ -191,7 +191,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->user_info_endpoint->enableSignedAndEncryptedResponsesSupport(
                 $this->getJWTCreator(),
-                $this->issuer,
+                $this->getIssuer(),
                 'HS512',
                 new JWK([
                     'kid' => 'JWK2',
@@ -751,7 +751,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ]),
-                $this->issuer
+                $this->getIssuer()
             );
 
             $this->jwt_access_token_manager->enableAccessTokenEncryption(
@@ -889,7 +889,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->id_token_manager = new IdTokenManager(
                 $this->getJWTLoader(),
                 $this->getJWTCreator(),
-                $this->issuer,
+                $this->getIssuer(),
                 'HS512',
                 new JWK([
                     'kid' => 'JWK2',
@@ -963,7 +963,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->claim_checker_manager) {
             $this->claim_checker_manager = new CheckerManager();
 
-            $this->claim_checker_manager->addClaimChecker(new AudienceChecker($this->issuer));
+            $this->claim_checker_manager->addClaimChecker(new AudienceChecker($this->getIssuer()));
         }
 
         return $this->claim_checker_manager;
@@ -982,7 +982,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->metadata) {
             $this->metadata = new Metadata();
 
-            $this->metadata->setIssuer($this->issuer);
+            $this->metadata->setIssuer($this->getIssuer());
             $this->metadata->setAuthorizationEndpoint('https://my.server.com/authorize');
             $this->metadata->setTokenEndpoint('https://my.server.com/token');
             $this->metadata->setUserinfoEndpoint('https://my.server.com/user_info');
@@ -1003,7 +1003,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->setRequestObjectSigningAlgValuesSupported($this->getAuthorizationFactory()->getSupportedSignatureAlgorithms());
             $this->metadata->setRequestObjectEncryptionAlgValuesSupported($this->getAuthorizationFactory()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->setRequestObjectEncryptionEncValuesSupported($this->getAuthorizationFactory()->getSupportedContentEncryptionAlgorithms());
-            //$this->metadata->setTokenEndpointAuthMethodsSupported('https://my.server.com/authorize');
+            $this->metadata->setTokenEndpointAuthMethodsSupported($this->getClientManagerSupervisor()->getSupportedAuthenticationMethods());
             //$this->metadata->setTokenEndpointAuthSigningAlgValuesSupported($this->getTokenEndpoint()->getSignatureAlgorithms());
             //$this->metadata->setDisplayValuesSupported('https://my.server.com/authorize');
             //$this->metadata->setClaimTypesSupported('https://my.server.com/authorize');

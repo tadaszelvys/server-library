@@ -46,7 +46,7 @@ final class AuthorizationFactory
     /**
      * @var string[]
      */
-    private $supported_signature_algorithms = [];
+    private $allowed_signature_algorithms = [];
 
     /**
      * @var \Jose\Object\JWKSetInterface|null
@@ -56,12 +56,12 @@ final class AuthorizationFactory
     /**
      * @var string[]
      */
-    private $supported_key_encryption_algorithms = [];
+    private $allowed_key_encryption_algorithms = [];
 
     /**
      * @var string[]
      */
-    private $supported_content_encryption_algorithms = [];
+    private $allowed_content_encryption_algorithms = [];
 
     /**
      * AuthorizationFactory constructor.
@@ -101,7 +101,7 @@ final class AuthorizationFactory
      */
     public function getSupportedSignatureAlgorithms()
     {
-        return $this->supported_signature_algorithms;
+        return $this->allowed_signature_algorithms;
     }
 
     /**
@@ -109,7 +109,7 @@ final class AuthorizationFactory
      */
     public function getSupportedKeyEncryptionAlgorithms()
     {
-        return $this->supported_key_encryption_algorithms;
+        return $this->allowed_key_encryption_algorithms;
     }
 
     /**
@@ -117,21 +117,21 @@ final class AuthorizationFactory
      */
     public function getSupportedContentEncryptionAlgorithms()
     {
-        return $this->supported_content_encryption_algorithms;
+        return $this->allowed_content_encryption_algorithms;
     }
 
     /**
-     * @param \OAuth2\Util\JWTLoader $jwt_loader
-     * @param string[]               $supported_signature_algorithms
+     * @param \OAuth2\Util\JWTLoader                $jwt_loader
+     * @param string[]                              $allowed_signature_algorithms
      */
     public function enableRequestObjectSupport(JWTLoader $jwt_loader,
-                                               array $supported_signature_algorithms
+                                               array $allowed_signature_algorithms
     ) {
-        Assertion::notEmpty($supported_signature_algorithms);
+        Assertion::notEmpty($allowed_signature_algorithms);
 
         $this->setJWTLoader($jwt_loader);
         $this->request_object_allowed = true;
-        $this->supported_signature_algorithms = $supported_signature_algorithms;
+        $this->allowed_signature_algorithms = $allowed_signature_algorithms;
     }
 
     /**
@@ -143,20 +143,20 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param string[]                     $supported_key_encryption_algorithms
-     * @param string[]                     $supported_content_encryption_algorithms
+     * @param string[]                     $allowed_key_encryption_algorithms
+     * @param string[]                     $allowed_content_encryption_algorithms
      * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
      */
-    public function enableEncryptedRequestObjectSupport(array $supported_key_encryption_algorithms,
-                                                   array $supported_content_encryption_algorithms,
+    public function enableEncryptedRequestObjectSupport(array $allowed_key_encryption_algorithms,
+                                                   array $allowed_content_encryption_algorithms,
                                                    JWKSetInterface $key_encryption_key_set)
     {
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
-        Assertion::notEmpty($supported_key_encryption_algorithms, 'You must set at least one key encryption algorithm.');
-        Assertion::notEmpty($supported_content_encryption_algorithms, 'You must set at least one content encryption algorithm.');
+        Assertion::notEmpty($allowed_key_encryption_algorithms, 'You must set at least one key encryption algorithm.');
+        Assertion::notEmpty($allowed_content_encryption_algorithms, 'You must set at least one content encryption algorithm.');
 
-        $this->supported_key_encryption_algorithms = $supported_key_encryption_algorithms;
-        $this->supported_content_encryption_algorithms = $supported_content_encryption_algorithms;
+        $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;
+        $this->allowed_content_encryption_algorithms = $allowed_content_encryption_algorithms;
         $this->key_encryption_key_set = $key_encryption_key_set;
     }
 
@@ -166,8 +166,8 @@ final class AuthorizationFactory
     public function isEncryptedRequestsSupportEnabled()
     {
         return null !== $this->key_encryption_key_set &&
-               !empty($this->supported_content_encryption_algorithms) &&
-               !empty($this->supported_key_encryption_algorithms);
+               !empty($this->allowed_content_encryption_algorithms) &&
+               !empty($this->allowed_key_encryption_algorithms);
     }
 
     /**
@@ -220,8 +220,8 @@ final class AuthorizationFactory
     {
         $jwt = $this->getJWTLoader()->load(
             $request,
-            $this->supported_key_encryption_algorithms,
-            $this->supported_content_encryption_algorithms,
+            $this->allowed_key_encryption_algorithms,
+            $this->allowed_content_encryption_algorithms,
             $this->key_encryption_key_set,
             false
         );
@@ -235,7 +235,7 @@ final class AuthorizationFactory
             $this->getJWTLoader()->verifySignature(
                 $jwt,
                 $client->getSignaturePublicKeySet(),
-                $this->supported_signature_algorithms
+                $this->allowed_signature_algorithms
             );
             $scope = $this->getScope($jwt->getClaims());
         } catch (\Exception $e) {
