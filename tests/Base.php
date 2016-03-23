@@ -38,6 +38,8 @@ use OAuth2\OpenIDConnect\Metadata;
 use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
 use OAuth2\OpenIDConnect\UserInfoEndpoint;
+use OAuth2\Scope\DefaultScopePolicy;
+use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\EndUserManager;
 use OAuth2\Test\Stub\ExceptionManager;
@@ -725,6 +727,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->scope_manager = new ScopeManager(
                 $this->getExceptionManager()
             );
+            $this->scope_manager->addScopePolicy(new DefaultScopePolicy(['scope1', 'scope2']), true);
+            $this->scope_manager->addScopePolicy(new ErrorScopePolicy($this->getExceptionManager()));
         }
 
         return $this->scope_manager;

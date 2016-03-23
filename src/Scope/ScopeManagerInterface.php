@@ -16,15 +16,12 @@ use Psr\Http\Message\ServerRequestInterface;
 
 interface ScopeManagerInterface
 {
-    const POLICY_MODE_NONE = null;
-    const POLICY_MODE_ERROR = 'error';
-    const POLICY_MODE_DEFAULT = 'default';
-
     /**
-     * @return array
+     * @param \OAuth2\Scope\ScopePolicyInterface $scope_policy
+     * @param bool                               $is_default
      */
-    public static function supportedPolicies();
-
+    public function addScopePolicy(ScopePolicyInterface $scope_policy, $is_default = false);
+        
     /**
      * This function returns the available scopes. If a valid ClientInterface object is set as parameter, the function will return available scopes for the client.
      * The request object is sent to the client to allow the client to have different scopes and scope policy depending on the grant type for example.
@@ -35,21 +32,6 @@ interface ScopeManagerInterface
      * @return string[] Return an array scope
      */
     public function getAvailableScopesForClient(ClientInterface $client, ServerRequestInterface $request = null);
-
-    public function getAvailableScopes();
-
-    /**
-     * This function returns the default scopes. If a valid ClientInterface object is set as parameter, the function will return default scopes for the client.
-     * The request object is sent to the client to allow the client to have different scopes and scope policy depending on the grant type for example.
-     *
-     * @param \OAuth2\Client\ClientInterface           $client  A client
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request
-     *
-     * @return string[] Return an array scope
-     */
-    public function getDefaultScopesForClient(ClientInterface $client, ServerRequestInterface $request = null);
-
-    public function getDefaultScopes();
 
     /**
      * This function returns the scope policy. If a valid ClientInterface object is set as parameter, the function will return scope policy for the client.
@@ -62,18 +44,16 @@ interface ScopeManagerInterface
      */
     public function getScopePolicyForClient(ClientInterface $client, ServerRequestInterface $request = null);
 
-    public function getScopePolicy();
-
     /**
      * This function check if the scopes respect the scope policy for the client.
      *
-     * @param \OAuth2\Client\ClientInterface           $client  A client
      * @param string[]                                 $scope   The scopes
+     * @param \OAuth2\Client\ClientInterface           $client  A client
      * @param \Psr\Http\Message\ServerRequestInterface $request The request
      *
      * @return string[] An array scopes according to the scope policy
      */
-    public function checkScopePolicy(ClientInterface $client, array $scope, ServerRequestInterface $request = null);
+    public function checkScopePolicy(array $scope, ClientInterface $client,ServerRequestInterface $request = null);
 
     /**
      * @param string[] $requestedScopes An array of scopes that represents requested scopes

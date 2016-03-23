@@ -336,7 +336,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkScope(Authorization &$authorization)
     {
         try {
-            $scope = $this->getScopeManager()->checkScopePolicy($authorization->getClient(), $authorization->getScopes());
+            $scope = $this->getScopeManager()->checkScopePolicy($authorization->getScopes(), $authorization->getClient());
             $authorization->setScopes($scope);
         } catch (BaseExceptionInterface $e) {
             throw $e;

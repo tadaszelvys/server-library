@@ -25,9 +25,7 @@ class ScopeManager extends Base
     {
         parent::__construct(
             $exception_manager,
-            ['scope1', 'scope2', 'scope3', 'scope4', 'openid'],
-            ['scope1', 'scope2'],
-            self::POLICY_MODE_DEFAULT
+            ['scope1', 'scope2', 'scope3', 'scope4', 'openid']
         );
     }
 }
