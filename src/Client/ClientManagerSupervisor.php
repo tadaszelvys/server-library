@@ -80,13 +80,13 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
                 }
             }
         }
-        throw $this->buildAuthenticationException($request, null);
+        throw $this->buildAuthenticationException($request);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildAuthenticationException(ServerRequestInterface $request, $reason)
+    public function buildAuthenticationException(ServerRequestInterface $request, $reason = null)
     {
         $schemes = [];
         $message = 'Client authentication failed.';

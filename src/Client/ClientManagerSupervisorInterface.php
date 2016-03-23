@@ -43,7 +43,7 @@ interface ClientManagerSupervisorInterface
      *
      * @return \OAuth2\Exception\BaseExceptionInterface
      */
-    public function buildAuthenticationException(ServerRequestInterface $request, $reason);
+    public function buildAuthenticationException(ServerRequestInterface $request, $reason = null);
 
     /**
      * @return string[]
