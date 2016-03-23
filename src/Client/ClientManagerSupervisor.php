@@ -70,17 +70,23 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     {
         foreach ($this->getClientManagers() as $manager) {
             $client = $manager->findClient($request, $client_credentials);
-            if ($client instanceof ClientInterface && true === $manager->isClientAuthenticated($client, $client_credentials, $request)) {
-                return $client;
+            if ($client instanceof ClientInterface && true === $manager->isClientSupported($client)) {
+                $is_authenticated = $manager->isClientAuthenticated($client, $client_credentials, $request, $reason);
+
+                if (true === $is_authenticated) {
+                    return $client;
+                } else {
+                    throw $this->buildAuthenticationException($request, $reason);
+                }
             }
         }
-        throw $this->buildAuthenticationException($request);
+        throw $this->buildAuthenticationException($request, null);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildAuthenticationException(ServerRequestInterface $request, $reason = null)
+    public function buildAuthenticationException(ServerRequestInterface $request, $reason)
     {
         $schemes = [];
         $message = 'Client authentication failed.';

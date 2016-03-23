@@ -11,7 +11,7 @@
 
 namespace OAuth2\Client;
 
-class JWTClient extends ConfidentialClient implements SignatureCapabilitiesInterface, EncryptionCapabilitiesInterface
+class JWTClient extends ConfidentialClient implements JWTClientInterface
 {
     use JWTClientTrait;
 

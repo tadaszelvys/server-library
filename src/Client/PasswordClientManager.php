@@ -88,16 +88,59 @@ abstract class PasswordClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
     {
-        if (!$client instanceof PasswordClientInterface) {
+        if (true === $client->areCredentialsExpired()) {
+            $reason = 'Credentials expired.';
+
             return false;
         }
 
         if ($client_credentials instanceof JWSInterface) {
-            return $this->verifyClientAssertion($client, $client_credentials);
+            return $this->verifyClientAssertion($client, $client_credentials, $reason);
         }
-        return hash_equals($client->getSecret(), $client_credentials);
+        
+        if (false === hash_equals($client->getSecret(), $client_credentials)) {
+            $reason = 'Bad credentials.';
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function arePasswordClientCredentialsInBodyRequestAllowed()
+    {
+        return $this->password_client_credentials_in_body_request_allowed;
+    }
+
+    public function enablePasswordClientCredentialsInBodyRequest()
+    {
+        $this->password_client_credentials_in_body_request_allowed = true;
+    }
+
+    public function disablePasswordClientCredentialsInBodyRequest()
+    {
+        $this->password_client_credentials_in_body_request_allowed = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientSupported(ClientInterface $client)
+    {
+        return $client instanceof PasswordClientInterface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return array_keys($this->getClientCredentialsMethods());
     }
 
     /**
@@ -190,31 +233,5 @@ abstract class PasswordClientManager implements ClientManagerInterface
     private function getRealm()
     {
         return $this->realm;
-    }
-
-    /**
-     * @return bool
-     */
-    public function arePasswordClientCredentialsInBodyRequestAllowed()
-    {
-        return $this->password_client_credentials_in_body_request_allowed;
-    }
-
-    public function enablePasswordClientCredentialsInBodyRequest()
-    {
-        $this->password_client_credentials_in_body_request_allowed = true;
-    }
-
-    public function disablePasswordClientCredentialsInBodyRequest()
-    {
-        $this->password_client_credentials_in_body_request_allowed = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedAuthenticationMethods()
-    {
-        return array_keys($this->getClientCredentialsMethods());
     }
 }

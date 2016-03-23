@@ -22,4 +22,8 @@ namespace OAuth2\Client;
  */
 interface ConfidentialClientInterface extends RegisteredClientInterface
 {
+    /**
+     * @return bool
+     */
+    public function areCredentialsExpired();
 }

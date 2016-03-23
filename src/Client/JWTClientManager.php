@@ -81,6 +81,36 @@ abstract class JWTClientManager implements ClientManagerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    {
+        if (true === $client->areCredentialsExpired()) {
+            $reason = 'Credentials expired.';
+            
+            return false;
+        }
+        
+        return $this->verifyClientAssertion($client, $client_credentials, $reason);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return array_keys($this->getClientCredentialsMethods());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientSupported(ClientInterface $client)
+    {
+        return $client instanceof JWTClientInterface;
+    }
+
+    /**
      * @param \Jose\Object\JWEInterface[] $result
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
@@ -104,21 +134,5 @@ abstract class JWTClientManager implements ClientManagerInterface
         }
 
         return $client;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
-    {
-        return $this->verifyClientAssertion($client, $client_credentials);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedAuthenticationMethods()
-    {
-        return array_keys($this->getClientCredentialsMethods());
     }
 }

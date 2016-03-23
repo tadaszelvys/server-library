@@ -73,24 +73,21 @@ trait ClientAssertionTrait
     /**
      * {@inheritdoc}
      */
-    private function verifyClientAssertion(ClientInterface $client, $client_credentials)
+    private function verifyClientAssertion(ClientInterface $client, $client_credentials, &$reason)
     {
-        if (!$client instanceof SignatureCapabilitiesInterface) {
-            return false;
-        }
-
         try {
             $this->getJWTLoader()->verifySignature(
                 $client_credentials,
                 $client->getSignaturePublicKeySet(),
                 $client->getAllowedSignatureAlgorithms()
             );
-
-            return true;
         } catch (\Exception $e) {
+            $reason = $e->getMessage();
 
             return false;
         }
+
+        return true;
     }
 
     /**

@@ -11,10 +11,6 @@
 
 namespace OAuth2\Client;
 
-interface PasswordClientInterface extends ConfidentialClientInterface, SignatureCapabilitiesInterface
+interface JWTClientInterface extends ConfidentialClientInterface, SignatureCapabilitiesInterface, EncryptionCapabilitiesInterface
 {
-    /**
-     * @return string
-     */
-    public function getSecret();
 }

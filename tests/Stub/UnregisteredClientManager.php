@@ -116,6 +116,30 @@ class UnregisteredClientManager implements ClientManagerInterface
     /**
      * {@inheritdoc}
      */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientSupported(ClientInterface $client)
+    {
+        return $client instanceof UnregisteredClient;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return ['none'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function findClientMethods()
     {
         return [
@@ -141,21 +165,5 @@ class UnregisteredClientManager implements ClientManagerInterface
         }
 
         return $header[0];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedAuthenticationMethods()
-    {
-        return ['none'];
     }
 }

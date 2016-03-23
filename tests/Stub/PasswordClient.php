@@ -15,7 +15,7 @@ use OAuth2\Client\PasswordClient as BasePasswordClient;
 use OAuth2\Client\SignatureCapabilitiesInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 
-class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface, SignatureCapabilitiesInterface
+class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface
 {
     /**
      * {@inheritdoc}

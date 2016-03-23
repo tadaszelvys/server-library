@@ -107,12 +107,8 @@ class ResourceServerManager extends Base
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
     {
-        if (!$client instanceof ResourceServer) {
-            return;
-        }
-
         $ip = IpAddress::getClientIp($request, $this->getTrustedProxies());
 
         return $client->isIpAddressAllowed($ip);
