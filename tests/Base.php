@@ -794,6 +794,11 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->bearer_token_type) {
             $this->bearer_token_type = new BearerToken();
+
+            $this->bearer_token_type->allowAccessTokenFromQueryString();
+            $this->bearer_token_type->disallowAccessTokenFromQueryString();
+            $this->bearer_token_type->disallowAccessTokenFromRequestBody();
+            $this->bearer_token_type->disallowAccessTokenFromRequestBody();
         }
 
         return $this->bearer_token_type;
@@ -816,6 +821,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->mac_token_type->setMacKeyMinLength(10);
             $this->mac_token_type->setMacKeyMaxLength(20);
             $this->mac_token_type->setMacAlgorithm('hmac-sha-256');
+            $this->mac_token_type->setTimestampLifetime(10);
         }
 
         return $this->mac_token_type;
