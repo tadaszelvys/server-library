@@ -131,6 +131,21 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"foo":"bar","scope":"scope1 scope2"}', $response->getBody()->getContents());
     }
 
+    public function testGrantTypeNotAuthorizedForClientWithExpiredCredentials()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'expired', 'PHP_AUTH_PW' => 'secret']);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals('Client authentication failed. Credentials expired.', $e->getDescription());
+            $this->assertEquals(401, $e->getHttpCode());
+        }
+    }
+
     public function testGrantTypeAuthorizedForClientWithMacAccessToken()
     {
         $response = new Response();
