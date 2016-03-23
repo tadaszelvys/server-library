@@ -314,6 +314,8 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->authorization_endpoint->allowResponseModeParameterInAuthorizationRequest();
             $this->authorization_endpoint->enableStateParameterEnforcement();
+            $this->authorization_endpoint->disableStateParameterEnforcement();
+            $this->authorization_endpoint->enableStateParameterEnforcement();
         }
 
         return $this->authorization_endpoint;
@@ -451,6 +453,8 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->password_client_manager->createClients();
             $this->password_client_manager->enablePasswordClientCredentialsInBodyRequest();
+            $this->password_client_manager->disablePasswordClientCredentialsInBodyRequest();
+            $this->password_client_manager->enablePasswordClientCredentialsInBodyRequest();
         }
 
         return $this->password_client_manager;
@@ -529,6 +533,8 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
+            $this->authorization_code_grant_type->disablePKCEForPublicClientsEnforcement();
+            $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
         }
 
         return $this->authorization_code_grant_type;
@@ -548,6 +554,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_credentials_grant_type = new ClientCredentialsGrantType(
                 $this->getExceptionManager()
             );
+            $this->client_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
+            $this->client_credentials_grant_type->disableRefreshTokenIssuanceWithAccessToken();
             $this->client_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
         }
 
@@ -1038,6 +1046,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->getRefreshTokenManager()
         );
 
+        $access_token_type->enableRefreshTokensRevocationWithAccessTokens();
+        $access_token_type->disableRefreshTokensRevocationWithAccessTokens();
         $access_token_type->enableRefreshTokensRevocationWithAccessTokens();
 
         return $access_token_type;
