@@ -98,4 +98,33 @@ class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensio
             unset($this->grant_types[$key]);
         }
     }
+
+    /**
+     * @param string $response_type
+     */
+    public function addAllowedResponseType($response_type)
+    {
+        if (!$this->isAllowedResponseType($response_type)) {
+            $this->response_types[] = $response_type;
+        }
+    }
+
+    /**
+     * @param string[] $response_types
+     */
+    public function setAllowedResponseTypes(array $response_types)
+    {
+        $this->response_types = $response_types;
+    }
+
+    /**
+     * @param string $response_type
+     */
+    public function removeAllowedResponseType($response_type)
+    {
+        $key = array_search($response_type, $this->response_types);
+        if (false !== $key) {
+            unset($this->response_types[$key]);
+        }
+    }
 }

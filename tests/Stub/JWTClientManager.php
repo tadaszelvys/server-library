@@ -56,7 +56,8 @@ class JWTClientManager extends Base
         $jwt1->setAllowedSignatureAlgorithms(['HS512']);
         $jwt1->setSignaturePublicKeySet(new JWKSet($keys));
         $jwt1->setRedirectUris(['http://example.com/test?good=false']);
-        $jwt1->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
+        $jwt1->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
+        $jwt1->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
         $jwt1->setPublicId('jwt1');
 
         $jwt2 = new JWTClient();

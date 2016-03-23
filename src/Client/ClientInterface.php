@@ -35,4 +35,18 @@ interface ClientInterface extends ResourceOwnerInterface
      * @return string[]
      */
     public function getAllowedGrantTypes();
+    
+    /**
+     * Checks if the response type is allowed for the client.
+     *
+     * @param string $response_type The response type
+     *
+     * @return bool true if the response type is allowed, else false
+     */
+    public function isAllowedResponseType($response_type);
+
+    /**
+     * @return string[]
+     */
+    public function getAllowedResponseTypes();
 }

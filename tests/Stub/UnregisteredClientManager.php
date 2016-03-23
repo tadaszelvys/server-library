@@ -107,7 +107,8 @@ class UnregisteredClientManager implements ClientManagerInterface
         }
 
         $client = new UnregisteredClient();
-        $client->setAllowedGrantTypes(['code', 'authorization_code']);
+        $client->setAllowedGrantTypes(['authorization_code']);
+        $client->setAllowedResponseTypes(['code']);
         $client->setPublicId($client_id);
 
         return $client;
