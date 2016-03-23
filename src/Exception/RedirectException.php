@@ -74,8 +74,8 @@ final class RedirectException extends BaseException implements RedirectException
         $this->checkHeaderValue($uri);
 
         return [
-            'Location'                => $uri,
-            'Content-Security-Policy' => 'referrer origin;',
+            'Location'                => $uri.'#',           // The fragment '#' is used to mitigate closing redirectors
+            'Content-Security-Policy' => 'referrer origin;', // The header is used to mitigate closing redirectors
         ];
     }
 }
