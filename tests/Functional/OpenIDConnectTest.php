@@ -13,6 +13,7 @@ namespace OAuth2\Test\Functional;
 
 use Jose\Loader;
 use Jose\Object\JWSInterface;
+use OAuth2\OpenIDConnect\Metadata;
 use OAuth2\Test\Base;
 use OAuth2\Token\AccessTokenInterface;
 use Zend\Diactoros\Response;
@@ -373,6 +374,13 @@ class OpenIDConnectTest extends Base
 
         $access_tokens = $this->getNoneListener()->getAccessTokens();
         $this->assertInstanceOf(AccessTokenInterface::class, $access_tokens[0]);
+    }
+
+    public function testMetadataAvailable()
+    {
+        $metadata = $this->getMetadata();
+
+        $this->assertInstanceOf(Metadata::class, $metadata);
     }
 
     public function testUserInfoSuccess()

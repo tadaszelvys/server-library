@@ -12,6 +12,7 @@
 namespace OAuth2\Test\Functional;
 
 use OAuth2\Exception\BaseExceptionInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
 
@@ -59,8 +60,8 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('The parameter "grant_type" parameter is missing.', $e->getDescription());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }
@@ -89,9 +90,9 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('unsupported_grant_type', $e->getMessage());
-            $this->assertEquals('The grant type "bar" is not supported by this server', $e->getDescription());
-            $this->assertEquals(501, $e->getHttpCode());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
+            $this->assertEquals(400, $e->getHttpCode());
         }
     }
 
@@ -104,8 +105,8 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('unauthorized_client', $e->getMessage());
-            $this->assertEquals('The grant type "password" is unauthorized for this client_id', $e->getDescription());
+            $this->assertEquals(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, $e->getMessage());
+            $this->assertEquals('The grant type "password" is unauthorized for this client.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }

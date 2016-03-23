@@ -65,8 +65,8 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('The parameter "grant_type" parameter is missing.', $e->getDescription());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }
@@ -95,9 +95,9 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('unsupported_grant_type', $e->getMessage());
-            $this->assertEquals('The grant type "bar" is not supported by this server', $e->getDescription());
-            $this->assertEquals(501, $e->getHttpCode());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
+            $this->assertEquals(400, $e->getHttpCode());
         }
     }
 
@@ -110,8 +110,8 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('unauthorized_client', $e->getMessage());
-            $this->assertEquals('The grant type "client_credentials" is unauthorized for this client_id', $e->getDescription());
+            $this->assertEquals(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, $e->getMessage());
+            $this->assertEquals('The grant type "client_credentials" is unauthorized for this client.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }

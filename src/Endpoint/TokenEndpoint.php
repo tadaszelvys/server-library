@@ -139,10 +139,6 @@ final class TokenEndpoint implements TokenEndpointInterface
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Method must be POST.');
         }
 
-        if (null === RequestBody::getParameter($request, 'grant_type')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "grant_type" parameter is missing.');
-        }
-
         $this->handleRequest($request, $response);
     }
 
@@ -154,14 +150,14 @@ final class TokenEndpoint implements TokenEndpointInterface
      */
     private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response)
     {
-        $grant_type = RequestBody::getParameter($request, 'grant_type');
-        $type = $this->getGrantType($grant_type);
+        $request_parameters = RequestBody::getParameters($request);
+        $type = $this->getGrantType($request_parameters);
 
         $grant_type_response = new GrantTypeResponse();
         $type->prepareGrantTypeResponse($request, $grant_type_response);
 
         $client = $this->findClient($request, $grant_type_response);
-        $this->checkGrantType($client, $grant_type);
+        $this->checkGrantType($client, $type->getGrantType());
 
         $grant_type_response->setClientPublicId($client->getPublicId());
 
@@ -184,7 +180,6 @@ final class TokenEndpoint implements TokenEndpointInterface
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'An unsupported scope was requested. Available scopes are ['.implode(',', $grant_type_response->getAvailableScope()).']');
         }
 
-        $request_parameters = RequestBody::getParameters($request);
         $token_type = $this->getTokenTypeFromRequest($request_parameters);
         $token_type_information = $token_type->getTokenTypeInformation();
 
@@ -281,18 +276,20 @@ final class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param string $grant_type
+     * @param array $request_parameters
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return \OAuth2\Grant\GrantTypeSupportInterface
      */
-    private function getGrantType($grant_type)
+    private function getGrantType(array $request_parameters)
     {
-        if (array_key_exists($grant_type, $this->grant_types)) {
-            return $this->grant_types[$grant_type];
+        foreach ($this->grant_types as $grant_type) {
+            if ($grant_type->isSupported($request_parameters)) {
+                return $grant_type;
+            }
         }
-        throw $this->getExceptionManager()->getNotImplementedException(ExceptionManagerInterface::UNSUPPORTED_GRANT_TYPE, 'The grant type "'.$grant_type.'" is not supported by this server');
+        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid or unsupported request.');
     }
 
     /**
@@ -304,7 +301,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     private function checkGrantType(ClientInterface $client, $grant_type)
     {
         if (!$client->isAllowedGrantType($grant_type)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The grant type "'.$grant_type.'" is unauthorized for this client_id');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, sprintf('The grant type "%s" is unauthorized for this client.', $grant_type));
         }
     }
 
