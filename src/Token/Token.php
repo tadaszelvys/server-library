@@ -138,6 +138,10 @@ class Token implements TokenInterface
      */
     public function hasExpired()
     {
+        $expires_at = $this->expires_at;
+        if (0 === $expires_at) {
+            return false;
+        }
         return $this->expires_at < time();
     }
 
@@ -146,6 +150,10 @@ class Token implements TokenInterface
      */
     public function getExpiresIn()
     {
+        $expires_at = $this->expires_at;
+        if (0 === $expires_at) {
+            return 0;
+        }
         return $this->expires_at - time() < 0 ? 0 : $this->expires_at - time();
     }
 
