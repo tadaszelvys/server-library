@@ -101,7 +101,8 @@ The following components are implemented:
             * [ ] Rotation of Asymmetric Signing Keys
         * [ ] Offline Access
     * [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
-    * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html and [RFC7591](https://tools.ietf.org/html/rfc7591))
+    * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html) and Dynamic Client Registration Protocol ([RFC7591](https://tools.ietf.org/html/rfc7591))
+    * [ ] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
     * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
     * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
     * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
