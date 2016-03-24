@@ -29,7 +29,7 @@ final class ErrorScopePolicy implements ScopePolicyInterface
     {
         $this->setExceptionManager($exception_manager);
     }
-    
+
     /**
      * {@inheritdoc}
      */

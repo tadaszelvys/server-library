@@ -99,7 +99,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
         if ($client_credentials instanceof JWSInterface) {
             return $this->verifyClientAssertion($client, $client_credentials, $reason);
         }
-        
+
         if (false === hash_equals($client->getSecret(), $client_credentials)) {
             $reason = 'Bad credentials.';
 
@@ -150,7 +150,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
     {
         $methods = [
             'client_secret_basic' => 'findCredentialsFromBasicAuthenticationScheme',
-            'client_secret_jwt' => 'findCredentialsFromClientAssertion',
+            'client_secret_jwt'   => 'findCredentialsFromClientAssertion',
         ];
 
         // This authentication method is not recommended by the RFC6749.

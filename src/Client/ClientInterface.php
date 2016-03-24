@@ -35,7 +35,7 @@ interface ClientInterface extends ResourceOwnerInterface
      * @return string[]
      */
     public function getAllowedGrantTypes();
-    
+
     /**
      * Checks if the response type is allowed for the client.
      *

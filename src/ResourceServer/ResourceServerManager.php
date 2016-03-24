@@ -10,8 +10,8 @@
  */
 
 namespace OAuth2\ResourceServer;
-use OAuth2\Client\ClientInterface;
 
+use OAuth2\Client\ClientInterface;
 
 /**
  * Class ResourceServerManager.

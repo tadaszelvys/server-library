@@ -113,6 +113,7 @@ class ResourceServerManager extends Base
 
         return $client->isIpAddressAllowed($ip);
     }
+
     /**
      * {@inheritdoc}
      */

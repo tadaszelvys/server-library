@@ -211,17 +211,17 @@ class ImplicitGrantTypeTest extends Base
         ]);
 
         $claims = [
-            'iat' => time(),
-            'nbf' => time(),
-            'exp' => time() + 120,
-            "iss" => "jwt1",
-            "aud" => "https://server.example.com",
-            "response_type" => "token",
-            "client_id" => "jwt1",
-            "redirect_uri" =>'http://example.com/test?good=false',
-            "scope" => "openid scope1 scope2",
-            "state" => "012345679",
-            "nonce" => "n-0S6_WzA2Mj",
+            'iat'           => time(),
+            'nbf'           => time(),
+            'exp'           => time() + 120,
+            'iss'           => 'jwt1',
+            'aud'           => 'https://server.example.com',
+            'response_type' => 'token',
+            'client_id'     => 'jwt1',
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'scope'         => 'openid scope1 scope2',
+            'state'         => '012345679',
+            'nonce'         => 'n-0S6_WzA2Mj',
         ];
 
         $jws = JWSFactory::createJWSToCompactJSON(
@@ -265,17 +265,17 @@ class ImplicitGrantTypeTest extends Base
         ]);
 
         $claims = [
-            'iat' => time(),
-            'nbf' => time(),
-            'exp' => time() + 120,
-            "iss" => "jwt1",
-            "aud" => "https://server.example.com",
-            "response_type" => "token",
-            "client_id" => "jwt1",
-            "redirect_uri" =>'http://example.com/test?good=false',
-            "scope" => "openid scope1 scope2",
-            "state" => "012345679",
-            "nonce" => "n-0S6_WzA2Mj",
+            'iat'           => time(),
+            'nbf'           => time(),
+            'exp'           => time() + 120,
+            'iss'           => 'jwt1',
+            'aud'           => 'https://server.example.com',
+            'response_type' => 'token',
+            'client_id'     => 'jwt1',
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'scope'         => 'openid scope1 scope2',
+            'state'         => '012345679',
+            'nonce'         => 'n-0S6_WzA2Mj',
         ];
 
         $jws = JWSFactory::createJWSToCompactJSON(

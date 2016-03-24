@@ -41,7 +41,7 @@ final class JWTCreator
     public function __construct(array $supported_signature_algorithms)
     {
         Assertion::notEmpty($supported_signature_algorithms);
-        
+
         $this->supported_signature_algorithms = $supported_signature_algorithms;
     }
 
@@ -51,7 +51,7 @@ final class JWTCreator
      */
     public function enableEncryptionSupport(array $supported_key_encryption_algorithms,
                                             array $supported_content_encryption_algorithms
-    ){
+    ) {
         Assertion::notEmpty($supported_key_encryption_algorithms, 'At least one key encryption algorithm must be set.');
         Assertion::notEmpty($supported_content_encryption_algorithms, 'At least one content encryption algorithm must be set.');
 

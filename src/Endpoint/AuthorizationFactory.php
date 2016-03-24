@@ -121,8 +121,8 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param \OAuth2\Util\JWTLoader                $jwt_loader
-     * @param string[]                              $allowed_signature_algorithms
+     * @param \OAuth2\Util\JWTLoader $jwt_loader
+     * @param string[]               $allowed_signature_algorithms
      */
     public function enableRequestObjectSupport(JWTLoader $jwt_loader,
                                                array $allowed_signature_algorithms
@@ -134,8 +134,6 @@ final class AuthorizationFactory
         $this->allowed_signature_algorithms = $allowed_signature_algorithms;
     }
 
-    /**
-     */
     public function enableRequestObjectReferenceSupport()
     {
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
@@ -258,7 +256,7 @@ final class AuthorizationFactory
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_URI_NOT_SUPPORTED, 'The parameter "request" is not supported.');
         }
         Assertion::url($request_uri, 'Invalid URL.');
-        
+
         $content = $this->downloadContent($request_uri);
         $scope = [];
         $jws = $this->loadRequest($content, $scope, $client);

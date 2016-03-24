@@ -104,7 +104,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
             ['schemes' => $schemes]
         );
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -117,7 +117,7 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
                 $methods
             );
         }
-        
+
         return array_unique($methods);
     }
 }

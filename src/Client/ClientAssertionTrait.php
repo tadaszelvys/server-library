@@ -23,7 +23,7 @@ trait ClientAssertionTrait
      * @return \OAuth2\Util\JWTLoader
      */
     abstract protected function getJWTLoader();
-    
+
     /**
      * @return \OAuth2\Exception\ExceptionManagerInterface
      */
@@ -124,7 +124,7 @@ trait ClientAssertionTrait
         } catch (\Exception $e) {
             return;
         }
-        
+
         if (false === $jwt->hasClaim('sub')) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The assertion does not contain the "sub" claim.');
         }

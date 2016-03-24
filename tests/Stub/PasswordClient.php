@@ -12,7 +12,6 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\PasswordClient as BasePasswordClient;
-use OAuth2\Client\SignatureCapabilitiesInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 
 class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface

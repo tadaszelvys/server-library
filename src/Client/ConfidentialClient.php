@@ -10,6 +10,7 @@
  */
 
 namespace OAuth2\Client;
+
 use Assert\Assertion;
 
 /**
@@ -35,6 +36,7 @@ class ConfidentialClient extends RegisteredClient implements ConfidentialClientI
 
         $this->credentials_expire_at = $timestamp;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -43,6 +45,7 @@ class ConfidentialClient extends RegisteredClient implements ConfidentialClientI
         if (0 === $this->credentials_expire_at) {
             return false;
         }
+
         return time() > $this->credentials_expire_at;
     }
 }

@@ -55,8 +55,8 @@ final class JWTLoader
     /**
      * JWTLoader constructor.
      *
-     * @param \Jose\Checker\CheckerManagerInterface             $checker_manager
-     * @param string[]                                          $supported_signature_algorithms
+     * @param \Jose\Checker\CheckerManagerInterface $checker_manager
+     * @param string[]                              $supported_signature_algorithms
      */
     public function __construct(CheckerManagerInterface $checker_manager, array $supported_signature_algorithms)
     {
@@ -74,10 +74,10 @@ final class JWTLoader
     public function enableEncryptionSupport(array $supported_key_encryption_algorithms,
                                             array $supported_content_encryption_algorithms,
                                             array $compression_methods = ['DEF', 'ZLIB', 'GZ']
-    ){
+    ) {
         Assertion::notEmpty($supported_key_encryption_algorithms, 'At least one key encryption algorithm must be set.');
         Assertion::notEmpty($supported_content_encryption_algorithms, 'At least one content encryption algorithm must be set.');
-        
+
         $this->decrypter = DecrypterFactory::createDecrypter(array_merge($supported_key_encryption_algorithms, $supported_content_encryption_algorithms), $compression_methods);
         $this->supported_key_encryption_algorithms = $supported_key_encryption_algorithms;
         $this->supported_content_encryption_algorithms = $supported_content_encryption_algorithms;

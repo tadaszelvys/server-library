@@ -21,7 +21,7 @@ interface ScopeManagerInterface
      * @param bool                               $is_default
      */
     public function addScopePolicy(ScopePolicyInterface $scope_policy, $is_default = false);
-        
+
     /**
      * This function returns the available scopes. If a valid ClientInterface object is set as parameter, the function will return available scopes for the client.
      * The request object is sent to the client to allow the client to have different scopes and scope policy depending on the grant type for example.
@@ -53,7 +53,7 @@ interface ScopeManagerInterface
      *
      * @return string[] An array scopes according to the scope policy
      */
-    public function checkScopePolicy(array $scope, ClientInterface $client,ServerRequestInterface $request = null);
+    public function checkScopePolicy(array $scope, ClientInterface $client, ServerRequestInterface $request = null);
 
     /**
      * @param string[] $requestedScopes An array of scopes that represents requested scopes
