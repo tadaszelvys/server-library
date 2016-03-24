@@ -11,7 +11,10 @@
 
 namespace OAuth2\Test\Functional;
 
+use Jose\Factory\DecrypterFactory;
 use Jose\Loader;
+use Jose\Object\JWEInterface;
+use Jose\Object\JWK;
 use Jose\Object\JWSInterface;
 use OAuth2\OpenIDConnect\Metadata;
 use OAuth2\Test\Base;
@@ -172,8 +175,6 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
             'state'                 => 'ABCDEF',
             'scope'                 => 'openid',
-            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
-            'code_challenge_method' => 'plain',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -190,6 +191,45 @@ class OpenIDConnectTest extends Base
         $id_token = Loader::load($params['id_token']);
 
         $this->assertInstanceOf(JWSInterface::class, $id_token);
+        $this->assertTrue($id_token->hasClaim('nonce'));
+        $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
+    }
+
+    public function testIdTokenSuccessWithEncryptionSupport()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'jwt1',
+            'response_type'         => 'id_token',
+            'nonce'                 => '0123456789',
+            'state'                 => 'ABCDEF',
+            'scope'                 => 'openid',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getEndUserManager()->getEndUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#state=ABCDEF&id_token=[^"]+$/', $response->getHeader('Location')[0]);
+        $values = parse_url($response->getHeader('Location')[0]);
+        parse_str($values['fragment'], $params);
+
+        $id_token = Loader::load($params['id_token']);
+
+        $this->assertInstanceOf(JWEInterface::class, $id_token);
+        $decrypter = DecrypterFactory::createDecrypter(['A256KW', 'A256CBC-HS512']);
+        $decrypter->decryptUsingKey($id_token, new JWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]));
+        $id_token = Loader::load($id_token->getPayload());
+
         $this->assertTrue($id_token->hasClaim('nonce'));
         $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
     }

@@ -11,6 +11,7 @@
 
 namespace OAuth2\Test\Stub;
 
+use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use OAuth2\Client\JWTClientManager as Base;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -59,6 +60,14 @@ class JWTClientManager extends Base
         $jwt1->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
         $jwt1->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
         $jwt1->setPublicId('jwt1');
+        $jwt1->setContentEncryptionAlgorithm('A256CBC-HS512');
+        $jwt1->setKeyEncryptionAlgorithm('A256KW');
+        $jwt1->setEncryptionPublicKey(new JWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]));
 
         $jwt2 = new JWTClient();
         $jwt2->setAllowedSignatureAlgorithms(['HS512']);

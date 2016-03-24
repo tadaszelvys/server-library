@@ -11,6 +11,9 @@
 
 namespace OAuth2\Client;
 
+use Assert\Assertion;
+use Jose\Object\JWKInterface;
+
 trait JWTClientTrait
 {
     /**
@@ -24,19 +27,27 @@ trait JWTClientTrait
     protected $signature_public_key_set;
 
     /**
-     * @var string[]
+     * @var string|null
      */
-    protected $supported_key_encryption_algorithms = [];
+    protected $key_encryption_algorithm = null;
 
     /**
-     * @var string[]
+     * @var string|null
      */
-    protected $supported_content_encryption_algorithms = [];
+    protected $content_encryption_algorithm = null;
 
     /**
-     * @var \Jose\Object\JWKSetInterface
+     * @var \Jose\Object\JWKInterface
      */
-    protected $encryption_public_key_set;
+    protected $encryption_public_key = null;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEncryptionSupportEnabled()
+    {
+        return null !== $this->encryption_public_key;
+    }
 
     /**
      * {@inheritdoc}
@@ -57,24 +68,50 @@ trait JWTClientTrait
     /**
      * {@inheritdoc}
      */
-    public function getEncryptionPublicKeySet()
+    public function getEncryptionPublicKey()
     {
-        return $this->encryption_public_key_set;
+        return $this->encryption_public_key;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedKeyEncryptionAlgorithms()
+    public function getKeyEncryptionAlgorithm()
     {
-        return $this->supported_key_encryption_algorithms;
+        return $this->key_encryption_algorithm;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedContentEncryptionAlgorithms()
+    public function getContentEncryptionAlgorithm()
     {
-        return $this->supported_content_encryption_algorithms;
+        return $this->content_encryption_algorithm;
+    }
+
+    /**
+     * @param \Jose\Object\JWKInterface $encryption_public_key
+     */
+    public function setEncryptionPublicKey(JWKInterface $encryption_public_key)
+    {
+        $this->encryption_public_key = $encryption_public_key;
+    }
+
+    /**
+     * @param string $content_encryption_algorithm
+     */
+    public function setContentEncryptionAlgorithm($content_encryption_algorithm)
+    {
+        Assertion::string($content_encryption_algorithm);
+        $this->content_encryption_algorithm = $content_encryption_algorithm;
+    }
+
+    /**
+     * @param string $key_encryption_algorithm
+     */
+    public function setKeyEncryptionAlgorithm($key_encryption_algorithm)
+    {
+        Assertion::string($key_encryption_algorithm);
+        $this->key_encryption_algorithm = $key_encryption_algorithm;
     }
 }
