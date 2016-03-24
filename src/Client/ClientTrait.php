@@ -17,7 +17,7 @@ trait ClientTrait
      * @var string[]
      */
     protected $grant_types = [];
-    
+
     /**
      * @var string[]
      */

@@ -147,7 +147,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         if (array_key_exists('grant_type', $request_parameters)) {
             return $this->getGrantType() === $request_parameters['grant_type'];
         }
-        
+
         return false;
     }
 

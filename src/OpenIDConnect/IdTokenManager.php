@@ -56,11 +56,11 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * IdTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader         $jwt_loader
-     * @param \OAuth2\Util\JWTCreator        $jwt_creator
-     * @param                                $issuer
-     * @param                                $signature_algorithm
-     * @param \Jose\Object\JWKInterface      $signature_key
+     * @param \OAuth2\Util\JWTLoader    $jwt_loader
+     * @param \OAuth2\Util\JWTCreator   $jwt_creator
+     * @param                           $issuer
+     * @param                           $signature_algorithm
+     * @param \Jose\Object\JWKInterface $signature_key
      */
     public function __construct(JWTLoader $jwt_loader,
                                 JWTCreator $jwt_creator,

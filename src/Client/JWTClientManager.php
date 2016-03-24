@@ -87,10 +87,10 @@ abstract class JWTClientManager implements ClientManagerInterface
     {
         if (true === $client->areCredentialsExpired()) {
             $reason = 'Credentials expired.';
-            
+
             return false;
         }
-        
+
         return $this->verifyClientAssertion($client, $client_credentials, $reason);
     }
 

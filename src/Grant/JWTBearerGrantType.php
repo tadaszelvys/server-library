@@ -81,7 +81,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         Assertion::boolean($encryption_required);
         Assertion::notEmpty($allowed_key_encryption_algorithms);
         Assertion::notEmpty($allowed_content_encryption_algorithms);
-        
+
         $this->encryption_required = $encryption_required;
         $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;
         $this->allowed_content_encryption_algorithms = $allowed_content_encryption_algorithms;

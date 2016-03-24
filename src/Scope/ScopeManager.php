@@ -130,7 +130,7 @@ class ScopeManager implements ScopeManagerInterface
     {
         $policy = $this->getScopePolicyForClient($client, $request);
         $policy->checkScopePolicy($scope, $client, $request);
-        
+
         return $scope;
     }
 

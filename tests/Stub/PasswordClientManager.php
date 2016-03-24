@@ -32,7 +32,7 @@ class PasswordClientManager extends Base
     {
         $bar = new PasswordClient();
         $bar->setSecret('secret');
-        $bar->setCredentialsExpireAt(time()+3600);
+        $bar->setCredentialsExpireAt(time() + 3600);
         $bar->setRedirectUris(['http://example.com/test?good=false']);
         $bar->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
         $bar->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
@@ -61,7 +61,7 @@ class PasswordClientManager extends Base
 
         $expired = new PasswordClient();
         $expired->setSecret('secret');
-        $expired->setCredentialsExpireAt(time()-1);
+        $expired->setCredentialsExpireAt(time() - 1);
         $expired->setRedirectUris(['http://example.com/test?good=false']);
         $expired->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
         $expired->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
