@@ -76,6 +76,9 @@ class AccessToken extends Token implements AccessTokenInterface
             $this->getParameters()
         );
 
+        if (0 === $this->getExpiresAt()) {
+            $values['expires_in'] = $this->getExpiresIn();
+        }
         if (!empty($this->getScope())) {
             $values['scope'] = implode(' ', $this->getScope());
         }
