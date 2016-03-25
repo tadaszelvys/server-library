@@ -16,7 +16,6 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ScopeExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 class ScopeManager implements ScopeManagerInterface
 {
@@ -106,17 +105,17 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getAvailableScopesForClient(ClientInterface $client, ServerRequestInterface $request = null)
+    public function getAvailableScopesForClient(ClientInterface $client)
     {
-        return ($client instanceof ScopeExtensionInterface && null !== $client->getAvailableScopes($request)) ? $client->getAvailableScopes($request) : $this->getAvailableScopes();
+        return ($client instanceof ScopeExtensionInterface && null !== $client->getAvailableScopes()) ? $client->getAvailableScopes() : $this->getAvailableScopes();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getScopePolicyForClient(ClientInterface $client, ServerRequestInterface $request = null)
+    public function getScopePolicyForClient(ClientInterface $client)
     {
-        if ($client instanceof ScopeExtensionInterface && null !== $policy_name = $client->getScopePolicy($request)) {
+        if ($client instanceof ScopeExtensionInterface && null !== $policy_name = $client->getScopePolicy()) {
             return $this->getScopePolicy($policy_name);
         }
 
@@ -126,10 +125,10 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function checkScopePolicy(array $scope, ClientInterface $client, ServerRequestInterface $request = null)
+    public function checkScopePolicy(array $scope, ClientInterface $client)
     {
-        $policy = $this->getScopePolicyForClient($client, $request);
-        $policy->checkScopePolicy($scope, $client, $request);
+        $policy = $this->getScopePolicyForClient($client);
+        $policy->checkScopePolicy($scope, $client);
 
         return $scope;
     }
