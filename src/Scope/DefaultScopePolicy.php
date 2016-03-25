@@ -13,7 +13,6 @@ namespace OAuth2\Scope;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ScopeExtensionInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 final class DefaultScopePolicy implements ScopePolicyInterface
 {
@@ -43,11 +42,9 @@ final class DefaultScopePolicy implements ScopePolicyInterface
     /**
      * {@inheritdoc}
      */
-    public function checkScopePolicy(array &$scope, ClientInterface $client, ServerRequestInterface $request = null)
+    public function checkScopePolicy(array &$scope, ClientInterface $client)
     {
-        if (empty($scope)) {
-            $scope = $this->getDefaultScopesForClient($client, $request);
-        }
+        $scope = $this->getDefaultScopesForClient($client, $request);
     }
 
     /**
@@ -61,8 +58,8 @@ final class DefaultScopePolicy implements ScopePolicyInterface
     /**
      * {@inheritdoc}
      */
-    private function getDefaultScopesForClient(ClientInterface $client, ServerRequestInterface $request = null)
+    private function getDefaultScopesForClient(ClientInterface $client)
     {
-        return ($client instanceof ScopeExtensionInterface && null !== $client->getDefaultScopes($request)) ? $client->getDefaultScopes($request) : $this->getDefaultScopes();
+        return ($client instanceof ScopeExtensionInterface && null !== $client->getDefaultScopes($request)) ? $client->getDefaultScopes() : $this->getDefaultScopes();
     }
 }
