@@ -10,6 +10,7 @@
  */
 
 namespace OAuth2\Exception;
+use OAuth2\Exception\Extension\ExceptionExtensionInterface;
 
 /**
  * An exception manager.
@@ -54,18 +55,6 @@ interface ExceptionManagerInterface
     const REGISTRATION_NOT_SUPPORTED = 'registration_not_supported';
 
     /**
-     * This function will try to get the URI to a human readable page according to the type, error and description of the exception.
-     *
-     * @param string      $type              The type of the exception
-     * @param string      $error             Short name of the error
-     * @param string|null $error_description Description of the error (optional)
-     * @param array       $data              Additional data sent to the exception (optional)
-     *
-     * @return string|null
-     */
-    public function getUri($type, $error, $error_description = null, array $data = []);
-
-    /**
      * This function will try to get the URI according to the type, error and description of the exception.
      *
      * @param string      $type              The type of the exception
@@ -76,4 +65,9 @@ interface ExceptionManagerInterface
      * @return \OAuth2\Exception\BaseExceptionInterface
      */
     public function getException($type, $error, $error_description = null, array $data = []);
+
+    /**
+     * @param \OAuth2\Exception\Extension\ExceptionExtensionInterface $extension
+     */
+    public function addExtension(ExceptionExtensionInterface $extension);
 }

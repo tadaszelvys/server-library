@@ -91,7 +91,7 @@ class ObjectsTest extends Base
      */
     public function testAuthenticateExceptionConstructionFailed()
     {
-        new AuthenticateException('foo_error', 'foo_description', 'https://foo.com/error', []);
+        new AuthenticateException('foo_error', 'foo_description', [], []);
     }
 
     /**
@@ -158,7 +158,7 @@ class ObjectsTest extends Base
 
     public function testAuthenticateException()
     {
-        $exception = new AuthenticateException('foo_error', 'foo_description', 'https://foo.com/error', ['schemes' => ['Bearer realm="foo",charset=UTF-8']]);
+        $exception = new AuthenticateException('foo_error', 'foo_description', ['error_uri' => 'https://foo.com/error'], ['schemes' => ['Bearer realm="foo",charset=UTF-8']]);
 
         $this->assertNull($exception->getResponseBody());
         $this->assertEquals([

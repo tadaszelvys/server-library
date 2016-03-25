@@ -25,6 +25,7 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
+use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
@@ -42,7 +43,7 @@ use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\EndUserManager;
-use OAuth2\Test\Stub\ExceptionManager;
+use OAuth2\Exception\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\JWTClientManager;
@@ -322,17 +323,18 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Test\Stub\ExceptionManager
+     * @var null|\OAuth2\Exception\ExceptionManagerInterface
      */
     private $exception_manager = null;
 
     /**
-     * @return \OAuth2\Test\Stub\ExceptionManager
+     * @return \OAuth2\Exception\ExceptionManagerInterface
      */
     protected function getExceptionManager()
     {
         if (null === $this->exception_manager) {
             $this->exception_manager = new ExceptionManager();
+            $this->exception_manager->addExtension(new UriExtension());
         }
 
         return $this->exception_manager;

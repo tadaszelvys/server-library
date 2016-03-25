@@ -29,15 +29,13 @@ final class RedirectException extends BaseException implements RedirectException
 
     /**
      * @param string $error             Short name of the error
-     * @param string $error_description Description of the error (optional)
-     * @param string $error_uri         Uri of the error (optional)
-     * @param array  $data              Additional data sent to the exception (optional)
-     *
-     * @throws \InvalidArgumentException
+     * @param string $error_description Description of the error
+     * @param array  $error_data        Data to add to the error
+     * @param array  $data              Additional data sent to the exception
      */
-    public function __construct($error, $error_description = null, $error_uri = null, array $data = [])
+    public function __construct($error, $error_description, array $error_data, array $data)
     {
-        parent::__construct(302, $error, $error_description, $error_uri);
+        parent::__construct(302, $error, $error_description, $error_data, $data);
 
         Assertion::keyExists($data, 'redirect_uri', 'redirect_uri_not_defined');
         Assertion::false(

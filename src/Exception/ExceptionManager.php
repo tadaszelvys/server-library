@@ -12,6 +12,7 @@
 namespace OAuth2\Exception;
 
 use Assert\Assertion;
+use OAuth2\Exception\Extension\ExceptionExtensionInterface;
 
 /**
  * An exception manager.
@@ -24,6 +25,11 @@ use Assert\Assertion;
  */
 class ExceptionManager implements ExceptionManagerInterface
 {
+    /**
+     * @var \OAuth2\Exception\Extension\ExceptionExtensionInterface[]
+     */
+    private $extensions = [];
+    
     /**
      * @param string $name
      * @param $arguments
@@ -49,8 +55,9 @@ class ExceptionManager implements ExceptionManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getUri($type, $error, $error_description = null, array $data = [])
+    public function addExtension(ExceptionExtensionInterface $extension)
     {
+        $this->extensions[] = $extension;
     }
 
     /**
@@ -62,17 +69,38 @@ class ExceptionManager implements ExceptionManagerInterface
         Assertion::string($error);
         Assertion::nullOrString($error_description);
 
-        $error_uri = $this->getUri($type, $error, $error_description, $data);
+        $error_data = $this->getAdditionalErrorData($type, $error, $error_description, $data);
 
         $supported_types = $this->getExceptionTypeMap();
 
         if (array_key_exists($type, $supported_types)) {
             $class = $supported_types[$type];
 
-            return new $class($error, $error_description, $error_uri, $data);
+            return new $class($error, $error_description, $error_data, $data);
         }
 
         throw new \InvalidArgumentException('Unsupported type');
+    }
+
+    /**
+     * @param string       $type
+     * @param string       $error
+     * @param string|null  $error_description
+     * @param array        $data
+     *
+     * @return array
+     */
+    private function getAdditionalErrorData($type, $error, $error_description = null, array $data)
+    {
+        $result = [];
+        foreach ($this->extensions as $extension) {
+            $result = array_merge(
+                $result,
+                $extension->getData($type, $error, $error_description, $data)
+            );
+        }
+
+        return $result;
     }
 
     /**
