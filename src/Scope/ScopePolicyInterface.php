@@ -26,7 +26,6 @@ interface ScopePolicyInterface
      *
      * @param string[]                                 $scope   The scopes. This variable may be modified according to the scope policy
      * @param \OAuth2\Client\ClientInterface           $client  The client
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request
      */
-    public function checkScopePolicy(array &$scope, ClientInterface $client, ServerRequestInterface $request = null);
+    public function checkScopePolicy(array &$scope, ClientInterface $client);
 }
