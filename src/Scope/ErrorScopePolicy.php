@@ -43,8 +43,6 @@ final class ErrorScopePolicy implements ScopePolicyInterface
      */
     public function checkScopePolicy(array &$scope, ClientInterface $client, ServerRequestInterface $request = null)
     {
-        if (empty($scope)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'No scope was requested.');
-        }
+        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'No scope was requested.');
     }
 }
