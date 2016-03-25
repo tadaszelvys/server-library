@@ -26,10 +26,12 @@ class BaseException extends \Exception implements BaseExceptionInterface
      * @param string $error             Short name of the error
      * @param string $error_description Description of the error
      * @param array  $error_data        Data to add to the error
-     * @param array  $data              Additional data sent to the exception
      */
-    public function __construct($code, $error, $error_description, array $error_data, array $data)
+    public function __construct($code, $error, $error_description, array $error_data)
     {
+        Assertion::integer($code);
+        Assertion::string($error);
+        Assertion::nullOrString($error_description);
         parent::__construct($error, $code);
 
         //Check %x20-21 / %x23-5B / %x5D-7E for error and error_description

@@ -29,7 +29,33 @@ class ExceptionManager implements ExceptionManagerInterface
      * @var \OAuth2\Exception\Extension\ExceptionExtensionInterface[]
      */
     private $extensions = [];
-    
+
+    /**
+     * @var array
+     */
+    private $exception_map = [];
+
+    public function __construct()
+    {
+        $this->exception_map = [
+            self::AUTHENTICATE    => AuthenticateException::class,
+            self::BAD_REQUEST     => BadRequestException::class,
+            self::NOT_IMPLEMENTED => NotImplementedException::class,
+            self::REDIRECT        => RedirectException::class,
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addExceptionType($name, $exception_class)
+    {
+        Assertion::string($name);
+        Assertion::string($exception_class);
+        Assertion::classExists($exception_class);
+        $this->exception_map[$name] = $exception_class;
+    }
+
     /**
      * @param string $name
      * @param $arguments
@@ -71,15 +97,9 @@ class ExceptionManager implements ExceptionManagerInterface
 
         $error_data = $this->getAdditionalErrorData($type, $error, $error_description, $data);
 
-        $supported_types = $this->getExceptionTypeMap();
+        $class = $this->getExceptionType($type);
 
-        if (array_key_exists($type, $supported_types)) {
-            $class = $supported_types[$type];
-
-            return new $class($error, $error_description, $error_data, $data);
-        }
-
-        throw new \InvalidArgumentException('Unsupported type');
+        return new $class($error, $error_description, $error_data, $data);
     }
 
     /**
@@ -104,15 +124,16 @@ class ExceptionManager implements ExceptionManagerInterface
     }
 
     /**
-     * @return array
+     * @param string $type
+     *
+     * @return string
      */
-    protected function getExceptionTypeMap()
+    private function getExceptionType($type)
     {
-        return [
-            self::AUTHENTICATE          => 'OAuth2\Exception\AuthenticateException',
-            self::BAD_REQUEST           => 'OAuth2\Exception\BadRequestException',
-            self::NOT_IMPLEMENTED       => 'OAuth2\Exception\NotImplementedException',
-            self::REDIRECT              => 'OAuth2\Exception\RedirectException',
-        ];
+        if (array_key_exists($type, $this->exception_map)) {
+            return $this->exception_map[$type];
+        }
+
+        throw new \InvalidArgumentException(sprintf('The exception type "%s" is not supported', $type));
     }
 }

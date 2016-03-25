@@ -18,10 +18,10 @@ interface ExceptionExtensionInterface
     /**
      * @param string      $type              The type of the exception
      * @param string      $error             Short name of the error
-     * @param string|null $error_description Description of the error (optional)
-     * @param array       $data              Additional data sent to the exception (optional)
+     * @param string|null $error_description Description of the error
+     * @param array       $data              Additional data sent to the exception
      *
      * @return array
      */
-    public function getData($type, $error, $error_description = null, array $data = []);
+    public function getData($type, $error, $error_description, array $data);
 }

@@ -21,6 +21,6 @@ final class BadRequestException extends BaseException implements BadRequestExcep
      */
     public function __construct($error, $error_description, array $error_data, array $data)
     {
-        parent::__construct(400, $error, $error_description, $error_data, $data);
+        parent::__construct(400, $error, $error_description, $error_data);
     }
 }

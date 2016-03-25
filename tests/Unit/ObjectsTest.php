@@ -11,12 +11,14 @@
 
 namespace OAuth2\Test\Unit;
 
+use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\AuthenticateException;
 use OAuth2\OpenIDConnect\IdToken;
 use OAuth2\Test\Base;
 use OAuth2\Test\Stub\EndUser;
 use OAuth2\Test\Stub\PublicClient;
 use OAuth2\Test\Stub\ResourceServer;
+use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AuthCode;
 
@@ -169,5 +171,29 @@ class ObjectsTest extends Base
                 'Bearer realm="foo",charset=UTF-8',
             ],
         ], $exception->getResponseHeaders());
+    }
+
+    public function testTooManyRequestsException()
+    {
+        try {
+            throw $this->getExceptionManager()->getException('TooManyRequests', 'unauthorized_client', 'Only 300 requests/day');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertInstanceOf(TooManyRequestsException::class, $e);
+            $this->assertEquals('unauthorized_client', $e->getMessage());
+            $this->assertEquals('Only 300 requests/day', $e->getDescription());
+            $this->assertEquals(429, $e->getHttpCode());
+        }
+    }
+
+    public function testTooManyRequestsException2()
+    {
+        try {
+            throw $this->getExceptionManager()->getTooManyRequestsException('unauthorized_client', 'Only 300 requests/day');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertInstanceOf(TooManyRequestsException::class, $e);
+            $this->assertEquals('unauthorized_client', $e->getMessage());
+            $this->assertEquals('Only 300 requests/day', $e->getDescription());
+            $this->assertEquals(429, $e->getHttpCode());
+        }
     }
 }

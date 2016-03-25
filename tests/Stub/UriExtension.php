@@ -21,7 +21,7 @@ class UriExtension implements ExceptionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getData($type, $error, $error_description = null, array $data = [])
+    public function getData($type, $error, $error_description, array $data)
     {
         if ($type !== ExceptionManagerInterface::INTERNAL_SERVER_ERROR) {
             return ['error_uri' => urlencode("https://foo.test/Error/$type/$error")];

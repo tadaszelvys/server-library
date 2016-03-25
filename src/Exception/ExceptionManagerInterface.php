@@ -70,4 +70,10 @@ interface ExceptionManagerInterface
      * @param \OAuth2\Exception\Extension\ExceptionExtensionInterface $extension
      */
     public function addExtension(ExceptionExtensionInterface $extension);
+
+    /**
+     * @param string $name
+     * @param string $exception_class
+     */
+    public function addExceptionType($name, $exception_class);
 }

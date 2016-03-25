@@ -25,7 +25,7 @@ final class AuthenticateException extends BaseException implements AuthenticateE
      */
     public function __construct($error, $error_description, array $error_data, array $data)
     {
-        parent::__construct(401, $error, $error_description, $error_data, $data);
+        parent::__construct(401, $error, $error_description, $error_data);
 
         Assertion::keyExists($data, 'schemes', 'schemes_not_defined');
 

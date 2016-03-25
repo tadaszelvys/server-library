@@ -25,6 +25,8 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
+use OAuth2\Test\Stub\FooBarExtension;
+use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
@@ -335,6 +337,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->exception_manager) {
             $this->exception_manager = new ExceptionManager();
             $this->exception_manager->addExtension(new UriExtension());
+            $this->exception_manager->addExceptionType('TooManyRequests', TooManyRequestsException::class);
         }
 
         return $this->exception_manager;

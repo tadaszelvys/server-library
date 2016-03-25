@@ -21,6 +21,6 @@ final class NotImplementedException extends BaseException implements NotImplemen
      */
     public function __construct($error, $error_description, array $error_data, array $data)
     {
-        parent::__construct(501, $error, $error_description, $error_data, $data);
+        parent::__construct(501, $error, $error_description, $error_data);
     }
 }
