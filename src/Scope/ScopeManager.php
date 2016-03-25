@@ -127,8 +127,10 @@ class ScopeManager implements ScopeManagerInterface
      */
     public function checkScopePolicy(array $scope, ClientInterface $client)
     {
-        $policy = $this->getScopePolicyForClient($client);
-        $policy->checkScopePolicy($scope, $client);
+        if (empty($scope)) {
+            $policy = $this->getScopePolicyForClient($client);
+            $policy->checkScopePolicy($scope, $client);
+        }
 
         return $scope;
     }
