@@ -27,81 +27,51 @@ You can now inject `$scope_manager` to other components that require the scope m
 
 # Scope Policies
 
-The [RFC6749, section 3.3,](https://tools.ietf.org/html/rfc6749#section-3.3) introduces scope policies `default` and `error` applied on client requests.
+According to the [RFC6749, section 3.3,](https://tools.ietf.org/html/rfc6749#section-3.3) ,if the client omits the scope parameter when requesting authorization, the authorization server must either process the request using a pre-defined default value or fail the request indicating an invalid scope.
 
-This library support these policies.
+To comply with the specifitation, the scope managr is able to support scope policies.
 
 ## No Scope Policy
 
-If the policy is not defined, the scope parameter (if passed as an argument) is not changed. This is the default behaviour.
-
-```php
-use OAuth2\Scope\ScopeManager;
-use OAuth2\Scope\ScopeManagerInterface;
-
-$scope_manager = new ScopeManager(
-    $exception_manager,
-    ['read', 'read_write', 'delete'],         // Available scopes
-    [],
-    ScopeManagerInterface::POLICY_MODE_NONE  // Scope policy
-);
-```
-
-Example #1:
+If the policy is not defined (default), the scope parameter (if passed as an argument) is not changed. This is the default behaviour.
 
 > A client sends a request without scope parameter. If an access token is issued, no scope is associated to the access token.
-
-Example #2:
-
-> A client sends a request with scope parameter `read_write delete`. If an access token is issued, the scope `read_write delete` are associated to the access token.
 
 ## Scope Policy 'Default'
 
 When no scope is set in the client request, the default scopes are set.
 
 ```php
-use OAuth2\Scope\ScopeManager;
-use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\Scope\DefaultScopePolicy;
 
-$scope_manager = new ScopeManager(
-    $exception_manager,
-    ['read', 'read_write', 'delete'],           // Available scopes
-    ['read'],                                   // Default scopes
-    ScopeManagerInterface::POLICY_MODE_DEFAULT  // Scope policy
-);
+// We create an instance of our scope policy
+$default_scope_policy = new DefaultScopePolicy(['read']);
+
+// We add it and we specify it is the default policy
+$scope_manager->addScopePolicy($default_scope_policy, true);
 ```
 
-Example #1:
-
 > A client sends a request without scope parameter. If an access token is issued, the scope `read` is associated to the access token.
-
-Example #2:
-
-> A client sends a request with scope parameter `read_write delete`. If an access token is issued, the scope `read_write delete` are associated to the access token.
 
 ## Scope Policy 'Error'
 
 When no scope is set in the client request, an error is thrown.
 
 ```php
-use OAuth2\Scope\ScopeManager;
-use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\Scope\ErrorScopePolicy;
 
-$scope_manager = new ScopeManager(
-    $exception_manager,
-    ['read', 'read_write', 'delete'],         // Available scopes
-    [], 
-    ScopeManagerInterface::POLICY_MODE_ERROR  // Scope policy
-);
+// We create an instance of our scope policy
+$error_scope_policy = new ErrorScopePolicy($exception_manager);
+
+// We add it and we specify it is the default policy
+$scope_manager->addScopePolicy($error_scope_policy, true);
 ```
-
-Example #1:
 
 > A client sends a request without scope parameter. An error is thrown and no access token is issued.
 
-Example #2:
+## Custom Scope Policy
 
-> A client sends a request with scope parameter `read_write delete`. If an access token is issued, the scope `read_write delete` are associated to the access token.
+If you want to set your own policy, just create a class that implements `OAuth2\Scope\ScopePolicyInterface`.
 
 # Scope and Scope Policy Per Client
 
@@ -109,7 +79,7 @@ The scope manager is able to support scope and scope policy per client.
 
 To enable this feature, your client class must implement the interface `OAuth2\Client\ScopeExtensionInterface`.
 
-In the following example, clients based on the class `Acme\PublicClient` have scope policy set to `POLICY_MODE_DEFAULT` and scope `read` is set by default if no scope is requested.
+In the following example, clients based on the class `Acme\PublicClient` have scope policy set to `default` and scope `read` is set by default if no scope is requested.
 Available scopes are not changed.
 
 ```php
@@ -125,28 +95,24 @@ class PublicClient extends Base implements ScopeExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getAvailableScopes(ServerRequestInterface $request = null)
+    public function getAvailableScopes()
     {
-        //We return nothing, it means that the available scopes are the same as those set in the scope manager.
-        //The same goes for other methods: if nothing is returned then the scope manager parameter is used.
+        // We return nothing (or null), it means that the available scopes are the same as those set in the scope manager.
+        // The same goes for other methods: if nothing is returned then the scope manager parameter is used.
+        // If you want to limit or add scope for this client, you must return a list of the scopes
+        // e.g.: ['read', 'delete', 'undelete'] means the scope 'read_write' is unavailable but the scope 'undelete' is added
+        // You should avoid to add new scope using this method, but you are free to limit them
+        // e.g. confidential client have full access on the scopes, but public client only have the 'read' and 'read_write' scopes
     }
     
     /**
      * {@inheritdoc}
      */
-    public function getDefaultScopes(ServerRequestInterface $request = null)
+    public function getScopePolicy()
     {
-        return [
-            'read',
-        ];
-    }
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopePolicy(ServerRequestInterface $request = null)
-    {
-        return ScopeManagerInterface::POLICY_MODE_DEFAULT;
+        // If you return nothin, it means that the scope policy is unchanged. The default policy will be used.
+        // Else, the specified policy will be applied.
+        return 'default';
     }
 }
 ```
@@ -159,8 +125,6 @@ You just have to create an instance of the `ScopeManager` class and inject it.
 ```php
 use OAuth2\Scope\ScopeManager;
 
-$scope_manager = new ScopeManager(
-    $exception_manager
-);
+$scope_manager = new ScopeManager($exception_manager);
 ```
 >>>>>>> origin/master
