@@ -11,6 +11,8 @@
 
 namespace OAuth2\Token;
 
+use Assert\Assertion;
+
 class AccessToken extends Token implements AccessTokenInterface
 {
     /**
@@ -36,6 +38,7 @@ class AccessToken extends Token implements AccessTokenInterface
      */
     public function setTokenType($token_type)
     {
+        Assertion::string($token_type);
         $this->token_type = $token_type;
     }
 
@@ -52,6 +55,7 @@ class AccessToken extends Token implements AccessTokenInterface
      */
     public function setRefreshToken($refresh_token)
     {
+        Assertion::nullOrString($refresh_token);
         $this->refresh_token = $refresh_token;
     }
 
@@ -68,15 +72,12 @@ class AccessToken extends Token implements AccessTokenInterface
      */
     public function toArray()
     {
-        $values = array_merge([
-                'access_token' => $this->getToken(),
-                'token_type'   => $this->getTokenType(),
-                'expires_in'   => $this->getExpiresIn(),
-            ],
-            $this->getParameters()
-        );
+        $values = [
+            'access_token' => $this->getToken(),
+            'token_type'   => $this->getTokenType(),
+        ];
 
-        if (0 === $this->getExpiresAt()) {
+        if (0 !== $this->getExpiresIn()) {
             $values['expires_in'] = $this->getExpiresIn();
         }
         if (!empty($this->getScope())) {
@@ -85,6 +86,11 @@ class AccessToken extends Token implements AccessTokenInterface
         if (!empty($this->getRefreshToken())) {
             $values['refresh_token'] = $this->getRefreshToken();
         }
+
+        $values = array_merge(
+            $values,
+            $this->getParameters()
+        );
 
         return $values;
     }

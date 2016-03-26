@@ -23,7 +23,7 @@ class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
             case 'authcode':
                 return 10;
             case 'access_token':
-                return 1000;
+                return 0;
             case 'refresh_token':
             default:
                 return 2000;

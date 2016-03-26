@@ -21,6 +21,7 @@ use OAuth2\Test\Stub\ResourceServer;
 use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AuthCode;
+use OAuth2\Token\RefreshToken;
 
 /**
  * @group Objects
@@ -119,12 +120,26 @@ class ObjectsTest extends Base
     public function testAccessTokenToArray()
     {
         $access_token = new AccessToken();
+        $access_token->setExpiresAt(0);
+        $access_token->setToken('foo');
+        $access_token->setTokenType('bar');
 
         $this->assertEquals([
-            'access_token' => null,
-            'token_type'   => null,
-            'expires_in'   => 0,
+            'access_token' => 'foo',
+            'token_type'   => 'bar',
         ], $access_token->toArray());
+
+        $this->assertFalse($access_token->hasExpired());
+    }
+
+    public function testRefreshTokenToArray()
+    {
+        $refresh_token = new RefreshToken();
+        $refresh_token->setExpiresAt(0);
+        $refresh_token->setToken('foo');
+
+        $this->assertEquals('foo', $refresh_token->getToken());
+        $this->assertFalse($refresh_token->hasExpired());
     }
 
     /**

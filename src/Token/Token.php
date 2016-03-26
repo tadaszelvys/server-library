@@ -130,6 +130,8 @@ class Token implements TokenInterface
      */
     public function setExpiresAt($expires_at)
     {
+        Assertion::integer($expires_at);
+        Assertion::greaterOrEqualThan($expires_at, 0);
         $this->expires_at = $expires_at;
     }
 
@@ -178,6 +180,7 @@ class Token implements TokenInterface
      */
     public function setParameter($key, $value)
     {
+        Assertion::string($key);
         $this->parameters[$key] = $value;
     }
 
@@ -196,6 +199,7 @@ class Token implements TokenInterface
      */
     public function hasParameter($key)
     {
+        Assertion::string($key);
         return array_key_exists($key, $this->parameters);
     }
 
@@ -204,6 +208,7 @@ class Token implements TokenInterface
      */
     public function unsetParameter($key)
     {
+        Assertion::string($key);
         if (array_key_exists($key, $this->parameters)) {
             unset($this->parameters[$key]);
         }

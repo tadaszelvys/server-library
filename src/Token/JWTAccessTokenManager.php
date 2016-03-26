@@ -115,7 +115,7 @@ class JWTAccessTokenManager extends AccessTokenManager
             $encryption_header = $this->prepareEncryptionHeader($client, $resource_server);
             $recipient_key = null === $resource_server || null === $resource_server->getPublicKeyEncryptionKey() ? $this->key_encryption_key : $resource_server->getPublicKeyEncryptionKey();
 
-            $jwt = $this->getJWTCreator()->encrypt($jwt, $encryption_header, $recipient_key, $this->key_encryption_key);
+            $jwt = $this->getJWTCreator()->encrypt($jwt, $encryption_header, $recipient_key);
         }
 
         $access_token->setToken($jwt);
@@ -137,12 +137,14 @@ class JWTAccessTokenManager extends AccessTokenManager
                 'iss' => $this->issuer,
                 'iat' => time(),
                 'nbf' => time(),
-                'exp' => time() + $this->getLifetime($client),
                 'typ' => 'JWT',
                 'alg' => $key_encryption_algorithm,
                 'enc' => $content_encryption_algorithm,
             ]
         );
+        if (0 !== $lifetime = $this->getLifetime($client)) {
+            $header['exp'] = time() + $lifetime;
+        }
         $header['aud'] = null === $resource_server ? $this->issuer : $resource_server->getServerName();
 
         return $header;
@@ -179,18 +181,21 @@ class JWTAccessTokenManager extends AccessTokenManager
             'nbf' => time(),
             'exp' => $access_token->getExpiresAt(),
             'sub' => $access_token->getClientPublicId(),
-            'aty' => $access_token->getTokenType(),
-            'sco' => $access_token->getScope(),
-            'r_o' => $access_token->getResourceOwnerPublicId(),
+            'token_type' => $access_token->getTokenType(),
+            'scope' => $access_token->getScope(),
+            'resource_owner' => $access_token->getResourceOwnerPublicId(),
         ];
+        if (0 !== $expires_at = $access_token->getExpiresAt()) {
+            $payload['exp'] = $expires_at;
+        }
         if (!empty($access_token->getParameters())) {
             $parameters = $access_token->getParameters();
             //This part should be updated to support 'cnf' (confirmation) claim (see POP).
 
-            $payload['oth'] = $parameters;
+            $payload['other'] = $parameters;
         }
         if (null !== $access_token->getRefreshToken()) {
-            $payload['ref'] = $access_token->getRefreshToken();
+            $payload['refresh_token'] = $access_token->getRefreshToken();
         }
 
         return $payload;
@@ -227,21 +232,23 @@ class JWTAccessTokenManager extends AccessTokenManager
         $access_token->setToken($assertion);
         $access_token->setJWS($jwt);
         $access_token->setClientPublicId($jwt->getClaim('sub'));
-        $access_token->setExpiresAt($jwt->getClaim('exp'));
-        $access_token->setTokenType($jwt->getClaim('aty'));
-        $access_token->setResourceOwnerPublicId($jwt->getClaim('r_o'));
+        $access_token->setTokenType($jwt->getClaim('token_type'));
+        $access_token->setResourceOwnerPublicId($jwt->getClaim('resource_owner'));
 
-        if ($jwt->hasClaim('oth')) {
-            $access_token->setParameters($jwt->getClaim('oth'));
+        if ($jwt->hasClaim('exp')) {
+            $access_token->setExpiresAt($jwt->getClaim('exp'));
+        }
+        if ($jwt->hasClaim('other')) {
+            $access_token->setParameters($jwt->getClaim('other'));
         }
         if ($jwt->hasClaim('cnf')) {
             $access_token->setParameter('cnf', $jwt->getClaim('cnf'));
         }
-        if ($jwt->hasClaim('sco')) {
-            $access_token->setScope($jwt->getClaim('sco'));
+        if ($jwt->hasClaim('scope')) {
+            $access_token->setScope($jwt->getClaim('scope'));
         }
-        if ($jwt->hasClaim('ref')) {
-            $access_token->setRefreshToken($jwt->getClaim('ref'));
+        if ($jwt->hasClaim('refresh_token')) {
+            $access_token->setRefreshToken($jwt->getClaim('refresh_token'));
         }
 
         return $access_token;
