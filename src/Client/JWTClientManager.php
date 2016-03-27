@@ -129,7 +129,7 @@ abstract class JWTClientManager implements ClientManagerInterface
 
         $client = $this->getClient($result[0]['client_id']);
 
-        if (!$client instanceof SignatureCapabilitiesInterface) {
+        if (!$client instanceof ClientInterface || !$client instanceof SignatureCapabilitiesInterface) {
             return;
         }
 

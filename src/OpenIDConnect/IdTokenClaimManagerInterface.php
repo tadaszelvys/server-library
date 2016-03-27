@@ -12,7 +12,7 @@
 namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\User\UserInterface;
+use OAuth2\User\UserInterface as BaseUserInterface;
 
 interface IdTokenClaimManagerInterface
 {
@@ -23,5 +23,5 @@ interface IdTokenClaimManagerInterface
      *
      * @return mixed
      */
-    public function process(array &$claims, UserInterface $user, ClientInterface $client);
+    public function process(array &$claims, BaseUserInterface $user, ClientInterface $client);
 }

@@ -83,7 +83,7 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     public function addIdTokenClaimManager(IdTokenClaimManagerInterface $id_token_claim_manager)
     {
-        $this->id_token_claim_managers = $id_token_claim_manager;
+        $this->id_token_claim_managers[] = $id_token_claim_manager;
     }
 
     /**

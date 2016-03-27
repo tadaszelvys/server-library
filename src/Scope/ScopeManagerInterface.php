@@ -40,7 +40,7 @@ interface ScopeManagerInterface
      *
      * @param \OAuth2\Client\ClientInterface           $client  A client
      *
-     * @return string Return "default" or "error" depending on the configuration
+     * @return \OAuth2\Scope\ScopePolicyInterface
      */
     public function getScopePolicyForClient(ClientInterface $client);
 

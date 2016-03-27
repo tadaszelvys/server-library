@@ -104,7 +104,7 @@ class ScopeManager implements ScopeManagerInterface
     }
 
     /**
-     * @return string
+     * @return \OAuth2\Scope\ScopePolicyInterface
      */
     public function getDefaultScopePolicy()
     {
