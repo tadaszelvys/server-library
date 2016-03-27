@@ -11,12 +11,12 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasEndUserManager;
+use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\EndUser\EndUserInterface;
-use OAuth2\EndUser\EndUserManagerInterface;
-use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
+use OAuth2\User\UserInterface;
+use OAuth2\User\UserManagerInterface;
+use OAuth2\User\IssueRefreshTokenExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,7 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSupportInterface
 {
     use HasExceptionManager;
-    use HasEndUserManager;
+    use HasUserManager;
 
     /**
      * @var bool
@@ -34,14 +34,14 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
     /**
      * ResourceOwnerPasswordCredentialsGrantType constructor.
      *
-     * @param \OAuth2\EndUser\EndUserManagerInterface     $end_user_manager
+     * @param \OAuth2\User\UserManagerInterface     $user_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(
-        EndUserManagerInterface $end_user_manager,
+        UserManagerInterface $user_manager,
         ExceptionManagerInterface $exception_manager
     ) {
-        $this->setEndUserManager($end_user_manager);
+        $this->setUserManager($user_manager);
         $this->setExceptionManager($exception_manager);
     }
 
@@ -81,25 +81,25 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
         $username = RequestBody::getParameter($request, 'username');
         $password = RequestBody::getParameter($request, 'password');
 
-        $end_user = $this->getEndUserManager()->getEndUser($username);
-        if (null === $end_user || !$this->getEndUserManager()->checkEndUserPasswordCredentials($end_user, $password)) {
+        $user = $this->getUserManager()->getUser($username);
+        if (null === $user || !$this->getUserManager()->checkUserPasswordCredentials($user, $password)) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Invalid username and password combination');
         }
 
-        $grant_type_response->setResourceOwnerPublicId($end_user->getPublicId());
-        $grant_type_response->setRefreshTokenIssued($this->getIssueRefreshToken($client, $end_user));
+        $grant_type_response->setResourceOwnerPublicId($user->getPublicId());
+        $grant_type_response->setRefreshTokenIssued($this->getIssueRefreshToken($client, $user));
         $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
     }
 
     /**
      * @param \OAuth2\Client\ClientInterface   $client
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param \OAuth2\User\UserInterface $user
      *
      * @return bool
      */
-    private function getIssueRefreshToken(ClientInterface $client, EndUserInterface $end_user)
+    private function getIssueRefreshToken(ClientInterface $client, UserInterface $user)
     {
-        if ($end_user instanceof IssueRefreshTokenExtensionInterface && false === $end_user->isRefreshTokenIssuanceAllowed($client, 'password')) {
+        if ($user instanceof IssueRefreshTokenExtensionInterface && false === $user->isRefreshTokenIssuanceAllowed($client, 'password')) {
             return false;
         }
 

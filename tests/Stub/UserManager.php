@@ -11,13 +11,13 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\EndUser\EndUserInterface;
-use OAuth2\EndUser\EndUserManagerInterface;
+use OAuth2\User\UserInterface;
+use OAuth2\User\UserManagerInterface;
 
-class EndUserManager implements EndUserManagerInterface
+class UserManager implements UserManagerInterface
 {
     /**
-     * @var \OAuth2\EndUser\EndUserInterface[]
+     * @var \OAuth2\User\UserInterface[]
      */
     private $users = [];
 
@@ -30,7 +30,7 @@ class EndUserManager implements EndUserManagerInterface
         $address1->setRegion('Île de France');
         $address1->setStreetAddress('5 rue Sainte Anne');
 
-        $user1 = new EndUser('user1', 'password1');
+        $user1 = new User('user1', 'password1');
         $user1->setAddress($address1);
         $user1->setAuthenticationMethodsReferences(['password', 'otp']);
         $user1->setBirthdate('1950-01-01');
@@ -38,7 +38,7 @@ class EndUserManager implements EndUserManagerInterface
         $user1->setEmailVerified(false);
         $user1->setLastLoginAt(time() - 100);
 
-        $user2 = new EndUser('user2', 'password2');
+        $user2 = new User('user2', 'password2');
         $user2->setLastLoginAt(time() - 1000);
 
         $this->users['user1'] = $user1;
@@ -48,19 +48,19 @@ class EndUserManager implements EndUserManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function checkEndUserPasswordCredentials(EndUserInterface $resource_owner, $password)
+    public function checkUserPasswordCredentials(UserInterface $resource_owner, $password)
     {
-        if (!$resource_owner instanceof EndUser) {
+        if (!$resource_owner instanceof User) {
             return false;
         }
 
-        return $resource_owner->getPassword() === $password;
+        return hash_equals($password, $resource_owner->getPassword());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getEndUser($public_id)
+    public function getUser($public_id)
     {
         return isset($this->users[$public_id]) ? $this->users[$public_id] : null;
     }

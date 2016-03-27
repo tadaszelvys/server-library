@@ -19,7 +19,7 @@ use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\EncryptionCapabilitiesInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\EndUser\EndUserInterface;
+use OAuth2\User\UserInterface as BaseUserInterface;
 use OAuth2\Util\JWTCreator;
 use OAuth2\Util\JWTLoader;
 
@@ -113,7 +113,7 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $id_token_claims = [], $access_token = null, $auth_code = null)
+    public function createIdToken(ClientInterface $client, BaseUserInterface $user, array $id_token_claims = [], $access_token = null, $auth_code = null)
     {
         $id_token = $this->createEmptyIdToken();
         $exp = time() + $this->getLifetime($client);
@@ -126,13 +126,16 @@ class IdTokenManager implements IdTokenManagerInterface
         $payload = [
             'jti'       => Base64Url::encode(random_bytes(25)),
             'iss'       => $this->issuer,
-            'sub'       => $end_user->getPublicId(),
+            'sub'       => $user->getPublicId(),
             'aud'       => $client->getPublicId(),
             'iat'       => time(),
             'nbf'       => time(),
             'exp'       => $exp,
-            'auth_time' => $end_user->getLastLoginAt(),
         ];
+        if ($user instanceof UserInterface) {
+
+            $payload['auth_time'] = $user->getLastLoginAt();
+        }
 
         foreach (['at_hash' => $access_token, 'c_hash' => $auth_code] as $key => $token) {
             if (null !== $token) {
@@ -140,7 +143,7 @@ class IdTokenManager implements IdTokenManagerInterface
             }
         }
         foreach (['amr' => 'getAuthenticationMethodsReferences', 'acr' => 'getAuthenticationContextClassReference'] as $claims => $method) {
-            $value = $end_user->$method();
+            $value = $user->$method();
             if (!empty($value)) {
                 $payload[$claims] = $value;
             }
@@ -151,7 +154,7 @@ class IdTokenManager implements IdTokenManagerInterface
         }
 
         foreach ($this->id_token_claim_managers as $id_token_claim_manager) {
-            $id_token_claim_manager->process($payload, $end_user, $client);
+            $id_token_claim_manager->process($payload, $user, $client);
         }
 
         $jwt = $this->jwt_creator->sign($payload, $headers, $this->signature_key);
@@ -174,7 +177,7 @@ class IdTokenManager implements IdTokenManagerInterface
 
         $id_token->setExpiresAt($exp);
         $id_token->setClientPublicId($client->getPublicId());
-        $id_token->setResourceOwnerPublicId($end_user->getPublicId());
+        $id_token->setResourceOwnerPublicId($user->getPublicId());
 
         return $id_token;
     }

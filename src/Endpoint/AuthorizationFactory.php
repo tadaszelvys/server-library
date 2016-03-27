@@ -20,7 +20,7 @@ use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Client\SignatureCapabilitiesInterface;
-use OAuth2\EndUser\EndUserInterface;
+use OAuth2\User\UserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Util\JWTLoader;
@@ -170,31 +170,31 @@ final class AuthorizationFactory
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \OAuth2\EndUser\EndUserInterface         $end_user
+     * @param \OAuth2\User\UserInterface         $user
      * @param bool                                     $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
      */
-    public function createFromRequest(ServerRequestInterface $request, EndUserInterface $end_user, $is_authorized)
+    public function createFromRequest(ServerRequestInterface $request, UserInterface $user, $is_authorized)
     {
         $params = $request->getQueryParams();
         if (array_key_exists('request', $params)) {
-            return $this->createFromRequestParameter($params['request'], $end_user, $is_authorized);
+            return $this->createFromRequestParameter($params['request'], $user, $is_authorized);
         } elseif (array_key_exists('request_uri', $params)) {
-            return $this->createFromRequestUriParameter($params['request_uri'], $end_user, $is_authorized);
+            return $this->createFromRequestUriParameter($params['request_uri'], $user, $is_authorized);
         }
 
-        return $this->createFromStandardRequest($params, $end_user, $is_authorized);
+        return $this->createFromStandardRequest($params, $user, $is_authorized);
     }
 
     /**
      * @param string                           $request
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param \OAuth2\User\UserInterface $user
      * @param bool                             $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
      */
-    private function createFromRequestParameter($request, EndUserInterface $end_user, $is_authorized)
+    private function createFromRequestParameter($request, UserInterface $user, $is_authorized)
     {
         if (false === $this->isRequestObjectSupportEnabled()) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_NOT_SUPPORTED, 'The parameter "request" is not supported.');
@@ -204,7 +204,7 @@ final class AuthorizationFactory
         $scope = [];
         $jws = $this->loadRequest($request, $scope, $client);
 
-        return $this->createAuthorization($jws->getClaims(), $end_user, $client, $scope, $is_authorized);
+        return $this->createAuthorization($jws->getClaims(), $user, $client, $scope, $is_authorized);
     }
 
     /**
@@ -245,12 +245,12 @@ final class AuthorizationFactory
 
     /**
      * @param string                           $request_uri
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param \OAuth2\User\UserInterface $user
      * @param bool                             $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
      */
-    private function createFromRequestUriParameter($request_uri, EndUserInterface $end_user, $is_authorized)
+    private function createFromRequestUriParameter($request_uri, UserInterface $user, $is_authorized)
     {
         if (false === $this->isRequestObjectReferenceSupportEnabled()) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_URI_NOT_SUPPORTED, 'The parameter "request" is not supported.');
@@ -261,36 +261,36 @@ final class AuthorizationFactory
         $scope = [];
         $jws = $this->loadRequest($content, $scope, $client);
 
-        return $this->createAuthorization($jws->getClaims(), $end_user, $client, $scope, $is_authorized);
+        return $this->createAuthorization($jws->getClaims(), $user, $client, $scope, $is_authorized);
     }
 
     /**
      * @param array                            $params
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param \OAuth2\User\UserInterface $user
      * @param bool                             $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
      */
-    private function createFromStandardRequest(array $params, EndUserInterface $end_user, $is_authorized)
+    private function createFromStandardRequest(array $params, UserInterface $user, $is_authorized)
     {
         $client = $this->getClient($params);
         $scope = $this->getScope($params);
 
-        return $this->createAuthorization($params, $end_user, $client, $scope, $is_authorized);
+        return $this->createAuthorization($params, $user, $client, $scope, $is_authorized);
     }
 
     /**
      * @param array                            $params
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param \OAuth2\User\UserInterface $user
      * @param \OAuth2\Client\ClientInterface   $client
      * @param array                            $scope
      * @param bool                             $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
      */
-    private function createAuthorization(array $params, EndUserInterface $end_user, ClientInterface $client, array $scope, $is_authorized)
+    private function createAuthorization(array $params, UserInterface $user, ClientInterface $client, array $scope, $is_authorized)
     {
-        return new Authorization($params, $end_user, $is_authorized, $client, $scope);
+        return new Authorization($params, $user, $is_authorized, $client, $scope);
     }
 
     /**

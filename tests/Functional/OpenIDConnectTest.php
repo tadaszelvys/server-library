@@ -43,7 +43,7 @@ class OpenIDConnectTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -125,7 +125,7 @@ class OpenIDConnectTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -178,7 +178,7 @@ class OpenIDConnectTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -208,7 +208,7 @@ class OpenIDConnectTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -249,7 +249,7 @@ class OpenIDConnectTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -282,7 +282,7 @@ class OpenIDConnectTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -345,7 +345,7 @@ class OpenIDConnectTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -402,7 +402,7 @@ class OpenIDConnectTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 

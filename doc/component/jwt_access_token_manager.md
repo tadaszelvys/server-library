@@ -1,13 +1,13 @@
 JWT Access Token Manager
 ========================
 
-This access token manager will create access tokens base of JSON Web Token (JWT).
+This access token manager will create access tokens based on JSON Web Token (JWT).
 It does not need a database as they contain digitally signed claims.
 The Authorization and Resource servers can directly verify signature using key materials.
 
 These tokens can also be encrypted to prevent leak of sensitive data.
 
-*Please note that if access tokens are encrypted, the authorization server will not be able to verify claims unless it is the audience of this token*
+*Please note that if access tokens are encrypted, the authorization server will not be able to verify claims unless it is the audience of this token or if no resource server was defined*
 
 # Algorithms and Keys
 
@@ -21,6 +21,7 @@ Thanks to [spomky-labs/jose](https://github.com/Spomky-Labs/jose), this library 
 * ES256, ES384, ES512 (require private EC key)
 * RS256, RS384, RS512 (require private RSA key)
 * PS256, PS384, PS512 (require private RSA key)
+* Ed25519 (require octet key pair key)
 
 We recommend you to use `RS512` algorithm as it is quite fast, secured and uses a public/private (RSA) key pair.
 
@@ -34,7 +35,7 @@ The key used to sign the access tokens must be in `JWK` format. Again, thanks to
 
 These case MUST only be used when the following two conditions are satisfied:
 * access tokens are encrypted
-* the authorization server (the issuer) is also resource server (the audience)
+* no resource server is defined, i.e. the authorization server (the issuer) is the audience.
 
 Examples:
 
@@ -67,8 +68,6 @@ $private_key = JWKFactory::createFromKeyFile(
 );
 ```
 
-*Tips: you can easily convert a private key into a public key: `$public_key = $private_key->toPublic();`*
-
 #### Private EC Keys
 
 Example:
@@ -84,8 +83,6 @@ $private_key = JWKFactory::createFromKeyFile(
     ]
 );
 ```
-
-*Tips: you can easily convert a private key into a public key: `$public_key = $private_key->toPublic();`*
 
 ## Access Token Encryption
 
@@ -135,5 +132,6 @@ $jwt_access_manager->enableAccessTokenEncryption(
 ## Encryption And Resource Servers
 
 This library is designed to allow multiple resource servers to receive access tokens, but this feature is not yet completely supported.
+When resource servers need to know if the access token is still valid, they must use the introspection endpoint.
 
 More details will be added when this feature will be implemented.

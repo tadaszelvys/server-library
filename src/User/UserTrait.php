@@ -9,11 +9,11 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\EndUser;
+namespace OAuth2\User;
 
 use OAuth2\Token\AccessTokenInterface;
 
-trait EndUserTrait
+trait UserTrait
 {
     /**
      * @var int|null
@@ -111,7 +111,7 @@ trait EndUserTrait
     protected $phone_number_verified = null;
 
     /**
-     * @var \OAuth2\EndUser\AddressInterface|null
+     * @var \OAuth2\User\AddressInterface|null
      */
     protected $address = null;
 

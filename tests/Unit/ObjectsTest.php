@@ -15,7 +15,7 @@ use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\AuthenticateException;
 use OAuth2\OpenIDConnect\IdToken;
 use OAuth2\Test\Base;
-use OAuth2\Test\Stub\EndUser;
+use OAuth2\Test\Stub\User;
 use OAuth2\Test\Stub\PublicClient;
 use OAuth2\Test\Stub\ResourceServer;
 use OAuth2\Test\Stub\TooManyRequestsException;
@@ -70,12 +70,12 @@ class ObjectsTest extends Base
         $this->assertEquals('type', $id_token->getTokenType());
     }
 
-    public function testEndUser()
+    public function testUser()
     {
-        $user = new EndUser('user1', 'pass');
+        $user = new User('user1', 'pass');
         $user->setLastLoginAt(time() - 1000);
 
-        $this->assertEquals('end_user', $user->getType());
+        $this->assertEquals('user', $user->getType());
         $this->assertTrue($user->getLastLoginAt() <= time() - 1000);
         $this->assertEquals('user1', $user->getUsername());
     }

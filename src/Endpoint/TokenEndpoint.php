@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
-use OAuth2\Behaviour\HasEndUserManager;
+use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
@@ -21,7 +21,7 @@ use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Behaviour\HasTokenTypeParameterSupport;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
-use OAuth2\EndUser\EndUserManagerInterface;
+use OAuth2\User\UserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponse;
 use OAuth2\Grant\GrantTypeResponseInterface;
@@ -37,7 +37,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class TokenEndpoint implements TokenEndpointInterface
 {
-    use HasEndUserManager;
+    use HasUserManager;
     use HasScopeManager;
     use HasExceptionManager;
     use HasClientManagerSupervisor;
@@ -62,7 +62,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
-     * @param \OAuth2\EndUser\EndUserManagerInterface         $end_user_manager
+     * @param \OAuth2\User\UserManagerInterface         $user_manager
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
@@ -71,7 +71,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         TokenTypeManagerInterface $token_type_manager,
         AccessTokenManagerInterface $access_token_manager,
         ClientManagerSupervisorInterface $client_manager_supervisor,
-        EndUserManagerInterface $end_user_manager,
+        UserManagerInterface $user_manager,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
         RefreshTokenManagerInterface $refresh_token_manager = null
@@ -79,7 +79,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
-        $this->setEndUserManager($end_user_manager);
+        $this->setUserManager($user_manager);
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
         if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
@@ -310,7 +310,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return null|\OAuth2\Client\ClientInterface|\OAuth2\EndUser\EndUserInterface
+     * @return null|\OAuth2\Client\ClientInterface|\OAuth2\User\UserInterface
      */
     private function getResourceOwner($resource_owner_public_id)
     {
@@ -318,9 +318,9 @@ final class TokenEndpoint implements TokenEndpointInterface
         if (null !== $client) {
             return $client;
         }
-        $end_user = $this->getEndUserManager()->getEndUser($resource_owner_public_id);
-        if (null !== $end_user) {
-            return $end_user;
+        $user = $this->getUserManager()->getUser($resource_owner_public_id);
+        if (null !== $user) {
+            return $user;
         }
 
         throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');

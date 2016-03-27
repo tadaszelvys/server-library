@@ -13,7 +13,7 @@ namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\TokenEndpointExtensionInterface;
-use OAuth2\EndUser\EndUserManagerInterface;
+use OAuth2\User\UserManagerInterface;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
@@ -29,21 +29,21 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
     private $id_token_manager;
 
     /**
-     * @var \OAuth2\EndUser\EndUserManagerInterface
+     * @var \OAuth2\User\UserManagerInterface
      */
-    private $end_user_manager;
+    private $user_manager;
 
     /**
      * OpenIDConnectTokenEndpointExtension constructor.
      *
      * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface $id_token_manager
-     * @param \OAuth2\EndUser\EndUserManagerInterface       $end_user_manager
+     * @param \OAuth2\User\UserManagerInterface       $user_manager
      */
     public function __construct(IdTokenManagerInterface $id_token_manager,
-                                EndUserManagerInterface $end_user_manager
+                                UserManagerInterface $user_manager
     ) {
         $this->id_token_manager = $id_token_manager;
-        $this->end_user_manager = $end_user_manager;
+        $this->user_manager = $user_manager;
     }
 
     /**
@@ -54,8 +54,8 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
         if (false === $this->issueIdToken($grant_type_response)) {
             return;
         }
-        $end_user = $this->end_user_manager->getEndUser($grant_type_response->getResourceOwnerPublicId());
-        if (null === $end_user) {
+        $user = $this->user_manager->getUser($grant_type_response->getResourceOwnerPublicId());
+        if (null === $user) {
             return;
         }
 
@@ -71,7 +71,7 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
 
         $id_token = $this->id_token_manager->createIdToken(
             $client,
-            $end_user,
+            $user,
             $claims,
             $access_token->getToken(),
             $auth_code instanceof AuthCodeInterface ? $auth_code->getToken() : null

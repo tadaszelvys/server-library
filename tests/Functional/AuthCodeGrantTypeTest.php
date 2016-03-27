@@ -29,7 +29,7 @@ class AuthCodeGrantTypeTest extends Base
             $request = new ServerRequest();
             $this->getAuthorizationFactory()->createFromRequest(
                 $request,
-                $this->getEndUserManager()->getEndUser('user1'),
+                $this->getUserManager()->getUser('user1'),
                 true
             );
             $this->fail('Should throw an Exception');
@@ -48,7 +48,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -71,7 +71,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -96,7 +96,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -120,7 +120,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -145,7 +145,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -169,7 +169,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -193,7 +193,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -218,7 +218,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -243,7 +243,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             false
         );
 
@@ -263,7 +263,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -284,7 +284,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -306,7 +306,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -331,7 +331,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -351,7 +351,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -371,7 +371,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -391,7 +391,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -431,7 +431,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -475,7 +475,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -516,7 +516,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -556,7 +556,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -596,7 +596,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -635,7 +635,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -675,7 +675,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 

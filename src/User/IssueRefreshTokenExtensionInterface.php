@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\EndUser;
+namespace OAuth2\User;
 
 use OAuth2\Client\ClientInterface;
 

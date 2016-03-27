@@ -25,7 +25,6 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
-use OAuth2\Test\Stub\FooBarExtension;
 use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Grant\AuthorizationCodeGrantType;
@@ -44,7 +43,7 @@ use OAuth2\OpenIDConnect\UserInfoEndpoint;
 use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Test\Stub\AuthCodeManager;
-use OAuth2\Test\Stub\EndUserManager;
+use OAuth2\Test\Stub\UserManager;
 use OAuth2\Exception\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
@@ -189,7 +188,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->user_info_endpoint = new UserInfoEndpoint(
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
-                $this->getEndUserManager(),
+                $this->getUserManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getExceptionManager()
             );
@@ -248,7 +247,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManagerSupervisor(),
-                $this->getEndUserManager(),
+                $this->getUserManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
                 $this->getRefreshTokenManager()
@@ -282,7 +281,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->openid_connect_token_endpoint_extension) {
             $this->openid_connect_token_endpoint_extension = new OpenIDConnectTokenEndpointExtension(
                 $this->getIdTokenManager(),
-                $this->getEndUserManager()
+                $this->getUserManager()
             );
         }
 
@@ -344,20 +343,20 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Test\Stub\EndUserManager
+     * @var null|\OAuth2\Test\Stub\UserManager
      */
-    private $end_user_manager = null;
+    private $user_manager = null;
 
     /**
-     * @return \OAuth2\Test\Stub\EndUserManager
+     * @return \OAuth2\Test\Stub\UserManager
      */
-    protected function getEndUserManager()
+    protected function getUserManager()
     {
-        if (null === $this->end_user_manager) {
-            $this->end_user_manager = new EndUserManager();
+        if (null === $this->user_manager) {
+            $this->user_manager = new UserManager();
         }
 
-        return $this->end_user_manager;
+        return $this->user_manager;
     }
 
     /**
@@ -718,7 +717,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->resource_owner_password_credentials_grant_type) {
             $this->resource_owner_password_credentials_grant_type = new ResourceOwnerPasswordCredentialsGrantType(
-                $this->getEndUserManager(),
+                $this->getUserManager(),
                 $this->getExceptionManager()
             );
         }

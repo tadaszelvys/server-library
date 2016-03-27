@@ -14,7 +14,7 @@ namespace OAuth2\Token;
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\EndUser\EndUserInterface;
+use OAuth2\User\UserInterface;
 use Security\DefuseGenerator;
 
 abstract class AuthCodeManager implements AuthCodeManagerInterface
@@ -68,7 +68,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createAuthCode(ClientInterface $client, EndUserInterface $resource_owner, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
+    public function createAuthCode(ClientInterface $client, UserInterface $resource_owner, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
     {
         $auth_code = $this->createEmptyAuthorizationCode();
         $auth_code->setScope($scope);

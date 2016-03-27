@@ -29,25 +29,29 @@ Please read [this page](component/scope.md) to know how to create and use this c
 
 # Access Token Manager
 
-Access tokens are one of the most important components in the OAuth2.
-They are issued by the authorization server to the clients.
+The Access token Manager is one of the most important component in the OAuth2 Framework library.
 
 This library is able to support any kind of access token managers.
 You can create your own access token manager. It just has to implement `OAuth2\Token\AccessTokenManagerInterface`.
 
 Or you can use the following implementation.
 
+## Random String Access Token Manager
+
+**This access token manager has been removed. Please use JWT Access Token Manager instead.**
+
 ## JWT Access Token Manager
 
-This manager will produce access tokens JSON Web Token (JWT) based.
-The tokens do not need a database and are digitaly signed by the authorization server.
+This manager will produce access tokens based on JSON Web Token (JWT).
+The tokens do not need a database and are digitally signed by the authorization server.
 They can also be encrypted in order to protect confidential information leak.
+The encryption is performed using the encryption key of the resource server or, if not available, of the authorization server.
 
 Please read [this page](component/jwt_access_token_manager.md) to know how to create and use this component.
 
 # Token Types
 
-When calling a protected resource, your client will have to demonstrate it is in possesion of an access token.
+When calling a protected resource, your client will have to demonstrate it is in possession of an access token.
 To do so, each issued access token has a token type. The demonstration made by the client will vary depending on that type.
 
 This library supports this token type and is able to support any kind of token type through a `Token Type Manager`.
@@ -56,7 +60,7 @@ This manager will handle token types enabled in your authorization server.
 
 Please read [this page](component/token_type_manager.md) to know how to create and use this component.
 
-# User Manager
+# Users And User Manager
 
 Please read [this page](component/user_manager.md) to know how to create and use this component.
 

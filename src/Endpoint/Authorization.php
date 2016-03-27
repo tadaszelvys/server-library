@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\EndUser\EndUserInterface;
+use OAuth2\User\UserInterface;
 
 final class Authorization
 {
@@ -28,9 +28,9 @@ final class Authorization
     private $client;
 
     /**
-     * @var \OAuth2\EndUser\EndUserInterface
+     * @var \OAuth2\User\UserInterface
      */
-    private $end_user;
+    private $user;
 
     /**
      * @var array
@@ -84,19 +84,19 @@ final class Authorization
      * Authorization constructor.
      *
      * @param array                            $query_params
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
+     * @param \OAuth2\User\UserInterface $user
      * @param bool                             $is_authorized
      * @param \OAuth2\Client\ClientInterface   $client
      * @param array                            $scopes
      */
     public function __construct(array $query_params,
-                                EndUserInterface $end_user,
+                                UserInterface $user,
                                 $is_authorized,
                                 ClientInterface $client,
                                 array $scopes = []
     ) {
         $this->query_params = $query_params;
-        $this->end_user = $end_user;
+        $this->user = $user;
         $this->client = $client;
         $this->is_authorized = $is_authorized;
         $this->scopes = $scopes;
@@ -106,11 +106,11 @@ final class Authorization
     }
 
     /**
-     * @return \OAuth2\EndUser\EndUserInterface
+     * @return \OAuth2\User\UserInterface
      */
-    public function getEndUser()
+    public function getUser()
     {
-        return $this->end_user;
+        return $this->user;
     }
 
     /**

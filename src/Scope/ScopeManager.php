@@ -66,6 +66,14 @@ class ScopeManager implements ScopeManagerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getSupportedScopePolicies()
+    {
+        return array_keys($this->scope_policies);
+    }
+
+    /**
      * @param string $scope_policy_name
      *
      * @return string

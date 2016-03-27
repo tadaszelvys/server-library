@@ -9,15 +9,15 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\EndUser;
+namespace OAuth2\OpenIDConnect;
 
-use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use OAuth2\User\UserInterface as BaseUserInterface;
 use OAuth2\Token\AccessTokenInterface;
 
 /**
  * This interface must be implemented by end-user classes.
  */
-interface EndUserInterface extends ResourceOwnerInterface
+interface UserInterface extends BaseUserInterface
 {
     /**
      * @param \OAuth2\Token\AccessTokenInterface $access_token
@@ -122,7 +122,7 @@ interface EndUserInterface extends ResourceOwnerInterface
     public function isPhoneNumberVerified();
 
     /**
-     * @return \OAuth2\EndUser\AddressInterface|null
+     * @return \OAuth2\OpenIdConnect\AddressInterface|null
      */
     public function getAddress();
 

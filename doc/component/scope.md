@@ -4,13 +4,14 @@ Scope Manager And Scopes
 This library allows access tokens to support scopes.
 These scopes are handled by a dedicated component: the Scope Manager.
 
-# Basic Usage
-
+The scope manager must implement `OAuth2\Scope\ScopeManagerInterface`.
 This library provides a simple scope manager class `OAuth2\Scope\ScopeManager`:
 It is able to manage multiple scopes and verify client requests.
+If this scope manager does not fit on your needs, you can create your own or extend it.
+
+# Basic Usage
 
 Let say you want to support the following scopes: `read`, `read_write`, `delete`.
-
 
 ```php
 use OAuth2\Scope\ScopeManager;
@@ -27,9 +28,9 @@ You can now inject `$scope_manager` to other components that require the scope m
 
 # Scope Policies
 
-According to the [RFC6749, section 3.3,](https://tools.ietf.org/html/rfc6749#section-3.3) ,if the client omits the scope parameter when requesting authorization, the authorization server must either process the request using a pre-defined default value or fail the request indicating an invalid scope.
+According to the [RFC6749, section 3.3,](https://tools.ietf.org/html/rfc6749#section-3.3), if the client omits the scope parameter when requesting authorization, the authorization server must either process the request using a pre-defined default value or fail the request indicating an invalid scope.
 
-To comply with the specifitation, the scope managr is able to support scope policies.
+To comply with the specification, the scope manager is able to support scope policies.
 
 ## No Scope Policy
 
@@ -73,46 +74,91 @@ $scope_manager->addScopePolicy($error_scope_policy, true);
 
 If you want to set your own policy, just create a class that implements `OAuth2\Scope\ScopePolicyInterface`.
 
-# Scope and Scope Policy Per Client
+# Per Client Rules
 
-The scope manager is able to support scope and scope policy per client.
+## Scope Policy Per Client
 
-To enable this feature, your client class must implement the interface `OAuth2\Client\ScopeExtensionInterface`.
+The scope manager is able to support scope policy per client.
 
-In the following example, clients based on the class `Acme\PublicClient` have scope policy set to `default` and scope `read` is set by default if no scope is requested.
-Available scopes are not changed.
+To enable this feature, your client class must implement the interface `OAuth2\Client\Extension\ScopePolicyExtensionInterface`.
+
+In the following example, clients based on the class `Acme\PublicClient` have scope policy set to `default`.
 
 ```php
 <?php
 namespace Acme;
 
 use OAuth2\Client\PublicClient as Base;
-use OAuth2\Client\ScopeExtensionInterface;
-use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
 
-class PublicClient extends Base implements ScopeExtensionInterface
+class PublicClient extends Base implements ScopePolicyExtensionInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getScopePolicy()
+    {
+        // If you return nothing, it means that the scope policy is unchanged. The default policy will be used.
+        // Else, the specified policy will be applied.
+        return 'default';
+    }
+}
+```
+
+## Available Scopes Per Client
+
+The scope manager is able to modify scope available per client.
+
+To enable this feature, your client class must implement the interface `OAuth2\Client\Extension\AvailableScopeExtensionInterface`.
+
+In the following example, clients based on the class `Acme\PublicClient` have only scope `['read', 'read_write']`. The scope `delete` is not available.
+
+```php
+<?php
+namespace Acme;
+
+use OAuth2\Client\PublicClient as Base;
+use OAuth2\Client\Extension\AvailableScopeExtensionInterface;
+
+class PublicClient extends Base implements AvailableScopeExtensionInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getAvailableScopes()
     {
-        // We return nothing (or null), it means that the available scopes are the same as those set in the scope manager.
-        // The same goes for other methods: if nothing is returned then the scope manager parameter is used.
-        // If you want to limit or add scope for this client, you must return a list of the scopes
-        // e.g.: ['read', 'delete', 'undelete'] means the scope 'read_write' is unavailable but the scope 'undelete' is added
-        // You should avoid to add new scope using this method, but you are free to limit them
-        // e.g. confidential client have full access on the scopes, but public client only have the 'read' and 'read_write' scopes
+        return ['read', 'read_write'];
     }
     
+}
+```
+
+Please note that you can add new scope using this extension. For example, if you return `['delete', 'undelete']`, the scope `undelete` is created.
+We do not recommend to create new scopes using this extension, but limit the available scopes. 
+
+## Default Scopes Per Client
+
+The scope manager is able to support default scope per client. This feature is only useful if the scope policy applied for the client is `default`.
+
+To enable this feature, your client class must implement the interface `OAuth2\Client\Extension\DefaultScopeExtensionInterface`.
+
+In the following example, clients based on the class `Acme\PublicClient` have default scope set to `['read']`.
+
+```php
+<?php
+namespace Acme;
+
+use OAuth2\Client\PublicClient as Base;
+use OAuth2\Client\Extension\DefaultScopeExtensionInterface;
+
+class PublicClient extends Base implements DefaultScopeExtensionInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getScopePolicy()
+    public function getDefaultScope()
     {
-        // If you return nothin, it means that the scope policy is unchanged. The default policy will be used.
-        // Else, the specified policy will be applied.
-        return 'default';
+        return ['read'];
     }
 }
 ```
@@ -127,4 +173,3 @@ use OAuth2\Scope\ScopeManager;
 
 $scope_manager = new ScopeManager($exception_manager);
 ```
->>>>>>> origin/master

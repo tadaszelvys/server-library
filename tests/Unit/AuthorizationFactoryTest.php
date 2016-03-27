@@ -31,7 +31,7 @@ class AuthorizationFactoryTest extends Base
         $request = $this->createRequest('/?'.http_build_query($params));
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
         true
         );
 
@@ -62,7 +62,7 @@ class AuthorizationFactoryTest extends Base
         $request = $this->createRequest('/?'.http_build_query($params));
         $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
     }
@@ -84,7 +84,7 @@ class AuthorizationFactoryTest extends Base
         $request = $this->createRequest('/?'.http_build_query($params));
         $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
     }

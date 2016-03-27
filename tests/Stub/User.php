@@ -14,12 +14,17 @@ namespace OAuth2\Test\Stub;
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ConfidentialClientInterface;
-use OAuth2\EndUser\AddressInterface;
-use OAuth2\EndUser\EndUser as BaseEndUser;
-use OAuth2\EndUser\IssueRefreshTokenExtensionInterface;
+use OAuth2\OpenIDConnect\AddressInterface;
+use OAuth2\OpenIDConnect\UserInterface;
+use OAuth2\ResourceOwner\ResourceOwnerTrait;
+use OAuth2\User\IssueRefreshTokenExtensionInterface;
+use OAuth2\User\UserTrait;
 
-class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
+class User implements UserInterface, IssueRefreshTokenExtensionInterface
 {
+    use ResourceOwnerTrait;
+    use UserTrait;
+
     /**
      * @var string
      */
@@ -31,12 +36,14 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
     private $password;
 
     /**
+     * User constructor.
+     *
      * @param string $username
      * @param string $password
      */
     public function __construct($username, $password)
     {
-        parent::__construct();
+        $this->setType('user');
         $this->setPublicId($username);
         $this->username = $username;
         $this->password = $password;
@@ -232,7 +239,7 @@ class EndUser extends BaseEndUser implements IssueRefreshTokenExtensionInterface
     }
 
     /**
-     * @param \OAuth2\EndUser\AddressInterface $address
+     * @param \OAuth2\OpenIDConnect\AddressInterface $address
      */
     public function setAddress(AddressInterface $address)
     {

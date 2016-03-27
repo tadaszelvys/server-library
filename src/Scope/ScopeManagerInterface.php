@@ -16,6 +16,11 @@ use OAuth2\Client\ClientInterface;
 interface ScopeManagerInterface
 {
     /**
+     * @return string[]
+     */
+    public function getSupportedScopePolicies();
+    
+    /**
      * @param \OAuth2\Scope\ScopePolicyInterface $scope_policy
      * @param bool                               $is_default
      */
@@ -24,11 +29,11 @@ interface ScopeManagerInterface
     /**
      * This function returns the available scopes. If a valid ClientInterface object is set as parameter, the function will return available scopes for the client.
      *
-     * @param \OAuth2\Client\ClientInterface           $client  A client
+     * @param \OAuth2\Client\ClientInterface $client A client
      *
      * @return string[] Return an array scope
      */
-    public function getAvailableScopesForClient(ClientInterface $clientl);
+    public function getAvailableScopesForClient(ClientInterface $client);
 
     /**
      * This function returns the scope policy. If a valid ClientInterface object is set as parameter, the function will return scope policy for the client.

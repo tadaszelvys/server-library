@@ -64,4 +64,4 @@ $jwt_loader->enableEncryptionSupport(
     ['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512']           // Content encryption algorithms
 ```
 
-**Your JWTLoader and JWTCreator should use the same algorithms.**
+**Your JWTLoader and JWTCreator should use the same algorithms. You should also use these services with all components that use them.**

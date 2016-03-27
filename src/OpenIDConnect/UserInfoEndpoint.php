@@ -15,14 +15,14 @@ use Assert\Assertion;
 use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
-use OAuth2\Behaviour\HasEndUserManager;
+use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Client\EncryptionCapabilitiesInterface;
-use OAuth2\EndUser\EndUserManagerInterface;
+use OAuth2\User\UserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
@@ -35,7 +35,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     use HasExceptionManager;
     use HasTokenTypeManager;
     use HasAccessTokenManager;
-    use HasEndUserManager;
+    use HasUserManager;
     use HasClientManagerSupervisor;
     use HasJWTCreator;
 
@@ -64,19 +64,19 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      *
      * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
-     * @param \OAuth2\EndUser\EndUserManagerInterface         $end_user_manager
+     * @param \OAuth2\User\UserManagerInterface         $user_manager
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
                                 AccessTokenManagerInterface $access_token_manager,
-                                EndUserManagerInterface $end_user_manager,
+                                UserManagerInterface $user_manager,
                                 ClientManagerSupervisorInterface $client_manager_supervisor,
                                 ExceptionManagerInterface $exception_manager
     ) {
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
-        $this->setEndUserManager($end_user_manager);
+        $this->setUserManager($user_manager);
         $this->setClientManagerSupervisor($client_manager_supervisor);
         $this->setExceptionManager($exception_manager);
     }
@@ -184,8 +184,8 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
             return;
         }
 
-        $end_user = $this->getEndUserManager()->getEndUser($access_token->getResourceOwnerPublicId());
-        if (null === $end_user) {
+        $user = $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId());
+        if (null === $user) {
             $exception = $this->getExceptionManager()->getAuthenticateException(
                 ExceptionManagerInterface::INVALID_TOKEN,
                 'Unable to find the resource owner.',
@@ -208,7 +208,11 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
             return;
         }
 
-        $this->populateResponse($response, $end_user->getUserInfo($access_token), $client);
+        if ($user instanceof UserInterface) {
+            $this->populateResponse($response, $user->getUserInfo($access_token), $client);
+            return;
+        }
+        $this->populateResponse($response, [], $client);
     }
 
     /**
@@ -247,11 +251,10 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
                     'iss' => $this->issuer,
                     'iat' => time(),
                     'nbf' => time(),
-                    'alg' => $client->getSupportedKeyEncryptionAlgorithms()[0],
-                    'enc' => $client->getSupportedContentEncryptionAlgorithms()[0],
+                    'alg' => $client->getKeyEncryptionAlgorithm(),
+                    'enc' => $client->getContentEncryptionAlgorithm(),
                 ],
-                $client->getEncryptionPublicKeySet()[0],
-                $this->key_encryption_key
+                $client->getEncryptionPublicKey()
             );
         }
     }

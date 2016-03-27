@@ -9,23 +9,23 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\EndUser;
+namespace OAuth2\User;
 
 use OAuth2\ResourceOwner\ResourceOwner;
 
 /**
  * This interface must be implemented by end-user classes.
  */
-class EndUser extends ResourceOwner implements EndUserInterface
+class User extends ResourceOwner implements UserInterface
 {
-    use EndUserTrait;
+    use UserTrait;
 
     /**
-     * EndUser constructor.
+     * User constructor.
      */
     public function __construct()
     {
         parent::__construct();
-        $this->setType('end_user');
+        $this->setType('user');
     }
 }

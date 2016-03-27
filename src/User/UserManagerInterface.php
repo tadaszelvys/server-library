@@ -9,26 +9,26 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\EndUser;
+namespace OAuth2\User;
 
-interface EndUserManagerInterface
+interface UserManagerInterface
 {
     /**
      * Check if the end-user password is valid.
      *
-     * @param \OAuth2\EndUser\EndUserInterface $end_user The end-user
+     * @param \OAuth2\User\UserInterface $user The end-user
      * @param string                           $password Password
      *
      * @return bool
      */
-    public function checkEndUserPasswordCredentials(EndUserInterface $end_user, $password);
+    public function checkUserPasswordCredentials(UserInterface $user, $password);
 
     /**
      * Get the end-user with the specified username.
      *
      * @param string $username Username
      *
-     * @return \OAuth2\EndUser\EndUserInterface|null
+     * @return \OAuth2\User\UserInterface|null
      */
-    public function getEndUser($username);
+    public function getUser($username);
 }

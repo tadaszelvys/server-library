@@ -12,7 +12,7 @@
 namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\EndUser\EndUserInterface;
+use OAuth2\User\UserInterface;
 
 interface AuthCodeManagerInterface
 {
@@ -24,7 +24,7 @@ interface AuthCodeManagerInterface
      * bail out of the script and provide a descriptive fail message.
      *
      * @param \OAuth2\Client\ClientInterface   $client            The client associated with this authorization code.
-     * @param \OAuth2\EndUser\EndUserInterface $end_user          End user to associate with this authorization code.
+     * @param \OAuth2\User\UserInterface $user          End user to associate with this authorization code.
      * @param array                            $query_params      The authorization request query parameters.
      * @param string                           $redirectUri       Redirect URI to be stored.
      * @param string[]                         $scope             (optional) Scopes to be stored.
@@ -32,7 +32,7 @@ interface AuthCodeManagerInterface
      *
      * @return null|AuthCodeInterface
      */
-    public function createAuthCode(ClientInterface $client, EndUserInterface $end_user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false);
+    public function createAuthCode(ClientInterface $client, UserInterface $user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false);
 
     /**
      * Retrieve the stored data for the given authorization code.

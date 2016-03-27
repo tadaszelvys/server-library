@@ -80,7 +80,7 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
 
         $id_token = $this->getIdTokenManager()->createIdToken(
             $authorization->getClient(),
-            $authorization->getEndUser(),
+            $authorization->getUser(),
             ['nonce' => $params['nonce']],
             array_key_exists('access_token', $response_parameters) ? $response_parameters['access_token'] : null,
             array_key_exists('code', $response_parameters) ? $response_parameters['code'] : null
