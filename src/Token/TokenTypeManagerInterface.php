@@ -47,10 +47,12 @@ interface TokenTypeManagerInterface
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param array                                    $additional_credential_values
+     * @param \OAuth2\Token\TokenTypeInterface|null    $type
      *
-     * @return array|null
+     * @return string|null
      */
-    public function findToken(ServerRequestInterface $request);
+    public function findToken(ServerRequestInterface $request, array &$additional_credential_values, TokenTypeInterface &$type);
 
     /**
      * @return array

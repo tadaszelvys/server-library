@@ -50,11 +50,6 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     private $signature_key = null;
 
     /**
-     * @var \Jose\Object\JWKInterface|null
-     */
-    private $key_encryption_key = null;
-
-    /**
      * @var string|null
      */
     private $signature_algorithm = null;
@@ -86,13 +81,11 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      * @param string                         $issuer
      * @param string                         $signature_algorithm
      * @param \Jose\Object\JWKInterface      $signature_key
-     * @param \Jose\Object\JWKInterface|null $key_encryption_key
      */
-    public function enableSignedAndEncryptedResponsesSupport(JWTCreator $jwt_creator,
-                                                             $issuer,
-                                                             $signature_algorithm,
-                                                             JWKInterface $signature_key,
-                                                             JWKInterface $key_encryption_key = null
+    public function enableSignedResponsesSupport(JWTCreator $jwt_creator,
+                                                 $issuer,
+                                                 $signature_algorithm,
+                                                 JWKInterface $signature_key
     ) {
         Assertion::string($issuer);
         Assertion::inArray($signature_algorithm, $jwt_creator->getSignatureAlgorithms());
@@ -101,15 +94,14 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
         $this->issuer = $issuer;
         $this->signature_key = $signature_key;
         $this->signature_algorithm = $signature_algorithm;
-        $this->key_encryption_key = $key_encryption_key;
     }
 
     /**
      * @return bool
      */
-    public function isSignedAndEncryptedResponsesSupportEnabled()
+    public function isSignedResponsesSupportEnabled()
     {
-        return null !== $this->getJWTCreator() && null !== $this->signature_algorithm  && null !== $this->signature_key;
+        return null !== $this->getJWTCreator();
     }
 
     /**
@@ -148,7 +140,8 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
             return;
         }
 
-        $token = $this->getTokenTypeManager()->findToken($request);
+        $additional_credential_values = [];
+        $token = $this->getTokenTypeManager()->findToken($request, $additional_credential_values, $type);
 
         if (null === $token) {
             $exception = $this->getExceptionManager()->getAuthenticateException(
@@ -161,8 +154,8 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
             return;
         }
 
-        $access_token = $this->getAccessTokenManager()->getAccessToken($token['token']);
-        if (null === $access_token || false === $token['type']->isTokenRequestValid($access_token, $request, $token['additional_credential_values'])) {
+        $access_token = $this->getAccessTokenManager()->getAccessToken($token);
+        if (null === $access_token || false === $type->isTokenRequestValid($access_token, $request, $additional_credential_values)) {
             $exception = $this->getExceptionManager()->getAuthenticateException(
                 ExceptionManagerInterface::INVALID_TOKEN,
                 'Access token does not exist or is not valid.',
@@ -232,7 +225,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
 
     private function signAndEncrypt(&$data, ClientInterface $client)
     {
-        if (true === $this->isSignedAndEncryptedResponsesSupportEnabled()) {
+        if (true === $this->isSignedResponsesSupportEnabled()) {
             $data = $this->getJWTCreator()->sign(
                 $data,
                 [

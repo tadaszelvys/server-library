@@ -193,7 +193,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager()
             );
 
-            $this->user_info_endpoint->enableSignedAndEncryptedResponsesSupport(
+            $this->user_info_endpoint->enableSignedResponsesSupport(
                 $this->getJWTCreator(),
                 $this->getIssuer(),
                 'HS512',

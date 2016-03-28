@@ -66,6 +66,14 @@ class JWTAccessTokenManager extends Base
         $efgh->setToken('EFGH');
         $efgh->setTokenType('Bearer');
 
+        $no_user_info = new AccessToken();
+        $no_user_info->setExpiresAt(time() + 3600);
+        $no_user_info->setResourceOwnerPublicId('user1');
+        $no_user_info->setScope(['scope1']);
+        $no_user_info->setClientPublicId('foo');
+        $no_user_info->setToken('NO_USER_INFO');
+        $no_user_info->setTokenType('Bearer');
+
         $user_info = new AccessToken();
         $user_info->setExpiresAt(time() + 3600);
         $user_info->setResourceOwnerPublicId('user1');
@@ -74,9 +82,19 @@ class JWTAccessTokenManager extends Base
         $user_info->setToken('USER_INFO');
         $user_info->setTokenType('Bearer');
 
+        $user_info2 = new AccessToken();
+        $user_info2->setExpiresAt(time() + 3600);
+        $user_info2->setResourceOwnerPublicId('user1');
+        $user_info2->setScope(['openid', 'profile', 'email', 'address', 'phone']);
+        $user_info2->setClientPublicId('jwt1');
+        $user_info2->setToken('USER_INFO2');
+        $user_info2->setTokenType('Bearer');
+
         $this->access_tokens[$abcd->getToken()] = $abcd;
         $this->access_tokens[$efgh->getToken()] = $efgh;
         $this->access_tokens[$user_info->getToken()] = $user_info;
+        $this->access_tokens[$user_info2->getToken()] = $user_info2;
+        $this->access_tokens[$no_user_info->getToken()] = $no_user_info;
     }
 
     /**

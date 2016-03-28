@@ -423,6 +423,57 @@ class OpenIDConnectTest extends Base
         $this->assertInstanceOf(Metadata::class, $metadata);
     }
 
+    public function testUserInfoUsingUnsecuredRequest()
+    {
+        $request = $this->createRequest('/', 'GET', [], [], ['authorization' => 'Bearer USER_INFO']);
+
+        $response = new Response();
+        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('{"error":"invalid_request","error_description":"Request must be secured","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+    }
+
+    public function testUserInfoRequestWithoutAccessToken()
+    {
+        $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer']);
+
+        $response = new Response();
+        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals(401, $response->getStatusCode());
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals(['Bearer', 'MAC'], $response->getHeader('WWW-Authenticate'));
+    }
+
+    public function testUserInfoRequestWithInvalidAccessToken()
+    {
+        $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer FOOBAR']);
+
+        $response = new Response();
+        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals(401, $response->getStatusCode());
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals(['Bearer', 'MAC'], $response->getHeader('WWW-Authenticate'));
+    }
+
+    public function testUserInfoRequestWithValidAccessTokenButNoOpenIDScope()
+    {
+        $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer NO_USER_INFO']);
+
+        $response = new Response();
+        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals(401, $response->getStatusCode());
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals(['Bearer', 'MAC'], $response->getHeader('WWW-Authenticate'));
+    }
+
     public function testUserInfoSuccess()
     {
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer USER_INFO']);
@@ -437,5 +488,32 @@ class OpenIDConnectTest extends Base
         $expected_claims = json_decode('{"sub":"user1","birthdate":"1950-01-01","email":"root@localhost.com","email_verified":false,"address":{"street_address":"5 rue Sainte Anne","locality":"Paris","region":"\u00cele de France","postal_code":"75001","country":"France"}}', true);
 
         $this->assertEquals($expected_claims, $jwt->getClaims());
+    }
+
+    public function testUserInfoSuccessAndEncrypted()
+    {
+        $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer USER_INFO2']);
+
+        $response = new Response();
+        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/jwt', $response->getHeader('Content-Type')[0]);
+
+        $jwt = Loader::load($response->getBody()->getContents());
+        $this->assertInstanceOf(JWEInterface::class, $jwt);
+        $decrypter = DecrypterFactory::createDecrypter(['A256KW', 'A256CBC-HS512']);
+        $decrypter->decryptUsingKey($jwt, new JWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]));
+        $id_token = Loader::load($jwt->getPayload());
+        $this->assertInstanceOf(JWSInterface::class, $id_token);
+
+        $expected_claims = json_decode('{"sub":"user1","birthdate":"1950-01-01","email":"root@localhost.com","email_verified":false,"address":{"street_address":"5 rue Sainte Anne","locality":"Paris","region":"\u00cele de France","postal_code":"75001","country":"France"}}', true);
+
+        $this->assertEquals($expected_claims, $id_token->getClaims());
     }
 }
