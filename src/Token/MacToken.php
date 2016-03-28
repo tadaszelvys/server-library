@@ -12,16 +12,11 @@
 namespace OAuth2\Token;
 
 use Assert\Assertion;
+use Base64Url\Base64Url;
 use Psr\Http\Message\ServerRequestInterface;
-use Security\DefuseGenerator;
 
 class MacToken implements TokenTypeInterface
 {
-    /**
-     * @var string
-     */
-    private $mac_key_charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/';
-
     /**
      * @var int
      */
@@ -76,9 +71,8 @@ class MacToken implements TokenTypeInterface
     private function generateMacKey()
     {
         $length = $this->getMacKeyLength();
-        $charset = $this->getMacKeyCharset();
 
-        return DefuseGenerator::getRandomString($length, $charset);
+        return Base64Url::encode(random_bytes($length));
     }
 
     /**
@@ -109,23 +103,6 @@ class MacToken implements TokenTypeInterface
         srand();
 
         return rand($min_length, $max_length);
-    }
-
-    /**
-     * @return string
-     */
-    public function getMacKeyCharset()
-    {
-        return $this->mac_key_charset;
-    }
-
-    /**
-     * @param string $mac_key_charset
-     */
-    public function setMacKeyCharset($mac_key_charset)
-    {
-        Assertion::string($mac_key_charset);
-        $this->$mac_key_charset = $mac_key_charset;
     }
 
     /**

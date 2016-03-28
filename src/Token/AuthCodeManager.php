@@ -12,10 +12,10 @@
 namespace OAuth2\Token;
 
 use Assert\Assertion;
+use Base64Url\Base64Url;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\TokenLifetimeExtensionInterface;
 use OAuth2\User\UserInterface;
-use Security\DefuseGenerator;
 
 abstract class AuthCodeManager implements AuthCodeManagerInterface
 {
@@ -23,11 +23,6 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
      * @var \OAuth2\Token\TokenUpdaterInterface[]
      */
     private $token_updaters = [];
-
-    /**
-     * @var string
-     */
-    private $authorization_code_charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/';
 
     /**
      * @var int
@@ -94,9 +89,8 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     private function generateAuthorizationCode()
     {
         $length = $this->getAuthCodeLength();
-        $charset = $this->getAuthorizationCodeCharset();
 
-        return DefuseGenerator::getRandomString($length, $charset);
+        return Base64Url::encode(random_bytes($length));
     }
 
     /**
@@ -134,23 +128,6 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
         foreach ($this->token_updaters as $token_updater) {
             $token_updater->updateToken($auth_code);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getAuthorizationCodeCharset()
-    {
-        return $this->authorization_code_charset;
-    }
-
-    /**
-     * @param string $authorization_code_charset
-     */
-    public function setAuthorizationCodeCharset($authorization_code_charset)
-    {
-        Assertion::string($authorization_code_charset);
-        $this->authorization_code_charset = $authorization_code_charset;
     }
 
     /**

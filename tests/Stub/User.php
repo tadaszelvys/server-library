@@ -18,7 +18,7 @@ use OAuth2\OpenIDConnect\AddressInterface;
 use OAuth2\OpenIDConnect\UserInterface;
 use OAuth2\ResourceOwner\ResourceOwnerTrait;
 use OAuth2\User\IssueRefreshTokenExtensionInterface;
-use OAuth2\User\UserTrait;
+use OAuth2\OpenIDConnect\UserTrait;
 
 class User implements UserInterface, IssueRefreshTokenExtensionInterface
 {

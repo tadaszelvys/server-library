@@ -821,7 +821,6 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->mac_token_type) {
             $this->mac_token_type = new MacToken();
 
-            $this->mac_token_type->setMacKeyCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             $this->mac_token_type->setMacKeyMinLength(10);
             $this->mac_token_type->setMacKeyMaxLength(20);
             $this->mac_token_type->setMacAlgorithm('hmac-sha-256');
@@ -866,7 +865,6 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->refresh_token_manager) {
             $this->refresh_token_manager = new RefreshTokenManager();
 
-            $this->refresh_token_manager->setRefreshTokenCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             $this->refresh_token_manager->setRefreshTokenMinLength(10);
             $this->refresh_token_manager->setRefreshTokenMaxLength(20);
             $this->refresh_token_manager->setRefreshTokenLifetime(36000);
@@ -888,7 +886,6 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->auth_code_manager) {
             $this->auth_code_manager = new AuthCodeManager();
 
-            $this->auth_code_manager->setAuthorizationCodeCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             $this->auth_code_manager->setAuthorizationCodeMinLength(10);
             $this->auth_code_manager->setAuthorizationCodeMaxLength(20);
             $this->auth_code_manager->setAuthorizationCodeLifetime(15);

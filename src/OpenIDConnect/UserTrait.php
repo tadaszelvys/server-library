@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\User;
+namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Token\AccessTokenInterface;
 
@@ -111,7 +111,7 @@ trait UserTrait
     protected $phone_number_verified = null;
 
     /**
-     * @var \OAuth2\User\AddressInterface|null
+     * @var \OAuth2\OpenIDConnect\AddressInterface|null
      */
     protected $address = null;
 

@@ -19,5 +19,4 @@ use OAuth2\ResourceOwner\ResourceOwnerTrait;
 class User implements UserInterface
 {
     use ResourceOwnerTrait;
-    use UserTrait;
 }
