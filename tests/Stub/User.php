@@ -43,7 +43,6 @@ class User implements UserInterface, IssueRefreshTokenExtensionInterface
      */
     public function __construct($username, $password)
     {
-        $this->setType('user');
         $this->setPublicId($username);
         $this->username = $username;
         $this->password = $password;

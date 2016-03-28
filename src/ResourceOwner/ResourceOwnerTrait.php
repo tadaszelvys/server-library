@@ -11,24 +11,12 @@
 
 namespace OAuth2\ResourceOwner;
 
-use Base64Url\Base64Url;
-
 trait ResourceOwnerTrait
 {
     /**
      * @var string
      */
     protected $public_id;
-
-    /**
-     * @var string
-     */
-    protected $type;
-
-    public function __construct()
-    {
-        $this->setPublicId(trim(chunk_split(Base64Url::encode(uniqid(mt_rand(), true)), 16, '-'), '-'));
-    }
 
     /**
      * {@inheritdoc}
@@ -44,21 +32,5 @@ trait ResourceOwnerTrait
     public function setPublicId($public_id)
     {
         $this->public_id = $public_id;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
     }
 }

@@ -18,7 +18,18 @@ $client_manager_supervisor->addClientManager($my_client_manager);
 
 This library provides classes to handle the following client manager:
 
-* Public Clients
-* Password Clients
-* JWT Clients
-* Unregistered Clients
+# Public Clients
+
+Please read [this page](component/client/public.md) to know how to create and use public clients.
+
+# Password Clients
+
+Please read [this page](component/client/password.md) to know how to create and use password clients.
+
+# JWT Clients
+
+Please read [this page](component/client/jwt.md) to know how to create and use JWT clients.
+
+# Unregistered Clients
+
+Please read [this page](component/client/unregistered.md) to know how to create and use unregistered clients.

@@ -38,7 +38,6 @@ class ObjectsTest extends Base
         $client->addRedirectUri('https://baz.com');
         $client->removeRedirectUri('https://baz.com');
 
-        $this->assertEquals('public_client', $client->getType());
         $this->assertEquals(['foo', 'bar'], $client->getAllowedGrantTypes());
         $this->assertEquals(['https://foo.com'], $client->getRedirectUris());
         $this->assertTrue($client->hasRedirectUri('https://foo.com'));
@@ -75,7 +74,6 @@ class ObjectsTest extends Base
         $user = new User('user1', 'pass');
         $user->setLastLoginAt(time() - 1000);
 
-        $this->assertEquals('user', $user->getType());
         $this->assertTrue($user->getLastLoginAt() <= time() - 1000);
         $this->assertEquals('user1', $user->getUsername());
     }
@@ -160,7 +158,6 @@ class ObjectsTest extends Base
     {
         $rs = new ResourceServer();
         $rs->setPublicId('bar');
-        $rs->setType(['plic']);
         $rs->setAllowedIpAddresses(['127.0.0.1']);
 
         $this->assertFalse($rs->isAllowedGrantType('foo'));
@@ -170,7 +167,6 @@ class ObjectsTest extends Base
         $this->assertEquals([], $rs->getAllowedGrantTypes());
         $this->assertEquals('bar', $rs->getPublicId());
         $this->assertNull($rs->getServerName());
-        $this->assertEquals('resource_server', $rs->getType());
     }
 
     public function testAuthenticateException()

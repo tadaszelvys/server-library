@@ -63,14 +63,6 @@ trait ResourceServerTrait
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
-        return 'resource_server';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getPublicKeyEncryptionKey()
     {
         return $this->public_key_encryption_keyset;

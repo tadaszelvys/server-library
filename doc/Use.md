@@ -58,9 +58,9 @@ This library supports this token type and is able to support any kind of token t
 
 This manager will handle token types enabled in your authorization server.
 
-Please read [this page](component/token_type_manager.md) to know how to create and use this component.
+Please read [this page](component/token_type/manager.md) to know how to create and use this component.
 
-# Users And User Manager
+# Users
 
 Please read [this page](component/user_manager.md) to know how to create and use this component.
 
@@ -71,15 +71,7 @@ Please read [this page](component/user_manager.md) to know how to create and use
 The role of the client manager supervisor is to manager all client managers you need.
 It will handle requests and try to identify which client is sending requests against the authorization server.
 
-Please read [this page](component/client_manager_supervisor.md) to know how to create and use this component.
-
-## Public Client Manager
-
-## Password Client Manager
-
-## JWT Client Manager
-
-## Unregistered Client Manager
+Please read [this page](component/client/manager_supervisor.md) to know how to create and use this component.
 
 # Resource Servers
 
@@ -87,34 +79,8 @@ Resource servers are not yet fully supported.
 
 # Endpoints
 
-## Authorization Endpoint
-
-## Token Endpoint
-
-## Token Revocation Endpoint
-
-## Token Introspection Endpoint
+Please read [this page](component/endpoint/endpoints.md) to know how to create and use the endpoints provided by this library.
 
 # Grant types
 
-## Authorization Code Grant Type
-
-### Proof Key for Code Exchange by OAuth Public Clients
-
-#### Plain
-
-#### S256
-
-## Implicit Code Grant Type
-
-## Resource Owner Password Credentials Code Grant Type
-
-## Client Credentials Code Grant Type
-
-## Refresh Token Code Grant Type
-
-## JWT Bearer Token Code Grant Type
-
-# OpenID Connect
-
-
+Please read [this page](component/grant/types.md) to know how to create and use the grant types provided by this library.

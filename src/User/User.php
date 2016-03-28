@@ -11,21 +11,13 @@
 
 namespace OAuth2\User;
 
-use OAuth2\ResourceOwner\ResourceOwner;
+use OAuth2\ResourceOwner\ResourceOwnerTrait;
 
 /**
  * This interface must be implemented by end-user classes.
  */
-class User extends ResourceOwner implements UserInterface
+class User implements UserInterface
 {
+    use ResourceOwnerTrait;
     use UserTrait;
-
-    /**
-     * User constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setType('user');
-    }
 }

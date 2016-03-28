@@ -21,11 +21,4 @@ interface ResourceOwnerInterface
      * @see http://tools.ietf.org/html/rfc6749#section-2.2
      */
     public function getPublicId();
-
-    /**
-     * Get resource owner type. The type is a string that represents the type of resource owner (end-user, public client, password client, unregistered client...).
-     *
-     * @return string Type of the resource owner
-     */
-    public function getType();
 }

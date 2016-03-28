@@ -20,7 +20,7 @@ You must add at least one token type
 The `Bearer Token Type` (see [RFC6750](https://tools.ietf.org/html/rfc6750)) is most common token type.
 It is not secured and can be used by an other application when stolen.
 
-Please read [this page](bearer_token_type.md) to know how to create and use this component.
+Please read [this page](bearer.md) to know how to create and use this component.
 
 ##  MAC Token Type
 
@@ -29,7 +29,7 @@ It is more secured than the previous token type as each request is signed by the
 
 Please note that this specification is not yet stable. This library provides a MAC Token Type support, but it is limited to the [revision 2 of the specification](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-02). No update will be made until this specification has not reach maturity.
 
-Please read [this page](mac_token_type.md) to know how to create and use this component.
+Please read [this page](mac.md) to know how to create and use this component.
 
 ##  POP Token Type
 

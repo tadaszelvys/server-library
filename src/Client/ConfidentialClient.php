@@ -11,7 +11,7 @@
 
 namespace OAuth2\Client;
 
-use Assert\Assertion;
+use OAuth2\ResourceOwner\ResourceOwnerTrait;
 
 /**
  * This interface is for confidential clients.
@@ -21,31 +21,8 @@ use Assert\Assertion;
  */
 class ConfidentialClient extends RegisteredClient implements ConfidentialClientInterface
 {
-    /**
-     * @var int
-     */
-    private $credentials_expire_at = 0;
-
-    /**
-     * @param int $timestamp
-     */
-    public function setCredentialsExpireAt($timestamp)
-    {
-        Assertion::integer($timestamp, 'The timestamp must be an integer.');
-        Assertion::greaterOrEqualThan($timestamp, 0, 'The timestamp must be a positive value.');
-
-        $this->credentials_expire_at = $timestamp;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function areCredentialsExpired()
-    {
-        if (0 === $this->credentials_expire_at) {
-            return false;
-        }
-
-        return time() > $this->credentials_expire_at;
-    }
+    use ResourceOwnerTrait;
+    use ClientTrait;
+    use RegisteredClientTrait;
+    use ConfidentialClientTrait;
 }

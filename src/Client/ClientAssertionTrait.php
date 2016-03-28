@@ -32,22 +32,22 @@ trait ClientAssertionTrait
     /**
      * @var bool
      */
-    private $encryption_required = false;
+    protected $encryption_required = false;
 
     /**
      * @var \Jose\Object\JWKSetInterface|null
      */
-    private $key_encryption_key_set = null;
+    protected $key_encryption_key_set = null;
 
     /**
      * @var string[]
      */
-    private $allowed_key_encryption_algorithms = [];
+    protected $allowed_key_encryption_algorithms = [];
 
     /**
      * @var string[]
      */
-    private $allowed_content_encryption_algorithms = [];
+    protected $allowed_content_encryption_algorithms = [];
 
     /**
      * @param bool                         $encryption_required
