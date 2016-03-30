@@ -357,6 +357,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_endpoint->addResponseMode(new FormPostResponseMode());
 
             $this->authorization_endpoint->allowResponseModeParameterInAuthorizationRequest();
+            $this->authorization_endpoint->disallowResponseModeParameterInAuthorizationRequest();
+            $this->authorization_endpoint->allowResponseModeParameterInAuthorizationRequest();
             $this->authorization_endpoint->enableStateParameterEnforcement();
             $this->authorization_endpoint->disableStateParameterEnforcement();
             $this->authorization_endpoint->enableStateParameterEnforcement();

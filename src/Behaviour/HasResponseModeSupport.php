@@ -72,7 +72,7 @@ trait HasResponseModeSupport
             case 'code id_token token':
                 return 'fragment';
             default:
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('The multiple response types "%s" are not supported.', $response_type));
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported response type combination "%s".', $response_type));
         }
     }
 

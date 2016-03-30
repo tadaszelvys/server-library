@@ -400,4 +400,86 @@ class ImplicitGrantTypeTest extends Base
         $this->assertNotNull($inputs);
         $this->assertEquals(6, count($inputs));
     }
+
+    public function testAccessTokenSuccessWithUnsupportedResponseMode()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token',
+            'state'                 => '0123456789',
+            'response_mode'         => 'foo_bar',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+
+        try {
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Unsupported response mode "foo_bar".', $e->getDescription());
+        }
+    }
+
+    public function testAccessTokenSuccessWithUnsupportedResponseModeParameter()
+    {
+        $this->getAuthorizationEndpoint()->disallowResponseModeParameterInAuthorizationRequest();
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token',
+            'state'                 => '0123456789',
+            'response_mode'         => 'fragment',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+
+        try {
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('The response mode parameter is not authorized.', $e->getDescription());
+        }
+        $this->getAuthorizationEndpoint()->allowResponseModeParameterInAuthorizationRequest();
+    }
+
+    public function testAccessTokenSuccessWithUnsupportedResponseTypeCombination()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token code id_token',
+            'state'                 => '0123456789',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+
+        try {
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Unsupported response type combination "token code id_token".', $e->getDescription());
+        }
+    }
 }
