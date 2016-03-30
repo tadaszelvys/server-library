@@ -66,16 +66,6 @@ class MacToken implements TokenTypeInterface
     }
 
     /**
-     * @return string
-     */
-    private function generateMacKey()
-    {
-        $length = $this->getMacKeyLength();
-
-        return Base64Url::encode(random_bytes($length));
-    }
-
-    /**
      * @return int
      */
     public function getTimestampLifetime()
@@ -160,6 +150,9 @@ class MacToken implements TokenTypeInterface
         $this->mac_algorithm = $mac_algorithm;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function findToken(ServerRequestInterface $request, array &$additional_credential_values)
     {
         $authorization_headers = $request->getHeader('AUTHORIZATION');
@@ -179,37 +172,8 @@ class MacToken implements TokenTypeInterface
     }
 
     /**
-     * @param string      $header
-     * @param array       $additional_credential_values
-     * @param string|null $token
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    private function isHeaderValid($header, array &$additional_credential_values, &$token = null)
-    {
-        if (1 === preg_match('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches)) {
-            preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
-
-            if (!is_array($matches)) {
-                return false;
-            }
-            $values = [];
-            foreach ($matches as $match) {
-                $values[$match[1]] = $match[3];
-            }
-
-            if (array_key_exists('id', $values)) {
-                $additional_credential_values = $values;
-
-                $token = $values['id'];
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public function isTokenRequestValid(AccessTokenInterface $access_token, ServerRequestInterface $request, array $additional_credential_values)
     {
         if ($access_token->getTokenType() !== $this->getTokenTypeName()) {
@@ -288,5 +252,47 @@ class MacToken implements TokenTypeInterface
             'hmac-sha-1'   => 'sha1',
             'hmac-sha-256' => 'sha256',
         ];
+    }
+
+    /**
+     * @param string      $header
+     * @param array       $additional_credential_values
+     * @param string|null $token
+     *
+     * @return bool
+     */
+    private function isHeaderValid($header, array &$additional_credential_values, &$token = null)
+    {
+        if (1 === preg_match('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches)) {
+            preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
+
+            if (!is_array($matches)) {
+                return false;
+            }
+            $values = [];
+            foreach ($matches as $match) {
+                $values[$match[1]] = $match[3];
+            }
+
+            if (array_key_exists('id', $values)) {
+                $additional_credential_values = $values;
+
+                $token = $values['id'];
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    private function generateMacKey()
+    {
+        $length = $this->getMacKeyLength();
+
+        return Base64Url::encode(random_bytes($length));
     }
 }

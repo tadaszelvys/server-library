@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Util;
+namespace OAuth2\Test\Stub;
 
 /*
  * This file contains source code for the Request object of the http-foundation package.
