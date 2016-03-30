@@ -22,11 +22,6 @@ class IdToken extends Token implements IdTokenInterface
     private $token_type;
 
     /**
-     * @var null|\Jose\Object\JWSInterface
-     */
-    private $jws;
-
-    /**
      * @var null|string
      */
     private $nonce = null;
@@ -113,21 +108,5 @@ class IdToken extends Token implements IdTokenInterface
         return [
             'id_token' => $this->getToken(),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getJWS()
-    {
-        return $this->jws;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setJWS(JWSInterface $jws)
-    {
-        $this->jws = $jws;
     }
 }
