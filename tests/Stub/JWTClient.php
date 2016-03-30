@@ -12,10 +12,11 @@
 namespace OAuth2\Test\Stub;
 
 use Jose\Object\JWKSetInterface;
+use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
 use OAuth2\Client\JWTClient as BaseJWTClient;
-use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 
-class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
+class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface, ScopePolicyExtensionInterface
 {
     public function getTokenLifetime($token)
     {
@@ -131,5 +132,10 @@ class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
         if (false !== $key) {
             unset($this->redirect_uris[$key]);
         }
+    }
+
+    public function getScopePolicy()
+    {
+        return 'error';
     }
 }

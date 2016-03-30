@@ -18,7 +18,7 @@ use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\EncryptionCapabilitiesInterface;
-use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\User\UserInterface as BaseUserInterface;
 use OAuth2\Util\JWTCreator;
 use OAuth2\Util\JWTLoader;

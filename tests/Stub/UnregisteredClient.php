@@ -11,7 +11,7 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\Client\UnregisteredClient as BaseUnregisteredClient;
 
 class UnregisteredClient extends BaseUnregisteredClient implements TokenLifetimeExtensionInterface

@@ -128,7 +128,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeNotAuthorizedForClientWithExpiredCredentials()
@@ -159,7 +159,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256","foo":"bar"}', $content);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[^"]+,"refresh_token":"[^"]+","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256","foo":"bar"}', $content);
     }
 
     public function testTokenTypeNotAuthorizedForClient()
@@ -189,7 +189,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButMissingPassword()
@@ -230,7 +230,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeAuthorizedForClientAndJWTAccessToken()
@@ -246,7 +246,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $content);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9^"]+,"refresh_token":"[^"]+","foo":"bar"}', $content);
 
         $response->getBody()->rewind();
         $values = json_decode($content, true);
@@ -392,6 +392,7 @@ class ClientCredentialsGrantTypeTest extends Base
                 'grant_type'            => 'client_credentials',
                 'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
                 'client_assertion'      => $jws,
+                'scope'                 => 'scope1',
             ],
             ['HTTPS' => 'on']
         );
@@ -403,7 +404,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","scope":"scope1","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testSignedAssertionForPasswordClientWithJWTBearerAuthentication()
@@ -448,7 +449,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testEncryptedAndSignedAssertionForJWTClient()
@@ -503,6 +504,7 @@ class ClientCredentialsGrantTypeTest extends Base
                 'grant_type'            => 'client_credentials',
                 'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
                 'client_assertion'      => $jwe,
+                'scope'                 => 'scope1',
             ],
             ['HTTPS' => 'on']
         );
@@ -516,6 +518,6 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
 
         $content = $response->getBody()->getContents();
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $content);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","scope":"scope1","refresh_token":"[^"]+","foo":"bar"}', $content);
     }
 }

@@ -11,10 +11,11 @@
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
 use OAuth2\Client\PasswordClient as BasePasswordClient;
-use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 
-class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface
+class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface, ScopePolicyExtensionInterface
 {
     /**
      * {@inheritdoc}
@@ -133,5 +134,10 @@ class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensio
     public function setAllowedTokenTypes(array $token_types)
     {
         $this->token_types = $token_types;
+    }
+
+    public function getScopePolicy()
+    {
+        return 'none';
     }
 }

@@ -14,7 +14,7 @@ namespace OAuth2\Token;
 use Assert\Assertion;
 use Base64Url\Base64Url;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
 abstract class RefreshTokenManager implements RefreshTokenManagerInterface

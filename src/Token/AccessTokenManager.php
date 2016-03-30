@@ -13,7 +13,7 @@ namespace OAuth2\Token;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\ResourceServer\ResourceServerInterface;
 

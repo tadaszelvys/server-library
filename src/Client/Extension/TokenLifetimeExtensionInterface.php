@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Client;
+namespace OAuth2\Client\Extension;
 
 /**
  * This extension will help client to override token lifetime configuration defined by the server.
