@@ -49,11 +49,6 @@ class IdTokenManager implements IdTokenManagerInterface
     private $signature_key;
 
     /**
-     * @var \OAuth2\OpenIDConnect\IdTokenClaimManagerInterface[]
-     */
-    private $id_token_claim_managers = [];
-
-    /**
      * IdTokenManager constructor.
      *
      * @param \OAuth2\Util\JWTLoader    $jwt_loader
@@ -76,14 +71,6 @@ class IdTokenManager implements IdTokenManagerInterface
 
         $this->setJWTLoader($jwt_loader);
         $this->setJWTCreator($jwt_creator);
-    }
-
-    /**
-     * @param \OAuth2\OpenIDConnect\IdTokenClaimManagerInterface $id_token_claim_manager
-     */
-    public function addIdTokenClaimManager(IdTokenClaimManagerInterface $id_token_claim_manager)
-    {
-        $this->id_token_claim_managers[] = $id_token_claim_manager;
     }
 
     /**
@@ -151,10 +138,6 @@ class IdTokenManager implements IdTokenManagerInterface
 
         if (!empty($id_token_claims)) {
             $payload = array_merge($payload, $id_token_claims);
-        }
-
-        foreach ($this->id_token_claim_managers as $id_token_claim_manager) {
-            $id_token_claim_manager->process($payload, $headers, $user, $client);
         }
         
         $jwt = $this->jwt_creator->sign($payload, $headers, $this->signature_key);

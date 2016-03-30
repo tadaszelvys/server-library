@@ -27,7 +27,6 @@ use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
 use OAuth2\Security\EntryPoint;
 use OAuth2\Security\Listener;
-use OAuth2\Test\Stub\FooClaim;
 use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Grant\AuthorizationCodeGrantType;
@@ -960,7 +959,6 @@ class Base extends \PHPUnit_Framework_TestCase
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ])
             );
-            $this->id_token_manager->addIdTokenClaimManager(new FooClaim());
         }
 
         return $this->id_token_manager;

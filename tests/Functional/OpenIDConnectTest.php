@@ -111,10 +111,6 @@ class OpenIDConnectTest extends Base
         $this->assertEquals('**UNREGISTERED**--foo', $id_token->getClaim('aud'));
         $this->assertEquals('user1', $id_token->getClaim('sub'));
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
-
-        $this->assertTrue($id_token->hasClaim('foo'));
-        $this->assertTrue($id_token->getSignature(0)->hasProtectedHeader('crit'));
-        $this->assertEquals(['foo'], $id_token->getSignature(0)->getProtectedHeader('crit'));
     }
 
     public function testCodeTokenSuccess()
