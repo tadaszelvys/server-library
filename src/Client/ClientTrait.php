@@ -33,7 +33,7 @@ trait ClientTrait
      */
     public function isTokenTypeAllowed($token_type)
     {
-        return empty($this->token_types) || in_array($token_type, $this->token_types);
+        return empty($this->token_types) || in_array($token_type, $this->getAllowedTokenTypes());
     }
 
     /**
@@ -49,7 +49,7 @@ trait ClientTrait
      */
     public function isGrantTypeAllowed($grant_type)
     {
-        return in_array($grant_type, $this->grant_types);
+        return in_array($grant_type, $this->getAllowedGrantTypes());
     }
 
     /**
@@ -65,7 +65,7 @@ trait ClientTrait
      */
     public function isResponseTypeAllowed($response_type)
     {
-        return in_array($response_type, $this->response_types);
+        return in_array($response_type, $this->getAllowedResponseTypes());
     }
 
     /**
