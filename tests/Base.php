@@ -350,7 +350,6 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_endpoint->addResponseType($this->getImplicitGrantType());
             $this->authorization_endpoint->addResponseType($this->getNoneResponseType());
             $this->authorization_endpoint->addResponseType($this->getIdTokenGrantType());
-            //$this->authorization_endpoint->addResponseType($this->getIdTokenTokenGrantType());
 
             $this->authorization_endpoint->addResponseMode(new QueryResponseMode());
             $this->authorization_endpoint->addResponseMode(new FragmentResponseMode());
@@ -843,10 +842,10 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->bearer_token_type) {
             $this->bearer_token_type = new BearerToken();
 
-            $this->bearer_token_type->allowAccessTokenFromQueryString();
             $this->bearer_token_type->disallowAccessTokenFromQueryString();
+            $this->bearer_token_type->allowAccessTokenFromQueryString();
             $this->bearer_token_type->disallowAccessTokenFromRequestBody();
-            $this->bearer_token_type->disallowAccessTokenFromRequestBody();
+            $this->bearer_token_type->allowAccessTokenFromRequestBody();
         }
 
         return $this->bearer_token_type;
