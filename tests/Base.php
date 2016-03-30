@@ -12,7 +12,7 @@
 namespace OAuth2\Test;
 
 use Jose\Checker\AudienceChecker;
-use Jose\Checker\CheckerManager;
+use Jose\Factory\CheckerManagerFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
@@ -27,6 +27,7 @@ use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
 use OAuth2\Security\EntryPoint;
 use OAuth2\Security\Listener;
+use OAuth2\Test\Stub\FooClaim;
 use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Grant\AuthorizationCodeGrantType;
@@ -958,6 +959,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ])
             );
+            $this->id_token_manager->addIdTokenClaimManager(new FooClaim());
         }
 
         return $this->id_token_manager;
@@ -1021,8 +1023,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getClaimCheckerManager()
     {
         if (null === $this->claim_checker_manager) {
-            $this->claim_checker_manager = new CheckerManager();
-
+            $this->claim_checker_manager = CheckerManagerFactory::createClaimCheckerManager();
             $this->claim_checker_manager->addClaimChecker(new AudienceChecker($this->getIssuer()));
         }
 

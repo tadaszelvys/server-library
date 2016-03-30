@@ -154,9 +154,9 @@ class IdTokenManager implements IdTokenManagerInterface
         }
 
         foreach ($this->id_token_claim_managers as $id_token_claim_manager) {
-            $id_token_claim_manager->process($payload, $user, $client);
+            $id_token_claim_manager->process($payload, $headers, $user, $client);
         }
-
+        
         $jwt = $this->jwt_creator->sign($payload, $headers, $this->signature_key);
         
         if ($client instanceof EncryptionCapabilitiesInterface && true === $client->isEncryptionSupportEnabled()) {

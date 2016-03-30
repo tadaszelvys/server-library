@@ -17,11 +17,12 @@ use OAuth2\User\UserInterface as BaseUserInterface;
 interface IdTokenClaimManagerInterface
 {
     /**
-     * @param array                            $claims
-     * @param \OAuth2\User\UserInterface $user
-     * @param \OAuth2\Client\ClientInterface   $client
+     * @param array                          $claims
+     * @param array                          $header
+     * @param \OAuth2\User\UserInterface     $user
+     * @param \OAuth2\Client\ClientInterface $client
      *
      * @return mixed
      */
-    public function process(array &$claims, BaseUserInterface $user, ClientInterface $client);
+    public function process(array &$claims, array &$header, BaseUserInterface $user, ClientInterface $client);
 }
