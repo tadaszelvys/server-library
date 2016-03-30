@@ -39,7 +39,7 @@ The following components are implemented:
     * [x] Public clients ([RFC6749, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1)) - See `none` authentication method
     * [x] Password clients ([RFC6749, section 2.3.1](https://tools.ietf.org/html/rfc6749#section-2.3.1))
         * [x] HTTP Basic Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617) and [RFC7617](https://tools.ietf.org/html/rfc7617)) - See `client_secret_basic` authentication method
-        * [x] JWT Assertion using password as shared key ([OpenID Connect Code](http://openid.net/specs/openid-connect-core-1_0.html#Signing)) - See `client_secret_jwt` authentication method
+        * [x] JWT Assertion using password as shared key ([OpenID Connect Core](http://openid.net/specs/openid-connect-core-1_0.html#Signing)) - See `client_secret_jwt` authentication method
         * [x] Credentials from request body - See `client_secret_post` authentication method
     * [ ] SAML clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
     * [x] JWT clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7523](https://tools.ietf.org/html/rfc7523)) - See `private_key_jwt` authentication method
@@ -70,47 +70,7 @@ The following components are implemented:
 * Partial implementation
     * [ ] Threat Model and Security Consideration ([RFC6819](https://tools.ietf.org/html/rfc6819))
 
-* OpenID Connect
-    * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html) - *Partial Support*
-        *  [x] ID Token - *Partial support*
-        * Response types:
-            * [x] `code`: Authorization Code Flow
-            * [x] `id_token`: Implicit Flow
-            * [x] `id_token token`: Implicit Flow
-            * [x] `code id_token`: Hybrid Flow
-            * [x] `code token`: Hybrid Flow
-            * [x] `code id_token token`: Hybrid Flow
-        * [ ] Login from third party
-        * [x] UserInfo Endpoint
-        * [x] UserInfo Claims
-            * [x] Scope `profile`
-            * [x] Scope `email`
-            * [x] Scope `phone`
-            * [x] Scope `address`
-            * [x] Custom Scope
-        * [ ] Claims Languages and Scripts
-        * [ ] Aggregated and Distributed Claims
-        * [ ] Self-Issued OpenID Provider Registration
-        *  Client Authentication
-            * Authentication Methods:
-                * [x] `client_secret_basic`
-                * [x] `client_secret_post` (disabled by default)
-                * [x] `client_secret_jwt`
-                * [x] `private_key_jwt`
-                * [x] `none` (public and unregistered clients supported)
-            * [ ] Rotation of Asymmetric Signing Keys
-        * [ ] Offline Access
-    * [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
-    * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html) and Dynamic Client Registration Protocol ([RFC7591](https://tools.ietf.org/html/rfc7591))
-    * [ ] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
-    * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
-    * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
-    * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
-    * [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
-    * [x] [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq) (experimental)
-        * [x] Request Objects support (this feature is disabled by default)
-        * [x] Request Object References support (this feature is disabled by default)
-        * [x] Encrypted Request Objects support (this feature is disabled by default)
+* OpenID Connect: - *Partial Support* - See [the dedicated page of its implementation](doc/OpenID_Connect_Implementeation_Status.md)
 
 * Integration planned
     * [Proof-of-Possession (PoP) Security Architecture](https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture)
