@@ -79,7 +79,7 @@ final class NoneResponseType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
     {
         //Nothing to do
     }

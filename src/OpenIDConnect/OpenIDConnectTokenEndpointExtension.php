@@ -62,7 +62,11 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
         $claims = [];
         $auth_code = $grant_type_response->getAdditionalData('auth_code');
 
-        if ($auth_code instanceof AuthCodeInterface && array_key_exists('nonce', $params = $auth_code->getQueryParams())) {
+        if (!$auth_code instanceof AuthCodeInterface) {
+            return;
+        }
+
+        if (array_key_exists('nonce', $params = $auth_code->getQueryParams())) {
             $claims = array_merge(
                 $claims,
                 ['nonce' => $params['nonce']]
@@ -72,9 +76,10 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
         $id_token = $this->id_token_manager->createIdToken(
             $client,
             $user,
+            $auth_code->getRedirectUri(),
             $claims,
             $access_token->getToken(),
-            $auth_code instanceof AuthCodeInterface ? $auth_code->getToken() : null
+            $auth_code->getToken()
         );
 
         return $id_token->toArray();

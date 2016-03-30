@@ -29,7 +29,7 @@ OpenID Connect Implementeation Status
     * [ ] [Self-Issued OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#SelfIssued)
     * [ ] [Subject Identifier Types](http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes)
         * [x] `public`
-        * [x] `pairwise`
+        * [x] `pairwise` (*experimental*)
     * [x]  [Client Authentication](http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
         * [x] Authentication Methods:
             * [x] `client_secret_basic`

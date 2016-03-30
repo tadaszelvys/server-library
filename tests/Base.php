@@ -77,6 +77,11 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     private $issuer = 'https://server.example.com';
 
+    /**
+     * @var string
+     */
+    private $pairwise_encryption_key = 'This is my secret Key !!!';
+
     protected function setUp()
     {
         //To fix HHVM tests on Travis-CI
@@ -89,6 +94,14 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getIssuer()
     {
         return $this->issuer;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPairwiseEncryptionKey()
+    {
+        return $this->pairwise_encryption_key;
     }
 
     /**
@@ -962,6 +975,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ])
             );
+            $this->id_token_manager->enablePairwiseSubject($this->getPairwiseEncryptionKey());
         }
 
         return $this->id_token_manager;

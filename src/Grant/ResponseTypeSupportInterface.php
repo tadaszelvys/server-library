@@ -51,10 +51,11 @@ interface ResponseTypeSupportInterface
      *
      * @param \OAuth2\Endpoint\Authorization $authorization       The authorization object
      * @param array                          $response_parameters The parameters to send to the client
+     * @param string                         $redirect_uri        The redirect URI
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return array
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization);
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri);
 }

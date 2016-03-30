@@ -153,7 +153,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
             $result['state'] = $authorization->get('state');
         }
         foreach ($types as $type) {
-            $type->finalizeAuthorization($result, $authorization);
+            $type->finalizeAuthorization($result, $authorization, $redirect_uri);
         }
 
         $response_mode->prepareResponse($redirect_uri, $result, $response);

@@ -49,6 +49,11 @@ class IdTokenManager implements IdTokenManagerInterface
     private $signature_key;
 
     /**
+     * @var null|string
+     */
+    private $pairwise_encryption_key = null;
+
+    /**
      * IdTokenManager constructor.
      *
      * @param \OAuth2\Util\JWTLoader    $jwt_loader
@@ -76,6 +81,14 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * {@inheritdoc}
      */
+    public function enablePairwiseSubject($pairwise_encryption_key)
+    {
+        $this->pairwise_encryption_key = $pairwise_encryption_key;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSignatureAlgorithms()
     {
         return $this->getJWTLoader()->getSupportedSignatureAlgorithms();
@@ -98,12 +111,38 @@ class IdTokenManager implements IdTokenManagerInterface
     }
 
     /**
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param \OAuth2\User\UserInterface     $user
+     * @param string                         $redirect_uri
+     *
+     * @return string
+     */
+    private function calculateSubjectIdentifier(ClientInterface $client, BaseUserInterface $user, $redirect_uri)
+    {
+        $sub = $user->getPublicId();
+
+        if (null === $this->pairwise_encryption_key) {
+            return $sub;
+        }
+        $prepared = sprintf(
+            '%s:%s:%s',
+            parse_url($redirect_uri)['host'],
+            $sub,
+            hash('sha256', $client->getPublicId(), true)
+        );
+
+        return Base64Url::encode(openssl_encrypt($prepared, 'aes-256-ecb', $this->pairwise_encryption_key, OPENSSL_RAW_DATA));
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function createIdToken(ClientInterface $client, BaseUserInterface $user, array $id_token_claims = [], $access_token = null, $auth_code = null)
+    public function createIdToken(ClientInterface $client, BaseUserInterface $user, $redirect_uri, array $id_token_claims = [], $access_token = null, $auth_code = null)
     {
         $id_token = $this->createEmptyIdToken();
         $exp = time() + $this->getLifetime($client);
+
+        $sub = $this->calculateSubjectIdentifier($client, $user, $redirect_uri);
 
         $headers = [
             'typ'       => 'JWT',
@@ -113,7 +152,7 @@ class IdTokenManager implements IdTokenManagerInterface
         $payload = [
             'jti'       => Base64Url::encode(random_bytes(25)),
             'iss'       => $this->issuer,
-            'sub'       => $user->getPublicId(),
+            'sub'       => $sub,
             'aud'       => $client->getPublicId(),
             'iat'       => time(),
             'nbf'       => time(),

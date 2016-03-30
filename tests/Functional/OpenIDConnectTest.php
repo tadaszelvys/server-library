@@ -11,6 +11,7 @@
 
 namespace OAuth2\Test\Functional;
 
+use Base64Url\Base64Url;
 use Jose\Factory\DecrypterFactory;
 use Jose\Loader;
 use Jose\Object\JWEInterface;
@@ -109,8 +110,16 @@ class OpenIDConnectTest extends Base
 
         $this->assertEquals($this->getIssuer(), $id_token->getClaim('iss'));
         $this->assertEquals('**UNREGISTERED**--foo', $id_token->getClaim('aud'));
-        $this->assertEquals('user1', $id_token->getClaim('sub'));
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
+
+
+        $this->assertEquals('GodTJ-2hBFhuBKdL_ZBZZ_RJXmlMlONgcA3dtXUNUy41Hi50dycFnx6UwwItDEAVIC9daJrfYVAann1rCRCebQ', $id_token->getClaim('sub'));
+
+        $decrypted = openssl_decrypt(Base64Url::decode($id_token->getClaim('sub')),'aes-256-ecb', $this->getPairwiseEncryptionKey(), OPENSSL_RAW_DATA);
+        $parts = explode(':', $decrypted);
+        $this->assertEquals(3, count($parts));
+        $this->assertEquals($parts[2], hash('sha256', $id_token->getClaim('aud'), true));
+        $this->assertEquals('user1', $parts[1]);
     }
 
     public function testCodeTokenSuccess()
