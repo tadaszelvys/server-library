@@ -377,7 +377,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
                 throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Response type "%s" is not supported by this server', $response_type));
             }
             $type = $this->response_types[$response_type];
-            if (!$authorization->getClient()->isAllowedResponseType($type->getResponseType())) {
+            if (!$authorization->getClient()->isResponseTypeAllowed($type->getResponseType())) {
                 throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$authorization->get('response_type').'" is unauthorized for this client.');
             }
             $types[] = $type;

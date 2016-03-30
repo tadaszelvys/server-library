@@ -47,7 +47,7 @@ trait ResourceServerTrait
     /**
      * {@inheritdoc}
      */
-    public function isAllowedGrantType($grant_type)
+    public function isGrantTypeAllowed($grant_type)
     {
         return false;
     }

@@ -58,6 +58,7 @@ class PasswordClientManager extends Base
         $mac->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
         $mac->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
         $mac->setPublicId('mac');
+        $mac->setAllowedTokenTypes(['MAC']);
 
         $expired = new PasswordClient();
         $expired->setSecret('secret');

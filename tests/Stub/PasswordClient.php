@@ -74,7 +74,7 @@ class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensio
      */
     public function addAllowedGrantType($grant_type)
     {
-        if (!$this->isAllowedGrantType($grant_type)) {
+        if (!$this->isGrantTypeAllowed($grant_type)) {
             $this->grant_types[] = $grant_type;
         }
     }
@@ -103,7 +103,7 @@ class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensio
      */
     public function addAllowedResponseType($response_type)
     {
-        if (!$this->isAllowedResponseType($response_type)) {
+        if (!$this->isResponseTypeAllowed($response_type)) {
             $this->response_types[] = $response_type;
         }
     }
@@ -125,5 +125,13 @@ class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensio
         if (false !== $key) {
             unset($this->response_types[$key]);
         }
+    }
+
+    /**
+     * @param string[] $token_types
+     */
+    public function setAllowedTokenTypes(array $token_types)
+    {
+        $this->token_types = $token_types;
     }
 }

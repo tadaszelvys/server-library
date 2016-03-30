@@ -161,6 +161,21 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256","foo":"bar"}', $response->getBody()->getContents());
     }
 
+    public function testTokenTypeNotAuthorizedForClient()
+    {
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials', 'token_type' => 'Bearer'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'mac', 'PHP_AUTH_PW' => 'secret']);
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals('The token type "Bearer" is not allowed for the client.', $e->getDescription());
+            $this->assertEquals(400, $e->getHttpCode());
+        }
+    }
+
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeader()
     {
         $response = new Response();

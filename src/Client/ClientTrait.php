@@ -16,6 +16,11 @@ trait ClientTrait
     /**
      * @var string[]
      */
+    protected $token_types = [];
+
+    /**
+     * @var string[]
+     */
     protected $grant_types = [];
 
     /**
@@ -26,7 +31,23 @@ trait ClientTrait
     /**
      * {@inheritdoc}
      */
-    public function isAllowedGrantType($grant_type)
+    public function isTokenTypeAllowed($token_type)
+    {
+        return empty($this->token_types) || in_array($token_type, $this->token_types);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllowedTokenTypes()
+    {
+        return $this->token_types;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isGrantTypeAllowed($grant_type)
     {
         return in_array($grant_type, $this->grant_types);
     }
@@ -42,7 +63,7 @@ trait ClientTrait
     /**
      * {@inheritdoc}
      */
-    public function isAllowedResponseType($response_type)
+    public function isResponseTypeAllowed($response_type)
     {
         return in_array($response_type, $this->response_types);
     }

@@ -35,7 +35,7 @@ class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
      */
     public function addAllowedGrantType($grant_type)
     {
-        if (!$this->isAllowedGrantType($grant_type)) {
+        if (!$this->isGrantTypeAllowed($grant_type)) {
             $this->grant_types[] = $grant_type;
         }
     }
@@ -53,7 +53,7 @@ class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
      */
     public function addAllowedResponseType($response_type)
     {
-        if (!$this->isAllowedResponseType($response_type)) {
+        if (!$this->isResponseTypeAllowed($response_type)) {
             $this->response_types[] = $response_type;
         }
     }

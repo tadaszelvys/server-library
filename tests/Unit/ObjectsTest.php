@@ -42,8 +42,8 @@ class ObjectsTest extends Base
         $this->assertEquals(['https://foo.com'], $client->getRedirectUris());
         $this->assertTrue($client->hasRedirectUri('https://foo.com'));
         $this->assertFalse($client->hasRedirectUri('https://bar.com'));
-        $this->assertTrue($client->isAllowedGrantType('foo'));
-        $this->assertFalse($client->isAllowedGrantType('baz'));
+        $this->assertTrue($client->isGrantTypeAllowed('foo'));
+        $this->assertFalse($client->isGrantTypeAllowed('baz'));
     }
 
     public function testIdToken()
@@ -160,8 +160,8 @@ class ObjectsTest extends Base
         $rs->setPublicId('bar');
         $rs->setAllowedIpAddresses(['127.0.0.1']);
 
-        $this->assertFalse($rs->isAllowedGrantType('foo'));
-        $this->assertFalse($rs->isAllowedGrantType('bar'));
+        $this->assertFalse($rs->isGrantTypeAllowed('foo'));
+        $this->assertFalse($rs->isGrantTypeAllowed('bar'));
         $this->assertEquals([], $rs->getAllowedGrantTypes());
         $this->assertEquals(['127.0.0.1'], $rs->getAllowedIpAddresses());
         $this->assertEquals([], $rs->getAllowedGrantTypes());

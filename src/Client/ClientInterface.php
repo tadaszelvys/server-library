@@ -29,12 +29,26 @@ interface ClientInterface extends ResourceOwnerInterface
      *
      * @return bool true if the grant type is allowed, else false
      */
-    public function isAllowedGrantType($grant_type);
+    public function isGrantTypeAllowed($grant_type);
 
     /**
      * @return string[]
      */
     public function getAllowedGrantTypes();
+    
+    /**
+     * Checks if the token type is allowed for the client.
+     *
+     * @param string $token_type The token type
+     *
+     * @return bool true if the token type is allowed, else false
+     */
+    public function isTokenTypeAllowed($token_type);
+
+    /**
+     * @return string[]
+     */
+    public function getAllowedTokenTypes();
 
     /**
      * Checks if the response type is allowed for the client.
@@ -43,7 +57,7 @@ interface ClientInterface extends ResourceOwnerInterface
      *
      * @return bool true if the response type is allowed, else false
      */
-    public function isAllowedResponseType($response_type);
+    public function isResponseTypeAllowed($response_type);
 
     /**
      * @return string[]
