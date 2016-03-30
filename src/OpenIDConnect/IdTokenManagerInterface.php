@@ -17,6 +17,16 @@ use OAuth2\User\UserInterface as BaseUserInterface;
 interface IdTokenManagerInterface
 {
     /**
+     * @param string $pairwise_encryption_key
+     */
+    public function enablePairwiseSubject($pairwise_encryption_key);
+
+    /**
+     * @return bool
+     */
+    public function isPairwiseSubjectIdentifierSupported();
+    
+    /**
      * @param \OAuth2\Client\ClientInterface   $client
      * @param \OAuth2\User\UserInterface       $user
      * @param string                           $redirect_uri

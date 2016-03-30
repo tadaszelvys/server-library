@@ -1070,7 +1070,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->setResponseModesSupported($this->getAuthorizationEndpoint()->getResponseModesSupported());
             $this->metadata->setGrantTypesSupported($this->getTokenEndpoint()->getGrantTypesSupported());
             $this->metadata->setAcrValuesSupported([]);
-            $this->metadata->setSubjectTypesSupported(['public']);
+            $this->metadata->setSubjectTypesSupported($this->getIdTokenManager()->isPairwiseSubjectIdentifierSupported()?['public', 'pairwise']:['public']);
             $this->metadata->setIdTokenSigningAlgValuesSupported($this->getIdTokenManager()->getSignatureAlgorithms());
             $this->metadata->setIdTokenEncryptionAlgValuesSupported($this->getIdTokenManager()->getKeyEncryptionAlgorithms());
             $this->metadata->setIdTokenEncryptionEncValuesSupported($this->getIdTokenManager()->getContentEncryptionAlgorithms());

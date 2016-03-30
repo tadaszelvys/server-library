@@ -89,6 +89,14 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * {@inheritdoc}
      */
+    public function isPairwiseSubjectIdentifierSupported()
+    {
+        return null !== $this->pairwise_encryption_key;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSignatureAlgorithms()
     {
         return $this->getJWTLoader()->getSupportedSignatureAlgorithms();
@@ -108,30 +116,6 @@ class IdTokenManager implements IdTokenManagerInterface
     public function getContentEncryptionAlgorithms()
     {
         return $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms();
-    }
-
-    /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param \OAuth2\User\UserInterface     $user
-     * @param string                         $redirect_uri
-     *
-     * @return string
-     */
-    private function calculateSubjectIdentifier(ClientInterface $client, BaseUserInterface $user, $redirect_uri)
-    {
-        $sub = $user->getPublicId();
-
-        if (null === $this->pairwise_encryption_key) {
-            return $sub;
-        }
-        $prepared = sprintf(
-            '%s:%s:%s',
-            parse_url($redirect_uri)['host'],
-            $sub,
-            hash('sha256', $client->getPublicId(), true)
-        );
-
-        return Base64Url::encode(openssl_encrypt($prepared, 'aes-256-ecb', $this->pairwise_encryption_key, OPENSSL_RAW_DATA));
     }
 
     /**
@@ -218,6 +202,30 @@ class IdTokenManager implements IdTokenManagerInterface
     protected function createEmptyIdToken()
     {
         return new IdToken();
+    }
+
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param \OAuth2\User\UserInterface     $user
+     * @param string                         $redirect_uri
+     *
+     * @return string
+     */
+    private function calculateSubjectIdentifier(ClientInterface $client, BaseUserInterface $user, $redirect_uri)
+    {
+        $sub = $user->getPublicId();
+
+        if (false === $this->isPairwiseSubjectIdentifierSupported()) {
+            return $sub;
+        }
+        $prepared = sprintf(
+            '%s:%s:%s',
+            parse_url($redirect_uri)['host'],
+            $sub,
+            hash('sha256', $client->getPublicId(), true)
+        );
+
+        return Base64Url::encode(openssl_encrypt($prepared, 'aes-256-ecb', $this->pairwise_encryption_key, OPENSSL_RAW_DATA));
     }
 
     /**
