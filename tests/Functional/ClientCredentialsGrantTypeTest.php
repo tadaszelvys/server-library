@@ -35,7 +35,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The request must be secured.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -50,7 +50,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('Method must be POST.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -80,7 +80,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_client', $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
             $this->assertEquals('Client authentication failed.', $e->getDescription());
             $this->assertEquals(401, $e->getHttpCode());
         }
@@ -269,7 +269,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_client', $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
             $this->assertEquals('The client is not a confidential client', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -519,5 +519,71 @@ class ClientCredentialsGrantTypeTest extends Base
 
         $content = $response->getBody()->getContents();
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","scope":"scope1","refresh_token":"[^"]+","foo":"bar"}', $content);
+    }
+
+    public function testNoScopeRequestedForErrorPolicy()
+    {
+        $response = new Response();
+        $jwk1 = new JWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]);
+        $jwk2 = new JWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $jws = JWSFactory::createJWSToCompactJSON([
+                'exp' => time() + 3600,
+                'aud' => $this->getIssuer(),
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
+            ],
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+
+        $jwe = JWEFactory::createJWEToCompactJSON(
+            $jws,
+            $jwk1,
+            [
+                'kid' => 'JWK1',
+                'cty' => 'JWT',
+                'alg' => 'A256KW',
+                'enc' => 'A256CBC-HS512',
+                'exp' => time() + 3600,
+                'aud' => $this->getIssuer(),
+                'iss' => 'My JWT issuer',
+                'sub' => 'jwt1',
+            ]
+        );
+
+        $request = $this->createRequest(
+            '/',
+            'POST',
+            [
+                'grant_type'            => 'client_credentials',
+                'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+                'client_assertion'      => $jwe,
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals(ExceptionManagerInterface::INVALID_SCOPE, $e->getMessage());
+            $this->assertEquals('No scope was requested.', $e->getDescription());
+            $this->assertEquals(400, $e->getHttpCode());
+        }
     }
 }
