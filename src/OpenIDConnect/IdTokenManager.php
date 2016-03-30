@@ -188,7 +188,7 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     private function getHash($token)
     {
-        return Base64Url::encode(substr(hash($this->getHashMethod(), $token, true), 0, $this->getHashSize()));
+        return Base64Url::encode(mb_substr(hash($this->getHashMethod(), $token, true), 0, $this->getHashSize(), '8bit'));
     }
 
     /**

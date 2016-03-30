@@ -227,7 +227,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     private function checkSecuredRedirectUri($redirect_uri)
     {
-        if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== substr($redirect_uri, 0, 5)) {
+        if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== mb_substr($redirect_uri, 0, 5, '8bit')) {
             if (!$this->isALocalUriOrAnUrn($redirect_uri)) {
                 throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must be secured');
             }

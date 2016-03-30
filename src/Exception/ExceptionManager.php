@@ -67,9 +67,9 @@ class ExceptionManager implements ExceptionManagerInterface
         if (method_exists($this, $name)) {
             return call_user_func([$this, $name], $arguments);
         }
-        if (0 === strpos($name, 'get') && 'Exception' === substr($name, -9)) {
+        if (0 === strpos($name, 'get') && 'Exception' === mb_substr($name, -9, null, '8bit')) {
             $arguments = array_merge(
-                [substr($name, 3, strlen($name) - 12)],
+                [mb_substr($name, 3, mb_strlen($name, '8bit') - 12, '8bit')],
                 $arguments
             );
 

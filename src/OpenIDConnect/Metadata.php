@@ -108,9 +108,9 @@ final class Metadata implements \JsonSerializable
             return call_user_func([$this, $name], $arguments);
         }
 
-        $method = substr($name, 0, 3);
+        $method = mb_substr($name, 0, 3, '8bit');
         if (in_array($method, ['get', 'set'])) {
-            $key = $this->decamelize(substr($name, 3));
+            $key = $this->decamelize(mb_substr($name, 3, null, '8bit'));
             $arguments = array_merge(
                 [$key],
                 $arguments
@@ -174,7 +174,7 @@ final class Metadata implements \JsonSerializable
     {
         return preg_replace_callback(
             '/(^|[a-z])([A-Z])/',
-            function ($m) { return strtolower(strlen($m[1]) ? "$m[1]_$m[2]" : "$m[2]"); },
+            function ($m) { return strtolower(mb_strlen($m[1], '8bit') ? sprintf("%s_%s", $m[1], $m[2]) : $m[2]); },
             $word
         );
     }

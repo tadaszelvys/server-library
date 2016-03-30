@@ -156,7 +156,7 @@ final class Uri
         }
 
         foreach ($storedUris as $storedUri) {
-            if (strcasecmp(substr($uri, 0, strlen($storedUri)), $storedUri) === 0) {
+            if (strcasecmp(mb_substr($uri, 0, mb_strlen($storedUri, '8bit'), '8bit'), $storedUri) === 0) {
                 return true;
             }
         }

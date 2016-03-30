@@ -162,8 +162,8 @@ class MacToken implements TokenTypeInterface
         }
 
         foreach ($authorization_headers as $authorization_header) {
-            if ('MAC ' === mb_substr($authorization_header, 0, 4, 'utf-8')) {
-                $header = trim(mb_substr($authorization_header, 4, null, 'utf-8'));
+            if ('MAC ' === mb_substr($authorization_header, 0, 4, '8bit')) {
+                $header = trim(mb_substr($authorization_header, 4, null, '8bit'));
                 if (true === $this->isHeaderValid($header, $additional_credential_values, $token)) {
                     return $token;
                 }
