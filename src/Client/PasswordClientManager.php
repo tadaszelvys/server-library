@@ -178,7 +178,7 @@ abstract class PasswordClientManager implements ClientManagerInterface
             ];
         }
         $header = $request->getHeader('Authorization');
-        if (0 < count($header) && strtolower(mb_substr($header[0], 0, 6, '8bit')) === 'basic ') {
+        if (0 < count($header) && mb_strtolower(mb_substr($header[0], 0, 6, '8bit'), '8bit') === 'basic ') {
             list($client_id, $client_secret) = explode(':', base64_decode(mb_substr($header[0], 6, mb_strlen($header[0], '8bit') - 6, '8bit')));
             if (!empty($client_id) && !empty($client_secret)) {
                 return [
