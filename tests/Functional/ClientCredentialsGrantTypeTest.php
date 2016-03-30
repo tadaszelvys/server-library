@@ -153,12 +153,13 @@ class ClientCredentialsGrantTypeTest extends Base
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
 
         $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[^"]+,"scope":"scope1 scope2","refresh_token":"[^"]+","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256","foo":"bar"}', $content);
     }
 
     public function testTokenTypeNotAuthorizedForClient()

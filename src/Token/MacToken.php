@@ -169,24 +169,45 @@ class MacToken implements TokenTypeInterface
         }
 
         foreach ($authorization_headers as $authorization_header) {
-            if ('MAC ' === substr($authorization_header, 0, 4) && 1 === preg_match('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', substr($authorization_header, 4), $matches)) {
-                preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', substr($authorization_header, 4), $matches, PREG_SET_ORDER);
-
-                if (!is_array($matches)) {
-                    return;
-                }
-                $values = [];
-                foreach ($matches as $match) {
-                    $values[$match[1]] = $match[3];
-                }
-
-                if (array_key_exists('id', $values)) {
-                    $additional_credential_values = $values;
-
-                    return $values['id'];
+            if ('MAC ' === mb_substr($authorization_header, 0, 4, 'utf-8')) {
+                $header = trim(mb_substr($authorization_header, 4, null, 'utf-8'));
+                if (true === $this->isHeaderValid($header, $additional_credential_values, $token)) {
+                    return $token;
                 }
             }
         }
+    }
+
+    /**
+     * @param string      $header
+     * @param array       $additional_credential_values
+     * @param string|null $token
+     *
+     * @return bool
+     */
+    private function isHeaderValid($header, array &$additional_credential_values, &$token = null)
+    {
+        if (1 === preg_match('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches)) {
+            preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
+
+            if (!is_array($matches)) {
+                return false;
+            }
+            $values = [];
+            foreach ($matches as $match) {
+                $values[$match[1]] = $match[3];
+            }
+
+            if (array_key_exists('id', $values)) {
+                $additional_credential_values = $values;
+
+                $token = $values['id'];
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function isTokenRequestValid(AccessTokenInterface $access_token, ServerRequestInterface $request, array $additional_credential_values)
@@ -230,7 +251,7 @@ class MacToken implements TokenTypeInterface
             $host."\n".
             $port."\n".
             $ext."\n";
-
+        
         $algorithms = $this->getAlgorithmMap();
         if (!array_key_exists($token->getParameter('mac_algorithm'), $algorithms)) {
             return false;

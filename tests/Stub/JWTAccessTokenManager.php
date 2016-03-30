@@ -90,10 +90,23 @@ class JWTAccessTokenManager extends Base
         $user_info2->setToken('USER_INFO2');
         $user_info2->setTokenType('Bearer');
 
+        $user_info_mac = new AccessToken();
+        $user_info_mac->setExpiresAt(time() + 3600);
+        $user_info_mac->setResourceOwnerPublicId('user1');
+        $user_info_mac->setScope(['openid', 'profile', 'email', 'address', 'phone']);
+        $user_info_mac->setClientPublicId('jwt1');
+        $user_info_mac->setToken('USER_INFO_MAC');
+        $user_info_mac->setTokenType('MAC');
+        $user_info_mac->setParameters([
+            'mac_key' => 'Ajpw1Q2mebV8kz4',
+            'mac_algorithm' => 'hmac-sha-256',
+        ]);
+
         $this->access_tokens[$abcd->getToken()] = $abcd;
         $this->access_tokens[$efgh->getToken()] = $efgh;
         $this->access_tokens[$user_info->getToken()] = $user_info;
         $this->access_tokens[$user_info2->getToken()] = $user_info2;
+        $this->access_tokens[$user_info_mac->getToken()] = $user_info_mac;
         $this->access_tokens[$no_user_info->getToken()] = $no_user_info;
     }
 
