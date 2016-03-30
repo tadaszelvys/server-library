@@ -331,7 +331,7 @@ final class AuthorizationFactory
      *
      * @return string
      */
-    private static function downloadContent($url)
+    private function downloadContent($url)
     {
         // The URL must be a valid URL and scheme must be https
         Assertion::false(
@@ -352,7 +352,9 @@ final class AuthorizationFactory
         $content = curl_exec($ch);
         curl_close($ch);
 
-        Assertion::notEmpty($content, 'Unable to get content.');
+        if (null === $content) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_URI, 'Unable to get content.');
+        }
 
         return $content;
     }

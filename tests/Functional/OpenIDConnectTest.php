@@ -16,6 +16,9 @@ use Jose\Loader;
 use Jose\Object\JWEInterface;
 use Jose\Object\JWK;
 use Jose\Object\JWSInterface;
+use OAuth2\Exception\AuthenticateExceptionInterface;
+use OAuth2\Exception\BadRequestExceptionInterface;
+use OAuth2\Exception\BaseException;
 use OAuth2\OpenIDConnect\Metadata;
 use OAuth2\Test\Base;
 use OAuth2\Token\AccessTokenInterface;
@@ -427,80 +430,106 @@ class OpenIDConnectTest extends Base
     {
         $request = $this->createRequest('/', 'GET', [], [], ['authorization' => 'Bearer USER_INFO']);
 
-        $response = new Response();
-        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
-        $response->getBody()->rewind();
+        try {
+            $this->getListener()->handle($request);
+            $this->fail('Should throw an Exception');
+        } catch (BaseException $e) {
+            $this->assertInstanceOf(BadRequestExceptionInterface::class, $e);
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Request must be secured', $e->getDescription());
+            $this->assertEquals(400, $e->getCode());
+        }
+    }
 
-        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
-        $this->assertEquals('{"error":"invalid_request","error_description":"Request must be secured","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+    public function testEntryPoint()
+    {
+        $request = $this->createRequest();
+        $response = new Response();
+
+        $this->getEntryPoint()->start($request, $response);
+        $this->assertEquals(401, $response->getStatusCode());
+        $this->assertEquals(['Bearer', 'MAC'], $response->getHeader('www-authenticate'));
+        $this->assertEquals(['no-store'], $response->getHeader('cache-control'));
+        $this->assertEquals(['no-cache'], $response->getHeader('pragma'));
+        $this->assertEquals(['application/json'], $response->getHeader('content-type'));
     }
 
     public function testUserInfoRequestWithoutAccessToken()
     {
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer']);
 
-        $response = new Response();
-        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
-        $this->assertEquals(['Bearer', 'MAC'], $response->getHeader('WWW-Authenticate'));
+        try {
+            $this->getListener()->handle($request);
+            $this->fail('Should throw an Exception');
+        } catch (BaseException $e) {
+            $this->assertInstanceOf(AuthenticateExceptionInterface::class, $e);
+            $this->assertEquals('invalid_token', $e->getMessage());
+            $this->assertEquals('Access token required.', $e->getDescription());
+            $this->assertEquals(401, $e->getCode());
+        }
     }
 
     public function testUserInfoRequestWithInvalidAccessToken()
     {
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer FOOBAR']);
 
-        $response = new Response();
-        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
-        $this->assertEquals(['Bearer', 'MAC'], $response->getHeader('WWW-Authenticate'));
+        try {
+            $access_token = $this->getListener()->handle($request);
+            $this->getUserInfo()->getUserInfo($access_token);
+            $this->fail('Should throw an Exception');
+        } catch (BaseException $e) {
+            $this->assertInstanceOf(AuthenticateExceptionInterface::class, $e);
+            $this->assertEquals('invalid_token', $e->getMessage());
+            $this->assertEquals('Access token does not exist or is not valid.', $e->getDescription());
+            $this->assertEquals(401, $e->getCode());
+        }
     }
 
     public function testUserInfoRequestWithValidAccessTokenButNoOpenIDScope()
     {
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer NO_USER_INFO']);
 
-        $response = new Response();
-        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
-        $this->assertEquals(['Bearer', 'MAC'], $response->getHeader('WWW-Authenticate'));
+        try {
+            $access_token = $this->getListener()->handle($request);
+            $this->getUserInfo()->getUserInfo($access_token);
+            $this->fail('Should throw an Exception');
+        } catch (BaseException $e) {
+            $this->assertInstanceOf(BadRequestExceptionInterface::class, $e);
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Access token does not contain the "openid" scope.', $e->getDescription());
+            $this->assertEquals(400, $e->getCode());
+        }
     }
 
     public function testUserInfoSuccess()
     {
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer USER_INFO']);
 
-        $response = new Response();
-        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
-        $response->getBody()->rewind();
+        $access_token = $this->getListener()->handle($request);
+        $data = $this->getUserInfo()->getUserInfo($access_token);
 
-        $this->assertEquals('application/jwt', $response->getHeader('Content-Type')[0]);
+        $id_token = Loader::load($data);
 
-        $jwt = Loader::load($response->getBody()->getContents());
-        $expected_claims = json_decode('{"sub":"user1","birthdate":"1950-01-01","email":"root@localhost.com","email_verified":false,"address":{"street_address":"5 rue Sainte Anne","locality":"Paris","region":"\u00cele de France","postal_code":"75001","country":"France"}}', true);
-
-        $this->assertEquals($expected_claims, $jwt->getClaims());
+        $this->assertTrue($id_token->hasClaim('exp'));
+        $this->assertTrue($id_token->hasClaim('nbf'));
+        $this->assertTrue($id_token->hasClaim('iat'));
+        $this->assertTrue($id_token->hasClaim('sub'));
+        $this->assertTrue($id_token->hasClaim('aud'));
+        $this->assertTrue($id_token->hasClaim('iss'));
+        $this->assertTrue($id_token->hasClaim('birthdate'));
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
+        $this->assertTrue($id_token->hasClaim('address'));
     }
 
     public function testUserInfoSuccessAndEncrypted()
     {
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer USER_INFO2']);
 
-        $response = new Response();
-        $this->getUserInfoEndpoint()->getUserInfo($request, $response);
-        $response->getBody()->rewind();
+        $access_token = $this->getListener()->handle($request);
+        $data = $this->getUserInfo()->getUserInfo($access_token);
 
-        $this->assertEquals('application/jwt', $response->getHeader('Content-Type')[0]);
-
-        $jwt = Loader::load($response->getBody()->getContents());
+        $jwt = Loader::load($data);
         $this->assertInstanceOf(JWEInterface::class, $jwt);
         $decrypter = DecrypterFactory::createDecrypter(['A256KW', 'A256CBC-HS512']);
         $decrypter->decryptUsingKey($jwt, new JWK([
@@ -512,8 +541,15 @@ class OpenIDConnectTest extends Base
         $id_token = Loader::load($jwt->getPayload());
         $this->assertInstanceOf(JWSInterface::class, $id_token);
 
-        $expected_claims = json_decode('{"sub":"user1","birthdate":"1950-01-01","email":"root@localhost.com","email_verified":false,"address":{"street_address":"5 rue Sainte Anne","locality":"Paris","region":"\u00cele de France","postal_code":"75001","country":"France"}}', true);
-
-        $this->assertEquals($expected_claims, $id_token->getClaims());
+        $this->assertTrue($id_token->hasClaim('exp'));
+        $this->assertTrue($id_token->hasClaim('nbf'));
+        $this->assertTrue($id_token->hasClaim('iat'));
+        $this->assertTrue($id_token->hasClaim('sub'));
+        $this->assertTrue($id_token->hasClaim('aud'));
+        $this->assertTrue($id_token->hasClaim('iss'));
+        $this->assertTrue($id_token->hasClaim('birthdate'));
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
+        $this->assertTrue($id_token->hasClaim('address'));
     }
 }

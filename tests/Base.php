@@ -25,6 +25,8 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
+use OAuth2\Security\EntryPoint;
+use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Grant\AuthorizationCodeGrantType;
@@ -39,7 +41,7 @@ use OAuth2\OpenIDConnect\IdTokenManager;
 use OAuth2\OpenIDConnect\Metadata;
 use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
-use OAuth2\OpenIDConnect\UserInfoEndpoint;
+use OAuth2\OpenIDConnect\UserInfo;
 use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Test\Stub\AuthCodeManager;
@@ -175,19 +177,17 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIDConnect\UserInfoEndpointInterface
+     * @var null|\OAuth2\OpenIDConnect\UserInfoInterface
      */
     private $user_info_endpoint = null;
 
     /**
-     * @return \OAuth2\OpenIDConnect\UserInfoEndpointInterface
+     * @return \OAuth2\OpenIDConnect\UserInfoInterface
      */
-    protected function getUserInfoEndpoint()
+    protected function getUserInfo()
     {
         if (null === $this->user_info_endpoint) {
-            $this->user_info_endpoint = new UserInfoEndpoint(
-                $this->getTokenTypeManager(),
-                $this->getJWTAccessTokenManager(),
+            $this->user_info_endpoint = new UserInfo(
                 $this->getUserManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getExceptionManager()
@@ -207,6 +207,47 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->user_info_endpoint;
+    }
+
+    /**
+     * @var null|\OAuth2\Security\ListenerInterface
+     */
+    private $listener = null;
+
+    /**
+     * @return \OAuth2\Security\ListenerInterface
+     */
+    protected function getListener()
+    {
+        if (null === $this->listener) {
+            $this->listener = new Listener(
+                $this->getTokenTypeManager(),
+                $this->getJWTAccessTokenManager(),
+                $this->getExceptionManager()
+            );
+        }
+
+        return $this->listener;
+    }
+
+    /**
+     * @var null|\OAuth2\Security\EntryPointInterface
+     */
+    private $entry_point = null;
+
+    /**
+     * @return \OAuth2\Security\EntryPointInterface
+     */
+    protected function getEntryPoint()
+    {
+        if (null === $this->entry_point) {
+            $this->entry_point = new EntryPoint(
+                $this->getTokenTypeManager(),
+                $this->getExceptionManager()
+            );
+        }
+
+        return $this->entry_point;
     }
 
     /**
@@ -1016,9 +1057,9 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->setIdTokenSigningAlgValuesSupported($this->getIdTokenManager()->getSignatureAlgorithms());
             $this->metadata->setIdTokenEncryptionAlgValuesSupported($this->getIdTokenManager()->getKeyEncryptionAlgorithms());
             $this->metadata->setIdTokenEncryptionEncValuesSupported($this->getIdTokenManager()->getContentEncryptionAlgorithms());
-            $this->metadata->setUserinfoSigningAlgValuesSupported($this->getUserInfoEndpoint()->getSignatureAlgorithms());
-            $this->metadata->setUserinfoEncryptionAlgValuesSupported($this->getUserInfoEndpoint()->getKeyEncryptionAlgorithms());
-            $this->metadata->setUserinfoEncryptionEncValuesSupported($this->getUserInfoEndpoint()->getContentEncryptionAlgorithms());
+            $this->metadata->setUserinfoSigningAlgValuesSupported($this->getUserInfo()->getSupportedSignatureAlgorithms());
+            $this->metadata->setUserinfoEncryptionAlgValuesSupported($this->getUserInfo()->getSupportedKeyEncryptionAlgorithms());
+            $this->metadata->setUserinfoEncryptionEncValuesSupported($this->getUserInfo()->getSupportedContentEncryptionAlgorithms());
             $this->metadata->setRequestObjectSigningAlgValuesSupported($this->getJWTLoader()->getSupportedSignatureAlgorithms());
             $this->metadata->setRequestObjectEncryptionAlgValuesSupported($this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->setRequestObjectEncryptionEncValuesSupported($this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());

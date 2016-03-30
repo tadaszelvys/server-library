@@ -20,11 +20,11 @@ use OAuth2\Token\AccessTokenInterface;
 interface UserInterface extends BaseUserInterface
 {
     /**
-     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     * @param string[] $scopes
      *
      * @return array
      */
-    public function getUserInfo(AccessTokenInterface $access_token);
+    public function getUserInfo(array $scopes);
 
     /**
      * @return null|int

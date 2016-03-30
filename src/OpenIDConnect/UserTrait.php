@@ -11,8 +11,6 @@
 
 namespace OAuth2\OpenIDConnect;
 
-use OAuth2\Token\AccessTokenInterface;
-
 trait UserTrait
 {
     /**
@@ -154,12 +152,12 @@ trait UserTrait
     /**
      * {@inheritdoc}
      */
-    public function getUserInfo(AccessTokenInterface $access_token)
+    public function getUserInfo(array $scopes)
     {
         $claims = [];
         $supported_scopes = $this->getSupportedUserInfoScopes();
         foreach ($supported_scopes as $scope => $method) {
-            if ($access_token->hasScope($scope)) {
+            if (in_array($scope, $scopes)) {
                 $claims = array_merge(
                     $claims,
                     $this->$method()
