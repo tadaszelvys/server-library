@@ -17,7 +17,7 @@ interface EncryptionCapabilitiesInterface
      * @return bool
      */
     public function isEncryptionSupportEnabled();
-    
+
     /**
      * @return \Jose\Object\JWKInterface
      */

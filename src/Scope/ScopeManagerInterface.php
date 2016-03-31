@@ -19,7 +19,7 @@ interface ScopeManagerInterface
      * @return string[]
      */
     public function getSupportedScopePolicies();
-    
+
     /**
      * @param \OAuth2\Scope\ScopePolicyInterface $scope_policy
      * @param bool                               $is_default
@@ -38,7 +38,7 @@ interface ScopeManagerInterface
     /**
      * This function returns the scope policy. If a valid ClientInterface object is set as parameter, the function will return scope policy for the client.
      *
-     * @param \OAuth2\Client\ClientInterface           $client  A client
+     * @param \OAuth2\Client\ClientInterface $client A client
      *
      * @return \OAuth2\Scope\ScopePolicyInterface
      */
@@ -47,8 +47,8 @@ interface ScopeManagerInterface
     /**
      * This function check if the scopes respect the scope policy for the client.
      *
-     * @param string[]                                 $scope   The scopes
-     * @param \OAuth2\Client\ClientInterface           $client  A client
+     * @param string[]                       $scope  The scopes
+     * @param \OAuth2\Client\ClientInterface $client A client
      *
      * @return string[] An array scopes according to the scope policy
      */

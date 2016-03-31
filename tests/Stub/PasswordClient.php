@@ -12,8 +12,8 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
-use OAuth2\Client\PasswordClient as BasePasswordClient;
 use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
+use OAuth2\Client\PasswordClient as BasePasswordClient;
 
 class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface, ScopePolicyExtensionInterface
 {

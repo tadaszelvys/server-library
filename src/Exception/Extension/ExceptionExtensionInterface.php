@@ -11,8 +11,6 @@
 
 namespace OAuth2\Exception\Extension;
 
-/**
- */
 interface ExceptionExtensionInterface
 {
     /**

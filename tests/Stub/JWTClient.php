@@ -13,8 +13,8 @@ namespace OAuth2\Test\Stub;
 
 use Jose\Object\JWKSetInterface;
 use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
-use OAuth2\Client\JWTClient as BaseJWTClient;
 use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
+use OAuth2\Client\JWTClient as BaseJWTClient;
 
 class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface, ScopePolicyExtensionInterface
 {

@@ -108,6 +108,7 @@ class MacAccessTokenTest extends Base
         $header = $this->generateHeader($mac_id, $mac_algorithm, $mac_key, $timestamp, $method, $uri);
 
         $request = $this->createRequest($uri, $method, $parameters, $server, array_merge($headers, ['Authorization' => $header]), $content);
+
         return $request;
     }
 

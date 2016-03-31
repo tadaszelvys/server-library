@@ -11,13 +11,13 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Client\ClientInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\User\IssueRefreshTokenExtensionInterface;
 use OAuth2\User\UserInterface;
 use OAuth2\User\UserManagerInterface;
-use OAuth2\User\IssueRefreshTokenExtensionInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -34,7 +34,7 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
     /**
      * ResourceOwnerPasswordCredentialsGrantType constructor.
      *
-     * @param \OAuth2\User\UserManagerInterface     $user_manager
+     * @param \OAuth2\User\UserManagerInterface           $user_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(
@@ -92,8 +92,8 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeSuppor
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface   $client
-     * @param \OAuth2\User\UserInterface $user
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param \OAuth2\User\UserInterface     $user
      *
      * @return bool
      */

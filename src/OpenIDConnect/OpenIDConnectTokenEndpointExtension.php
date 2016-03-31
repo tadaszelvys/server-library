@@ -13,10 +13,10 @@ namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\TokenEndpointExtensionInterface;
-use OAuth2\User\UserManagerInterface;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
+use OAuth2\User\UserManagerInterface;
 
 /**
  * Class OpenIDConnectTokenEndpointExtension.
@@ -37,7 +37,7 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
      * OpenIDConnectTokenEndpointExtension constructor.
      *
      * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface $id_token_manager
-     * @param \OAuth2\User\UserManagerInterface       $user_manager
+     * @param \OAuth2\User\UserManagerInterface             $user_manager
      */
     public function __construct(IdTokenManagerInterface $id_token_manager,
                                 UserManagerInterface $user_manager

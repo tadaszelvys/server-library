@@ -10,6 +10,7 @@
  */
 
 namespace OAuth2\Exception;
+
 use OAuth2\Exception\Extension\ExceptionExtensionInterface;
 
 /**

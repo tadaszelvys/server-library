@@ -16,8 +16,8 @@ use OAuth2\User\UserInterface;
 interface PairwiseSubjectIdentifierAlgorithmInterface
 {
     /**
-     * @param \OAuth2\User\UserInterface     $user
-     * @param string                         $sector_identifier_uri
+     * @param \OAuth2\User\UserInterface $user
+     * @param string                     $sector_identifier_uri
      *
      * @return string
      */

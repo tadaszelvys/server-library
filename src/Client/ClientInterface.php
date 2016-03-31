@@ -35,7 +35,7 @@ interface ClientInterface extends ResourceOwnerInterface
      * @return string[]
      */
     public function getAllowedGrantTypes();
-    
+
     /**
      * Checks if the token type is allowed for the client.
      *

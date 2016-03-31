@@ -16,8 +16,8 @@ interface UserManagerInterface
     /**
      * Check if the end-user password is valid.
      *
-     * @param \OAuth2\User\UserInterface $user The end-user
-     * @param string                           $password Password
+     * @param \OAuth2\User\UserInterface $user     The end-user
+     * @param string                     $password Password
      *
      * @return bool
      */

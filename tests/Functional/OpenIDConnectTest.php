@@ -113,7 +113,6 @@ class OpenIDConnectTest extends Base
         $this->assertEquals('**UNREGISTERED**--foo', $id_token->getClaim('aud'));
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
 
-
         $this->assertEquals('iu6KK2l_kPf4_mOdpWE668f9bc6fk-2auRRZi4lWhi_zpypYTW45N6SpsahXSqbzQNjcbd30f8srPLf7XEdCKA', $id_token->getClaim('sub'));
     }
 

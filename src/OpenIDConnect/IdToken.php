@@ -11,7 +11,6 @@
 
 namespace OAuth2\OpenIDConnect;
 
-use Jose\Object\JWSInterface;
 use OAuth2\Token\Token;
 
 class IdToken extends Token implements IdTokenInterface

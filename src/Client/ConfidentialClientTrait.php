@@ -14,7 +14,7 @@ namespace OAuth2\Client;
 use Assert\Assertion;
 
 /**
- * Class ConfidentialClientTrait
+ * Class ConfidentialClientTrait.
  */
 trait ConfidentialClientTrait
 {

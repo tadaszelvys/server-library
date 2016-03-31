@@ -145,7 +145,6 @@ class IdTokenManager implements IdTokenManagerInterface
             'exp'       => $exp,
         ];
         if ($user instanceof UserInterface) {
-
             $payload['auth_time'] = $user->getLastLoginAt();
         }
 
@@ -164,9 +163,9 @@ class IdTokenManager implements IdTokenManagerInterface
         if (!empty($id_token_claims)) {
             $payload = array_merge($payload, $id_token_claims);
         }
-        
+
         $jwt = $this->jwt_creator->sign($payload, $headers, $this->signature_key);
-        
+
         if ($client instanceof EncryptionCapabilitiesInterface && true === $client->isEncryptionSupportEnabled()) {
             $headers = [
                 'typ'       => 'JWT',
@@ -222,7 +221,7 @@ class IdTokenManager implements IdTokenManagerInterface
         }
 
         $sector_identifier_host = $this->getSectorIdentifierHost($client, $redirect_uri);
-        
+
         return $this->pairwise_algorithm->calculateSubjectIdentifier(
             $user,
             $sector_identifier_host
@@ -247,7 +246,7 @@ class IdTokenManager implements IdTokenManagerInterface
         if (!is_array($data) || !array_key_exists('host', $data)) {
             throw new \InvalidArgumentException(sprintf('Invalid Sector Identifier Uri "%s".', $uri));
         }
-        
+
         return $data['host'];
     }
 

@@ -12,7 +12,6 @@
 namespace OAuth2\Scope;
 
 use OAuth2\Client\ClientInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 interface ScopePolicyInterface
 {
@@ -24,8 +23,8 @@ interface ScopePolicyInterface
     /**
      * This function check if the scopes respect the scope policy for the client.
      *
-     * @param string[]                                 $scope   The scopes. This variable may be modified according to the scope policy
-     * @param \OAuth2\Client\ClientInterface           $client  The client
+     * @param string[]                       $scope  The scopes. This variable may be modified according to the scope policy
+     * @param \OAuth2\Client\ClientInterface $client The client
      */
     public function checkScopePolicy(array &$scope, ClientInterface $client);
 }

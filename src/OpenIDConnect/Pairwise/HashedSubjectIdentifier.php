@@ -21,12 +21,12 @@ class HashedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInter
      * @var string
      */
     private $algorithm;
-    
+
     /**
      * @var string
      */
     private $pairwise_hash_key;
-    
+
     /**
      * @var string
      */

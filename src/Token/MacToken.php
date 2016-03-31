@@ -215,7 +215,7 @@ class MacToken implements TokenTypeInterface
             $host."\n".
             $port."\n".
             $ext."\n";
-        
+
         $algorithms = $this->getAlgorithmMap();
         if (!array_key_exists($token->getParameter('mac_algorithm'), $algorithms)) {
             return false;
