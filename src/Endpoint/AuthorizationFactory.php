@@ -179,32 +179,35 @@ final class AuthorizationFactory
     {
         $params = $request->getQueryParams();
         if (array_key_exists('request', $params)) {
-            return $this->createFromRequestParameter($params['request'], $user, $is_authorized);
+            return $this->createFromRequestParameter($params, $user, $is_authorized);
         } elseif (array_key_exists('request_uri', $params)) {
-            return $this->createFromRequestUriParameter($params['request_uri'], $user, $is_authorized);
+            return $this->createFromRequestUriParameter($params, $user, $is_authorized);
         }
 
         return $this->createFromStandardRequest($params, $user, $is_authorized);
     }
 
     /**
-     * @param string                           $request
+     * @param array                      $params
      * @param \OAuth2\User\UserInterface $user
-     * @param bool                             $is_authorized
+     * @param bool                       $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
      */
-    private function createFromRequestParameter($request, UserInterface $user, $is_authorized)
+    private function createFromRequestParameter(array $params, UserInterface $user, $is_authorized)
     {
         if (false === $this->isRequestObjectSupportEnabled()) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_NOT_SUPPORTED, 'The parameter "request" is not supported.');
         }
+        $request = $params['request'];
         Assertion::string($request);
 
         $scope = [];
         $jws = $this->loadRequest($request, $scope, $client);
+        $params = array_merge($params, $jws->getClaims());
+        unset($params['request']);
 
-        return $this->createAuthorization($jws->getClaims(), $user, $client, $scope, $is_authorized);
+        return $this->createAuthorization($params, $user, $client, $scope, $is_authorized);
     }
 
     /**
@@ -244,24 +247,27 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param string                           $request_uri
+     * @param array                      $params
      * @param \OAuth2\User\UserInterface $user
-     * @param bool                             $is_authorized
+     * @param bool                       $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
      */
-    private function createFromRequestUriParameter($request_uri, UserInterface $user, $is_authorized)
+    private function createFromRequestUriParameter(array $params, UserInterface $user, $is_authorized)
     {
         if (false === $this->isRequestObjectReferenceSupportEnabled()) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_URI_NOT_SUPPORTED, 'The parameter "request" is not supported.');
         }
+        $request_uri = $params['request_uri'];
         Assertion::url($request_uri, 'Invalid URL.');
 
         $content = $this->downloadContent($request_uri);
         $scope = [];
         $jws = $this->loadRequest($content, $scope, $client);
+        $params = array_merge($params, $jws->getClaims());
+        unset($params['request_uri']);
 
-        return $this->createAuthorization($jws->getClaims(), $user, $client, $scope, $is_authorized);
+        return $this->createAuthorization($params, $user, $client, $scope, $is_authorized);
     }
 
     /**
