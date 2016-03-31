@@ -69,8 +69,7 @@ The following components are implemented:
 
 * Partial implementation
     * [ ] Threat Model and Security Consideration ([RFC6819](https://tools.ietf.org/html/rfc6819))
-
-* OpenID Connect: - *Partial Support* - See [the dedicated page of its implementation](doc/OpenID_Connect_Implementeation_Status.md)
+    * [ ] OpenID Connect: See [the dedicated page of its implementation](doc/OpenID_Connect_Implementation_Status.md)
 
 * Integration planned
     * [Proof-of-Possession (PoP) Security Architecture](https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture)
