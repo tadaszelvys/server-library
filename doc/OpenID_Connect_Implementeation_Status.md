@@ -30,6 +30,9 @@ OpenID Connect Implementeation Status
     * [ ] [Subject Identifier Types](http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes)
         * [x] `public`
         * [x] `pairwise` (*experimental*)
+            * [x] Hashed Subject Identifier
+            * [x] Encrypted Subject Identifier
+            * [x] Ability to support other Subject Identifier Calculation Algorithms
     * [x]  [Client Authentication](http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
         * [x] Authentication Methods:
             * [x] `client_secret_basic`

@@ -11,7 +11,6 @@
 
 namespace OAuth2\Test\Functional;
 
-use Base64Url\Base64Url;
 use Jose\Factory\DecrypterFactory;
 use Jose\Loader;
 use Jose\Object\JWEInterface;
@@ -21,6 +20,8 @@ use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BadRequestExceptionInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\OpenIDConnect\Metadata;
+use OAuth2\OpenIDConnect\Pairwise\EncryptedSubjectIdentifier;
+use OAuth2\OpenIDConnect\Pairwise\HashedSubjectIdentifier;
 use OAuth2\Test\Base;
 use OAuth2\Token\AccessTokenInterface;
 use Zend\Diactoros\Response;
@@ -113,13 +114,35 @@ class OpenIDConnectTest extends Base
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
 
 
-        $this->assertEquals('GodTJ-2hBFhuBKdL_ZBZZ_RJXmlMlONgcA3dtXUNUy41Hi50dycFnx6UwwItDEAVIC9daJrfYVAann1rCRCebQ', $id_token->getClaim('sub'));
+        $this->assertEquals('iu6KK2l_kPf4_mOdpWE668f9bc6fk-2auRRZi4lWhi_zpypYTW45N6SpsahXSqbzQNjcbd30f8srPLf7XEdCKA', $id_token->getClaim('sub'));
+    }
 
-        $decrypted = openssl_decrypt(Base64Url::decode($id_token->getClaim('sub')),'aes-256-ecb', $this->getPairwiseEncryptionKey(), OPENSSL_RAW_DATA);
-        $parts = explode(':', $decrypted);
-        $this->assertEquals(3, count($parts));
-        $this->assertEquals($parts[2], hash('sha256', $id_token->getClaim('aud'), true));
-        $this->assertEquals('user1', $parts[1]);
+    public function testHashedPairwise()
+    {
+        $user = $this->getUserManager()->getUser('user1');
+        $algorithm = new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData());
+
+        $this->assertEquals(
+            'iu6KK2l_kPf4_mOdpWE668f9bc6fk-2auRRZi4lWhi_zpypYTW45N6SpsahXSqbzQNjcbd30f8srPLf7XEdCKA',
+            $algorithm->calculateSubjectIdentifier(
+                $user,
+                'example.com'
+            )
+        );
+    }
+
+    public function testEncryptedPairwise()
+    {
+        $user = $this->getUserManager()->getUser('user1');
+        $algorithm = new EncryptedSubjectIdentifier($this->getPairwiseKey(), 'aes-128-cbc', $this->getPairwiseAdditionalData(), $this->getPairwiseAdditionalData());
+
+        $this->assertEquals(
+            'uy1climA7Ruoi3HKyb5vrgygYnO2uL6Wp7xxT1FuYjGRr52Dqqv1Kk27M-gGrrAH',
+            $algorithm->calculateSubjectIdentifier(
+                $user,
+                'example.com'
+            )
+        );
     }
 
     public function testCodeTokenSuccess()

@@ -25,6 +25,7 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
+use OAuth2\OpenIDConnect\Pairwise\HashedSubjectIdentifier;
 use OAuth2\Security\EntryPoint;
 use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\TooManyRequestsException;
@@ -80,7 +81,12 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    private $pairwise_encryption_key = 'This is my secret Key !!!';
+    private $pairwise_key = 'This is my secret Key !!!';
+
+    /**
+     * @var string
+     */
+    private $pairwise_additional_data = 'This is my salt or my IV !!!';
 
     protected function setUp()
     {
@@ -99,9 +105,17 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @return string
      */
-    protected function getPairwiseEncryptionKey()
+    protected function getPairwiseKey()
     {
-        return $this->pairwise_encryption_key;
+        return $this->pairwise_key;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPairwiseAdditionalData()
+    {
+        return mb_substr($this->pairwise_additional_data,0, 16, '8bit');
     }
 
     /**
@@ -975,7 +989,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ])
             );
-            $this->id_token_manager->enablePairwiseSubject($this->getPairwiseEncryptionKey());
+            $this->id_token_manager->enablePairwiseSubject(new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData()));
         }
 
         return $this->id_token_manager;

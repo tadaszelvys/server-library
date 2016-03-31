@@ -25,6 +25,19 @@ trait RegisteredClientTrait
     protected $redirect_uris = [];
 
     /**
+     * @var string|null
+     */
+    protected $sector_identifier_uri = null;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSectorIdentifierUri()
+    {
+        return $this->sector_identifier_uri;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getRedirectUris()

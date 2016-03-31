@@ -20,6 +20,12 @@ namespace OAuth2\Client;
 interface RegisteredClientInterface extends ClientInterface
 {
     /**
+     * 
+     * @return string|null
+     */
+    public function getSectorIdentifierUri();
+    
+    /**
      * Get the redirect URIs where the authorization server directs the resource owner.
      * URIs must be absolute.
      *

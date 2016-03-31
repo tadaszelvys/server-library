@@ -12,14 +12,15 @@
 namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Client\ClientInterface;
+use OAuth2\OpenIDConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
 use OAuth2\User\UserInterface as BaseUserInterface;
 
 interface IdTokenManagerInterface
 {
     /**
-     * @param string $pairwise_encryption_key
+     * @param \OAuth2\OpenIDConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface $algorithm
      */
-    public function enablePairwiseSubject($pairwise_encryption_key);
+    public function enablePairwiseSubject(PairwiseSubjectIdentifierAlgorithmInterface $algorithm);
 
     /**
      * @return bool
