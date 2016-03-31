@@ -12,7 +12,7 @@
 namespace OAuth2\Test;
 
 use Jose\Checker\AudienceChecker;
-use Jose\Checker\CheckerManager;
+use Jose\Factory\CheckerManagerFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use OAuth2\Client\ClientManagerSupervisor;
@@ -25,6 +25,7 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
+use OAuth2\Exception\ExceptionManager;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
@@ -34,12 +35,16 @@ use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\OpenIDConnect\FormPostResponseMode;
 use OAuth2\OpenIDConnect\IdTokenGrantType;
 use OAuth2\OpenIDConnect\IdTokenManager;
+use OAuth2\OpenIDConnect\Metadata;
 use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
-use OAuth2\OpenIDConnect\UserInfoEndpoint;
+use OAuth2\OpenIDConnect\Pairwise\HashedSubjectIdentifier;
+use OAuth2\OpenIDConnect\UserInfo;
+use OAuth2\Scope\DefaultScopePolicy;
+use OAuth2\Scope\ErrorScopePolicy;
+use OAuth2\Security\EntryPoint;
+use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\AuthCodeManager;
-use OAuth2\Test\Stub\EndUserManager;
-use OAuth2\Test\Stub\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\JWTClientManager;
@@ -49,7 +54,10 @@ use OAuth2\Test\Stub\PublicClientManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
+use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\UnregisteredClientManager;
+use OAuth2\Test\Stub\UriExtension;
+use OAuth2\Test\Stub\UserManager;
 use OAuth2\Token\BearerToken;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
@@ -68,12 +76,46 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    private $issuer = 'My Authorization Server';
+    private $issuer = 'https://server.example.com';
+
+    /**
+     * @var string
+     */
+    private $pairwise_key = 'This is my secret Key !!!';
+
+    /**
+     * @var string
+     */
+    private $pairwise_additional_data = 'This is my salt or my IV !!!';
 
     protected function setUp()
     {
         //To fix HHVM tests on Travis-CI
         date_default_timezone_set('UTC');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getIssuer()
+    {
+        return $this->issuer;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPairwiseKey()
+    {
+        return $this->pairwise_key;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPairwiseAdditionalData()
+    {
+        return mb_substr($this->pairwise_additional_data, 0, 16, '8bit');
     }
 
     /**
@@ -115,21 +157,13 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager()
             );
 
-            $this->authorization_factory->enableSignedRequestsSupport(
+            $this->authorization_factory->enableRequestObjectSupport(
                 $this->getJWTLoader(),
-                ['HS512'],
-                new JWKSet(['keys' => [
-                    [
-                        'kid' => 'JWK2',
-                        'use' => 'sig',
-                        'kty' => 'oct',
-                        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                    ],
-                ]])
+                ['HS256', 'HS512']
             );
+            $this->authorization_factory->enableRequestObjectReferenceSupport();
 
-            $this->authorization_factory->enableEncryptedRequestsSupport(
-                false,
+            $this->authorization_factory->enableEncryptedRequestObjectSupport(
                 ['A256KW'],
                 ['A256CBC-HS512'],
                 new JWKSet(['keys' => [
@@ -141,9 +175,6 @@ class Base extends \PHPUnit_Framework_TestCase
                     ],
                 ]])
             );
-
-            $this->authorization_factory->enableRequestParameterSupport();
-            $this->authorization_factory->enableRequestUriParameterSupport();
         }
 
         return $this->authorization_factory;
@@ -173,27 +204,25 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIDConnect\UserInfoEndpointInterface
+     * @var null|\OAuth2\OpenIDConnect\UserInfoInterface
      */
     private $user_info_endpoint = null;
 
     /**
-     * @return \OAuth2\OpenIDConnect\UserInfoEndpointInterface
+     * @return \OAuth2\OpenIDConnect\UserInfoInterface
      */
-    protected function getUserInfoEndpoint()
+    protected function getUserInfo()
     {
         if (null === $this->user_info_endpoint) {
-            $this->user_info_endpoint = new UserInfoEndpoint(
-                $this->getTokenTypeManager(),
-                $this->getJWTAccessTokenManager(),
-                $this->getEndUserManager(),
+            $this->user_info_endpoint = new UserInfo(
+                $this->getUserManager(),
                 $this->getClientManagerSupervisor(),
                 $this->getExceptionManager()
             );
 
-            $this->user_info_endpoint->enableSignedAndEncryptedResponsesSupport(
+            $this->user_info_endpoint->enableSignedResponsesSupport(
                 $this->getJWTCreator(),
-                $this->issuer,
+                $this->getIssuer(),
                 'HS512',
                 new JWK([
                     'kid' => 'JWK2',
@@ -205,6 +234,47 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->user_info_endpoint;
+    }
+
+    /**
+     * @var null|\OAuth2\Security\ListenerInterface
+     */
+    private $listener = null;
+
+    /**
+     * @return \OAuth2\Security\ListenerInterface
+     */
+    protected function getListener()
+    {
+        if (null === $this->listener) {
+            $this->listener = new Listener(
+                $this->getTokenTypeManager(),
+                $this->getJWTAccessTokenManager(),
+                $this->getExceptionManager()
+            );
+        }
+
+        return $this->listener;
+    }
+
+    /**
+     * @var null|\OAuth2\Security\EntryPointInterface
+     */
+    private $entry_point = null;
+
+    /**
+     * @return \OAuth2\Security\EntryPointInterface
+     */
+    protected function getEntryPoint()
+    {
+        if (null === $this->entry_point) {
+            $this->entry_point = new EntryPoint(
+                $this->getTokenTypeManager(),
+                $this->getExceptionManager()
+            );
+        }
+
+        return $this->entry_point;
     }
 
     /**
@@ -245,7 +315,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManagerSupervisor(),
-                $this->getEndUserManager(),
+                $this->getUserManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
                 $this->getRefreshTokenManager()
@@ -279,8 +349,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->openid_connect_token_endpoint_extension) {
             $this->openid_connect_token_endpoint_extension = new OpenIDConnectTokenEndpointExtension(
                 $this->getIdTokenManager(),
-                $this->getEndUserManager(),
-                $this->getExceptionManager()
+                $this->getUserManager()
             );
         }
 
@@ -307,13 +376,16 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_endpoint->addResponseType($this->getImplicitGrantType());
             $this->authorization_endpoint->addResponseType($this->getNoneResponseType());
             $this->authorization_endpoint->addResponseType($this->getIdTokenGrantType());
-            //$this->authorization_endpoint->addResponseType($this->getIdTokenTokenGrantType());
 
             $this->authorization_endpoint->addResponseMode(new QueryResponseMode());
             $this->authorization_endpoint->addResponseMode(new FragmentResponseMode());
             $this->authorization_endpoint->addResponseMode(new FormPostResponseMode());
 
             $this->authorization_endpoint->allowResponseModeParameterInAuthorizationRequest();
+            $this->authorization_endpoint->disallowResponseModeParameterInAuthorizationRequest();
+            $this->authorization_endpoint->allowResponseModeParameterInAuthorizationRequest();
+            $this->authorization_endpoint->enableStateParameterEnforcement();
+            $this->authorization_endpoint->disableStateParameterEnforcement();
             $this->authorization_endpoint->enableStateParameterEnforcement();
         }
 
@@ -321,37 +393,39 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Test\Stub\ExceptionManager
+     * @var null|\OAuth2\Exception\ExceptionManagerInterface
      */
     private $exception_manager = null;
 
     /**
-     * @return \OAuth2\Test\Stub\ExceptionManager
+     * @return \OAuth2\Exception\ExceptionManagerInterface
      */
     protected function getExceptionManager()
     {
         if (null === $this->exception_manager) {
             $this->exception_manager = new ExceptionManager();
+            $this->exception_manager->addExtension(new UriExtension());
+            $this->exception_manager->addExceptionType('TooManyRequests', TooManyRequestsException::class);
         }
 
         return $this->exception_manager;
     }
 
     /**
-     * @var null|\OAuth2\Test\Stub\EndUserManager
+     * @var null|\OAuth2\Test\Stub\UserManager
      */
-    private $end_user_manager = null;
+    private $user_manager = null;
 
     /**
-     * @return \OAuth2\Test\Stub\EndUserManager
+     * @return \OAuth2\Test\Stub\UserManager
      */
-    protected function getEndUserManager()
+    protected function getUserManager()
     {
-        if (null === $this->end_user_manager) {
-            $this->end_user_manager = new EndUserManager();
+        if (null === $this->user_manager) {
+            $this->user_manager = new UserManager();
         }
 
-        return $this->end_user_manager;
+        return $this->user_manager;
     }
 
     /**
@@ -429,11 +503,30 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->password_client_manager) {
             $this->password_client_manager = new PasswordClientManager(
+                $this->getJWTLoader(),
                 $this->getExceptionManager(),
                 $this->realm
             );
 
+            $key_encryption_key_set = new JWKSet(['keys' => [
+                [
+                    'kid' => 'JWK1',
+                    'use' => 'enc',
+                    'kty' => 'oct',
+                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                ],
+            ]]);
+
+            $this->password_client_manager->enableEncryptedAssertions(
+                false,
+                ['A256KW'],
+                ['A256CBC-HS512'],
+                $key_encryption_key_set
+            );
+
             $this->password_client_manager->createClients();
+            $this->password_client_manager->enablePasswordClientCredentialsInBodyRequest();
+            $this->password_client_manager->disablePasswordClientCredentialsInBodyRequest();
             $this->password_client_manager->enablePasswordClientCredentialsInBodyRequest();
         }
 
@@ -470,13 +563,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTClientManager()
     {
         if (null === $this->jwt_client_manager) {
-            $signature_key_set = new JWKSet(['keys' => [[
-                'kid' => 'JWK2',
-                'use' => 'sig',
-                'kty' => 'oct',
-                'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-            ],
-            ]]);
             $key_encryption_key_set = new JWKSet(['keys' => [
                 [
                     'kid' => 'JWK1',
@@ -488,9 +574,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->jwt_client_manager = new JWTClientManager(
                 $this->getJWTLoader(),
-                $this->getExceptionManager(),
-                ['HS512'],
-                $signature_key_set
+                $this->getExceptionManager()
 
             );
             $this->jwt_client_manager->enableEncryptedAssertions(
@@ -522,6 +606,8 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
+            $this->authorization_code_grant_type->disablePKCEForPublicClientsEnforcement();
+            $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
         }
 
         return $this->authorization_code_grant_type;
@@ -542,6 +628,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager()
             );
             $this->client_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
+            $this->client_credentials_grant_type->disableRefreshTokenIssuanceWithAccessToken();
+            $this->client_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
         }
 
         return $this->client_credentials_grant_type;
@@ -558,13 +646,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getJWTBearerGrantType()
     {
         if (null === $this->jwt_bearer_grant_type) {
-            $signature_key_set = new JWKSet(['keys' => [[
-                    'kid' => 'JWK2',
-                    'use' => 'sig',
-                    'kty' => 'oct',
-                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ],
-            ]]);
             $key_encryption_key_set = new JWKSet(['keys' => [
                 [
                     'kid' => 'JWK1',
@@ -576,9 +657,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->jwt_bearer_grant_type = new JWTBearerGrantType(
                 $this->getJWTLoader(),
-                $this->getExceptionManager(),
-                ['HS512'],
-                $signature_key_set
+                $this->getExceptionManager()
 
             );
             $this->jwt_bearer_grant_type->enableEncryptedAssertions(
@@ -707,9 +786,12 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->resource_owner_password_credentials_grant_type) {
             $this->resource_owner_password_credentials_grant_type = new ResourceOwnerPasswordCredentialsGrantType(
-                $this->getEndUserManager(),
+                $this->getUserManager(),
                 $this->getExceptionManager()
             );
+            $this->resource_owner_password_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
+            $this->resource_owner_password_credentials_grant_type->disableRefreshTokenIssuanceWithAccessToken();
+            $this->resource_owner_password_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
         }
 
         return $this->resource_owner_password_credentials_grant_type;
@@ -729,6 +811,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->scope_manager = new ScopeManager(
                 $this->getExceptionManager()
             );
+            $this->scope_manager->addScopePolicy(new DefaultScopePolicy(['scope1', 'scope2']), true);
+            $this->scope_manager->addScopePolicy(new ErrorScopePolicy($this->getExceptionManager()));
         }
 
         return $this->scope_manager;
@@ -755,7 +839,7 @@ class Base extends \PHPUnit_Framework_TestCase
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ]),
-                $this->issuer
+                $this->getIssuer()
             );
 
             $this->jwt_access_token_manager->enableAccessTokenEncryption(
@@ -786,6 +870,11 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->bearer_token_type) {
             $this->bearer_token_type = new BearerToken();
+
+            $this->bearer_token_type->disallowAccessTokenFromQueryString();
+            $this->bearer_token_type->allowAccessTokenFromQueryString();
+            $this->bearer_token_type->disallowAccessTokenFromRequestBody();
+            $this->bearer_token_type->allowAccessTokenFromRequestBody();
         }
 
         return $this->bearer_token_type;
@@ -804,10 +893,10 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->mac_token_type) {
             $this->mac_token_type = new MacToken();
 
-            $this->mac_token_type->setMacKeyCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             $this->mac_token_type->setMacKeyMinLength(10);
             $this->mac_token_type->setMacKeyMaxLength(20);
             $this->mac_token_type->setMacAlgorithm('hmac-sha-256');
+            $this->mac_token_type->setTimestampLifetime(10);
         }
 
         return $this->mac_token_type;
@@ -848,7 +937,6 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->refresh_token_manager) {
             $this->refresh_token_manager = new RefreshTokenManager();
 
-            $this->refresh_token_manager->setRefreshTokenCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             $this->refresh_token_manager->setRefreshTokenMinLength(10);
             $this->refresh_token_manager->setRefreshTokenMaxLength(20);
             $this->refresh_token_manager->setRefreshTokenLifetime(36000);
@@ -870,7 +958,6 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->auth_code_manager) {
             $this->auth_code_manager = new AuthCodeManager();
 
-            $this->auth_code_manager->setAuthorizationCodeCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             $this->auth_code_manager->setAuthorizationCodeMinLength(10);
             $this->auth_code_manager->setAuthorizationCodeMaxLength(20);
             $this->auth_code_manager->setAuthorizationCodeLifetime(15);
@@ -893,22 +980,16 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->id_token_manager = new IdTokenManager(
                 $this->getJWTLoader(),
                 $this->getJWTCreator(),
-                $this->issuer,
+                $this->getIssuer(),
                 'HS512',
                 new JWK([
                     'kid' => 'JWK2',
                     'use' => 'sig',
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ]),
-                false,
-                new JWK([
-                    'kid' => 'JWK1',
-                    'use' => 'enc',
-                    'kty' => 'oct',
-                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
                 ])
             );
+            $this->id_token_manager->enablePairwiseSubject(new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData()));
         }
 
         return $this->id_token_manager;
@@ -927,9 +1008,11 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->jwt_loader) {
             $this->jwt_loader = new JWTLoader(
                 $this->getClaimCheckerManager(),
-                ['HS256', 'HS384', 'HS512', 'ES256', 'ES384', 'ES512', 'none', 'RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'],
-                ['A128KW', 'A192KW', 'A256KW', 'A128GCMKW', 'A192GCMKW', 'A256GCMKW', 'dir', 'ECDH-ES', 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW', 'PBES2-HS256+A128KW', 'PBES2-HS384+A192KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
-                ['A128GCM', 'A192GCM', 'A256GCM', 'A128CBC-HS256', 'A192CBC-HS384', 'A256CBC-HS512']
+                ['HS256', 'HS512', 'RS256', 'RS512']
+            );
+            $this->jwt_loader->enableEncryptionSupport(
+                ['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
+                ['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512']
             );
         }
 
@@ -948,9 +1031,11 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->jwt_creator) {
             $this->jwt_creator = new JWTCreator(
-                ['HS256', 'HS384', 'HS512', 'ES256', 'ES384', 'ES512', 'none', 'RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'],
-                ['A128KW', 'A192KW', 'A256KW', 'A128GCMKW', 'A192GCMKW', 'A256GCMKW', 'dir', 'ECDH-ES', 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW', 'PBES2-HS256+A128KW', 'PBES2-HS384+A192KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
-                ['A128GCM', 'A192GCM', 'A256GCM', 'A128CBC-HS256', 'A192CBC-HS384', 'A256CBC-HS512']
+                ['HS256', 'HS512', 'RS256', 'RS512']
+            );
+            $this->jwt_creator->enableEncryptionSupport(
+                ['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
+                ['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512']
             );
         }
 
@@ -968,12 +1053,66 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getClaimCheckerManager()
     {
         if (null === $this->claim_checker_manager) {
-            $this->claim_checker_manager = new CheckerManager();
-
-            $this->claim_checker_manager->addClaimChecker(new AudienceChecker($this->issuer));
+            $this->claim_checker_manager = CheckerManagerFactory::createClaimCheckerManager();
+            $this->claim_checker_manager->addClaimChecker(new AudienceChecker($this->getIssuer()));
         }
 
         return $this->claim_checker_manager;
+    }
+
+    /**
+     * @var null|\OAuth2\OpenIDConnect\Metadata
+     */
+    private $metadata = null;
+
+    /**
+     * @return \OAuth2\OpenIDConnect\Metadata
+     */
+    protected function getMetadata()
+    {
+        if (null === $this->metadata) {
+            $this->metadata = new Metadata();
+
+            $this->metadata->setIssuer($this->getIssuer());
+            $this->metadata->setAuthorizationEndpoint('https://my.server.com/authorize');
+            $this->metadata->setTokenEndpoint('https://my.server.com/token');
+            $this->metadata->setUserinfoEndpoint('https://my.server.com/user_info');
+            $this->metadata->setJwksUri('https://my.server.com/jwks');
+            $this->metadata->setRegistrationEndpoint('https://my.server.com/register');
+            $this->metadata->setScopesSupported($this->getScopeManager()->getAvailableScopes());
+            $this->metadata->setResponseTypesSupported($this->getAuthorizationEndpoint()->getResponseTypesSupported());
+            $this->metadata->setResponseModesSupported($this->getAuthorizationEndpoint()->getResponseModesSupported());
+            $this->metadata->setGrantTypesSupported($this->getTokenEndpoint()->getGrantTypesSupported());
+            $this->metadata->setAcrValuesSupported([]);
+            $this->metadata->setSubjectTypesSupported($this->getIdTokenManager()->isPairwiseSubjectIdentifierSupported() ? ['public', 'pairwise'] : ['public']);
+            $this->metadata->setIdTokenSigningAlgValuesSupported($this->getIdTokenManager()->getSignatureAlgorithms());
+            $this->metadata->setIdTokenEncryptionAlgValuesSupported($this->getIdTokenManager()->getKeyEncryptionAlgorithms());
+            $this->metadata->setIdTokenEncryptionEncValuesSupported($this->getIdTokenManager()->getContentEncryptionAlgorithms());
+            $this->metadata->setUserinfoSigningAlgValuesSupported($this->getUserInfo()->getSupportedSignatureAlgorithms());
+            $this->metadata->setUserinfoEncryptionAlgValuesSupported($this->getUserInfo()->getSupportedKeyEncryptionAlgorithms());
+            $this->metadata->setUserinfoEncryptionEncValuesSupported($this->getUserInfo()->getSupportedContentEncryptionAlgorithms());
+            $this->metadata->setRequestObjectSigningAlgValuesSupported($this->getJWTLoader()->getSupportedSignatureAlgorithms());
+            $this->metadata->setRequestObjectEncryptionAlgValuesSupported($this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
+            $this->metadata->setRequestObjectEncryptionEncValuesSupported($this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());
+            $this->metadata->setTokenEndpointAuthMethodsSupported($this->getClientManagerSupervisor()->getSupportedAuthenticationMethods());
+            $this->metadata->setTokenEndpointAuthSigningAlgValuesSupported($this->getAuthorizationFactory()->getSupportedSignatureAlgorithms());
+            $this->metadata->setTokenEndpointAuthEncryptionAlgValuesSupported($this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
+            $this->metadata->setTokenEndpointAuthEncryptionEncValuesSupported($this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());
+            $this->metadata->setDisplayValuesSupported(['page']);
+            $this->metadata->setClaimTypesSupported(false);
+            $this->metadata->setClaimsSupported(false);
+            $this->metadata->setServiceDocumentation('https://my.server.com/documentation');
+            $this->metadata->setClaimsLocalesSupported([]);
+            $this->metadata->setUiLocalesSupported(['en_US', 'fr_FR']);
+            $this->metadata->setClaimsParameterSupported(false);
+            $this->metadata->setRequestParameterSupported($this->getAuthorizationFactory()->isRequestObjectSupportEnabled());
+            $this->metadata->setRequestUriParameterSupported($this->getAuthorizationFactory()->isRequestObjectReferenceSupportEnabled());
+            $this->metadata->setRequireRequestUriRegistration(true);
+            $this->metadata->setOpPolicyUri('https://my.server.com/policy.html');
+            $this->metadata->setOpTosUri('https://my.server.com/tos.html');
+        }
+
+        return $this->metadata;
     }
 
     /**
@@ -987,6 +1126,8 @@ class Base extends \PHPUnit_Framework_TestCase
         );
 
         $access_token_type->enableRefreshTokensRevocationWithAccessTokens();
+        $access_token_type->disableRefreshTokensRevocationWithAccessTokens();
+        $access_token_type->enableRefreshTokensRevocationWithAccessTokens();
 
         return $access_token_type;
     }
@@ -997,47 +1138,5 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRefreshTokenType()
     {
         return new RefreshToken($this->getRefreshTokenManager());
-    }
-
-    protected function getSupportedJWTAlgorithms()
-    {
-        return [
-            'HS256'              => '\Jose\Algorithm\Signature\HS256',
-            'HS384'              => '\Jose\Algorithm\Signature\HS384',
-            'HS512'              => '\Jose\Algorithm\Signature\HS512',
-            'ES256'              => '\Jose\Algorithm\Signature\ES256',
-            'ES384'              => '\Jose\Algorithm\Signature\ES384',
-            'ES512'              => '\Jose\Algorithm\Signature\ES512',
-            'none'               => '\Jose\Algorithm\Signature\None',
-            'RS256'              => '\Jose\Algorithm\Signature\RS256',
-            'RS384'              => '\Jose\Algorithm\Signature\RS384',
-            'RS512'              => '\Jose\Algorithm\Signature\RS512',
-            'PS256'              => '\Jose\Algorithm\Signature\PS256',
-            'PS384'              => '\Jose\Algorithm\Signature\PS384',
-            'PS512'              => '\Jose\Algorithm\Signature\PS512',
-            'A128GCM'            => '\Jose\Algorithm\ContentEncryption\A128GCM',
-            'A192GCM'            => '\Jose\Algorithm\ContentEncryption\A192GCM',
-            'A256GCM'            => '\Jose\Algorithm\ContentEncryption\A256GCM',
-            'A128CBC-HS256'      => '\Jose\Algorithm\ContentEncryption\A128CBCHS256',
-            'A192CBC-HS384'      => '\Jose\Algorithm\ContentEncryption\A192CBCHS384',
-            'A256CBC-HS512'      => '\Jose\Algorithm\ContentEncryption\A256CBCHS512',
-            'A128KW'             => '\Jose\Algorithm\KeyEncryption\A128KW',
-            'A192KW'             => '\Jose\Algorithm\KeyEncryption\A192KW',
-            'A256KW'             => '\Jose\Algorithm\KeyEncryption\A256KW',
-            'A128GCMKW'          => '\Jose\Algorithm\KeyEncryption\A128GCMKW',
-            'A192GCMKW'          => '\Jose\Algorithm\KeyEncryption\A192GCMKW',
-            'A256GCMKW'          => '\Jose\Algorithm\KeyEncryption\A256GCMKW',
-            'dir'                => '\Jose\Algorithm\KeyEncryption\Dir',
-            'ECDH-ES'            => '\Jose\Algorithm\KeyEncryption\ECDHES',
-            'ECDH-ES+A128KW'     => '\Jose\Algorithm\KeyEncryption\ECDHESA128KW',
-            'ECDH-ES+A192KW'     => '\Jose\Algorithm\KeyEncryption\ECDHESA192KW',
-            'ECDH-ES+A256KW'     => '\Jose\Algorithm\KeyEncryption\ECDHESA256KW',
-            'PBES2-HS256+A128KW' => '\Jose\Algorithm\KeyEncryption\PBES2HS256A128KW',
-            'PBES2-HS384+A192KW' => '\Jose\Algorithm\KeyEncryption\PBES2HS384A192KW',
-            'PBES2-HS512+A256KW' => '\Jose\Algorithm\KeyEncryption\PBES2HS512A256KW',
-            'RSA1_5'             => '\Jose\Algorithm\KeyEncryption\RSA15',
-            'RSA-OAEP'           => '\Jose\Algorithm\KeyEncryption\RSAOAEP',
-            'RSA-OAEP-256'       => '\Jose\Algorithm\KeyEncryption\RSAOAEP256',
-        ];
     }
 }

@@ -11,16 +11,13 @@
 
 namespace OAuth2\Client;
 
-class JWTClient extends ConfidentialClient implements SignatureCapabilitiesInterface, EncryptionCapabilitiesInterface
-{
-    use JWTClientTrait;
+use OAuth2\ResourceOwner\ResourceOwnerTrait;
 
-    /**
-     * JWTClient constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setType('jwt_client');
-    }
+class JWTClient implements JWTClientInterface
+{
+    use ResourceOwnerTrait;
+    use ClientTrait;
+    use RegisteredClientTrait;
+    use ConfidentialClientTrait;
+    use JWTClientTrait;
 }

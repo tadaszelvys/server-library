@@ -11,6 +11,9 @@
 
 namespace OAuth2\Test\Functional;
 
+use Jose\Factory\JWEFactory;
+use Jose\Factory\JWSFactory;
+use Jose\Object\JWK;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Test\Base;
 use PHPHtmlParser\Dom;
@@ -28,7 +31,7 @@ class ImplicitGrantTypeTest extends Base
             $request = new ServerRequest();
             $this->getAuthorizationFactory()->createFromRequest(
                 $request,
-                $this->getEndUserManager()->getEndUser('user1'),
+                $this->getUserManager()->getUser('user1'),
                 true
             );
             $this->fail('Should throw an Exception');
@@ -47,7 +50,7 @@ class ImplicitGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -70,7 +73,7 @@ class ImplicitGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -95,7 +98,7 @@ class ImplicitGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -119,7 +122,7 @@ class ImplicitGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -144,7 +147,7 @@ class ImplicitGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -169,13 +172,13 @@ class ImplicitGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             false
         );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertEquals('http://example.com/test?good=false#error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied&state=012345679', $response->getHeader('Location')[0]);
+        $this->assertEquals('http://example.com/test?good=false#error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied&state=012345679#', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccess()
@@ -189,13 +192,175 @@ class ImplicitGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=scope1\+scope2&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAccessTokenSuccessUsingSignedRequest()
+    {
+        $jwk2 = new JWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $claims = [
+            'iat'           => time(),
+            'nbf'           => time(),
+            'exp'           => time() + 120,
+            'iss'           => 'jwt1',
+            'aud'           => 'https://server.example.com',
+            'response_type' => 'token',
+            'client_id'     => 'jwt1',
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'scope'         => 'openid scope1 scope2',
+            'nonce'         => 'n-0S6_WzA2Mj',
+        ];
+
+        $jws = JWSFactory::createJWSToCompactJSON(
+            $claims,
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'request'       => $jws,
+            'client_id'     => 'bad_client', // Wil be ignored as already set in the request object
+            'redirect_uri'  => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
+            'scope'         => 'openid email profile address', // Wil be ignored as already set in the request object
+            'state'         => '012345679',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAccessTokenSuccessUsingSignedAndEncryptedRequest()
+    {
+        $jwk1 = new JWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]);
+        $jwk2 = new JWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $claims = [
+            'iat'           => time(),
+            'nbf'           => time(),
+            'exp'           => time() + 120,
+            'iss'           => 'jwt1',
+            'aud'           => 'https://server.example.com',
+            'response_type' => 'token',
+            'client_id'     => 'jwt1',
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'scope'         => 'openid scope1 scope2',
+            'nonce'         => 'n-0S6_WzA2Mj',
+        ];
+
+        $jws = JWSFactory::createJWSToCompactJSON(
+            $claims,
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+
+        $jwe = JWEFactory::createJWEToCompactJSON(
+            $jws,
+            $jwk1,
+            [
+                'kid' => 'JWK1',
+                'cty' => 'JWT',
+                'alg' => 'A256KW',
+                'enc' => 'A256CBC-HS512',
+                'exp' => time() + 120,
+                'aud' => $this->getIssuer(),
+                'iss' => 'jwt1',
+            ]
+        );
+
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'request'       => $jwe,
+            'client_id'     => 'bad_client', // Wil be ignored as already set in the request object
+            'redirect_uri'  => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
+            'scope'         => 'openid email profile address', // Wil be ignored as already set in the request object
+            'state'         => '012345679',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAccessTokenSuccessUsingSignedRequestUri()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'request_uri'  => 'https://gist.githubusercontent.com/Spomky/23ca2a645f97584aaa22/raw/e9ff926a07940db9033c0ed7b8d623afee5f144a/signed.jwt',
+            'client_id'    => 'bad_client', // Wil be ignored as already set in the request object
+            'redirect_uri' => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
+            'scope'        => 'openid email profile address', // Wil be ignored as already set in the request object
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testAccessTokenSuccessUsingSignedAndEncryptedRequestUri()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'request_uri'  => 'https://gist.githubusercontent.com/Spomky/3f22bbdc279a05aaac62/raw/7bc47a71eb48b37296dc69c70ec81a2d782f8055/encrypted.jwt',
+            'client_id'    => 'bad_client', // Wil be ignored as already set in the request object
+            'redirect_uri' => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
+            'scope'        => 'openid email profile address', // Wil be ignored as already set in the request object
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithState()
@@ -209,13 +374,13 @@ class ImplicitGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&foo=bar&scope=scope1\+scope2&state=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithStateAndForPostResponseMode()
@@ -230,7 +395,7 @@ class ImplicitGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -246,5 +411,87 @@ class ImplicitGrantTypeTest extends Base
 
         $this->assertNotNull($inputs);
         $this->assertEquals(6, count($inputs));
+    }
+
+    public function testAccessTokenSuccessWithUnsupportedResponseMode()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token',
+            'state'                 => '0123456789',
+            'response_mode'         => 'foo_bar',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+
+        try {
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Unsupported response mode "foo_bar".', $e->getDescription());
+        }
+    }
+
+    public function testAccessTokenSuccessWithUnsupportedResponseModeParameter()
+    {
+        $this->getAuthorizationEndpoint()->disallowResponseModeParameterInAuthorizationRequest();
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token',
+            'state'                 => '0123456789',
+            'response_mode'         => 'fragment',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+
+        try {
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('The response mode parameter is not authorized.', $e->getDescription());
+        }
+        $this->getAuthorizationEndpoint()->allowResponseModeParameterInAuthorizationRequest();
+    }
+
+    public function testAccessTokenSuccessWithUnsupportedResponseTypeCombination()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'foo',
+            'response_type'         => 'token code id_token',
+            'state'                 => '0123456789',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+
+        try {
+            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+            $this->fail('Should throw an Exception');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Unsupported response type combination "token code id_token".', $e->getDescription());
+        }
     }
 }

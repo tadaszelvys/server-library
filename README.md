@@ -36,14 +36,14 @@ The following components are implemented:
 * [x] Exception manager
 * [x] Scope manager ([RFC6749, section 3.3](https://tools.ietf.org/html/rfc6749#section-3.3))
 * Clients Managers:
-    * [x] Public clients ([RFC6749, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1))
+    * [x] Public clients ([RFC6749, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1)) - See `none` authentication method
     * [x] Password clients ([RFC6749, section 2.3.1](https://tools.ietf.org/html/rfc6749#section-2.3.1))
-        * [x] HTTP Basic Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617) and [RFC7617](https://tools.ietf.org/html/rfc7617))
-        * [ ] HTTP Digest Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617) and [RFC7617](https://tools.ietf.org/html/rfc7616)) - *Note: This authentication scheme has been removed since it does not provide real security improvements*
-        * [x] Credentials from request body
+        * [x] HTTP Basic Authentication Scheme ([RFC2617](https://tools.ietf.org/html/rfc2617) and [RFC7617](https://tools.ietf.org/html/rfc7617)) - See `client_secret_basic` authentication method
+        * [x] JWT Assertion using password as shared key ([OpenID Connect Core](http://openid.net/specs/openid-connect-core-1_0.html#Signing)) - See `client_secret_jwt` authentication method
+        * [x] Credentials from request body - See `client_secret_post` authentication method
     * [ ] SAML clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
-    * [x] JWT clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7523](https://tools.ietf.org/html/rfc7523))
-    * [x] Unregistered clients ([RFC6749, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4))
+    * [x] JWT clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7523](https://tools.ietf.org/html/rfc7523)) - See `private_key_jwt` authentication method
+    * [x] Unregistered clients ([RFC6749, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4)) - See `none` authentication method
     * [x] Ability to use other Client Managers
 * Endpoints:
     * [x] Authorization ([RFC6749, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
@@ -69,51 +69,12 @@ The following components are implemented:
 
 * Partial implementation
     * [ ] Threat Model and Security Consideration ([RFC6819](https://tools.ietf.org/html/rfc6819))
-
-* OpenID Connect
-    * [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html) - *Partial Support*
-        *  [x] ID Token - *Partial support*
-        * Response types:
-            * [x] `code`: Authorization Code Flow
-            * [x] `id_token`: Implicit Flow
-            * [x] `id_token token`: Implicit Flow
-            * [x] `code id_token`: Hybrid Flow
-            * [x] `code token`: Hybrid Flow
-            * [x] `code id_token token`: Hybrid Flow
-        * [ ] Login from third party
-        * [x] UserInfo Endpoint
-        * [x] UserInfo Claims
-            * [x] Scope `profile`
-            * [x] Scope `email`
-            * [x] Scope `phone`
-            * [x] Scope `address`
-            * [x] Custom Scope
-        * [ ] Claims Languages and Scripts
-        * [ ] Aggregated and Distributed Claims
-        * [ ] Self-Issued OpenID Provider Registration
-        *  Client Authentication
-            * Authentication Methods:
-                * [x] `client_secret_basic`
-                * [x] `client_secret_post` (disabled by default)
-                * [ ] `client_secret_jwt`
-                * [x] `private_key_jwt`
-                * [x] `none` (public and unregistered clients supported)
-            * [ ] Rotation of Asymmetric Signing Keys
-        * [ ] Offline Access
-    * [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
-    * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html and [RFC7591](https://tools.ietf.org/html/rfc7591))
-    * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
-    * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
-    * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
-    * [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
+    * [ ] OpenID Connect: See [the dedicated page of its implementation](doc/OpenID_Connect_Implementation_Status.md)
 
 * Integration planned
     * [Proof-of-Possession (PoP) Security Architecture](https://tools.ietf.org/html/draft-ietf-oauth-pop-architecture)
     * [Proof-of-Possession: Authorization Server to Client Key Distribution](https://tools.ietf.org/html/draft-ietf-oauth-pop-key-distribution)
     * [Proof-of-Possession Key Semantics for JSON Web Tokens (JWTs)](https://tools.ietf.org/html/draft-ietf-oauth-proof-of-possession)
-
-* For information only
-    * [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq)
     * [A Method for Signing an HTTP Requests for OAuth](https://tools.ietf.org/html/draft-ietf-oauth-signed-http-request)
     * [Token Exchange: An STS for the REST of Us](https://tools.ietf.org/html/draft-ietf-oauth-token-exchange)
 
@@ -141,7 +102,9 @@ Have a look at [How to use](doc/Use.md) to use OAuth2 server and handle your fir
 
 # Contributing
 
-Requests for new features, bug fixed and all other ideas to make this library useful are welcome. [Please follow these best practices](doc/Contributing.md).
+Requests for new features, bug fixed and all other ideas to make this library useful are welcome. The best contribution you could provide is by fixing the [opened issues where help is wanted](https://github.com/Spomky-Labs/oauth2-server-library/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
+
+Please make sure to [follow these best practices](doc/Contributing.md).
 
 # Licence
 

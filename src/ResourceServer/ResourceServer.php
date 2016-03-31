@@ -19,13 +19,4 @@ use OAuth2\Client\Client;
 class ResourceServer extends Client implements ResourceServerInterface
 {
     use ResourceServerTrait;
-
-    /**
-     * ResourceServer constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setType('resource_server');
-    }
 }

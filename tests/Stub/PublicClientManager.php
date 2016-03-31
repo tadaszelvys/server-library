@@ -33,7 +33,8 @@ class PublicClientManager extends Base
 
         $foo = new PublicClient();
         $foo->setPublicId('foo');
-        $foo->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
+        $foo->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code']);
+        $foo->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
         $foo->setRedirectUris(['http://example.com/test?good=false', 'http://127.0.0.1', 'https://another.uri/callback', 'urn:ietf:wg:oauth:2.0:oob', 'urn:ietf:wg:oauth:2.0:oob:auto']);
 
         $oof = new PublicClient();

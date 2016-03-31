@@ -12,10 +12,11 @@
 namespace OAuth2\Test\Stub;
 
 use Jose\Object\JWKSetInterface;
+use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\Client\JWTClient as BaseJWTClient;
-use OAuth2\Client\TokenLifetimeExtensionInterface;
 
-class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
+class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface, ScopePolicyExtensionInterface
 {
     public function getTokenLifetime($token)
     {
@@ -23,7 +24,7 @@ class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
             case 'authcode':
                 return 10;
             case 'access_token':
-                return 1000;
+                return 0;
             case 'refresh_token':
             default:
                 return 2000;
@@ -35,7 +36,7 @@ class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
      */
     public function addAllowedGrantType($grant_type)
     {
-        if (!$this->isAllowedGrantType($grant_type)) {
+        if (!$this->isGrantTypeAllowed($grant_type)) {
             $this->grant_types[] = $grant_type;
         }
     }
@@ -46,6 +47,35 @@ class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
     public function setAllowedGrantTypes(array $grant_types)
     {
         $this->grant_types = $grant_types;
+    }
+
+    /**
+     * @param string $response_type
+     */
+    public function addAllowedResponseType($response_type)
+    {
+        if (!$this->isResponseTypeAllowed($response_type)) {
+            $this->response_types[] = $response_type;
+        }
+    }
+
+    /**
+     * @param string[] $response_types
+     */
+    public function setAllowedResponseTypes(array $response_types)
+    {
+        $this->response_types = $response_types;
+    }
+
+    /**
+     * @param string $response_type
+     */
+    public function removeAllowedResponseType($response_type)
+    {
+        $key = array_search($response_type, $this->response_types);
+        if (false !== $key) {
+            unset($this->response_types[$key]);
+        }
     }
 
     /**
@@ -102,5 +132,10 @@ class JWTClient extends BaseJWTClient implements TokenLifetimeExtensionInterface
         if (false !== $key) {
             unset($this->redirect_uris[$key]);
         }
+    }
+
+    public function getScopePolicy()
+    {
+        return 'error';
     }
 }

@@ -11,16 +11,13 @@
 
 namespace OAuth2\Client;
 
-class PasswordClient extends ConfidentialClient implements PasswordClientInterface
-{
-    use PasswordClientTrait;
+use OAuth2\ResourceOwner\ResourceOwnerTrait;
 
-    /**
-     * PasswordClient constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setType('password_client');
-    }
+class PasswordClient implements PasswordClientInterface
+{
+    use ResourceOwnerTrait;
+    use ClientTrait;
+    use RegisteredClientTrait;
+    use ConfidentialClientTrait;
+    use PasswordClientTrait;
 }

@@ -28,33 +28,6 @@ final class S256 implements PKCEMethodInterface
      */
     public function isChallengeVerified($code_verifier, $code_challenge)
     {
-        return $this->compareHMAC($code_challenge, Base64Url::encode(hash('sha256', $code_verifier, true)));
-    }
-
-    /**
-     * @param string $safe
-     * @param string $user
-     *
-     * @return bool
-     */
-    private function compareHMAC($safe, $user)
-    {
-        if (function_exists('hash_equals')) {
-            return hash_equals($safe, $user);
-        }
-        $safeLen = strlen($safe);
-        $userLen = strlen($user);
-
-        if ($userLen !== $safeLen) {
-            return false;
-        }
-
-        $result = 0;
-
-        for ($i = 0; $i < $userLen; $i++) {
-            $result |= (ord($safe[$i]) ^ ord($user[$i]));
-        }
-
-        return $result === 0;
+        return hash_equals($code_challenge, Base64Url::encode(hash('sha256', $code_verifier, true)));
     }
 }

@@ -13,7 +13,6 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceServer\ResourceServerManager as Base;
-use OAuth2\Util\IpAddress;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ResourceServerManager extends Base
@@ -109,12 +108,16 @@ class ResourceServerManager extends Base
      */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
     {
-        if (!$client instanceof ResourceServer) {
-            return;
-        }
-
         $ip = IpAddress::getClientIp($request, $this->getTrustedProxies());
 
         return $client->isIpAddressAllowed($ip);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return ['resource_server_custom_auth'];
     }
 }

@@ -12,6 +12,7 @@
 namespace OAuth2\Test\Functional;
 
 use OAuth2\Exception\BaseExceptionInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
 
@@ -59,8 +60,8 @@ class RefreshTokenGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('The parameter "grant_type" parameter is missing.', $e->getDescription());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }
@@ -89,9 +90,9 @@ class RefreshTokenGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('unsupported_grant_type', $e->getMessage());
-            $this->assertEquals('The grant type "bar" is not supported by this server', $e->getDescription());
-            $this->assertEquals(501, $e->getHttpCode());
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
+            $this->assertEquals(400, $e->getHttpCode());
         }
     }
 
@@ -104,8 +105,8 @@ class RefreshTokenGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('unauthorized_client', $e->getMessage());
-            $this->assertEquals('The grant type "refresh_token" is unauthorized for this client_id', $e->getDescription());
+            $this->assertEquals(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, $e->getMessage());
+            $this->assertEquals('The grant type "refresh_token" is unauthorized for this client.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }
@@ -122,7 +123,7 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"foo":"bar","scope":"scope1 scope2 scope3","refresh_token":"[^"]+"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testRefreshTokenParameterIsMissing()
@@ -182,7 +183,7 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"foo":"bar","scope":"scope1 scope2 scope3","refresh_token":"[^"]+"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -206,6 +207,6 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"foo":"bar","scope":"scope2","refresh_token":"[^"]+"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"scope":"scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 }

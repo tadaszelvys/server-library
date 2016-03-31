@@ -11,95 +11,30 @@
 
 namespace OAuth2\Client;
 
-use Assert\Assertion;
-use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
-use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
-use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class JWTClientManager implements ClientManagerInterface
 {
     use HasExceptionManager;
     use HasJWTLoader;
-
-    /**
-     * @var \Jose\Object\JWKSetInterface
-     */
-    private $signature_key_set;
-
-    /**
-     * @var string[]
-     */
-    private $allowed_signature_algorithms;
-
-    /**
-     * @var bool
-     */
-    private $encryption_required = false;
-
-    /**
-     * @var \Jose\Object\JWKSetInterface|null
-     */
-    private $key_encryption_key_set = null;
-
-    /**
-     * @var string[]
-     */
-    private $allowed_key_encryption_algorithms = [];
-
-    /**
-     * @var string[]
-     */
-    private $allowed_content_encryption_algorithms = [];
+    use ClientAssertionTrait;
 
     /**
      * JWTClientManager constructor.
      *
      * @param \OAuth2\Util\JWTLoader                      $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param string[]                                    $allowed_signature_algorithms
-     * @param \Jose\Object\JWKSetInterface                $signature_key_set
      */
     public function __construct(
         JWTLoader $loader,
-        ExceptionManagerInterface $exception_manager,
-        array $allowed_signature_algorithms,
-        JWKSetInterface $signature_key_set
+        ExceptionManagerInterface $exception_manager
     ) {
-        Assertion::notEmpty($allowed_signature_algorithms);
-        Assertion::true(empty(array_diff($allowed_signature_algorithms, $loader->getSupportedSignatureAlgorithms())));
         $this->setJWTLoader($loader);
         $this->setExceptionManager($exception_manager);
-
-        $this->signature_key_set = $signature_key_set;
-        $this->allowed_signature_algorithms = $allowed_signature_algorithms;
-    }
-
-    /**
-     * @param bool                         $encryption_required
-     * @param string[]                     $allowed_key_encryption_algorithms
-     * @param string[]                     $allowed_content_encryption_algorithms
-     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
-     */
-    public function enableEncryptedAssertions($encryption_required,
-                                              array $allowed_key_encryption_algorithms,
-                                              array $allowed_content_encryption_algorithms,
-                                              JWKSetInterface $key_encryption_key_set)
-    {
-        Assertion::boolean($encryption_required);
-        Assertion::notEmpty($allowed_key_encryption_algorithms);
-        Assertion::notEmpty($allowed_content_encryption_algorithms);
-        Assertion::true(empty(array_diff($allowed_key_encryption_algorithms, $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms())));
-        Assertion::true(empty(array_diff($allowed_content_encryption_algorithms, $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms())));
-
-        $this->encryption_required = $encryption_required;
-        $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;
-        $this->allowed_content_encryption_algorithms = $allowed_content_encryption_algorithms;
-        $this->key_encryption_key_set = $key_encryption_key_set;
     }
 
     /**
@@ -113,10 +48,10 @@ abstract class JWTClientManager implements ClientManagerInterface
     /**
      * @return string[]
      */
-    protected function findClientCredentialsMethods()
+    protected function getClientCredentialsMethods()
     {
         $methods = [
-            'findCredentialsFromClientAssertion',
+            'private_key_jwt' => 'findCredentialsFromClientAssertion',
         ];
 
         return $methods;
@@ -127,7 +62,7 @@ abstract class JWTClientManager implements ClientManagerInterface
      */
     public function findClient(ServerRequestInterface $request, &$client_credentials = null)
     {
-        $methods = $this->findClientCredentialsMethods();
+        $methods = $this->getClientCredentialsMethods();
         $assertions = [];
 
         foreach ($methods as $method) {
@@ -140,7 +75,7 @@ abstract class JWTClientManager implements ClientManagerInterface
         if (null === $client = $this->checkResult($assertions)) {
             return;
         }
-        $client_credentials = $assertions[0];
+        $client_credentials = $assertions[0]['client_credentials'];
 
         return $client;
     }
@@ -150,65 +85,29 @@ abstract class JWTClientManager implements ClientManagerInterface
      */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
     {
-        if (!$client instanceof SignatureCapabilitiesInterface) {
-            return false;
-        }
-
-        try {
-            $this->getJWTLoader()->verifySignature(
-                $client_credentials,
-                $client->getSignaturePublicKeySet(),
-                $client->getAllowedSignatureAlgorithms()
-            );
-
-            return true;
-        } catch (BaseException $e) {
-            $reason = $e->getDescription();
-
-            return false;
-        } catch (\Exception $e) {
-            $reason = $e->getMessage();
+        if (true === $client->areCredentialsExpired()) {
+            $reason = 'Credentials expired.';
 
             return false;
         }
+
+        return $this->verifyClientAssertion($client, $client_credentials, $reason);
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return \Jose\Object\JWSInterface
+     * {@inheritdoc}
      */
-    protected function findCredentialsFromClientAssertion(ServerRequestInterface $request)
+    public function getSupportedAuthenticationMethods()
     {
-        $client_assertion_type = RequestBody::getParameter($request, 'client_assertion_type');
+        return array_keys($this->getClientCredentialsMethods());
+    }
 
-        //We verify the client assertion type in the request
-        if ('urn:ietf:params:oauth:client-assertion-type:jwt-bearer' !== $client_assertion_type) {
-            return;
-        }
-
-        $client_assertion = RequestBody::getParameter($request, 'client_assertion');
-        //We verify the client assertion exists
-        if (null === $client_assertion) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_assertion" is missing.');
-        }
-
-        //We load the assertion
-        try {
-            $jwt = $this->getJWTLoader()->load(
-                $client_assertion,
-                $this->allowed_key_encryption_algorithms,
-                $this->allowed_content_encryption_algorithms,
-                $this->key_encryption_key_set,
-                $this->encryption_required
-            );
-        } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
-        }
-
-        return $jwt;
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientSupported(ClientInterface $client)
+    {
+        return $client instanceof JWTClientInterface;
     }
 
     /**
@@ -227,13 +126,10 @@ abstract class JWTClientManager implements ClientManagerInterface
         if (count($result) < 1) {
             return;
         }
-        if (!$result[0]->hasClaim('sub')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "sub" is missing.');
-        }
 
-        $client = $this->getClient($result[0]->getClaim('sub'));
+        $client = $this->getClient($result[0]['client_id']);
 
-        if (!$client instanceof SignatureCapabilitiesInterface) {
+        if (!$client instanceof ClientInterface || !$client instanceof SignatureCapabilitiesInterface) {
             return;
         }
 

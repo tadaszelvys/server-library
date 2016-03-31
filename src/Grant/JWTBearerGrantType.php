@@ -29,16 +29,6 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     use HasJWTLoader;
 
     /**
-     * @var \Jose\Object\JWKSetInterface
-     */
-    private $signature_key_set;
-
-    /**
-     * @var string[]
-     */
-    private $allowed_signature_algorithms;
-
-    /**
      * @var bool
      */
     private $encryption_required = false;
@@ -68,22 +58,13 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
      *
      * @param \OAuth2\Util\JWTLoader                      $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param string[]                                    $allowed_signature_algorithms
-     * @param \Jose\Object\JWKSetInterface                $signature_key_set
      */
     public function __construct(
         JWTLoader $loader,
-        ExceptionManagerInterface $exception_manager,
-        array $allowed_signature_algorithms,
-        JWKSetInterface $signature_key_set
+        ExceptionManagerInterface $exception_manager
     ) {
-        Assertion::notEmpty($allowed_signature_algorithms);
-        Assertion::true(empty(array_diff($allowed_signature_algorithms, $loader->getSupportedSignatureAlgorithms())));
         $this->setJWTLoader($loader);
         $this->setExceptionManager($exception_manager);
-
-        $this->signature_key_set = $signature_key_set;
-        $this->allowed_signature_algorithms = $allowed_signature_algorithms;
     }
 
     /**
@@ -100,8 +81,6 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         Assertion::boolean($encryption_required);
         Assertion::notEmpty($allowed_key_encryption_algorithms);
         Assertion::notEmpty($allowed_content_encryption_algorithms);
-        Assertion::true(empty(array_diff($allowed_key_encryption_algorithms, $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms())));
-        Assertion::true(empty(array_diff($allowed_content_encryption_algorithms, $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms())));
 
         $this->encryption_required = $encryption_required;
         $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;
@@ -115,6 +94,18 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     public function getGrantType()
     {
         return 'urn:ietf:params:oauth:grant-type:jwt-bearer';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSupported(array $request_parameters)
+    {
+        if (array_key_exists('grant_type', $request_parameters)) {
+            return $this->getGrantType() === $request_parameters['grant_type'];
+        }
+
+        return false;
     }
 
     /**
@@ -160,15 +151,19 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         if (!$client instanceof SignatureCapabilitiesInterface) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a JWT client');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a client with signature capabilities.');
         }
         $jwt = $grant_type_response->getAdditionalData('jwt');
 
-        $this->getJWTLoader()->verifySignature(
-            $jwt,
-            $client->getSignaturePublicKeySet(),
-            $client->getAllowedSignatureAlgorithms()
-        );
+        try {
+            $this->getJWTLoader()->verifySignature(
+                $jwt,
+                $client->getSignaturePublicKeySet(),
+                $client->getAllowedSignatureAlgorithms()
+            );
+        } catch (\Exception $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+        }
 
         $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
 

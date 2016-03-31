@@ -29,7 +29,7 @@ class AuthCodeGrantTypeTest extends Base
             $request = new ServerRequest();
             $this->getAuthorizationFactory()->createFromRequest(
                 $request,
-                $this->getEndUserManager()->getEndUser('user1'),
+                $this->getUserManager()->getUser('user1'),
                 true
             );
             $this->fail('Should throw an Exception');
@@ -48,7 +48,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -71,7 +71,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -96,7 +96,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -120,7 +120,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -145,7 +145,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -169,7 +169,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -193,7 +193,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -218,7 +218,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -243,13 +243,13 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             false
         );
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertEquals('http://example.com/test?good=false&error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied&state=012345679', $response->getHeader('Location')[0]);
+        $this->assertEquals('http://example.com/test?good=false&error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied&state=012345679#', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccess()
@@ -263,7 +263,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -284,7 +284,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -306,7 +306,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -331,7 +331,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -351,7 +351,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -371,7 +371,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -391,7 +391,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -431,7 +431,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -456,7 +456,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"foo":"bar","scope":"scope1 scope2"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
     }
 
     /**
@@ -475,7 +475,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -500,7 +500,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"foo":"bar","scope":"scope1 scope2"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testAuthcodeSuccessWithPKCEAndPlainAndPublicClient()
@@ -516,7 +516,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -541,7 +541,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"foo":"bar","scope":"scope1 scope2"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testAuthcodeSuccessWithPKCEAndDefaultMethodAndPublicClient()
@@ -556,7 +556,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -581,7 +581,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"foo":"bar","scope":"scope1 scope2"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testAuthcodeFailedWithBadCodeVerifier()
@@ -596,7 +596,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -635,7 +635,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -675,7 +675,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
-            $this->getEndUserManager()->getEndUser('user1'),
+            $this->getUserManager()->getUser('user1'),
             true
         );
 
@@ -826,7 +826,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"foo":"bar","scope":"scope1 scope2","refresh_token":"[^"]+"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
 
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);
@@ -849,7 +849,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"foo":"bar","scope":"scope1 scope2","refresh_token":"[^"]+"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
 
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);

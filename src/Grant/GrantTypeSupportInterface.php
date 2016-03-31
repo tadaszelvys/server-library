@@ -24,6 +24,13 @@ interface GrantTypeSupportInterface
     public function getGrantType();
 
     /**
+     * @param array $request_parameters
+     *
+     * @return bool
+     */
+    public function isSupported(array $request_parameters);
+
+    /**
      * This function checks the request and returns information to issue an access token.
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request             The request

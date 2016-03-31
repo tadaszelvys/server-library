@@ -14,17 +14,22 @@ namespace OAuth2\Client;
 interface EncryptionCapabilitiesInterface
 {
     /**
-     * @return \Jose\Object\JWKSetInterface
+     * @return bool
      */
-    public function getEncryptionPublicKeySet();
+    public function isEncryptionSupportEnabled();
+
+    /**
+     * @return \Jose\Object\JWKInterface
+     */
+    public function getEncryptionPublicKey();
+
+    /**
+     * @return string
+     */
+    public function getKeyEncryptionAlgorithm();
 
     /**
      * @return string[]
      */
-    public function getSupportedKeyEncryptionAlgorithms();
-
-    /**
-     * @return string[]
-     */
-    public function getSupportedContentEncryptionAlgorithms();
+    public function getContentEncryptionAlgorithm();
 }

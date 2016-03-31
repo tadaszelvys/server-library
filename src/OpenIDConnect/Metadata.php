@@ -60,6 +60,10 @@ use Assert\Assertion;
  * @method getTokenEndpointAuthMethodsSupported()
  * @method setTokenEndpointAuthSigningAlgValuesSupported($value)
  * @method getTokenEndpointAuthSigningAlgValuesSupported()
+ * @method setTokenEndpointAuthEncryptionAlgValuesSupported($value)
+ * @method getTokenEndpointAuthEncryptionAlgValuesSupported()
+ * @method setTokenEndpointAuthEncryptionEncValuesSupported($value)
+ * @method getTokenEndpointAuthEncryptionEncValuesSupported()
  * @method setDisplayValuesSupported($value)
  * @method getDisplayValuesSupported()
  * @method setClaimTypesSupported($value)
@@ -104,9 +108,9 @@ final class Metadata implements \JsonSerializable
             return call_user_func([$this, $name], $arguments);
         }
 
-        $method = substr($name, 0, 3);
+        $method = mb_substr($name, 0, 3, '8bit');
         if (in_array($method, ['get', 'set'])) {
-            $key = $this->decamelize(substr($name, 3));
+            $key = $this->decamelize(mb_substr($name, 3, null, '8bit'));
             $arguments = array_merge(
                 [$key],
                 $arguments
@@ -136,11 +140,9 @@ final class Metadata implements \JsonSerializable
      */
     public function get($key)
     {
-        if (true === $this->has($key)) {
-            return $this->values[$key];
-        }
+        Assertion::true($this->has($key), sprintf('Configuration value with key "%s" does not exist.', $key));
 
-        throw new \InvalidArgumentException(sprintf('Configuration value with key "%s" does not exist.', $key));
+        return $this->values[$key];
     }
 
     /**
@@ -172,7 +174,7 @@ final class Metadata implements \JsonSerializable
     {
         return preg_replace_callback(
             '/(^|[a-z])([A-Z])/',
-            function ($m) { return strtolower(strlen($m[1]) ? "$m[1]_$m[2]" : "$m[2]"); },
+            function ($m) { return mb_strtolower(mb_strlen($m[1], '8bit') ? sprintf('%s_%s', $m[1], $m[2]) : $m[2], '8bit'); },
             $word
         );
     }

@@ -70,12 +70,14 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
     {
         foreach ($this->getClientManagers() as $manager) {
             $client = $manager->findClient($request, $client_credentials);
-            if ($client instanceof ClientInterface) {
-                if (false === $manager->isClientAuthenticated($client, $client_credentials, $request, $reason)) {
+            if ($client instanceof ClientInterface && true === $manager->isClientSupported($client)) {
+                $is_authenticated = $manager->isClientAuthenticated($client, $client_credentials, $request, $reason);
+
+                if (true === $is_authenticated) {
+                    return $client;
+                } else {
                     throw $this->buildAuthenticationException($request, $reason);
                 }
-
-                return $client;
             }
         }
         throw $this->buildAuthenticationException($request);
@@ -101,5 +103,21 @@ class ClientManagerSupervisor implements ClientManagerSupervisorInterface
             $message,
             ['schemes' => $schemes]
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        $methods = [];
+        foreach ($this->getClientManagers() as $manager) {
+            $methods = array_merge(
+                $manager->getSupportedAuthenticationMethods(),
+                $methods
+            );
+        }
+
+        return array_unique($methods);
     }
 }

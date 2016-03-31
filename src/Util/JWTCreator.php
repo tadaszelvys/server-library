@@ -11,58 +11,52 @@
 
 namespace OAuth2\Util;
 
-use Jose\Factory\EncrypterFactory;
+use Assert\Assertion;
 use Jose\Factory\JWEFactory;
 use Jose\Factory\JWSFactory;
-use Jose\Factory\SignerFactory;
 use Jose\Object\JWKInterface;
 
 final class JWTCreator
 {
     /**
-     * @var \Jose\EncrypterInterface
+     * @var string[]
      */
-    private $encrypter;
-
-    /**
-     * @var \Jose\SignerInterface
-     */
-    private $signer;
+    private $supported_signature_algorithms;
 
     /**
      * @var string[]
      */
-    private $signature_algorithms;
+    private $supported_key_encryption_algorithms;
 
     /**
      * @var string[]
      */
-    private $key_encryption_algorithms;
-
-    /**
-     * @var string[]
-     */
-    private $content_encryption_algorithms;
+    private $supported_content_encryption_algorithms;
 
     /**
      * JWTCreator constructor.
      *
-     * @param string[]                                          $signature_algorithms
-     * @param string[]                                          $key_encryption_algorithms
-     * @param string[]                                          $content_encryption_algorithms
-     * @param string[]|\Jose\Compression\CompressionInterface[] $compression_methods
+     * @param string[] $supported_signature_algorithms
      */
-    public function __construct(array $signature_algorithms,
-                                array $key_encryption_algorithms = [],
-                                array $content_encryption_algorithms = [],
-                                array $compression_methods = ['DEF']
-    ) {
-        $this->signature_algorithms = $signature_algorithms;
-        $this->key_encryption_algorithms = $key_encryption_algorithms;
-        $this->content_encryption_algorithms = $content_encryption_algorithms;
+    public function __construct(array $supported_signature_algorithms)
+    {
+        Assertion::notEmpty($supported_signature_algorithms);
 
-        $this->signer = SignerFactory::createSigner($signature_algorithms);
-        $this->encrypter = EncrypterFactory::createEncrypter(array_merge($key_encryption_algorithms, $content_encryption_algorithms), $compression_methods);
+        $this->supported_signature_algorithms = $supported_signature_algorithms;
+    }
+
+    /**
+     * @param string[] $supported_key_encryption_algorithms
+     * @param string[] $supported_content_encryption_algorithms
+     */
+    public function enableEncryptionSupport(array $supported_key_encryption_algorithms,
+                                            array $supported_content_encryption_algorithms
+    ) {
+        Assertion::notEmpty($supported_key_encryption_algorithms, 'At least one key encryption algorithm must be set.');
+        Assertion::notEmpty($supported_content_encryption_algorithms, 'At least one content encryption algorithm must be set.');
+
+        $this->supported_key_encryption_algorithms = $supported_key_encryption_algorithms;
+        $this->supported_content_encryption_algorithms = $supported_content_encryption_algorithms;
     }
 
     /**
@@ -94,7 +88,7 @@ final class JWTCreator
      */
     public function getSignatureAlgorithms()
     {
-        return $this->signature_algorithms;
+        return $this->supported_signature_algorithms;
     }
 
     /**
@@ -102,7 +96,7 @@ final class JWTCreator
      */
     public function getKeyEncryptionAlgorithms()
     {
-        return $this->key_encryption_algorithms;
+        return $this->supported_key_encryption_algorithms;
     }
 
     /**
@@ -110,6 +104,6 @@ final class JWTCreator
      */
     public function getContentEncryptionAlgorithms()
     {
-        return $this->content_encryption_algorithms;
+        return $this->supported_content_encryption_algorithms;
     }
 }

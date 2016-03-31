@@ -11,7 +11,7 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\Client\UnregisteredClient as BaseUnregisteredClient;
 
 class UnregisteredClient extends BaseUnregisteredClient implements TokenLifetimeExtensionInterface
@@ -34,7 +34,7 @@ class UnregisteredClient extends BaseUnregisteredClient implements TokenLifetime
      */
     public function addAllowedGrantType($grant_type)
     {
-        if (!$this->isAllowedGrantType($grant_type)) {
+        if (!$this->isGrantTypeAllowed($grant_type)) {
             $this->grant_types[] = $grant_type;
         }
     }
@@ -55,6 +55,35 @@ class UnregisteredClient extends BaseUnregisteredClient implements TokenLifetime
         $key = array_search($grant_type, $this->grant_types);
         if (false !== $key) {
             unset($this->grant_types[$key]);
+        }
+    }
+
+    /**
+     * @param string $response_type
+     */
+    public function addAllowedResponseType($response_type)
+    {
+        if (!$this->isResponseTypeAllowed($response_type)) {
+            $this->response_types[] = $response_type;
+        }
+    }
+
+    /**
+     * @param string[] $response_types
+     */
+    public function setAllowedResponseTypes(array $response_types)
+    {
+        $this->response_types = $response_types;
+    }
+
+    /**
+     * @param string $response_type
+     */
+    public function removeAllowedResponseType($response_type)
+    {
+        $key = array_search($response_type, $this->response_types);
+        if (false !== $key) {
+            unset($this->response_types[$key]);
         }
     }
 }

@@ -12,10 +12,10 @@
 namespace OAuth2\Token;
 
 use Assert\Assertion;
+use Base64Url\Base64Url;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\TokenLifetimeExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
-use Security\DefuseGenerator;
 
 abstract class RefreshTokenManager implements RefreshTokenManagerInterface
 {
@@ -23,11 +23,6 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
      * @var \OAuth2\Token\TokenUpdaterInterface[]
      */
     private $token_updaters = [];
-
-    /**
-     * @var string
-     */
-    private $refresh_token_charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/';
 
     /**
      * @var int
@@ -92,9 +87,8 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     private function generateToken()
     {
         $length = $this->getRefreshTokenLength();
-        $charset = $this->getRefreshTokenCharset();
 
-        return DefuseGenerator::getRandomString($length, $charset);
+        return Base64Url::encode(random_bytes($length));
     }
 
     /**
@@ -133,23 +127,6 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
         foreach ($this->token_updaters as $token_updater) {
             $token_updater->updateToken($refresh_token);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getRefreshTokenCharset()
-    {
-        return $this->refresh_token_charset;
-    }
-
-    /**
-     * @param string $refresh_token_charset
-     */
-    public function setRefreshTokenCharset($refresh_token_charset)
-    {
-        Assertion::string($refresh_token_charset);
-        $this->refresh_token_charset = $refresh_token_charset;
     }
 
     /**

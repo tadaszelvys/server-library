@@ -11,10 +11,11 @@
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\Client\PasswordClient as BasePasswordClient;
-use OAuth2\Client\TokenLifetimeExtensionInterface;
 
-class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface
+class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensionInterface, ScopePolicyExtensionInterface
 {
     /**
      * {@inheritdoc}
@@ -74,7 +75,7 @@ class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensio
      */
     public function addAllowedGrantType($grant_type)
     {
-        if (!$this->isAllowedGrantType($grant_type)) {
+        if (!$this->isGrantTypeAllowed($grant_type)) {
             $this->grant_types[] = $grant_type;
         }
     }
@@ -96,5 +97,47 @@ class PasswordClient extends BasePasswordClient implements TokenLifetimeExtensio
         if (false !== $key) {
             unset($this->grant_types[$key]);
         }
+    }
+
+    /**
+     * @param string $response_type
+     */
+    public function addAllowedResponseType($response_type)
+    {
+        if (!$this->isResponseTypeAllowed($response_type)) {
+            $this->response_types[] = $response_type;
+        }
+    }
+
+    /**
+     * @param string[] $response_types
+     */
+    public function setAllowedResponseTypes(array $response_types)
+    {
+        $this->response_types = $response_types;
+    }
+
+    /**
+     * @param string $response_type
+     */
+    public function removeAllowedResponseType($response_type)
+    {
+        $key = array_search($response_type, $this->response_types);
+        if (false !== $key) {
+            unset($this->response_types[$key]);
+        }
+    }
+
+    /**
+     * @param string[] $token_types
+     */
+    public function setAllowedTokenTypes(array $token_types)
+    {
+        $this->token_types = $token_types;
+    }
+
+    public function getScopePolicy()
+    {
+        return 'none';
     }
 }

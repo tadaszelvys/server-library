@@ -153,7 +153,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
             $result['state'] = $authorization->get('state');
         }
         foreach ($types as $type) {
-            $type->finalizeAuthorization($result, $authorization);
+            $type->finalizeAuthorization($result, $authorization, $redirect_uri);
         }
 
         $response_mode->prepareResponse($redirect_uri, $result, $response);
@@ -227,7 +227,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     private function checkSecuredRedirectUri($redirect_uri)
     {
-        if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== substr($redirect_uri, 0, 5)) {
+        if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== mb_substr($redirect_uri, 0, 5, '8bit')) {
             if (!$this->isALocalUriOrAnUrn($redirect_uri)) {
                 throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" must be secured');
             }
@@ -336,7 +336,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkScope(Authorization &$authorization)
     {
         try {
-            $scope = $this->getScopeManager()->checkScopePolicy($authorization->getClient(), $authorization->getScopes());
+            $scope = $this->getScopeManager()->checkScopePolicy($authorization->getScopes(), $authorization->getClient());
             $authorization->setScopes($scope);
         } catch (BaseExceptionInterface $e) {
             throw $e;
@@ -377,7 +377,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
                 throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Response type "%s" is not supported by this server', $response_type));
             }
             $type = $this->response_types[$response_type];
-            if (!$authorization->getClient()->isAllowedGrantType($type->getResponseType())) {
+            if (!$authorization->getClient()->isResponseTypeAllowed($type->getResponseType())) {
                 throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$authorization->get('response_type').'" is unauthorized for this client.');
             }
             $types[] = $type;

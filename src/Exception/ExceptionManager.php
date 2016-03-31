@@ -12,6 +12,7 @@
 namespace OAuth2\Exception;
 
 use Assert\Assertion;
+use OAuth2\Exception\Extension\ExceptionExtensionInterface;
 
 /**
  * An exception manager.
@@ -25,6 +26,37 @@ use Assert\Assertion;
 class ExceptionManager implements ExceptionManagerInterface
 {
     /**
+     * @var \OAuth2\Exception\Extension\ExceptionExtensionInterface[]
+     */
+    private $extensions = [];
+
+    /**
+     * @var array
+     */
+    private $exception_map = [];
+
+    public function __construct()
+    {
+        $this->exception_map = [
+            self::AUTHENTICATE    => AuthenticateException::class,
+            self::BAD_REQUEST     => BadRequestException::class,
+            self::NOT_IMPLEMENTED => NotImplementedException::class,
+            self::REDIRECT        => RedirectException::class,
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addExceptionType($name, $exception_class)
+    {
+        Assertion::string($name);
+        Assertion::string($exception_class);
+        Assertion::classExists($exception_class);
+        $this->exception_map[$name] = $exception_class;
+    }
+
+    /**
      * @param string $name
      * @param $arguments
      *
@@ -35,9 +67,9 @@ class ExceptionManager implements ExceptionManagerInterface
         if (method_exists($this, $name)) {
             return call_user_func([$this, $name], $arguments);
         }
-        if (0 === strpos($name, 'get') && 'Exception' === substr($name, -9)) {
+        if (0 === mb_strpos($name, 'get', null, '8bit') && 'Exception' === mb_substr($name, -9, null, '8bit')) {
             $arguments = array_merge(
-                [substr($name, 3, strlen($name) - 12)],
+                [mb_substr($name, 3, mb_strlen($name, '8bit') - 12, '8bit')],
                 $arguments
             );
 
@@ -49,8 +81,9 @@ class ExceptionManager implements ExceptionManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getUri($type, $error, $error_description = null, array $data = [])
+    public function addExtension(ExceptionExtensionInterface $extension)
     {
+        $this->extensions[] = $extension;
     }
 
     /**
@@ -62,29 +95,45 @@ class ExceptionManager implements ExceptionManagerInterface
         Assertion::string($error);
         Assertion::nullOrString($error_description);
 
-        $error_uri = $this->getUri($type, $error, $error_description, $data);
+        $error_data = $this->getAdditionalErrorData($type, $error, $error_description, $data);
 
-        $supported_types = $this->getExceptionTypeMap();
+        $class = $this->getExceptionType($type);
 
-        if (array_key_exists($type, $supported_types)) {
-            $class = $supported_types[$type];
-
-            return new $class($error, $error_description, $error_uri, $data);
-        }
-
-        throw new \InvalidArgumentException('Unsupported type');
+        return new $class($error, $error_description, $error_data, $data);
     }
 
     /**
+     * @param string      $type
+     * @param string      $error
+     * @param string|null $error_description
+     * @param array       $data
+     *
      * @return array
      */
-    protected function getExceptionTypeMap()
+    private function getAdditionalErrorData($type, $error, $error_description, array $data)
     {
-        return [
-            self::AUTHENTICATE          => 'OAuth2\Exception\AuthenticateException',
-            self::BAD_REQUEST           => 'OAuth2\Exception\BadRequestException',
-            self::NOT_IMPLEMENTED       => 'OAuth2\Exception\NotImplementedException',
-            self::REDIRECT              => 'OAuth2\Exception\RedirectException',
-        ];
+        $result = [];
+        foreach ($this->extensions as $extension) {
+            $result = array_merge(
+                $result,
+                $extension->getData($type, $error, $error_description, $data)
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return string
+     */
+    private function getExceptionType($type)
+    {
+        if (array_key_exists($type, $this->exception_map)) {
+            return $this->exception_map[$type];
+        }
+
+        throw new \InvalidArgumentException(sprintf('The exception type "%s" is not supported', $type));
     }
 }

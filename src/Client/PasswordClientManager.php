@@ -12,14 +12,19 @@
 namespace OAuth2\Client;
 
 use Assert\Assertion;
+use Jose\Object\JWSInterface;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Util\JWTLoader;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class PasswordClientManager implements ClientManagerInterface
 {
+    use HasJWTLoader;
     use HasExceptionManager;
+    use ClientAssertionTrait;
 
     /**
      * @var string
@@ -34,13 +39,15 @@ abstract class PasswordClientManager implements ClientManagerInterface
     /**
      * PasswordClientManager constructor.
      *
+     * @param \OAuth2\Util\JWTLoader                      $jwt_loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param                                             $realm
+     * @param string                                      $realm
      */
-    public function __construct(ExceptionManagerInterface $exception_manager, $realm)
+    public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager, $realm)
     {
         Assertion::string($realm);
 
+        $this->setJWTLoader($jwt_loader);
         $this->setExceptionManager($exception_manager);
         $this->realm = $realm;
     }
@@ -83,11 +90,57 @@ abstract class PasswordClientManager implements ClientManagerInterface
      */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
     {
-        if (!$client instanceof PasswordClientInterface) {
+        if (true === $client->areCredentialsExpired()) {
+            $reason = 'Credentials expired.';
+
             return false;
         }
 
-        return $client_credentials === $client->getSecret();
+        if ($client_credentials instanceof JWSInterface) {
+            return $this->verifyClientAssertion($client, $client_credentials, $reason);
+        }
+
+        if (false === hash_equals($client->getSecret(), $client_credentials)) {
+            $reason = 'Bad credentials.';
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function arePasswordClientCredentialsInBodyRequestAllowed()
+    {
+        return $this->password_client_credentials_in_body_request_allowed;
+    }
+
+    public function enablePasswordClientCredentialsInBodyRequest()
+    {
+        $this->password_client_credentials_in_body_request_allowed = true;
+    }
+
+    public function disablePasswordClientCredentialsInBodyRequest()
+    {
+        $this->password_client_credentials_in_body_request_allowed = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientSupported(ClientInterface $client)
+    {
+        return $client instanceof PasswordClientInterface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return array_keys($this->getClientCredentialsMethods());
     }
 
     /**
@@ -96,14 +149,15 @@ abstract class PasswordClientManager implements ClientManagerInterface
     protected function getClientCredentialsMethods()
     {
         $methods = [
-            'findCredentialsFromBasicAuthenticationScheme',
+            'client_secret_basic' => 'findCredentialsFromBasicAuthenticationScheme',
+            'client_secret_jwt'   => 'findCredentialsFromClientAssertion',
         ];
 
         // This authentication method is not recommended by the RFC6749.
         // This option allows to enable this authentication method (not recommended).
         // See http://tools.ietf.org/html/rfc6749#section-2.3.1
         if ($this->arePasswordClientCredentialsInBodyRequestAllowed()) {
-            $methods[] = 'findCredentialsFromRequestBody';
+            $methods['client_secret_post'] = 'findCredentialsFromRequestBody';
         }
 
         return $methods;
@@ -124,8 +178,8 @@ abstract class PasswordClientManager implements ClientManagerInterface
             ];
         }
         $header = $request->getHeader('Authorization');
-        if (0 < count($header) && strtolower(substr($header[0], 0, 6)) === 'basic ') {
-            list($client_id, $client_secret) = explode(':', base64_decode(substr($header[0], 6, strlen($header[0]) - 6)));
+        if (0 < count($header) && mb_strtolower(mb_substr($header[0], 0, 6, '8bit'), '8bit') === 'basic ') {
+            list($client_id, $client_secret) = explode(':', base64_decode(mb_substr($header[0], 6, mb_strlen($header[0], '8bit') - 6, '8bit')));
             if (!empty($client_id) && !empty($client_secret)) {
                 return [
                     'client_id'          => $client_id,
@@ -179,23 +233,5 @@ abstract class PasswordClientManager implements ClientManagerInterface
     private function getRealm()
     {
         return $this->realm;
-    }
-
-    /**
-     * @return bool
-     */
-    public function arePasswordClientCredentialsInBodyRequestAllowed()
-    {
-        return $this->password_client_credentials_in_body_request_allowed;
-    }
-
-    public function enablePasswordClientCredentialsInBodyRequest()
-    {
-        $this->password_client_credentials_in_body_request_allowed = true;
-    }
-
-    public function disablePasswordClientCredentialsInBodyRequest()
-    {
-        $this->password_client_credentials_in_body_request_allowed = false;
     }
 }

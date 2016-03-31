@@ -74,7 +74,7 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
     {
         $server_params = $request->getServerParams();
 
-        return !empty($server_params['HTTPS']) && 'on' === strtolower($server_params['HTTPS']);
+        return !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
     }
 
     /**

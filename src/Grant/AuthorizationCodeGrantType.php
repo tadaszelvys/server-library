@@ -109,7 +109,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
     {
         //Nothing to do
     }
@@ -121,7 +121,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     {
         $code = $this->getAuthorizationCodeManager()->createAuthCode(
             $authorization->getClient(),
-            $authorization->getEndUser(),
+            $authorization->getUser(),
             $authorization->getQueryParams(),
             $authorization->has('redirect_uri') ? $authorization->get('redirect_uri') : null,
             $authorization->getScopes(),
@@ -137,6 +137,18 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     public function getGrantType()
     {
         return 'authorization_code';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSupported(array $request_parameters)
+    {
+        if (array_key_exists('grant_type', $request_parameters)) {
+            return $this->getGrantType() === $request_parameters['grant_type'];
+        }
+
+        return false;
     }
 
     /**

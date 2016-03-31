@@ -12,7 +12,7 @@
 namespace OAuth2\Test\Stub;
 
 use Assert\Assertion;
-use OAuth2\EndUser\Address as Base;
+use OAuth2\OpenIDConnect\Address as Base;
 
 class Address extends Base
 {

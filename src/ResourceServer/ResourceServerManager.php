@@ -11,9 +11,18 @@
 
 namespace OAuth2\ResourceServer;
 
+use OAuth2\Client\ClientInterface;
+
 /**
  * Class ResourceServerManager.
  */
 abstract class ResourceServerManager implements ResourceServerManagerInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientSupported(ClientInterface $client)
+    {
+        return $client instanceof ResourceServerInterface;
+    }
 }

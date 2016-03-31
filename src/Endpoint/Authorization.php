@@ -11,8 +11,9 @@
 
 namespace OAuth2\Endpoint;
 
+use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\EndUser\EndUserInterface;
+use OAuth2\User\UserInterface;
 
 final class Authorization
 {
@@ -27,9 +28,9 @@ final class Authorization
     private $client;
 
     /**
-     * @var \OAuth2\EndUser\EndUserInterface
+     * @var \OAuth2\User\UserInterface
      */
-    private $end_user;
+    private $user;
 
     /**
      * @var array
@@ -82,20 +83,20 @@ final class Authorization
     /**
      * Authorization constructor.
      *
-     * @param array                            $query_params
-     * @param \OAuth2\EndUser\EndUserInterface $end_user
-     * @param bool                             $is_authorized
-     * @param \OAuth2\Client\ClientInterface   $client
-     * @param array                            $scopes
+     * @param array                          $query_params
+     * @param \OAuth2\User\UserInterface     $user
+     * @param bool                           $is_authorized
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param array                          $scopes
      */
     public function __construct(array $query_params,
-                                EndUserInterface $end_user,
+                                UserInterface $user,
                                 $is_authorized,
                                 ClientInterface $client,
                                 array $scopes = []
     ) {
         $this->query_params = $query_params;
-        $this->end_user = $end_user;
+        $this->user = $user;
         $this->client = $client;
         $this->is_authorized = $is_authorized;
         $this->scopes = $scopes;
@@ -105,11 +106,11 @@ final class Authorization
     }
 
     /**
-     * @return \OAuth2\EndUser\EndUserInterface
+     * @return \OAuth2\User\UserInterface
      */
-    public function getEndUser()
+    public function getUser()
     {
-        return $this->end_user;
+        return $this->user;
     }
 
     /**
@@ -187,24 +188,24 @@ final class Authorization
      */
     public function get($param)
     {
-        if (!$this->has($param)) {
-            throw new \InvalidArgumentException(sprintf('Invalid parameter "%s"', $param));
-        }
+        Assertion::true($this->has($param), sprintf('Invalid parameter "%s"', $param));
 
         return $this->query_params[$param];
     }
 
     private function checkDisplay()
     {
-        if ($this->has('display') && !in_array($this->get('display'), $this->getAllowedDisplayValues())) {
-            throw new \InvalidArgumentException('Invalid "display" parameter. Allowed values are '.json_encode($this->getAllowedDisplayValues()));
-        }
+        Assertion::false(
+            $this->has('display') && !in_array($this->get('display'), $this->getAllowedDisplayValues()),
+            'Invalid "display" parameter. Allowed values are '.json_encode($this->getAllowedDisplayValues())
+        );
     }
 
     private function checkPrompt()
     {
-        if ($this->has('prompt') && !in_array($this->get('prompt'), $this->getAllowedPromptValues())) {
-            throw new \InvalidArgumentException('Invalid "prompt" parameter. Allowed values are '.json_encode($this->getAllowedPromptValues()));
-        }
+        Assertion::false(
+            $this->has('prompt') && !in_array($this->get('prompt'), $this->getAllowedPromptValues()),
+            'Invalid "prompt" parameter. Allowed values are '.json_encode($this->getAllowedPromptValues())
+        );
     }
 }

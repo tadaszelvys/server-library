@@ -11,7 +11,7 @@
 
 namespace OAuth2\Client;
 
-use OAuth2\ResourceOwner\ResourceOwner;
+use OAuth2\ResourceOwner\ResourceOwnerTrait;
 
 /**
  * Class Client.
@@ -20,7 +20,8 @@ use OAuth2\ResourceOwner\ResourceOwner;
  * A client is a resource owner with a set of allowed grant types and can perform requests against
  * available endpoints.
  */
-class Client extends ResourceOwner implements ClientInterface
+class Client implements ClientInterface
 {
+    use ResourceOwnerTrait;
     use ClientTrait;
 }

@@ -11,6 +11,7 @@
 
 namespace OAuth2\Exception;
 
+use Assert\Assertion;
 use Psr\Http\Message\ResponseInterface;
 
 class BaseException extends \Exception implements BaseExceptionInterface
@@ -18,27 +19,32 @@ class BaseException extends \Exception implements BaseExceptionInterface
     /**
      * @var array
      */
-    protected $errorData = [];
+    protected $errorData;
 
     /**
      * @param string $code              HTTP error code
      * @param string $error             Short name of the error
-     * @param string $error_description Description of the error (optional)
-     * @param string $error_uri         Uri of the error (optional)
+     * @param string $error_description Description of the error
+     * @param array  $error_data        Data to add to the error
      */
-    public function __construct($code, $error, $error_description = null, $error_uri = null)
+    public function __construct($code, $error, $error_description, array $error_data)
     {
+        Assertion::integer($code);
+        Assertion::string($error);
+        Assertion::nullOrString($error_description);
         parent::__construct($error, $code);
 
         //Check %x20-21 / %x23-5B / %x5D-7E for error and error_description
         //Check %x21 / %x23-5B / %x5D-7E for error_uri
-        $this->errorData['error'] = $error;
+        $this->errorData = ['error' => $error];
         if (null !== $error_description) {
             $this->errorData['error_description'] = $error_description;
         }
-        if (null !== $error_uri) {
-            $this->errorData['error_uri'] = urlencode($error_uri);
-        }
+
+        $this->errorData = array_merge(
+            $this->errorData,
+            $error_data
+        );
     }
 
     /**
@@ -46,7 +52,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
      */
     public function getDescription()
     {
-        return isset($this->errorData['error_description']) ? $this->errorData['error_description'] : null;
+        return array_key_exists('error_description', $this->errorData) ? $this->errorData['error_description'] : null;
     }
 
     /**
@@ -54,7 +60,7 @@ class BaseException extends \Exception implements BaseExceptionInterface
      */
     public function getUri()
     {
-        return isset($this->errorData['error_uri']) ? urldecode($this->errorData['error_uri']) : null;
+        return array_key_exists('error_uri', $this->errorData) ? urldecode($this->errorData['error_uri']) : null;
     }
 
     /**
@@ -114,8 +120,9 @@ class BaseException extends \Exception implements BaseExceptionInterface
      */
     protected function checkHeaderValue($text)
     {
-        if (preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $text) || preg_match('/[^\x09\x0a\x0d\x20-\x7E\x80-\xFE]/', $text)) {
-            throw new \InvalidArgumentException(sprintf('The header value "%s" contains invalid characters.', $text));
-        }
+        Assertion::false(
+            preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $text) || preg_match('/[^\x09\x0a\x0d\x20-\x7E\x80-\xFE]/', $text),
+            sprintf('The header value "%s" contains invalid characters.', $text)
+        );
     }
 }

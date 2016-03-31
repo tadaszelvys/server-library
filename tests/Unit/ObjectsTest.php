@@ -12,13 +12,16 @@
 namespace OAuth2\Test\Unit;
 
 use OAuth2\Exception\AuthenticateException;
+use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\OpenIDConnect\IdToken;
 use OAuth2\Test\Base;
-use OAuth2\Test\Stub\EndUser;
 use OAuth2\Test\Stub\PublicClient;
 use OAuth2\Test\Stub\ResourceServer;
+use OAuth2\Test\Stub\TooManyRequestsException;
+use OAuth2\Test\Stub\User;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AuthCode;
+use OAuth2\Token\RefreshToken;
 
 /**
  * @group Objects
@@ -35,13 +38,12 @@ class ObjectsTest extends Base
         $client->addRedirectUri('https://baz.com');
         $client->removeRedirectUri('https://baz.com');
 
-        $this->assertEquals('public_client', $client->getType());
         $this->assertEquals(['foo', 'bar'], $client->getAllowedGrantTypes());
         $this->assertEquals(['https://foo.com'], $client->getRedirectUris());
         $this->assertTrue($client->hasRedirectUri('https://foo.com'));
         $this->assertFalse($client->hasRedirectUri('https://bar.com'));
-        $this->assertTrue($client->isAllowedGrantType('foo'));
-        $this->assertFalse($client->isAllowedGrantType('baz'));
+        $this->assertTrue($client->isGrantTypeAllowed('foo'));
+        $this->assertFalse($client->isGrantTypeAllowed('baz'));
     }
 
     public function testIdToken()
@@ -67,18 +69,11 @@ class ObjectsTest extends Base
         $this->assertEquals('type', $id_token->getTokenType());
     }
 
-    public function testAuthorizationFactory()
+    public function testUser()
     {
-        $this->assertTrue($this->getAuthorizationFactory()->isRequestParameterSupported());
-        $this->assertTrue($this->getAuthorizationFactory()->isRequestUriParameterSupported());
-    }
-
-    public function testEndUser()
-    {
-        $user = new EndUser('user1', 'pass');
+        $user = new User('user1', 'pass');
         $user->setLastLoginAt(time() - 1000);
 
-        $this->assertEquals('end_user', $user->getType());
         $this->assertTrue($user->getLastLoginAt() <= time() - 1000);
         $this->assertEquals('user1', $user->getUsername());
     }
@@ -97,7 +92,7 @@ class ObjectsTest extends Base
      */
     public function testAuthenticateExceptionConstructionFailed()
     {
-        new AuthenticateException('foo_error', 'foo_description', 'https://foo.com/error', []);
+        new AuthenticateException('foo_error', 'foo_description', [], []);
     }
 
     /**
@@ -123,12 +118,26 @@ class ObjectsTest extends Base
     public function testAccessTokenToArray()
     {
         $access_token = new AccessToken();
+        $access_token->setExpiresAt(0);
+        $access_token->setToken('foo');
+        $access_token->setTokenType('bar');
 
         $this->assertEquals([
-            'access_token' => null,
-            'token_type'   => null,
-            'expires_in'   => 0,
+            'access_token' => 'foo',
+            'token_type'   => 'bar',
         ], $access_token->toArray());
+
+        $this->assertFalse($access_token->hasExpired());
+    }
+
+    public function testRefreshTokenToArray()
+    {
+        $refresh_token = new RefreshToken();
+        $refresh_token->setExpiresAt(0);
+        $refresh_token->setToken('foo');
+
+        $this->assertEquals('foo', $refresh_token->getToken());
+        $this->assertFalse($refresh_token->hasExpired());
     }
 
     /**
@@ -149,22 +158,20 @@ class ObjectsTest extends Base
     {
         $rs = new ResourceServer();
         $rs->setPublicId('bar');
-        $rs->setType(['plic']);
         $rs->setAllowedIpAddresses(['127.0.0.1']);
 
-        $this->assertFalse($rs->isAllowedGrantType('foo'));
-        $this->assertFalse($rs->isAllowedGrantType('bar'));
+        $this->assertFalse($rs->isGrantTypeAllowed('foo'));
+        $this->assertFalse($rs->isGrantTypeAllowed('bar'));
         $this->assertEquals([], $rs->getAllowedGrantTypes());
         $this->assertEquals(['127.0.0.1'], $rs->getAllowedIpAddresses());
         $this->assertEquals([], $rs->getAllowedGrantTypes());
         $this->assertEquals('bar', $rs->getPublicId());
         $this->assertNull($rs->getServerName());
-        $this->assertEquals('resource_server', $rs->getType());
     }
 
     public function testAuthenticateException()
     {
-        $exception = new AuthenticateException('foo_error', 'foo_description', 'https://foo.com/error', ['schemes' => ['Bearer realm="foo",charset=UTF-8']]);
+        $exception = new AuthenticateException('foo_error', 'foo_description', ['error_uri' => 'https://foo.com/error'], ['schemes' => ['Bearer realm="foo",charset=UTF-8']]);
 
         $this->assertNull($exception->getResponseBody());
         $this->assertEquals([
@@ -175,5 +182,29 @@ class ObjectsTest extends Base
                 'Bearer realm="foo",charset=UTF-8',
             ],
         ], $exception->getResponseHeaders());
+    }
+
+    public function testTooManyRequestsException()
+    {
+        try {
+            throw $this->getExceptionManager()->getException('TooManyRequests', 'unauthorized_client', 'Only 300 requests/day');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertInstanceOf(TooManyRequestsException::class, $e);
+            $this->assertEquals('unauthorized_client', $e->getMessage());
+            $this->assertEquals('Only 300 requests/day', $e->getDescription());
+            $this->assertEquals(429, $e->getHttpCode());
+        }
+    }
+
+    public function testTooManyRequestsException2()
+    {
+        try {
+            throw $this->getExceptionManager()->getTooManyRequestsException('unauthorized_client', 'Only 300 requests/day');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertInstanceOf(TooManyRequestsException::class, $e);
+            $this->assertEquals('unauthorized_client', $e->getMessage());
+            $this->assertEquals('Only 300 requests/day', $e->getDescription());
+            $this->assertEquals(429, $e->getHttpCode());
+        }
     }
 }

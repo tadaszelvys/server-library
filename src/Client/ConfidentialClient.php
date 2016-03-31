@@ -11,6 +11,8 @@
 
 namespace OAuth2\Client;
 
+use OAuth2\ResourceOwner\ResourceOwnerTrait;
+
 /**
  * This interface is for confidential clients.
  * You can create confidential clients using this interface.
@@ -19,4 +21,8 @@ namespace OAuth2\Client;
  */
 class ConfidentialClient extends RegisteredClient implements ConfidentialClientInterface
 {
+    use ResourceOwnerTrait;
+    use ClientTrait;
+    use RegisteredClientTrait;
+    use ConfidentialClientTrait;
 }

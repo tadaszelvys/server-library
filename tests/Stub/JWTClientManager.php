@@ -11,8 +11,8 @@
 
 namespace OAuth2\Test\Stub;
 
+use Jose\Object\JWK;
 use Jose\Object\JWKSet;
-use Jose\Object\JWKSetInterface;
 use OAuth2\Client\JWTClientManager as Base;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTLoader;
@@ -29,20 +29,14 @@ class JWTClientManager extends Base
      *
      * @param \OAuth2\Util\JWTLoader                      $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param string[]                                    $allowed_signature_algorithms
-     * @param \Jose\Object\JWKSetInterface                $signature_key_set
      */
     public function __construct(
         JWTLoader $loader,
-        ExceptionManagerInterface $exception_manager,
-        array $allowed_signature_algorithms,
-        JWKSetInterface $signature_key_set
+        ExceptionManagerInterface $exception_manager
     ) {
         parent::__construct(
             $loader,
-            $exception_manager,
-            $allowed_signature_algorithms,
-            $signature_key_set
+            $exception_manager
         );
 
         $keys = ['keys' => [[
@@ -63,8 +57,17 @@ class JWTClientManager extends Base
         $jwt1->setAllowedSignatureAlgorithms(['HS512']);
         $jwt1->setSignaturePublicKeySet(new JWKSet($keys));
         $jwt1->setRedirectUris(['http://example.com/test?good=false']);
-        $jwt1->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
+        $jwt1->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
+        $jwt1->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
         $jwt1->setPublicId('jwt1');
+        $jwt1->setContentEncryptionAlgorithm('A256CBC-HS512');
+        $jwt1->setKeyEncryptionAlgorithm('A256KW');
+        $jwt1->setEncryptionPublicKey(new JWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]));
 
         $jwt2 = new JWTClient();
         $jwt2->setAllowedSignatureAlgorithms(['HS512']);

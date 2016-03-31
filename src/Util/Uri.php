@@ -11,6 +11,8 @@
 
 namespace OAuth2\Util;
 
+use Assert\Assertion;
+
 final class Uri
 {
     /**
@@ -31,9 +33,7 @@ final class Uri
     public static function buildURI($uri, $params = [])
     {
         $parse_url = parse_url($uri);
-        if (false === $parse_url) {
-            throw new \InvalidArgumentException('The argument is not a valid URI.');
-        }
+        Assertion::isArray($parse_url, 'The argument is not a valid URI.');
 
         foreach ($params as $k => $v) {
             if (isset($parse_url[$k])) {
@@ -156,7 +156,7 @@ final class Uri
         }
 
         foreach ($storedUris as $storedUri) {
-            if (strcasecmp(substr($uri, 0, strlen($storedUri)), $storedUri) === 0) {
+            if (strcasecmp(mb_substr($uri, 0, mb_strlen($storedUri, '8bit'), '8bit'), $storedUri) === 0) {
                 return true;
             }
         }

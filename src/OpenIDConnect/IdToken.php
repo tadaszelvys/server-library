@@ -11,7 +11,6 @@
 
 namespace OAuth2\OpenIDConnect;
 
-use Jose\Object\JWSInterface;
 use OAuth2\Token\Token;
 
 class IdToken extends Token implements IdTokenInterface
@@ -20,11 +19,6 @@ class IdToken extends Token implements IdTokenInterface
      * @var string
      */
     private $token_type;
-
-    /**
-     * @var null|\Jose\Object\JWSInterface
-     */
-    private $jws;
 
     /**
      * @var null|string
@@ -113,21 +107,5 @@ class IdToken extends Token implements IdTokenInterface
         return [
             'id_token' => $this->getToken(),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getJWS()
-    {
-        return $this->jws;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setJWS(JWSInterface $jws)
-    {
-        $this->jws = $jws;
     }
 }

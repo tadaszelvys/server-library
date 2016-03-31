@@ -11,7 +11,7 @@
 
 namespace OAuth2\Client;
 
-interface PasswordClientInterface extends ConfidentialClientInterface
+interface PasswordClientInterface extends ConfidentialClientInterface, SignatureCapabilitiesInterface
 {
     /**
      * @return string

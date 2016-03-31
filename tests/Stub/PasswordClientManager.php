@@ -32,9 +32,12 @@ class PasswordClientManager extends Base
     {
         $bar = new PasswordClient();
         $bar->setSecret('secret');
+        $bar->setCredentialsExpireAt(time() + 3600);
         $bar->setRedirectUris(['http://example.com/test?good=false']);
-        $bar->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
+        $bar->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
+        $bar->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
         $bar->setPublicId('bar');
+        $bar->setAllowedSignatureAlgorithms(['HS256', 'HS512']);
 
         $baz = new PasswordClient();
         $baz->setSecret('secret');
@@ -45,18 +48,30 @@ class PasswordClientManager extends Base
         $digest = new PasswordClient();
         $digest->setSecret('Circle Of Life');
         $digest->setRedirectUris([]);
-        $digest->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
+        $digest->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
+        $digest->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
         $digest->setPublicId('Mufasa');
 
         $mac = new PasswordClient();
         $mac->setSecret('secret');
         $mac->setRedirectUris(['http://example.com/test?good=false']);
-        $mac->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'id_token', 'none', 'refresh_token', 'code', 'authorization_code']);
+        $mac->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
+        $mac->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
         $mac->setPublicId('mac');
+        $mac->setAllowedTokenTypes(['MAC']);
+
+        $expired = new PasswordClient();
+        $expired->setSecret('secret');
+        $expired->setCredentialsExpireAt(time() - 1);
+        $expired->setRedirectUris(['http://example.com/test?good=false']);
+        $expired->setAllowedGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
+        $expired->setAllowedResponseTypes(['token', 'id_token', 'none', 'code']);
+        $expired->setPublicId('expired');
 
         $this->clients['bar'] = $bar;
         $this->clients['baz'] = $baz;
         $this->clients['Mufasa'] = $digest;
         $this->clients['mac'] = $mac;
+        $this->clients['expired'] = $expired;
     }
 }

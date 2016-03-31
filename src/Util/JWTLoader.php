@@ -28,9 +28,9 @@ final class JWTLoader
     private $checker_manager;
 
     /**
-     * @var \Jose\DecrypterInterface
+     * @var \Jose\DecrypterInterface|null
      */
-    private $decrypter;
+    private $decrypter = null;
 
     /**
      * @var \Jose\VerifierInterface
@@ -45,34 +45,40 @@ final class JWTLoader
     /**
      * @var string[]
      */
-    private $supported_key_encryption_algorithms;
+    private $supported_key_encryption_algorithms = [];
 
     /**
      * @var string[]
      */
-    private $supported_content_encryption_algorithms;
+    private $supported_content_encryption_algorithms = [];
 
     /**
      * JWTLoader constructor.
      *
-     * @param \Jose\Checker\CheckerManagerInterface             $checker_manager
-     * @param string[]                                          $supported_signature_algorithms
-     * @param string[]                                          $supported_key_encryption_algorithms
-     * @param string[]                                          $supported_content_encryption_algorithms
-     * @param string[]|\Jose\Compression\CompressionInterface[] $compression_methods
+     * @param \Jose\Checker\CheckerManagerInterface $checker_manager
+     * @param string[]                              $supported_signature_algorithms
      */
-    public function __construct(
-        CheckerManagerInterface $checker_manager,
-        array $supported_signature_algorithms,
-        array $supported_key_encryption_algorithms = [],
-        array $supported_content_encryption_algorithms = [],
-        array $compression_methods = ['DEF']
-    ) {
+    public function __construct(CheckerManagerInterface $checker_manager, array $supported_signature_algorithms)
+    {
         $this->checker_manager = $checker_manager;
         $this->verifier = VerifierFactory::createVerifier($supported_signature_algorithms);
-        $this->decrypter = DecrypterFactory::createDecrypter(array_merge($supported_key_encryption_algorithms, $supported_content_encryption_algorithms), $compression_methods);
 
         $this->supported_signature_algorithms = $supported_signature_algorithms;
+    }
+
+    /**
+     * @param string[] $supported_key_encryption_algorithms
+     * @param string[] $supported_content_encryption_algorithms
+     * @param string[] $compression_methods
+     */
+    public function enableEncryptionSupport(array $supported_key_encryption_algorithms,
+                                            array $supported_content_encryption_algorithms,
+                                            array $compression_methods = ['DEF', 'ZLIB', 'GZ']
+    ) {
+        Assertion::notEmpty($supported_key_encryption_algorithms, 'At least one key encryption algorithm must be set.');
+        Assertion::notEmpty($supported_content_encryption_algorithms, 'At least one content encryption algorithm must be set.');
+
+        $this->decrypter = DecrypterFactory::createDecrypter(array_merge($supported_key_encryption_algorithms, $supported_content_encryption_algorithms), $compression_methods);
         $this->supported_key_encryption_algorithms = $supported_key_encryption_algorithms;
         $this->supported_content_encryption_algorithms = $supported_content_encryption_algorithms;
     }
@@ -116,30 +122,25 @@ final class JWTLoader
         Assertion::boolean($is_encryption_required);
         $jwt = Loader::load($assertion);
         if ($jwt instanceof JWEInterface) {
-            Assertion::true($this->isEncryptedJotSupportEnabled($allowed_key_encryption_algorithms, $allowed_content_encryption_algorithms, $encryption_key_set), 'Encrypted JWT support is not enabled.');
-            Assertion::eq(1, $jwt->countRecipients(), 'The assertion does not contain a single JWS or a single JWE.');
-            Assertion::inArray($jwt->getSharedProtectedHeader('alg'), $allowed_key_encryption_algorithms, sprintf('The key encryption algorithm "%s" is not allowed.', $jwt->getSharedProtectedHeader('alg')));
-            Assertion::inArray($jwt->getSharedProtectedHeader('enc'), $allowed_content_encryption_algorithms, sprintf('The content encryption algorithm "%s" is not allowed.', $jwt->getSharedProtectedHeader('enc')));
+            Assertion::true($this->isEncryptionSupportEnabled(), 'Encryption support is not enabled.');
+            $key_encryption_algorithms = array_intersect($allowed_key_encryption_algorithms, $this->supported_key_encryption_algorithms);
+            $content_encryption_algorithms = array_intersect($allowed_content_encryption_algorithms, $this->supported_content_encryption_algorithms);
+            Assertion::inArray($jwt->getSharedProtectedHeader('alg'), $key_encryption_algorithms, sprintf('The key encryption algorithm "%s" is not allowed.', $jwt->getSharedProtectedHeader('alg')));
+            Assertion::inArray($jwt->getSharedProtectedHeader('enc'), $content_encryption_algorithms, sprintf('The content encryption algorithm "%s" is not allowed or not supported.', $jwt->getSharedProtectedHeader('enc')));
             $jwt = $this->decryptAssertion($jwt, $encryption_key_set);
         } elseif (true === $is_encryption_required) {
             throw new \InvalidArgumentException('The assertion must be encrypted.');
         }
-        Assertion::eq(1, $jwt->countSignatures(), 'The assertion does not contain a single JWS or a single JWE.');
-        $this->checker_manager->checkJWS($jwt, 0);
 
         return $jwt;
     }
 
     /**
-     * @param string[]                          $allowed_key_encryption_algorithms
-     * @param string[]                          $allowed_content_encryption_algorithms
-     * @param \Jose\Object\JWKSetInterface|null $encryption_key_set
-     *
      * @return bool
      */
-    private function isEncryptedJotSupportEnabled(array $allowed_key_encryption_algorithms, array $allowed_content_encryption_algorithms, JWKSetInterface $encryption_key_set = null)
+    private function isEncryptionSupportEnabled()
     {
-        return !empty($allowed_key_encryption_algorithms) && !empty($allowed_content_encryption_algorithms) && null !== $encryption_key_set;
+        return null !== $this->decrypter;
     }
 
     /**
@@ -148,15 +149,12 @@ final class JWTLoader
      *
      * @return \Jose\Object\JWEInterface|\Jose\Object\JWSInterface
      */
-    protected function decryptAssertion(JWEInterface $jwe, JWKSetInterface $encryption_key_set)
+    private function decryptAssertion(JWEInterface $jwe, JWKSetInterface $encryption_key_set)
     {
-        if (false === $this->decrypter->decryptUsingKeySet($jwe, $encryption_key_set)) {
-            throw new \InvalidArgumentException('Unable to decrypt the payload. Please verify keys used for encryption.');
-        }
+        $this->decrypter->decryptUsingKeySet($jwe, $encryption_key_set);
+
         $jws = Loader::load($jwe->getPayload());
-        if (!$jws instanceof JWSInterface) {
-            throw new \InvalidArgumentException('The encrypted assertion does not contain a single JWS.');
-        }
+        Assertion::isInstanceOf($jws, JWSInterface::class, 'The encrypted assertion does not contain a JWS.');
 
         return $jws;
     }
@@ -168,14 +166,13 @@ final class JWTLoader
      */
     public function verifySignature(JWSInterface $jws, JWKSetInterface $signature_key_set, array $allowed_signature_algorithms)
     {
-        if (1 !== $jws->countSignatures()) {
-            throw new \InvalidArgumentException('The JWS must not contain only one signature.');
-        }
+        $algorithms = array_intersect(
+            $allowed_signature_algorithms,
+            $this->supported_signature_algorithms
+        );
+        Assertion::inArray($jws->getSignature(0)->getProtectedHeader('alg'), $algorithms, sprintf('The signature algorithm "%s" is not supported or not allowed.', $jws->getSignature(0)->getProtectedHeader('alg')));
 
-        Assertion::inArray($jws->getSignature(0)->getProtectedHeader('alg'), $allowed_signature_algorithms, sprintf('The signature algorithm "%s" is not allowed.', $jws->getSignature(0)->getProtectedHeader('alg')));
-
-        if (false === $this->verifier->verifyWithKeySet($jws, $signature_key_set)) {
-            throw new \InvalidArgumentException('Invalid signature.');
-        }
+        $this->verifier->verifyWithKeySet($jws, $signature_key_set, null, $index);
+        $this->checker_manager->checkJWS($jws, $index);
     }
 }

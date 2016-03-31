@@ -29,34 +29,38 @@ Please read [this page](component/scope.md) to know how to create and use this c
 
 # Access Token Manager
 
-Access tokens are one of the most important components in the OAuth2.
-They are issued by the authorization server to the clients.
+The Access token Manager is one of the most important component in the OAuth2 Framework library.
 
 This library is able to support any kind of access token managers.
 You can create your own access token manager. It just has to implement `OAuth2\Token\AccessTokenManagerInterface`.
 
 Or you can use the following implementation.
 
+## Random String Access Token Manager
+
+**This access token manager has been removed. Please use JWT Access Token Manager instead.**
+
 ## JWT Access Token Manager
 
-This manager will produce access tokens JSON Web Token (JWT) based.
-The tokens do not need a database and are digitaly signed by the authorization server.
+This manager will produce access tokens based on JSON Web Token (JWT).
+The tokens do not need a database and are digitally signed by the authorization server.
 They can also be encrypted in order to protect confidential information leak.
+The encryption is performed using the encryption key of the resource server or, if not available, of the authorization server.
 
 Please read [this page](component/jwt_access_token_manager.md) to know how to create and use this component.
 
 # Token Types
 
-When calling a protected resource, your client will have to demonstrate it is in possesion of an access token.
+When calling a protected resource, your client will have to demonstrate it is in possession of an access token.
 To do so, each issued access token has a token type. The demonstration made by the client will vary depending on that type.
 
 This library supports this token type and is able to support any kind of token type through a `Token Type Manager`.
 
 This manager will handle token types enabled in your authorization server.
 
-Please read [this page](component/token_type_manager.md) to know how to create and use this component.
+Please read [this page](component/token_type/manager.md) to know how to create and use this component.
 
-# User Manager
+# Users
 
 Please read [this page](component/user_manager.md) to know how to create and use this component.
 
@@ -67,15 +71,7 @@ Please read [this page](component/user_manager.md) to know how to create and use
 The role of the client manager supervisor is to manager all client managers you need.
 It will handle requests and try to identify which client is sending requests against the authorization server.
 
-Please read [this page](component/client_manager_supervisor.md) to know how to create and use this component.
-
-## Public Client Manager
-
-## Password Client Manager
-
-## JWT Client Manager
-
-## Unregistered Client Manager
+Please read [this page](component/client/manager_supervisor.md) to know how to create and use this component.
 
 # Resource Servers
 
@@ -83,34 +79,8 @@ Resource servers are not yet fully supported.
 
 # Endpoints
 
-## Authorization Endpoint
-
-## Token Endpoint
-
-## Token Revocation Endpoint
-
-## Token Introspection Endpoint
+Please read [this page](component/endpoint/endpoints.md) to know how to create and use the endpoints provided by this library.
 
 # Grant types
 
-## Authorization Code Grant Type
-
-### Proof Key for Code Exchange by OAuth Public Clients
-
-#### Plain
-
-#### S256
-
-## Implicit Code Grant Type
-
-## Resource Owner Password Credentials Code Grant Type
-
-## Client Credentials Code Grant Type
-
-## Refresh Token Code Grant Type
-
-## JWT Bearer Token Code Grant Type
-
-# OpenID Connect
-
-
+Please read [this page](component/grant/types.md) to know how to create and use the grant types provided by this library.

@@ -14,9 +14,9 @@ namespace OAuth2\Scope;
 use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ScopeExtensionInterface;
+use OAuth2\Client\Extension\AvailableScopeExtensionInterface;
+use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 class ScopeManager implements ScopeManagerInterface
 {
@@ -28,35 +28,71 @@ class ScopeManager implements ScopeManagerInterface
     private $available_scopes;
 
     /**
-     * @var string[]
+     * @var \OAuth2\Scope\ScopePolicyInterface[]
      */
-    private $default_scopes;
+    private $scope_policies = [];
 
     /**
-     * @var string|null
+     * @var string
      */
-    private $scope_policy;
+    private $default_scope_policy;
 
     /**
      * ScopeManager constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      * @param array                                       $available_scopes
-     * @param array                                       $default_scopes
-     * @param null                                        $scope_policy
      */
-    public function __construct(
-        ExceptionManagerInterface $exception_manager,
-        array $available_scopes = [],
-        array $default_scopes = [],
-        $scope_policy = self::POLICY_MODE_NONE
-    ) {
-        Assertion::nullOrString($scope_policy);
-
+    public function __construct(ExceptionManagerInterface $exception_manager, array $available_scopes = [])
+    {
         $this->available_scopes = $available_scopes;
-        $this->default_scopes = $default_scopes;
-        $this->scope_policy = $scope_policy;
         $this->setExceptionManager($exception_manager);
+        $this->addScopePolicy(new NoScopePolicy(), true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addScopePolicy(ScopePolicyInterface $scope_policy, $is_default = false)
+    {
+        $name = $scope_policy->getName();
+        if (!$this->hasScopePolicy($name)) {
+            $this->scope_policies[$name] = $scope_policy;
+        }
+
+        if (true === $is_default) {
+            $this->default_scope_policy = $name;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedScopePolicies()
+    {
+        return array_keys($this->scope_policies);
+    }
+
+    /**
+     * @param string $scope_policy_name
+     *
+     * @return string
+     */
+    private function hasScopePolicy($scope_policy_name)
+    {
+        return array_key_exists($scope_policy_name, $this->scope_policies);
+    }
+
+    /**
+     * @param string $scope_policy_name
+     *
+     * @return \OAuth2\Scope\ScopePolicyInterface
+     */
+    private function getScopePolicy($scope_policy_name)
+    {
+        Assertion::keyExists($this->scope_policies, $scope_policy_name, sprintf('The scope policy with name "%s" is not supported', $scope_policy_name));
+
+        return $this->scope_policies[$scope_policy_name];
     }
 
     /**
@@ -68,72 +104,41 @@ class ScopeManager implements ScopeManagerInterface
     }
 
     /**
-     * @return string[]
+     * @return \OAuth2\Scope\ScopePolicyInterface
      */
-    public function getDefaultScopes()
+    public function getDefaultScopePolicy()
     {
-        return $this->default_scopes;
-    }
-
-    /**
-     * @return string
-     */
-    public function getScopePolicy()
-    {
-        return $this->scope_policy;
+        return $this->scope_policies[$this->default_scope_policy];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function supportedPolicies()
+    public function getAvailableScopesForClient(ClientInterface $client)
     {
-        return [
-            self::POLICY_MODE_NONE,
-            self::POLICY_MODE_DEFAULT,
-            self::POLICY_MODE_ERROR,
-        ];
+        return ($client instanceof AvailableScopeExtensionInterface && null !== $client->getAvailableScopes()) ? $client->getAvailableScopes() : $this->getAvailableScopes();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAvailableScopesForClient(ClientInterface $client, ServerRequestInterface $request = null)
+    public function getScopePolicyForClient(ClientInterface $client)
     {
-        return ($client instanceof ScopeExtensionInterface && null !== $client->getAvailableScopes($request)) ? $client->getAvailableScopes($request) : $this->getAvailableScopes();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultScopesForClient(ClientInterface $client, ServerRequestInterface $request = null)
-    {
-        return ($client instanceof ScopeExtensionInterface && null !== $client->getDefaultScopes($request)) ? $client->getDefaultScopes($request) : $this->getDefaultScopes();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopePolicyForClient(ClientInterface $client, ServerRequestInterface $request = null)
-    {
-        return ($client instanceof ScopeExtensionInterface && null !== $client->getScopePolicy($request)) ? $client->getScopePolicy($request) : $this->getScopePolicy();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function checkScopePolicy(ClientInterface $client, array $scope, ServerRequestInterface $request = null)
-    {
-        $policy = $this->getScopePolicyForClient($client, $request);
-
-        // If Scopes Policy is set to "error" and no scope is set, then throws an error
-        if (empty($scope) && self::POLICY_MODE_ERROR === $policy) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'No scope was requested.');
+        if ($client instanceof ScopePolicyExtensionInterface && null !== $policy_name = $client->getScopePolicy()) {
+            return $this->getScopePolicy($policy_name);
         }
 
-        // If Scopes Policy is set to "default" and no scope is set, then application or client defaults are set
-        if (empty($scope) && self::POLICY_MODE_DEFAULT === $policy) {
-            return $this->getDefaultScopesForClient($client, $request);
+        return $this->getDefaultScopePolicy();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function checkScopePolicy(array $scope, ClientInterface $client)
+    {
+        if (empty($scope)) {
+            $policy = $this->getScopePolicyForClient($client);
+            $policy->checkScopePolicy($scope, $client);
         }
 
         return $scope;

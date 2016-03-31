@@ -20,6 +20,11 @@ abstract class PublicClientManager implements ClientManagerInterface
     use HasExceptionManager;
 
     /**
+     * @return array
+     */
+    abstract protected function findClientMethods();
+
+    /**
      * PublicClientManager constructor.
      *
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
@@ -36,11 +41,6 @@ abstract class PublicClientManager implements ClientManagerInterface
     {
         return [];
     }
-
-    /**
-     * @return array
-     */
-    abstract protected function findClientMethods();
 
     /**
      * {@inheritdoc}
@@ -70,7 +70,23 @@ abstract class PublicClientManager implements ClientManagerInterface
      */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
     {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientSupported(ClientInterface $client)
+    {
         return $client instanceof PublicClientInterface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return ['none'];
     }
 
     /**

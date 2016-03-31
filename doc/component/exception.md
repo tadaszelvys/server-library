@@ -16,37 +16,47 @@ Now the variable `$exception_manager` can be injected to all other components th
 
 # Advanced
 
-## Error Uri Parameter
+## Extensions
 
-Your authorization server may provide pages containing human readable error descriptions.
+The exception manager allow you to add error data using extensions.
+For example, your authorization server may provide pages containing human readable error descriptions.
 You can add the `error_uri` parameter for all returned error or a certain type of them.
 
-To do so, you just have to extend the class `OAuth2\Exception\ExceptionManager` and override the method `getUri`.
-If this method returns a string, the `error_uri` parameter will be set.
+To do so, you just have to create and add an extension using the menthod `addExtension`.
+This extension must implement `OAuth2\Exception\Extension\ExceptionExtensionInterface`.
 
 The following example shows you how to define an error URI for bad request errors only:
+
+First, we create our extension:
 
 ```php
 namespace Acme;
 
-use OAuth2\Exception\ExceptionManager;
+use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Exception\Extension\ExceptionExtensionInterface;
 
-class MyExceptionManager extends ExceptionManager
+/**
+ */
+class UriExtension implements ExceptionExtensionInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getUri($type, $error, $error_description = null, array $data = [])
+    public function getData($type, $error, $error_description, array $data)
     {
-        if (self::BAD_REQUEST === $type) {
-            return sprintf(
-                'https://my.service.example/oauth2/error/%s/%s',
-                $error,
-                null === $error_description?'':url_encode($error_description)
-            );
+        if ($type === ExceptionManagerInterface::BAD_REQUEST) {
+            return ['error_uri' => urlencode("https://foo.test/Error/$type/$error")];
         }
+
+        return [];
     }
 }
+```
+
+Then, we add this extension to the exception manager:
+
+```php
+$exception_manager->addExtension(new UriExtension());
 ```
 
 ## Custom Exception Type
@@ -66,37 +76,20 @@ class TooManyRequestsException extends BaseException
     /**
      * {@inheritdoc}
      */
-    public function __construct($error, $error_description = null, $error_uri = null, array $data = [])
+    public function __construct($error, $error_description, array $error_data, array $data])
     {
-        parent::__construct(429, $error, $error_description, $error_uri);
+        parent::__construct(429, $error, $error_description, $error_data, $data);
     }
 }
 ```
 
-> Please note that the constructor signature MUST be `public function __construct($error, $error_description = null, $error_uri = null, array $data = [])`.
+> Please note that the constructor signature MUST be `public function __construct($error, $error_description, array $error_data, array $data])`.
 
-Then, you have to extend the class `OAuth2\Exception\ExceptionManager` and add your new exception type:
+Then, you just have to add this class to the class mapping of the exception manager:
 
 ```php
-namespace Acme;
-
-use OAuth2\Exception\ExceptionManager;
-
-class MyExceptionManager extends ExceptionManager
-{
-    /**
-     * return array
-     */
-    protected function getExceptionTypeMap()
-    {
-        return array_merge(
-            parent::getExceptionTypeMap(),
-            [
-                'TooManyRequests' => '\Acme\TooManyRequestsException',
-            ]
-        );
-    }
-}
+use  Acme\TooManyRequestsException;
+$exception_manager->addExceptionType('TooManyRequests', TooManyRequestsException::class);
 ```
 
 Now, you are able to throw your new exception type:

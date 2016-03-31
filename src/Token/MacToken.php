@@ -12,16 +12,11 @@
 namespace OAuth2\Token;
 
 use Assert\Assertion;
+use Base64Url\Base64Url;
 use Psr\Http\Message\ServerRequestInterface;
-use Security\DefuseGenerator;
 
 class MacToken implements TokenTypeInterface
 {
-    /**
-     * @var string
-     */
-    private $mac_key_charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/';
-
     /**
      * @var int
      */
@@ -71,17 +66,6 @@ class MacToken implements TokenTypeInterface
     }
 
     /**
-     * @return string
-     */
-    private function generateMacKey()
-    {
-        $length = $this->getMacKeyLength();
-        $charset = $this->getMacKeyCharset();
-
-        return DefuseGenerator::getRandomString($length, $charset);
-    }
-
-    /**
      * @return int
      */
     public function getTimestampLifetime()
@@ -109,23 +93,6 @@ class MacToken implements TokenTypeInterface
         srand();
 
         return rand($min_length, $max_length);
-    }
-
-    /**
-     * @return string
-     */
-    public function getMacKeyCharset()
-    {
-        return $this->mac_key_charset;
-    }
-
-    /**
-     * @param string $mac_key_charset
-     */
-    public function setMacKeyCharset($mac_key_charset)
-    {
-        Assertion::string($mac_key_charset);
-        $this->$mac_key_charset = $mac_key_charset;
     }
 
     /**
@@ -183,6 +150,9 @@ class MacToken implements TokenTypeInterface
         $this->mac_algorithm = $mac_algorithm;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function findToken(ServerRequestInterface $request, array &$additional_credential_values)
     {
         $authorization_headers = $request->getHeader('AUTHORIZATION');
@@ -192,26 +162,18 @@ class MacToken implements TokenTypeInterface
         }
 
         foreach ($authorization_headers as $authorization_header) {
-            if ('MAC ' === substr($authorization_header, 0, 4) && 1 === preg_match('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', substr($authorization_header, 4), $matches)) {
-                preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', substr($authorization_header, 4), $matches, PREG_SET_ORDER);
-
-                if (!is_array($matches)) {
-                    return;
-                }
-                $values = [];
-                foreach ($matches as $match) {
-                    $values[$match[1]] = $match[3];
-                }
-
-                if (array_key_exists('id', $values)) {
-                    $additional_credential_values = $values;
-
-                    return $values['id'];
+            if ('MAC ' === mb_substr($authorization_header, 0, 4, '8bit')) {
+                $header = trim(mb_substr($authorization_header, 4, null, '8bit'));
+                if (true === $this->isHeaderValid($header, $additional_credential_values, $token)) {
+                    return $token;
                 }
             }
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isTokenRequestValid(AccessTokenInterface $access_token, ServerRequestInterface $request, array $additional_credential_values)
     {
         if ($access_token->getTokenType() !== $this->getTokenTypeName()) {
@@ -290,5 +252,47 @@ class MacToken implements TokenTypeInterface
             'hmac-sha-1'   => 'sha1',
             'hmac-sha-256' => 'sha256',
         ];
+    }
+
+    /**
+     * @param string      $header
+     * @param array       $additional_credential_values
+     * @param string|null $token
+     *
+     * @return bool
+     */
+    private function isHeaderValid($header, array &$additional_credential_values, &$token = null)
+    {
+        if (1 === preg_match('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches)) {
+            preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
+
+            if (!is_array($matches)) {
+                return false;
+            }
+            $values = [];
+            foreach ($matches as $match) {
+                $values[$match[1]] = $match[3];
+            }
+
+            if (array_key_exists('id', $values)) {
+                $additional_credential_values = $values;
+
+                $token = $values['id'];
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    private function generateMacKey()
+    {
+        $length = $this->getMacKeyLength();
+
+        return Base64Url::encode(random_bytes($length));
     }
 }

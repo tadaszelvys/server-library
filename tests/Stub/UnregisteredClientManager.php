@@ -107,10 +107,35 @@ class UnregisteredClientManager implements ClientManagerInterface
         }
 
         $client = new UnregisteredClient();
-        $client->setAllowedGrantTypes(['code', 'authorization_code']);
+        $client->setAllowedGrantTypes(['authorization_code']);
+        $client->setAllowedResponseTypes(['code']);
         $client->setPublicId($client_id);
 
         return $client;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientSupported(ClientInterface $client)
+    {
+        return $client instanceof UnregisteredClient;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return ['none'];
     }
 
     /**
@@ -141,13 +166,5 @@ class UnregisteredClientManager implements ClientManagerInterface
         }
 
         return $header[0];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
-    {
-        return true;
     }
 }

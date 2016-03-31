@@ -17,8 +17,11 @@ use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\TokenLifetimeExtensionInterface;
-use OAuth2\EndUser\EndUserInterface;
+use OAuth2\Client\EncryptionCapabilitiesInterface;
+use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
+use OAuth2\Client\RegisteredClientInterface;
+use OAuth2\OpenIDConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
+use OAuth2\User\UserInterface as BaseUserInterface;
 use OAuth2\Util\JWTCreator;
 use OAuth2\Util\JWTLoader;
 
@@ -48,58 +51,49 @@ class IdTokenManager implements IdTokenManagerInterface
     private $signature_key;
 
     /**
-     * @var bool
+     * @var null|\OAuth2\OpenIDConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface
      */
-    private $encrypt_if_possible;
-
-    /**
-     * @var \Jose\Object\JWKInterface|null
-     */
-    private $key_encryption_key;
-
-    /**
-     * @var \OAuth2\OpenIDConnect\IdTokenClaimManagerInterface[]
-     */
-    private $id_token_claim_managers = [];
+    private $pairwise_algorithm = null;
 
     /**
      * IdTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader         $jwt_loader
-     * @param \OAuth2\Util\JWTCreator        $jwt_creator
-     * @param                                $issuer
-     * @param                                $signature_algorithm
-     * @param \Jose\Object\JWKInterface      $signature_key
-     * @param bool                           $encrypt_if_possible
-     * @param \Jose\Object\JWKInterface|null $key_encryption_key
+     * @param \OAuth2\Util\JWTLoader    $jwt_loader
+     * @param \OAuth2\Util\JWTCreator   $jwt_creator
+     * @param                           $issuer
+     * @param                           $signature_algorithm
+     * @param \Jose\Object\JWKInterface $signature_key
      */
     public function __construct(JWTLoader $jwt_loader,
                                 JWTCreator $jwt_creator,
                                 $issuer,
                                 $signature_algorithm,
-                                JWKInterface $signature_key,
-                                $encrypt_if_possible = false,
-                                JWKInterface $key_encryption_key = null
+                                JWKInterface $signature_key
     ) {
         Assertion::string($signature_algorithm);
         Assertion::string($issuer);
-        Assertion::boolean($encrypt_if_possible);
         $this->issuer = $issuer;
         $this->signature_algorithm = $signature_algorithm;
         $this->signature_key = $signature_key;
-        $this->encrypt_if_possible = $encrypt_if_possible;
-        $this->key_encryption_key = $key_encryption_key;
 
         $this->setJWTLoader($jwt_loader);
         $this->setJWTCreator($jwt_creator);
     }
 
     /**
-     * @param \OAuth2\OpenIDConnect\IdTokenClaimManagerInterface $id_token_claim_manager
+     * {@inheritdoc}
      */
-    public function addIdTokenClaimManager(IdTokenClaimManagerInterface $id_token_claim_manager)
+    public function enablePairwiseSubject(PairwiseSubjectIdentifierAlgorithmInterface $pairwise_algorithm)
     {
-        $this->id_token_claim_managers = $id_token_claim_manager;
+        $this->pairwise_algorithm = $pairwise_algorithm;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isPairwiseSubjectIdentifierSupported()
+    {
+        return null !== $this->pairwise_algorithm;
     }
 
     /**
@@ -129,10 +123,12 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createIdToken(ClientInterface $client, EndUserInterface $end_user, array $id_token_claims = [], $access_token = null, $auth_code = null)
+    public function createIdToken(ClientInterface $client, BaseUserInterface $user, $redirect_uri, array $id_token_claims = [], $access_token = null, $auth_code = null)
     {
         $id_token = $this->createEmptyIdToken();
         $exp = time() + $this->getLifetime($client);
+
+        $sub = $this->calculateSubjectIdentifier($client, $user, $redirect_uri);
 
         $headers = [
             'typ'       => 'JWT',
@@ -142,13 +138,15 @@ class IdTokenManager implements IdTokenManagerInterface
         $payload = [
             'jti'       => Base64Url::encode(random_bytes(25)),
             'iss'       => $this->issuer,
-            'sub'       => $end_user->getPublicId(),
+            'sub'       => $sub,
             'aud'       => $client->getPublicId(),
             'iat'       => time(),
             'nbf'       => time(),
             'exp'       => $exp,
-            'auth_time' => $end_user->getLastLoginAt(),
         ];
+        if ($user instanceof UserInterface) {
+            $payload['auth_time'] = $user->getLastLoginAt();
+        }
 
         foreach (['at_hash' => $access_token, 'c_hash' => $auth_code] as $key => $token) {
             if (null !== $token) {
@@ -156,7 +154,7 @@ class IdTokenManager implements IdTokenManagerInterface
             }
         }
         foreach (['amr' => 'getAuthenticationMethodsReferences', 'acr' => 'getAuthenticationContextClassReference'] as $claims => $method) {
-            $value = $end_user->$method();
+            $value = $user->$method();
             if (!empty($value)) {
                 $payload[$claims] = $value;
             }
@@ -166,39 +164,27 @@ class IdTokenManager implements IdTokenManagerInterface
             $payload = array_merge($payload, $id_token_claims);
         }
 
-        foreach ($this->id_token_claim_managers as $id_token_claim_manager) {
-            $id_token_claim_manager->process($payload, $end_user, $client);
-        }
-
         $jwt = $this->jwt_creator->sign($payload, $headers, $this->signature_key);
 
-        /*if (true === $this->encrypt_if_possible || $client instanceof EncryptionCapabilitiesInterface) {
-            // TODO: Fix the selection of the algorithms
+        if ($client instanceof EncryptionCapabilitiesInterface && true === $client->isEncryptionSupportEnabled()) {
             $headers = [
                 'typ'       => 'JWT',
-                'jti'       => Base64Url::encode(StringUtil::generateRandomBytes(25)),
-                'alg'       => $client->getSupportedKeyEncryptionAlgorithms()[0],
-                'enc'       => $client->getSupportedContentEncryptionAlgorithms()[0],
-                'iss'       => $this->issuer,
-                'sub'       => $end_user->getPublicId(),
-                'aud'       => $client->getPublicId(),
-                'iat'       => time(),
-                'nbf'       => time(),
-                'exp'       => $exp,
+                'jti'       => Base64Url::encode(random_bytes(25)),
+                'alg'       => $client->getKeyEncryptionAlgorithm(),
+                'enc'       => $client->getContentEncryptionAlgorithm(),
             ];
 
-            // TODO: Fix the selection of the public key
             $jwt = $this->jwt_creator->encrypt(
                 $jwt,
                 $headers,
-                $client->getEncryptionPublicKeySet()->getKey(0)
+                $client->getEncryptionPublicKey()
             );
-        }*/
+        }
         $id_token->setToken($jwt);
 
         $id_token->setExpiresAt($exp);
         $id_token->setClientPublicId($client->getPublicId());
-        $id_token->setResourceOwnerPublicId($end_user->getPublicId());
+        $id_token->setResourceOwnerPublicId($user->getPublicId());
 
         return $id_token;
     }
@@ -220,13 +206,58 @@ class IdTokenManager implements IdTokenManagerInterface
     }
 
     /**
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param \OAuth2\User\UserInterface     $user
+     * @param string                         $redirect_uri
+     *
+     * @return string
+     */
+    private function calculateSubjectIdentifier(ClientInterface $client, BaseUserInterface $user, $redirect_uri)
+    {
+        $sub = $user->getPublicId();
+
+        if (false === $this->isPairwiseSubjectIdentifierSupported()) {
+            return $sub;
+        }
+
+        $sector_identifier_host = $this->getSectorIdentifierHost($client, $redirect_uri);
+
+        return $this->pairwise_algorithm->calculateSubjectIdentifier(
+            $user,
+            $sector_identifier_host
+        );
+    }
+
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param string                         $redirect_uri
+     *
+     * @return string
+     */
+    private function getSectorIdentifierHost(ClientInterface $client, $redirect_uri)
+    {
+        $uri = $redirect_uri;
+
+        if ($client instanceof RegisteredClientInterface && null !== $sector_identifier_uri = $client->getSectorIdentifierUri()) {
+            $uri = $sector_identifier_uri;
+        }
+
+        $data = parse_url($uri);
+        if (!is_array($data) || !array_key_exists('host', $data)) {
+            throw new \InvalidArgumentException(sprintf('Invalid Sector Identifier Uri "%s".', $uri));
+        }
+
+        return $data['host'];
+    }
+
+    /**
      * @param string $token
      *
      * @return string
      */
     private function getHash($token)
     {
-        return Base64Url::encode(substr(hash($this->getHashMethod(), $token, true), 0, $this->getHashSize()));
+        return Base64Url::encode(mb_substr(hash($this->getHashMethod(), $token, true), 0, $this->getHashSize(), '8bit'));
     }
 
     /**

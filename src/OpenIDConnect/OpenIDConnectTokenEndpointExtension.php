@@ -13,11 +13,10 @@ namespace OAuth2\OpenIDConnect;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\TokenEndpointExtensionInterface;
-use OAuth2\EndUser\EndUserManagerInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
+use OAuth2\User\UserManagerInterface;
 
 /**
  * Class OpenIDConnectTokenEndpointExtension.
@@ -30,29 +29,21 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
     private $id_token_manager;
 
     /**
-     * @var \OAuth2\EndUser\EndUserManagerInterface
+     * @var \OAuth2\User\UserManagerInterface
      */
-    private $end_user_manager;
-
-    /**
-     * @var \OAuth2\Exception\ExceptionManagerInterface
-     */
-    private $exception_manager;
+    private $user_manager;
 
     /**
      * OpenIDConnectTokenEndpointExtension constructor.
      *
      * @param \OAuth2\OpenIDConnect\IdTokenManagerInterface $id_token_manager
-     * @param \OAuth2\EndUser\EndUserManagerInterface       $end_user_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface   $exception_manager
+     * @param \OAuth2\User\UserManagerInterface             $user_manager
      */
     public function __construct(IdTokenManagerInterface $id_token_manager,
-                                EndUserManagerInterface $end_user_manager,
-                                ExceptionManagerInterface $exception_manager
+                                UserManagerInterface $user_manager
     ) {
         $this->id_token_manager = $id_token_manager;
-        $this->end_user_manager = $end_user_manager;
-        $this->exception_manager = $exception_manager;
+        $this->user_manager = $user_manager;
     }
 
     /**
@@ -63,15 +54,19 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
         if (false === $this->issueIdToken($grant_type_response)) {
             return;
         }
-        $end_user = $this->end_user_manager->getEndUser($grant_type_response->getResourceOwnerPublicId());
-        if (null === $end_user) {
+        $user = $this->user_manager->getUser($grant_type_response->getResourceOwnerPublicId());
+        if (null === $user) {
             return;
         }
 
         $claims = [];
         $auth_code = $grant_type_response->getAdditionalData('auth_code');
 
-        if ($auth_code instanceof AuthCodeInterface && array_key_exists('nonce', $params = $auth_code->getQueryParams())) {
+        if (!$auth_code instanceof AuthCodeInterface) {
+            return;
+        }
+
+        if (array_key_exists('nonce', $params = $auth_code->getQueryParams())) {
             $claims = array_merge(
                 $claims,
                 ['nonce' => $params['nonce']]
@@ -80,10 +75,11 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
 
         $id_token = $this->id_token_manager->createIdToken(
             $client,
-            $end_user,
+            $user,
+            $auth_code->getRedirectUri(),
             $claims,
             $access_token->getToken(),
-            $auth_code instanceof AuthCodeInterface ? $auth_code->getToken() : null
+            $auth_code->getToken()
         );
 
         return $id_token->toArray();

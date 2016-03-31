@@ -11,6 +11,8 @@
 
 namespace OAuth2\Token;
 
+use Assert\Assertion;
+
 class Token implements TokenInterface
 {
     /**
@@ -128,6 +130,8 @@ class Token implements TokenInterface
      */
     public function setExpiresAt($expires_at)
     {
+        Assertion::integer($expires_at);
+        Assertion::greaterOrEqualThan($expires_at, 0);
         $this->expires_at = $expires_at;
     }
 
@@ -136,6 +140,11 @@ class Token implements TokenInterface
      */
     public function hasExpired()
     {
+        $expires_at = $this->expires_at;
+        if (0 === $expires_at) {
+            return false;
+        }
+
         return $this->expires_at < time();
     }
 
@@ -144,6 +153,11 @@ class Token implements TokenInterface
      */
     public function getExpiresIn()
     {
+        $expires_at = $this->expires_at;
+        if (0 === $expires_at) {
+            return 0;
+        }
+
         return $this->expires_at - time() < 0 ? 0 : $this->expires_at - time();
     }
 
@@ -168,6 +182,7 @@ class Token implements TokenInterface
      */
     public function setParameter($key, $value)
     {
+        Assertion::string($key);
         $this->parameters[$key] = $value;
     }
 
@@ -176,9 +191,7 @@ class Token implements TokenInterface
      */
     public function getParameter($key)
     {
-        if (!$this->hasParameter($key)) {
-            throw new \InvalidArgumentException(sprintf('Parameter with key "%s" does not exist.', $key));
-        }
+        Assertion::true($this->hasParameter($key), sprintf('Parameter with key "%s" does not exist.', $key));
 
         return $this->parameters[$key];
     }
@@ -188,6 +201,8 @@ class Token implements TokenInterface
      */
     public function hasParameter($key)
     {
+        Assertion::string($key);
+
         return array_key_exists($key, $this->parameters);
     }
 
@@ -196,6 +211,7 @@ class Token implements TokenInterface
      */
     public function unsetParameter($key)
     {
+        Assertion::string($key);
         if (array_key_exists($key, $this->parameters)) {
             unset($this->parameters[$key]);
         }

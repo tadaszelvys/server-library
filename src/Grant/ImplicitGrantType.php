@@ -56,7 +56,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
     {
         //Nothing to do
     }
@@ -70,7 +70,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
 
         $token = $this->getAccessTokenManager()->createAccessToken(
             $authorization->getClient(),
-            $authorization->getEndUser(),
+            $authorization->getUser(),
             $token_type->getTokenTypeInformation(),
             $authorization->getQueryParams(),
             $authorization->getScopes()

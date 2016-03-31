@@ -11,6 +11,8 @@
 
 namespace OAuth2\Client;
 
+use OAuth2\ResourceOwner\ResourceOwnerTrait;
+
 /**
  * This interface is for unregistered clients.
  * These clients have an ID, but the server can get the client details.
@@ -18,14 +20,8 @@ namespace OAuth2\Client;
  *
  * @see http://tools.ietf.org/html/rfc6749#section-2.1
  */
-class UnregisteredClient extends Client
+class UnregisteredClient implements ClientInterface
 {
-    /**
-     * UnregisteredClient constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setType('unregistered_client');
-    }
+    use ResourceOwnerTrait;
+    use ClientTrait;
 }
