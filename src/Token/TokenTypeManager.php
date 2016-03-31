@@ -101,6 +101,7 @@ class TokenTypeManager implements TokenTypeManagerInterface
             if (null !== $token) {
                 $additional_credential_values = $tmp_additional_credential_values;
                 $type = $tmp_type;
+
                 return $token;
             }
         }

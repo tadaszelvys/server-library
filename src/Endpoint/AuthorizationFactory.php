@@ -20,9 +20,9 @@ use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Client\SignatureCapabilitiesInterface;
-use OAuth2\User\UserInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\User\UserInterface;
 use OAuth2\Util\JWTLoader;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -170,7 +170,7 @@ final class AuthorizationFactory
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \OAuth2\User\UserInterface         $user
+     * @param \OAuth2\User\UserInterface               $user
      * @param bool                                     $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
@@ -271,9 +271,9 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param array                            $params
+     * @param array                      $params
      * @param \OAuth2\User\UserInterface $user
-     * @param bool                             $is_authorized
+     * @param bool                       $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
      */
@@ -286,11 +286,11 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param array                            $params
-     * @param \OAuth2\User\UserInterface $user
-     * @param \OAuth2\Client\ClientInterface   $client
-     * @param array                            $scope
-     * @param bool                             $is_authorized
+     * @param array                          $params
+     * @param \OAuth2\User\UserInterface     $user
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param array                          $scope
+     * @param bool                           $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
      */

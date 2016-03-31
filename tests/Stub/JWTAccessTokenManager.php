@@ -98,7 +98,7 @@ class JWTAccessTokenManager extends Base
         $user_info_mac->setToken('USER_INFO_MAC');
         $user_info_mac->setTokenType('MAC');
         $user_info_mac->setParameters([
-            'mac_key' => 'Ajpw1Q2mebV8kz4',
+            'mac_key'       => 'Ajpw1Q2mebV8kz4',
             'mac_algorithm' => 'hmac-sha-256',
         ]);
 

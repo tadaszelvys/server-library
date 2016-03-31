@@ -12,7 +12,6 @@
 namespace OAuth2\OpenIDConnect;
 
 use OAuth2\User\UserInterface as BaseUserInterface;
-use OAuth2\Token\AccessTokenInterface;
 
 /**
  * This interface must be implemented by end-user classes.

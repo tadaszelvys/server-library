@@ -26,8 +26,8 @@ final class EntryPoint implements EntryPointInterface
     /**
      * EntryPoint constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     * @param \OAuth2\Token\TokenTypeManagerInterface     $token_type_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
                                 ExceptionManagerInterface $exception_manager
@@ -46,7 +46,7 @@ final class EntryPoint implements EntryPointInterface
             null,
             ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes()]
         );
-        
+
         $exception->getHttpResponse($response);
     }
 }

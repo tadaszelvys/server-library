@@ -103,14 +103,14 @@ class ExceptionManager implements ExceptionManagerInterface
     }
 
     /**
-     * @param string       $type
-     * @param string       $error
-     * @param string|null  $error_description
-     * @param array        $data
+     * @param string      $type
+     * @param string      $error
+     * @param string|null $error_description
+     * @param array       $data
      *
      * @return array
      */
-    private function getAdditionalErrorData($type, $error, $error_description = null, array $data)
+    private function getAdditionalErrorData($type, $error, $error_description, array $data)
     {
         $result = [];
         foreach ($this->extensions as $extension) {

@@ -83,11 +83,11 @@ final class Authorization
     /**
      * Authorization constructor.
      *
-     * @param array                            $query_params
-     * @param \OAuth2\User\UserInterface $user
-     * @param bool                             $is_authorized
-     * @param \OAuth2\Client\ClientInterface   $client
-     * @param array                            $scopes
+     * @param array                          $query_params
+     * @param \OAuth2\User\UserInterface     $user
+     * @param bool                           $is_authorized
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param array                          $scopes
      */
     public function __construct(array $query_params,
                                 UserInterface $user,

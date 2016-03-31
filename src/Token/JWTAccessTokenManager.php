@@ -174,15 +174,15 @@ class JWTAccessTokenManager extends AccessTokenManager
     protected function preparePayload(AccessTokenInterface $access_token, ResourceServerInterface $resource_server = null)
     {
         $payload = [
-            'jti' => Base64Url::encode(random_bytes(25)),
-            'iss' => $this->issuer,
-            'aud' => null === $resource_server ? $this->issuer : $resource_server->getServerName(),
-            'iat' => time(),
-            'nbf' => time(),
-            'exp' => $access_token->getExpiresAt(),
-            'sub' => $access_token->getClientPublicId(),
-            'token_type' => $access_token->getTokenType(),
-            'scope' => $access_token->getScope(),
+            'jti'            => Base64Url::encode(random_bytes(25)),
+            'iss'            => $this->issuer,
+            'aud'            => null === $resource_server ? $this->issuer : $resource_server->getServerName(),
+            'iat'            => time(),
+            'nbf'            => time(),
+            'exp'            => $access_token->getExpiresAt(),
+            'sub'            => $access_token->getClientPublicId(),
+            'token_type'     => $access_token->getTokenType(),
+            'scope'          => $access_token->getScope(),
             'resource_owner' => $access_token->getResourceOwnerPublicId(),
         ];
         if (0 !== $expires_at = $access_token->getExpiresAt()) {

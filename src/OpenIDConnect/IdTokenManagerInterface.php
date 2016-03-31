@@ -26,14 +26,14 @@ interface IdTokenManagerInterface
      * @return bool
      */
     public function isPairwiseSubjectIdentifierSupported();
-    
+
     /**
-     * @param \OAuth2\Client\ClientInterface   $client
-     * @param \OAuth2\User\UserInterface       $user
-     * @param string                           $redirect_uri
-     * @param array                            $id_token_claims
-     * @param string|null                      $access_token
-     * @param string|null                      $auth_code
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param \OAuth2\User\UserInterface     $user
+     * @param string                         $redirect_uri
+     * @param array                          $id_token_claims
+     * @param string|null                    $access_token
+     * @param string|null                    $auth_code
      *
      * @return mixed
      */

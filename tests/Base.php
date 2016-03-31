@@ -25,11 +25,7 @@ use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\RefreshToken;
-use OAuth2\OpenIDConnect\Pairwise\HashedSubjectIdentifier;
-use OAuth2\Security\EntryPoint;
-use OAuth2\Security\Listener;
-use OAuth2\Test\Stub\TooManyRequestsException;
-use OAuth2\Test\Stub\UriExtension;
+use OAuth2\Exception\ExceptionManager;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
@@ -42,12 +38,13 @@ use OAuth2\OpenIDConnect\IdTokenManager;
 use OAuth2\OpenIDConnect\Metadata;
 use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
+use OAuth2\OpenIDConnect\Pairwise\HashedSubjectIdentifier;
 use OAuth2\OpenIDConnect\UserInfo;
 use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
+use OAuth2\Security\EntryPoint;
+use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\AuthCodeManager;
-use OAuth2\Test\Stub\UserManager;
-use OAuth2\Exception\ExceptionManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\JWTClientManager;
@@ -57,7 +54,10 @@ use OAuth2\Test\Stub\PublicClientManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
+use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\UnregisteredClientManager;
+use OAuth2\Test\Stub\UriExtension;
+use OAuth2\Test\Stub\UserManager;
 use OAuth2\Token\BearerToken;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
@@ -115,7 +115,7 @@ class Base extends \PHPUnit_Framework_TestCase
      */
     protected function getPairwiseAdditionalData()
     {
-        return mb_substr($this->pairwise_additional_data,0, 16, '8bit');
+        return mb_substr($this->pairwise_additional_data, 0, 16, '8bit');
     }
 
     /**
@@ -1084,7 +1084,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->setResponseModesSupported($this->getAuthorizationEndpoint()->getResponseModesSupported());
             $this->metadata->setGrantTypesSupported($this->getTokenEndpoint()->getGrantTypesSupported());
             $this->metadata->setAcrValuesSupported([]);
-            $this->metadata->setSubjectTypesSupported($this->getIdTokenManager()->isPairwiseSubjectIdentifierSupported()?['public', 'pairwise']:['public']);
+            $this->metadata->setSubjectTypesSupported($this->getIdTokenManager()->isPairwiseSubjectIdentifierSupported() ? ['public', 'pairwise'] : ['public']);
             $this->metadata->setIdTokenSigningAlgValuesSupported($this->getIdTokenManager()->getSignatureAlgorithms());
             $this->metadata->setIdTokenEncryptionAlgValuesSupported($this->getIdTokenManager()->getKeyEncryptionAlgorithms());
             $this->metadata->setIdTokenEncryptionEncValuesSupported($this->getIdTokenManager()->getContentEncryptionAlgorithms());

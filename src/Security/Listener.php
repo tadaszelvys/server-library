@@ -28,9 +28,9 @@ final class Listener implements ListenerInterface
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     * @param \OAuth2\Token\TokenTypeManagerInterface     $token_type_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface   $access_token_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
                                 AccessTokenManagerInterface $access_token_manager,
@@ -65,7 +65,7 @@ final class Listener implements ListenerInterface
         $server_params = $request->getServerParams();
 
         $is_secured = !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
-        
+
         if (false === $is_secured) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
         }

@@ -13,25 +13,25 @@ namespace OAuth2\Endpoint;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
-use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Behaviour\HasTokenTypeParameterSupport;
+use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
-use OAuth2\Token\AccessTokenInterface;
-use OAuth2\User\UserManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponse;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
+use OAuth2\User\UserManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -63,7 +63,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
-     * @param \OAuth2\User\UserManagerInterface         $user_manager
+     * @param \OAuth2\User\UserManagerInterface               $user_manager
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
@@ -276,7 +276,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
      */
-    private function populateScope(ServerRequestInterface $request,GrantTypeResponseInterface &$grant_type_response)
+    private function populateScope(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
     {
         $scope = RequestBody::getParameter($request, 'scope');
 

@@ -174,7 +174,7 @@ final class Metadata implements \JsonSerializable
     {
         return preg_replace_callback(
             '/(^|[a-z])([A-Z])/',
-            function ($m) { return mb_strtolower(mb_strlen($m[1], '8bit') ? sprintf("%s_%s", $m[1], $m[2]) : $m[2], '8bit'); },
+            function ($m) { return mb_strtolower(mb_strlen($m[1], '8bit') ? sprintf('%s_%s', $m[1], $m[2]) : $m[2], '8bit'); },
             $word
         );
     }

@@ -14,8 +14,6 @@ namespace OAuth2\Test\Stub;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Exception\Extension\ExceptionExtensionInterface;
 
-/**
- */
 class UriExtension implements ExceptionExtensionInterface
 {
     /**

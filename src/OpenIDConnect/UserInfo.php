@@ -14,15 +14,15 @@ namespace OAuth2\OpenIDConnect;
 use Assert\Assertion;
 use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasClientManagerSupervisor;
-use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTCreator;
+use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerSupervisorInterface;
 use OAuth2\Client\EncryptionCapabilitiesInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\User\UserManagerInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\JWTCreator;
 
 final class UserInfo implements UserInfoInterface
@@ -50,7 +50,7 @@ final class UserInfo implements UserInfoInterface
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param \OAuth2\User\UserManagerInterface         $user_manager
+     * @param \OAuth2\User\UserManagerInterface               $user_manager
      * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      */
@@ -64,10 +64,10 @@ final class UserInfo implements UserInfoInterface
     }
 
     /**
-     * @param \OAuth2\Util\JWTCreator        $jwt_creator
-     * @param string                         $issuer
-     * @param string                         $signature_algorithm
-     * @param \Jose\Object\JWKInterface      $signature_key
+     * @param \OAuth2\Util\JWTCreator   $jwt_creator
+     * @param string                    $issuer
+     * @param string                    $signature_algorithm
+     * @param \Jose\Object\JWKInterface $signature_key
      */
     public function enableSignedResponsesSupport(JWTCreator $jwt_creator,
                                                  $issuer,
@@ -120,7 +120,6 @@ final class UserInfo implements UserInfoInterface
      */
     public function getUserInfo(AccessTokenInterface $access_token)
     {
-
         if (!in_array('openid', $access_token->getScope())) {
             throw $this->getExceptionManager()->getBadRequestException(
                 ExceptionManagerInterface::INVALID_REQUEST,
@@ -160,9 +159,9 @@ final class UserInfo implements UserInfoInterface
                 $user->getUserInfo($access_token->getScope())
             );
         }
-        
+
         $this->signAndEncrypt($info, $client);
-        
+
         return $info;
     }
 
