@@ -47,22 +47,6 @@ trait ResourceServerTrait
     /**
      * {@inheritdoc}
      */
-    public function isGrantTypeAllowed($grant_type)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedGrantTypes()
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getPublicKeyEncryptionKey()
     {
         return $this->public_key_encryption_keyset;

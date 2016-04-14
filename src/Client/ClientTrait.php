@@ -19,9 +19,10 @@ use Jose\Object\JWKSet;
 /**
  * Class ClientTrait
  *
+ * @method string getTokenEndpointAuthMethod()
  * @method string getJwksUri()
  * @method bool hasJwksUri()
- * @method string getJwks()
+ * @method array getJwks()
  * @method bool hasJwks()
  * @method string getClientSecret()
  * @method bool hasClientSecret()
@@ -188,7 +189,7 @@ trait ClientTrait
         Assertion::true($this->hasPublicKeySet(), 'The client has no public key set');
         
         if ($this->hasJwks()) {
-            return new JWKSet($this->getJwks(), true);
+            return new JWKSet($this->getJwks());
         }
         if ($this->hasJwksUri()) {
             return JWKFactory::createFromJKU($this->getJwksUri());
