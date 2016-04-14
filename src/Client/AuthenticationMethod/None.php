@@ -64,14 +64,6 @@ class None implements AuthenticationMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function isClientSupported(ClientInterface $client)
-    {
-        return $client->isPublic();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getSupportedAuthenticationMethods()
     {
         return ['none'];
