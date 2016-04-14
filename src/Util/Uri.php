@@ -139,18 +139,12 @@ final class Uri
             return false;
         }
 
-        // If URI is not a valid URI, return false
-        if (!filter_var($uri, FILTER_VALIDATE_URL)) {
-            return false;
-        }
-
-        $parsed = parse_url($uri);
-
-        // Checks for path traversal (e.g. http://foo.bar/redirect/../bad/url)
-        if (isset($parsed['path']) && !$path_traversal_allowed) {
-            $path = urldecode($parsed['path']);
-            // check for 'path traversal'
-            if (preg_match('#/\.\.?(/|$)#', $path)) {
+        if ('urn:' === mb_substr($uri,0, 4, '8bit')) {
+            if (false === self::checkUrn($uri)) {
+                return false;
+            }
+        } else {
+            if (false === self::checkUrl($uri, $path_traversal_allowed)) {
                 return false;
             }
         }
@@ -162,5 +156,42 @@ final class Uri
         }
 
         return false;
+    }
+
+    /**
+     * @param string $url
+     * @param bool   $path_traversal_allowed
+     *
+     * @return bool
+     */
+    private static function checkUrl($url, $path_traversal_allowed)
+    {
+        // If URI is not a valid URI, return false
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        $parsed = parse_url($url);
+
+        // Checks for path traversal (e.g. http://foo.bar/redirect/../bad/url)
+        if (isset($parsed['path']) && !$path_traversal_allowed) {
+            $path = urldecode($parsed['path']);
+            // check for 'path traversal'
+            if (preg_match('#/\.\.?(/|$)#', $path)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $urn
+     *
+     * @return bool
+     */
+    private static function checkUrn($urn)
+    {
+        return 1 === preg_match('/^urn:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9()+,\-.:=@;$_!*\'%\/?#]+$/', $urn);
     }
 }

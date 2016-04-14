@@ -277,7 +277,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->enableSecuredRedirectUriEnforcement();
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri'  => 'http://127.0.0.1',
+            'redirect_uri'  => 'http://127.0.0.1/',
             'client_id'     => 'foo',
             'response_type' => 'code',
             'state'         => '012345679',
@@ -295,7 +295,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->disableSecuredRedirectUriEnforcement();
     }
 
-    public function testAuthcodeFailureToNotSupportedURN()
+    public function testAuthcodeAuthorizedToSupportedURN()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
@@ -311,14 +311,8 @@ class AuthCodeGrantTypeTest extends Base
         );
 
         $response = new Response();
-
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('The specified redirect URI is not valid', $e->getDescription());
-        }
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^urn\:\/\/ietf\:wg\:oauth\:2.0\:oob\:auto\?code=[^"]+&state=012345679$/', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccessWithoutRedirectUri()
