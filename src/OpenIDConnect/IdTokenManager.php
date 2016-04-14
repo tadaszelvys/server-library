@@ -269,25 +269,26 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     private function getHashMethod()
     {
-        switch ($this->signature_algorithm) {
-            case 'HS256':
-            case 'ES256':
-            case 'RS256':
-            case 'PS256':
-                return 'sha256';
-            case 'HS384':
-            case 'ES384':
-            case 'RS384':
-            case 'PS384':
-                return 'sha384';
-            case 'HS512':
-            case 'ES512':
-            case 'RS512':
-            case 'PS512':
-                return 'sha512';
-            default:
-                throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
+        $map = [
+            'HS256' => 'sha256',
+            'ES256' => 'sha256',
+            'RS256' => 'sha256',
+            'PS256' => 'sha256',
+            'HS384' => 'sha384',
+            'ES384' => 'sha384',
+            'RS384' => 'sha384',
+            'PS384' => 'sha384',
+            'HS512' => 'sha512',
+            'ES512' => 'sha512',
+            'RS512' => 'sha512',
+            'PS512' => 'sha512',
+        ];
+
+        if (array_key_exists($this->signature_algorithm, $map)) {
+            return $map[$this->signature_algorithm];
         }
+
+        throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
     }
 
     /**
@@ -297,25 +298,25 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     private function getHashSize()
     {
-        switch ($this->signature_algorithm) {
-            case 'HS256':
-            case 'ES256':
-            case 'RS256':
-            case 'PS256':
-                return 128 / 8;
-            case 'HS384':
-            case 'ES384':
-            case 'RS384':
-            case 'PS384':
-                return 192 / 8;
-            case 'HS512':
-            case 'ES512':
-            case 'RS512':
-            case 'PS512':
-                return 256 / 8;
-            default:
-                throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
+        $map = [
+            'HS256' => 16,
+            'ES256' => 16,
+            'RS256' => 16,
+            'PS256' => 16,
+            'HS384' => 24,
+            'ES384' => 24,
+            'RS384' => 24,
+            'PS384' => 24,
+            'HS512' => 32,
+            'ES512' => 32,
+            'RS512' => 32,
+            'PS512' => 32,
+        ];
+
+        if (array_key_exists($this->signature_algorithm, $map)) {
+            return $map[$this->signature_algorithm];
         }
+        throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
     }
 
     /**
