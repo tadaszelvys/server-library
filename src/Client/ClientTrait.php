@@ -16,6 +16,16 @@ use Jose\Factory\JWKFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 
+/**
+ * Class ClientTrait
+ *
+ * @method string getJwksUri()
+ * @method bool hasJwksUri()
+ * @method string getJwks()
+ * @method bool hasJwks()
+ * @method string getClientSecret()
+ * @method bool hasClientSecret()
+ */
 trait ClientTrait
 {
     /**
@@ -167,7 +177,7 @@ trait ClientTrait
      */
     public function hasPublicKeySet()
     {
-        return $this->has('jwks') || $this->has('jwks_uri') || $this->hasClientSecret();
+        return $this->hasJwks() || $this->hasJwksUri() || $this->hasClientSecret();
     }
 
     /**
@@ -177,11 +187,11 @@ trait ClientTrait
     {
         Assertion::true($this->hasPublicKeySet(), 'The client has no public key set');
         
-        if ($this->has('jwks')) {
-            return new JWKSet($this->get('jwks'), true);
+        if ($this->hasJwks()) {
+            return new JWKSet($this->getJwks(), true);
         }
-        if ($this->has('jwks_uri')) {
-            return JWKFactory::createFromJKU($this->get('jwks_uri'));
+        if ($this->hasJwksUri()) {
+            return JWKFactory::createFromJKU($this->getJwksUri());
         }
         
         $jwk_set = new JWKSet();

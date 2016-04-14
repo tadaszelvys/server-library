@@ -32,7 +32,7 @@ interface ResourceServerInterface
     public function getContentEncryptionAlgorithm();
 
     /**
-     * @return null|\Jose\Object\JWKSetInterface
+     * @return null|\Jose\Object\JWKInterface
      */
     public function getPublicKeyEncryptionKey();
 }
