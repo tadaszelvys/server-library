@@ -48,8 +48,6 @@ class None implements AuthenticationMethodInterface
 
         if (is_array($header) && 1 === count($header)) {
             return $header[0];
-        } elseif (is_string($header)) {
-            return $header;
         }
     }
 
