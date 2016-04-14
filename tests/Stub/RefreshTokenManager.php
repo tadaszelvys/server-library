@@ -29,15 +29,15 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
      */
     public function __construct()
     {
-        $bar = new PasswordClient();
-        $bar->setSecret('secret');
+        $bar = new Client();
+        $bar->setSecret('Circle Of Life');
         $bar->setRedirectUris(['http://example.com/test?good=false']);
-        $bar->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
-        $bar->setPublicId('bar');
+        $bar->setGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
+        $bar->setPublicId('Mufasa');
 
-        $foo = new PublicClient();
+        $foo = new Client();
         $foo->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback']);
-        $foo->setAllowedGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
+        $foo->setGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
         $foo->setPublicId('foo');
 
         $this->addRefreshToken(

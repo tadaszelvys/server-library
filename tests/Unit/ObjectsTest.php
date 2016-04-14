@@ -11,11 +11,11 @@
 
 namespace OAuth2\Test\Unit;
 
+use OAuth2\Client\Client;
 use OAuth2\Exception\AuthenticateException;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\OpenIDConnect\IdToken;
 use OAuth2\Test\Base;
-use OAuth2\Test\Stub\PublicClient;
 use OAuth2\Test\Stub\ResourceServer;
 use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\User;
@@ -30,18 +30,12 @@ class ObjectsTest extends Base
 {
     public function testClient()
     {
-        $client = new PublicClient();
-        $client->setAllowedGrantTypes(['foo', 'bar']);
-        $client->addAllowedGrantType('baz');
-        $client->removeAllowedGrantType('baz');
+        $client = new Client();
+        $client->setGrantTypes(['foo', 'bar']);
         $client->setRedirectUris(['https://foo.com']);
-        $client->addRedirectUri('https://baz.com');
-        $client->removeRedirectUri('https://baz.com');
 
-        $this->assertEquals(['foo', 'bar'], $client->getAllowedGrantTypes());
+        $this->assertEquals(['foo', 'bar'], $client->getGrantTypes());
         $this->assertEquals(['https://foo.com'], $client->getRedirectUris());
-        $this->assertTrue($client->hasRedirectUri('https://foo.com'));
-        $this->assertFalse($client->hasRedirectUri('https://bar.com'));
         $this->assertTrue($client->isGrantTypeAllowed('foo'));
         $this->assertFalse($client->isGrantTypeAllowed('baz'));
     }
@@ -152,21 +146,6 @@ class ObjectsTest extends Base
         ]);
         $access_token->unsetParameter('foo');
         $access_token->getParameter('foo');
-    }
-
-    public function testResourceServer()
-    {
-        $rs = new ResourceServer();
-        $rs->setPublicId('bar');
-        $rs->setAllowedIpAddresses(['127.0.0.1']);
-
-        $this->assertFalse($rs->isGrantTypeAllowed('foo'));
-        $this->assertFalse($rs->isGrantTypeAllowed('bar'));
-        $this->assertEquals([], $rs->getAllowedGrantTypes());
-        $this->assertEquals(['127.0.0.1'], $rs->getAllowedIpAddresses());
-        $this->assertEquals([], $rs->getAllowedGrantTypes());
-        $this->assertEquals('bar', $rs->getPublicId());
-        $this->assertNull($rs->getServerName());
     }
 
     public function testAuthenticateException()

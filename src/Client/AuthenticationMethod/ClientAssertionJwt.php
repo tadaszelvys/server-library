@@ -9,45 +9,54 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Client;
+namespace OAuth2\Client\AuthenticationMethod;
 
 use Assert\Assertion;
 use Jose\Object\JWKSetInterface;
+use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTLoader;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use Jose\Factory\JWTLoader;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-trait ClientAssertionTrait
+class ClientAssertionJwt implements AuthenticationMethodInterface
 {
-    /**
-     * @return \OAuth2\Util\JWTLoader
-     */
-    abstract protected function getJWTLoader();
-
-    /**
-     * @return \OAuth2\Exception\ExceptionManagerInterface
-     */
-    abstract protected function getExceptionManager();
+    use HasJWTLoader;
+    use HasExceptionManager;
 
     /**
      * @var bool
      */
-    protected $encryption_required = false;
+    private $encryption_required = false;
 
     /**
      * @var \Jose\Object\JWKSetInterface|null
      */
-    protected $key_encryption_key_set = null;
+    private $key_encryption_key_set = null;
 
     /**
      * @var string[]
      */
-    protected $allowed_key_encryption_algorithms = [];
+    private $allowed_key_encryption_algorithms = [];
 
     /**
      * @var string[]
      */
-    protected $allowed_content_encryption_algorithms = [];
+    private $allowed_content_encryption_algorithms = [];
+
+    /**
+     * PasswordClientManager constructor.
+     *
+     * @param \Jose\Factory\JWTLoader                      $jwt_loader
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     */
+    public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager)
+    {
+        $this->setJWTLoader($jwt_loader);
+        $this->setExceptionManager($exception_manager);
+    }
 
     /**
      * @param bool                         $encryption_required
@@ -73,31 +82,15 @@ trait ClientAssertionTrait
     /**
      * {@inheritdoc}
      */
-    private function verifyClientAssertion(ClientInterface $client, $client_credentials, &$reason)
+    public function getSchemesParameters()
     {
-        try {
-            $this->getJWTLoader()->verifySignature(
-                $client_credentials,
-                $client->getSignaturePublicKeySet(),
-                $client->getAllowedSignatureAlgorithms()
-            );
-        } catch (\Exception $e) {
-            $reason = $e->getMessage();
-
-            return false;
-        }
-
-        return true;
+        return [];
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return \Jose\Object\JWSInterface
+     * {@inheritdoc}
      */
-    protected function findCredentialsFromClientAssertion(ServerRequestInterface $request)
+    public function findClient(ServerRequestInterface $request, &$client_credentials = null)
     {
         $client_assertion_type = RequestBody::getParameter($request, 'client_assertion_type');
 
@@ -122,16 +115,57 @@ trait ClientAssertionTrait
                 $this->encryption_required
             );
         } catch (\Exception $e) {
-            return;
+            var_dump($e->getFile());
+            var_dump($e->getLine());
+            var_dump($e->getMessage());
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
 
-        if (false === $jwt->hasClaim('sub')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The assertion does not contain the "sub" claim.');
+        foreach (['iss', 'sub', 'aud', 'jti', 'exp'] as $claim) {
+            if (false === $jwt->hasClaim($claim)) {
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('The claim "%s" is mandatory.', $claim));
+            }
         }
 
-        return [
-            'client_id'          => $jwt->getClaim('sub'),
-            'client_credentials' => $jwt,
-        ];
+        if ($jwt->getClaim('sub') !== $jwt->getClaim('iss')) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The claims "sub" and "iss" must contain the client public ID.');
+        }
+
+        $client_credentials = $jwt;
+
+        return $jwt->getClaim('sub');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    {
+        $jwk_set = $client->getPublicKeySet();
+        if (!$jwk_set instanceof JWKSetInterface) {
+            return false;
+        }
+
+        try {
+            $this->getJWTLoader()->verifySignature(
+                $client_credentials,
+                $jwk_set,
+                $this->getJWTLoader()->getSupportedSignatureAlgorithms()
+            );
+        } catch (\Exception $e) {
+            $reason = $e->getMessage();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedAuthenticationMethods()
+    {
+        return ['client_secret_jwt', 'private_key_jwt'];
     }
 }

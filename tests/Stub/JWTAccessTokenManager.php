@@ -15,8 +15,8 @@ use Jose\Object\JWKInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\JWTAccessTokenManager as Base;
-use OAuth2\Util\JWTCreator;
-use OAuth2\Util\JWTLoader;
+use Jose\Factory\JWTCreator;
+use Jose\Factory\JWTLoader;
 
 class JWTAccessTokenManager extends Base
 {
@@ -28,8 +28,8 @@ class JWTAccessTokenManager extends Base
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTCreator   $jwt_creator
-     * @param \OAuth2\Util\JWTLoader    $jwt_loader
+     * @param \Jose\Factory\JWTCreator   $jwt_creator
+     * @param \Jose\Factory\JWTLoader    $jwt_loader
      * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
      * @param string                    $issuer
@@ -50,9 +50,9 @@ class JWTAccessTokenManager extends Base
 
         $abcd = new AccessToken();
         $abcd->setExpiresAt(time() + 3600);
-        $abcd->setResourceOwnerPublicId('bar');
+        $abcd->setResourceOwnerPublicId('Mufasa');
         $abcd->setScope([]);
-        $abcd->setClientPublicId('bar');
+        $abcd->setClientPublicId('Mufasa');
         $abcd->setRefreshToken(null);
         $abcd->setToken('ABCD');
         $abcd->setTokenType('Bearer');

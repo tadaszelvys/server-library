@@ -14,8 +14,7 @@ namespace OAuth2\Endpoint;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasResponseModeSupport;
 use OAuth2\Behaviour\HasScopeManager;
-use OAuth2\Client\ConfidentialClientInterface;
-use OAuth2\Client\RegisteredClientInterface;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\ResponseTypeSupportInterface;
@@ -265,9 +264,6 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function getClientRedirectUris(Authorization $authorization)
     {
         $client = $authorization->getClient();
-        if (!$client instanceof RegisteredClientInterface) {
-            return [];
-        }
 
         $redirect_uris = $client->getRedirectUris();
         /*
@@ -295,26 +291,26 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Client\RegisteredClientInterface $client
+     * @param \OAuth2\Client\ClientInterface $client
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function checkRedirectUriForNonConfidentialClient(RegisteredClientInterface $client)
+    private function checkRedirectUriForNonConfidentialClient(ClientInterface $client)
     {
-        if (!$client instanceof ConfidentialClientInterface) {
+        if (true === $client->isPublic()) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Non-confidential clients must register at least one redirect URI');
         }
     }
 
     /**
-     * @param \OAuth2\Client\RegisteredClientInterface $client
+     * @param \OAuth2\Client\ClientInterface $client
      * @param \OAuth2\Endpoint\Authorization           $authorization
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function checkRedirectUriForConfidentialClient(RegisteredClientInterface $client, Authorization $authorization)
+    private function checkRedirectUriForConfidentialClient(ClientInterface $client, Authorization $authorization)
     {
-        if ($client instanceof ConfidentialClientInterface && $authorization->has('response_type') && $authorization->get('response_type') === 'token') {
+        if (!$client->isPublic() && $authorization->has('response_type') && $authorization->get('response_type') === 'token') {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients must register at least one redirect URI when using "token" response type');
         }
     }

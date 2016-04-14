@@ -17,13 +17,11 @@ use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\EncryptionCapabilitiesInterface;
 use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
-use OAuth2\Client\RegisteredClientInterface;
 use OAuth2\OpenIDConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
 use OAuth2\User\UserInterface as BaseUserInterface;
-use OAuth2\Util\JWTCreator;
-use OAuth2\Util\JWTLoader;
+use Jose\Factory\JWTCreator;
+use Jose\Factory\JWTLoader;
 
 class IdTokenManager implements IdTokenManagerInterface
 {
@@ -58,8 +56,8 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * IdTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader    $jwt_loader
-     * @param \OAuth2\Util\JWTCreator   $jwt_creator
+     * @param \Jose\Factory\JWTLoader    $jwt_loader
+     * @param \Jose\Factory\JWTCreator   $jwt_creator
      * @param                           $issuer
      * @param                           $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
@@ -166,19 +164,23 @@ class IdTokenManager implements IdTokenManagerInterface
 
         $jwt = $this->jwt_creator->sign($payload, $headers, $this->signature_key);
 
-        if ($client instanceof EncryptionCapabilitiesInterface && true === $client->isEncryptionSupportEnabled()) {
-            $headers = [
-                'typ'       => 'JWT',
-                'jti'       => Base64Url::encode(random_bytes(25)),
-                'alg'       => $client->getKeyEncryptionAlgorithm(),
-                'enc'       => $client->getContentEncryptionAlgorithm(),
-            ];
+        if ($client->hasPublicKeySet() && $client->has('id_token_encryption_alg_value') && $client->has('id_token_encryption_enc_value')) {
+            $key_set = $client->getPublicKeySet();
+            $key = $key_set->selectKey('enc');
+            if (null !== $key) {
+                $headers = [
+                    'typ'       => 'JWT',
+                    'jti'       => Base64Url::encode(random_bytes(25)),
+                    'alg'       => $client->get('id_token_encryption_alg_value'),
+                    'enc'       => $client->get('id_token_encryption_enc_value'),
+                ];
 
-            $jwt = $this->jwt_creator->encrypt(
-                $jwt,
-                $headers,
-                $client->getEncryptionPublicKey()
-            );
+                $jwt = $this->jwt_creator->encrypt(
+                    $jwt,
+                    $headers,
+                    $key
+                );
+            }
         }
         $id_token->setToken($jwt);
 
@@ -238,8 +240,8 @@ class IdTokenManager implements IdTokenManagerInterface
     {
         $uri = $redirect_uri;
 
-        if ($client instanceof RegisteredClientInterface && null !== $sector_identifier_uri = $client->getSectorIdentifierUri()) {
-            $uri = $sector_identifier_uri;
+        if (true === $client->has('sector_identifier_uri')) {
+            $uri = $client->get('sector_identifier_uri');
         }
 
         $data = parse_url($uri);

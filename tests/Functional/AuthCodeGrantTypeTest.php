@@ -380,7 +380,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
     }
 
-    public function testAuthcodeFailWithStateAndUnregisteredClient()
+    /*public function testAuthcodeFailWithStateAndUnregisteredClient()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
@@ -416,9 +416,9 @@ class AuthCodeGrantTypeTest extends Base
             $this->assertEquals('invalid_request', $e->getMessage());
             $this->assertEquals('Non-confidential clients must set a proof key (PKCE) for code exchange.', $e->getDescription());
         }
-    }
+    }*/
 
-    public function testAuthcodeSuccessWithStateAndUnregisteredClient()
+    /*public function testAuthcodeSuccessWithStateAndUnregisteredClient()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
@@ -457,7 +457,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
-    }
+    }*/
 
     /**
      * @see https://tools.ietf.org/html/rfc7636#appendix-B
@@ -719,7 +719,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testPublicClientWithMultipleAuthenticationProcess()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo', 'XX-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -761,7 +761,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testExpiredAuthcode()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'EXPIRED_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'EXPIRED_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -775,7 +775,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testRedirectUriMismatch()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -789,7 +789,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthCodeDoesNotExists()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'DO_NOT_EXIST', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'DO_NOT_EXIST', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -821,15 +821,15 @@ class AuthCodeGrantTypeTest extends Base
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
+        $body = $response->getBody()->getContents();
 
         $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $body);
 
-        $response->getBody()->rewind();
-        $json = json_decode($response->getBody()->getContents(), true);
+        $json = json_decode($body, true);
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
 
@@ -840,7 +840,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testPrivateClientGranted()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();

@@ -15,7 +15,10 @@ use Jose\Checker\AudienceChecker;
 use Jose\Factory\CheckerManagerFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
-use OAuth2\Client\ClientManagerSupervisor;
+use OAuth2\Client\AuthenticationMethod\ClientAssertionJwt;
+use OAuth2\Client\AuthenticationMethod\ClientSecretBasic;
+use OAuth2\Client\AuthenticationMethod\ClientSecretPost;
+use OAuth2\Client\AuthenticationMethod\None;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\AuthorizationFactory;
 use OAuth2\Endpoint\FragmentResponseMode;
@@ -45,24 +48,21 @@ use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Security\EntryPoint;
 use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\AuthCodeManager;
+use OAuth2\Test\Stub\ClientManager;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
-use OAuth2\Test\Stub\JWTClientManager;
 use OAuth2\Test\Stub\NoneListener;
-use OAuth2\Test\Stub\PasswordClientManager;
-use OAuth2\Test\Stub\PublicClientManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\TooManyRequestsException;
-use OAuth2\Test\Stub\UnregisteredClientManager;
 use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Test\Stub\UserManager;
 use OAuth2\Token\BearerToken;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
-use OAuth2\Util\JWTCreator;
-use OAuth2\Util\JWTLoader;
+use Jose\Factory\JWTCreator;
+use Jose\Factory\JWTLoader;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -153,7 +153,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->authorization_factory) {
             $this->authorization_factory = new AuthorizationFactory(
                 $this->getScopeManager(),
-                $this->getClientManagerSupervisor(),
+                $this->getClientManager(),
                 $this->getExceptionManager()
             );
 
@@ -192,7 +192,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->revocation_endpoint) {
             $this->revocation_endpoint = new TokenRevocationEndpoint(
-                $this->getClientManagerSupervisor(),
+                $this->getClientManager(),
                 $this->getExceptionManager()
             );
 
@@ -216,7 +216,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->user_info_endpoint) {
             $this->user_info_endpoint = new UserInfo(
                 $this->getUserManager(),
-                $this->getClientManagerSupervisor(),
+                $this->getClientManager(),
                 $this->getExceptionManager()
             );
 
@@ -289,7 +289,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->token_introspection_endpoint) {
             $this->token_introspection_endpoint = new TokenIntrospectionEndpoint(
-                $this->getClientManagerSupervisor(),
+                $this->getClientManager(),
                 $this->getExceptionManager()
             );
 
@@ -314,7 +314,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint = new TokenEndpoint(
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
-                $this->getClientManagerSupervisor(),
+                $this->getClientManager(),
                 $this->getUserManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
@@ -429,108 +429,40 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Client\ClientManagerSupervisor
+     * @var null|\OAuth2\Client\ClientManager
      */
-    private $client_manager_supervisor = null;
+    private $client_manager = null;
 
     /**
-     * @return \OAuth2\Client\ClientManagerSupervisor
+     * @return \OAuth2\Client\ClientManager
      */
-    protected function getClientManagerSupervisor()
+    protected function getClientManager()
     {
-        if (null === $this->client_manager_supervisor) {
-            $this->client_manager_supervisor = new ClientManagerSupervisor(
-                $this->getExceptionManager()
-            );
+        if (null === $this->client_manager) {
+            $this->client_manager = new ClientManager($this->getExceptionManager());
 
-            $this->client_manager_supervisor->addClientManager($this->getUnregisteredClientManager());
-            $this->client_manager_supervisor->addClientManager($this->getPasswordClientManager());
-            $this->client_manager_supervisor->addClientManager($this->getPublicClientManager());
-            $this->client_manager_supervisor->addClientManager($this->getJWTClientManager());
-            $this->client_manager_supervisor->addClientManager($this->getResourceServerManager());
-        }
-
-        return $this->client_manager_supervisor;
-    }
-
-    /**
-     * @var null|\OAuth2\Test\Stub\UnregisteredClientManager
-     */
-    private $unregistered_client_manager = null;
-
-    /**
-     * @return \OAuth2\Test\Stub\UnregisteredClientManager
-     */
-    protected function getUnregisteredClientManager()
-    {
-        if (null === $this->unregistered_client_manager) {
-            $this->unregistered_client_manager = new UnregisteredClientManager(
-                $this->getExceptionManager()
-            );
-        }
-
-        return $this->unregistered_client_manager;
-    }
-
-    /**
-     * @var null|\OAuth2\Test\Stub\PublicClientManager
-     */
-    private $public_client_manager = null;
-
-    /**
-     * @return \OAuth2\Test\Stub\PublicClientManager
-     */
-    protected function getPublicClientManager()
-    {
-        if (null === $this->public_client_manager) {
-            $this->public_client_manager = new PublicClientManager(
-                $this->getExceptionManager()
-            );
-        }
-
-        return $this->public_client_manager;
-    }
-
-    /**
-     * @var null|\OAuth2\Test\Stub\PasswordClientManager
-     */
-    private $password_client_manager = null;
-
-    /**
-     * @return \OAuth2\Test\Stub\PasswordClientManager
-     */
-    protected function getPasswordClientManager()
-    {
-        if (null === $this->password_client_manager) {
-            $this->password_client_manager = new PasswordClientManager(
-                $this->getJWTLoader(),
-                $this->getExceptionManager(),
-                $this->realm
-            );
-
-            $key_encryption_key_set = new JWKSet(['keys' => [
-                [
-                    'kid' => 'JWK1',
-                    'use' => 'enc',
-                    'kty' => 'oct',
-                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ],
-            ]]);
-
-            $this->password_client_manager->enableEncryptedAssertions(
+            $jwt_assertion = new ClientAssertionJwt($this->getJWTLoader(), $this->getExceptionManager());
+            $jwt_assertion->enableEncryptedAssertions(
                 false,
                 ['A256KW'],
                 ['A256CBC-HS512'],
-                $key_encryption_key_set
+                new JWKSet(['keys' => [
+                    [
+                        'kid' => 'JWK1',
+                        'use' => 'enc',
+                        'kty' => 'oct',
+                        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                    ],
+                ]])
             );
 
-            $this->password_client_manager->createClients();
-            $this->password_client_manager->enablePasswordClientCredentialsInBodyRequest();
-            $this->password_client_manager->disablePasswordClientCredentialsInBodyRequest();
-            $this->password_client_manager->enablePasswordClientCredentialsInBodyRequest();
+            $this->client_manager->addAuthenticationMethod(new None());
+            $this->client_manager->addAuthenticationMethod(new ClientSecretBasic($this->realm));
+            $this->client_manager->addAuthenticationMethod(new ClientSecretPost());
+            $this->client_manager->addAuthenticationMethod($jwt_assertion);
         }
 
-        return $this->password_client_manager;
+        return $this->client_manager;
     }
 
     /**
@@ -550,42 +482,6 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->resource_server_manager;
-    }
-
-    /**
-     * @var null|\OAuth2\Test\Stub\JWTClientManager
-     */
-    private $jwt_client_manager = null;
-
-    /**
-     * @return \OAuth2\Test\Stub\JWTClientManager
-     */
-    protected function getJWTClientManager()
-    {
-        if (null === $this->jwt_client_manager) {
-            $key_encryption_key_set = new JWKSet(['keys' => [
-                [
-                    'kid' => 'JWK1',
-                    'use' => 'enc',
-                    'kty' => 'oct',
-                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ],
-            ]]);
-
-            $this->jwt_client_manager = new JWTClientManager(
-                $this->getJWTLoader(),
-                $this->getExceptionManager()
-
-            );
-            $this->jwt_client_manager->enableEncryptedAssertions(
-                false,
-                ['A256KW'],
-                ['A256CBC-HS512'],
-                $key_encryption_key_set
-            );
-        }
-
-        return $this->jwt_client_manager;
     }
 
     /**
@@ -996,12 +892,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Util\JWTLoader
+     * @var null|\Jose\Factory\JWTLoader
      */
     private $jwt_loader = null;
 
     /**
-     * @return \OAuth2\Util\JWTLoader
+     * @return \Jose\Factory\JWTLoader
      */
     protected function getJWTLoader()
     {
@@ -1020,12 +916,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Util\JWTCreator
+     * @var null|\Jose\Factory\JWTCreator
      */
     private $jwt_creator = null;
 
     /**
-     * @return \OAuth2\Util\JWTCreator
+     * @return \Jose\Factory\JWTCreator
      */
     protected function getJWTCreator()
     {
@@ -1094,7 +990,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->setRequestObjectSigningAlgValuesSupported($this->getJWTLoader()->getSupportedSignatureAlgorithms());
             $this->metadata->setRequestObjectEncryptionAlgValuesSupported($this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->setRequestObjectEncryptionEncValuesSupported($this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());
-            $this->metadata->setTokenEndpointAuthMethodsSupported($this->getClientManagerSupervisor()->getSupportedAuthenticationMethods());
+            $this->metadata->setTokenEndpointAuthMethodsSupported($this->getClientManager()->getSupportedAuthenticationMethods());
             $this->metadata->setTokenEndpointAuthSigningAlgValuesSupported($this->getAuthorizationFactory()->getSupportedSignatureAlgorithms());
             $this->metadata->setTokenEndpointAuthEncryptionAlgValuesSupported($this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->setTokenEndpointAuthEncryptionEncValuesSupported($this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());

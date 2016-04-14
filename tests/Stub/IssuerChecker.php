@@ -11,7 +11,7 @@
 
 namespace OAuth2\Test\Stub;
 
-use Jose\ClaimChecker\IssuerChecker as Base;
+use Jose\Checker\IssuerChecker as Base;
 
 class IssuerChecker extends Base
 {

@@ -17,9 +17,8 @@ use Jose\Object\JWSInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\SignatureCapabilitiesInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Util\JWTLoader;
+use Jose\Factory\JWTLoader;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -56,7 +55,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     /**
      * JWTBearerGrantType constructor.
      *
-     * @param \OAuth2\Util\JWTLoader                      $loader
+     * @param \Jose\Factory\JWTLoader                      $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(
@@ -150,7 +149,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
      */
     public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
-        if (!$client instanceof SignatureCapabilitiesInterface) {
+        if (false === $client->hasPublicKeySet()) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a client with signature capabilities.');
         }
         $jwt = $grant_type_response->getAdditionalData('jwt');
@@ -158,8 +157,8 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         try {
             $this->getJWTLoader()->verifySignature(
                 $jwt,
-                $client->getSignaturePublicKeySet(),
-                $client->getAllowedSignatureAlgorithms()
+                $client->getPublicKeySet(),
+                $this->getJWTLoader()->getSupportedSignatureAlgorithms()
             );
         } catch (\Exception $e) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());

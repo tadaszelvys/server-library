@@ -11,12 +11,10 @@
 
 namespace OAuth2\ResourceServer;
 
-use OAuth2\Client\ClientInterface;
-
 /**
  * This interface is for resource servers.
  */
-interface ResourceServerInterface extends ClientInterface
+interface ResourceServerInterface
 {
     /**
      * @return string
