@@ -177,7 +177,6 @@ final class UserInfo implements UserInfoInterface
             );
         }
 
-        // TODO: To be fixed
         if ($client->hasPublicKeySet() && $client->has('id_token_encryption_alg_value') && $client->has('id_token_encryption_enc_value')) {
             $key_set = $client->getPublicKeySet();
             $key = $key_set->selectKey('enc');
