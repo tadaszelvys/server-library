@@ -42,11 +42,9 @@ class ClientSecretPost implements AuthenticationMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
         if (false === hash_equals($client->getClientSecret(), $client_credentials)) {
-            $reason = 'Bad credentials.';
-
             return false;
         }
 

@@ -64,13 +64,34 @@ abstract class ClientManager implements ClientManagerInterface
      */
     public function findClient(ServerRequestInterface $request)
     {
+        $client_id = $this->findClientInTheRequest($request, $authentication_method, $client_credentials);
+
+        if (null !== $client_id) {
+            $client = $this->getClient($client_id);
+            if ($client instanceof ClientInterface && true === $this->isClientAuthenticated($request, $client, $authentication_method, $client_credentials)) {
+                return $client;
+            }
+        }
+        
+        throw $this->buildAuthenticationException($request);
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface                               $request
+     * @param null|\OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
+     * @param mixed                                                                  $client_credentials    The client credentials found in the request
+     *
+     * @return null|string
+     */
+    private function findClientInTheRequest(ServerRequestInterface $request, &$authentication_method = null, &$client_credentials = null)
+    {
         $client_id = null;
-        $authentication_method = null;
         $client_credentials = null;
         foreach ($this->getAuthenticationMethods() as $method) {
             $temp = $method->findClient($request, $client_credentials);
             if (null !== $temp) {
                 if (null !== $client_id) {
+                    $authentication_method = null;
                     throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Only one authentication method may be used to authenticate the client.');
                 } else {
                     $client_id = $temp;
@@ -79,37 +100,35 @@ abstract class ClientManager implements ClientManagerInterface
             }
         }
 
-        $reason = null;
-        if (null !== $client_id) {
-            $client = $this->getClient($client_id);
-            if ($client instanceof ClientInterface) {
-                if (in_array($client->getTokenEndpointAuthMethod(), $authentication_method->getSupportedAuthenticationMethods())) {
-                    if (true === $client->areClientCredentialsExpired()) {
-                        $reason = 'Credentials expired.';
-                    } else {
-                        $is_authenticated = $authentication_method->isClientAuthenticated($client, $client_credentials, $request, $reason);
+        return $client_id;
+    }
 
-                        if (true === $is_authenticated) {
-                            return $client;
-                        }
-                    }
-                }
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface                          $request
+     * @param \OAuth2\Client\ClientInterface                                    $client
+     * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
+     * @param mixed|null                                                        $client_credentials
+     *
+     * @return true
+     */
+    public function isClientAuthenticated(ServerRequestInterface $request, ClientInterface $client, AuthenticationMethodInterface $authentication_method, $client_credentials)
+    {
+        if (in_array($client->getTokenEndpointAuthMethod(), $authentication_method->getSupportedAuthenticationMethods())) {
+            if (false === $client->areClientCredentialsExpired()) {
+                return $authentication_method->isClientAuthenticated($client, $client_credentials, $request);
             }
         }
-        
-        throw $this->buildAuthenticationException($request, $reason);
+
+        return false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildAuthenticationException(ServerRequestInterface $request, $reason = null)
+    public function buildAuthenticationException(ServerRequestInterface $request)
     {
         $schemes = [];
         $message = 'Client authentication failed.';
-        if (is_string($reason)) {
-            $message .= sprintf(' %s', $reason);
-        }
         foreach ($this->getAuthenticationMethods() as $method) {
             $scheme = $method->getSchemesParameters();
             $schemes = array_merge($schemes, $scheme);

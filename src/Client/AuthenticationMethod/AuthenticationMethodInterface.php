@@ -38,11 +38,10 @@ interface AuthenticationMethodInterface
      * @param \OAuth2\Client\ClientInterface           $client
      * @param mixed                                    $client_credentials
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param string|null                              $reason
      *
      * @return bool Returns true if the client is authenticated, else false
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null);
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request);
 
     /**
      * @return array

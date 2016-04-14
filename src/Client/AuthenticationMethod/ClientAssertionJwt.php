@@ -136,7 +136,7 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null)
+    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
         $jwk_set = $client->getPublicKeySet();
         if (!$jwk_set instanceof JWKSetInterface) {
@@ -150,8 +150,6 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
                 $this->getJWTLoader()->getSupportedSignatureAlgorithms()
             );
         } catch (\Exception $e) {
-            $reason = $e->getMessage();
-
             return false;
         }
 

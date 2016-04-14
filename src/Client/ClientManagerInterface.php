@@ -51,11 +51,10 @@ interface ClientManagerInterface
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param null|string                              $reason
      *
      * @return \OAuth2\Exception\BaseExceptionInterface
      */
-    public function buildAuthenticationException(ServerRequestInterface $request, $reason = null);
+    public function buildAuthenticationException(ServerRequestInterface $request);
 
     /**
      * @return string[]
