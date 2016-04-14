@@ -234,7 +234,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * Redirection to an URN or a local host is allowed.
+     * Redirection to an URN or a local host is allowed if the https is required.
      *
      * @param string $redirect_uri
      *
@@ -244,7 +244,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         $parsed = parse_url($redirect_uri);
         if (array_key_exists('scheme', $parsed) && array_key_exists('host', $parsed) &&
-            'http' === $parsed['scheme'] && in_array($parsed['host'], ['localhost', '127.0.0.1'])
+            'http' === $parsed['scheme'] && in_array($parsed['host'], ['[::1]', '127.0.0.1'])
         ) {
             return true;
         }

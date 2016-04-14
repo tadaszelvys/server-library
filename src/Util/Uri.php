@@ -139,6 +139,27 @@ final class Uri
             return false;
         }
 
+        if (false === self::isAnUrlOrUrn($uri, $path_traversal_allowed)) {
+            return false;
+        }
+
+        foreach ($storedUris as $storedUri) {
+            if (strcasecmp(mb_substr($uri, 0, mb_strlen($storedUri, '8bit'), '8bit'), $storedUri) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $uri
+     * @param bool   $path_traversal_allowed
+     *
+     * @return bool
+     */
+    private static function isAnUrlOrUrn($uri, $path_traversal_allowed)
+    {
         if ('urn:' === mb_substr($uri,0, 4, '8bit')) {
             if (false === self::checkUrn($uri)) {
                 return false;
@@ -149,13 +170,7 @@ final class Uri
             }
         }
 
-        foreach ($storedUris as $storedUri) {
-            if (strcasecmp(mb_substr($uri, 0, mb_strlen($storedUri, '8bit'), '8bit'), $storedUri) === 0) {
-                return true;
-            }
-        }
-
-        return false;
+        return true;
     }
 
     /**
