@@ -108,7 +108,7 @@ class ClientManager extends Base
 
         $expired = $this->createClient();
         $expired->set('client_secret', 'secret');
-        $expired->set('client_secret_expires_at', time() - 1);
+        $expired->set('client_secret_expires_at', time() - 3600);
         $expired->setRedirectUris(['http://example.com/test?good=false']);
         $expired->setGrantTypes(['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
         $expired->setResponseTypes(['token', 'id_token', 'none', 'code']);
