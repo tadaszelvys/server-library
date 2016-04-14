@@ -115,9 +115,6 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
                 $this->encryption_required
             );
         } catch (\Exception $e) {
-            var_dump($e->getFile());
-            var_dump($e->getLine());
-            var_dump($e->getMessage());
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
 
