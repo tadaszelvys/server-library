@@ -33,12 +33,12 @@ use Zend\Diactoros\Uri;
  */
 class OpenIDConnectTest extends Base
 {
-    /*public function testAuthorizationCodeSuccessWithIdToken()
+    public function testAuthorizationCodeSuccessWithIdToken()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => '**UNREGISTERED**--foo',
+            'client_id'             => 'Mufasa',
             'response_type'         => 'code',
             'scope'                 => 'openid',
             'nonce'                 => 'foo/bar',
@@ -61,10 +61,10 @@ class OpenIDConnectTest extends Base
         $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
 
         $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
-        $this->assertEquals('**UNREGISTERED**--foo', $authcode->getClientPublicId());
+        $this->assertEquals('Mufasa', $authcode->getClientPublicId());
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => '**UNREGISTERED**--foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Unregistered-Client-ID' => '**UNREGISTERED**--foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -78,6 +78,7 @@ class OpenIDConnectTest extends Base
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);
 
+        $loader = new Loader();
         $id_token = $loader->load($json['id_token']);
 
         $this->assertInstanceOf(JWSInterface::class, $id_token);
@@ -110,11 +111,15 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->hasClaim('c_hash'));
 
         $this->assertEquals($this->getIssuer(), $id_token->getClaim('iss'));
-        $this->assertEquals('**UNREGISTERED**--foo', $id_token->getClaim('aud'));
+        $this->assertEquals('Mufasa', $id_token->getClaim('aud'));
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
 
         $this->assertEquals('iu6KK2l_kPf4_mOdpWE668f9bc6fk-2auRRZi4lWhi_zpypYTW45N6SpsahXSqbzQNjcbd30f8srPLf7XEdCKA', $id_token->getClaim('sub'));
-    }*/
+
+        $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
+        $this->assertEquals('Mufasa', $access_token->getClientPublicId());
+        $this->assertEquals('user1', $access_token->getResourceOwnerPublicId());
+    }
 
     public function testHashedPairwise()
     {

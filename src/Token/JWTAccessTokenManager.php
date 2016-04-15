@@ -182,7 +182,7 @@ class JWTAccessTokenManager extends AccessTokenManager
             'exp'            => $access_token->getExpiresAt(),
             'sub'            => $access_token->getClientPublicId(),
             'token_type'     => $access_token->getTokenType(),
-            'scope'          => $access_token->getScope(),
+            'scp'            => $access_token->getScope(),
             'resource_owner' => $access_token->getResourceOwnerPublicId(),
         ];
         if (0 !== $expires_at = $access_token->getExpiresAt()) {
@@ -244,8 +244,8 @@ class JWTAccessTokenManager extends AccessTokenManager
         if ($jwt->hasClaim('cnf')) {
             $access_token->setParameter('cnf', $jwt->getClaim('cnf'));
         }
-        if ($jwt->hasClaim('scope')) {
-            $access_token->setScope($jwt->getClaim('scope'));
+        if ($jwt->hasClaim('scp')) {
+            $access_token->setScope($jwt->getClaim('scp'));
         }
         if ($jwt->hasClaim('refresh_token')) {
             $access_token->setRefreshToken($jwt->getClaim('refresh_token'));

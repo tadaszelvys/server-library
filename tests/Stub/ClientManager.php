@@ -53,8 +53,8 @@ class ClientManager extends Base
         $jwt1->setResponseTypes(['token', 'id_token', 'none', 'code']);
         $jwt1->setPublicId('jwt1');
         $jwt1->setTokenEndpointAuthMethod('private_key_jwt');
-        $jwt1->set('id_token_encryption_alg_value', 'A256KW');
-        $jwt1->set('id_token_encryption_enc_value', 'A256CBC-HS512');
+        $jwt1->set('id_token_encrypted_response_alg', 'A256KW');
+        $jwt1->set('id_token_encrypted_response_enc', 'A256CBC-HS512');
         $jwt1->set('jwks', $keys);
 
         $jwt2 = $this->createClient();

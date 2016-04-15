@@ -164,15 +164,15 @@ class IdTokenManager implements IdTokenManagerInterface
 
         $jwt = $this->jwt_creator->sign($payload, $headers, $this->signature_key);
 
-        if ($client->hasPublicKeySet() && $client->has('id_token_encryption_alg_value') && $client->has('id_token_encryption_enc_value')) {
+        if ($client->hasPublicKeySet() && $client->has('id_token_encrypted_response_alg') && $client->has('id_token_encrypted_response_enc')) {
             $key_set = $client->getPublicKeySet();
             $key = $key_set->selectKey('enc');
             if (null !== $key) {
                 $headers = [
                     'typ'       => 'JWT',
                     'jti'       => Base64Url::encode(random_bytes(25)),
-                    'alg'       => $client->get('id_token_encryption_alg_value'),
-                    'enc'       => $client->get('id_token_encryption_enc_value'),
+                    'alg'       => $client->get('id_token_encrypted_response_alg'),
+                    'enc'       => $client->get('id_token_encrypted_response_enc'),
                 ];
 
                 $jwt = $this->jwt_creator->encrypt(
