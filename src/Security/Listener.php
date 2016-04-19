@@ -67,7 +67,7 @@ final class Listener implements ListenerInterface
         $is_secured = !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
 
         if (false === $is_secured) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
         }
     }
 

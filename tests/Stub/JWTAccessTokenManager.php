@@ -15,8 +15,8 @@ use Jose\Object\JWKInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\JWTAccessTokenManager as Base;
-use Jose\Factory\JWTCreator;
-use Jose\Factory\JWTLoader;
+use Jose\JWTCreator;
+use Jose\JWTLoader;
 
 class JWTAccessTokenManager extends Base
 {
@@ -28,8 +28,8 @@ class JWTAccessTokenManager extends Base
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \Jose\Factory\JWTCreator   $jwt_creator
-     * @param \Jose\Factory\JWTLoader    $jwt_loader
+     * @param \Jose\JWTCreator          $jwt_creator
+     * @param \Jose\JWTLoader           $jwt_loader
      * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
      * @param string                    $issuer

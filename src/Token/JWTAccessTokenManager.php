@@ -20,8 +20,8 @@ use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\ResourceServer\ResourceServerInterface;
-use Jose\Factory\JWTCreator;
-use Jose\Factory\JWTLoader;
+use Jose\JWTCreator;
+use Jose\JWTLoader;
 
 class JWTAccessTokenManager extends AccessTokenManager
 {
@@ -61,8 +61,8 @@ class JWTAccessTokenManager extends AccessTokenManager
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \Jose\Factory\JWTCreator   $jwt_creator
-     * @param \Jose\Factory\JWTLoader    $jwt_loader
+     * @param \Jose\JWTCreator   $jwt_creator
+     * @param \Jose\JWTLoader    $jwt_loader
      * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
      * @param string                    $issuer

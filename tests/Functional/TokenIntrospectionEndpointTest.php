@@ -30,7 +30,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Request must be secured","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"The request must be secured.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
     }
 
     public function testMissingTokenParameter()

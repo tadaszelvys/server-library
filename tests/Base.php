@@ -12,15 +12,20 @@
 namespace OAuth2\Test;
 
 use Jose\Checker\AudienceChecker;
+use Jose\Decrypter;
+use Jose\Encrypter;
 use Jose\Factory\CheckerManagerFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
+use Jose\Signer;
+use Jose\Verifier;
 use OAuth2\Client\AuthenticationMethod\ClientAssertionJwt;
 use OAuth2\Client\AuthenticationMethod\ClientSecretBasic;
 use OAuth2\Client\AuthenticationMethod\ClientSecretPost;
 use OAuth2\Client\AuthenticationMethod\None;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\AuthorizationFactory;
+use OAuth2\Endpoint\ClientRegistrationEndpoint;
 use OAuth2\Endpoint\FragmentResponseMode;
 use OAuth2\Endpoint\QueryResponseMode;
 use OAuth2\Endpoint\TokenEndpoint;
@@ -61,8 +66,8 @@ use OAuth2\Test\Stub\UserManager;
 use OAuth2\Token\BearerToken;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
-use Jose\Factory\JWTCreator;
-use Jose\Factory\JWTLoader;
+use Jose\JWTCreator;
+use Jose\JWTLoader;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -892,47 +897,47 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\Jose\Factory\JWTLoader
+     * @var null|\Jose\JWTLoader
      */
     private $jwt_loader = null;
 
     /**
-     * @return \Jose\Factory\JWTLoader
+     * @return \Jose\JWTLoader
      */
     protected function getJWTLoader()
     {
         if (null === $this->jwt_loader) {
             $this->jwt_loader = new JWTLoader(
                 $this->getClaimCheckerManager(),
-                ['HS256', 'HS512', 'RS256', 'RS512']
+                Verifier::createVerifier(['HS256', 'HS512', 'RS256', 'RS512'])
             );
-            $this->jwt_loader->enableEncryptionSupport(
+            $this->jwt_loader->enableEncryptionSupport(Decrypter::createDecrypter(
                 ['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
                 ['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512']
-            );
+            ));
         }
 
         return $this->jwt_loader;
     }
 
     /**
-     * @var null|\Jose\Factory\JWTCreator
+     * @var null|\Jose\JWTCreator
      */
     private $jwt_creator = null;
 
     /**
-     * @return \Jose\Factory\JWTCreator
+     * @return \Jose\JWTCreator
      */
     protected function getJWTCreator()
     {
         if (null === $this->jwt_creator) {
-            $this->jwt_creator = new JWTCreator(
+            $this->jwt_creator = new JWTCreator(Signer::createSigner(
                 ['HS256', 'HS512', 'RS256', 'RS512']
-            );
-            $this->jwt_creator->enableEncryptionSupport(
+            ));
+            $this->jwt_creator->enableEncryptionSupport(Encrypter::createEncrypter(
                 ['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
                 ['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512']
-            );
+            ));
         }
 
         return $this->jwt_creator;
@@ -1034,5 +1039,24 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRefreshTokenType()
     {
         return new RefreshToken($this->getRefreshTokenManager());
+    }
+
+    /**
+     * @var null|\OAuth2\Endpoint\ClientRegistrationEndpointInterface
+     */
+    private $client_registration_endpoint = null;
+
+    /**
+     * @return \OAuth2\Endpoint\ClientRegistrationEndpointInterface
+     */
+    protected function getClientRegistrationEndpoint()
+    {
+        if (null === $this->client_registration_endpoint) {
+            $this->client_registration_endpoint = new ClientRegistrationEndpoint(
+                $this->getExceptionManager()
+            );
+        }
+        
+        return $this->client_registration_endpoint;
     }
 }

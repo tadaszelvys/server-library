@@ -17,7 +17,7 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Jose\Factory\JWTLoader;
+use Jose\JWTLoader;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -49,7 +49,7 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
     /**
      * PasswordClientManager constructor.
      *
-     * @param \Jose\Factory\JWTLoader                      $jwt_loader
+     * @param \Jose\JWTLoader                      $jwt_loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager)

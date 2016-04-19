@@ -22,7 +22,7 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\User\UserManagerInterface;
-use Jose\Factory\JWTCreator;
+use Jose\JWTCreator;
 
 final class UserInfo implements UserInfoInterface
 {
@@ -63,7 +63,7 @@ final class UserInfo implements UserInfoInterface
     }
 
     /**
-     * @param \Jose\Factory\JWTCreator   $jwt_creator
+     * @param \Jose\JWTCreator   $jwt_creator
      * @param string                    $issuer
      * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key

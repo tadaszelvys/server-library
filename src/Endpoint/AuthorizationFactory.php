@@ -24,7 +24,7 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\User\UserInterface;
-use Jose\Factory\JWTLoader;
+use Jose\JWTLoader;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationFactory
@@ -122,7 +122,7 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param \Jose\Factory\JWTLoader $jwt_loader
+     * @param \Jose\JWTLoader $jwt_loader
      * @param string[]               $allowed_signature_algorithms
      */
     public function enableRequestObjectSupport(JWTLoader $jwt_loader,

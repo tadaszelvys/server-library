@@ -20,8 +20,8 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\OpenIDConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
 use OAuth2\User\UserInterface as BaseUserInterface;
-use Jose\Factory\JWTCreator;
-use Jose\Factory\JWTLoader;
+use Jose\JWTCreator;
+use Jose\JWTLoader;
 
 class IdTokenManager implements IdTokenManagerInterface
 {
@@ -56,8 +56,8 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * IdTokenManager constructor.
      *
-     * @param \Jose\Factory\JWTLoader    $jwt_loader
-     * @param \Jose\Factory\JWTCreator   $jwt_creator
+     * @param \Jose\JWTLoader    $jwt_loader
+     * @param \Jose\JWTCreator   $jwt_creator
      * @param                           $issuer
      * @param                           $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key

@@ -18,7 +18,7 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Jose\Factory\JWTLoader;
+use Jose\JWTLoader;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -55,7 +55,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     /**
      * JWTBearerGrantType constructor.
      *
-     * @param \Jose\Factory\JWTLoader                      $loader
+     * @param \Jose\JWTLoader                      $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(

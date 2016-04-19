@@ -84,7 +84,7 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
     {
         $this->getParameters($request, $token, $token_type_hint, $callback);
         if (!$this->isRequestSecured($request)) {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
 
             return;

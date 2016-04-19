@@ -17,11 +17,11 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Interface ClientRegistrationManagementEndpointInterface
  */
-interface ClientRegistrationManagementEndpointInterface
+interface ClientConfigurationEndpointInterface
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface      $response
      */
-    public function manage(ServerRequestInterface $request, ResponseInterface &$response);
+    public function configure(ServerRequestInterface $request, ResponseInterface &$response);
 }

@@ -479,7 +479,7 @@ class OpenIDConnectTest extends Base
         } catch (BaseException $e) {
             $this->assertInstanceOf(BadRequestExceptionInterface::class, $e);
             $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('Request must be secured', $e->getDescription());
+            $this->assertEquals('The request must be secured.', $e->getDescription());
             $this->assertEquals(400, $e->getCode());
         }
     }

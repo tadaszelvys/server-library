@@ -72,7 +72,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     public function introspection(ServerRequestInterface $request, ResponseInterface &$response)
     {
         if (!$this->isRequestSecured($request)) {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
             $exception->getHttpResponse($response);
 
             return;
