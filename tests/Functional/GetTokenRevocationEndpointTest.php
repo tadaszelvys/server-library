@@ -23,7 +23,7 @@ class GetTokenRevocationEndpointTest extends Base
 {
     public function testRequestNotSecured()
     {
-        $request = $this->createRequest('/?token=ABCD', 'GET', [], ['PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/?token=ABCD', 'GET', [], ['PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
@@ -37,7 +37,7 @@ class GetTokenRevocationEndpointTest extends Base
 
     public function testRequestNotSecuredWithCallback()
     {
-        $request = $this->createRequest('/?token=ABCD&callback=foo.bar', 'GET', [], ['PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/?token=ABCD&callback=foo.bar', 'GET', [], ['PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
@@ -46,12 +46,12 @@ class GetTokenRevocationEndpointTest extends Base
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"Request must be secured","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"})', $response->getBody()->getContents());
+        $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"The request must be secured.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"})', $response->getBody()->getContents());
     }
 
     public function testMissingTokenParameter()
     {
-        $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
@@ -65,7 +65,7 @@ class GetTokenRevocationEndpointTest extends Base
 
     public function testMissingTokenParameterWithCallback()
     {
-        $request = $this->createRequest('/?callback=foo.bar', 'GET', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/?callback=foo.bar', 'GET', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
@@ -107,7 +107,7 @@ class GetTokenRevocationEndpointTest extends Base
 
     public function testAccessTokenRevokedForAuthenticatedConfidentialClient()
     {
-        $request = $this->createRequest('/?token=ABCD', 'GET', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/?token=ABCD', 'GET', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
@@ -135,7 +135,7 @@ class GetTokenRevocationEndpointTest extends Base
 
     public function testAccessTokenRevokedForAuthenticatedConfidentialClientWithCallback()
     {
-        $request = $this->createRequest('/?token=ABCD&callback=foo.bar', 'GET', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/?token=ABCD&callback=foo.bar', 'GET', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $response = new Response();
@@ -299,7 +299,7 @@ class GetTokenRevocationEndpointTest extends Base
 
     public function testFooTokenNotSupported()
     {
-        $request = $this->createRequest('/?token=VALID_REFRESH_TOKEN&token_type_hint=foo_token', 'GET', [], ['PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret', 'HTTPS' => 'on']);
+        $request = $this->createRequest('/?token=VALID_REFRESH_TOKEN&token_type_hint=foo_token', 'GET', [], ['PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life', 'HTTPS' => 'on']);
 
         $this->assertInstanceOf(RefreshTokenInterface::class, $this->getRefreshTokenManager()->getRefreshToken('VALID_REFRESH_TOKEN'));
         $response = new Response();
@@ -313,7 +313,7 @@ class GetTokenRevocationEndpointTest extends Base
 
     public function testFooTokenNotSupportedWithCallback()
     {
-        $request = $this->createRequest('/?token=VALID_REFRESH_TOKEN&callback=foo.bar&token_type_hint=foo_token', 'GET', [], ['PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret', 'HTTPS' => 'on']);
+        $request = $this->createRequest('/?token=VALID_REFRESH_TOKEN&callback=foo.bar&token_type_hint=foo_token', 'GET', [], ['PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life', 'HTTPS' => 'on']);
 
         $this->assertInstanceOf(RefreshTokenInterface::class, $this->getRefreshTokenManager()->getRefreshToken('VALID_REFRESH_TOKEN'));
         $response = new Response();

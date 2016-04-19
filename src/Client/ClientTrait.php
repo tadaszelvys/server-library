@@ -11,37 +11,105 @@
 
 namespace OAuth2\Client;
 
+use Assert\Assertion;
+use Jose\Factory\JWKFactory;
+use Jose\Object\JWK;
+use Jose\Object\JWKSet;
+
+/**
+ * Class ClientTrait
+ *
+ * @method string getTokenEndpointAuthMethod()
+ * @method string getJwksUri()
+ * @method bool hasJwksUri()
+ * @method array getJwks()
+ * @method bool hasJwks()
+ * @method string getClientSecret()
+ * @method bool hasClientSecret()
+ */
 trait ClientTrait
 {
     /**
-     * @var string[]
+     * @var array
      */
-    protected $token_types = [];
+    private $metadatas = [];
 
     /**
-     * @var string[]
+     * @var int
      */
-    protected $grant_types = [];
+    private $client_secret_expires_at = 0;
 
     /**
-     * @var string[]
+     * @var string
      */
-    protected $response_types = [];
+    private $token_endpoint_auth_method = 'client_secret_basic';
 
     /**
-     * {@inheritdoc}
+     * @param string $name
+     * @param $arguments
+     *
+     * @return mixed
      */
-    public function isTokenTypeAllowed($token_type)
+    public function __call($name, array $arguments)
     {
-        return empty($this->token_types) || in_array($token_type, $this->getAllowedTokenTypes());
+        if (method_exists($this, $name)) {
+            return call_user_func([$this, $name], $arguments);
+        }
+
+        $method = mb_substr($name, 0, 3, '8bit');
+        if (in_array($method, ['get', 'set', 'has'])) {
+            $key = $this->decamelize(mb_substr($name, 3, null, '8bit'));
+            $arguments = array_merge(
+                [$key],
+                $arguments
+            );
+
+            return call_user_func_array([$this, $method], $arguments);
+        }
+        throw new \BadMethodCallException(sprintf('Method "%s" does not exists.', $name));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAllowedTokenTypes()
+    public function has($key)
     {
-        return $this->token_types;
+        Assertion::string($key);
+
+        return property_exists($this, $key) || array_key_exists($key, $this->metadatas);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get($key)
+    {
+        Assertion::true($this->has($key), sprintf('Configuration value with key "%s" does not exist.', $key));
+
+        return property_exists($this, $key) ? $this->$key : $this->metadatas[$key];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($key, $value)
+    {
+        Assertion::string($key);
+        if (property_exists($this, $key)) {
+            $this->$key = $value;
+        } else {
+            $this->metadatas[$key] = $value;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($key)
+    {
+        if (true === $this->has($key)) {
+            unset($this->metadatas[$key]);
+        }
     }
 
     /**
@@ -49,15 +117,11 @@ trait ClientTrait
      */
     public function isGrantTypeAllowed($grant_type)
     {
-        return in_array($grant_type, $this->getAllowedGrantTypes());
-    }
+        Assertion::string($grant_type, 'Argument must be a string.');
+        $grant_types = $this->get('grant_types');
+        Assertion::isArray($grant_types, 'The metadata "grant_types" must be an array.');
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedGrantTypes()
-    {
-        return $this->grant_types;
+        return in_array($grant_type, $grant_types);
     }
 
     /**
@@ -65,14 +129,93 @@ trait ClientTrait
      */
     public function isResponseTypeAllowed($response_type)
     {
-        return in_array($response_type, $this->getAllowedResponseTypes());
+        Assertion::string($response_type, 'Argument must be a string.');
+        $response_types = $this->get('response_types');
+        Assertion::isArray($response_types, 'The metadata "response_types" must be an array.');
+        
+        return in_array($response_type, $response_types);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAllowedResponseTypes()
+    public function isTokenTypeAllowed($token_type)
     {
-        return $this->response_types;
+        Assertion::string($token_type, 'Argument must be a string.');
+        if (!$this->has('token_types')) {
+            return true;
+        }
+        $token_types = $this->get('token_types');
+        Assertion::isArray($token_types, 'The metadata "token_types" must be an array.');
+
+        return in_array($token_type, $token_types);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isPublic()
+    {
+        return 'none' === $this->getTokenEndpointAuthMethod();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function areClientCredentialsExpired()
+    {
+        if (0 === $this->client_secret_expires_at) {
+            return false;
+        }
+
+        return time() > $this->client_secret_expires_at;
+    }
+
+
+
+    /**
+     * @return bool
+     */
+    public function hasPublicKeySet()
+    {
+        return $this->hasJwks() || $this->hasJwksUri() || $this->hasClientSecret();
+    }
+
+    /**
+     * @return \Jose\Object\JWKSetInterface
+     */
+    public function getPublicKeySet()
+    {
+        Assertion::true($this->hasPublicKeySet(), 'The client has no public key set');
+        
+        if ($this->hasJwks()) {
+            return new JWKSet($this->getJwks());
+        }
+        if ($this->hasJwksUri()) {
+            return JWKFactory::createFromJKU($this->getJwksUri());
+        }
+        
+        $jwk_set = new JWKSet();
+        $jwk_set->addKey(new JWK([
+            'kty' => 'oct',
+            'use' => 'sig',
+            'k'   => $this->getClientSecret(),
+        ]));
+        
+        return $jwk_set;
+    }
+
+    /**
+     * @param string $word
+     *
+     * @return string
+     */
+    private function decamelize($word)
+    {
+        return preg_replace_callback(
+            '/(^|[a-z])([A-Z])/',
+            function ($m) { return mb_strtolower(mb_strlen($m[1], '8bit') ? sprintf('%s_%s', $m[1], $m[2]) : $m[2], '8bit'); },
+            $word
+        );
     }
 }

@@ -89,7 +89,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testUnsupportedGrantType()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -119,7 +119,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -128,7 +128,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeNotAuthorizedForClientWithExpiredCredentials()
@@ -141,7 +141,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
-            $this->assertEquals('Client authentication failed. Credentials expired.', $e->getDescription());
+            $this->assertEquals('Client authentication failed.', $e->getDescription());
             $this->assertEquals(401, $e->getHttpCode());
         }
     }
@@ -159,7 +159,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[^"]+,"refresh_token":"[^"]+","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256","foo":"bar"}', $content);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[0-9]+,"refresh_token":"[^"]+","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256","foo":"bar"}', $content);
     }
 
     public function testTokenTypeNotAuthorizedForClient()
@@ -180,7 +180,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeader()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:secret')]);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('Mufasa:Circle Of Life')]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -189,7 +189,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButMissingPassword()
@@ -208,20 +208,20 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButBadPassword()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:foo')]);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('Mufasa:foo')]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
-            $this->assertEquals('Client authentication failed. Bad credentials.', $e->getDescription());
+            $this->assertEquals('Client authentication failed.', $e->getDescription());
         }
     }
 
     public function testGrantTypeAuthorizedForClientUsingQueryRequest()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials', 'client_id' => 'bar', 'client_secret' => 'secret'], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials', 'client_id' => 'Mufasa2', 'client_secret' => 'Circle Of Life'], ['HTTPS' => 'on']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -230,13 +230,13 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeAuthorizedForClientAndJWTAccessToken()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'bar', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -254,8 +254,8 @@ class ClientCredentialsGrantTypeTest extends Base
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($values['access_token']);
         $this->assertInstanceOf(JWTAccessTokenInterface::class, $access_token);
-        $this->assertEquals('bar', $access_token->getClientPublicId());
-        $this->assertEquals('bar', $access_token->getResourceOwnerPublicId());
+        $this->assertEquals('Mufasa', $access_token->getClientPublicId());
+        $this->assertEquals('Mufasa', $access_token->getResourceOwnerPublicId());
         $this->assertInstanceOf(JWSInterface::class, $access_token->getJWS());
         $this->assertTrue($access_token->getExpiresIn() <= 3600);
     }
@@ -286,9 +286,10 @@ class ClientCredentialsGrantTypeTest extends Base
         ]);
 
         $jws = JWSFactory::createJWSToCompactJSON([
+                'jti' => '0123456789',
                 'exp' => time() - 1,
                 'aud' => $this->getIssuer(),
-                'iss' => 'My JWT issuer',
+                'iss' => 'jwt1',
                 'sub' => 'jwt1',
             ],
             $jwk2,
@@ -314,7 +315,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
-            $this->assertEquals('Client authentication failed. The JWT has expired.', $e->getDescription());
+            $this->assertEquals('Client authentication failed.', $e->getDescription());
         }
     }
 
@@ -329,9 +330,10 @@ class ClientCredentialsGrantTypeTest extends Base
         ]);
 
         $jws = JWSFactory::createJWSToCompactJSON([
+                'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => 'Bad Audience',
-                'iss' => 'My JWT issuer',
+                'iss' => 'jwt1',
                 'sub' => 'jwt1',
             ],
             $jwk2,
@@ -357,7 +359,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
-            $this->assertEquals('Client authentication failed. Bad audience.', $e->getDescription());
+            $this->assertEquals('Client authentication failed.', $e->getDescription());
         }
     }
 
@@ -372,9 +374,10 @@ class ClientCredentialsGrantTypeTest extends Base
         ]);
 
         $jws = JWSFactory::createJWSToCompactJSON([
+                'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'My JWT issuer',
+                'iss' => 'jwt1',
                 'sub' => 'jwt1',
             ],
             $jwk2,
@@ -418,9 +421,10 @@ class ClientCredentialsGrantTypeTest extends Base
         ]);
 
         $jws = JWSFactory::createJWSToCompactJSON([
+                'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'My JWT issuer',
+                'iss' => 'bar',
                 'sub' => 'bar',
             ],
             $jwk2,
@@ -449,7 +453,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[^"]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testEncryptedAndSignedAssertionForJWTClient()
@@ -469,9 +473,10 @@ class ClientCredentialsGrantTypeTest extends Base
         ]);
 
         $jws = JWSFactory::createJWSToCompactJSON([
+                'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'My JWT issuer',
+                'iss' => 'jwt1',
                 'sub' => 'jwt1',
             ],
             $jwk2,
@@ -492,7 +497,7 @@ class ClientCredentialsGrantTypeTest extends Base
                 'enc' => 'A256CBC-HS512',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'My JWT issuer',
+                'iss' => 'jwt1',
                 'sub' => 'jwt1',
             ]
         );
@@ -538,9 +543,10 @@ class ClientCredentialsGrantTypeTest extends Base
         ]);
 
         $jws = JWSFactory::createJWSToCompactJSON([
+                'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'My JWT issuer',
+                'iss' => 'jwt1',
                 'sub' => 'jwt1',
             ],
             $jwk2,
@@ -561,7 +567,7 @@ class ClientCredentialsGrantTypeTest extends Base
                 'enc' => 'A256CBC-HS512',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'My JWT issuer',
+                'iss' => 'jwt1',
                 'sub' => 'jwt1',
             ]
         );

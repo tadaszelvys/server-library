@@ -11,10 +11,10 @@
 
 namespace OAuth2\Endpoint;
 
-use OAuth2\Behaviour\HasClientManagerSupervisor;
+use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ClientManagerSupervisorInterface;
+use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -26,7 +26,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
 {
     use HasExceptionManager;
-    use HasClientManagerSupervisor;
+    use HasClientManager;
 
     /**
      * @var \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface[]
@@ -36,14 +36,14 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
     /**
      * RevocationEndpoint constructor.
      *
-     * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
+     * @param \OAuth2\Client\ClientManagerInterface $client_manager_supervisor
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      */
     public function __construct(
-        ClientManagerSupervisorInterface $client_manager_supervisor,
+        ClientManagerInterface $client_manager_supervisor,
         ExceptionManagerInterface $exception_manager
     ) {
-        $this->setClientManagerSupervisor($client_manager_supervisor);
+        $this->setClientManager($client_manager_supervisor);
         $this->setExceptionManager($exception_manager);
     }
 
@@ -84,7 +84,7 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
     {
         $this->getParameters($request, $token, $token_type_hint, $callback);
         if (!$this->isRequestSecured($request)) {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Request must be secured');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
 
             return;
@@ -97,7 +97,7 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
         }
         $client = null;
         try {
-            $client = $this->getClientManagerSupervisor()->findClient($request);
+            $client = $this->getClientManager()->findClient($request);
         } catch (AuthenticateExceptionInterface $e) {
             $e->getHttpResponse($response);
 

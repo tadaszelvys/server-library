@@ -17,13 +17,11 @@ use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\EncryptionCapabilitiesInterface;
 use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
-use OAuth2\Client\RegisteredClientInterface;
 use OAuth2\OpenIDConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
 use OAuth2\User\UserInterface as BaseUserInterface;
-use OAuth2\Util\JWTCreator;
-use OAuth2\Util\JWTLoader;
+use Jose\JWTCreator;
+use Jose\JWTLoader;
 
 class IdTokenManager implements IdTokenManagerInterface
 {
@@ -58,8 +56,8 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * IdTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTLoader    $jwt_loader
-     * @param \OAuth2\Util\JWTCreator   $jwt_creator
+     * @param \Jose\JWTLoader    $jwt_loader
+     * @param \Jose\JWTCreator   $jwt_creator
      * @param                           $issuer
      * @param                           $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
@@ -166,19 +164,23 @@ class IdTokenManager implements IdTokenManagerInterface
 
         $jwt = $this->jwt_creator->sign($payload, $headers, $this->signature_key);
 
-        if ($client instanceof EncryptionCapabilitiesInterface && true === $client->isEncryptionSupportEnabled()) {
-            $headers = [
-                'typ'       => 'JWT',
-                'jti'       => Base64Url::encode(random_bytes(25)),
-                'alg'       => $client->getKeyEncryptionAlgorithm(),
-                'enc'       => $client->getContentEncryptionAlgorithm(),
-            ];
+        if ($client->hasPublicKeySet() && $client->has('id_token_encrypted_response_alg') && $client->has('id_token_encrypted_response_enc')) {
+            $key_set = $client->getPublicKeySet();
+            $key = $key_set->selectKey('enc');
+            if (null !== $key) {
+                $headers = [
+                    'typ'       => 'JWT',
+                    'jti'       => Base64Url::encode(random_bytes(25)),
+                    'alg'       => $client->get('id_token_encrypted_response_alg'),
+                    'enc'       => $client->get('id_token_encrypted_response_enc'),
+                ];
 
-            $jwt = $this->jwt_creator->encrypt(
-                $jwt,
-                $headers,
-                $client->getEncryptionPublicKey()
-            );
+                $jwt = $this->jwt_creator->encrypt(
+                    $jwt,
+                    $headers,
+                    $key
+                );
+            }
         }
         $id_token->setToken($jwt);
 
@@ -238,8 +240,8 @@ class IdTokenManager implements IdTokenManagerInterface
     {
         $uri = $redirect_uri;
 
-        if ($client instanceof RegisteredClientInterface && null !== $sector_identifier_uri = $client->getSectorIdentifierUri()) {
-            $uri = $sector_identifier_uri;
+        if (true === $client->has('sector_identifier_uri')) {
+            $uri = $client->get('sector_identifier_uri');
         }
 
         $data = parse_url($uri);
@@ -267,25 +269,26 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     private function getHashMethod()
     {
-        switch ($this->signature_algorithm) {
-            case 'HS256':
-            case 'ES256':
-            case 'RS256':
-            case 'PS256':
-                return 'sha256';
-            case 'HS384':
-            case 'ES384':
-            case 'RS384':
-            case 'PS384':
-                return 'sha384';
-            case 'HS512':
-            case 'ES512':
-            case 'RS512':
-            case 'PS512':
-                return 'sha512';
-            default:
-                throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
+        $map = [
+            'HS256' => 'sha256',
+            'ES256' => 'sha256',
+            'RS256' => 'sha256',
+            'PS256' => 'sha256',
+            'HS384' => 'sha384',
+            'ES384' => 'sha384',
+            'RS384' => 'sha384',
+            'PS384' => 'sha384',
+            'HS512' => 'sha512',
+            'ES512' => 'sha512',
+            'RS512' => 'sha512',
+            'PS512' => 'sha512',
+        ];
+
+        if (array_key_exists($this->signature_algorithm, $map)) {
+            return $map[$this->signature_algorithm];
         }
+
+        throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
     }
 
     /**
@@ -295,25 +298,25 @@ class IdTokenManager implements IdTokenManagerInterface
      */
     private function getHashSize()
     {
-        switch ($this->signature_algorithm) {
-            case 'HS256':
-            case 'ES256':
-            case 'RS256':
-            case 'PS256':
-                return 128 / 8;
-            case 'HS384':
-            case 'ES384':
-            case 'RS384':
-            case 'PS384':
-                return 192 / 8;
-            case 'HS512':
-            case 'ES512':
-            case 'RS512':
-            case 'PS512':
-                return 256 / 8;
-            default:
-                throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
+        $map = [
+            'HS256' => 16,
+            'ES256' => 16,
+            'RS256' => 16,
+            'PS256' => 16,
+            'HS384' => 24,
+            'ES384' => 24,
+            'RS384' => 24,
+            'PS384' => 24,
+            'HS512' => 32,
+            'ES512' => 32,
+            'RS512' => 32,
+            'PS512' => 32,
+        ];
+
+        if (array_key_exists($this->signature_algorithm, $map)) {
+            return $map[$this->signature_algorithm];
         }
+        throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
     }
 
     /**

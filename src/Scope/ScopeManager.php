@@ -14,7 +14,6 @@ namespace OAuth2\Scope;
 use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\Extension\AvailableScopeExtensionInterface;
 use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
@@ -116,7 +115,7 @@ class ScopeManager implements ScopeManagerInterface
      */
     public function getAvailableScopesForClient(ClientInterface $client)
     {
-        return ($client instanceof AvailableScopeExtensionInterface && null !== $client->getAvailableScopes()) ? $client->getAvailableScopes() : $this->getAvailableScopes();
+        return ($client->has('scope')) ? $this->convertToArray($client->get('scope')) : $this->getAvailableScopes();
     }
 
     /**

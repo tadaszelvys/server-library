@@ -12,25 +12,26 @@
 namespace OAuth2\Endpoint;
 
 use Assert\Assertion;
+use Jose\Object\JWK;
+use Jose\Object\JWKSet;
 use Jose\Object\JWKSetInterface;
-use OAuth2\Behaviour\HasClientManagerSupervisor;
+use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ClientManagerSupervisorInterface;
-use OAuth2\Client\SignatureCapabilitiesInterface;
+use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\User\UserInterface;
-use OAuth2\Util\JWTLoader;
+use Jose\JWTLoader;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationFactory
 {
     use HasJWTLoader;
     use HasScopeManager;
-    use HasClientManagerSupervisor;
+    use HasClientManager;
     use HasExceptionManager;
 
     /**
@@ -67,17 +68,17 @@ final class AuthorizationFactory
      * AuthorizationFactory constructor.
      *
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
-     * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
+     * @param \OAuth2\Client\ClientManagerInterface $client_manager_supervisor
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      */
     public function __construct(
         ScopeManagerInterface $scope_manager,
-        ClientManagerSupervisorInterface $client_manager_supervisor,
+        ClientManagerInterface $client_manager_supervisor,
         ExceptionManagerInterface $exception_manager
     ) {
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
-        $this->setClientManagerSupervisor($client_manager_supervisor);
+        $this->setClientManager($client_manager_supervisor);
     }
 
     /**
@@ -121,7 +122,7 @@ final class AuthorizationFactory
     }
 
     /**
-     * @param \OAuth2\Util\JWTLoader $jwt_loader
+     * @param \Jose\JWTLoader $jwt_loader
      * @param string[]               $allowed_signature_algorithms
      */
     public function enableRequestObjectSupport(JWTLoader $jwt_loader,
@@ -231,11 +232,14 @@ final class AuthorizationFactory
             Assertion::true($jwt->hasClaims(), 'The request object does not contain claims.');
             $client = $this->getClient($jwt->getClaims());
             Assertion::isInstanceOf($client, ClientInterface::class, 'Invalid client.');
-            Assertion::isInstanceOf($client, SignatureCapabilitiesInterface::class, 'The client does not have signature capabilities.');
+            
+            $public_key_set = $client->getPublicKeySet();
+
+            Assertion::notNull($public_key_set, 'The client does not have signature capabilities.');
 
             $this->getJWTLoader()->verifySignature(
                 $jwt,
-                $client->getSignaturePublicKeySet(),
+                $public_key_set,
                 $this->allowed_signature_algorithms
             );
             $scope = $this->getScope($jwt->getClaims());
@@ -308,7 +312,7 @@ final class AuthorizationFactory
      */
     private function getClient(array $params)
     {
-        $client = array_key_exists('client_id', $params) ? $this->getClientManagerSupervisor()->getClient($params['client_id']) : null;
+        $client = array_key_exists('client_id', $params) ? $this->getClientManager()->getClient($params['client_id']) : null;
         if (!$client instanceof ClientInterface) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_id" missing or invalid.');
         }

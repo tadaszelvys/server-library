@@ -11,12 +11,10 @@
 
 namespace OAuth2\ResourceServer;
 
-use OAuth2\Client\ClientInterface;
-
 /**
  * This interface is for resource servers.
  */
-interface ResourceServerInterface extends ClientInterface
+interface ResourceServerInterface
 {
     /**
      * @return string
@@ -34,7 +32,7 @@ interface ResourceServerInterface extends ClientInterface
     public function getContentEncryptionAlgorithm();
 
     /**
-     * @return null|\Jose\Object\JWKSetInterface
+     * @return null|\Jose\Object\JWKInterface
      */
     public function getPublicKeyEncryptionKey();
 }

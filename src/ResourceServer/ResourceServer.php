@@ -11,12 +11,10 @@
 
 namespace OAuth2\ResourceServer;
 
-use OAuth2\Client\Client;
-
 /**
  * Class ResourceServer.
  */
-class ResourceServer extends Client implements ResourceServerInterface
+class ResourceServer implements ResourceServerInterface
 {
     use ResourceServerTrait;
 }

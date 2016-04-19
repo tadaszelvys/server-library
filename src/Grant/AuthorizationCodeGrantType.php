@@ -15,7 +15,6 @@ use OAuth2\Behaviour\HasAuthorizationCodeManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\Endpoint\Authorization;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
@@ -218,7 +217,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      */
     private function checkClient(ServerRequestInterface $request, ClientInterface $client)
     {
-        if (!$client instanceof ConfidentialClientInterface) {
+        if (true === $client->isPublic()) {
             if (null === ($client_id = RequestBody::getParameter($request, 'client_id')) || $client_id !== $client->getPublicId()) {
                 throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The client_id parameter is required for non-confidential clients.');
             }
@@ -236,7 +235,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     {
         $params = $authCode->getQueryParams();
         if (!array_key_exists('code_challenge', $params)) {
-            if (true === $this->isPKCEForPublicClientsEnforced() && !$client instanceof ConfidentialClientInterface) {
+            if (true === $this->isPKCEForPublicClientsEnforced() && $client->isPublic()) {
                 throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Non-confidential clients must set a proof key (PKCE) for code exchange.');
             }
 

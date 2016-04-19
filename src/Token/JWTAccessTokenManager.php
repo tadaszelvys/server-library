@@ -20,8 +20,8 @@ use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\ResourceServer\ResourceServerInterface;
-use OAuth2\Util\JWTCreator;
-use OAuth2\Util\JWTLoader;
+use Jose\JWTCreator;
+use Jose\JWTLoader;
 
 class JWTAccessTokenManager extends AccessTokenManager
 {
@@ -61,8 +61,8 @@ class JWTAccessTokenManager extends AccessTokenManager
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \OAuth2\Util\JWTCreator   $jwt_creator
-     * @param \OAuth2\Util\JWTLoader    $jwt_loader
+     * @param \Jose\JWTCreator   $jwt_creator
+     * @param \Jose\JWTLoader    $jwt_loader
      * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
      * @param string                    $issuer
@@ -93,8 +93,8 @@ class JWTAccessTokenManager extends AccessTokenManager
                                                 $content_encryption_algorithm,
                                                 JWKInterface $key_encryption_key
     ) {
-        Assertion::inArray($key_encryption_algorithm, $this->jwt_creator->getKeyEncryptionAlgorithms());
-        Assertion::inArray($content_encryption_algorithm, $this->jwt_creator->getContentEncryptionAlgorithms());
+        Assertion::inArray($key_encryption_algorithm, $this->jwt_creator->getSupportedKeyEncryptionAlgorithms());
+        Assertion::inArray($content_encryption_algorithm, $this->jwt_creator->getSupportedContentEncryptionAlgorithms());
 
         $this->key_encryption_algorithm = $key_encryption_algorithm;
         $this->content_encryption_algorithm = $content_encryption_algorithm;
@@ -182,7 +182,7 @@ class JWTAccessTokenManager extends AccessTokenManager
             'exp'            => $access_token->getExpiresAt(),
             'sub'            => $access_token->getClientPublicId(),
             'token_type'     => $access_token->getTokenType(),
-            'scope'          => $access_token->getScope(),
+            'scp'            => $access_token->getScope(),
             'resource_owner' => $access_token->getResourceOwnerPublicId(),
         ];
         if (0 !== $expires_at = $access_token->getExpiresAt()) {
@@ -211,7 +211,7 @@ class JWTAccessTokenManager extends AccessTokenManager
             $allowed_content_encryption_algorithms = $this->isEncryptionEnabled() ? [$this->content_encryption_algorithm] : [];
             $jwk_set = new JWKSet();
             if (true === $this->isEncryptionEnabled()) {
-                $jwk_set = $jwk_set->addKey($this->key_encryption_key);
+                $jwk_set->addKey($this->key_encryption_key);
             }
             $jwt = $this->getJWTLoader()->load(
                 $assertion,
@@ -222,7 +222,7 @@ class JWTAccessTokenManager extends AccessTokenManager
             );
 
             $jwk_set = new JWKSet();
-            $jwk_set = $jwk_set->addKey($this->signature_key);
+            $jwk_set->addKey($this->signature_key);
             $this->jwt_loader->verifySignature($jwt, $jwk_set, [$this->signature_algorithm]);
         } catch (\Exception $e) {
             return;
@@ -244,8 +244,8 @@ class JWTAccessTokenManager extends AccessTokenManager
         if ($jwt->hasClaim('cnf')) {
             $access_token->setParameter('cnf', $jwt->getClaim('cnf'));
         }
-        if ($jwt->hasClaim('scope')) {
-            $access_token->setScope($jwt->getClaim('scope'));
+        if ($jwt->hasClaim('scp')) {
+            $access_token->setScope($jwt->getClaim('scp'));
         }
         if ($jwt->hasClaim('refresh_token')) {
             $access_token->setRefreshToken($jwt->getClaim('refresh_token'));

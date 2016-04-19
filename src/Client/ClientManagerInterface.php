@@ -11,53 +11,50 @@
 
 namespace OAuth2\Client;
 
+use OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface ClientManagerInterface
 {
     /**
-     * Find a client using the request.
-     * If the client is confidential, the client credentials must be checked.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request            The request
-     * @param mixed                                    $client_credentials The client credentials found in the request
-     *
-     * @return null|\OAuth2\Client\ClientInterface Return the client if found else null.
+     * @return \OAuth2\Client\ClientInterface Return a new client object.
      */
-    public function findClient(ServerRequestInterface $request, &$client_credentials = null);
-
+    public function createClient();
+    
     /**
-     * This method verifies the client credentials in the request.
+     * Get a client using its Id.
      *
-     * @param \OAuth2\Client\ClientInterface           $client
-     * @param mixed                                    $client_credentials
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param string|null                              $reason
+     * @param string $client_id The Id of the client
      *
-     * @return bool Returns true if the client is authenticated, else false
-     */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request, &$reason = null);
-
-    /**
-     * @param \OAuth2\Client\ClientInterface $client
-     *
-     * @return bool
-     */
-    public function isClientSupported(ClientInterface $client);
-
-    /**
-     * Get a client by its ID.
-     *
-     * @param string $client_id The client ID
-     *
-     * @return null|\OAuth2\Client\ClientInterface Return the client object or null if no client has been found.
+     * @return null|\OAuth2\Client\ClientInterface Return the client object or null if no client is found.
      */
     public function getClient($client_id);
 
+
     /**
-     * @return array
+     * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
      */
-    public function getSchemesParameters();
+    public function addAuthenticationMethod(AuthenticationMethodInterface $authentication_method);
+
+    /**
+     * Find a client ID using the request
+     * This interface should send the request to all its ClientManager and return null or a ClientInterface object.
+     * If client is Confidential, the client credentials must be checked by by the client manager.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request The request
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface Throw an exception if a client tried to authenticate against the server, but failed
+     *
+     * @return \OAuth2\Client\ClientInterface Return the client object.
+     */
+    public function findClient(ServerRequestInterface $request);
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \OAuth2\Exception\BaseExceptionInterface
+     */
+    public function buildAuthenticationException(ServerRequestInterface $request);
 
     /**
      * @return string[]

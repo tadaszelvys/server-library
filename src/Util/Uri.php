@@ -139,12 +139,54 @@ final class Uri
             return false;
         }
 
-        // If URI is not a valid URI, return false
-        if (!filter_var($uri, FILTER_VALIDATE_URL)) {
+        if (false === self::isAnUrlOrUrn($uri, $path_traversal_allowed)) {
             return false;
         }
 
-        $parsed = parse_url($uri);
+        foreach ($storedUris as $storedUri) {
+            if (strcasecmp(mb_substr($uri, 0, mb_strlen($storedUri, '8bit'), '8bit'), $storedUri) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $uri
+     * @param bool   $path_traversal_allowed
+     *
+     * @return bool
+     */
+    private static function isAnUrlOrUrn($uri, $path_traversal_allowed)
+    {
+        if ('urn:' === mb_substr($uri,0, 4, '8bit')) {
+            if (false === self::checkUrn($uri)) {
+                return false;
+            }
+        } else {
+            if (false === self::checkUrl($uri, $path_traversal_allowed)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $url
+     * @param bool   $path_traversal_allowed
+     *
+     * @return bool
+     */
+    private static function checkUrl($url, $path_traversal_allowed)
+    {
+        // If URI is not a valid URI, return false
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        $parsed = parse_url($url);
 
         // Checks for path traversal (e.g. http://foo.bar/redirect/../bad/url)
         if (isset($parsed['path']) && !$path_traversal_allowed) {
@@ -155,12 +197,16 @@ final class Uri
             }
         }
 
-        foreach ($storedUris as $storedUri) {
-            if (strcasecmp(mb_substr($uri, 0, mb_strlen($storedUri, '8bit'), '8bit'), $storedUri) === 0) {
-                return true;
-            }
-        }
+        return true;
+    }
 
-        return false;
+    /**
+     * @param string $urn
+     *
+     * @return bool
+     */
+    private static function checkUrn($urn)
+    {
+        return 1 === preg_match('/^urn:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9()+,\-.:=@;$_!*\'%\/?#]+$/', $urn);
     }
 }

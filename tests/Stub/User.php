@@ -13,7 +13,6 @@ namespace OAuth2\Test\Stub;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ConfidentialClientInterface;
 use OAuth2\OpenIDConnect\AddressInterface;
 use OAuth2\OpenIDConnect\UserInterface;
 use OAuth2\OpenIDConnect\UserTrait;
@@ -66,7 +65,7 @@ class User implements UserInterface, IssueRefreshTokenExtensionInterface
      */
     public function isRefreshTokenIssuanceAllowed(ClientInterface $client, $grant_type)
     {
-        return $client instanceof ConfidentialClientInterface;
+        return !$client->isPublic();
     }
 
     public function setLastLoginAt($last_login_at)

@@ -11,17 +11,17 @@
 
 namespace OAuth2\Behaviour;
 
-use OAuth2\Util\JWTLoader;
+use Jose\JWTLoader;
 
 trait HasJWTLoader
 {
     /**
-     * @var \OAuth2\Util\JWTLoader
+     * @var \Jose\JWTLoader
      */
     private $jwt_loader;
 
     /**
-     * @return \OAuth2\Util\JWTLoader
+     * @return \Jose\JWTLoader
      */
     protected function getJWTLoader()
     {
@@ -29,7 +29,7 @@ trait HasJWTLoader
     }
 
     /**
-     * @param \OAuth2\Util\JWTLoader $jwt_loader
+     * @param \Jose\JWTLoader $jwt_loader
      */
     private function setJWTLoader(JWTLoader $jwt_loader)
     {

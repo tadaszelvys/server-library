@@ -13,23 +13,22 @@ namespace OAuth2\OpenIDConnect;
 
 use Assert\Assertion;
 use Jose\Object\JWKInterface;
-use OAuth2\Behaviour\HasClientManagerSupervisor;
+use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ClientManagerSupervisorInterface;
-use OAuth2\Client\EncryptionCapabilitiesInterface;
+use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\User\UserManagerInterface;
-use OAuth2\Util\JWTCreator;
+use Jose\JWTCreator;
 
 final class UserInfo implements UserInfoInterface
 {
     use HasExceptionManager;
     use HasUserManager;
-    use HasClientManagerSupervisor;
+    use HasClientManager;
     use HasJWTCreator;
 
     /**
@@ -51,20 +50,20 @@ final class UserInfo implements UserInfoInterface
      * UserInfoEndpoint constructor.
      *
      * @param \OAuth2\User\UserManagerInterface               $user_manager
-     * @param \OAuth2\Client\ClientManagerSupervisorInterface $client_manager_supervisor
+     * @param \OAuth2\Client\ClientManagerInterface $client_manager_supervisor
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      */
     public function __construct(UserManagerInterface $user_manager,
-                                ClientManagerSupervisorInterface $client_manager_supervisor,
+                                ClientManagerInterface $client_manager_supervisor,
                                 ExceptionManagerInterface $exception_manager
     ) {
         $this->setUserManager($user_manager);
-        $this->setClientManagerSupervisor($client_manager_supervisor);
+        $this->setClientManager($client_manager_supervisor);
         $this->setExceptionManager($exception_manager);
     }
 
     /**
-     * @param \OAuth2\Util\JWTCreator   $jwt_creator
+     * @param \Jose\JWTCreator   $jwt_creator
      * @param string                    $issuer
      * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
@@ -104,7 +103,7 @@ final class UserInfo implements UserInfoInterface
      */
     public function getSupportedKeyEncryptionAlgorithms()
     {
-        return $this->getJWTCreator()->getKeyEncryptionAlgorithms();
+        return $this->getJWTCreator()->getSupportedKeyEncryptionAlgorithms();
     }
 
     /**
@@ -112,7 +111,7 @@ final class UserInfo implements UserInfoInterface
      */
     public function getSupportedContentEncryptionAlgorithms()
     {
-        return $this->getJWTCreator()->getContentEncryptionAlgorithms();
+        return $this->getJWTCreator()->getSupportedContentEncryptionAlgorithms();
     }
 
     /**
@@ -135,7 +134,7 @@ final class UserInfo implements UserInfoInterface
             );
         }
 
-        $client = $this->getClientManagerSupervisor()->getClient($access_token->getClientPublicId());
+        $client = $this->getClientManager()->getClient($access_token->getClientPublicId());
         if (null === $client) {
             throw $this->getExceptionManager()->getBadRequestException(
                 ExceptionManagerInterface::INVALID_REQUEST,
@@ -178,15 +177,20 @@ final class UserInfo implements UserInfoInterface
             );
         }
 
-        if ($client instanceof EncryptionCapabilitiesInterface) {
-            $data = $this->getJWTCreator()->encrypt(
-                $data,
-                [
-                    'alg' => $client->getKeyEncryptionAlgorithm(),
-                    'enc' => $client->getContentEncryptionAlgorithm(),
-                ],
-                $client->getEncryptionPublicKey()
-            );
+        if ($client->hasPublicKeySet() && $client->has('id_token_encrypted_response_alg') && $client->has('id_token_encrypted_response_enc')) {
+            $key_set = $client->getPublicKeySet();
+            $key = $key_set->selectKey('enc');
+            if (null !== $key) {
+
+                $data = $this->getJWTCreator()->encrypt(
+                    $data,
+                    [
+                        'alg' => $client->get('id_token_encrypted_response_alg'),
+                        'enc' => $client->get('id_token_encrypted_response_enc'),
+                    ],
+                    $key
+                );
+            }
         }
     }
 }

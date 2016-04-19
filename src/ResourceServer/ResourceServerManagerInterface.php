@@ -11,11 +11,9 @@
 
 namespace OAuth2\ResourceServer;
 
-use OAuth2\Client\ClientManagerInterface;
-
 /**
  * This interface is for resource servers.
  */
-interface ResourceServerManagerInterface extends ClientManagerInterface
+interface ResourceServerManagerInterface
 {
 }
