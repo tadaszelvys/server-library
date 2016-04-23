@@ -390,7 +390,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         return $this->redirect_uri_enforced;
     }
 
-    public function enabledRedirectUriEnforcement()
+    public function enableRedirectUriEnforcement()
     {
         $this->redirect_uri_enforced = true;
     }
