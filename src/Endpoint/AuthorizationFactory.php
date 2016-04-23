@@ -134,9 +134,7 @@ final class AuthorizationFactory
      */
     public function isEncryptedRequestsSupportEnabled()
     {
-        return null !== $this->key_encryption_key_set &&
-               !empty($this->allowed_content_encryption_algorithms) &&
-               !empty($this->allowed_key_encryption_algorithms);
+        return null !== $this->key_encryption_key_set;
     }
 
     /**
