@@ -11,12 +11,22 @@
 
 namespace OAuth2\ResourceOwner;
 
+use Base64Url\Base64Url;
+
 trait ResourceOwnerTrait
 {
     /**
      * @var string
      */
     protected $public_id;
+
+    /**
+     * ResourceOwnerTrait constructor.
+     */
+    public function __construct()
+    {
+        $this->setPublicId(Base64Url::encode(random_bytes(50)));
+    }
 
     /**
      * {@inheritdoc}
