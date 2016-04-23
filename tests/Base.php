@@ -25,7 +25,6 @@ use OAuth2\Client\AuthenticationMethod\ClientSecretPost;
 use OAuth2\Client\AuthenticationMethod\None;
 use OAuth2\Endpoint\AuthorizationEndpoint;
 use OAuth2\Endpoint\AuthorizationFactory;
-use OAuth2\Endpoint\ClientRegistrationEndpoint;
 use OAuth2\Endpoint\FragmentResponseMode;
 use OAuth2\Endpoint\QueryResponseMode;
 use OAuth2\Endpoint\TokenEndpoint;
@@ -163,14 +162,11 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->authorization_factory->enableRequestObjectSupport(
-                $this->getJWTLoader(),
-                ['HS256', 'HS512']
+                $this->getJWTLoader()
             );
             $this->authorization_factory->enableRequestObjectReferenceSupport();
 
             $this->authorization_factory->enableEncryptedRequestObjectSupport(
-                ['A256KW'],
-                ['A256CBC-HS512'],
                 new JWKSet(['keys' => [
                     [
                         'kid' => 'JWK1',
@@ -449,8 +445,6 @@ class Base extends \PHPUnit_Framework_TestCase
             $jwt_assertion = new ClientAssertionJwt($this->getJWTLoader(), $this->getExceptionManager());
             $jwt_assertion->enableEncryptedAssertions(
                 false,
-                ['A256KW'],
-                ['A256CBC-HS512'],
                 new JWKSet(['keys' => [
                     [
                         'kid' => 'JWK1',
@@ -563,8 +557,6 @@ class Base extends \PHPUnit_Framework_TestCase
             );
             $this->jwt_bearer_grant_type->enableEncryptedAssertions(
                 true,
-                ['A256KW'],
-                ['A256CBC-HS512'],
                 $key_encryption_key_set
             );
             $this->jwt_bearer_grant_type->disableRefreshTokenIssuanceWithAccessToken();
@@ -1039,24 +1031,5 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRefreshTokenType()
     {
         return new RefreshToken($this->getRefreshTokenManager());
-    }
-
-    /**
-     * @var null|\OAuth2\Endpoint\ClientRegistrationEndpointInterface
-     */
-    private $client_registration_endpoint = null;
-
-    /**
-     * @return \OAuth2\Endpoint\ClientRegistrationEndpointInterface
-     */
-    protected function getClientRegistrationEndpoint()
-    {
-        if (null === $this->client_registration_endpoint) {
-            $this->client_registration_endpoint = new ClientRegistrationEndpoint(
-                $this->getExceptionManager()
-            );
-        }
-        
-        return $this->client_registration_endpoint;
     }
 }

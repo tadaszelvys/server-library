@@ -37,16 +37,6 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
     private $key_encryption_key_set = null;
 
     /**
-     * @var string[]
-     */
-    private $allowed_key_encryption_algorithms = [];
-
-    /**
-     * @var string[]
-     */
-    private $allowed_content_encryption_algorithms = [];
-
-    /**
      * PasswordClientManager constructor.
      *
      * @param \Jose\JWTLoader                      $jwt_loader
@@ -60,22 +50,14 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
 
     /**
      * @param bool                         $encryption_required
-     * @param string[]                     $allowed_key_encryption_algorithms
-     * @param string[]                     $allowed_content_encryption_algorithms
      * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
      */
     public function enableEncryptedAssertions($encryption_required,
-                                              array $allowed_key_encryption_algorithms,
-                                              array $allowed_content_encryption_algorithms,
                                               JWKSetInterface $key_encryption_key_set)
     {
         Assertion::boolean($encryption_required);
-        Assertion::notEmpty($allowed_key_encryption_algorithms);
-        Assertion::notEmpty($allowed_content_encryption_algorithms);
 
         $this->encryption_required = $encryption_required;
-        $this->allowed_key_encryption_algorithms = $allowed_key_encryption_algorithms;
-        $this->allowed_content_encryption_algorithms = $allowed_content_encryption_algorithms;
         $this->key_encryption_key_set = $key_encryption_key_set;
     }
 
@@ -109,8 +91,6 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
         try {
             $jwt = $this->getJWTLoader()->load(
                 $client_assertion,
-                $this->allowed_key_encryption_algorithms,
-                $this->allowed_content_encryption_algorithms,
                 $this->key_encryption_key_set,
                 $this->encryption_required
             );

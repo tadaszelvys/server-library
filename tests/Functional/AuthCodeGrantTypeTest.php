@@ -269,7 +269,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=012345679#$/', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccessToLocalHostAndSecuredRedirectUriEnforced()
@@ -290,7 +290,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/127.0.0.1\/\?code=[^"]+&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/127.0.0.1\/\?code=[^"]+&state=012345679#$/', $response->getHeader('Location')[0]);
 
         $this->getAuthorizationEndpoint()->disableSecuredRedirectUriEnforcement();
     }
@@ -312,7 +312,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^urn\:\/\/ietf\:wg\:oauth\:2.0\:oob\:auto\?code=[^"]+&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^urn\:\/\/ietf\:wg\:oauth\:2.0\:oob\:auto\?code=[^"]+&state=012345679#$/', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccessWithoutRedirectUri()
@@ -331,7 +331,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=012345679#$/', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccessUsingAnotherRedirectUri()
@@ -351,7 +351,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^https:\/\/another.uri\/callback\?code=[^"]+&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^https:\/\/another.uri\/callback\?code=[^"]+&state=012345679#$/', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccessWithState()
@@ -371,7 +371,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
     }
 
     /*public function testAuthcodeFailWithStateAndUnregisteredClient()
@@ -475,7 +475,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
@@ -516,7 +516,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
@@ -556,7 +556,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
@@ -596,7 +596,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
@@ -635,7 +635,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
@@ -675,7 +675,7 @@ class AuthCodeGrantTypeTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
