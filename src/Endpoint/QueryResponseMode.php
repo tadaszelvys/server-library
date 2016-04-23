@@ -31,6 +31,10 @@ final class QueryResponseMode implements ResponseModeInterface
     public function prepareResponse($redirect_uri, array $data, ResponseInterface &$response)
     {
         $params = empty($data) ? [] : [$this->getName() => $data];
+        if (!array_key_exists('fragment', $params)) {
+            $params['fragment'] = [];
+        }
+
 
         $response = $response->withStatus(302)
             ->withHeader('Location', Uri::buildURI($redirect_uri, $params));

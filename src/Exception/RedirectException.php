@@ -68,11 +68,15 @@ final class RedirectException extends BaseException implements RedirectException
             $data['error_uri'] = urldecode($data['error_uri']);
         }
         $params = [$this->transport_mode => $data];
+        if (!array_key_exists('fragment', $params)) {
+            $params['fragment'] = [];
+        }
+
         $uri = Uri::buildURI($this->redirect_uri, $params);
         $this->checkHeaderValue($uri);
 
         return [
-            'Location'                => $uri.'#',           // The fragment '#' is used to mitigate closing redirectors
+            'Location'                => $uri,
             'Content-Security-Policy' => 'referrer origin;', // The header is used to mitigate closing redirectors
         ];
     }

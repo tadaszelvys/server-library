@@ -207,23 +207,19 @@ class JWTAccessTokenManager extends AccessTokenManager
     public function getAccessToken($assertion)
     {
         try {
-            $allowed_key_encryption_algorithms = $this->isEncryptionEnabled() ? [$this->key_encryption_algorithm] : [];
-            $allowed_content_encryption_algorithms = $this->isEncryptionEnabled() ? [$this->content_encryption_algorithm] : [];
             $jwk_set = new JWKSet();
             if (true === $this->isEncryptionEnabled()) {
                 $jwk_set->addKey($this->key_encryption_key);
             }
             $jwt = $this->getJWTLoader()->load(
                 $assertion,
-                $allowed_key_encryption_algorithms,
-                $allowed_content_encryption_algorithms,
                 $jwk_set,
                 $this->isEncryptionEnabled()
             );
 
             $jwk_set = new JWKSet();
             $jwk_set->addKey($this->signature_key);
-            $this->jwt_loader->verifySignature($jwt, $jwk_set, [$this->signature_algorithm]);
+            $this->jwt_loader->verifySignature($jwt, $jwk_set);
         } catch (\Exception $e) {
             return;
         }

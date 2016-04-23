@@ -54,7 +54,7 @@ class OpenIDConnectTest extends Base
 
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
@@ -455,7 +455,7 @@ class OpenIDConnectTest extends Base
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
 
-        $this->assertEquals('http://example.com/test?good=false&state=0123456789', $response->getHeader('Location')[0]);
+        $this->assertEquals('http://example.com/test?good=false&state=0123456789#', $response->getHeader('Location')[0]);
         $this->assertEquals(1, count($this->getNoneListener()->getAccessTokens()));
 
         $access_tokens = $this->getNoneListener()->getAccessTokens();
