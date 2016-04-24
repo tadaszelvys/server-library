@@ -188,7 +188,7 @@ class MacToken implements TokenTypeInterface
             return false;
         }
 
-        if (false === $this->checkTimestampValid($additional_credential_values['ts'])) {
+        if (false === $this->checkTimestampValid((int)$additional_credential_values['ts'])) {
             return false;
         }
 
@@ -236,7 +236,7 @@ class MacToken implements TokenTypeInterface
      */
     private function checkTimestampValid($timestamp)
     {
-        if ($timestamp < time() - $this->getTimestampLifetime()) {
+        if (abs(time() - $timestamp) > $this->getTimestampLifetime()) {
             return false;
         }
 
@@ -269,9 +269,10 @@ class MacToken implements TokenTypeInterface
             if (!is_array($matches)) {
                 return false;
             }
+
             $values = [];
             foreach ($matches as $match) {
-                $values[$match[1]] = $match[3];
+                $values[$match[1]] = isset($match[4]) ? $match[4] : $match[3];
             }
 
             if (array_key_exists('id', $values)) {
