@@ -30,25 +30,19 @@ class FormPostResponseMode implements ResponseModeInterface
      */
     public function prepareResponse($redirect_uri, array $data, ResponseInterface &$response)
     {
-        $input = [];
-        foreach ($data as $key => $value) {
-            $input[] = sprintf('<input type="hidden" name="%s" value="%s"/>', $key, $value);
-        }
-        $replacements = [
-            '{{redirect_uri}}' => $redirect_uri,
-            '{{input}}'        => implode(PHP_EOL, $input),
-        ];
-        $content = str_replace(array_keys($replacements), $replacements, $this->getTemplate());
-
-        $response->getBody()->write($content);
+        $template = $this->renderTemplate($redirect_uri, $data);
+        $response->getBody()->write($template);
     }
 
     /**
+     * @param string                              $redirect_uri
+     * @param array                               $data
+     *
      * @return string
      */
-    protected function getTemplate()
+    protected function renderTemplate($redirect_uri, array $data)
     {
-        return <<<'EOT'
+        $content = <<<'EOT'
 <!doctype html>
 <html>
     <head>
@@ -67,5 +61,15 @@ class FormPostResponseMode implements ResponseModeInterface
     </body>
 </html>
 EOT;
+
+        $input = [];
+        foreach ($data as $key => $value) {
+            $input[] = sprintf('<input type="hidden" name="%s" value="%s"/>', $key, $value);
+        }
+        $replacements = [
+            '{{redirect_uri}}' => $redirect_uri,
+            '{{input}}'        => implode(PHP_EOL, $input),
+        ];
+        return str_replace(array_keys($replacements), $replacements, $content);
     }
 }
