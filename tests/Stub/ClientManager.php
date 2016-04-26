@@ -56,6 +56,7 @@ class ClientManager extends Base
         $jwt1->set('id_token_encrypted_response_alg', 'A256KW');
         $jwt1->set('id_token_encrypted_response_enc', 'A256CBC-HS512');
         $jwt1->set('jwks', $keys);
+        $jwt1->set('scope_policy', 'error');
 
         $jwt2 = $this->createClient();
         $jwt2->setRedirectUris([]);
@@ -71,7 +72,7 @@ class ClientManager extends Base
         $bar->setResponseTypes(['token', 'id_token', 'none', 'code']);
         $bar->setPublicId('bar');
         $bar->setTokenEndpointAuthMethod('client_secret_jwt');
-        //$bar->setSignatureAlgorithms(['HS256', 'HS512']);
+        $bar->set('scope_policy', 'none');
 
         $baz = $this->createClient();
         $baz->set('client_secret', 'secret');
@@ -80,6 +81,7 @@ class ClientManager extends Base
         $baz->setResponseTypes([]);
         $baz->setPublicId('baz');
         $baz->setTokenEndpointAuthMethod('client_secret_basic');
+        $baz->set('scope_policy', 'none');
 
         $mufasa = $this->createClient();
         $mufasa->set('client_secret', 'Circle Of Life');
@@ -88,6 +90,7 @@ class ClientManager extends Base
         $mufasa->setResponseTypes(['token', 'id_token', 'none', 'code']);
         $mufasa->setPublicId('Mufasa');
         $mufasa->setTokenEndpointAuthMethod('client_secret_basic');
+        $mufasa->set('scope_policy', 'none');
 
         $mufasa2 = $this->createClient();
         $mufasa2->set('client_secret', 'Circle Of Life');
@@ -96,6 +99,7 @@ class ClientManager extends Base
         $mufasa2->setResponseTypes(['token', 'id_token', 'none', 'code']);
         $mufasa2->setPublicId('Mufasa2');
         $mufasa2->setTokenEndpointAuthMethod('client_secret_post');
+        $mufasa2->set('scope_policy', 'none');
 
         $mac = $this->createClient();
         $mac->set('client_secret', 'secret');
@@ -105,6 +109,7 @@ class ClientManager extends Base
         $mac->setPublicId('mac');
         $mac->set('token_types', ['MAC']);
         $mac->setTokenEndpointAuthMethod('client_secret_basic');
+        $mac->set('scope_policy', 'none');
 
         $expired = $this->createClient();
         $expired->set('client_secret', 'secret');
@@ -114,6 +119,7 @@ class ClientManager extends Base
         $expired->setResponseTypes(['token', 'id_token', 'none', 'code']);
         $expired->setPublicId('expired');
         $expired->setTokenEndpointAuthMethod('client_secret_basic');
+        $expired->set('scope_policy', 'none');
 
         $foo = $this->createClient();
         $foo->setPublicId('foo');

@@ -12,10 +12,9 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\Client as Base;
-use OAuth2\Client\Extension\ScopePolicyExtensionInterface;
 use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 
-class Client extends Base implements TokenLifetimeExtensionInterface, ScopePolicyExtensionInterface
+class Client extends Base implements TokenLifetimeExtensionInterface
 {
     /**
      * {@inheritdoc}
@@ -43,19 +42,6 @@ class Client extends Base implements TokenLifetimeExtensionInterface, ScopePolic
                 default:
                     return 2000;
             }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopePolicy()
-    {
-        if ($this->hasClientSecret()) {
-            return 'none';
-        }
-        if ($this->hasPublicKeySet()) {
-            return 'error';
         }
     }
 }

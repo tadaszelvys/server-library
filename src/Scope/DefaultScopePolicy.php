@@ -12,7 +12,6 @@
 namespace OAuth2\Scope;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\Extension\DefaultScopeExtensionInterface;
 
 final class DefaultScopePolicy implements ScopePolicyInterface
 {
@@ -60,6 +59,6 @@ final class DefaultScopePolicy implements ScopePolicyInterface
      */
     private function getDefaultScopesForClient(ClientInterface $client)
     {
-        return ($client instanceof DefaultScopeExtensionInterface && null !== $client->getDefaultScopes()) ? $client->getDefaultScopes() : $this->getDefaultScopes();
+        return ($client->has('scope')) && null !== $client->get('scope') ? $client->get('scope') : $this->getDefaultScopes();
     }
 }
