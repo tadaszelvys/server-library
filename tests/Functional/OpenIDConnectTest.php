@@ -122,7 +122,13 @@ class OpenIDConnectTest extends Base
         $this->assertEquals('Mufasa', $access_token->getClientPublicId());
         $this->assertEquals('user1', $access_token->getResourceOwnerPublicId());
 
-        //var_dump($this->getUserInfoEndpoint()->handle($access_token));
+        $userinfo = $this->getUserInfoEndpoint()->handle($access_token);
+        $userinfo = $loader->load($userinfo);
+
+        $this->assertEquals($userinfo->getClaim('sub'), $id_token->getClaim('sub'));
+        $this->assertEquals($userinfo->getClaim('exp'), $id_token->getClaim('exp'));
+        $this->assertEquals($userinfo->getClaim('iss'), $id_token->getClaim('iss'));
+        $this->assertEquals($userinfo->getClaim('aud'), $id_token->getClaim('aud'));
     }
 
     public function testHashedPairwise()
@@ -600,7 +606,7 @@ class OpenIDConnectTest extends Base
         ]));
         $id_token = $loader->load($jwt->getPayload());
         $this->assertInstanceOf(JWSInterface::class, $id_token);
-        
+
         $this->assertTrue($id_token->hasClaim('exp'));
         $this->assertTrue($id_token->hasClaim('nbf'));
         $this->assertTrue($id_token->hasClaim('iat'));
