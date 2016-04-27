@@ -23,8 +23,8 @@ final class Uri
     }
 
     /**
-     * @param string$uri    The URI
-     * @param array $params Parameters added to the URI
+     * @param string $uri    The URI
+     * @param array  $params Parameters added to the URI
      *
      * @throws \InvalidArgumentException
      *

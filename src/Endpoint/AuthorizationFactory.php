@@ -258,7 +258,7 @@ final class AuthorizationFactory
      * @param array                          $params
      * @param \OAuth2\User\UserInterface     $user
      * @param \OAuth2\Client\ClientInterface $client
-     * @param array                          $scope
+     * @param string[]                       $scope
      * @param bool                           $is_authorized
      *
      * @return \OAuth2\Endpoint\Authorization
