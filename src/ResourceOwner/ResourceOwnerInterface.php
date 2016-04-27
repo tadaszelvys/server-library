@@ -36,4 +36,16 @@ interface ResourceOwnerInterface
      * @return bool
      */
     public function has($key);
+
+    /**
+     * @param string $metadata
+     * @param mixed $value
+     */
+    public function set($metadata, $value);
+
+    /**
+     * @param string $metadata
+     */
+    public function remove($metadata);
+
 }

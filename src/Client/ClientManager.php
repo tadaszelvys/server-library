@@ -77,13 +77,13 @@ abstract class ClientManager implements ClientManagerInterface
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface                               $request
-     * @param null|\OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
-     * @param mixed                                                                  $client_credentials    The client credentials found in the request
+     * @param \Psr\Http\Message\ServerRequestInterface                          $request
+     * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
+     * @param mixed                                                             $client_credentials    The client credentials found in the request
      *
      * @return null|string
      */
-    private function findClientInTheRequest(ServerRequestInterface $request, &$authentication_method = null, &$client_credentials = null)
+    private function findClientInTheRequest(ServerRequestInterface $request, &$authentication_method, &$client_credentials = null)
     {
         $client_id = null;
         $client_credentials = null;

@@ -30,6 +30,20 @@ use Jose\Object\JWKSet;
 trait ClientTrait
 {
     /**
+     * @param string $metadata
+     *
+     * @return bool
+     */
+    abstract public function has($metadata);
+
+    /**
+     * @param string $metadata
+     *
+     * @return mixed
+     */
+    abstract public function get($metadata);
+
+    /**
      * @var int
      */
     protected $client_secret_expires_at = 0;

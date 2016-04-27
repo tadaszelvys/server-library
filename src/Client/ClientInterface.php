@@ -72,31 +72,6 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
 interface ClientInterface extends ResourceOwnerInterface
 {
     /**
-     * @param string $metadata
-     *
-     * @return bool
-     */
-    public function has($metadata);
-    
-    /**
-     * @param string $metadata
-     *
-     * @return mixed
-     */
-    public function get($metadata);
-
-    /**
-     * @param string $metadata
-     * @param mixed $value
-     */
-    public function set($metadata, $value);
-
-    /**
-     * @param string $metadata
-     */
-    public function remove($metadata);
-    
-    /**
      * Checks if the grant type is allowed for the client.
      *
      * @param string $grant_type The grant type
