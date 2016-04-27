@@ -209,7 +209,6 @@ class GetTokenRevocationEndpointTest extends Base
         $this->assertInstanceOf(RefreshTokenInterface::class, $this->getRefreshTokenManager()->getRefreshToken('REFRESH_EFGH'));
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
-        $this->assertTrue(array_key_exists('Content-Type', $headers));
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
@@ -229,7 +228,6 @@ class GetTokenRevocationEndpointTest extends Base
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
-        $this->assertTrue(array_key_exists('Content-Type', $headers));
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
@@ -249,7 +247,6 @@ class GetTokenRevocationEndpointTest extends Base
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
-        $this->assertTrue(array_key_exists('Content-Type', $headers));
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
@@ -268,7 +265,6 @@ class GetTokenRevocationEndpointTest extends Base
 
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
-        $this->assertTrue(array_key_exists('Content-Type', $headers));
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
@@ -288,7 +284,6 @@ class GetTokenRevocationEndpointTest extends Base
 
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
-        $this->assertTrue(array_key_exists('Content-Type', $headers));
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));

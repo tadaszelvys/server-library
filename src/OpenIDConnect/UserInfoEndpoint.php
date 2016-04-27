@@ -79,7 +79,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
                                                  JWKInterface $signature_key
     ) {
         Assertion::string($issuer);
-        Assertion::inArray($signature_algorithm, $jwt_creator->getSignatureAlgorithms());
+        Assertion::inArray($signature_algorithm, $jwt_creator->getSupportedSignatureAlgorithms());
         $this->setJWTCreator($jwt_creator);
 
         $this->issuer = $issuer;
@@ -100,7 +100,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      */
     public function getSupportedSignatureAlgorithms()
     {
-        return $this->getJWTCreator()->getSignatureAlgorithms();
+        return $this->getJWTCreator()->getSupportedSignatureAlgorithms();
     }
 
     /**

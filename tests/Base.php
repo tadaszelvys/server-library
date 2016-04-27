@@ -905,7 +905,6 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->id_token_manager) {
             $this->id_token_manager = new IdTokenManager(
-                $this->getJWTLoader(),
                 $this->getJWTCreator(),
                 $this->getIssuer(),
                 'HS512',
@@ -917,8 +916,6 @@ class Base extends \PHPUnit_Framework_TestCase
                 ]),
                 $this->getUserInfo()
             );
-
-            //$this->id_token_manager->enablePairwiseSubject(new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData()));
         }
 
         return $this->id_token_manager;
@@ -1014,9 +1011,9 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->setGrantTypesSupported($this->getTokenEndpoint()->getGrantTypesSupported());
             $this->metadata->setAcrValuesSupported([]);
             $this->metadata->setSubjectTypesSupported($this->getUserInfo()->isPairwiseSubjectIdentifierSupported() ? ['public', 'pairwise'] : ['public']);
-            $this->metadata->setIdTokenSigningAlgValuesSupported($this->getIdTokenManager()->getSignatureAlgorithms());
-            $this->metadata->setIdTokenEncryptionAlgValuesSupported($this->getIdTokenManager()->getKeyEncryptionAlgorithms());
-            $this->metadata->setIdTokenEncryptionEncValuesSupported($this->getIdTokenManager()->getContentEncryptionAlgorithms());
+            $this->metadata->setIdTokenSigningAlgValuesSupported($this->getIdTokenManager()->getSupportedSignatureAlgorithms());
+            $this->metadata->setIdTokenEncryptionAlgValuesSupported($this->getIdTokenManager()->getSupportedKeyEncryptionAlgorithms());
+            $this->metadata->setIdTokenEncryptionEncValuesSupported($this->getIdTokenManager()->getSupportedContentEncryptionAlgorithms());
             $this->metadata->setUserinfoSigningAlgValuesSupported($this->getUserInfoEndpoint()->getSupportedSignatureAlgorithms());
             $this->metadata->setUserinfoEncryptionAlgValuesSupported($this->getUserInfoEndpoint()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->setUserinfoEncryptionEncValuesSupported($this->getUserInfoEndpoint()->getSupportedContentEncryptionAlgorithms());

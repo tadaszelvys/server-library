@@ -39,15 +39,15 @@ interface IdTokenManagerInterface
     /**
      * @return string[]
      */
-    public function getSignatureAlgorithms();
+    public function getSupportedSignatureAlgorithms();
 
     /**
      * @return string[]
      */
-    public function getKeyEncryptionAlgorithms();
+    public function getSupportedKeyEncryptionAlgorithms();
 
     /**
      * @return string[]
      */
-    public function getContentEncryptionAlgorithms();
+    public function getSupportedContentEncryptionAlgorithms();
 }

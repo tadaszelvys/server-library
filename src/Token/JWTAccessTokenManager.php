@@ -73,7 +73,7 @@ class JWTAccessTokenManager extends AccessTokenManager
                                 JWKInterface $signature_key,
                                 $issuer
     ) {
-        Assertion::inArray($signature_algorithm, $jwt_creator->getSignatureAlgorithms());
+        Assertion::inArray($signature_algorithm, $jwt_creator->getSupportedSignatureAlgorithms());
         Assertion::string($issuer);
 
         $this->signature_algorithm = $signature_algorithm;

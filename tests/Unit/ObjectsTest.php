@@ -16,7 +16,6 @@ use OAuth2\Exception\AuthenticateException;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\OpenIDConnect\IdToken;
 use OAuth2\Test\Base;
-use OAuth2\Test\Stub\ResourceServer;
 use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\User;
 use OAuth2\Token\AccessToken;
@@ -66,9 +65,9 @@ class ObjectsTest extends Base
     public function testUser()
     {
         $user = new User('user1', 'pass');
-        $user->setLastLoginAt(time() - 1000);
+        $user->set('last_login_at', time() - 1000);
 
-        $this->assertTrue($user->getLastLoginAt() <= time() - 1000);
+        $this->assertTrue($user->get('last_login_at') <= time() - 1000);
         $this->assertEquals('user1', $user->getUsername());
     }
 
@@ -150,11 +149,10 @@ class ObjectsTest extends Base
 
     public function testAuthenticateException()
     {
-        $exception = new AuthenticateException('foo_error', 'foo_description', ['error_uri' => 'https://foo.com/error'], ['schemes' => ['Bearer realm="foo",charset=UTF-8']]);
+        $exception = new AuthenticateException('foo_error', 'foo_description', [], ['schemes' => ['Bearer realm="foo",charset=UTF-8']]);
 
         $this->assertNull($exception->getResponseBody());
         $this->assertEquals([
-            'Content-Type'     => 'application/json',
             'Cache-Control'    => 'no-store',
             'Pragma'           => 'no-cache',
             'WWW-Authenticate' => [

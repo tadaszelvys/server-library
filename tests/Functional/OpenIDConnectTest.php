@@ -504,7 +504,6 @@ class OpenIDConnectTest extends Base
         $this->assertEquals(['Bearer', 'MAC'], $response->getHeader('www-authenticate'));
         $this->assertEquals(['no-store'], $response->getHeader('cache-control'));
         $this->assertEquals(['no-cache'], $response->getHeader('pragma'));
-        $this->assertEquals(['application/json'], $response->getHeader('content-type'));
     }
 
     public function testUserInfoRequestWithoutAccessToken()

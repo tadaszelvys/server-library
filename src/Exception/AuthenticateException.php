@@ -37,7 +37,10 @@ final class AuthenticateException extends BaseException implements AuthenticateE
      */
     public function getResponseHeaders()
     {
-        return array_merge(parent::getResponseHeaders(), $this->header);
+        $headers = parent::getResponseHeaders();
+        unset($headers['Content-Type']);
+
+        return array_merge($headers, $this->header);
     }
 
     /**

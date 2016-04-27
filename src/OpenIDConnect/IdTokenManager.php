@@ -15,19 +15,16 @@ use Assert\Assertion;
 use Base64Url\Base64Url;
 use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasJWTCreator;
-use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\User\UserInterface;
 use Jose\JWTCreator;
-use Jose\JWTLoader;
 
 class IdTokenManager implements IdTokenManagerInterface
 {
     use HasJWTCreator;
-    use HasJWTLoader;
     use HasUserinfo;
 
     /**
@@ -53,15 +50,13 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * IdTokenManager constructor.
      *
-     * @param \Jose\JWTLoader                         $jwt_loader
      * @param \Jose\JWTCreator                        $jwt_creator
      * @param string                                  $issuer
      * @param string                                  $signature_algorithm
      * @param \Jose\Object\JWKInterface               $signature_key
      * @param \OAuth2\OpenIDConnect\UserInfoInterface $userinfo
      */
-    public function __construct(JWTLoader $jwt_loader,
-                                JWTCreator $jwt_creator,
+    public function __construct(JWTCreator $jwt_creator,
                                 $issuer,
                                 $signature_algorithm,
                                 JWKInterface $signature_key,
@@ -74,32 +69,31 @@ class IdTokenManager implements IdTokenManagerInterface
         $this->signature_key = $signature_key;
         $this->userinfo = $userinfo;
 
-        $this->setJWTLoader($jwt_loader);
         $this->setJWTCreator($jwt_creator);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSignatureAlgorithms()
+    public function getSupportedSignatureAlgorithms()
     {
-        return $this->getJWTLoader()->getSupportedSignatureAlgorithms();
+        return $this->getJWTCreator()->getSupportedSignatureAlgorithms();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getKeyEncryptionAlgorithms()
+    public function getSupportedKeyEncryptionAlgorithms()
     {
-        return $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms();
+        return $this->getJWTCreator()->getSupportedKeyEncryptionAlgorithms();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getContentEncryptionAlgorithms()
+    public function getSupportedContentEncryptionAlgorithms()
     {
-        return $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms();
+        return $this->getJWTCreator()->getSupportedContentEncryptionAlgorithms();
     }
 
     /**

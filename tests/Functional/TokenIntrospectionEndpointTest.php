@@ -69,47 +69,6 @@ class TokenIntrospectionEndpointTest extends Base
         $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[0-9]+,"sub":"foo"}', $response->getBody()->getContents());
     }
 
-    /*public function testAccessTokenIntrospectionAllowedForResourceServer()
-    {
-        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Resource-Server' => 'SERVER1']);
-
-        $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[0-9]+,"sub":"foo"}', $response->getBody()->getContents());
-    }*/
-
-    /*public function testAccessTokenIntrospectionNotAllowedForResourceServerFromDisallowedIpAddress()
-    {
-        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on', 'REMOTE_ADDR' => '192.168.1.12'], ['X-OAuth2-Resource-Server' => 'SERVER1']);
-
-        $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(401, $response->getStatusCode());
-        $headers = $response->getHeaders();
-        $this->assertTrue(array_key_exists('Content-Type', $headers));
-        $this->assertTrue(array_key_exists('Cache-Control', $headers));
-        $this->assertTrue(array_key_exists('Pragma', $headers));
-        $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
-        $this->assertEquals(1, count($headers['WWW-Authenticate']));
-    }*/
-
-    /*public function testAccessTokenIntrospectionAllowedForResourceServerFromTrustedProxy()
-    {
-        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on', 'REMOTE_ADDR' => '127.0.0.1'], ['X-OAuth2-Resource-Server' => 'SERVER2', 'X_FORWARDED_FOR' => '192.168.1.12']);
-
-        $response = new Response();
-        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
-        $response->getBody()->rewind();
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[0-9]+,"sub":"foo"}', $response->getBody()->getContents());
-    }*/
-
     public function testAccessTokenIntrospectionRefusedForUnauthenticatedPublicClient()
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'bam']);
@@ -120,7 +79,6 @@ class TokenIntrospectionEndpointTest extends Base
 
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
-        $this->assertTrue(array_key_exists('Content-Type', $headers));
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
@@ -162,7 +120,6 @@ class TokenIntrospectionEndpointTest extends Base
 
         $this->assertEquals(401, $response->getStatusCode());
         $headers = $response->getHeaders();
-        $this->assertTrue(array_key_exists('Content-Type', $headers));
         $this->assertTrue(array_key_exists('Cache-Control', $headers));
         $this->assertTrue(array_key_exists('Pragma', $headers));
         $this->assertTrue(array_key_exists('WWW-Authenticate', $headers));
