@@ -11,7 +11,7 @@
 
 namespace OAuth2\Client;
 
-use OAuth2\ResourceOwner\ResourceOwnerTrait;
+use OAuth2\ResourceOwner\ResourceOwner;
 
 /**
  * Class Client.
@@ -69,8 +69,7 @@ use OAuth2\ResourceOwner\ResourceOwnerTrait;
  * @method bool hasClientSecret()
  * @method setClientSecret(string $client_secret)
  */
-class Client implements ClientInterface
+class Client extends ResourceOwner implements ClientInterface
 {
-    use ResourceOwnerTrait;
     use ClientTrait;
 }

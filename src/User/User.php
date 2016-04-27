@@ -11,13 +11,12 @@
 
 namespace OAuth2\User;
 
-use OAuth2\ResourceOwner\ResourceOwnerTrait;
+use OAuth2\ResourceOwner\ResourceOwner;
 
 /**
  * This interface must be implemented by end-user classes.
  */
-class User implements UserInterface
+class User extends ResourceOwner implements UserInterface
 {
-    use ResourceOwnerTrait;
     use UserTrait;
 }
