@@ -62,7 +62,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
-     * @param \OAuth2\Client\ClientManagerInterface $client_manager_supervisor
+     * @param \OAuth2\Client\ClientManagerInterface $client_manager
      * @param \OAuth2\User\UserManagerInterface               $user_manager
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
@@ -71,7 +71,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     public function __construct(
         TokenTypeManagerInterface $token_type_manager,
         AccessTokenManagerInterface $access_token_manager,
-        ClientManagerInterface $client_manager_supervisor,
+        ClientManagerInterface $client_manager,
         UserManagerInterface $user_manager,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
@@ -79,7 +79,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     ) {
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
-        $this->setClientManager($client_manager_supervisor);
+        $this->setClientManager($client_manager);
         $this->setUserManager($user_manager);
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
@@ -338,7 +338,9 @@ final class TokenEndpoint implements TokenEndpointInterface
             $token_type_information,
             $request_parameters,
             $grant_type_response->getRequestedScope(),
-            $refresh_token
+            $refresh_token,
+            null,
+            $grant_type_response->getRedirectUri()
         );
 
         return $access_token;

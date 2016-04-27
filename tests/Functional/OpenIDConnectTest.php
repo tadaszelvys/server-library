@@ -96,8 +96,10 @@ class OpenIDConnectTest extends Base
             ],
             $this->getAuthorizationEndpoint()->getResponseTypesSupported()
         );
+
         $this->assertTrue($id_token->hasClaim('iss'));
         $this->assertTrue($id_token->hasClaim('sub'));
+        $this->assertEquals('iu6KK2l_kPf4_mOdpWE668f9bc6fk-2auRRZi4lWhi_zpypYTW45N6SpsahXSqbzQNjcbd30f8srPLf7XEdCKA', $id_token->getClaim('sub'));
         $this->assertTrue($id_token->hasClaim('aud'));
         $this->assertTrue($id_token->hasClaim('exp'));
         $this->assertTrue($id_token->hasClaim('iat'));
@@ -119,6 +121,8 @@ class OpenIDConnectTest extends Base
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
         $this->assertEquals('Mufasa', $access_token->getClientPublicId());
         $this->assertEquals('user1', $access_token->getResourceOwnerPublicId());
+
+        //var_dump($this->getUserInfoEndpoint()->handle($access_token));
     }
 
     public function testHashedPairwise()
@@ -518,7 +522,12 @@ class OpenIDConnectTest extends Base
 
         try {
             $access_token = $this->getListener()->handle($request);
-            $this->getUserInfo()->getUserInfo($access_token);
+            $this->getUserInfo()->getUserinfo(
+                $this->getClientManager()->getClient($access_token->getClientPublicId()),
+                $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId()),
+                $access_token->getRedirectUri(),
+                $access_token->getScope()
+            );
             $this->fail('Should throw an Exception');
         } catch (BaseException $e) {
             $this->assertInstanceOf(AuthenticateExceptionInterface::class, $e);
@@ -534,7 +543,12 @@ class OpenIDConnectTest extends Base
 
         try {
             $access_token = $this->getListener()->handle($request);
-            $this->getUserInfo()->getUserInfo($access_token);
+            $this->getUserInfo()->getUserinfo(
+                $this->getClientManager()->getClient($access_token->getClientPublicId()),
+                $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId()),
+                $access_token->getRedirectUri(),
+                $access_token->getScope()
+            );
             $this->fail('Should throw an Exception');
         } catch (BaseException $e) {
             $this->assertInstanceOf(BadRequestExceptionInterface::class, $e);
@@ -549,7 +563,7 @@ class OpenIDConnectTest extends Base
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer USER_INFO']);
 
         $access_token = $this->getListener()->handle($request);
-        $data = $this->getUserInfo()->getUserInfo($access_token);
+        $data = $this->getUserInfoEndpoint()->handle($access_token);
 
         $loader = new Loader();
         $id_token = $loader->load($data);
@@ -571,10 +585,11 @@ class OpenIDConnectTest extends Base
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer USER_INFO2']);
 
         $access_token = $this->getListener()->handle($request);
-        $data = $this->getUserInfo()->getUserInfo($access_token);
+        $data = $this->getUserInfoEndpoint()->handle($access_token);
 
         $loader = new Loader();
         $jwt = $loader->load($data);
+
         $this->assertInstanceOf(JWEInterface::class, $jwt);
         $decrypter = new Decrypter(['A256KW'], ['A256CBC-HS512'], []);
         $decrypter->decryptUsingKey($jwt, new JWK([
@@ -585,7 +600,7 @@ class OpenIDConnectTest extends Base
         ]));
         $id_token = $loader->load($jwt->getPayload());
         $this->assertInstanceOf(JWSInterface::class, $id_token);
-
+        
         $this->assertTrue($id_token->hasClaim('exp'));
         $this->assertTrue($id_token->hasClaim('nbf'));
         $this->assertTrue($id_token->hasClaim('iat'));

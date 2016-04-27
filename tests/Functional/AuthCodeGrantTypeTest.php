@@ -58,7 +58,7 @@ class AuthCodeGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('Invalid "response_type" parameter or parameter is missing.', $e->getDescription());
+            $this->assertEquals('The "response_type" parameter is mandatory.', $e->getDescription());
         }
     }
 
@@ -66,8 +66,9 @@ class AuthCodeGrantTypeTest extends Base
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri' => 'http://example.com/bade.redirect?URI',
-            'client_id'    => 'foo',
+            'response_type' => 'token',
+            'redirect_uri'  => 'http://example.com/bade.redirect?URI',
+            'client_id'     => 'foo',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -313,25 +314,6 @@ class AuthCodeGrantTypeTest extends Base
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($authorization, $response);
         $this->assertRegExp('/^urn\:\/\/ietf\:wg\:oauth\:2.0\:oob\:auto\?code=[^"]+&state=012345679#$/', $response->getHeader('Location')[0]);
-    }
-
-    public function testAuthcodeSuccessWithoutRedirectUri()
-    {
-        $request = new ServerRequest();
-        $request = $request->withQueryParams([
-            'client_id'     => 'foo',
-            'response_type' => 'code',
-            'state'         => '012345679',
-        ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
-        $response = new Response();
-        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=012345679#$/', $response->getHeader('Location')[0]);
     }
 
     public function testAuthcodeSuccessUsingAnotherRedirectUri()

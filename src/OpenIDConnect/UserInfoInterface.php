@@ -11,29 +11,29 @@
 
 namespace OAuth2\OpenIDConnect;
 
-use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Client\ClientInterface;
+use OAuth2\OpenIDConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
+use OAuth2\User\UserInterface;
 
 interface UserInfoInterface
 {
     /**
-     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     * @param \OAuth2\OpenIDConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface $algorithm
+     */
+    public function enablePairwiseSubject(PairwiseSubjectIdentifierAlgorithmInterface $algorithm);
+
+    /**
+     * @return bool
+     */
+    public function isPairwiseSubjectIdentifierSupported();
+
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param \OAuth2\User\UserInterface     $user
+     * @param string                         $redirect_uri
+     * @param array                          $scope
      *
-     * @return array|string
+     * @return array
      */
-    public function getUserInfo(AccessTokenInterface $access_token);
-
-    /**
-     * @return string[]
-     */
-    public function getSupportedSignatureAlgorithms();
-
-    /**
-     * @return string[]
-     */
-    public function getSupportedKeyEncryptionAlgorithms();
-
-    /**
-     * @return string[]
-     */
-    public function getSupportedContentEncryptionAlgorithms();
+    public function getUserinfo(ClientInterface $client, UserInterface $user, $redirect_uri, array $scope);
 }

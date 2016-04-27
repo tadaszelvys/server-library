@@ -36,22 +36,12 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * @var bool
      */
-    private $redirect_uri_enforced = false;
-
-    /**
-     * @var bool
-     */
     private $secured_redirect_uri_enforced = false;
 
     /**
      * @var bool
      */
     private $state_parameter_enforced = false;
-
-    /**
-     * @var bool
-     */
-    private $redirect_uri_required_for_registered_client = false;
 
     /**
      * AuthorizationEndpoint constructor.
@@ -116,9 +106,8 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     public function authorize(Authorization $authorization, ResponseInterface &$response)
     {
-        $redirect_uri = $this->checkRedirectUri($authorization);
-        $this->checkRedirectUriFragment($redirect_uri);
-        $this->checkSecuredRedirectUri($redirect_uri);
+        $this->checkHasResponseType($authorization);
+        $redirect_uri = $this->getRedirectUri($authorization);
 
         $this->checkState($authorization);
         $this->checkScope($authorization);
@@ -130,7 +119,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
         if ($authorization->isAuthorized() === false) {
             $params = [
                 'transport_mode' => $response_mode->getName(),
-                'redirect_uri'   => $authorization->get('redirect_uri'),
+                'redirect_uri'   => $redirect_uri,
             ];
             if (true === $authorization->has('state')) {
                 $params['state'] = $authorization->get('state');
@@ -141,21 +130,21 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
             return;
         }
 
-        $result = [];
+        $response_parameters = [];
         foreach ($types as $type) {
-            $result = array_merge(
-                $result,
+            $response_parameters = array_merge(
+                $response_parameters,
                 $type->prepareAuthorization($authorization)
             );
         }
         if ($authorization->has('state')) {
-            $result['state'] = $authorization->get('state');
+            $response_parameters['state'] = $authorization->get('state');
         }
         foreach ($types as $type) {
-            $type->finalizeAuthorization($result, $authorization, $redirect_uri);
+            $type->finalizeAuthorization($response_parameters, $authorization, $redirect_uri);
         }
 
-        $response_mode->prepareResponse($redirect_uri, $result, $response);
+        $response_mode->prepareResponse($redirect_uri, $response_parameters, $response);
     }
 
     /**
@@ -165,24 +154,37 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @return string
      */
-    private function checkRedirectUri(Authorization $authorization)
+    private function checkHasResponseType(Authorization $authorization)
     {
-        $this->checkRedirectUriIfRequired($authorization);
-
-        $redirect_uri = $authorization->has('redirect_uri') ? $authorization->get('redirect_uri') : null;
-        $redirect_uris = $this->getClientRedirectUris($authorization);
-
-        if (empty($redirect_uri) && empty($redirect_uris)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is missing. Add "redirect_uri" parameter or store redirect URIs to your client');
+        /*
+         * @see http://tools.ietf.org/html/rfc6749#section-3.1.1
+         */
+        if (false === $authorization->has('response_type')) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "response_type" parameter is mandatory.');
         }
-        if (!empty($redirect_uri) && !empty($redirect_uris) && false === Uri::isRedirectUriAllowed($redirect_uri, $redirect_uris)) {
+    }
+
+    /**
+     * @param \OAuth2\Endpoint\Authorization $authorization An array with mixed values
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return string
+     */
+    private function getRedirectUri(Authorization $authorization)
+    {
+        $this->checkRedirectUriIsSet($authorization);
+        $redirect_uri = $authorization->get('redirect_uri');
+        $this->checkRedirectUriHasNoFragment($redirect_uri);
+        $this->checkIfRedirectUriIsSecuredIfNeeded($redirect_uri);
+
+        $client_redirect_uris = $this->getClientRedirectUris($authorization);
+
+        if (!empty($client_redirect_uris) && false === Uri::isRedirectUriAllowed($redirect_uri, $client_redirect_uris)) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The specified redirect URI is not valid');
         }
-        if (!empty($redirect_uri)) {
-            return $redirect_uri;
-        }
 
-        return $redirect_uris[0];
+        return $redirect_uri;
     }
 
     /**
@@ -190,24 +192,24 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function checkRedirectUriIfRequired(Authorization $authorization)
+    private function checkRedirectUriIsSet(Authorization $authorization)
     {
-        //If the redirect URI is not set and the configuration requires it, throws an exception
-        if (true === $this->isRedirectUriEnforced() && false === $authorization->has('redirect_uri')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is mandatory');
+        //If the redirect URI is not set, throws an exception
+        if (false === $authorization->has('redirect_uri')) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "redirect_uri" parameter is mandatory.');
         }
     }
 
     /**
      * Check if a fragment is in the URI.
      *
-     * @param string $redirect_uri An array with mixed values
+     * @param string $redirect_uri
      *
      * @see http://tools.ietf.org/html/rfc6749#section-3.1.2
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function checkRedirectUriFragment($redirect_uri)
+    private function checkRedirectUriHasNoFragment($redirect_uri)
     {
         $uri = parse_url($redirect_uri);
         if (isset($uri['fragment'])) {
@@ -218,13 +220,13 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * Check if the redirect URI is secured if the configuration requires it.
      *
-     * @param string $redirect_uri The redirect uri to check
+     * @param string $redirect_uri
      *
      * @see http://tools.ietf.org/html/rfc6749#section-3.1.2.1
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function checkSecuredRedirectUri($redirect_uri)
+    private function checkIfRedirectUriIsSecuredIfNeeded($redirect_uri)
     {
         if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== mb_substr($redirect_uri, 0, 5, '8bit')) {
             if (!$this->isALocalUriOrAnUrn($redirect_uri)) {
@@ -273,21 +275,10 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
             return $redirect_uris;
         }
 
-        $this->checkRedirectUriIfRequiredForRegisteredClients();
         $this->checkRedirectUriForNonConfidentialClient($client);
         $this->checkRedirectUriForConfidentialClient($client, $authorization);
 
         return [];
-    }
-
-    /**
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    private function checkRedirectUriIfRequiredForRegisteredClients()
-    {
-        if (true === $this->isRedirectUriRequiredForRegisteredClients()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Registered clients must register at least one redirect URI');
-        }
     }
 
     /**
@@ -310,7 +301,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     private function checkRedirectUriForConfidentialClient(ClientInterface $client, Authorization $authorization)
     {
-        if (!$client->isPublic() && $authorization->has('response_type') && $authorization->get('response_type') === 'token') {
+        if (!$client->isPublic() && $authorization->get('response_type') === 'token') {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients must register at least one redirect URI when using "token" response type');
         }
     }
@@ -325,7 +316,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function checkState(Authorization $authorization)
     {
         if (!$authorization->has('state') && $this->isStateParameterEnforced()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "state" parameter is mandatory');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The "state" parameter is mandatory.');
         }
     }
 
@@ -355,13 +346,6 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     private function getResponseTypes(Authorization $authorization)
     {
-        /*
-         * @see http://tools.ietf.org/html/rfc6749#section-3.1.1
-         */
-        if (!$authorization->has('response_type')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing.');
-        }
-
         $response_types = explode(' ', $authorization->get('response_type'));
         if (count($response_types) > count(array_unique($response_types))) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing.');
@@ -385,24 +369,6 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * @return bool
      */
-    public function isRedirectUriEnforced()
-    {
-        return $this->redirect_uri_enforced;
-    }
-
-    public function enableRedirectUriEnforcement()
-    {
-        $this->redirect_uri_enforced = true;
-    }
-
-    public function disableRedirectUriEnforcement()
-    {
-        $this->redirect_uri_enforced = false;
-    }
-
-    /**
-     * @return bool
-     */
     public function isSecuredRedirectUriEnforced()
     {
         return $this->secured_redirect_uri_enforced;
@@ -416,24 +382,6 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     public function disableSecuredRedirectUriEnforcement()
     {
         $this->secured_redirect_uri_enforced = false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRedirectUriRequiredForRegisteredClients()
-    {
-        return $this->redirect_uri_required_for_registered_client;
-    }
-
-    public function enableRedirectUriForRegisteredClientsRequirement()
-    {
-        $this->redirect_uri_required_for_registered_client = true;
-    }
-
-    public function disableRedirectUriForRegisteredClientsRequirement()
-    {
-        $this->redirect_uri_required_for_registered_client = false;
     }
 
     /**

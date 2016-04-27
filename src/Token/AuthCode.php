@@ -19,11 +19,6 @@ class AuthCode extends Token implements AuthCodeInterface
     protected $issue_refresh_token = false;
 
     /**
-     * @var string|null
-     */
-    protected $redirect_uri = null;
-
-    /**
      * @var array
      */
     protected $query_params = [];
@@ -42,22 +37,6 @@ class AuthCode extends Token implements AuthCodeInterface
     public function setIssueRefreshToken($issue_refresh_token)
     {
         $this->issue_refresh_token = $issue_refresh_token;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRedirectUri()
-    {
-        return $this->redirect_uri;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRedirectUri($redirect_uri)
-    {
-        $this->redirect_uri = $redirect_uri;
     }
 
     /**

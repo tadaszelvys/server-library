@@ -97,6 +97,8 @@ final class NoneResponseType implements ResponseTypeSupportInterface
             $token_type->getTokenTypeInformation(),
             $authorization->getScopes()
         );
+        
+        $authorization->setData('access_token', $token);
 
         foreach ($this->listeners as $listener) {
             $listener->call($token);

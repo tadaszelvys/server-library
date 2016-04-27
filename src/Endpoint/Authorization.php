@@ -37,6 +37,11 @@ final class Authorization
      */
     private $scopes = [];
 
+    /**
+     * @var array
+     */
+    private $data = [];
+
     const DISPLAY_PAGE = 'page';
     const DISPLAY_POPUP = 'popup';
     const DISPLAY_TOUCH = 'touch';
@@ -191,6 +196,39 @@ final class Authorization
         Assertion::true($this->has($param), sprintf('Invalid parameter "%s"', $param));
 
         return $this->query_params[$param];
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasData($key)
+    {
+        return array_key_exists($key, $this->data);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function getData($key)
+    {
+        Assertion::true($this->hasData($key), sprintf('Invalid data "%s"', $key));
+
+        return $this->data[$key];
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $data
+     *
+     * @return mixed
+     */
+    public function setData($key, $data)
+    {
+        $this->data[$key] = $data;
     }
 
     private function checkDisplay()

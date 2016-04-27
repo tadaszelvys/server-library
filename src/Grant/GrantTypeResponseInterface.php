@@ -16,6 +16,16 @@ use OAuth2\Token\RefreshTokenInterface;
 interface GrantTypeResponseInterface
 {
     /**
+     * @return string|null
+     */
+    public function getRedirectUri();
+
+    /**
+     * @param string $redirect_uri
+     */
+    public function setRedirectUri($redirect_uri);
+    
+    /**
      * @param string $key
      *
      * @return mixed

@@ -62,7 +62,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null, ResourceServerInterface $resource_server = null)
+    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null, ResourceServerInterface $resource_server = null, $redirect_uri = null)
     {
         $access_token = $this->createEmptyAccessToken();
         $access_token->setExpiresAt(time() + $this->getLifetime($client));
@@ -70,6 +70,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
         $access_token->setResourceOwnerPublicId($resource_owner->getPublicId());
         $access_token->setClientPublicId($client->getPublicId());
         $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
+        $access_token->setRedirectUri($redirect_uri);
 
         foreach ($token_type_parameters as $key => $value) {
             if ('token_type' === $key) {

@@ -51,17 +51,17 @@ final class AuthorizationFactory
      * AuthorizationFactory constructor.
      *
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
-     * @param \OAuth2\Client\ClientManagerInterface $client_manager_supervisor
+     * @param \OAuth2\Client\ClientManagerInterface $client_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      */
     public function __construct(
         ScopeManagerInterface $scope_manager,
-        ClientManagerInterface $client_manager_supervisor,
+        ClientManagerInterface $client_manager,
         ExceptionManagerInterface $exception_manager
     ) {
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
-        $this->setClientManager($client_manager_supervisor);
+        $this->setClientManager($client_manager);
     }
 
     /**

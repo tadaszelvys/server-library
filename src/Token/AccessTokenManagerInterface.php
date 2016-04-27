@@ -20,17 +20,19 @@ interface AccessTokenManagerInterface
     /**
      * Creates an access token and stores it if necessary.
      *
-     * @param \OAuth2\Client\ClientInterface               $client                The client associated with this access token.
-     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resource_owner        Resource owner associated with the access token.
-     * @param array                                        $token_type_parameters The parameters from token type to add to the access token
-     * @param array                                        $request_parameters    The parameters of the request
-     * @param string[]                                     $scope                 (optional) Scopes of the access token.
-     * @param \OAuth2\Token\RefreshTokenInterface|null     $refresh_token         (optional) Refresh token associated with the access token.
+     * @param \OAuth2\Client\ClientInterface                      $client                The client associated with this access token.
+     * @param \OAuth2\ResourceOwner\ResourceOwnerInterface        $resource_owner        Resource owner associated with the access token.
+     * @param array                                               $token_type_parameters The parameters from token type to add to the access token
+     * @param array                                               $request_parameters    The parameters of the request
+     * @param string[]                                            $scope                 (optional) Scopes of the access token.
+     * @param \OAuth2\Token\RefreshTokenInterface|null            $refresh_token         (optional) Refresh token associated with the access token.
+     * @param \OAuth2\ResourceServer\ResourceServerInterface|null $resource_server       (optional) The resource server.
+     * @param string|null                                         $redirect_uri          (optional) The redirect Uri.
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null, ResourceServerInterface $resource_server = null);
-
+    public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null, ResourceServerInterface $resource_server = null, $redirect_uri = null);
+    
     /**
      * This function revoke an access token.
      *

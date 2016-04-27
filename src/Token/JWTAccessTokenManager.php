@@ -184,6 +184,7 @@ class JWTAccessTokenManager extends AccessTokenManager
             'token_type'     => $access_token->getTokenType(),
             'scp'            => $access_token->getScope(),
             'resource_owner' => $access_token->getResourceOwnerPublicId(),
+            'redirect_uri'   => $access_token->getRedirectUri(),
         ];
         if (0 !== $expires_at = $access_token->getExpiresAt()) {
             $payload['exp'] = $expires_at;
@@ -246,7 +247,10 @@ class JWTAccessTokenManager extends AccessTokenManager
         if ($jwt->hasClaim('refresh_token')) {
             $access_token->setRefreshToken($jwt->getClaim('refresh_token'));
         }
-
+        if ($jwt->hasClaim('redirect_uri')) {
+            $access_token->setRedirectUri($jwt->getClaim('redirect_uri'));
+        }
+        
         return $access_token;
     }
 

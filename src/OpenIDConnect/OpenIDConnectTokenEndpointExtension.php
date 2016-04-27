@@ -77,9 +77,10 @@ final class OpenIDConnectTokenEndpointExtension implements TokenEndpointExtensio
             $client,
             $user,
             $auth_code->getRedirectUri(),
+            $access_token->getScope(),
             $claims,
-            $access_token->getToken(),
-            $auth_code->getToken()
+            $access_token,
+            $auth_code
         );
 
         return $id_token->toArray();

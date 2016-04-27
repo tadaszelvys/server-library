@@ -23,23 +23,22 @@ class UserManager implements UserManagerInterface
 
     public function __construct()
     {
-        $address1 = new Address();
-        $address1->setCountry('France');
-        $address1->setLocality('Paris');
-        $address1->setPostalCode('75001');
-        $address1->setRegion('Île de France');
-        $address1->setStreetAddress('5 rue Sainte Anne');
-
         $user1 = new User('user1', 'password1');
-        $user1->setAddress($address1);
-        $user1->setAuthenticationMethodsReferences(['password', 'otp']);
-        $user1->setBirthdate('1950-01-01');
-        $user1->setEmail('root@localhost.com');
-        $user1->setEmailVerified(false);
-        $user1->setLastLoginAt(time() - 100);
+        $user1->set('address', [
+            'street_address' =>'5 rue Sainte Anne',
+            'region' =>'Île de France',
+            'postal_code' => '75001',
+            'locality' => 'Paris',
+            'country' => 'France',
+        ]);
+        $user1->set('amr', ['password', 'otp']);
+        $user1->set('birthdate', '1950-01-01');
+        $user1->set('email', 'root@localhost.com');
+        $user1->set('email_verified', false);
+        $user1->set('last_login_at', time() - 100);
 
         $user2 = new User('user2', 'password2');
-        $user2->setLastLoginAt(time() - 1000);
+        $user2->set('last_login_at', time() - 1000);
 
         $this->users['user1'] = $user1;
         $this->users['user2'] = $user2;

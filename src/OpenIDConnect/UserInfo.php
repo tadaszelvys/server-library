@@ -12,128 +12,107 @@
 namespace OAuth2\OpenIDConnect;
 
 use Assert\Assertion;
-use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Token\AccessTokenInterface;
+use OAuth2\OpenIDConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface;
+use OAuth2\User\UserInterface;
 use OAuth2\User\UserManagerInterface;
-use Jose\JWTCreator;
 
 final class UserInfo implements UserInfoInterface
 {
     use HasExceptionManager;
     use HasUserManager;
     use HasClientManager;
-    use HasJWTCreator;
-
+    use HasPairwiseSubjectIdentifierSupportTrait;
+    
     /**
-     * @var string|null
+     * @var \OAuth2\OpenIDConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface[]
      */
-    private $issuer = null;
-
-    /**
-     * @var \Jose\Object\JWKInterface|null
-     */
-    private $signature_key = null;
-
-    /**
-     * @var string|null
-     */
-    private $signature_algorithm = null;
+    private $userinfo_scope_supports = [];
 
     /**
      * UserInfoEndpoint constructor.
      *
      * @param \OAuth2\User\UserManagerInterface               $user_manager
-     * @param \OAuth2\Client\ClientManagerInterface $client_manager_supervisor
+     * @param \OAuth2\Client\ClientManagerInterface $client_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      */
     public function __construct(UserManagerInterface $user_manager,
-                                ClientManagerInterface $client_manager_supervisor,
+                                ClientManagerInterface $client_manager,
                                 ExceptionManagerInterface $exception_manager
     ) {
         $this->setUserManager($user_manager);
-        $this->setClientManager($client_manager_supervisor);
+        $this->setClientManager($client_manager);
         $this->setExceptionManager($exception_manager);
     }
 
     /**
-     * @param \Jose\JWTCreator   $jwt_creator
-     * @param string                    $issuer
-     * @param string                    $signature_algorithm
-     * @param \Jose\Object\JWKInterface $signature_key
+     * @param \OAuth2\OpenIDConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface $userinfo_scope_support
      */
-    public function enableSignedResponsesSupport(JWTCreator $jwt_creator,
-                                                 $issuer,
-                                                 $signature_algorithm,
-                                                 JWKInterface $signature_key
-    ) {
-        Assertion::string($issuer);
-        Assertion::inArray($signature_algorithm, $jwt_creator->getSignatureAlgorithms());
-        $this->setJWTCreator($jwt_creator);
-
-        $this->issuer = $issuer;
-        $this->signature_key = $signature_key;
-        $this->signature_algorithm = $signature_algorithm;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSignedResponsesSupportEnabled()
+    public function addUserInfoScopeSupport(UserinfoScopeSupportInterface $userinfo_scope_support)
     {
-        return null !== $this->getJWTCreator();
+        $scope = $userinfo_scope_support->getScope();
+        Assertion::false(array_key_exists($scope, $this->userinfo_scope_supports), sprintf('The userinfo scope "%s" is already supported.', $scope));
+        $this->userinfo_scope_supports[] = $userinfo_scope_support;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedSignatureAlgorithms()
+    public function getUserinfo(ClientInterface $client, UserInterface $user, $redirect_uri, array $scope)
     {
-        return $this->getJWTCreator()->getSignatureAlgorithms();
+        $this->checkScope($scope);
+        
+        $claims = [
+            'sub' => $this->calculateSubjectIdentifier($client, $user, $redirect_uri),
+        ];
+        $supported_userinfo_scopes = $this->getSupportedUserInfoScopes();
+        foreach ($supported_userinfo_scopes as $supported_userinfo_scope) {
+            if (in_array($supported_userinfo_scope->getScope(), $scope)) {
+                $scope_claims = $supported_userinfo_scope->getClaims();
+                foreach ($scope_claims as $scope_claim) {
+                    if ($user->has($scope_claim)) {
+                        $claims[$scope_claim] = $user->get($scope_claim);
+                    }
+                }
+            }
+        }
+
+        return $claims;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string[] $scope
      */
-    public function getSupportedKeyEncryptionAlgorithms()
+    private function checkScope($scope)
     {
-        return $this->getJWTCreator()->getSupportedKeyEncryptionAlgorithms();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedContentEncryptionAlgorithms()
-    {
-        return $this->getJWTCreator()->getSupportedContentEncryptionAlgorithms();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUserInfo(AccessTokenInterface $access_token)
-    {
-        if (!in_array('openid', $access_token->getScope())) {
+        if (!in_array('openid', $scope)) {
             throw $this->getExceptionManager()->getBadRequestException(
                 ExceptionManagerInterface::INVALID_REQUEST,
                 'Access token does not contain the "openid" scope.'
             );
         }
+    }
 
-        $user = $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId());
-        if (null === $user) {
-            throw $this->getExceptionManager()->getBadRequestException(
-                ExceptionManagerInterface::INVALID_REQUEST,
-                'Unable to find the resource owner.'
-            );
-        }
+    /**
+     * @return \OAuth2\OpenIDConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface[]
+     */
+    private function getSupportedUserInfoScopes()
+    {
+        return $this->userinfo_scope_supports;
+    }
 
+    /**
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     *
+     * @return \OAuth2\Client\ClientInterface
+     */
+    /*private function getClient(AccessTokenInterface $access_token)
+    {
         $client = $this->getClientManager()->getClient($access_token->getClientPublicId());
         if (null === $client) {
             throw $this->getExceptionManager()->getBadRequestException(
@@ -142,55 +121,36 @@ final class UserInfo implements UserInfoInterface
             );
         }
 
-        $info = [
-            'aud' => $client->getPublicId(),
-            'sub' => $user->getPublicId(),
-            'iss' => $this->issuer,
-            'iat' => time(),
-            'nbf' => time(),
-        ];
-        if (0 !== $access_token->getExpiresAt()) {
-            $info['exp'] = $access_token->getExpiresAt();
-        }
-        if ($user instanceof UserInterface) {
-            $info = array_merge(
-                $info,
-                $user->getUserInfo($access_token->getScope())
-            );
-        }
+        return $client;
+    }*/
 
-        $this->signAndEncrypt($info, $client);
-
-        return $info;
-    }
-
-    private function signAndEncrypt(&$data, ClientInterface $client)
+    /**
+     * {@inheritdoc}
+     */
+    /*public function getUserInfo(AccessTokenInterface $access_token)
     {
-        if (true === $this->isSignedResponsesSupportEnabled()) {
-            $data = $this->getJWTCreator()->sign(
-                $data,
-                [
-                    'typ' => 'JWT',
-                    'alg' => $this->signature_algorithm,
-                ],
-                $this->signature_key
+        $this->checkAccessTokenScope($access_token);
+        $user = $this->getUser($access_token);
+        $client = $this->getClient($access_token);
+
+        return $this->getInfo($access_token, $client, $user);
+    }*/
+
+    /**
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     *
+     * @return \OAuth2\User\UserInterface
+     */
+    /*private function getUser(AccessTokenInterface $access_token)
+    {
+        $user = $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId());
+        if (null === $user) {
+            throw $this->getExceptionManager()->getBadRequestException(
+                ExceptionManagerInterface::INVALID_REQUEST,
+                'Unable to find the resource owner.'
             );
         }
 
-        if ($client->hasPublicKeySet() && $client->has('id_token_encrypted_response_alg') && $client->has('id_token_encrypted_response_enc')) {
-            $key_set = $client->getPublicKeySet();
-            $key = $key_set->selectKey('enc');
-            if (null !== $key) {
-
-                $data = $this->getJWTCreator()->encrypt(
-                    $data,
-                    [
-                        'alg' => $client->get('id_token_encrypted_response_alg'),
-                        'enc' => $client->get('id_token_encrypted_response_enc'),
-                    ],
-                    $key
-                );
-            }
-        }
-    }
+        return $user;
+    }*/
 }

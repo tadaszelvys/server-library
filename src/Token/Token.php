@@ -46,6 +46,11 @@ class Token implements TokenInterface
     protected $resource_owner_public_id;
 
     /**
+     * @var string|null
+     */
+    protected $redirect_uri = null;
+
+    /**
      * {@inheritdoc}
      */
     public function getClientPublicId()
@@ -215,5 +220,21 @@ class Token implements TokenInterface
         if (array_key_exists($key, $this->parameters)) {
             unset($this->parameters[$key]);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRedirectUri()
+    {
+        return $this->redirect_uri;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRedirectUri($redirect_uri)
+    {
+        $this->redirect_uri = $redirect_uri;
     }
 }

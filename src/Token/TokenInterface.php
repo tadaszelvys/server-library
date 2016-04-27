@@ -122,4 +122,14 @@ interface TokenInterface
      * @param string $key
      */
     public function unsetParameter($key);
+
+    /**
+     * @return string|null The redirect URI set in the authorization request
+     */
+    public function getRedirectUri();
+
+    /**
+     * @param string $redirect_uri
+     */
+    public function setRedirectUri($redirect_uri);
 }

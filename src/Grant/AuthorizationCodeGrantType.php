@@ -126,6 +126,8 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             $authorization->getScopes(),
             $authorization->has('issue_refresh_token') ? $authorization->get('issue_refresh_token') : false
         );
+        
+        $authorization->setData('code', $code);
 
         return $code->toArray();
     }
@@ -179,6 +181,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
         $grant_type_response->setAvailableScope($authCode->getScope());
         $grant_type_response->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
+        $grant_type_response->setRedirectUri($authCode->getRedirectUri());
 
         // Refresh Token
         $grant_type_response->setRefreshTokenIssued($authCode->getIssueRefreshToken());

@@ -56,6 +56,11 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     private $revoke_refresh_token = null;
 
     /**
+     * @var null|string
+     */
+    private $redirect_uri = null;
+
+    /**
      * {@inheritdoc}
      */
     public function setAdditionalData($key, $data)
@@ -181,5 +186,21 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function getRefreshTokenRevoked()
     {
         return $this->revoke_refresh_token;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRedirectUri()
+    {
+        return $this->redirect_uri;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRedirectUri($redirect_uri)
+    {
+        $this->redirect_uri = $redirect_uri;
     }
 }

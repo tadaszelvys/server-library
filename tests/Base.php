@@ -47,6 +47,11 @@ use OAuth2\OpenIDConnect\NoneResponseType;
 use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
 use OAuth2\OpenIDConnect\Pairwise\HashedSubjectIdentifier;
 use OAuth2\OpenIDConnect\UserInfo;
+use OAuth2\OpenIDConnect\UserInfoEndpoint;
+use OAuth2\OpenIDConnect\UserinfoScopeSupport\AddressScopeSupport;
+use OAuth2\OpenIDConnect\UserinfoScopeSupport\EmailScopeSupport;
+use OAuth2\OpenIDConnect\UserinfoScopeSupport\PhoneScopeSupport;
+use OAuth2\OpenIDConnect\UserinfoScopeSupport\ProfilScopeSupport;
 use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Security\EntryPoint;
@@ -207,21 +212,50 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @var null|\OAuth2\OpenIDConnect\UserInfoInterface
      */
-    private $user_info_endpoint = null;
+    private $userinfo = null;
 
     /**
      * @return \OAuth2\OpenIDConnect\UserInfoInterface
      */
     protected function getUserInfo()
     {
-        if (null === $this->user_info_endpoint) {
-            $this->user_info_endpoint = new UserInfo(
+        if (null === $this->userinfo) {
+            $this->userinfo = new UserInfo(
                 $this->getUserManager(),
                 $this->getClientManager(),
                 $this->getExceptionManager()
             );
 
-            $this->user_info_endpoint->enableSignedResponsesSupport(
+            $this->userinfo->addUserInfoScopeSupport(new ProfilScopeSupport());
+            $this->userinfo->addUserInfoScopeSupport(new AddressScopeSupport());
+            $this->userinfo->addUserInfoScopeSupport(new EmailScopeSupport());
+            $this->userinfo->addUserInfoScopeSupport(new PhoneScopeSupport());
+
+            $this->userinfo->enablePairwiseSubject(new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData()));
+        }
+
+        return $this->userinfo;
+    }
+
+    /**
+     * @var null|\OAuth2\OpenIDConnect\UserInfoEndpointInterface
+     */
+    private $userinfo_endpoint = null;
+
+    /**
+     * @return \OAuth2\OpenIDConnect\UserInfoEndpointInterface
+     */
+    protected function getUserInfoEndpoint()
+    {
+        if (null === $this->userinfo_endpoint) {
+            $this->userinfo_endpoint = new UserInfoEndpoint(
+                $this->getUserManager(),
+                $this->getClientManager(),
+                $this->getUserInfo(),
+                $this->getExceptionManager()
+            );
+
+            $this->userinfo_endpoint->enableSignedResponsesSupport(
                 $this->getJWTCreator(),
                 $this->getIssuer(),
                 'HS512',
@@ -234,7 +268,7 @@ class Base extends \PHPUnit_Framework_TestCase
             );
         }
 
-        return $this->user_info_endpoint;
+        return $this->userinfo_endpoint;
     }
 
     /**
@@ -880,9 +914,11 @@ class Base extends \PHPUnit_Framework_TestCase
                     'use' => 'sig',
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ])
+                ]),
+                $this->getUserInfo()
             );
-            $this->id_token_manager->enablePairwiseSubject(new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData()));
+
+            //$this->id_token_manager->enablePairwiseSubject(new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData()));
         }
 
         return $this->id_token_manager;
@@ -977,13 +1013,13 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->setResponseModesSupported($this->getAuthorizationEndpoint()->getResponseModesSupported());
             $this->metadata->setGrantTypesSupported($this->getTokenEndpoint()->getGrantTypesSupported());
             $this->metadata->setAcrValuesSupported([]);
-            $this->metadata->setSubjectTypesSupported($this->getIdTokenManager()->isPairwiseSubjectIdentifierSupported() ? ['public', 'pairwise'] : ['public']);
+            $this->metadata->setSubjectTypesSupported($this->getUserInfo()->isPairwiseSubjectIdentifierSupported() ? ['public', 'pairwise'] : ['public']);
             $this->metadata->setIdTokenSigningAlgValuesSupported($this->getIdTokenManager()->getSignatureAlgorithms());
             $this->metadata->setIdTokenEncryptionAlgValuesSupported($this->getIdTokenManager()->getKeyEncryptionAlgorithms());
             $this->metadata->setIdTokenEncryptionEncValuesSupported($this->getIdTokenManager()->getContentEncryptionAlgorithms());
-            $this->metadata->setUserinfoSigningAlgValuesSupported($this->getUserInfo()->getSupportedSignatureAlgorithms());
-            $this->metadata->setUserinfoEncryptionAlgValuesSupported($this->getUserInfo()->getSupportedKeyEncryptionAlgorithms());
-            $this->metadata->setUserinfoEncryptionEncValuesSupported($this->getUserInfo()->getSupportedContentEncryptionAlgorithms());
+            $this->metadata->setUserinfoSigningAlgValuesSupported($this->getUserInfoEndpoint()->getSupportedSignatureAlgorithms());
+            $this->metadata->setUserinfoEncryptionAlgValuesSupported($this->getUserInfoEndpoint()->getSupportedKeyEncryptionAlgorithms());
+            $this->metadata->setUserinfoEncryptionEncValuesSupported($this->getUserInfoEndpoint()->getSupportedContentEncryptionAlgorithms());
             $this->metadata->setRequestObjectSigningAlgValuesSupported($this->getJWTLoader()->getSupportedSignatureAlgorithms());
             $this->metadata->setRequestObjectEncryptionAlgValuesSupported($this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->setRequestObjectEncryptionEncValuesSupported($this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());

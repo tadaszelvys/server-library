@@ -21,4 +21,19 @@ interface ResourceOwnerInterface
      * @see http://tools.ietf.org/html/rfc6749#section-2.2
      */
     public function getPublicId();
+
+    /**
+     * @param string $key
+     * @throws \InvalidArgumentException
+     *
+     * @return mixed
+     */
+    public function get($key);
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function has($key);
 }
