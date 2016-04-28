@@ -19,9 +19,9 @@ use Jose\Object\JWSInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\BadRequestExceptionInterface;
 use OAuth2\Exception\BaseException;
-use OAuth2\OpenIDConnect\Metadata;
-use OAuth2\OpenIDConnect\Pairwise\EncryptedSubjectIdentifier;
-use OAuth2\OpenIDConnect\Pairwise\HashedSubjectIdentifier;
+use OAuth2\OpenIdConnect\Metadata;
+use OAuth2\OpenIdConnect\Pairwise\EncryptedSubjectIdentifier;
+use OAuth2\OpenIdConnect\Pairwise\HashedSubjectIdentifier;
 use OAuth2\Test\Base;
 use OAuth2\Token\AccessTokenInterface;
 use Zend\Diactoros\Response;
@@ -29,9 +29,9 @@ use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
 
 /**
- * @group OpenIDConnect
+ * @group OpenIdConnect
  */
-class OpenIDConnectTest extends Base
+class OpenIdConnectTest extends Base
 {
     public function testAuthorizationCodeSuccessWithIdToken()
     {

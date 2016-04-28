@@ -39,19 +39,19 @@ use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\JWTBearerGrantType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
-use OAuth2\OpenIDConnect\FormPostResponseMode;
-use OAuth2\OpenIDConnect\IdTokenGrantType;
-use OAuth2\OpenIDConnect\IdTokenManager;
-use OAuth2\OpenIDConnect\Metadata;
-use OAuth2\OpenIDConnect\NoneResponseType;
-use OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension;
-use OAuth2\OpenIDConnect\Pairwise\HashedSubjectIdentifier;
-use OAuth2\OpenIDConnect\UserInfo;
-use OAuth2\OpenIDConnect\UserInfoEndpoint;
-use OAuth2\OpenIDConnect\UserinfoScopeSupport\AddressScopeSupport;
-use OAuth2\OpenIDConnect\UserinfoScopeSupport\EmailScopeSupport;
-use OAuth2\OpenIDConnect\UserinfoScopeSupport\PhoneScopeSupport;
-use OAuth2\OpenIDConnect\UserinfoScopeSupport\ProfilScopeSupport;
+use OAuth2\OpenIdConnect\FormPostResponseMode;
+use OAuth2\OpenIdConnect\IdTokenGrantType;
+use OAuth2\OpenIdConnect\IdTokenManager;
+use OAuth2\OpenIdConnect\Metadata;
+use OAuth2\OpenIdConnect\NoneResponseType;
+use OAuth2\OpenIdConnect\OpenIdConnectTokenEndpointExtension;
+use OAuth2\OpenIdConnect\Pairwise\HashedSubjectIdentifier;
+use OAuth2\OpenIdConnect\UserInfo;
+use OAuth2\OpenIdConnect\UserInfoEndpoint;
+use OAuth2\OpenIdConnect\UserinfoScopeSupport\AddressScopeSupport;
+use OAuth2\OpenIdConnect\UserinfoScopeSupport\EmailScopeSupport;
+use OAuth2\OpenIdConnect\UserinfoScopeSupport\PhoneScopeSupport;
+use OAuth2\OpenIdConnect\UserinfoScopeSupport\ProfilScopeSupport;
 use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Security\EntryPoint;
@@ -210,12 +210,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIDConnect\UserInfoInterface
+     * @var null|\OAuth2\OpenIdConnect\UserInfoInterface
      */
     private $userinfo = null;
 
     /**
-     * @return \OAuth2\OpenIDConnect\UserInfoInterface
+     * @return \OAuth2\OpenIdConnect\UserInfoInterface
      */
     protected function getUserInfo()
     {
@@ -238,12 +238,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIDConnect\UserInfoEndpointInterface
+     * @var null|\OAuth2\OpenIdConnect\UserInfoEndpointInterface
      */
     private $userinfo_endpoint = null;
 
     /**
-     * @return \OAuth2\OpenIDConnect\UserInfoEndpointInterface
+     * @return \OAuth2\OpenIdConnect\UserInfoEndpointInterface
      */
     protected function getUserInfoEndpoint()
     {
@@ -363,7 +363,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
             $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
 
-            $this->token_endpoint->addTokenEndpointExtension($this->getOpenIDConnectTokenEndpointExtension());
+            $this->token_endpoint->addTokenEndpointExtension($this->getOpenIdConnectTokenEndpointExtension());
 
             $this->token_endpoint->allowAccessTokenTypeParameter();
         }
@@ -372,17 +372,17 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension
+     * @var null|\OAuth2\OpenIdConnect\OpenIdConnectTokenEndpointExtension
      */
     private $openid_connect_token_endpoint_extension = null;
 
     /**
-     * @return \OAuth2\OpenIDConnect\OpenIDConnectTokenEndpointExtension
+     * @return \OAuth2\OpenIdConnect\OpenIdConnectTokenEndpointExtension
      */
-    protected function getOpenIDConnectTokenEndpointExtension()
+    protected function getOpenIdConnectTokenEndpointExtension()
     {
         if (null === $this->openid_connect_token_endpoint_extension) {
-            $this->openid_connect_token_endpoint_extension = new OpenIDConnectTokenEndpointExtension(
+            $this->openid_connect_token_endpoint_extension = new OpenIdConnectTokenEndpointExtension(
                 $this->getIdTokenManager(),
                 $this->getUserManager()
             );
@@ -617,12 +617,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIDConnect\NoneResponseType
+     * @var null|\OAuth2\OpenIdConnect\NoneResponseType
      */
     private $none_response_type = null;
 
     /**
-     * @return \OAuth2\OpenIDConnect\NoneResponseType
+     * @return \OAuth2\OpenIdConnect\NoneResponseType
      */
     protected function getNoneResponseType()
     {
@@ -640,12 +640,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIDConnect\IdTokenGrantType
+     * @var null|\OAuth2\OpenIdConnect\IdTokenGrantType
      */
     private $id_token_type = null;
 
     /**
-     * @return \OAuth2\OpenIDConnect\IdTokenGrantType
+     * @return \OAuth2\OpenIdConnect\IdTokenGrantType
      */
     protected function getIdTokenGrantType()
     {
@@ -894,12 +894,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return null|\\OAuth2\OpenIDConnect\IdTokenManager
+     * @return null|\\OAuth2\OpenIdConnect\IdTokenManager
      */
     private $id_token_manager = null;
 
     /**
-     * @return \OAuth2\OpenIDConnect\IdTokenManager
+     * @return \OAuth2\OpenIdConnect\IdTokenManager
      */
     protected function getIdTokenManager()
     {
@@ -987,12 +987,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIDConnect\Metadata
+     * @var null|\OAuth2\OpenIdConnect\Metadata
      */
     private $metadata = null;
 
     /**
-     * @return \OAuth2\OpenIDConnect\Metadata
+     * @return \OAuth2\OpenIdConnect\Metadata
      */
     protected function getMetadata()
     {
