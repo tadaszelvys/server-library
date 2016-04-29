@@ -126,7 +126,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             $authorization->getScopes(),
             $authorization->has('issue_refresh_token') ? $authorization->get('issue_refresh_token') : false
         );
-        
+
         $authorization->setData('code', $code);
 
         return $code->toArray();

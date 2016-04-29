@@ -19,7 +19,7 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
  * This interface is used for every client types.
  * A client is a resource owner with a set of allowed grant types and can perform requests against
  * available endpoints.
- * 
+ *
  * @method string[] getRedirectUris()
  * @method bool hasRedirectUris()
  * @method setRedirectUris(string[] $redirect_uris)
@@ -88,7 +88,7 @@ interface ClientInterface extends ResourceOwnerInterface
      * @return bool true if the response type is allowed, else false
      */
     public function isResponseTypeAllowed($response_type);
-    
+
     /**
      * Checks if the token type is allowed for the client.
      *

@@ -28,7 +28,7 @@ final class UserInfo implements UserInfoInterface
     use HasUserManager;
     use HasClientManager;
     use HasPairwiseSubjectIdentifierSupportTrait;
-    
+
     /**
      * @var \OAuth2\OpenIdConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface[]
      */
@@ -37,9 +37,9 @@ final class UserInfo implements UserInfoInterface
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param \OAuth2\User\UserManagerInterface               $user_manager
-     * @param \OAuth2\Client\ClientManagerInterface $client_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     * @param \OAuth2\User\UserManagerInterface           $user_manager
+     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(UserManagerInterface $user_manager,
                                 ClientManagerInterface $client_manager,
@@ -66,7 +66,7 @@ final class UserInfo implements UserInfoInterface
     public function getUserinfo(ClientInterface $client, UserInterface $user, $redirect_uri, array $scope)
     {
         $this->checkScope($scope);
-        
+
         $claims = [
             'sub' => $this->calculateSubjectIdentifier($client, $user, $redirect_uri),
         ];

@@ -13,6 +13,7 @@ namespace OAuth2\OpenIdConnect;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
+use Jose\JWTCreator;
 use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Client\ClientInterface;
@@ -20,7 +21,6 @@ use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\User\UserInterface;
-use Jose\JWTCreator;
 
 class IdTokenManager implements IdTokenManagerInterface
 {

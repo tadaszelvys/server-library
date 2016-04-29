@@ -62,7 +62,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
-     * @param \OAuth2\Client\ClientManagerInterface $client_manager
+     * @param \OAuth2\Client\ClientManagerInterface           $client_manager
      * @param \OAuth2\User\UserManagerInterface               $user_manager
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager

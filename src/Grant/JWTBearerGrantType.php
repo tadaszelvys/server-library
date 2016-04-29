@@ -12,13 +12,13 @@
 namespace OAuth2\Grant;
 
 use Assert\Assertion;
+use Jose\JWTLoader;
 use Jose\Object\JWKSetInterface;
 use Jose\Object\JWSInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use Jose\JWTLoader;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -45,7 +45,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
     /**
      * JWTBearerGrantType constructor.
      *
-     * @param \Jose\JWTLoader                      $loader
+     * @param \Jose\JWTLoader                             $loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(

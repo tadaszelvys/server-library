@@ -72,7 +72,7 @@ abstract class ClientManager implements ClientManagerInterface
                 return $client;
             }
         }
-        
+
         throw $this->buildAuthenticationException($request);
     }
 
@@ -153,9 +153,10 @@ abstract class ClientManager implements ClientManagerInterface
                 $method->getSupportedAuthenticationMethods()
             );
         }
+
         return array_unique($result);
     }
-    
+
     /**
      * @return \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface[]
      */

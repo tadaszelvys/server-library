@@ -35,8 +35,8 @@ class FormPostResponseMode implements ResponseModeInterface
     }
 
     /**
-     * @param string                              $redirect_uri
-     * @param array                               $data
+     * @param string $redirect_uri
+     * @param array  $data
      *
      * @return string
      */
@@ -70,6 +70,7 @@ EOT;
             '{{redirect_uri}}' => $redirect_uri,
             '{{input}}'        => implode(PHP_EOL, $input),
         ];
+
         return str_replace(array_keys($replacements), $replacements, $content);
     }
 }

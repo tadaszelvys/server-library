@@ -11,12 +11,12 @@
 
 namespace OAuth2\Test\Stub;
 
+use Jose\JWTCreator;
+use Jose\JWTLoader;
 use Jose\Object\JWKInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\JWTAccessTokenManager as Base;
-use Jose\JWTCreator;
-use Jose\JWTLoader;
 
 class JWTAccessTokenManager extends Base
 {

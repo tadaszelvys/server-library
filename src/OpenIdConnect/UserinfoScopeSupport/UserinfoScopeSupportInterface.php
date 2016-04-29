@@ -17,7 +17,7 @@ interface UserinfoScopeSupportInterface
      * @return string
      */
     public function getScope();
-    
+
     /**
      * @return string[]
      */

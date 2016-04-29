@@ -160,7 +160,7 @@ final class Uri
      */
     private static function isAnUrlOrUrn($uri, $path_traversal_allowed)
     {
-        if ('urn:' === mb_substr($uri,0, 4, '8bit')) {
+        if ('urn:' === mb_substr($uri, 0, 4, '8bit')) {
             if (false === self::checkUrn($uri)) {
                 return false;
             }

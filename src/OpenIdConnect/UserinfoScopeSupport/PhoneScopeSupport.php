@@ -20,7 +20,7 @@ final class PhoneScopeSupport implements UserinfoScopeSupportInterface
     {
         return 'phone';
     }
-    
+
     /**
      * {@inheritdoc}
      */

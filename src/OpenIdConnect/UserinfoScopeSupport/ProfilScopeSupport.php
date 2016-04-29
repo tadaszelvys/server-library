@@ -20,7 +20,7 @@ final class ProfilScopeSupport implements UserinfoScopeSupportInterface
     {
         return 'profile';
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -29,15 +29,15 @@ final class ProfilScopeSupport implements UserinfoScopeSupportInterface
         return [
             'sub',
             'name',
-            'given_name' ,
+            'given_name',
             'middle_name',
             'family_name',
-            'nickname' ,
+            'nickname',
             'preferred_username',
             'profile',
             'picture',
             'website',
-            'gender' ,
+            'gender',
             'birthdate',
             'zoneinfo',
             'locale',

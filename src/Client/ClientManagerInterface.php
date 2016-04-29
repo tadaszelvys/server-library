@@ -20,7 +20,7 @@ interface ClientManagerInterface
      * @return \OAuth2\Client\ClientInterface Return a new client object.
      */
     public function createClient();
-    
+
     /**
      * Get a client using its Id.
      *
@@ -29,7 +29,6 @@ interface ClientManagerInterface
      * @return null|\OAuth2\Client\ClientInterface Return the client object or null if no client is found.
      */
     public function getClient($client_id);
-
 
     /**
      * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method

@@ -11,7 +11,6 @@
 
 namespace OAuth2\Test\Stub;
 
-use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\User\IssueRefreshTokenExtensionInterface;
 use OAuth2\User\User as BaseUser;

@@ -35,6 +35,7 @@ class ClientSecretPost implements AuthenticationMethodInterface
 
         if (!empty($client_id) && !empty($client_secret)) {
             $client_credentials = $client_secret;
+
             return $client_id;
         }
     }

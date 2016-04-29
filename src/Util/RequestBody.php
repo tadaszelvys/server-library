@@ -48,6 +48,7 @@ final class RequestBody
     public static function getJsonObject(ServerRequestInterface $request)
     {
         $content = json_decode($request->getBody()->getContents());
+
         return is_array($content) ? $content : null;
     }
 }

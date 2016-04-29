@@ -25,7 +25,7 @@ class ClientSecretBasic implements AuthenticationMethodInterface
     /**
      * PasswordClientManager constructor.
      *
-     * @param string                                      $realm
+     * @param string $realm
      */
     public function __construct($realm)
     {
@@ -51,6 +51,7 @@ class ClientSecretBasic implements AuthenticationMethodInterface
         $server_params = $request->getServerParams();
         if (array_key_exists('PHP_AUTH_USER', $server_params) && array_key_exists('PHP_AUTH_PW', $server_params)) {
             $client_credentials = $server_params['PHP_AUTH_PW'];
+
             return $server_params['PHP_AUTH_USER'];
         }
         $authorization_headers = $request->getHeader('Authorization');
@@ -60,6 +61,7 @@ class ClientSecretBasic implements AuthenticationMethodInterface
                     list($client_id, $client_secret) = explode(':', base64_decode(mb_substr($authorization_header, 6, mb_strlen($authorization_header, '8bit') - 6, '8bit')));
                     if (!empty($client_id) && !empty($client_secret)) {
                         $client_credentials = $client_secret;
+
                         return $client_id;
                     }
                 }

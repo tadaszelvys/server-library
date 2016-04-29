@@ -24,7 +24,7 @@ interface GrantTypeResponseInterface
      * @param string $redirect_uri
      */
     public function setRedirectUri($redirect_uri);
-    
+
     /**
      * @param string $key
      *

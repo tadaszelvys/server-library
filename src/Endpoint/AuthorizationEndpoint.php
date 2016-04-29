@@ -295,7 +295,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
     /**
      * @param \OAuth2\Client\ClientInterface $client
-     * @param \OAuth2\Endpoint\Authorization           $authorization
+     * @param \OAuth2\Endpoint\Authorization $authorization
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
