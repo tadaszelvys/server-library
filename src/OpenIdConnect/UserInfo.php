@@ -12,21 +12,15 @@
 namespace OAuth2\OpenIdConnect;
 
 use Assert\Assertion;
-use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\OpenIdConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface;
 use OAuth2\User\UserInterface;
-use OAuth2\User\UserManagerInterface;
 
 final class UserInfo implements UserInfoInterface
 {
     use HasExceptionManager;
-    use HasUserManager;
-    use HasClientManager;
     use HasPairwiseSubjectIdentifierSupportTrait;
 
     /**
@@ -37,16 +31,10 @@ final class UserInfo implements UserInfoInterface
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param \OAuth2\User\UserManagerInterface           $user_manager
-     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
-    public function __construct(UserManagerInterface $user_manager,
-                                ClientManagerInterface $client_manager,
-                                ExceptionManagerInterface $exception_manager
-    ) {
-        $this->setUserManager($user_manager);
-        $this->setClientManager($client_manager);
+    public function __construct(ExceptionManagerInterface $exception_manager)
+    {
         $this->setExceptionManager($exception_manager);
     }
 

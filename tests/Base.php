@@ -220,11 +220,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getUserInfo()
     {
         if (null === $this->userinfo) {
-            $this->userinfo = new UserInfo(
-                $this->getUserManager(),
-                $this->getClientManager(),
-                $this->getExceptionManager()
-            );
+            $this->userinfo = new UserInfo($this->getExceptionManager());
 
             $this->userinfo->addUserInfoScopeSupport(new ProfilScopeSupport());
             $this->userinfo->addUserInfoScopeSupport(new AddressScopeSupport());
