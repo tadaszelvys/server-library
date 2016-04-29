@@ -25,11 +25,11 @@ class UserManager implements UserManagerInterface
     {
         $user1 = new User('user1', 'password1');
         $user1->set('address', [
-            'street_address' =>'5 rue Sainte Anne',
-            'region' =>'Île de France',
-            'postal_code' => '75001',
-            'locality' => 'Paris',
-            'country' => 'France',
+            'street_address' => '5 rue Sainte Anne',
+            'region'         => 'Île de France',
+            'postal_code'    => '75001',
+            'locality'       => 'Paris',
+            'country'        => 'France',
         ]);
         $user1->set('amr', ['password', 'otp']);
         $user1->set('birthdate', '1950-01-01');

@@ -17,7 +17,7 @@ use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 
 /**
- * Class ClientTrait
+ * Class ClientTrait.
  *
  * @method string getTokenEndpointAuthMethod()
  * @method string getJwksUri()
@@ -73,7 +73,7 @@ trait ClientTrait
         Assertion::string($response_type, 'Argument must be a string.');
         $response_types = $this->get('response_types');
         Assertion::isArray($response_types, 'The metadata "response_types" must be an array.');
-        
+
         return in_array($response_type, $response_types);
     }
 
@@ -112,8 +112,6 @@ trait ClientTrait
         return time() > $this->client_secret_expires_at;
     }
 
-
-
     /**
      * @return bool
      */
@@ -128,21 +126,21 @@ trait ClientTrait
     public function getPublicKeySet()
     {
         Assertion::true($this->hasPublicKeySet(), 'The client has no public key set');
-        
+
         if ($this->hasJwks()) {
             return new JWKSet($this->getJwks());
         }
         if ($this->hasJwksUri()) {
             return JWKFactory::createFromJKU($this->getJwksUri());
         }
-        
+
         $jwk_set = new JWKSet();
         $jwk_set->addKey(new JWK([
             'kty' => 'oct',
             'use' => 'sig',
             'k'   => $this->getClientSecret(),
         ]));
-        
+
         return $jwk_set;
     }
 }

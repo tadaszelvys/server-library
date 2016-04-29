@@ -15,6 +15,8 @@ use Jose\Checker\AudienceChecker;
 use Jose\Decrypter;
 use Jose\Encrypter;
 use Jose\Factory\CheckerManagerFactory;
+use Jose\JWTCreator;
+use Jose\JWTLoader;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use Jose\Signer;
@@ -70,8 +72,6 @@ use OAuth2\Test\Stub\UserManager;
 use OAuth2\Token\BearerToken;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
-use Jose\JWTCreator;
-use Jose\JWTLoader;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
 

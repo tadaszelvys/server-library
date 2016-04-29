@@ -12,6 +12,7 @@
 namespace OAuth2\Endpoint;
 
 use Assert\Assertion;
+use Jose\JWTLoader;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
@@ -22,7 +23,6 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\User\UserInterface;
-use Jose\JWTLoader;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationFactory
@@ -50,9 +50,9 @@ final class AuthorizationFactory
     /**
      * AuthorizationFactory constructor.
      *
-     * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
-     * @param \OAuth2\Client\ClientManagerInterface $client_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     * @param \OAuth2\Scope\ScopeManagerInterface         $scope_manager
+     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(
         ScopeManagerInterface $scope_manager,
@@ -198,7 +198,7 @@ final class AuthorizationFactory
             Assertion::true($jwt->hasClaims(), 'The request object does not contain claims.');
             $client = $this->getClient($jwt->getClaims());
             Assertion::isInstanceOf($client, ClientInterface::class, 'Invalid client.');
-            
+
             $public_key_set = $client->getPublicKeySet();
 
             Assertion::notNull($public_key_set, 'The client does not have signature capabilities.');

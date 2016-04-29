@@ -31,7 +31,7 @@ use Zend\Diactoros\Uri;
 /**
  * @group OpenIdConnect
  */
-class OpenIdConnectTest extends Base
+class OpenIDConnectTest extends Base
 {
     public function testAuthorizationCodeSuccessWithIdToken()
     {

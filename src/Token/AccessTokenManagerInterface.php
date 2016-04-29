@@ -32,7 +32,7 @@ interface AccessTokenManagerInterface
      * @return \OAuth2\Token\AccessTokenInterface
      */
     public function createAccessToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $token_type_parameters, array $request_parameters, array $scope = [], RefreshTokenInterface $refresh_token = null, ResourceServerInterface $resource_server = null, $redirect_uri = null);
-    
+
     /**
      * This function revoke an access token.
      *

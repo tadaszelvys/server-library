@@ -37,8 +37,8 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     /**
      * TokenIntrospectionEndpoint constructor.
      *
-     * @param \OAuth2\Client\ClientManagerInterface $client_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(
         ClientManagerInterface $client_manager,

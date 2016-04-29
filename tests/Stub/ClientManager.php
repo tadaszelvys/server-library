@@ -139,7 +139,7 @@ class ClientManager extends Base
         $fii->setGrantTypes([]);
         $fii->setRedirectUris(['http://example.com/test?good=false']);
         $fii->setTokenEndpointAuthMethod('none');
-        
+
         $this->clients['foo'] = $foo;
         $this->clients['oof'] = $oof;
         $this->clients['fii'] = $fii;

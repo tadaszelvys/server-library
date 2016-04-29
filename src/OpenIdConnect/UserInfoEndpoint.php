@@ -68,7 +68,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     }
 
     /**
-     * @param \Jose\JWTCreator   $jwt_creator
+     * @param \Jose\JWTCreator          $jwt_creator
      * @param string                    $issuer
      * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
@@ -126,14 +126,13 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     {
         $client = $this->getClient($access_token);
         $user = $this->getUser($access_token);
-        
+
         $claims = $this->getUserinfo()->getUserinfo(
             $client,
             $user,
             $access_token->getRedirectUri(),
             $access_token->getScope()
         );
-
 
         if (true === $this->isSignedResponsesSupportEnabled()) {
             $claims = array_merge(
@@ -191,7 +190,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     }
 
     /**
-     * @param array                           $claims
+     * @param array                          $claims
      * @param \OAuth2\Client\ClientInterface $client
      *
      * @return string
@@ -211,7 +210,6 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
             $key_set = $client->getPublicKeySet();
             $key = $key_set->selectKey('enc');
             if (null !== $key) {
-
                 $jwt = $this->getJWTCreator()->encrypt(
                     $jwt,
                     [
@@ -222,7 +220,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
                 );
             }
         }
-        
+
         return $jwt;
     }
 }

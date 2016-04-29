@@ -20,7 +20,7 @@ final class AddressScopeSupport implements UserinfoScopeSupportInterface
     {
         return 'address';
     }
-    
+
     /**
      * {@inheritdoc}
      */

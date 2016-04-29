@@ -28,7 +28,7 @@ interface AuthenticationMethodInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request            The request
      * @param mixed                                    $client_credentials The client credentials found in the request
      *
-     * @return null|string Return the client public ID if found else null. If credentials have are needed to authenticate the client, they are set to the variable $client_credentials 
+     * @return null|string Return the client public ID if found else null. If credentials have are needed to authenticate the client, they are set to the variable $client_credentials
      */
     public function findClient(ServerRequestInterface $request, &$client_credentials = null);
 

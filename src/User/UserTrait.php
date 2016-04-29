@@ -12,8 +12,7 @@
 namespace OAuth2\User;
 
 /**
- * Class UserTrait
- * @package OAuth2\User
+ * Class UserTrait.
  */
 trait UserTrait
 {

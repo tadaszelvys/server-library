@@ -13,6 +13,8 @@ namespace OAuth2\Token;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
+use Jose\JWTCreator;
+use Jose\JWTLoader;
 use Jose\Object\JWKInterface;
 use Jose\Object\JWKSet;
 use OAuth2\Behaviour\HasJWTCreator;
@@ -20,8 +22,6 @@ use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\ResourceServer\ResourceServerInterface;
-use Jose\JWTCreator;
-use Jose\JWTLoader;
 
 class JWTAccessTokenManager extends AccessTokenManager
 {
@@ -61,8 +61,8 @@ class JWTAccessTokenManager extends AccessTokenManager
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \Jose\JWTCreator   $jwt_creator
-     * @param \Jose\JWTLoader    $jwt_loader
+     * @param \Jose\JWTCreator          $jwt_creator
+     * @param \Jose\JWTLoader           $jwt_loader
      * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
      * @param string                    $issuer
@@ -250,7 +250,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         if ($jwt->hasClaim('redirect_uri')) {
             $access_token->setRedirectUri($jwt->getClaim('redirect_uri'));
         }
-        
+
         return $access_token;
     }
 

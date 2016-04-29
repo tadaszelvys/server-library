@@ -87,7 +87,7 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
             $authorization->hasData('access_token') ? $authorization->getData('access_token') : null,
             $authorization->hasData('code') ? $authorization->getData('code') : null
         );
-        
+
         $authorization->setData('id_token', $id_token);
 
         $response_parameters = array_merge(

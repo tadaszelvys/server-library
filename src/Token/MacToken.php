@@ -188,7 +188,7 @@ class MacToken implements TokenTypeInterface
             return false;
         }
 
-        if (false === $this->checkTimestampValid((int)$additional_credential_values['ts'])) {
+        if (false === $this->checkTimestampValid((int) $additional_credential_values['ts'])) {
             return false;
         }
 

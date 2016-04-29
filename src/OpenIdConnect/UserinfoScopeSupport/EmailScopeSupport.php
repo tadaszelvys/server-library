@@ -20,7 +20,7 @@ final class EmailScopeSupport implements UserinfoScopeSupportInterface
     {
         return 'email';
     }
-    
+
     /**
      * {@inheritdoc}
      */

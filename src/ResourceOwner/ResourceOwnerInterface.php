@@ -24,6 +24,7 @@ interface ResourceOwnerInterface
 
     /**
      * @param string $key
+     *
      * @throws \InvalidArgumentException
      *
      * @return mixed
@@ -39,7 +40,7 @@ interface ResourceOwnerInterface
 
     /**
      * @param string $metadata
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function set($metadata, $value);
 
@@ -47,5 +48,4 @@ interface ResourceOwnerInterface
      * @param string $metadata
      */
     public function remove($metadata);
-
 }

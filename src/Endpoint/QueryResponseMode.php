@@ -35,7 +35,6 @@ final class QueryResponseMode implements ResponseModeInterface
             $params['fragment'] = [];
         }
 
-
         $response = $response->withStatus(302)
             ->withHeader('Location', Uri::buildURI($redirect_uri, $params));
     }
