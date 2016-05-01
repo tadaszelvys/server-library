@@ -89,7 +89,7 @@ use Assert\Assertion;
  * @method setOpTosUri($value)
  * @method getOpTosUri()
  */
-final class Metadata implements \JsonSerializable
+class Metadata implements \JsonSerializable
 {
     /**
      * @var array
