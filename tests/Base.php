@@ -1001,7 +1001,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->setUserinfoEndpoint('https://my.server.com/user_info');
             $this->metadata->setJwksUri('https://my.server.com/jwks');
             $this->metadata->setRegistrationEndpoint('https://my.server.com/register');
-            $this->metadata->setScopesSupported($this->getScopeManager()->getAvailableScopes());
+            $this->metadata->setScopesSupported($this->getScopeManager()->getSupportedScopes());
             $this->metadata->setResponseTypesSupported($this->getAuthorizationEndpoint()->getResponseTypesSupported());
             $this->metadata->setResponseModesSupported($this->getAuthorizationEndpoint()->getResponseModesSupported());
             $this->metadata->setGrantTypesSupported($this->getTokenEndpoint()->getGrantTypesSupported());

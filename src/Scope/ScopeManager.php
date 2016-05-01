@@ -96,7 +96,7 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * @return string[]
      */
-    public function getAvailableScopes()
+    public function getSupportedScopes()
     {
         return $this->available_scopes;
     }
@@ -114,7 +114,7 @@ class ScopeManager implements ScopeManagerInterface
      */
     public function getAvailableScopesForClient(ClientInterface $client)
     {
-        return ($client->has('scope')) ? $this->convertToArray($client->get('scope')) : $this->getAvailableScopes();
+        return ($client->has('scope')) ? $this->convertToArray($client->get('scope')) : $this->getSupportedScopes();
     }
 
     /**

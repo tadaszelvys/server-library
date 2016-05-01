@@ -21,6 +21,11 @@ interface ScopeManagerInterface
     public function getSupportedScopePolicies();
 
     /**
+     * @return string[]
+     */
+    public function getSupportedScopes();
+
+    /**
      * @param \OAuth2\Scope\ScopePolicyInterface $scope_policy
      * @param bool                               $is_default
      */

@@ -151,7 +151,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals('invalid_scope', $e->getMessage());
-            $this->assertEquals('An unsupported scope was requested. Available scopes are [scope1,scope2,scope3,scope4,openid]', $e->getDescription());
+            $this->assertEquals('An unsupported scope was requested. Available scopes are [scope1,scope2,scope3,scope4,openid,profile,email,phone,address]', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }
