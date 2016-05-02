@@ -100,7 +100,9 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      */
     public function getSupportedSignatureAlgorithms()
     {
-        return $this->getJWTCreator()->getSupportedSignatureAlgorithms();
+        $jwt_creator = $this->getJWTCreator();
+        
+        return null === $jwt_creator ? [] : $jwt_creator->getSupportedSignatureAlgorithms();
     }
 
     /**
@@ -108,7 +110,9 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      */
     public function getSupportedKeyEncryptionAlgorithms()
     {
-        return $this->getJWTCreator()->getSupportedKeyEncryptionAlgorithms();
+        $jwt_creator = $this->getJWTCreator();
+        
+        return null === $jwt_creator ? [] : $jwt_creator->getSupportedKeyEncryptionAlgorithms();
     }
 
     /**
@@ -116,7 +120,9 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      */
     public function getSupportedContentEncryptionAlgorithms()
     {
-        return $this->getJWTCreator()->getSupportedContentEncryptionAlgorithms();
+        $jwt_creator = $this->getJWTCreator();
+        
+        return null === $jwt_creator ? [] : $jwt_creator->getSupportedContentEncryptionAlgorithms();
     }
 
     /**
