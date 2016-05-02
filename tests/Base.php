@@ -460,6 +460,23 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @var null|\OAuth2\Client\AuthenticationMethod\ClientAssertionJwt
+     */
+    private $assertion_jwt_auth_method = null;
+
+    /**
+     * @return \OAuth2\Client\AuthenticationMethod\ClientAssertionJwt
+     */
+    protected function getAssertionJwtAuthMethod()
+    {
+        if (null == $this->assertion_jwt_auth_method) {
+            $this->assertion_jwt_auth_method = new ClientAssertionJwt($this->getJWTLoader(), $this->getExceptionManager());
+        }
+
+        return $this->assertion_jwt_auth_method;
+    }
+
+    /**
      * @var null|\OAuth2\Client\ClientManager
      */
     private $client_manager = null;
@@ -472,7 +489,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->client_manager) {
             $this->client_manager = new ClientManager($this->getExceptionManager());
 
-            $jwt_assertion = new ClientAssertionJwt($this->getJWTLoader(), $this->getExceptionManager());
+            $jwt_assertion = $this->getAssertionJwtAuthMethod();
             $jwt_assertion->enableEncryptedAssertions(
                 false,
                 new JWKSet(['keys' => [

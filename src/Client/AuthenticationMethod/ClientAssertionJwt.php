@@ -62,6 +62,30 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
     }
 
     /**
+     * @return \string[]
+     */
+    public function getSupportedSignatureAlgorithms()
+    {
+        return $this->getJWTLoader()->getSupportedSignatureAlgorithms();
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getSupportedContentEncryptionAlgorithms()
+    {
+        return $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms();
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getSupportedKeyEncryptionAlgorithms()
+    {
+        return $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getSchemesParameters()

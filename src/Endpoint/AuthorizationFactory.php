@@ -327,7 +327,7 @@ final class AuthorizationFactory
         $content = curl_exec($ch);
         curl_close($ch);
 
-        if (null === $content) {
+        if (!is_string($content)) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_URI, 'Unable to get content.');
         }
 
