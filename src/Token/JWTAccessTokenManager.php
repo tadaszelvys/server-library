@@ -112,7 +112,7 @@ class JWTAccessTokenManager extends AccessTokenManager
 
         if ($this->isEncryptionEnabled()) {
             $encryption_header = $this->prepareEncryptionHeader($client, $resource_server);
-            $recipient_key = null === $resource_server || null === $resource_server->getPublicKeyEncryptionKey() ? $this->key_encryption_key : $resource_server->getPublicKeyEncryptionKey();
+            $recipient_key = $this->key_encryption_key;
 
             $jwt = $this->getJWTCreator()->encrypt($jwt, $encryption_header, $recipient_key);
         }
@@ -122,14 +122,14 @@ class JWTAccessTokenManager extends AccessTokenManager
 
     /**
      * @param \OAuth2\Client\ClientInterface       $client
-     * @param \\OAuth2\Client\ClientInterface|null $resource_server
+     * @param \OAuth2\Client\ClientInterface|null $resource_server
      *
      * @return array
      */
     protected function prepareEncryptionHeader(ClientInterface $client, ClientInterface $resource_server = null)
     {
-        $key_encryption_algorithm = null === $resource_server ? $this->key_encryption_algorithm : $resource_server->getKeyEncryptionAlgorithm();
-        $content_encryption_algorithm = null === $resource_server ? $this->content_encryption_algorithm : $resource_server->getContentEncryptionAlgorithm();
+        $key_encryption_algorithm = $this->key_encryption_algorithm;
+        $content_encryption_algorithm = $this->content_encryption_algorithm;
         $header = array_merge(
             [
                 'jti' => Base64Url::encode(random_bytes(25)),

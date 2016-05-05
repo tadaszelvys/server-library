@@ -197,7 +197,6 @@ final class AuthorizationFactory
         try {
             Assertion::true($jwt->hasClaims(), 'The request object does not contain claims.');
             $client = $this->getClient($jwt->getClaims());
-            Assertion::isInstanceOf($client, ClientInterface::class, 'Invalid client.');
 
             $public_key_set = $client->getPublicKeySet();
 
