@@ -30,7 +30,7 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
     public function __construct()
     {
         $bar = new Client();
-        $bar->setSecret('Circle Of Life');
+        $bar->set('secret', 'Circle Of Life');
         $bar->setRedirectUris(['http://example.com/test?good=false']);
         $bar->setGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
         $bar->setPublicId('Mufasa');
@@ -72,7 +72,6 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
     protected function addRefreshToken($token, $expiresAt, ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [])
     {
         $refresh_token = $this->createEmptyRefreshToken();
-        $refresh_token->setUsed(false);
         $refresh_token->setExpiresAt($expiresAt);
         $refresh_token->setToken($token);
         $refresh_token->setClientPublicId($client->getPublicId());
@@ -85,14 +84,6 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
     public function getRefreshToken($token)
     {
         return isset($this->refresh_tokens[$token]) ? $this->refresh_tokens[$token] : null;
-    }
-
-    public function markRefreshTokenAsUsed(RefreshTokenInterface $token)
-    {
-        if (isset($this->refresh_tokens[$token->getToken()])) {
-            $token->setUsed(true);
-            $this->refresh_tokens[$token->getToken()] = $token;
-        }
     }
 
     public function revokeRefreshToken(RefreshTokenInterface $refresh_token)

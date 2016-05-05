@@ -55,6 +55,13 @@ interface AuthCodeManagerInterface
     public function markAuthCodeAsUsed(AuthCodeInterface $code);
 
     /**
+     * Revoke the auth code.
+     *
+     * @param AuthCodeInterface $code
+     */
+    public function revokeAuthCode(AuthCodeInterface $code);
+
+    /**
      * @param \OAuth2\Token\TokenUpdaterInterface $token_updater
      */
     public function addTokenUpdater(TokenUpdaterInterface $token_updater);

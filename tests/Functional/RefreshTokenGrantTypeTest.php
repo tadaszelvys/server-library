@@ -171,7 +171,7 @@ class RefreshTokenGrantTypeTest extends Base
         }
     }
 
-    public function testGrantTypeAuthorizedForClientAndRefreshTokenIsMarkedAsUsed()
+    public function testGrantTypeAuthorizedForClientAndRefreshTokenCanStillBeUsed()
     {
         $response = new Response();
         $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
@@ -185,14 +185,14 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
 
-        try {
-            $this->getTokenEndpoint()->getAccessToken($request, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_grant', $e->getMessage());
-            $this->assertEquals('Invalid refresh token', $e->getDescription());
-            $this->assertEquals(400, $e->getHttpCode());
-        }
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeAuthorizedForClientWithReducedScope()

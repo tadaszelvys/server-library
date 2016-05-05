@@ -11,6 +11,7 @@
 
 namespace OAuth2\Grant;
 
+use Assert\Assertion;
 use OAuth2\Token\RefreshTokenInterface;
 
 final class GrantTypeResponse implements GrantTypeResponseInterface
@@ -73,7 +74,16 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
      */
     public function getAdditionalData($key)
     {
-        return array_key_exists($key, $this->additional_data) ? $this->additional_data[$key] : null;
+        Assertion::true($this->hasAdditionalData($key), sprintf('The additional data with key "%s" does not exist.', $key));
+        return $this->additional_data[$key];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasAdditionalData($key)
+    {
+        return array_key_exists($key, $this->additional_data);
     }
 
     /**

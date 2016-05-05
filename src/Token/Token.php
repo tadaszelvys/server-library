@@ -19,6 +19,11 @@ class Token implements TokenInterface
      * @var array
      */
     protected $parameters = [];
+    
+    /**
+     * @var array
+     */
+    protected $metadatas = [];
 
     /**
      * @var array
@@ -225,16 +230,56 @@ class Token implements TokenInterface
     /**
      * {@inheritdoc}
      */
-    public function getRedirectUri()
+    public function getMetadatas()
     {
-        return $this->redirect_uri;
+        return $this->metadatas;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setRedirectUri($redirect_uri)
+    public function setMetadatas(array $metadatas)
     {
-        $this->redirect_uri = $redirect_uri;
+        $this->metadatas = $metadatas;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMetadata($key, $value)
+    {
+        Assertion::string($key);
+        $this->metadatas[$key] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadata($key)
+    {
+        Assertion::true($this->hasMetadata($key), sprintf('Metadata with key "%s" does not exist.', $key));
+
+        return $this->metadatas[$key];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasMetadata($key)
+    {
+        Assertion::string($key);
+
+        return array_key_exists($key, $this->metadatas);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unsetMetadata($key)
+    {
+        Assertion::string($key);
+        if (array_key_exists($key, $this->metadatas)) {
+            unset($this->metadatas[$key]);
+        }
     }
 }

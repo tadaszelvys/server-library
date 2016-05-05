@@ -34,6 +34,13 @@ interface GrantTypeResponseInterface
 
     /**
      * @param string $key
+     *
+     * @return bool
+     */
+    public function hasAdditionalData($key);
+
+    /**
+     * @param string $key
      * @param mixed  $data
      */
     public function setAdditionalData($key, $data);

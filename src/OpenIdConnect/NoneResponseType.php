@@ -95,7 +95,11 @@ final class NoneResponseType implements ResponseTypeSupportInterface
             $authorization->getClient(),
             $authorization->getUser(),
             $token_type->getTokenTypeInformation(),
-            $authorization->getScopes()
+            $authorization->getQueryParams(),
+            $authorization->getScopes(),
+            null, // Refresh token
+            null, // Resource Server
+            ['redirect_uri' => $authorization->get('redirect_uri')]
         );
 
         $authorization->setData('access_token', $token);

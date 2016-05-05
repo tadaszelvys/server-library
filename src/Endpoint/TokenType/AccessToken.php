@@ -93,10 +93,9 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
             'client_id'  => $token->getClientPublicId(),
             'token_type' => $token->getTokenType(),
             'exp'        => $token->getExpiresAt(),
-            'sub'        => $token->getResourceOwnerPublicId(),
         ];
         if (!empty($token->getScope())) {
-            $result['scope'] = $token->getScope();
+            $result['scp'] = $token->getScope();
         }
         if ($token instanceof JWTAccessTokenInterface) {
             $result = array_merge($result, $this->getJWTInformation($token->getJWS()));

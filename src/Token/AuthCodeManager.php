@@ -73,7 +73,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
         $auth_code->setToken($this->generateAuthorizationCode());
         $auth_code->setIssueRefreshToken($issueRefreshToken);
         $auth_code->setQueryParams($query_params);
-        $auth_code->setRedirectUri($redirectUri);
+        $auth_code->setMetadata('redirect_uri', $redirectUri);
 
         $this->updateAuthCode($auth_code);
         $this->saveAuthorizationCode($auth_code);

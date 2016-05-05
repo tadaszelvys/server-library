@@ -33,6 +33,7 @@ use OAuth2\Endpoint\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
+use OAuth2\Endpoint\TokenType\AuthCode;
 use OAuth2\Endpoint\TokenType\RefreshToken;
 use OAuth2\Exception\ExceptionManager;
 use OAuth2\Grant\AuthorizationCodeGrantType;
@@ -64,7 +65,6 @@ use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\NoneListener;
 use OAuth2\Test\Stub\RefreshTokenManager;
-use OAuth2\Test\Stub\ResourceServerManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\TooManyRequestsException;
 use OAuth2\Test\Stub\UriExtension;
@@ -204,6 +204,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->revocation_endpoint->addRevocationTokenType($this->getAccessTokenType());
             $this->revocation_endpoint->addRevocationTokenType($this->getRefreshTokenType());
+            $this->revocation_endpoint->addRevocationTokenType($this->getAuthCodeType());
         }
 
         return $this->revocation_endpoint;
@@ -326,6 +327,7 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->token_introspection_endpoint->addIntrospectionTokenType($this->getAccessTokenType());
             $this->token_introspection_endpoint->addIntrospectionTokenType($this->getRefreshTokenType());
+            $this->token_introspection_endpoint->addIntrospectionTokenType($this->getAuthCodeType());
         }
 
         return $this->token_introspection_endpoint;
@@ -509,25 +511,6 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->client_manager;
-    }
-
-    /**
-     * @var null|\OAuth2\Test\Stub\ResourceServerManager
-     */
-    private $resource_server_manager = null;
-
-    /**
-     * @return \OAuth2\Test\Stub\ResourceServerManager
-     */
-    protected function getResourceServerManager()
-    {
-        if (null === $this->resource_server_manager) {
-            $this->resource_server_manager = new ResourceServerManager();
-
-            $this->resource_server_manager->createResourceServers();
-        }
-
-        return $this->resource_server_manager;
     }
 
     /**
@@ -1077,5 +1060,13 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRefreshTokenType()
     {
         return new RefreshToken($this->getRefreshTokenManager());
+    }
+
+    /**
+     * @return \OAuth2\Endpoint\TokenType\AuthCode
+     */
+    protected function getAuthCodeType()
+    {
+        return new AuthCode($this->getAuthCodeManager());
     }
 }

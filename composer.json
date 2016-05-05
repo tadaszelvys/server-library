@@ -19,8 +19,7 @@
     },
     "require-dev": {
         "zendframework/zend-diactoros": "^1.1",
-        "mdanter/ecc": "0.3",
-        "phpunit/phpunit": "^4.8|^5.1",
+        "phpunit/phpunit": "^4.8|^5.0",
         "symfony/psr-http-message-bridge": "^0.2",
         "satooshi/php-coveralls": "^1.0",
         "paquettg/php-html-parser": "^1.6",

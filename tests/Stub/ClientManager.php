@@ -91,6 +91,7 @@ class ClientManager extends Base
         $mufasa->setPublicId('Mufasa');
         $mufasa->setTokenEndpointAuthMethod('client_secret_basic');
         $mufasa->set('scope_policy', 'none');
+        $mufasa->set('subject_type', 'pairwise');
 
         $mufasa2 = $this->createClient();
         $mufasa2->set('client_secret', 'Circle Of Life');

@@ -21,9 +21,18 @@ interface TokenEndpointExtensionInterface
      * @param \OAuth2\Client\ClientInterface           $client
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
      * @param array                                    $token_type_information
+     *
+     * @return array|null
+     */
+    public function preAccessTokenCreation(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information);
+    
+    /**
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
+     * @param array                                    $token_type_information
      * @param \OAuth2\Token\AccessTokenInterface       $access_token
      *
      * @return array|null
      */
-    public function process(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information, AccessTokenInterface $access_token);
+    public function postAccessTokenCreation(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information, AccessTokenInterface $access_token);
 }

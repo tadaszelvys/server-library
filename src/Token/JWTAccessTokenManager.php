@@ -21,7 +21,6 @@ use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
-use OAuth2\ResourceServer\ResourceServerInterface;
 
 class JWTAccessTokenManager extends AccessTokenManager
 {
@@ -104,7 +103,7 @@ class JWTAccessTokenManager extends AccessTokenManager
     /**
      * {@inheritdoc}
      */
-    public function populateAccessToken(AccessTokenInterface &$access_token, ClientInterface $client, ResourceOwnerInterface $resource_owner, RefreshTokenInterface $refresh_token = null, ResourceServerInterface $resource_server = null)
+    public function populateAccessToken(AccessTokenInterface &$access_token, ClientInterface $client, ResourceOwnerInterface $resource_owner, RefreshTokenInterface $refresh_token = null, ClientInterface $resource_server = null)
     {
         $payload = $this->preparePayload($access_token, $resource_server);
         $signature_header = $this->prepareSignatureHeader();
@@ -122,12 +121,12 @@ class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface                      $client
-     * @param \OAuth2\ResourceServer\ResourceServerInterface|null $resource_server
+     * @param \OAuth2\Client\ClientInterface       $client
+     * @param \\OAuth2\Client\ClientInterface|null $resource_server
      *
      * @return array
      */
-    protected function prepareEncryptionHeader(ClientInterface $client, ResourceServerInterface $resource_server = null)
+    protected function prepareEncryptionHeader(ClientInterface $client, ClientInterface $resource_server = null)
     {
         $key_encryption_algorithm = null === $resource_server ? $this->key_encryption_algorithm : $resource_server->getKeyEncryptionAlgorithm();
         $content_encryption_algorithm = null === $resource_server ? $this->content_encryption_algorithm : $resource_server->getContentEncryptionAlgorithm();
@@ -145,7 +144,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         if (0 !== $lifetime = $this->getLifetime($client)) {
             $header['exp'] = time() + $lifetime;
         }
-        $header['aud'] = null === $resource_server ? $this->issuer : $resource_server->getServerName();
+        $header['aud'] = null === $resource_server ? $this->issuer : $resource_server->getPublicId();
 
         return $header;
     }
@@ -166,17 +165,17 @@ class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface                  $access_token
-     * @param \OAuth2\ResourceServer\ResourceServerInterface|null $resource_server
+     * @param \OAuth2\Token\AccessTokenInterface  $access_token
+     * @param \OAuth2\Client\ClientInterface|null $resource_server
      *
      * @return array
      */
-    protected function preparePayload(AccessTokenInterface $access_token, ResourceServerInterface $resource_server = null)
+    protected function preparePayload(AccessTokenInterface $access_token, ClientInterface $resource_server = null)
     {
         $payload = [
             'jti'            => Base64Url::encode(random_bytes(25)),
             'iss'            => $this->issuer,
-            'aud'            => null === $resource_server ? $this->issuer : $resource_server->getServerName(),
+            'aud'            => null === $resource_server ? $this->issuer : $resource_server->getPublicId(),
             'iat'            => time(),
             'nbf'            => time(),
             'exp'            => $access_token->getExpiresAt(),
@@ -184,8 +183,8 @@ class JWTAccessTokenManager extends AccessTokenManager
             'token_type'     => $access_token->getTokenType(),
             'scp'            => $access_token->getScope(),
             'resource_owner' => $access_token->getResourceOwnerPublicId(),
-            'redirect_uri'   => $access_token->getRedirectUri(),
         ];
+        $payload['metadatas'] = $access_token->getMetadatas();
         if (0 !== $expires_at = $access_token->getExpiresAt()) {
             $payload['exp'] = $expires_at;
         }
@@ -247,8 +246,8 @@ class JWTAccessTokenManager extends AccessTokenManager
         if ($jwt->hasClaim('refresh_token')) {
             $access_token->setRefreshToken($jwt->getClaim('refresh_token'));
         }
-        if ($jwt->hasClaim('redirect_uri')) {
-            $access_token->setRedirectUri($jwt->getClaim('redirect_uri'));
+        if ($jwt->hasClaim('metadatas')) {
+            $access_token->setMetadatas($jwt->getClaim('metadatas'));
         }
 
         return $access_token;

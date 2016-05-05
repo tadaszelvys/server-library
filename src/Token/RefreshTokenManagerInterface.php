@@ -44,8 +44,9 @@ interface RefreshTokenManagerInterface
      * @param \OAuth2\Client\ClientInterface               $client        The client associated with this refresh token.
      * @param \OAuth2\ResourceOwner\ResourceOwnerInterface $resourceOwner Resource owner associated with the refresh token.
      * @param string[]                                     $scope         (optional) Scopes of the refresh token.
+     * @param string[]                                     $metadatas     (optional) Metadata associated to the token.
      */
-    public function createRefreshToken(ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = []);
+    public function createRefreshToken(ClientInterface $client, ResourceOwnerInterface $resourceOwner, array $scope = [], array  $metadatas = []);
 
     /**
      * Revoke a refresh token.
@@ -53,18 +54,6 @@ interface RefreshTokenManagerInterface
      * @param \OAuth2\Token\RefreshTokenInterface $refreshToken The refresh token string to revoke.
      */
     public function revokeRefreshToken(RefreshTokenInterface $refreshToken);
-
-    /**
-     * Expire a used refresh token.
-     *
-     * This is not explicitly required in the spec, but is almost implied. After granting a new refresh token, the old
-     * one is no longer useful and so should be forcibly expired in the data store so it can't be used again.
-     * If storage fails for some reason, we're not currently checking for any sort of success/failure, so you should
-     * bail out of the script and provide a descriptive fail message.
-     *
-     * @param \OAuth2\Token\RefreshTokenInterface $refreshToken The refresh token string to expire.
-     */
-    public function markRefreshTokenAsUsed(RefreshTokenInterface $refreshToken);
 
     /**
      * @param \OAuth2\Token\TokenUpdaterInterface $token_updater

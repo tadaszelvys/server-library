@@ -49,7 +49,7 @@ trait HasPairwiseSubjectIdentifierSupportTrait
     {
         $sub = $user->getPublicId();
 
-        if (false === $this->isPairwiseSubjectIdentifierSupported()) {
+        if (false === $this->isPairwiseSubjectIdentifierSupported() || !$client->has('subject_type') || 'pairwise' !== $client->get('subject_type')) {
             return $sub;
         }
 

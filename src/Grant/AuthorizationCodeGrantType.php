@@ -181,7 +181,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
         $grant_type_response->setAvailableScope($authCode->getScope());
         $grant_type_response->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
-        $grant_type_response->setRedirectUri($authCode->getRedirectUri());
+        $grant_type_response->setRedirectUri($authCode->getMetadata('redirect_uri'));
 
         // Refresh Token
         $grant_type_response->setRefreshTokenIssued($authCode->getIssueRefreshToken());
@@ -282,7 +282,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      */
     private function checkRedirectUri(AuthCodeInterface $authCode, $redirect_uri)
     {
-        if (null !== $authCode->getRedirectUri() && $redirect_uri !== $authCode->getRedirectUri()) {
+        if (true === $authCode->hasMetadata('redirect_uri') && $redirect_uri !== $authCode->getMetadata('redirect_uri')) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The redirect URI is missing or does not match.');
         }
     }

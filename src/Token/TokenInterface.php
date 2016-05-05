@@ -124,12 +124,35 @@ interface TokenInterface
     public function unsetParameter($key);
 
     /**
-     * @return string|null The redirect URI set in the authorization request
+     * @return array
      */
-    public function getRedirectUri();
+    public function getMetadatas();
 
     /**
-     * @param string $redirect_uri
+     * @param array $metadatas
      */
-    public function setRedirectUri($redirect_uri);
+    public function setMetadatas(array $metadatas);
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function setMetadata($key, $value);
+
+    /**
+     * @param string $key
+     */
+    public function getMetadata($key);
+
+    /**
+     * @param string $key
+     */
+    public function hasMetadata($key);
+
+    /**
+     * @param string $key
+     */
+    public function unsetMetadata($key);
 }

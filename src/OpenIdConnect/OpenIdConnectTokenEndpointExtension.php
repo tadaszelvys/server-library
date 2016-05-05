@@ -49,7 +49,7 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
     /**
      * {@inheritdoc].
      */
-    public function process(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information, AccessTokenInterface $access_token)
+    public function postAccessTokenCreation(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information, AccessTokenInterface $access_token)
     {
         if (false === $this->issueIdToken($grant_type_response)) {
             return;
@@ -76,7 +76,7 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
         $id_token = $this->id_token_manager->createIdToken(
             $client,
             $user,
-            $auth_code->getRedirectUri(),
+            $access_token->getMetadata('redirect_uri'),
             $access_token->getScope(),
             $claims,
             $access_token,
@@ -96,5 +96,15 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
         $scope = $grant_type_response->getRequestedScope();
 
         return is_array($scope) && in_array('openid', $scope);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function preAccessTokenCreation(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information)
+    {
+        return [
+            'redirect_uri' => $grant_type_response->getRedirectUri(),
+        ];
     }
 }

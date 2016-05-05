@@ -13,24 +13,4 @@ namespace OAuth2\Token;
 
 class RefreshToken extends Token implements RefreshTokenInterface
 {
-    /**
-     * @var bool
-     */
-    protected $used = false;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isUsed()
-    {
-        return $this->used;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setUsed($used)
-    {
-        $this->used = $used;
-    }
 }

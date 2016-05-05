@@ -11,23 +11,23 @@
 
 namespace OAuth2\Endpoint\TokenType;
 
-use OAuth2\Behaviour\HasRefreshTokenManager;
-use OAuth2\Token\RefreshTokenInterface;
-use OAuth2\Token\RefreshTokenManagerInterface;
+use OAuth2\Behaviour\HasAuthorizationCodeManager;
+use OAuth2\Token\AuthCodeInterface;
+use OAuth2\Token\AuthCodeManagerInterface;
 use OAuth2\Token\TokenInterface;
 
-final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationTokenTypeInterface
+final class AuthCode implements IntrospectionTokenTypeInterface, RevocationTokenTypeInterface
 {
-    use HasRefreshTokenManager;
+    use HasAuthorizationCodeManager;
 
     /**
-     * RefreshToken constructor.
+     * AuthCode constructor.
      *
-     * @param \OAuth2\Token\RefreshTokenManagerInterface $refresh_token_manager
+     * @param \OAuth2\Token\AuthCodeManagerInterface $authorization_code_manager
      */
-    public function __construct(RefreshTokenManagerInterface $refresh_token_manager)
+    public function __construct(AuthCodeManagerInterface $authorization_code_manager)
     {
-        $this->setRefreshTokenManager($refresh_token_manager);
+        $this->setAuthorizationCodeManager($authorization_code_manager);
     }
 
     /**
@@ -35,7 +35,7 @@ final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationT
      */
     public function getTokenTypeHint()
     {
-        return 'refresh_token';
+        return 'auth_code';
     }
 
     /**
@@ -43,7 +43,7 @@ final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationT
      */
     public function getToken($token)
     {
-        return $this->getRefreshTokenManager()->getRefreshToken($token);
+        return $this->getAuthorizationCodeManager()->getAuthCode($token);
     }
 
     /**
@@ -51,8 +51,8 @@ final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationT
      */
     public function revokeToken(TokenInterface $token)
     {
-        if ($token instanceof RefreshTokenInterface) {
-            $this->getRefreshTokenManager()->revokeRefreshToken($token);
+        if ($token instanceof AuthCodeInterface) {
+            $this->getAuthorizationCodeManager()->revokeAuthCode($token);
         }
     }
 
@@ -61,7 +61,7 @@ final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationT
      */
     public function introspectToken(TokenInterface $token)
     {
-        if (!$token instanceof RefreshTokenInterface) {
+        if (!$token instanceof AuthCodeInterface) {
             return [];
         }
 

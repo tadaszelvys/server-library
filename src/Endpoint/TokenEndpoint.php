@@ -176,16 +176,24 @@ final class TokenEndpoint implements TokenEndpointInterface
         //Check if scope requested are within the available scope
         $this->checkRequestedScope($grant_type_response);
 
+        //Call extensions to add metadatas to the Access Token
+        $metadatas = $this->preAccessTokenCreation(
+            $client,
+            $grant_type_response,
+            $token_type_information
+        );
+
         //The access token can be created
         $access_token = $this->createAccessToken(
             $client,
             $grant_type_response,
             $request_parameters,
-            $token_type_information
+            $token_type_information,
+            $metadatas
         );
 
         //The result is processed using the access token and the other information
-        $data = $this->processResult(
+        $data = $this->postAccessTokenCreation(
             $client,
             $grant_type_response,
             $token_type_information,
@@ -218,11 +226,38 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Client\ClientInterface           $client
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
      * @param array                                    $token_type_information
+     *
+     * @return array
+     */
+    private function preAccessTokenCreation(ClientInterface $client,
+                                   GrantTypeResponseInterface $grant_type_response,
+                                   array $token_type_information
+    ) {
+        $metadatas = $grant_type_response->hasAdditionalData('metadatas') ? $grant_type_response->getAdditionalData('metadatas') : [];
+        foreach ($this->token_endpoint_extensions as $token_endpoint_extension) {
+            $result = $token_endpoint_extension->preAccessTokenCreation(
+                $client,
+                $grant_type_response,
+                $token_type_information
+            );
+
+            if (!empty($result)) {
+                $metadatas = array_merge($metadatas, $result);
+            }
+        }
+
+        return $metadatas;
+    }
+
+    /**
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
+     * @param array                                    $token_type_information
      * @param \OAuth2\Token\AccessTokenInterface       $access_token
      *
      * @return array
      */
-    private function processResult(ClientInterface $client,
+    private function postAccessTokenCreation(ClientInterface $client,
                                    GrantTypeResponseInterface $grant_type_response,
                                    array $token_type_information,
                                    AccessTokenInterface $access_token
@@ -230,7 +265,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         $data = $access_token->toArray();
 
         foreach ($this->token_endpoint_extensions as $token_endpoint_extension) {
-            $result = $token_endpoint_extension->process(
+            $result = $token_endpoint_extension->postAccessTokenCreation(
                 $client,
                 $grant_type_response,
                 $token_type_information,
@@ -314,21 +349,19 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
      * @param array                                    $request_parameters
      * @param array                                    $token_type_information
+     * @param array                                    $metadatas
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    private function createAccessToken(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $request_parameters, array $token_type_information)
+    private function createAccessToken(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $request_parameters, array $token_type_information, array $metadatas)
     {
         $refresh_token = null;
         $resource_owner = $this->getResourceOwner($grant_type_response->getResourceOwnerPublicId());
         if (null !== $this->getRefreshTokenManager()) {
             if (true === $grant_type_response->isRefreshTokenIssued()) {
-                $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $resource_owner, $grant_type_response->getRefreshTokenScope());
-            }
-            if ($grant_type_response->getRefreshTokenRevoked() instanceof RefreshTokenInterface) {
-                $this->getRefreshTokenManager()->markRefreshTokenAsUsed($grant_type_response->getRefreshTokenRevoked());
+                $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $resource_owner, $grant_type_response->getRefreshTokenScope(), $metadatas);
             }
         }
 
@@ -339,8 +372,8 @@ final class TokenEndpoint implements TokenEndpointInterface
             $request_parameters,
             $grant_type_response->getRequestedScope(),
             $refresh_token,
-            null,
-            $grant_type_response->getRedirectUri()
+            null, // Resource Server
+            $metadatas
         );
 
         return $access_token;

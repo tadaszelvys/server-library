@@ -74,9 +74,9 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
             $token_type->getTokenTypeInformation(),
             $authorization->getQueryParams(),
             $authorization->getScopes(),
-            null,
-            null,
-            $authorization->get('redirect_uri')
+            null, // Refresh token
+            null, // Resource Server
+            ['redirect_uri' => $authorization->get('redirect_uri')]
         );
 
         $authorization->setData('access_token', $token);

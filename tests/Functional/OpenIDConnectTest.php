@@ -211,7 +211,7 @@ class OpenIDConnectTest extends Base
         $introspection_response->getBody()->rewind();
 
         $this->assertEquals(200, $introspection_response->getStatusCode());
-        $this->assertRegExp('/^{"active":true,"client_id":"foo","token_type":"Bearer","exp":[\d]+,"sub":"user1","scope":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
+        $this->assertRegExp('/^{"active":true,"client_id":"foo","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
     }
 
     public function testIdTokenSuccess()
@@ -530,7 +530,7 @@ class OpenIDConnectTest extends Base
             $this->getUserInfo()->getUserinfo(
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
                 $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId()),
-                $access_token->getRedirectUri(),
+                $access_token->getMetadata('redirect_uri'),
                 $access_token->getScope()
             );
             $this->fail('Should throw an Exception');
@@ -551,7 +551,7 @@ class OpenIDConnectTest extends Base
             $this->getUserInfo()->getUserinfo(
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
                 $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId()),
-                $access_token->getRedirectUri(),
+                $access_token->getMetadata('redirect_uri'),
                 $access_token->getScope()
             );
             $this->fail('Should throw an Exception');

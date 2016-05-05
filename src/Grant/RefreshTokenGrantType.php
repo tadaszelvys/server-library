@@ -77,7 +77,7 @@ final class RefreshTokenGrantType implements GrantTypeSupportInterface
 
         $token = $this->getRefreshTokenManager()->getRefreshToken($refresh_token);
 
-        if (!$token instanceof RefreshTokenInterface || $token->isUsed()) {
+        if (!$token instanceof RefreshTokenInterface) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Invalid refresh token');
         }
 
@@ -91,6 +91,7 @@ final class RefreshTokenGrantType implements GrantTypeSupportInterface
         $grant_type_response->setRefreshTokenIssued(true);
         $grant_type_response->setRefreshTokenScope($token->getScope());
         $grant_type_response->setRefreshTokenRevoked($token);
+        $grant_type_response->setAdditionalData('metadatas', $token->getMetadatas());
     }
 
     /**

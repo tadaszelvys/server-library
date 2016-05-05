@@ -63,15 +63,15 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createRefreshToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [])
+    public function createRefreshToken(ClientInterface $client, ResourceOwnerInterface $resource_owner, array $scope = [], array $metadatas = [])
     {
         $refresh_token = $this->createEmptyRefreshToken();
         $refresh_token->setScope($scope);
         $refresh_token->setResourceOwnerPublicId($resource_owner->getPublicId());
         $refresh_token->setClientPublicId($client->getPublicId());
         $refresh_token->setExpiresAt(time() + $this->getLifetime($client));
-        $refresh_token->setUsed(false);
         $refresh_token->setToken($this->generateToken());
+        $refresh_token->setMetadatas($metadatas);
 
         $this->updateRefreshToken($refresh_token);
         $this->saveRefreshToken($refresh_token);

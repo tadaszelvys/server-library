@@ -18,7 +18,6 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\ResourceServer\ResourceServerInterface;
 use OAuth2\Token\TokenInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
@@ -142,7 +141,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
     {
         $result = $token_type->getToken($token);
         if ($result instanceof TokenInterface) {
-            if ($result->getClientPublicId() === $client->getPublicId() || $client instanceof ResourceServerInterface) {
+            if ($result->getClientPublicId() === $client->getPublicId() || true === $this->isClientAResourceServer($client)) {
                 $data = $token_type->introspectToken($result);
                 $this->populateResponse($response, $data);
 
@@ -151,6 +150,16 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         }
 
         return false;
+    }
+
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     *
+     * @return bool
+     */
+    private function isClientAResourceServer(ClientInterface $client)
+    {
+        return $client->has('is_resource_server') && true === $client->get('is_resource_server');
     }
 
     /**
