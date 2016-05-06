@@ -142,7 +142,7 @@ final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInte
         $result = $token_type->getToken($token);
         if ($result instanceof TokenInterface) {
             if ($result->getClientPublicId() === $client->getPublicId() || true === $this->isClientAResourceServer($client)) {
-                $data = $token_type->introspectToken($result);
+                $data = $token_type->introspectToken($result, $client);
                 $this->populateResponse($response, $data);
 
                 return true;

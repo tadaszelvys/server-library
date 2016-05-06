@@ -83,6 +83,15 @@ class ClientManager extends Base
         $baz->setTokenEndpointAuthMethod('client_secret_basic');
         $baz->set('scope_policy', 'none');
 
+        $resource_server = $this->createClient();
+        $resource_server->set('client_secret', 'secret');
+        $resource_server->setRedirectUris([]);
+        $resource_server->setGrantTypes([]);
+        $resource_server->setResponseTypes([]);
+        $resource_server->setPublicId('resource_server');
+        $resource_server->setTokenEndpointAuthMethod('client_secret_basic');
+        $resource_server->set('is_resource_server', true);
+
         $mufasa = $this->createClient();
         $mufasa->set('client_secret', 'Circle Of Life');
         $mufasa->setRedirectUris([]);
@@ -154,6 +163,7 @@ class ClientManager extends Base
         $this->clients['Mufasa2'] = $mufasa2;
         $this->clients['mac'] = $mac;
         $this->clients['expired'] = $expired;
+        $this->clients['resource_server'] = $resource_server;
     }
 
     public function createClient()

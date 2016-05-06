@@ -11,14 +11,16 @@
 
 namespace OAuth2\Endpoint\TokenType;
 
+use OAuth2\Client\ClientInterface;
 use OAuth2\Token\TokenInterface;
 
 interface IntrospectionTokenTypeInterface extends TokenTypeInterface
 {
     /**
-     * @param \OAuth2\Token\TokenInterface $token
+     * @param \OAuth2\Token\TokenInterface   $token
+     * @param \OAuth2\Client\ClientInterface $client
      *
      * @return array
      */
-    public function introspectToken(TokenInterface $token);
+    public function introspectToken(TokenInterface $token, ClientInterface $client);
 }

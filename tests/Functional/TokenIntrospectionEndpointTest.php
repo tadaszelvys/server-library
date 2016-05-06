@@ -57,6 +57,19 @@ class TokenIntrospectionEndpointTest extends Base
         $this->assertRegExp('{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[0-9]+}', $response->getBody()->getContents());
     }
 
+    public function testAccessTokenIntrospectionAllowedForResourceServer()
+    {
+        $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'resource_server', 'PHP_AUTH_PW' => 'secret']);
+
+        $response = new Response();
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+        
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertRegExp('{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[0-9]+,"sub":"Mufasa","metadatas":\["plic","ploc","pluc"\],"parameters":{"foo":"bar"}}', $content);
+    }
+
     public function testAccessTokenIntrospectionAllowedForAuthenticatedPublicClient()
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
@@ -66,7 +79,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[0-9]+}', $response->getBody()->getContents());
+        $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[0-9]+,"sub":"foo"}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenIntrospectionRefusedForUnauthenticatedPublicClient()

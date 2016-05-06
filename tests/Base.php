@@ -58,6 +58,7 @@ use OAuth2\OpenIdConnect\UserinfoScopeSupport\ProfilScopeSupport;
 use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Security\EntryPoint;
+use OAuth2\Security\Handler\AccessTokenManagerHandler;
 use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\ClientManager;
@@ -281,7 +282,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->listener) {
             $this->listener = new Listener(
                 $this->getTokenTypeManager(),
-                $this->getJWTAccessTokenManager(),
+                new AccessTokenManagerHandler($this->getJWTAccessTokenManager()),
                 $this->getExceptionManager()
             );
         }

@@ -43,19 +43,17 @@ OpenID Connect Implementeation Status
             * [x] Ability to support custom authentication methods
     * [x]  [Signature and encryption](http://openid.net/specs/openid-connect-core-1_0.html#SigEnc)
         * [x]  Signing
-            * [ ] [Rotation of Asymmetric Signing Keys](http://openid.net/specs/openid-connect-core-1_0.html#RotateSigKeys)
         * [x]  Encryption
-           * [ ] [Rotation of Asymmetric Encryption Keys](http://openid.net/specs/openid-connect-core-1_0.html#RotateEncKeys)
     * [ ] [Offline Access](http://openid.net/specs/openid-connect-core-1_0.html#OfflineAccess)
-    * [ ] [Using Refresh Tokens](http://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
-* [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
+    * [x] [Using Refresh Tokens](http://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
+* [ ] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html) **Partial Implementation**
 * [ ] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html) and Dynamic Client Registration Protocol ([RFC7591](https://tools.ietf.org/html/rfc7591))
 * [ ] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
 * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
 * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
 * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
 * [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
-* [x] [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq) (experimental)
+* [x] [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq)
     * [x] Request Objects support (this feature is disabled by default)
     * [x] Request Object References support (this feature is disabled by default)
     * [x] Encrypted Request Objects support (this feature is disabled by default)

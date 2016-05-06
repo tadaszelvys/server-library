@@ -11,11 +11,10 @@
 
 namespace OAuth2\Security;
 
-use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Token\AccessTokenManagerInterface;
+use OAuth2\Security\Handler\AccessTokenHandlerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -23,21 +22,25 @@ final class Listener implements ListenerInterface
 {
     use HasExceptionManager;
     use HasTokenTypeManager;
-    use HasAccessTokenManager;
 
     /**
-     * UserInfoEndpoint constructor.
+     * @var \OAuth2\Security\Handler\AccessTokenHandlerInterface
+     */
+    private $access_token_handler;
+
+    /**
+     * Listener constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface     $token_type_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface   $access_token_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\Token\TokenTypeManagerInterface              $token_type_manager
+     * @param \OAuth2\Security\Handler\AccessTokenHandlerInterface $access_token_handler
+     * @param \OAuth2\Exception\ExceptionManagerInterface          $exception_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
-                                AccessTokenManagerInterface $access_token_manager,
+                                AccessTokenHandlerInterface $access_token_handler,
                                 ExceptionManagerInterface $exception_manager
     ) {
         $this->setTokenTypeManager($token_type_manager);
-        $this->setAccessTokenManager($access_token_manager);
+        $this->access_token_handler = $access_token_handler;
         $this->setExceptionManager($exception_manager);
     }
 
@@ -51,7 +54,7 @@ final class Listener implements ListenerInterface
         $additional_credential_values = [];
         $token = $this->getTokenTypeManager()->findToken($request, $additional_credential_values, $type);
         $this->checkToken($token);
-        $access_token = $this->getAccessTokenManager()->getAccessToken($token);
+        $access_token = $this->access_token_handler->getAccessToken($token);
         $this->checkAccessToken($type, $access_token, $request, $additional_credential_values);
 
         return $access_token;

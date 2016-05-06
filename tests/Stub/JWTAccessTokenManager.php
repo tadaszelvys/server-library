@@ -56,6 +56,8 @@ class JWTAccessTokenManager extends Base
         $abcd->setRefreshToken(null);
         $abcd->setToken('ABCD');
         $abcd->setTokenType('Bearer');
+        $abcd->setParameter('foo', 'bar');
+        $abcd->setMetadatas(['plic', 'ploc', 'pluc']);
 
         $efgh = new AccessToken();
         $efgh->setExpiresAt(time() + 3600);

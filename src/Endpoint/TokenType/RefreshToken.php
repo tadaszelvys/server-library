@@ -12,6 +12,7 @@
 namespace OAuth2\Endpoint\TokenType;
 
 use OAuth2\Behaviour\HasRefreshTokenManager;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\TokenInterface;
@@ -59,7 +60,7 @@ final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationT
     /**
      * {@inheritdoc}
      */
-    public function introspectToken(TokenInterface $token)
+    public function introspectToken(TokenInterface $token, ClientInterface $client)
     {
         if (!$token instanceof RefreshTokenInterface) {
             return [];

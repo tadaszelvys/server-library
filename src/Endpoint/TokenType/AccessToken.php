@@ -14,6 +14,7 @@ namespace OAuth2\Endpoint\TokenType;
 use Jose\Object\JWTInterface;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\JWTAccessTokenInterface;
@@ -82,7 +83,7 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
     /**
      * {@inheritdoc}
      */
-    public function introspectToken(TokenInterface $token)
+    public function introspectToken(TokenInterface $token, ClientInterface $client)
     {
         if (!$token instanceof AccessTokenInterface) {
             return [];
@@ -94,6 +95,24 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
             'token_type' => $token->getTokenType(),
             'exp'        => $token->getExpiresAt(),
         ];
+
+        // If the client is the subject, we add this information.
+        //
+        // The subject is not added if the client is not a resource owner.
+        // The reason is that if the client received an ID Token, the subject may have been computed (pairwise) and
+        // the subject returned here may be different. As per the OpenID Connect specification, the client must reject the token
+        // if subject are different and we want to avoid this case.
+        if ($client->getPublicId() === $token->getResourceOwnerPublicId()) {
+            $result['sub'] = $token->getResourceOwnerPublicId();
+        }
+
+        // If the client is a resource server, we return all the information stored in the access token including the metadata
+        if ($client->has('is_resource_server') && true === $client->get('is_resource_server')) {
+            $result['sub'] = $token->getResourceOwnerPublicId();
+            $result['metadatas'] = $token->getMetadatas();
+            $result['parameters'] = $token->getParameters();
+        }
+
         if (!empty($token->getScope())) {
             $result['scp'] = $token->getScope();
         }

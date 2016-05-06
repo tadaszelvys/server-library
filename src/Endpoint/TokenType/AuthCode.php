@@ -12,6 +12,7 @@
 namespace OAuth2\Endpoint\TokenType;
 
 use OAuth2\Behaviour\HasAuthorizationCodeManager;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
 use OAuth2\Token\TokenInterface;
@@ -59,7 +60,7 @@ final class AuthCode implements IntrospectionTokenTypeInterface, RevocationToken
     /**
      * {@inheritdoc}
      */
-    public function introspectToken(TokenInterface $token)
+    public function introspectToken(TokenInterface $token, ClientInterface $client)
     {
         if (!$token instanceof AuthCodeInterface) {
             return [];
