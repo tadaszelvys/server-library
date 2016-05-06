@@ -130,6 +130,9 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      */
     public function handle(AccessTokenInterface $access_token)
     {
+        $this->checkScope($access_token->getScope());
+        $this->checkHasRedirectUri($access_token);
+
         $client = $this->getClient($access_token);
         $user = $this->getUser($access_token);
 
@@ -230,5 +233,35 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
         }
 
         return $jwt;
+    }
+
+    /**
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     */
+    private function checkHasRedirectUri(AccessTokenInterface $access_token)
+    {
+        if (!$access_token->hasMetadata('redirect_uri')) {
+            throw $this->getExceptionManager()->getBadRequestException(
+                ExceptionManagerInterface::INVALID_REQUEST,
+                'The access token has no "redirect_uri" data and cannot be used.'
+            );
+        }
+    }
+
+    /**
+     * @param string[] $scope
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     */
+    private function checkScope(array $scope)
+    {
+        if (!in_array('openid', $scope)) {
+            throw $this->getExceptionManager()->getBadRequestException(
+                ExceptionManagerInterface::INVALID_REQUEST,
+                'The access token does not contain the "openid" scope.'
+            );
+        }
     }
 }
