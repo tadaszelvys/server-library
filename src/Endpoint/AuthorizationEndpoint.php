@@ -267,7 +267,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         $client = $authorization->getClient();
 
-        $redirect_uris = $client->getRedirectUris();
+        $redirect_uris = $client->get('redirect_uris');
         /*
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.2.2
          */

@@ -16,11 +16,10 @@ use OAuth2\Exception\Extension\ExceptionExtensionInterface;
 /**
  * An exception manager.
  *
- * @method getAuthenticateException(string $error, string $error_description = null, array $data = [])
- * @method getBadRequestException(string $error, string $error_description = null, array $data = [])
- * @method getNotImplementedException(string $error, string $error_description = null, array $data = [])
- * @method getRedirectException(string $error, string $error_description = null, array $data = [])
- * @method getInternalServerErrorException(string $error, string $error_description = null, array $data = [])
+ * @method \OAuth2\Exception\AuthenticateExceptionInterface getAuthenticateException(string $error, string $error_description = null, array $data = [])
+ * @method \OAuth2\Exception\BadRequestExceptionInterface getBadRequestException(string $error, string $error_description = null, array $data = [])
+ * @method \OAuth2\Exception\NotImplementedExceptionInterface getNotImplementedException(string $error, string $error_description = null, array $data = [])
+ * @method \OAuth2\Exception\RedirectExceptionInterface getRedirectException(string $error, string $error_description = null, array $data = [])
  */
 interface ExceptionManagerInterface
 {

@@ -162,7 +162,8 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     /**
      * @param \OAuth2\Token\AccessTokenInterface $access_token
      *
-     * @return \OAuth2\Client\ClientInterface
+     * @return null|\OAuth2\Client\ClientInterface
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
      */
     private function getClient(AccessTokenInterface $access_token)
     {
@@ -180,7 +181,8 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     /**
      * @param \OAuth2\Token\AccessTokenInterface $access_token
      *
-     * @return \OAuth2\User\UserInterface
+     * @return null|\OAuth2\User\UserInterface
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
      */
     private function getUser(AccessTokenInterface $access_token)
     {

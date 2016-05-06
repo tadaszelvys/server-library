@@ -75,6 +75,8 @@ final class UserInfo implements UserInfoInterface
 
     /**
      * @param string[] $scope
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
      */
     private function checkScope($scope)
     {

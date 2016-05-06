@@ -74,7 +74,7 @@ class ClientSecretBasic implements AuthenticationMethodInterface
      */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
-        if (false === hash_equals($client->getClientSecret(), $client_credentials)) {
+        if (false === hash_equals($client->get('client_secret'), $client_credentials)) {
             return false;
         }
 

@@ -62,6 +62,8 @@ final class Listener implements ListenerInterface
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
      */
     private function checkRequestIsSecured(ServerRequestInterface $request)
     {
@@ -79,6 +81,8 @@ final class Listener implements ListenerInterface
      * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param array                                    $additional_credential_values
+     *
+     * @throws \OAuth2\Exception\AuthenticateExceptionInterface
      */
     private function checkAccessToken($type, $access_token, ServerRequestInterface $request, array $additional_credential_values)
     {

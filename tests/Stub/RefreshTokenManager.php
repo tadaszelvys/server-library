@@ -31,13 +31,13 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
     {
         $bar = new Client();
         $bar->set('secret', 'Circle Of Life');
-        $bar->setRedirectUris(['http://example.com/test?good=false']);
-        $bar->setGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
+        $bar->set('redirect_uris', ['http://example.com/test?good=false']);
+        $bar->set('grant_types', ['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
         $bar->setPublicId('Mufasa');
 
         $foo = new Client();
-        $foo->setRedirectUris(['http://example.com/test?good=false', 'https://another.uri/callback']);
-        $foo->setGrantTypes(['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
+        $foo->set('redirect_uris', ['http://example.com/test?good=false', 'https://another.uri/callback']);
+        $foo->set('grant_types', ['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
         $foo->setPublicId('foo');
 
         $this->addRefreshToken(

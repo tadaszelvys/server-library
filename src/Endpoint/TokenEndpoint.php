@@ -28,7 +28,6 @@ use OAuth2\Grant\GrantTypeSupportInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
-use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 use OAuth2\User\UserManagerInterface;
