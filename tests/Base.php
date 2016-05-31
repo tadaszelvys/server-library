@@ -933,7 +933,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getClaimCheckerManager(),
                 Verifier::createVerifier(['HS256', 'HS512', 'RS256', 'RS512'])
             );
-            $this->jwt_loader->enableEncryptionSupport(Decrypter::createDecrypter(
+            $this->jwt_loader->enableDecryptionSupport(Decrypter::createDecrypter(
                 ['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'],
                 ['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512']
             ));

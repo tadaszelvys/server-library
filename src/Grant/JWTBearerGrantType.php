@@ -135,7 +135,7 @@ final class JWTBearerGrantType implements GrantTypeSupportInterface
         $jwt = $grant_type_response->getAdditionalData('jwt');
 
         try {
-            $this->getJWTLoader()->verifySignature(
+            $this->getJWTLoader()->verify(
                 $jwt,
                 $client->getPublicKeySet()
             );

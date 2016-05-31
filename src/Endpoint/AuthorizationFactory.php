@@ -202,7 +202,7 @@ final class AuthorizationFactory
 
             Assertion::notNull($public_key_set, 'The client does not have signature capabilities.');
 
-            $this->getJWTLoader()->verifySignature(
+            $this->getJWTLoader()->verify(
                 $jwt,
                 $public_key_set
             );

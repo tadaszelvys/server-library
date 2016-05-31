@@ -148,7 +148,7 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
         }
 
         try {
-            $this->getJWTLoader()->verifySignature(
+            $this->getJWTLoader()->verify(
                 $client_credentials,
                 $jwk_set
             );
