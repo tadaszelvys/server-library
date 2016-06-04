@@ -118,13 +118,15 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
      */
     public function prepareAuthorization(Authorization $authorization)
     {
+        $offline_access = $this->isOfflineAccessRequested($authorization);
+
         $code = $this->getAuthorizationCodeManager()->createAuthCode(
             $authorization->getClient(),
             $authorization->getUser(),
             $authorization->getQueryParams(),
             $authorization->has('redirect_uri') ? $authorization->get('redirect_uri') : null,
             $authorization->getScopes(),
-            $authorization->has('issue_refresh_token') ? $authorization->get('issue_refresh_token') : false
+            $offline_access
         );
 
         $authorization->setData('code', $code);
@@ -312,13 +314,44 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
         return $this->pkce_for_public_clients_enforced;
     }
 
+    /**
+     * When this method is called, the PKCE is enforced.
+     */
     public function enablePKCEForPublicClientsEnforcement()
     {
         $this->pkce_for_public_clients_enforced = true;
     }
 
+    /**
+     * When this method is called, the PKCE is not enforced.
+     */
     public function disablePKCEForPublicClientsEnforcement()
     {
         $this->pkce_for_public_clients_enforced = false;
+    }
+
+    /**
+     * @param \OAuth2\Endpoint\Authorization $authorization
+     *
+     * @return bool
+     */
+    private function isOfflineAccessRequested(Authorization $authorization)
+    {
+        // The scope offline_access is not requested
+        if (!in_array('offline_access', $authorization->getScopes())) {
+            return false;
+        }
+
+        // The scope offline_access is requested but prompt is not consent
+        // The scope offline_access is ignored
+        if (!$authorization->has('prompt') || 'consent' !== $authorization->get('prompt')) {
+            $scope = $authorization->getScopes();
+            unset($scope[array_search('offline_access', $scope)]);
+            $authorization->setScopes($scope);
+
+            return false;
+        }
+
+        return true;
     }
 }

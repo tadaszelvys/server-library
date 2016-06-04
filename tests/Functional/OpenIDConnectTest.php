@@ -160,7 +160,7 @@ class OpenIDConnectTest extends Base
         );
     }
 
-    public function testCodeTokenSuccess()
+    public function testCodeTokenSuccessWithRefreshToken()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
@@ -170,9 +170,69 @@ class OpenIDConnectTest extends Base
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
             'state'                 => 'ABCDEF',
-            'scope'                 => 'openid',
+            'scope'                 => 'openid offline_access',
             'nonce'                 => '0123456789',
-            'issue_refresh_token'   => true,
+            'prompt'                => 'consent',
+        ]);
+        $authorization = $this->getAuthorizationFactory()->createFromRequest(
+            $request,
+            $this->getUserManager()->getUser('user1'),
+            true
+        );
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+offline_access&foo=bar&state=ABCDEF$/', $response->getHeader('Location')[0]);
+        $values = parse_url($response->getHeader('Location')[0]);
+        parse_str($values['fragment'], $params);
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('/^{"access_token":"[^"]+","token_type":"Bearer","expires_in":[\d]+,"scope":"openid offline_access","refresh_token":"[^"]+","foo":"bar","id_token":"[^"]+"}$/', $response->getBody()->getContents());
+
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
+        $refresh_token = $this->getRefreshTokenManager()->getRefreshToken($json['refresh_token']);
+
+        $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
+        $this->assertInstanceOf(RefreshTokenInterface::class, $refresh_token);
+        $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
+
+        $introspection_request = $this->createRequest('/', 'POST', ['token' => $json['access_token']], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+
+        $introspection_response = new Response();
+        $this->getTokenIntrospectionEndpoint()->introspection($introspection_request, $introspection_response);
+        $introspection_response->getBody()->rewind();
+
+        $this->assertEquals(200, $introspection_response->getStatusCode());
+        $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\,"offline_access"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
+    }
+
+    /**
+     * Refresh token is not issued because the prompt=consent parameter is not set
+     */
+    public function testCodeTokenSuccessWithoutRefreshToken()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'Mufasa',
+            'response_type'         => 'code token',
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'plain',
+            'state'                 => 'ABCDEF',
+            'scope'                 => 'openid offline_access',
+            'nonce'                 => '0123456789',
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -196,16 +256,14 @@ class OpenIDConnectTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('/^{"access_token":"[^"]+","token_type":"Bearer","expires_in":[\d]+,"scope":"openid","refresh_token":"[^"]+","foo":"bar","id_token":"[^"]+"}$/', $response->getBody()->getContents());
+        $this->assertRegExp('/^{"access_token":"[^"]+","token_type":"Bearer","expires_in":[\d]+,"scope":"openid","foo":"bar","id_token":"[^"]+"}$/', $response->getBody()->getContents());
 
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
-        $refresh_token = $this->getRefreshTokenManager()->getRefreshToken($json['refresh_token']);
 
         $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
-        $this->assertInstanceOf(RefreshTokenInterface::class, $refresh_token);
         $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
 
         $introspection_request = $this->createRequest('/', 'POST', ['token' => $json['access_token']], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
