@@ -101,7 +101,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     public function getSupportedSignatureAlgorithms()
     {
         $jwt_creator = $this->getJWTCreator();
-        
+
         return null === $jwt_creator ? [] : $jwt_creator->getSupportedSignatureAlgorithms();
     }
 
@@ -111,7 +111,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     public function getSupportedKeyEncryptionAlgorithms()
     {
         $jwt_creator = $this->getJWTCreator();
-        
+
         return null === $jwt_creator ? [] : $jwt_creator->getSupportedKeyEncryptionAlgorithms();
     }
 
@@ -121,7 +121,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     public function getSupportedContentEncryptionAlgorithms()
     {
         $jwt_creator = $this->getJWTCreator();
-        
+
         return null === $jwt_creator ? [] : $jwt_creator->getSupportedContentEncryptionAlgorithms();
     }
 
@@ -165,8 +165,9 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     /**
      * @param \OAuth2\Token\AccessTokenInterface $access_token
      *
-     * @return null|\OAuth2\Client\ClientInterface
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     *
+     * @return null|\OAuth2\Client\ClientInterface
      */
     private function getClient(AccessTokenInterface $access_token)
     {
@@ -184,8 +185,9 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     /**
      * @param \OAuth2\Token\AccessTokenInterface $access_token
      *
-     * @return null|\OAuth2\User\UserInterface
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     *
+     * @return null|\OAuth2\User\UserInterface
      */
     private function getUser(AccessTokenInterface $access_token)
     {

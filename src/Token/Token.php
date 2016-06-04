@@ -19,7 +19,7 @@ class Token implements TokenInterface
      * @var array
      */
     protected $parameters = [];
-    
+
     /**
      * @var array
      */

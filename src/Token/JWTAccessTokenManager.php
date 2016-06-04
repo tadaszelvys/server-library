@@ -121,7 +121,7 @@ class JWTAccessTokenManager extends AccessTokenManager
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface       $client
+     * @param \OAuth2\Client\ClientInterface      $client
      * @param \OAuth2\Client\ClientInterface|null $resource_server
      *
      * @return array

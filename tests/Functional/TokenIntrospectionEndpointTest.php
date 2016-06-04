@@ -65,7 +65,7 @@ class TokenIntrospectionEndpointTest extends Base
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
-        
+
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertRegExp('{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[0-9]+,"sub":"Mufasa","metadatas":\["plic","ploc","pluc"\],"parameters":{"foo":"bar"}}', $content);
     }
