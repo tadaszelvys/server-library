@@ -135,7 +135,7 @@ interface TokenInterface
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return mixed
      */

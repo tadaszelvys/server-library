@@ -25,7 +25,7 @@ interface TokenEndpointExtensionInterface
      * @return array|null
      */
     public function preAccessTokenCreation(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information);
-    
+
     /**
      * @param \OAuth2\Client\ClientInterface           $client
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response

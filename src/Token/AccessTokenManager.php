@@ -70,7 +70,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
         $access_token->setClientPublicId($client->getPublicId());
         $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
         $access_token->setMetadatas($metadatas);
-        
+
         foreach ($token_type_parameters as $key => $value) {
             if ('token_type' === $key) {
                 $access_token->setTokenType($value);
@@ -78,7 +78,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
                 $access_token->setParameter($key, $value);
             }
         }
-        
+
         $this->updateAccessToken($access_token);
         $this->populateAccessToken($access_token, $client, $resource_owner, $refresh_token, $resource_server);
         $this->saveAccessToken($access_token);
