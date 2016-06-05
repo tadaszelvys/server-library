@@ -10,7 +10,7 @@ OpenID Connect Implementeation Status
         * [x] `code id_token`: Hybrid Flow
         * [x] `code token`: Hybrid Flow
         * [x] `code id_token token`: Hybrid Flow
-    * [ ] [Initiating Login from third party](http://openid.net/specs/openid-connect-core-1_0.html#ThirdPartyInitiatedLogin)
+    * [Initiating Login from third party](http://openid.net/specs/openid-connect-core-1_0.html#ThirdPartyInitiatedLogin) **RP side only**
     * [ ] [Claims](http://openid.net/specs/openid-connect-core-1_0.html#Claims)
         * [x] [Standard Claims](http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims) and [Scope Claims](http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims)
             * [x] Scope `profile`
@@ -26,10 +26,10 @@ OpenID Connect Implementeation Status
         * [x] Passing a Request Object by Value
         * [x] Passing a Request Object by Reference
         * [x] Encrypted Request Object
-    * [ ] [Self-Issued OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#SelfIssued)
-    * [ ] [Subject Identifier Types](http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes)
+    * [Self-Issued OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#SelfIssued) **Out of the scope of this project**
+    * [x] [Subject Identifier Types](http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes)
         * [x] `public`
-        * [x] `pairwise` (*experimental*)
+        * [x] `pairwise`
             * [x] Hashed Subject Identifier
             * [x] Encrypted Subject Identifier
             * [x] Ability to support other Subject Identifier Calculation Algorithms
