@@ -44,6 +44,11 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private $state_parameter_enforced = false;
 
     /**
+     * @var bool
+     */
+    private $redirect_uri_storage_enforced = false;
+
+    /**
      * AuthorizationEndpoint constructor.
      *
      * @param \OAuth2\Scope\ScopeManagerInterface         $scope_manager
@@ -275,6 +280,7 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
             return $redirect_uris;
         }
 
+        $this->checkRedirectUriForAllClient();
         $this->checkRedirectUriForNonConfidentialClient($client);
         $this->checkRedirectUriForConfidentialClient($client, $authorization);
 
@@ -303,6 +309,16 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         if (!$client->isPublic() && $authorization->get('response_type') === 'token') {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients must register at least one redirect URI when using "token" response type');
+        }
+    }
+
+    /**
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function checkRedirectUriForAllClient()
+    {
+        if (true === $this->isRedirectUriStorageEnforced()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Clients must register at least one redirect URI.');
         }
     }
 
@@ -400,5 +416,23 @@ final class AuthorizationEndpoint implements AuthorizationEndpointInterface
     public function disableStateParameterEnforcement()
     {
         $this->state_parameter_enforced = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRedirectUriStorageEnforced()
+    {
+        return $this->redirect_uri_storage_enforced;
+    }
+
+    public function enableRedirectUriStorageEnforcement()
+    {
+        $this->redirect_uri_storage_enforced = true;
+    }
+
+    public function disableRedirectUriStorageEnforcement()
+    {
+        $this->redirect_uri_storage_enforced = false;
     }
 }

@@ -46,7 +46,7 @@ OpenID Connect Implementeation Status
         * [x]  Encryption
     * [x] [Offline Access](http://openid.net/specs/openid-connect-core-1_0.html#OfflineAccess)
     * [x] [Using Refresh Tokens](http://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
-* [x] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html) **Partial Implementation**
+* [x] [Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
     * [x] [Issuer Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html#IssuerDiscovery)
     * [x] [OpenID Provider Metadata](http://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata)
     * [x] [Obtaining OpenID Provider Configuration Information](http://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig)
@@ -55,7 +55,6 @@ OpenID Connect Implementeation Status
 * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
 * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
 * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
-* [ ] [HTTP Based logout](http://openid.net/specs/openid-connect-logout-1_0.html)
 * [ ] [Front-Channel logout](http://openid.net/specs/openid-connect-frontchannel-1_0.html)
 * [ ] [Back-Channel logout](http://openid.net/specs/openid-connect-backchannel-1_0.html)
 * [x] [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq)
