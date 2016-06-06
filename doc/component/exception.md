@@ -83,13 +83,39 @@ class TooManyRequestsException extends BaseException
 }
 ```
 
-> Please note that the constructor signature MUST be `public function __construct($error, $error_description, array $error_data, array $data])`.
+Then, you have to create an exception factory. This factory will create exceptions with that new type.
+
+```php
+namespace Acme;
+
+use OAuth2\Exception\Factory\ExceptionFactoryInterface;
+
+class TooManyRequestsExceptionFactory implements ExceptionFactoryInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getType()
+    {
+        return 'TooManyRequests';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createException($error, $error_description, array $error_data, array $data)
+    {
+        // We just return the exception with parameters, but you can add all your application logic here.
+        return new TooManyRequestsException($error, $error_description, $error_data, $data);
+    }
+}
+```
 
 Then, you just have to add this class to the class mapping of the exception manager:
 
 ```php
-use  Acme\TooManyRequestsException;
-$exception_manager->addExceptionType('TooManyRequests', TooManyRequestsException::class);
+use  Acme\TooManyRequestsExceptionFactory;
+$exception_manager->addExceptionFactory(new TooManyRequestsExceptionFactory());
 ```
 
 Now, you are able to throw your new exception type:
