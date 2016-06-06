@@ -45,6 +45,7 @@ use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\OpenIdConnect\FormPostResponseMode;
 use OAuth2\OpenIdConnect\IdTokenGrantType;
 use OAuth2\OpenIdConnect\IdTokenManager;
+use OAuth2\OpenIdConnect\IssuerDiscoveryEndpoint;
 use OAuth2\OpenIdConnect\Metadata;
 use OAuth2\OpenIdConnect\NoneResponseType;
 use OAuth2\OpenIdConnect\OpenIdConnectTokenEndpointExtension;
@@ -233,6 +234,27 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->userinfo;
+    }
+
+    /**
+     * @var null|\OAuth2\OpenIdConnect\IssuerDiscoveryEndpointInterface
+     */
+    private $issuer_discovery_endpoint = null;
+
+    /**
+     * @return \OAuth2\OpenIdConnect\IssuerDiscoveryEndpointInterface
+     */
+    protected function getIssuerDiscoveryEndpoint()
+    {
+        if (null === $this->issuer_discovery_endpoint) {
+            $this->issuer_discovery_endpoint = new IssuerDiscoveryEndpoint(
+                $this->getUserManager(),
+                $this->getExceptionManager(),
+                $this->getIssuer()
+            );
+        }
+
+        return $this->issuer_discovery_endpoint;
     }
 
     /**

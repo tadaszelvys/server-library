@@ -63,4 +63,19 @@ class UserManager implements UserManagerInterface
     {
         return isset($this->users[$public_id]) ? $this->users[$public_id] : null;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUserFromResource($resource)
+    {
+        if ('https://server.example.com/+' === mb_substr($resource, 0, 28, 'utf-8')) {
+            $resource = mb_substr($resource, 28, null, 'utf-8');
+        }
+        if ('acct:' === mb_substr($resource, 0, 5, 'utf-8') && '@server.example.com' === mb_substr($resource, -19, null, 'utf-8')) {
+            $resource = mb_substr($resource, 5, -19, 'utf-8');
+        }
+        
+        return isset($this->users[$resource]) ? $this->users[$resource] : null;
+    }
 }

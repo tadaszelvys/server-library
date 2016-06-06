@@ -31,4 +31,13 @@ interface UserManagerInterface
      * @return \OAuth2\User\UserInterface|null
      */
     public function getUser($username);
+
+    /**
+     * Get the end-user with the specified username.
+     *
+     * @param string $resource Resource
+     *
+     * @return \OAuth2\User\UserInterface|null
+     */
+    public function getUserFromResource($resource);
 }
