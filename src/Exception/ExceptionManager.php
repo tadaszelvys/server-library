@@ -13,6 +13,11 @@ namespace OAuth2\Exception;
 
 use Assert\Assertion;
 use OAuth2\Exception\Extension\ExceptionExtensionInterface;
+use OAuth2\Exception\Factory\AuthenticateExceptionFactory;
+use OAuth2\Exception\Factory\BadRequestExceptionFactory;
+use OAuth2\Exception\Factory\ExceptionFactoryInterface;
+use OAuth2\Exception\Factory\NotImplementedExceptionFactory;
+use OAuth2\Exception\Factory\RedirectExceptionFactory;
 
 /**
  * An exception manager.
@@ -30,29 +35,24 @@ class ExceptionManager implements ExceptionManagerInterface
     private $extensions = [];
 
     /**
-     * @var array
+     * @var \OAuth2\Exception\Factory\ExceptionFactoryInterface[]
      */
-    private $exception_map = [];
+    private $exception_factories = [];
 
     public function __construct()
     {
-        $this->exception_map = [
-            self::AUTHENTICATE    => AuthenticateException::class,
-            self::BAD_REQUEST     => BadRequestException::class,
-            self::NOT_IMPLEMENTED => NotImplementedException::class,
-            self::REDIRECT        => RedirectException::class,
-        ];
+        $this->addExceptionFactory(new AuthenticateExceptionFactory());
+        $this->addExceptionFactory(new BadRequestExceptionFactory());
+        $this->addExceptionFactory(new NotImplementedExceptionFactory());
+        $this->addExceptionFactory(new RedirectExceptionFactory());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addExceptionType($name, $exception_class)
+    public function addExceptionFactory(ExceptionFactoryInterface $exception_factory)
     {
-        Assertion::string($name);
-        Assertion::string($exception_class);
-        Assertion::classExists($exception_class);
-        $this->exception_map[$name] = $exception_class;
+        $this->exception_factories[$exception_factory->getType()] = $exception_factory;
     }
 
     /**
@@ -96,9 +96,9 @@ class ExceptionManager implements ExceptionManagerInterface
 
         $error_data = $this->getAdditionalErrorData($type, $error, $error_description, $data);
 
-        $class = $this->getExceptionType($type);
+        $factory = $this->getExceptionFactory($type);
 
-        return new $class($error, $error_description, $error_data, $data);
+        return $factory->createException($error, $error_description, $error_data, $data);
     }
 
     /**
@@ -123,14 +123,16 @@ class ExceptionManager implements ExceptionManagerInterface
     }
 
     /**
-     * @param string $type
+     * @param string$type
      *
-     * @return string
+     * @throws \InvalidArgumentException
+     *
+     * @return \OAuth2\Exception\Factory\ExceptionFactoryInterface
      */
-    private function getExceptionType($type)
+    private function getExceptionFactory($type)
     {
-        if (array_key_exists($type, $this->exception_map)) {
-            return $this->exception_map[$type];
+        if (array_key_exists($type, $this->exception_factories)) {
+            return $this->exception_factories[$type];
         }
 
         throw new \InvalidArgumentException(sprintf('The exception type "%s" is not supported', $type));

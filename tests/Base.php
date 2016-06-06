@@ -67,7 +67,7 @@ use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\NoneListener;
 use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ScopeManager;
-use OAuth2\Test\Stub\TooManyRequestsException;
+use OAuth2\Test\Stub\TooManyRequestsExceptionFactory;
 use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Test\Stub\UserManager;
 use OAuth2\Token\BearerToken;
@@ -439,7 +439,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->exception_manager) {
             $this->exception_manager = new ExceptionManager();
             $this->exception_manager->addExtension(new UriExtension());
-            $this->exception_manager->addExceptionType('TooManyRequests', TooManyRequestsException::class);
+            $this->exception_manager->addExceptionFactory(new TooManyRequestsExceptionFactory());
         }
 
         return $this->exception_manager;

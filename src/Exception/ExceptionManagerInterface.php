@@ -12,6 +12,7 @@
 namespace OAuth2\Exception;
 
 use OAuth2\Exception\Extension\ExceptionExtensionInterface;
+use OAuth2\Exception\Factory\ExceptionFactoryInterface;
 
 /**
  * An exception manager.
@@ -72,8 +73,9 @@ interface ExceptionManagerInterface
     public function addExtension(ExceptionExtensionInterface $extension);
 
     /**
-     * @param string $name
-     * @param string $exception_class
+     * @param \OAuth2\Exception\Factory\ExceptionFactoryInterface $exception_factory
+     *
+     * @return mixed
      */
-    public function addExceptionType($name, $exception_class);
+    public function addExceptionFactory(ExceptionFactoryInterface $exception_factory);
 }
