@@ -105,25 +105,25 @@ class IssuerDiscoveryTest extends Base
 
     public function testDomainForEmailResourceInTheRequest()
     {
-        $request = $this->createRequest('/?resource=acct:user1%40server.example.com&rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer', 'GET', [], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/?resource=acct:user1%40my-service.com:9000&rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer', 'GET', [], ['HTTPS' => 'on']);
         $response = new Response();
         $this->getIssuerDiscoveryEndpoint()->handle($request, $response);
 
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('{"subject":"acct:user1@server.example.com","links":[{"rel":"http:\/\/openid.net\/specs\/connect\/1.0\/issuer","href":"https:\/\/server.example.com"}]}', $response->getBody()->getContents());
+        $this->assertEquals('{"subject":"acct:user1@my-service.com:9000","links":[{"rel":"http:\/\/openid.net\/specs\/connect\/1.0\/issuer","href":"https:\/\/server.example.com"}]}', $response->getBody()->getContents());
     }
 
     public function testDomainForUriResourceInTheRequest()
     {
-        $request = $this->createRequest('/?resource=https%3A%2F%2Fserver.example.com%2F%2Buser1&rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer', 'GET', [], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/?resource=https%3A%2F%2Fmy-service.com:9000%2F%2Buser1&rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer', 'GET', [], ['HTTPS' => 'on']);
         $response = new Response();
         $this->getIssuerDiscoveryEndpoint()->handle($request, $response);
 
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('{"subject":"https:\/\/server.example.com\/+user1","links":[{"rel":"http:\/\/openid.net\/specs\/connect\/1.0\/issuer","href":"https:\/\/server.example.com"}]}', $response->getBody()->getContents());
+        $this->assertEquals('{"subject":"https:\/\/my-service.com:9000\/+user1","links":[{"rel":"http:\/\/openid.net\/specs\/connect\/1.0\/issuer","href":"https:\/\/server.example.com"}]}', $response->getBody()->getContents());
     }
 }

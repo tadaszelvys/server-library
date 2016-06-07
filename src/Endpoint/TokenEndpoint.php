@@ -281,6 +281,8 @@ final class TokenEndpoint implements TokenEndpointInterface
 
     /**
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
      */
     private function checkRequestedScope(GrantTypeResponseInterface $grant_type_response)
     {
@@ -294,6 +296,8 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param array                          $request_parameters
      * @param \OAuth2\Client\ClientInterface $client
      *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * 
      * @return array
      */
     private function getTokenTypeInformation(array $request_parameters, ClientInterface $client)

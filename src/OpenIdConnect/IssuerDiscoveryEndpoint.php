@@ -29,6 +29,16 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
      * @var string
      */
     private $issuer;
+    
+    /**
+     * @var string
+     */
+    private $server;
+    
+    /**
+     * @var string
+     */
+    private $computed_server;
 
     /**
      * @var string
@@ -40,17 +50,22 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
      *
      * @param \OAuth2\User\UserManagerInterface           $user_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param string                                      $issuer
+     * @param string                                      $issuer            The issuer of the resource
+     * @param string                                      $server            The server URI of this discovery service
      */
     public function __construct(UserManagerInterface $user_manager,
                                 ExceptionManagerInterface $exception_manager,
-                                $issuer
+                                $issuer,
+                                $server
     ) {
         Assertion::url($issuer, 'The issuer must be an URL.');
+        Assertion::url($server, 'The server must be an URL.');
         $this->setUserManager($user_manager);
         $this->setExceptionManager($exception_manager);
         $this->issuer = $issuer;
+        $this->server = $server;
         $this->computed_issuer = $this->getDomain($this->issuer);
+        $this->computed_server = $this->getDomain($this->server);
     }
 
     /**
@@ -236,7 +251,7 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
      */
     private function checkDomain($domain)
     {
-        if ($domain !== $this->computed_issuer) {
+        if ($domain !== $this->computed_server) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported domain.');
         }
     }

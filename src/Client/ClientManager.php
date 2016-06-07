@@ -81,6 +81,8 @@ abstract class ClientManager implements ClientManagerInterface
      * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
      * @param mixed                                                             $client_credentials    The client credentials found in the request
      *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     *
      * @return null|string
      */
     private function findClientInTheRequest(ServerRequestInterface $request, &$authentication_method, &$client_credentials = null)

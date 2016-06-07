@@ -250,7 +250,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->issuer_discovery_endpoint = new IssuerDiscoveryEndpoint(
                 $this->getUserManager(),
                 $this->getExceptionManager(),
-                $this->getIssuer()
+                $this->getIssuer(),
+                'https://my-service.com:9000'
             );
         }
 

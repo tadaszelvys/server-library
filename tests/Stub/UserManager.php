@@ -69,11 +69,13 @@ class UserManager implements UserManagerInterface
      */
     public function getUserFromResource($resource)
     {
-        if ('https://server.example.com/+' === mb_substr($resource, 0, 28, 'utf-8')) {
-            $resource = mb_substr($resource, 28, null, 'utf-8');
+        $server = 'my-service.com:9000';
+        $length = mb_strlen($server, 'utf-8');
+        if ('https://'.$server.'/+' === mb_substr($resource, 0, $length+10, 'utf-8')) {
+            $resource = mb_substr($resource, $length+10, null, 'utf-8');
         }
-        if ('acct:' === mb_substr($resource, 0, 5, 'utf-8') && '@server.example.com' === mb_substr($resource, -19, null, 'utf-8')) {
-            $resource = mb_substr($resource, 5, -19, 'utf-8');
+        if ('acct:' === mb_substr($resource, 0, 5, 'utf-8') && '@'.$server === mb_substr($resource, -($length+1), null, 'utf-8')) {
+            $resource = mb_substr($resource, 5, -($length+1), 'utf-8');
         }
         
         return isset($this->users[$resource]) ? $this->users[$resource] : null;
