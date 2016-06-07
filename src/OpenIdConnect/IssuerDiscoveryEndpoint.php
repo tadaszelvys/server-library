@@ -230,12 +230,17 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
     /**
      * @param string $uri
      *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     *
      * @return string
      */
     private function getDomain($uri)
     {
         $parsed_uri = parse_url($uri);
 
+        if (false === array_key_exists('host', $parsed_uri)) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported resource value. Must be compliant with RFC3986 (URI) or RFC5322 (e-mail).');
+        }
         $host = $parsed_uri['host'];
         if (array_key_exists('port', $parsed_uri)) {
             $host = sprintf('%s:%s', $host, $parsed_uri['port']);
