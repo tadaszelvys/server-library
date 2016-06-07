@@ -103,6 +103,18 @@ class IssuerDiscoveryTest extends Base
         $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported domain.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
     }
 
+    public function testInvalidResourceFormatInTheRequest()
+    {
+        $request = $this->createRequest('/?resource=user1&rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer', 'GET', [], ['HTTPS' => 'on']);
+        $response = new Response();
+        $this->getIssuerDiscoveryEndpoint()->handle($request, $response);
+
+        $response->getBody()->rewind();
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported resource value. Must be compliant with RFC3986 (URI) or RFC5322 (e-mail).","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+    }
+
     public function testDomainForEmailResourceInTheRequest()
     {
         $request = $this->createRequest('/?resource=acct:user1%40my-service.com:9000&rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer', 'GET', [], ['HTTPS' => 'on']);
