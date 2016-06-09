@@ -34,19 +34,14 @@ class BearerToken implements TokenTypeInterface
         return $this->token_from_request_body_allowed;
     }
 
-    public function allowTokenFromRequestBody()
+    public function allowAccessTokenFromRequestBody()
     {
         $this->token_from_request_body_allowed = true;
     }
 
-    public function allowAccessTokenFromRequestBody()
-    {
-        $this->token_from_query_string_allowed = true;
-    }
-
     public function disallowAccessTokenFromRequestBody()
     {
-        $this->token_from_query_string_allowed = false;
+        $this->token_from_request_body_allowed = false;
     }
 
     /**
