@@ -42,6 +42,7 @@ use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\JWTBearerGrantType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
+use OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManager;
 use OAuth2\OpenIdConnect\FormPostResponseMode;
 use OAuth2\OpenIdConnect\IdTokenGrantType;
 use OAuth2\OpenIdConnect\IdTokenManager;
@@ -63,6 +64,7 @@ use OAuth2\Security\Handler\AccessTokenManagerHandler;
 use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\ClientManager;
+use OAuth2\Test\Stub\DistributedClaimSource;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\NoneListener;
@@ -223,7 +225,10 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getUserInfo()
     {
         if (null === $this->userinfo) {
-            $this->userinfo = new UserInfo($this->getExceptionManager());
+            $this->userinfo = new UserInfo(
+                $this->getClaimSourceManager(),
+                $this->getExceptionManager()
+            );
 
             $this->userinfo->addUserInfoScopeSupport(new ProfilScopeSupport());
             $this->userinfo->addUserInfoScopeSupport(new AddressScopeSupport());
@@ -1004,6 +1009,24 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->claim_checker_manager;
+    }
+
+    /**
+     * @var null|\OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManagerInterface
+     */
+    private $claim_source_manager = null;
+
+    /**
+     * @return \OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManagerInterface
+     */
+    protected function getClaimSourceManager()
+    {
+        if (null === $this->claim_source_manager) {
+            $this->claim_source_manager = new ClaimSourceManager();
+            $this->claim_source_manager->addClaimSource(new DistributedClaimSource());
+        }
+
+        return $this->claim_source_manager;
     }
 
     /**

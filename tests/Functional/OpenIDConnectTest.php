@@ -132,6 +132,17 @@ class OpenIDConnectTest extends Base
         $this->assertEquals($userinfo->getClaim('aud'), $id_token->getClaim('aud'));
     }
 
+    public function testClaimSource()
+    {
+        $client = $this->getClientManager()->getClient('Mufasa');
+        $user = $this->getUserManager()->getUser('user2');
+        $result = $this->getUserInfo()->getUserinfo($client, $user, 'https://foo.bar/', ['openid', 'email', 'email_verified']);
+
+        $this->assertEquals('OkKmIBUobGzXso3FyJo3yY0XzMPRS0AD-DjTXjIGLaq6VPuJtfyYQX2JiSXmtisuGuON05BhHQj2jQ17I09lRQ', $result['sub']);
+        $this->assertArrayHasKey('_claim_names', $result);
+        $this->assertArrayHasKey('_claim_sources', $result);
+    }
+
     public function testHashedPairwise()
     {
         $user = $this->getUserManager()->getUser('user1');

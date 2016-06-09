@@ -15,6 +15,7 @@ use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManagerInterface;
 use OAuth2\OpenIdConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface;
 use OAuth2\User\UserInterface;
 
@@ -28,14 +29,18 @@ final class UserInfo implements UserInfoInterface
      */
     private $userinfo_scope_supports = [];
 
+    private $claim_source_manager;
+
     /**
-     * UserInfoEndpoint constructor.
+     * UserInfo constructor.
      *
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManagerInterface $claim_source_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface                   $exception_manager
      */
-    public function __construct(ExceptionManagerInterface $exception_manager)
+    public function __construct(ClaimSourceManagerInterface $claim_source_manager, ExceptionManagerInterface $exception_manager)
     {
         $this->setExceptionManager($exception_manager);
+        $this->claim_source_manager = $claim_source_manager;
     }
 
     /**
@@ -69,6 +74,11 @@ final class UserInfo implements UserInfoInterface
                 }
             }
         }
+
+        $claims = array_merge(
+            $claims,
+            $this->claim_source_manager->getUserInfo($user, $scope, [])
+        );
 
         return $claims;
     }
