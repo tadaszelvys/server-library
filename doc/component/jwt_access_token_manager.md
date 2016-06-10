@@ -5,9 +5,7 @@ This access token manager will create access tokens based on JSON Web Token (JWT
 It does not need a database as they contain digitally signed claims.
 The Authorization and Resource servers can directly verify signature using key materials.
 
-These tokens can also be encrypted to prevent leak of sensitive data.
-
-*Please note that if access tokens are encrypted, the authorization server will not be able to verify claims unless it is the audience of this token or if no resource server was defined*
+These tokens can also be encrypted to prevent leak of sensitive data. *We highly recommend to enable the access token encryption feature, especially if you use the OpenId Connect extension with pairwise subject support*.
 
 # Algorithms and Keys
 
@@ -31,11 +29,7 @@ The key used to sign the access tokens must be in `JWK` format. Again, thanks to
 
 #### Symmetric Keys
 
-**Symmetric keys ARE NOT RECOMMENDED to sign access tokens as they are shared and you do not want to share keys with clients.**
-
-These case MUST only be used when the following two conditions are satisfied:
-* access tokens are encrypted
-* no resource server is defined, i.e. the authorization server (the issuer) is the audience.
+*If you decide to use this kind of keys, we highly recommend you to encrypt the access tokens.*
 
 Examples:
 
@@ -84,10 +78,6 @@ $private_key = JWKFactory::createFromKeyFile(
 );
 ```
 
-## Access Token Encryption
-
-To be written
-
 # The JWT Access Token Manager
 
 Now you have your keys, you can create an instance of the JWT Access Token Manager `OAuth2\Token\JWTAccessTokenManager`.
@@ -106,11 +96,11 @@ $jwt_access_manager = new JWTAccessTokenManager(
         'kty' => 'oct',
         'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
     ]),
-    $this->issuer // The issuer of the token.
+    $this->issuer // The issuer of the token (i.e. the authorization serve URL).
 );
 ```
 
-**Important note: the JWTLoader and JWTCreator services MUST support the signature algorithm you want to use**
+*Important note: the JWTLoader and JWTCreator services MUST support the signature algorithm you want to use*
 
 ## Encrypted Access Tokens
 
@@ -131,7 +121,7 @@ $jwt_access_manager->enableAccessTokenEncryption(
 
 ## Encryption And Resource Servers
 
-This library is designed to allow multiple resource servers to receive access tokens, but this feature is not yet completely supported.
+This library is designed to allow multiple resource servers to receive access tokens, but this feature is not yet supported.
 When resource servers need to know if the access token is still valid, they must use the introspection endpoint.
 
 More details will be added when this feature will be implemented.
