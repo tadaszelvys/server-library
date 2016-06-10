@@ -236,6 +236,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->userinfo->addUserInfoScopeSupport(new PhoneScopeSupport());
 
             $this->userinfo->enablePairwiseSubject(new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData()));
+            $this->userinfo->setPairwiseSubjectByDefault();
         }
 
         return $this->userinfo;

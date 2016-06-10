@@ -56,31 +56,93 @@ final class UserInfo implements UserInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function getUserinfo(ClientInterface $client, UserInterface $user, $redirect_uri, array $scope)
+    public function getUserinfo(ClientInterface $client, UserInterface $user, $redirect_uri, array $request_claims, array $scope)
     {
         $this->checkScope($scope);
-
-        $claims = [
-            'sub' => $this->calculateSubjectIdentifier($client, $user, $redirect_uri),
-        ];
-        $supported_userinfo_scopes = $this->getSupportedUserInfoScopes();
-        foreach ($supported_userinfo_scopes as $supported_userinfo_scope) {
-            if (in_array($supported_userinfo_scope->getScope(), $scope)) {
-                $scope_claims = $supported_userinfo_scope->getClaims();
-                foreach ($scope_claims as $scope_claim) {
-                    if ($user->has($scope_claim)) {
-                        $claims[$scope_claim] = $user->get($scope_claim);
-                    }
-                }
-            }
-        }
-
+        $request_claims = array_merge(
+            $this->getClaimsFromClaimScope($scope),
+            $request_claims
+        );
+        $request_claims['sub'] = null;
+        $claims = $this->getClaimValues($user, $request_claims);
         $claims = array_merge(
             $claims,
             $this->claim_source_manager->getUserInfo($user, $scope, [])
         );
+        $claims['sub'] = $this->calculateSubjectIdentifier($client, $user, $redirect_uri);
 
         return $claims;
+    }
+
+    /**
+     * @param string[] $scope
+     *
+     * @return array
+     */
+    private function getClaimsFromClaimScope(array $scope)
+    {
+        $result = [];
+        foreach ($this->getSupportedUserInfoScopes() as $supported_userinfo_scope) {
+            if (in_array($supported_userinfo_scope->getScope(), $scope)) {
+                $scope_claims = $supported_userinfo_scope->getClaims();
+                foreach ($scope_claims as $scope_claim) {
+                    $result[$scope_claim] = null;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param \OAuth2\User\UserInterface $user
+     * @param array                      $claims
+     *
+     * @return array
+     */
+    private function getClaimValues(UserInterface $user, array $claims)
+    {
+        $result = [];
+        foreach ($claims as $claim => $config) {
+            $claim_value = $this->getUserClaim($user, $claim, $config);
+            if (null !== $claim_value) {
+                $result[$claim] = $claim_value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param \OAuth2\User\UserInterface $user
+     * @param string                     $claim
+     * @param null|array                 $config
+     *
+     * @return null|mixed
+     */
+    protected function getUserClaim(UserInterface $user, $claim, $config)
+    {
+        if ($user->has($claim)) {
+            return $user->get($claim);
+        }
+    }
+
+    /**
+     * @param null|array $config
+     *
+     * @return bool
+     */
+    private function isClaimEssential($config)
+    {
+        if (null === $config || !is_array($config)) {
+            return false;
+        }
+        if (array_key_exists('essential', $config) && is_bool($config['essential'])) {
+            return $config['essential'];
+        }
+
+        // We ignore the configuration if not correctly defined (no error is thrown as required by the specification
+        return false;
     }
 
     /**

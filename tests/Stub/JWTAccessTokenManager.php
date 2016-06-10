@@ -76,29 +76,32 @@ class JWTAccessTokenManager extends Base
         $no_user_info->setToken('NO_USER_INFO');
         $no_user_info->setTokenType('Bearer');
         $no_user_info->setMetadata('redirect_uri', 'https://example.com');
+        $no_user_info->setMetadata('requested_claims', []);
 
         $user_info = new AccessToken();
         $user_info->setExpiresAt(time() + 3600);
         $user_info->setResourceOwnerPublicId('user1');
-        $user_info->setScope(['openid', 'profile', 'email', 'address', 'phone']);
+        $user_info->setScope(['openid', 'profile', 'address', 'phone']);
         $user_info->setClientPublicId('foo');
         $user_info->setToken('USER_INFO');
         $user_info->setTokenType('Bearer');
         $user_info->setMetadata('redirect_uri', 'https://example.com');
+        $user_info->setMetadata('requested_claims', ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]);
 
         $user_info2 = new AccessToken();
         $user_info2->setExpiresAt(time() + 3600);
         $user_info2->setResourceOwnerPublicId('user1');
-        $user_info2->setScope(['openid', 'profile', 'email', 'address', 'phone']);
+        $user_info2->setScope(['openid', 'profile', 'address', 'phone']);
         $user_info2->setClientPublicId('jwt1');
         $user_info2->setToken('USER_INFO2');
         $user_info2->setTokenType('Bearer');
         $user_info2->setMetadata('redirect_uri', 'https://example2.com');
+        $user_info2->setMetadata('requested_claims', ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]);
 
         $user_info_mac = new AccessToken();
         $user_info_mac->setExpiresAt(time() + 3600);
         $user_info_mac->setResourceOwnerPublicId('user1');
-        $user_info_mac->setScope(['openid', 'profile', 'email', 'address', 'phone']);
+        $user_info_mac->setScope(['openid', 'profile', 'address', 'phone']);
         $user_info_mac->setClientPublicId('jwt1');
         $user_info_mac->setToken('USER_INFO_MAC');
         $user_info_mac->setTokenType('MAC');
@@ -107,6 +110,7 @@ class JWTAccessTokenManager extends Base
             'mac_algorithm' => 'hmac-sha-256',
         ]);
         $user_info_mac->setMetadata('redirect_uri', 'https://example_mac.com');
+        $user_info_mac->setMetadata('requested_claims', ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]);
 
         $this->access_tokens[$abcd->getToken()] = $abcd;
         $this->access_tokens[$efgh->getToken()] = $efgh;

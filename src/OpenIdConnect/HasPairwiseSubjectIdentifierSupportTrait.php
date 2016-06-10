@@ -11,6 +11,7 @@
 
 namespace OAuth2\OpenIdConnect;
 
+use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\OpenIdConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
 use OAuth2\User\UserInterface;
@@ -23,6 +24,11 @@ trait HasPairwiseSubjectIdentifierSupportTrait
     private $pairwise_algorithm = null;
 
     /**
+     * @var bool
+     */
+    private $is_pairwise_subject_default = false;
+
+    /**
      * {@inheritdoc}
      */
     public function enablePairwiseSubject(PairwiseSubjectIdentifierAlgorithmInterface $pairwise_algorithm)
@@ -33,9 +39,34 @@ trait HasPairwiseSubjectIdentifierSupportTrait
     /**
      * {@inheritdoc}
      */
+    public function setPairwiseSubjectByDefault()
+    {
+        Assertion::notNull($this->pairwise_algorithm, 'The pairwise algorithm must be set before calling this method.');
+        $this->is_pairwise_subject_default = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPublicSubjectByDefault()
+    {
+        $this->is_pairwise_subject_default = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isPairwiseSubjectIdentifierSupported()
     {
         return null !== $this->pairwise_algorithm;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isPairwiseSubjectDefault()
+    {
+        return $this->is_pairwise_subject_default;
     }
 
     /**
@@ -49,16 +80,20 @@ trait HasPairwiseSubjectIdentifierSupportTrait
     {
         $sub = $user->getPublicId();
 
-        if (false === $this->isPairwiseSubjectIdentifierSupported() || !$client->has('subject_type') || 'pairwise' !== $client->get('subject_type')) {
+        if (false === $this->isPairwiseSubjectIdentifierSupported()) {
             return $sub;
         }
+        if ($client->has('subject_type') && ('pairwise' === $client->get('subject_type') || true === $this->isPairwiseSubjectDefault())) {
+            $sector_identifier_host = $this->getSectorIdentifierHost($client, $redirect_uri);
 
-        $sector_identifier_host = $this->getSectorIdentifierHost($client, $redirect_uri);
+            return $this->pairwise_algorithm->calculateSubjectIdentifier(
+                $user,
+                $sector_identifier_host
+            );
+        }
 
-        return $this->pairwise_algorithm->calculateSubjectIdentifier(
-            $user,
-            $sector_identifier_host
-        );
+        return $sub;
+
     }
 
     /**

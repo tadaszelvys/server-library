@@ -46,6 +46,7 @@ class OpenIDConnectTest extends Base
             'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
+            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -97,7 +98,8 @@ class OpenIDConnectTest extends Base
             ],
             $this->getAuthorizationEndpoint()->getResponseTypesSupported()
         );
-
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('iss'));
         $this->assertTrue($id_token->hasClaim('sub'));
         $this->assertEquals('iu6KK2l_kPf4_mOdpWE668f9bc6fk-2auRRZi4lWhi_zpypYTW45N6SpsahXSqbzQNjcbd30f8srPLf7XEdCKA', $id_token->getClaim('sub'));
@@ -126,6 +128,8 @@ class OpenIDConnectTest extends Base
         $userinfo = $this->getUserInfoEndpoint()->handle($access_token);
         $userinfo = $loader->load($userinfo);
 
+        $this->assertEquals($userinfo->getClaim('email'), $id_token->getClaim('email'));
+        $this->assertEquals($userinfo->getClaim('email_verified'), $id_token->getClaim('email_verified'));
         $this->assertEquals($userinfo->getClaim('sub'), $id_token->getClaim('sub'));
         $this->assertEquals($userinfo->getClaim('exp'), $id_token->getClaim('exp'));
         $this->assertEquals($userinfo->getClaim('iss'), $id_token->getClaim('iss'));
@@ -136,10 +140,11 @@ class OpenIDConnectTest extends Base
     {
         $client = $this->getClientManager()->getClient('Mufasa');
         $user = $this->getUserManager()->getUser('user2');
-        $result = $this->getUserInfo()->getUserinfo($client, $user, 'https://foo.bar/', ['openid', 'email', 'email_verified']);
+        $result = $this->getUserInfo()->getUserinfo($client, $user, 'https://foo.bar/', [], ['openid', 'email']);
 
         $this->assertEquals('OkKmIBUobGzXso3FyJo3yY0XzMPRS0AD-DjTXjIGLaq6VPuJtfyYQX2JiSXmtisuGuON05BhHQj2jQ17I09lRQ', $result['sub']);
         $this->assertArrayHasKey('_claim_names', $result);
+        $this->assertArrayHasKey('email', $result['_claim_names']);
         $this->assertArrayHasKey('_claim_sources', $result);
     }
 
@@ -297,6 +302,7 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
             'state'                 => 'ABCDEF',
             'scope'                 => 'openid',
+            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -314,6 +320,8 @@ class OpenIDConnectTest extends Base
         $id_token = $loader->load($params['id_token']);
 
         $this->assertInstanceOf(JWSInterface::class, $id_token);
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('nonce'));
         $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
     }
@@ -328,6 +336,7 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
             'state'                 => 'ABCDEF',
             'scope'                 => 'openid',
+            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -354,6 +363,8 @@ class OpenIDConnectTest extends Base
         ]));
         $id_token = $loader->load($id_token->getPayload());
 
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('nonce'));
         $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
     }
@@ -370,6 +381,7 @@ class OpenIDConnectTest extends Base
             'scope'                 => 'openid',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
+            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -387,6 +399,8 @@ class OpenIDConnectTest extends Base
         $id_token = $loader->load($params['id_token']);
 
         $this->assertInstanceOf(JWSInterface::class, $id_token);
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('nonce'));
         $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
         $this->assertTrue($id_token->hasClaim('at_hash'));
@@ -404,6 +418,7 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
+            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -421,6 +436,8 @@ class OpenIDConnectTest extends Base
         $id_token = $loader->load($params['id_token']);
 
         $this->assertInstanceOf(JWSInterface::class, $id_token);
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('nonce'));
         $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
         $this->assertTrue($id_token->hasClaim('at_hash'));
@@ -450,6 +467,8 @@ class OpenIDConnectTest extends Base
         $id_token2 = $loader->load($json['id_token']);
 
         $this->assertInstanceOf(JWSInterface::class, $id_token2);
+        $this->assertTrue($id_token2->hasClaim('email'));
+        $this->assertTrue($id_token2->hasClaim('email_verified'));
         $this->assertTrue($id_token2->hasClaim('nonce'));
         $this->assertEquals('0123456789', $id_token2->getClaim('nonce'));
         $this->assertTrue($id_token2->hasClaim('at_hash'));
@@ -469,6 +488,7 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
+            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -486,6 +506,8 @@ class OpenIDConnectTest extends Base
         $id_token = $loader->load($params['id_token']);
 
         $this->assertInstanceOf(JWSInterface::class, $id_token);
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('nonce'));
         $this->assertEquals('0123456789', $id_token->getClaim('nonce'));
         $this->assertTrue($id_token->hasClaim('c_hash'));
@@ -514,6 +536,8 @@ class OpenIDConnectTest extends Base
         $id_token2 = $loader->load($json['id_token']);
 
         $this->assertInstanceOf(JWSInterface::class, $id_token2);
+        $this->assertTrue($id_token2->hasClaim('email'));
+        $this->assertTrue($id_token2->hasClaim('email_verified'));
         $this->assertTrue($id_token2->hasClaim('nonce'));
         $this->assertEquals('0123456789', $id_token2->getClaim('nonce'));
         $this->assertTrue($id_token2->hasClaim('c_hash'));
@@ -604,6 +628,7 @@ class OpenIDConnectTest extends Base
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
                 $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId()),
                 $access_token->getMetadata('redirect_uri'),
+                [],
                 $access_token->getScope()
             );
             $this->fail('Should throw an Exception');
@@ -625,6 +650,7 @@ class OpenIDConnectTest extends Base
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
                 $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId()),
                 $access_token->getMetadata('redirect_uri'),
+                [],
                 $access_token->getScope()
             );
             $this->fail('Should throw an Exception');
@@ -646,6 +672,8 @@ class OpenIDConnectTest extends Base
         $loader = new Loader();
         $id_token = $loader->load($data);
 
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('exp'));
         $this->assertTrue($id_token->hasClaim('nbf'));
         $this->assertTrue($id_token->hasClaim('iat'));
@@ -679,6 +707,8 @@ class OpenIDConnectTest extends Base
         $id_token = $loader->load($jwt->getPayload());
         $this->assertInstanceOf(JWSInterface::class, $id_token);
 
+        $this->assertTrue($id_token->hasClaim('email'));
+        $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('exp'));
         $this->assertTrue($id_token->hasClaim('nbf'));
         $this->assertTrue($id_token->hasClaim('iat'));

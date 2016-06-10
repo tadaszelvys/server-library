@@ -77,11 +77,11 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
     public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
     {
         $params = $authorization->getQueryParams();
-
         $id_token = $this->getIdTokenManager()->createIdToken(
             $authorization->getClient(),
             $authorization->getUser(),
             $redirect_uri,
+            $authorization->has('claims') ? $authorization->get('claims') : [],
             $authorization->getScopes(),
             ['nonce' => $params['nonce']],
             $authorization->hasData('access_token') ? $authorization->getData('access_token') : null,

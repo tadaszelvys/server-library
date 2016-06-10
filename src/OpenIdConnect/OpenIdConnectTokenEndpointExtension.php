@@ -72,11 +72,12 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
                 ['nonce' => $params['nonce']]
             );
         }
-
+        
         $id_token = $this->id_token_manager->createIdToken(
             $client,
             $user,
             $access_token->getMetadata('redirect_uri'),
+            $access_token->getMetadata('requested_claims'),
             $access_token->getScope(),
             $claims,
             $access_token,
@@ -103,8 +104,15 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
      */
     public function preAccessTokenCreation(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information)
     {
-        return [
+        $data = [
             'redirect_uri' => $grant_type_response->getRedirectUri(),
         ];
+        if ($grant_type_response->hasAdditionalData('auth_code') && null !== $grant_type_response->getAdditionalData('auth_code')) {
+            $data['requested_claims'] = array_key_exists('claims', $grant_type_response->getAdditionalData('auth_code')->getQueryParams()) ? $grant_type_response->getAdditionalData('auth_code')->getQueryParams()['claims'] : [];
+        } else {
+            $data['requested_claims'] = [];
+        }
+        
+        return $data;
     }
 }

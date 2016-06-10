@@ -99,16 +99,16 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createIdToken(ClientInterface $client, UserInterface $user, $redirect_uri, array $scope, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null)
+    public function createIdToken(ClientInterface $client, UserInterface $user, $redirect_uri, array $request_claims, array $scope, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null)
     {
         $id_token = $this->createEmptyIdToken();
         $exp = null !== $access_token ? $access_token->getExpiresAt() : time() + $this->getLifetime($client);
-
         $claims = array_merge(
             $this->userinfo->getUserinfo(
                 $client,
                 $user,
                 $redirect_uri,
+                $request_claims,
                 $scope
             ),
             [
@@ -120,7 +120,7 @@ class IdTokenManager implements IdTokenManagerInterface
                 'exp'       => $exp,
             ]
         );
-
+        
         foreach (['at_hash' => $access_token, 'c_hash' => $auth_code] as $key => $token) {
             if (null !== $token) {
                 $claims[$key] = $this->getHash($token->getToken());

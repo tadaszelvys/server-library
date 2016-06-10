@@ -140,6 +140,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
             $client,
             $user,
             $access_token->getMetadata('redirect_uri'),
+            $access_token->getMetadata('requested_claims'),
             $access_token->getScope()
         );
 
