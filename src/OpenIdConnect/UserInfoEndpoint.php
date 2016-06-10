@@ -135,12 +135,14 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
 
         $client = $this->getClient($access_token);
         $user = $this->getUser($access_token);
+        $endpoint_claims = $this->getEndpointClaims($access_token);
 
         $claims = $this->getUserinfo()->getUserinfo(
             $client,
             $user,
             $access_token->getMetadata('redirect_uri'),
-            $access_token->getMetadata('requested_claims'),
+            $access_token->getMetadata('claims_locales'),
+            $endpoint_claims,
             $access_token->getScope()
         );
 
@@ -161,6 +163,25 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
         }
 
         return $claims;
+    }
+
+    /**
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     *
+     * @return array
+     */
+    private function getEndpointClaims(AccessTokenInterface $access_token)
+    {
+        if (!$access_token->hasMetadata('requested_claims')) {
+            return [];
+        }
+        
+        $requested_claims = $access_token->getMetadata('requested_claims');
+        if (true === array_key_exists('userinfo', $requested_claims)) {
+            return $requested_claims['userinfo'];
+        }
+        
+        return [];
     }
 
     /**

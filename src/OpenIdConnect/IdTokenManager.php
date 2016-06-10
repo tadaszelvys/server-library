@@ -99,7 +99,7 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createIdToken(ClientInterface $client, UserInterface $user, $redirect_uri, array $request_claims, array $scope, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null)
+    public function createIdToken(ClientInterface $client, UserInterface $user, $redirect_uri, $claims_locales, array $request_claims, array $scope, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null)
     {
         $id_token = $this->createEmptyIdToken();
         $exp = null !== $access_token ? $access_token->getExpiresAt() : time() + $this->getLifetime($client);
@@ -108,6 +108,7 @@ class IdTokenManager implements IdTokenManagerInterface
                 $client,
                 $user,
                 $redirect_uri,
+                $claims_locales,
                 $request_claims,
                 $scope
             ),

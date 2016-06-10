@@ -46,7 +46,8 @@ class OpenIDConnectTest extends Base
             'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
-            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
+            'claims_locales'        => ['fr_fr', 'fr', 'de', 'en'],
+            'claims'                => ['id_token' => ['website' => ['essential' => false], 'picture' => ['essential' => false], 'email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['website' => ['essential' => false], 'picture' => ['essential' => false], 'email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -98,6 +99,7 @@ class OpenIDConnectTest extends Base
             ],
             $this->getAuthorizationEndpoint()->getResponseTypesSupported()
         );
+        dump($id_token->getClaims());
         $this->assertTrue($id_token->hasClaim('email'));
         $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('iss'));
@@ -140,7 +142,7 @@ class OpenIDConnectTest extends Base
     {
         $client = $this->getClientManager()->getClient('Mufasa');
         $user = $this->getUserManager()->getUser('user2');
-        $result = $this->getUserInfo()->getUserinfo($client, $user, 'https://foo.bar/', [], ['openid', 'email']);
+        $result = $this->getUserInfo()->getUserinfo($client, $user, 'https://foo.bar/', null, [], ['openid', 'email']);
 
         $this->assertEquals('OkKmIBUobGzXso3FyJo3yY0XzMPRS0AD-DjTXjIGLaq6VPuJtfyYQX2JiSXmtisuGuON05BhHQj2jQ17I09lRQ', $result['sub']);
         $this->assertArrayHasKey('_claim_names', $result);
@@ -302,7 +304,7 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
             'state'                 => 'ABCDEF',
             'scope'                 => 'openid',
-            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
+            'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -336,7 +338,7 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
             'state'                 => 'ABCDEF',
             'scope'                 => 'openid',
-            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
+            'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -381,7 +383,7 @@ class OpenIDConnectTest extends Base
             'scope'                 => 'openid',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
-            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
+            'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -418,7 +420,7 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
-            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
+            'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -488,7 +490,7 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
-            'claims'                => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]],
+            'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $authorization = $this->getAuthorizationFactory()->createFromRequest(
             $request,
@@ -628,6 +630,7 @@ class OpenIDConnectTest extends Base
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
                 $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId()),
                 $access_token->getMetadata('redirect_uri'),
+                null,
                 [],
                 $access_token->getScope()
             );
@@ -650,6 +653,7 @@ class OpenIDConnectTest extends Base
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
                 $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId()),
                 $access_token->getMetadata('redirect_uri'),
+                null,
                 [],
                 $access_token->getScope()
             );

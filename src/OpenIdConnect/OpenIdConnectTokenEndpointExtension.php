@@ -73,11 +73,14 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
             );
         }
         
+        $requested_claims = $this->getIdTokenClaims($access_token);
+        
         $id_token = $this->id_token_manager->createIdToken(
             $client,
             $user,
             $access_token->getMetadata('redirect_uri'),
-            $access_token->getMetadata('requested_claims'),
+            $access_token->getMetadata('claims_locales'),
+            $requested_claims,
             $access_token->getScope(),
             $claims,
             $access_token,
@@ -85,6 +88,25 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
         );
 
         return $id_token->toArray();
+    }
+
+    /**
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     *
+     * @return array
+     */
+    private function getIdTokenClaims(AccessTokenInterface $access_token)
+    {
+        if (!$access_token->hasMetadata('requested_claims')) {
+            return [];
+        }
+
+        $requested_claims = $access_token->getMetadata('requested_claims');
+        if (true === array_key_exists('id_token', $requested_claims)) {
+            return $requested_claims['id_token'];
+        }
+
+        return [];
     }
 
     /**
@@ -108,8 +130,10 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
             'redirect_uri' => $grant_type_response->getRedirectUri(),
         ];
         if ($grant_type_response->hasAdditionalData('auth_code') && null !== $grant_type_response->getAdditionalData('auth_code')) {
+            $data['claims_locales'] = array_key_exists('claims_locales', $grant_type_response->getAdditionalData('auth_code')->getQueryParams()) ? $grant_type_response->getAdditionalData('auth_code')->getQueryParams()['claims_locales'] : null;
             $data['requested_claims'] = array_key_exists('claims', $grant_type_response->getAdditionalData('auth_code')->getQueryParams()) ? $grant_type_response->getAdditionalData('auth_code')->getQueryParams()['claims'] : [];
         } else {
+            $data['claims_locales'] = null;
             $data['requested_claims'] = [];
         }
         

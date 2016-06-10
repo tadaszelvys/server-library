@@ -31,10 +31,11 @@ interface UserInfoInterface
      * @param \OAuth2\Client\ClientInterface $client
      * @param \OAuth2\User\UserInterface     $user
      * @param string                         $redirect_uri
+     * @param null|array                     $claims_locales
      * @param array                          $request_claims
      * @param string[]                       $scope
      *
      * @return array
      */
-    public function getUserinfo(ClientInterface $client, UserInterface $user, $redirect_uri, array $request_claims, array $scope);
+    public function getUserinfo(ClientInterface $client, UserInterface $user, $redirect_uri, $claims_locales, array $request_claims, array $scope);
 }

@@ -77,11 +77,13 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
     public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
     {
         $params = $authorization->getQueryParams();
+        $requested_claims = $this->getIdTokenClaims($authorization);
         $id_token = $this->getIdTokenManager()->createIdToken(
             $authorization->getClient(),
             $authorization->getUser(),
             $redirect_uri,
-            $authorization->has('claims') ? $authorization->get('claims') : [],
+            $authorization->has('claims_locales') ? $authorization->get('claims_locales') : null,
+            $requested_claims,
             $authorization->getScopes(),
             ['nonce' => $params['nonce']],
             $authorization->hasData('access_token') ? $authorization->getData('access_token') : null,
@@ -94,5 +96,24 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
             $response_parameters,
             $id_token->toArray()
         );
+    }
+
+    /**
+     * @param \OAuth2\Endpoint\Authorization $authorization
+     *
+     * @return array
+     */
+    private function getIdTokenClaims(Authorization $authorization)
+    {
+        if (!$authorization->has('claims')) {
+            return [];
+        }
+
+        $requested_claims = $authorization->get('claims');
+        if (true === array_key_exists('id_token', $requested_claims)) {
+            return $requested_claims['id_token'];
+        }
+
+        return [];
     }
 }

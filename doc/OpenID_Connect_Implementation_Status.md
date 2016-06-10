@@ -18,9 +18,9 @@ OpenID Connect Implementeation Status
             * [x] Scope `phone`
             * [x] Scope `address`
             * [x] Custom Scope
-        * [ ] [Claims Languages and Scripts](http://openid.net/specs/openid-connect-core-1_0.html#ClaimsLanguagesAndScripts)
+        * [x] [Claims Languages and Scripts](http://openid.net/specs/openid-connect-core-1_0.html#ClaimsLanguagesAndScripts)
         * [x] [UserInfo Endpoint](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
-        * [ ] [Requesting Claims using the "claims" Request Parameter](http://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter) *Partial Support*
+        * [x] [Requesting Claims using the "claims" Request Parameter](http://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter) *Partial Support*
         * [x] [Aggregated and Distributed Claims](http://openid.net/specs/openid-connect-core-1_0.html#AggregatedDistributedClaims)
     * [x] [Passing Request Parameters as JWTs](http://openid.net/specs/openid-connect-core-1_0.html#JWTRequests)
         * [x] Passing a Request Object by Value

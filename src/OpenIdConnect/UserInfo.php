@@ -56,7 +56,7 @@ final class UserInfo implements UserInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function getUserinfo(ClientInterface $client, UserInterface $user, $redirect_uri, array $request_claims, array $scope)
+    public function getUserinfo(ClientInterface $client, UserInterface $user, $redirect_uri, $claims_locales, array $request_claims, array $scope)
     {
         $this->checkScope($scope);
         $request_claims = array_merge(
@@ -64,7 +64,7 @@ final class UserInfo implements UserInfoInterface
             $request_claims
         );
         $request_claims['sub'] = null;
-        $claims = $this->getClaimValues($user, $request_claims);
+        $claims = $this->getClaimValues($user, $claims_locales, $request_claims);
         $claims = array_merge(
             $claims,
             $this->claim_source_manager->getUserInfo($user, $scope, [])
@@ -96,17 +96,26 @@ final class UserInfo implements UserInfoInterface
 
     /**
      * @param \OAuth2\User\UserInterface $user
+     * @param array|null                 $claims_locales
      * @param array                      $claims
      *
      * @return array
      */
-    private function getClaimValues(UserInterface $user, array $claims)
+    private function getClaimValues(UserInterface $user, $claims_locales, array $claims)
     {
         $result = [];
+        if (null === $claims_locales) {
+            $claims_locales = [];
+        }
+        $claims_locales[] = '';
         foreach ($claims as $claim => $config) {
-            $claim_value = $this->getUserClaim($user, $claim, $config);
-            if (null !== $claim_value) {
-                $result[$claim] = $claim_value;
+            foreach ($claims_locales as $claims_locale) {
+                $claim_locale = $this->computeClaimWithLocale($claim, $claims_locale);
+                $claim_value = $this->getUserClaim($user, $claim_locale, $config);
+                if (null !== $claim_value) {
+                    $result[$claim_locale] = $claim_value;
+                    break;
+                }
             }
         }
 
@@ -114,7 +123,23 @@ final class UserInfo implements UserInfoInterface
     }
 
     /**
+     * @param string $claim
+     * @param string $locale
+     *
+     * @return string
+     */
+    protected function computeClaimWithLocale($claim, $locale)
+    {
+        if (empty($locale)) {
+            return $claim;
+        }
+
+        return sprintf('%s#%s', $claim, $locale);
+    }
+
+    /**
      * @param \OAuth2\User\UserInterface $user
+     * @param string                     $claim
      * @param string                     $claim
      * @param null|array                 $config
      *

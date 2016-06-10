@@ -36,6 +36,10 @@ class UserManager implements UserManagerInterface
         $user1->set('email', 'root@localhost.com');
         $user1->set('email_verified', false);
         $user1->set('last_login_at', time() - 100);
+        $user1->set('website', 'https://john.doe.com');
+        $user1->set('website#fr_fr', 'https://john.doe.fr');
+        $user1->set('website#fr', 'https://john.doe.fr');
+        $user1->set('picture#de', 'https://john.doe.de/picture');
 
         $user2 = new User('user2', 'password2');
         $user2->set('last_login_at', time() - 1000);
