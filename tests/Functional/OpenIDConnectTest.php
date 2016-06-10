@@ -99,7 +99,7 @@ class OpenIDConnectTest extends Base
             ],
             $this->getAuthorizationEndpoint()->getResponseTypesSupported()
         );
-        dump($id_token->getClaims());
+        
         $this->assertTrue($id_token->hasClaim('email'));
         $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('iss'));
