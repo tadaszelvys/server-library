@@ -11,25 +11,11 @@
 
 namespace OAuth2\Scope;
 
-use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class ErrorScopePolicy implements ScopePolicyInterface
 {
-    use HasExceptionManager;
-
-    /**
-     * ErrorScopePolicy constructor.
-     *
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     */
-    public function __construct(ExceptionManagerInterface $exception_manager)
-    {
-        $this->setExceptionManager($exception_manager);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -43,6 +29,6 @@ final class ErrorScopePolicy implements ScopePolicyInterface
      */
     public function checkScopePolicy(array &$scope, ClientInterface $client, ServerRequestInterface $request = null)
     {
-        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'No scope was requested.');
+        throw new \InvalidArgumentException('No scope was requested.');
     }
 }

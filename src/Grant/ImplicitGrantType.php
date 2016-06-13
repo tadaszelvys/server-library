@@ -14,11 +14,11 @@ namespace OAuth2\Grant;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Behaviour\HasTokenTypeParameterSupport;
-use OAuth2\Endpoint\Authorization;
+use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 
-final class ImplicitGrantType implements ResponseTypeSupportInterface
+final class ImplicitGrantType implements ResponseTypeInterface
 {
     use HasTokenTypeManager;
     use HasAccessTokenManager;
@@ -56,7 +56,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
         //Nothing to do
     }
@@ -64,7 +64,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareAuthorization(Authorization $authorization)
+    public function prepareAuthorization(AuthorizationInterface $authorization)
     {
         $token_type = $this->getTokenTypeFromRequest($authorization->getQueryParams());
 
@@ -76,7 +76,7 @@ final class ImplicitGrantType implements ResponseTypeSupportInterface
             $authorization->getScopes(),
             null, // Refresh token
             null, // Resource Server
-            ['redirect_uri' => $authorization->get('redirect_uri')]
+            ['redirect_uri' => $authorization->getRedirectUri()]
         );
 
         $authorization->setData('access_token', $token);

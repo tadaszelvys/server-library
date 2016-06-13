@@ -25,13 +25,14 @@ use OAuth2\Client\AuthenticationMethod\ClientAssertionJwt;
 use OAuth2\Client\AuthenticationMethod\ClientSecretBasic;
 use OAuth2\Client\AuthenticationMethod\ClientSecretPost;
 use OAuth2\Client\AuthenticationMethod\None;
-use OAuth2\Endpoint\AuthorizationEndpoint;
-use OAuth2\Endpoint\AuthorizationFactory;
-use OAuth2\Endpoint\FragmentResponseMode;
-use OAuth2\Endpoint\QueryResponseMode;
-use OAuth2\Endpoint\TokenEndpoint;
-use OAuth2\Endpoint\TokenIntrospectionEndpoint;
-use OAuth2\Endpoint\TokenRevocationEndpoint;
+use OAuth2\Endpoint\Authorization\AuthorizationRequestLoader;
+use OAuth2\Test\Stub\AuthorizationEndpoint;
+use OAuth2\Endpoint\Authorization\AuthorizationFactory;
+use OAuth2\ResponseMode\FragmentResponseMode;
+use OAuth2\ResponseMode\QueryResponseMode;
+use OAuth2\Endpoint\Token\TokenEndpoint;
+use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
+use OAuth2\Endpoint\TokenRevocation\TokenRevocationEndpoint;
 use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\AuthCode;
 use OAuth2\Endpoint\TokenType\RefreshToken;
@@ -43,7 +44,7 @@ use OAuth2\Grant\JWTBearerGrantType;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManager;
-use OAuth2\OpenIdConnect\FormPostResponseMode;
+use OAuth2\ResponseMode\FormPostResponseMode;
 use OAuth2\OpenIdConnect\IdTokenGrantType;
 use OAuth2\OpenIdConnect\IdTokenManager;
 use OAuth2\OpenIdConnect\IssuerDiscoveryEndpoint;
@@ -154,28 +155,61 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var \OAuth2\Endpoint\AuthorizationFactory
+     * @var \OAuth2\Endpoint\Authorization\AuthorizationFactoryInterface
      */
     private $authorization_factory;
 
     /**
-     * @return \OAuth2\Endpoint\AuthorizationFactory
+     * @return \OAuth2\Endpoint\Authorization\AuthorizationFactoryInterface
      */
     protected function getAuthorizationFactory()
     {
         if (null === $this->authorization_factory) {
             $this->authorization_factory = new AuthorizationFactory(
+                $this->getAuthorizationRequestLoader(),
                 $this->getScopeManager(),
+                $this->getExceptionManager(),
+                true,
+                false,
+                false,
+                true
+            );
+            
+            $this->authorization_factory->addResponseType($this->getAuthorizationCodeGrantType());
+            $this->authorization_factory->addResponseType($this->getImplicitGrantType());
+            $this->authorization_factory->addResponseType($this->getNoneResponseType());
+            $this->authorization_factory->addResponseType($this->getIdTokenGrantType());
+
+            $this->authorization_factory->addResponseMode(new QueryResponseMode());
+            $this->authorization_factory->addResponseMode(new FragmentResponseMode());
+            $this->authorization_factory->addResponseMode(new FormPostResponseMode());
+        }
+
+        return $this->authorization_factory;
+    }
+
+    /**
+     * @var \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface
+     */
+    private $authorization__request_loader;
+
+    /**
+     * @return \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface
+     */
+    protected function getAuthorizationRequestLoader()
+    {
+        if (null === $this->authorization__request_loader) {
+            $this->authorization__request_loader = new AuthorizationRequestLoader(
                 $this->getClientManager(),
                 $this->getExceptionManager()
             );
 
-            $this->authorization_factory->enableRequestObjectSupport(
+            $this->authorization__request_loader->enableRequestObjectSupport(
                 $this->getJWTLoader()
             );
-            $this->authorization_factory->enableRequestObjectReferenceSupport();
+            $this->authorization__request_loader->enableRequestObjectReferenceSupport();
 
-            $this->authorization_factory->enableEncryptedRequestObjectSupport(
+            $this->authorization__request_loader->enableEncryptedRequestObjectSupport(
                 new JWKSet(['keys' => [
                     [
                         'kid' => 'JWK1',
@@ -187,16 +221,16 @@ class Base extends \PHPUnit_Framework_TestCase
             );
         }
 
-        return $this->authorization_factory;
+        return $this->authorization__request_loader;
     }
 
     /**
-     * @var null|\OAuth2\Endpoint\TokenRevocationEndpointInterface
+     * @var null|\OAuth2\Endpoint\TokenRevocation\TokenRevocationEndpointInterface
      */
     private $revocation_endpoint = null;
 
     /**
-     * @return \OAuth2\Endpoint\TokenRevocationEndpointInterface
+     * @return \OAuth2\Endpoint\TokenRevocation\TokenRevocationEndpointInterface
      */
     protected function getRevocationTokenEndpoint()
     {
@@ -340,12 +374,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Endpoint\TokenIntrospectionEndpoint
+     * @var null|\OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint
      */
     private $token_introspection_endpoint = null;
 
     /**
-     * @return \OAuth2\Endpoint\TokenIntrospectionEndpoint
+     * @return \OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint
      */
     protected function getTokenIntrospectionEndpoint()
     {
@@ -364,12 +398,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Endpoint\TokenEndpoint
+     * @var null|\OAuth2\Endpoint\Token\TokenEndpoint
      */
     private $token_endpoint = null;
 
     /**
-     * @return \OAuth2\Endpoint\TokenEndpoint
+     * @return \OAuth2\Endpoint\Token\TokenEndpoint
      */
     protected function getTokenEndpoint()
     {
@@ -420,36 +454,22 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Endpoint\AuthorizationEndpoint
+     * @var null|\OAuth2\Test\Stub\AuthorizationEndpoint
      */
     private $authorization_endpoint = null;
 
     /**
-     * @return \OAuth2\Endpoint\AuthorizationEndpoint
+     * @return \OAuth2\Test\Stub\AuthorizationEndpoint
      */
     protected function getAuthorizationEndpoint()
     {
         if (null === $this->authorization_endpoint) {
             $this->authorization_endpoint = new AuthorizationEndpoint(
+                $this->getUserManager(),
+                $this->getAuthorizationFactory(),
                 $this->getScopeManager(),
                 $this->getExceptionManager()
             );
-
-            $this->authorization_endpoint->addResponseType($this->getAuthorizationCodeGrantType());
-            $this->authorization_endpoint->addResponseType($this->getImplicitGrantType());
-            $this->authorization_endpoint->addResponseType($this->getNoneResponseType());
-            $this->authorization_endpoint->addResponseType($this->getIdTokenGrantType());
-
-            $this->authorization_endpoint->addResponseMode(new QueryResponseMode());
-            $this->authorization_endpoint->addResponseMode(new FragmentResponseMode());
-            $this->authorization_endpoint->addResponseMode(new FormPostResponseMode());
-
-            $this->authorization_endpoint->allowResponseModeParameterInAuthorizationRequest();
-            $this->authorization_endpoint->disallowResponseModeParameterInAuthorizationRequest();
-            $this->authorization_endpoint->allowResponseModeParameterInAuthorizationRequest();
-            $this->authorization_endpoint->enableStateParameterEnforcement();
-            $this->authorization_endpoint->disableStateParameterEnforcement();
-            $this->authorization_endpoint->enableStateParameterEnforcement();
         }
 
         return $this->authorization_endpoint;
@@ -1050,8 +1070,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->set('jwks_uri', 'https://my.server.com/jwks');
             $this->metadata->set('registration_endpoint', 'https://my.server.com/register');
             $this->metadata->set('scopes_supported', $this->getScopeManager()->getSupportedScopes());
-            $this->metadata->set('response_types_supported', $this->getAuthorizationEndpoint()->getResponseTypesSupported());
-            $this->metadata->set('response_modes_supported', $this->getAuthorizationEndpoint()->getResponseModesSupported());
+            $this->metadata->set('response_types_supported', $this->getAuthorizationFactory()->getResponseTypesSupported());
+            $this->metadata->set('response_modes_supported', $this->getAuthorizationFactory()->getResponseModesSupported());
             $this->metadata->set('grant_types_supported', $this->getTokenEndpoint()->getGrantTypesSupported());
             $this->metadata->set('acr_values_supported', []);
             $this->metadata->set('subject_types_supported', $this->getUserInfo()->isPairwiseSubjectIdentifierSupported() ? ['public', 'pairwise'] : ['public']);
@@ -1065,7 +1085,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->set('request_object_encryption_alg_values_supported', $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->set('request_object_encryption_enc_values_supported', $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());
             $this->metadata->set('token_endpoint_auth_methods_supported', $this->getClientManager()->getSupportedAuthenticationMethods());
-            $this->metadata->set('token_endpoint_auth_signing_alg_values_supported', $this->getAuthorizationFactory()->getSupportedSignatureAlgorithms());
+            $this->metadata->set('token_endpoint_auth_signing_alg_values_supported', $this->getAuthorizationRequestLoader()->getSupportedSignatureAlgorithms());
             $this->metadata->set('token_endpoint_auth_encryption_alg_values_supported', $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->set('token_endpoint_auth_encryption_enc_values_supported', $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());
             $this->metadata->set('display_values_supported', ['page']);
@@ -1075,8 +1095,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->set('claims_locales_supported', []);
             $this->metadata->set('ui_locales_supported', ['en_US', 'fr_FR']);
             $this->metadata->set('claims_parameter_supported', false);
-            $this->metadata->set('request_parameter_supported', $this->getAuthorizationFactory()->isRequestObjectSupportEnabled());
-            $this->metadata->set('request_uri_parameter_supported', $this->getAuthorizationFactory()->isRequestObjectReferenceSupportEnabled());
+            $this->metadata->set('request_parameter_supported', $this->getAuthorizationRequestLoader()->isRequestObjectSupportEnabled());
+            $this->metadata->set('request_uri_parameter_supported', $this->getAuthorizationRequestLoader()->isRequestObjectReferenceSupportEnabled());
             $this->metadata->set('require_request_uri_registration', true);
             $this->metadata->set('op_policy_uri', 'https://my.server.com/policy.html');
             $this->metadata->set('op_tos_uri', 'https://my.server.com/tos.html');

@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint;
+namespace OAuth2\Endpoint\Token;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManager;
@@ -24,7 +24,7 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\GrantTypeResponse;
 use OAuth2\Grant\GrantTypeResponseInterface;
-use OAuth2\Grant\GrantTypeSupportInterface;
+use OAuth2\Grant\GrantTypeInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
@@ -47,12 +47,12 @@ final class TokenEndpoint implements TokenEndpointInterface
     use HasTokenTypeParameterSupport;
 
     /**
-     * @var \OAuth2\Grant\GrantTypeSupportInterface[]
+     * @var \OAuth2\Grant\GrantTypeInterface[]
      */
     private $grant_types = [];
 
     /**
-     * @var \OAuth2\Endpoint\TokenEndpointExtensionInterface[]
+     * @var \OAuth2\Endpoint\Token\TokenEndpointExtensionInterface[]
      */
     private $token_endpoint_extensions = [];
 
@@ -88,7 +88,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Endpoint\TokenEndpointExtensionInterface $token_endpoint_extension
+     * @param \OAuth2\Endpoint\Token\TokenEndpointExtensionInterface $token_endpoint_extension
      */
     public function addTokenEndpointExtension(TokenEndpointExtensionInterface $token_endpoint_extension)
     {
@@ -96,9 +96,9 @@ final class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Grant\GrantTypeSupportInterface $grant_type
+     * @param \OAuth2\Grant\GrantTypeInterface $grant_type
      */
-    public function addGrantType(GrantTypeSupportInterface $grant_type)
+    public function addGrantType(GrantTypeInterface $grant_type)
     {
         $type = $grant_type->getGrantType();
         if (!array_key_exists($type, $this->grant_types)) {
@@ -170,7 +170,12 @@ final class TokenEndpoint implements TokenEndpointInterface
         $grant_type_response->setAvailableScope($grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopesForClient($client));
 
         //Modify the scope according to the scope policy
-        $grant_type_response->setRequestedScope($this->getScopeManager()->checkScopePolicy($grant_type_response->getRequestedScope(), $client));
+        try {
+            $requested_scope = $this->getScopeManager()->checkScopePolicy($grant_type_response->getRequestedScope(), $client);
+        } catch (\InvalidArgumentException $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, $e->getMessage());
+        }
+        $grant_type_response->setRequestedScope($requested_scope);
 
         //Check if scope requested are within the available scope
         $this->checkRequestedScope($grant_type_response);
@@ -287,7 +292,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     private function checkRequestedScope(GrantTypeResponseInterface $grant_type_response)
     {
         //Check if scope requested are within the available scope
-        if (!$this->getScopeManager()->checkScopes($grant_type_response->getRequestedScope(), $grant_type_response->getAvailableScope())) {
+        if (!$this->getScopeManager()->areRequestScopesAvailable($grant_type_response->getRequestedScope(), $grant_type_response->getAvailableScope())) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, sprintf('An unsupported scope was requested. Available scopes are [%s]', implode(',', $grant_type_response->getAvailableScope())));
         }
     }
@@ -387,7 +392,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return \OAuth2\Grant\GrantTypeSupportInterface
+     * @return \OAuth2\Grant\GrantTypeInterface
      */
     private function getGrantType(array $request_parameters)
     {

@@ -96,7 +96,9 @@ final class Listener implements ListenerInterface
     }
 
     /**
-     * @param null|string$token
+     * @param null|string $token
+     *
+     * @throws \OAuth2\Exception\AuthenticateExceptionInterface
      */
     private function checkToken($token)
     {

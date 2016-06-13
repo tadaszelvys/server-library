@@ -145,7 +145,7 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function checkScopes(array $requestedScopes, array $availableScopes)
+    public function areRequestScopesAvailable(array $requestedScopes, array $availableScopes)
     {
         return 0 === count(array_diff($requestedScopes, $availableScopes));
     }

@@ -14,7 +14,6 @@ namespace OAuth2\Test\Functional;
 use Jose\Factory\JWEFactory;
 use Jose\Factory\JWSFactory;
 use Jose\Object\JWK;
-use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Test\Base;
 use PHPHtmlParser\Dom;
 use Zend\Diactoros\Response;
@@ -27,18 +26,12 @@ class ImplicitGrantTypeTest extends Base
 {
     public function testClientIdParameterIsMissing()
     {
-        try {
-            $request = new ServerRequest();
-            $this->getAuthorizationFactory()->createFromRequest(
-                $request,
-                $this->getUserManager()->getUser('user1'),
-                true
-            );
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('Parameter "client_id" missing or invalid.', $e->getDescription());
-        }
+        $request = new ServerRequest();
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"invalid_request","error_description":"Parameter \"client_id\" missing or invalid.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testResponseTypeParameterIsMissing()
@@ -46,22 +39,28 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'client_id' => 'foo',
-            'state'     => '012345679',
+            'state'     => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('The "response_type" parameter is mandatory.', $e->getDescription());
-        }
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"invalid_request","error_description":"The parameter \"response_type\" is mandatory.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+    }
+
+    public function testStateParameterIsMissing()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'response_type' => 'token',
+            'redirect_uri'  => 'http://example.com/test?good=true',
+            'client_id'     => 'foo',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"invalid_request","error_description":"The parameter \"state\" is mandatory.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testRedirectUriParameterIsNotValid()
@@ -71,21 +70,13 @@ class ImplicitGrantTypeTest extends Base
             'response_type' => 'token',
             'redirect_uri'  => 'http://example.com/test?good=true',
             'client_id'     => 'foo',
+            'state'         => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('The specified redirect URI is not valid', $e->getDescription());
-        }
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"invalid_request","error_description":"The specified redirect URI is not valid.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testResponseTypeParameterIsNotSupported()
@@ -95,46 +86,29 @@ class ImplicitGrantTypeTest extends Base
             'redirect_uri'  => 'http://example.com/test?good=false',
             'client_id'     => 'foo',
             'response_type' => 'bad_response_type',
-            'state'         => '012345679',
+            'state'         => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('Response type "bad_response_type" is not supported by this server', $e->getDescription());
-        }
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"invalid_request","error_description":"Response type \"bad_response_type\" is not supported by this server","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testNonConfidentialClientMustRegisterAtLeastOneRedirectUri()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'oof',
-            'response_type'         => 'bad_response_type',
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'oof',
+            'response_type' => 'bad_response_type',
+            'state'         => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_client', $e->getMessage());
-            $this->assertEquals('Non-confidential clients must register at least one redirect URI', $e->getDescription());
-        }
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"invalid_request","error_description":"Non-confidential clients must register at least one redirect URI.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testResponseTypeisNotAuthorizedForTheClient()
@@ -144,22 +118,13 @@ class ImplicitGrantTypeTest extends Base
             'redirect_uri'  => 'http://example.com/test?good=false',
             'client_id'     => 'fii',
             'response_type' => 'token',
-            'state'         => '012345679',
+            'state'         => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('unauthorized_client', $e->getMessage());
-            $this->assertEquals('The response type "token" is unauthorized for this client.', $e->getDescription());
-        }
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"unauthorized_client","error_description":"The response type \"token\" is unauthorized for this client.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/unauthorized_client"}', $response->getBody()->getContents());
     }
 
     public function testResourceOwnerDeniedAccess()
@@ -169,17 +134,14 @@ class ImplicitGrantTypeTest extends Base
             'redirect_uri'  => 'http://example.com/test?good=false',
             'client_id'     => 'foo',
             'response_type' => 'token',
-            'state'         => '012345679',
+            'state'         => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            false
-        );
-
         $response = new Response();
-        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertEquals('http://example.com/test?good=false#error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied&state=012345679', $response->getHeader('Location')[0]);
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(false);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertEquals('http://example.com/test?good=false#error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied&state=0123456789', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccess()
@@ -189,17 +151,14 @@ class ImplicitGrantTypeTest extends Base
             'redirect_uri'  => 'http://example.com/test?good=false',
             'client_id'     => 'foo',
             'response_type' => 'token',
-            'state'         => '012345679',
+            'state'         => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessUsingSignedRequest()
@@ -240,17 +199,15 @@ class ImplicitGrantTypeTest extends Base
             'client_id'     => 'bad_client', // Wil be ignored as already set in the request object
             'redirect_uri'  => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
             'scope'         => 'openid email profile address', // Wil be ignored as already set in the request object
-            'state'         => '012345679',
+            'state'         => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessUsingSignedAndEncryptedRequest()
@@ -311,17 +268,14 @@ class ImplicitGrantTypeTest extends Base
             'client_id'     => 'bad_client', // Wil be ignored as already set in the request object
             'redirect_uri'  => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
             'scope'         => 'openid email profile address', // Wil be ignored as already set in the request object
-            'state'         => '012345679',
+            'state'         => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessUsingSignedRequestUri()
@@ -333,14 +287,11 @@ class ImplicitGrantTypeTest extends Base
             'redirect_uri' => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
             'scope'        => 'openid email profile address', // Wil be ignored as already set in the request object
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
     }
 
@@ -353,14 +304,11 @@ class ImplicitGrantTypeTest extends Base
             'redirect_uri' => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
             'scope'        => 'openid email profile address', // Wil be ignored as already set in the request object
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
     }
 
@@ -373,14 +321,11 @@ class ImplicitGrantTypeTest extends Base
             'response_type'         => 'token',
             'state'                 => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
@@ -394,14 +339,10 @@ class ImplicitGrantTypeTest extends Base
             'state'                 => '0123456789',
             'response_mode'         => 'form_post',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
-        $this->getAuthorizationEndpoint()->authorize($authorization, $response);
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
@@ -424,26 +365,16 @@ class ImplicitGrantTypeTest extends Base
             'state'                 => '0123456789',
             'response_mode'         => 'foo_bar',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('Unsupported response mode "foo_bar".', $e->getDescription());
-        }
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported response mode \"foo_bar\".","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenSuccessWithUnsupportedResponseModeParameter()
     {
-        $this->getAuthorizationEndpoint()->disallowResponseModeParameterInAuthorizationRequest();
+        //$this->getAuthorizationEndpoint()->disallowResponseModeParameterInAuthorizationRequest();
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -452,22 +383,12 @@ class ImplicitGrantTypeTest extends Base
             'state'                 => '0123456789',
             'response_mode'         => 'fragment',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('The response mode parameter is not authorized.', $e->getDescription());
-        }
-        $this->getAuthorizationEndpoint()->allowResponseModeParameterInAuthorizationRequest();
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithUnsupportedResponseTypeCombination()
@@ -479,20 +400,10 @@ class ImplicitGrantTypeTest extends Base
             'response_type'         => 'token code id_token',
             'state'                 => '0123456789',
         ]);
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
-
         $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        try {
-            $this->getAuthorizationEndpoint()->authorize($authorization, $response);
-            $this->fail('Should throw an Exception');
-        } catch (BaseExceptionInterface $e) {
-            $this->assertEquals('invalid_request', $e->getMessage());
-            $this->assertEquals('Unsupported response type combination "token code id_token".', $e->getDescription());
-        }
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported response type combination \"token code id_token\".","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 }

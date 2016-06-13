@@ -9,10 +9,9 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect;
+namespace OAuth2\ResponseMode;
 
-use OAuth2\Endpoint\ResponseModeInterface;
-use OAuth2\Grant\ResponseTypeSupportInterface;
+use OAuth2\Grant\ResponseTypeInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class FormPostResponseMode implements ResponseModeInterface
@@ -22,7 +21,7 @@ class FormPostResponseMode implements ResponseModeInterface
      */
     public function getName()
     {
-        return ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_FORM_POST;
+        return ResponseTypeInterface::RESPONSE_TYPE_MODE_FORM_POST;
     }
 
     /**

@@ -30,7 +30,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"The request must be secured.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"The request must be secured.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testMissingTokenParameter()
@@ -42,7 +42,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Parameter \"token\" is missing","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Parameter \"token\" is missing","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenIntrospectionAllowedForAuthenticatedConfidentialClient()
@@ -107,7 +107,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported token type hint","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported token type hint","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenNotIntrospectionNotForAuthenticatedPublicClientAndTypeHint()
@@ -120,7 +120,7 @@ class TokenIntrospectionEndpointTest extends Base
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('EFGH'));
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testRefreshTokenIntrospectionNotForAuthenticatedPublicClient()
@@ -160,7 +160,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertRegExp('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unable to find token or client not authenticated.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testFooTokenNotSupported()
@@ -173,6 +173,6 @@ class TokenIntrospectionEndpointTest extends Base
 
         $this->assertInstanceOf(RefreshTokenInterface::class, $this->getRefreshTokenManager()->getRefreshToken('VALID_REFRESH_TOKEN'));
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported token type hint","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported token type hint","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 }

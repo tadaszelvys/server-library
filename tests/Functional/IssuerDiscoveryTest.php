@@ -28,7 +28,7 @@ class IssuerDiscoveryTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"The request must be secured.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"The request must be secured.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testNoRelInTheRequest()
@@ -40,7 +40,7 @@ class IssuerDiscoveryTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"The parameter \"rel\" is mandatory.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"The parameter \"rel\" is mandatory.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testUnsupportedRelInTheRequest()
@@ -52,7 +52,7 @@ class IssuerDiscoveryTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported \"rel\" parameter value.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported \"rel\" parameter value.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testMissingResourceInTheRequest()
@@ -64,7 +64,7 @@ class IssuerDiscoveryTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"The parameter \"resource\" is mandatory.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"The parameter \"resource\" is mandatory.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testUnsupportedXRIResourceInTheRequest()
@@ -76,7 +76,7 @@ class IssuerDiscoveryTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported Extensible Resource Identifier (XRI) resource value.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported Extensible Resource Identifier (XRI) resource value.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testUnsupportedDomainForEmailResourceInTheRequest()
@@ -88,7 +88,7 @@ class IssuerDiscoveryTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported domain.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported domain.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testUnsupportedDomainForUriResourceInTheRequest()
@@ -100,7 +100,7 @@ class IssuerDiscoveryTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported domain.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported domain.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testInvalidResourceFormatInTheRequest()
@@ -112,7 +112,7 @@ class IssuerDiscoveryTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported resource value. Must be compliant with RFC3986 (URI) or RFC5322 (e-mail).","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported resource value. Must be compliant with RFC3986 (URI) or RFC5322 (e-mail).","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
     public function testDomainForEmailResourceInTheRequest()

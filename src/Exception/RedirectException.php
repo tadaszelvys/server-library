@@ -12,8 +12,8 @@
 namespace OAuth2\Exception;
 
 use Assert\Assertion;
-use OAuth2\Grant\ResponseTypeSupportInterface;
-use OAuth2\Util\Uri;
+use OAuth2\ResponseMode\ResponseModeInterface;
+use Psr\Http\Message\ResponseInterface;
 
 final class RedirectException extends BaseException implements RedirectExceptionInterface
 {
@@ -23,9 +23,9 @@ final class RedirectException extends BaseException implements RedirectException
     private $redirect_uri;
 
     /**
-     * @var string
+     * @var \OAuth2\ResponseMode\ResponseModeInterface
      */
-    private $transport_mode;
+    private $response_mode;
 
     /**
      * @param string $error             Short name of the error
@@ -38,16 +38,30 @@ final class RedirectException extends BaseException implements RedirectException
         parent::__construct(302, $error, $error_description, $error_data);
 
         Assertion::keyExists($data, 'redirect_uri', 'redirect_uri_not_defined');
-        Assertion::false(
-            !array_key_exists('transport_mode', $data) || !in_array($data['transport_mode'], [ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_FRAGMENT, ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_QUERY]),
-            'invalid_transport_mode'
-        );
-        $this->transport_mode = $data['transport_mode'];
+        Assertion::keyExists($data, 'response_mode', 'invalid_response_mode');
+        Assertion::isInstanceOf($data['response_mode'], ResponseModeInterface::class, 'invalid_response_mode');
+        $this->response_mode = $data['response_mode'];
 
         $this->redirect_uri = $data['redirect_uri'];
 
         if (array_key_exists('state', $data) && null !== $data['state']) {
             $this->errorData['state'] = $data['state'];
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHttpResponse(ResponseInterface &$response)
+    {
+        $this->response_mode->prepareResponse(
+            $this->redirect_uri,
+            $this->getResponseData(),
+            $response
+        );
+
+        foreach ($this->getResponseHeaders() as $name => $header) {
+            $response = $response->withAddedHeader($name, $header);
         }
     }
 
@@ -63,20 +77,7 @@ final class RedirectException extends BaseException implements RedirectException
      */
     public function getResponseHeaders()
     {
-        $data = $this->errorData;
-        if (array_key_exists('error_uri', $data)) {
-            $data['error_uri'] = urldecode($data['error_uri']);
-        }
-        $params = [$this->transport_mode => $data];
-        if (!array_key_exists('fragment', $params)) {
-            $params['fragment'] = [];
-        }
-
-        $uri = Uri::buildURI($this->redirect_uri, $params);
-        $this->checkHeaderValue($uri);
-
         return [
-            'Location'                => $uri,
             'Content-Security-Policy' => 'referrer origin;', // The header is used to mitigate closing redirectors
         ];
     }

@@ -46,7 +46,7 @@ class PostTokenRevocationEndpointTest extends Base
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"The request must be secured.","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"})', $response->getBody()->getContents());
+        $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"The request must be secured.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"})', $response->getBody()->getContents());
     }
 
     public function testMissingTokenParameter()
@@ -74,7 +74,7 @@ class PostTokenRevocationEndpointTest extends Base
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"Parameter \"token\" is missing","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"})', $response->getBody()->getContents());
+        $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"Parameter \"token\" is missing","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"})', $response->getBody()->getContents());
     }
 
     public function testAccessTokenNotForAuthenticatedClient()
@@ -102,7 +102,7 @@ class PostTokenRevocationEndpointTest extends Base
 
         $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"Parameter \"token\" is missing","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FBadRequest%2Finvalid_request"})', $response->getBody()->getContents());
+        $this->assertEquals('foo.bar({"error":"invalid_request","error_description":"Parameter \"token\" is missing","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"})', $response->getBody()->getContents());
     }
 
     public function testAccessTokenRevokedForAuthenticatedConfidentialClient()
@@ -303,6 +303,6 @@ class PostTokenRevocationEndpointTest extends Base
 
         $this->assertInstanceOf(RefreshTokenInterface::class, $this->getRefreshTokenManager()->getRefreshToken('VALID_REFRESH_TOKEN'));
         $this->assertEquals(501, $response->getStatusCode());
-        $this->assertEquals('foo.bar({"error":"unsupported_token_type","error_description":"Token type \"foo_token\" not supported","error_uri":"https%3A%2F%2Ffoo.test%2FError%2FNotImplemented%2Funsupported_token_type"})', $response->getBody()->getContents());
+        $this->assertEquals('foo.bar({"error":"unsupported_token_type","error_description":"Token type \"foo_token\" not supported","error_uri":"https:\/\/foo.test\/Error\/NotImplemented\/unsupported_token_type"})', $response->getBody()->getContents());
     }
 }

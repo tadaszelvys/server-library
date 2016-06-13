@@ -22,7 +22,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class JWTBearerGrantType implements GrantTypeSupportInterface
+final class JWTBearerGrantType implements GrantTypeInterface
 {
     use HasExceptionManager;
     use HasJWTLoader;

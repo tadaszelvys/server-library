@@ -14,7 +14,7 @@ namespace OAuth2\Grant;
 use OAuth2\Client\ClientInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface GrantTypeSupportInterface
+interface GrantTypeInterface
 {
     /**
      * This function returns the supported grant type.

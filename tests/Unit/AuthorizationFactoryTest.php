@@ -11,6 +11,7 @@
 
 namespace OAuth2\Test\Unit;
 
+use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Test\Base;
 
 /**
@@ -27,28 +28,44 @@ class AuthorizationFactoryTest extends Base
             'response_type' => 'token',
             'display'       => 'page',
             'prompt'        => 'none',
+            'redirect_uri'  => 'https://another.uri/callback',
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
-        $authorization = $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-        true
-        );
+        $authorization = $this->getAuthorizationFactory()->createAuthorizationFromRequest($request);
+        $authorization->setUser($this->getUserManager()->getUser('user1'));
+        $authorization->setAuthorized(true);
 
-        $this->assertEquals('0123456789', $authorization->get('state'));
-        $this->assertEquals('foo', $authorization->get('client_id'));
+        $this->assertEquals('0123456789', $authorization->getQueryParam('state'));
+        $this->assertEquals('foo', $authorization->getQueryParam('client_id'));
         $this->assertEquals('foo', $authorization->getClient()->getPublicId());
-        $this->assertEquals('token', $authorization->get('response_type'));
-        $this->assertEquals('page', $authorization->get('display'));
-        $this->assertEquals('none', $authorization->get('prompt'));
-        $this->assertEquals('scope1 scope2', $authorization->get('scope'));
-        $this->assertEquals($params, $authorization->getQueryParams());
+        $this->assertEquals('token', $authorization->getQueryParam('response_type'));
+        $this->assertEquals('page', $authorization->getQueryParam('display'));
+        $this->assertEquals(['none'], $authorization->getQueryParam('prompt'));
+        $this->assertEquals(['scope1','scope2'], $authorization->getQueryParam('scope'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage  Invalid "prompt" parameter. Allowed values are [null,"none","login","consent","select_account"]
-     */
+    public function testPromptNoneMustBeUsedAlone()
+    {
+        $params = [
+            'client_id'     => 'foo',
+            'state'         => '0123456789',
+            'scope'         => 'scope1 scope2',
+            'response_type' => 'token',
+            'display'       => 'page',
+            'prompt'        => 'none login',
+            'redirect_uri'  => 'https://another.uri/callback',
+        ];
+        $request = $this->createRequest('/?'.http_build_query($params));
+
+        try {
+            $this->getAuthorizationFactory()->createAuthorizationFromRequest($request);
+            $this->fail('The expected exception was not thrown');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Invalid parameter "prompt". Prompt value "none" must be used alone.', $e->getDescription());
+        }
+    }
+
     public function testCreateAuthorizationWithBadPrompt()
     {
         $params = [
@@ -60,32 +77,34 @@ class AuthorizationFactoryTest extends Base
             'prompt'        => 'foo',
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
-        $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
+
+        try {
+            $this->getAuthorizationFactory()->createAuthorizationFromRequest($request);
+            $this->fail('The expected exception was not thrown');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Invalid parameter "prompt". Allowed values are ["none","login","consent","select_account"]', $e->getDescription());
+        }
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage  Invalid "display" parameter. Allowed values are [null,"page","popup","touch","wap"]
-     */
     public function testCreateAuthorizationWithBadDisplay()
     {
         $params = [
-            'client_id'     => 'foo',
-            'state'         => '0123456789',
-            'scope'         => 'scope1 scope2',
+            'client_id' => 'foo',
+            'state' => '0123456789',
+            'scope' => 'scope1 scope2',
             'response_type' => 'token',
-            'display'       => 'foo',
-            'prompt'        => 'none',
+            'display' => 'foo',
+            'prompt' => 'none',
+            'redirect_uri' => 'https://another.uri/callback',
         ];
-        $request = $this->createRequest('/?'.http_build_query($params));
-        $this->getAuthorizationFactory()->createFromRequest(
-            $request,
-            $this->getUserManager()->getUser('user1'),
-            true
-        );
+        $request = $this->createRequest('/?' . http_build_query($params));
+        try {
+            $this->getAuthorizationFactory()->createAuthorizationFromRequest($request);
+            $this->fail('The expected exception was not thrown');
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals('invalid_request', $e->getMessage());
+            $this->assertEquals('Invalid parameter "display". Allowed values are ["page","popup","touch","wap"]', $e->getDescription());
+        }
     }
 }

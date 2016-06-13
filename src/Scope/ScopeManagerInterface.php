@@ -65,7 +65,7 @@ interface ScopeManagerInterface
      *
      * @return bool Return true if the requested scope is within the available scope
      */
-    public function checkScopes(array $requestedScopes, array $availableScopes);
+    public function areRequestScopesAvailable(array $requestedScopes, array $availableScopes);
 
     /**
      * Convert a string that contains at least one scope to an array of scopes.

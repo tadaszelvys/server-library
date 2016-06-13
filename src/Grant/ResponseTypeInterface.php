@@ -11,9 +11,9 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Endpoint\Authorization;
+use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 
-interface ResponseTypeSupportInterface
+interface ResponseTypeInterface
 {
     const RESPONSE_TYPE_MODE_FRAGMENT = 'fragment';
     const RESPONSE_TYPE_MODE_QUERY = 'query';
@@ -38,18 +38,18 @@ interface ResponseTypeSupportInterface
     /**
      * This function checks the request and prepare the authorization response.
      *
-     * @param \OAuth2\Endpoint\Authorization $authorization The authorization object
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization The authorization object
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return array
      */
-    public function prepareAuthorization(Authorization $authorization);
+    public function prepareAuthorization(AuthorizationInterface $authorization);
 
     /**
      * This function finish the authorization response.
      *
-     * @param \OAuth2\Endpoint\Authorization $authorization       The authorization object
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization The authorization object
      * @param array                          $response_parameters The parameters to send to the client
      * @param string                         $redirect_uri        The redirect URI
      *
@@ -57,5 +57,5 @@ interface ResponseTypeSupportInterface
      *
      * @return array
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri);
+    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri);
 }

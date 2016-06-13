@@ -22,9 +22,9 @@ class UriExtension implements ExceptionExtensionInterface
     public function getData($type, $error, $error_description, array $data)
     {
         if ($type !== ExceptionManagerInterface::INTERNAL_SERVER_ERROR) {
-            return ['error_uri' => urlencode("https://foo.test/Error/$type/$error")];
+            return ['error_uri' => "https://foo.test/Error/$type/$error"];
         }
 
-        return ['error_uri' => urlencode("https://foo.test/Internal/$type/$error")];
+        return ['error_uri' => "https://foo.test/Internal/$type/$error"];
     }
 }

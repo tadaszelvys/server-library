@@ -13,12 +13,12 @@ namespace OAuth2\OpenIdConnect;
 
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
-use OAuth2\Endpoint\Authorization;
+use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Grant\ResponseTypeSupportInterface;
+use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 
-final class IdTokenGrantType implements ResponseTypeSupportInterface
+final class IdTokenGrantType implements ResponseTypeInterface
 {
     use HasTokenTypeManager;
     use HasIdTokenManager;
@@ -59,7 +59,7 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareAuthorization(Authorization $authorization)
+    public function prepareAuthorization(AuthorizationInterface $authorization)
     {
         if (!in_array('openid', $authorization->getScopes())) {
             return [];
@@ -74,7 +74,7 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
         $params = $authorization->getQueryParams();
         $requested_claims = $this->getIdTokenClaims($authorization);
@@ -82,7 +82,7 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
             $authorization->getClient(),
             $authorization->getUser(),
             $redirect_uri,
-            $authorization->has('claims_locales') ? $authorization->get('claims_locales') : null,
+            $authorization->hasQueryParam('claims_locales') ? $authorization->getQueryParam('claims_locales') : null,
             $requested_claims,
             $authorization->getScopes(),
             ['nonce' => $params['nonce']],
@@ -99,17 +99,17 @@ final class IdTokenGrantType implements ResponseTypeSupportInterface
     }
 
     /**
-     * @param \OAuth2\Endpoint\Authorization $authorization
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
      *
      * @return array
      */
-    private function getIdTokenClaims(Authorization $authorization)
+    private function getIdTokenClaims(AuthorizationInterface $authorization)
     {
-        if (!$authorization->has('claims')) {
+        if (!$authorization->hasQueryParam('claims')) {
             return [];
         }
 
-        $requested_claims = $authorization->get('claims');
+        $requested_claims = $authorization->getQueryParam('claims');
         if (true === array_key_exists('id_token', $requested_claims)) {
             return $requested_claims['id_token'];
         }

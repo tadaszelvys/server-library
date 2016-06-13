@@ -9,20 +9,20 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint;
+namespace OAuth2\ResponseMode;
 
-use OAuth2\Grant\ResponseTypeSupportInterface;
+use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
 
-final class QueryResponseMode implements ResponseModeInterface
+final class FragmentResponseMode implements ResponseModeInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return ResponseTypeSupportInterface::RESPONSE_TYPE_MODE_QUERY;
+        return ResponseTypeInterface::RESPONSE_TYPE_MODE_FRAGMENT;
     }
 
     /**
@@ -31,9 +31,6 @@ final class QueryResponseMode implements ResponseModeInterface
     public function prepareResponse($redirect_uri, array $data, ResponseInterface &$response)
     {
         $params = empty($data) ? [] : [$this->getName() => $data];
-        if (!array_key_exists('fragment', $params)) {
-            $params['fragment'] = [];
-        }
 
         $response = $response->withStatus(302)
             ->withHeader('Location', Uri::buildURI($redirect_uri, $params));

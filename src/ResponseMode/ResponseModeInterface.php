@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint;
+namespace OAuth2\ResponseMode;
 
 use Psr\Http\Message\ResponseInterface;
 

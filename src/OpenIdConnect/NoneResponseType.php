@@ -14,8 +14,8 @@ namespace OAuth2\OpenIdConnect;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Behaviour\HasTokenTypeParameterSupport;
-use OAuth2\Endpoint\Authorization;
-use OAuth2\Grant\ResponseTypeSupportInterface;
+use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 
@@ -28,7 +28,7 @@ use OAuth2\Token\TokenTypeManagerInterface;
  *
  * @see http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#none
  */
-final class NoneResponseType implements ResponseTypeSupportInterface
+final class NoneResponseType implements ResponseTypeInterface
 {
     use HasTokenTypeManager;
     use HasAccessTokenManager;
@@ -79,7 +79,7 @@ final class NoneResponseType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
         //Nothing to do
     }
@@ -87,7 +87,7 @@ final class NoneResponseType implements ResponseTypeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareAuthorization(Authorization $authorization)
+    public function prepareAuthorization(AuthorizationInterface $authorization)
     {
         $token_type = $this->getTokenTypeFromRequest($authorization->getQueryParams());
 
@@ -99,7 +99,7 @@ final class NoneResponseType implements ResponseTypeSupportInterface
             $authorization->getScopes(),
             null, // Refresh token
             null, // Resource Server
-            ['redirect_uri' => $authorization->get('redirect_uri')]
+            ['redirect_uri' => $authorization->getQueryParam('redirect_uri')]
         );
 
         $authorization->setData('access_token', $token);

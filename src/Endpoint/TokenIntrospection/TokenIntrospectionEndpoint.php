@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint;
+namespace OAuth2\Endpoint\TokenIntrospection;
 
 use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;

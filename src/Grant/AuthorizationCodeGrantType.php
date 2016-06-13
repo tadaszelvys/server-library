@@ -15,7 +15,7 @@ use OAuth2\Behaviour\HasAuthorizationCodeManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Endpoint\Authorization;
+use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
 use OAuth2\Grant\PKCEMethod\Plain;
@@ -26,7 +26,7 @@ use OAuth2\Token\AuthCodeManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, GrantTypeSupportInterface
+final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInterface
 {
     use HasExceptionManager;
     use HasAuthorizationCodeManager;
@@ -108,7 +108,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
         //Nothing to do
     }
@@ -116,7 +116,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     /**
      * {@inheritdoc}
      */
-    public function prepareAuthorization(Authorization $authorization)
+    public function prepareAuthorization(AuthorizationInterface $authorization)
     {
         $offline_access = $this->isOfflineAccessRequested($authorization);
 
@@ -124,7 +124,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
             $authorization->getClient(),
             $authorization->getUser(),
             $authorization->getQueryParams(),
-            $authorization->has('redirect_uri') ? $authorization->get('redirect_uri') : null,
+            $authorization->getQueryParam('redirect_uri') ? $authorization->getQueryParam('redirect_uri') : null,
             $authorization->getScopes(),
             $offline_access
         );
@@ -331,11 +331,11 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
     }
 
     /**
-     * @param \OAuth2\Endpoint\Authorization $authorization
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
      *
      * @return bool
      */
-    private function isOfflineAccessRequested(Authorization $authorization)
+    private function isOfflineAccessRequested(AuthorizationInterface $authorization)
     {
         // The scope offline_access is not requested
         if (!in_array('offline_access', $authorization->getScopes())) {
@@ -344,10 +344,8 @@ final class AuthorizationCodeGrantType implements ResponseTypeSupportInterface, 
 
         // The scope offline_access is requested but prompt is not consent
         // The scope offline_access is ignored
-        if (!$authorization->has('prompt') || 'consent' !== $authorization->get('prompt')) {
-            $scope = $authorization->getScopes();
-            unset($scope[array_search('offline_access', $scope)]);
-            $authorization->setScopes($scope);
+        if (!$authorization->hasQueryParam('prompt') || !in_array('consent', $authorization->getQueryParam('prompt'))) {
+            $authorization->unsetScope('offline_access');
 
             return false;
         }

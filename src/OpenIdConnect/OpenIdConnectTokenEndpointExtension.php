@@ -12,7 +12,7 @@
 namespace OAuth2\OpenIdConnect;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\Endpoint\TokenEndpointExtensionInterface;
+use OAuth2\Endpoint\Token\TokenEndpointExtensionInterface;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
