@@ -14,13 +14,13 @@ namespace OAuth2\Endpoint\Authorization\PreConfiguredAuthorization;
 interface PreConfiguredAuthorizationManagerInterface
 {
     /**
-     * @param string $resource_owner_public_id
-     * @param string $client_public_id
-     * @param string $request_scope
+     * @param string   $resource_owner_public_id
+     * @param string   $client_public_id
+     * @param string[] $request_scope
      *
      * @return \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface|null
      */
-    public function findOnePreConfiguredAuthorization($resource_owner_public_id, $client_public_id, $request_scope);
+    public function findOnePreConfiguredAuthorization($resource_owner_public_id, $client_public_id, array $request_scope);
 
     /**
      * @return \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface
@@ -28,7 +28,7 @@ interface PreConfiguredAuthorizationManagerInterface
     public function createPreConfiguredAuthorization();
 
     /**
-     * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface $authorization
+     * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface $pre_configured_authorization
      */
-    public function savePreConfiguredAuthorization(PreConfiguredAuthorizationInterface $authorization);
+    public function savePreConfiguredAuthorization(PreConfiguredAuthorizationInterface $pre_configured_authorization);
 }

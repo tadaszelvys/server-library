@@ -517,7 +517,7 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->getClaim('c_hash') === $id_token2->getClaim('c_hash'));
     }
 
-    public function testNoneSuccess()
+    public function testNoneGrantTypeSuccess()
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
@@ -690,5 +690,162 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->hasClaim('email'));
         $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('address'));
+    }
+
+    public function testPromptLoginWithNotFullyAuthenticatedUser()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'none',
+            'prompt'        => 'login',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(false);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('You are redirected to the login page', $response->getBody()->getContents());
+    }
+
+    public function testPromptLoginWithFullyAuthenticatedUser()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'none',
+            'prompt'        => 'login',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertEquals('http://example.com/test?good=false&state=0123456789#', $response->getHeader('Location')[0]);
+        $this->assertEquals(1, count($this->getNoneListener()->getAccessTokens()));
+
+        $access_tokens = $this->getNoneListener()->getAccessTokens();
+        $this->assertInstanceOf(AccessTokenInterface::class, $access_tokens[0]);
+    }
+
+    public function testPromptLoginWithFullyAuthenticatedUserButConsentNotGiven()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'none',
+            'prompt'        => 'login',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(null);
+        $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('You are on the consent screen', $response->getBody()->getContents());
+    }
+
+    public function testPromptLoginWithFullyAuthenticatedUserAndConsentGiven()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'token',
+            'prompt'        => 'login',
+            'scope'         => 'openid email profile',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(null);
+        $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+email\+profile&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+    }
+
+    public function testPromptNoneWithNotFullyAuthenticatedUser()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'none',
+            'prompt'        => 'none',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertEquals('http://example.com/test?good=false&error=login_required&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Flogin_required&state=0123456789#', $response->getHeader('Location')[0]);
+    }
+
+    public function testPromptNoneWithAuthenticatedUserButConsentRequired()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'none',
+            'prompt'        => 'none',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertEquals('http://example.com/test?good=false&error=interaction_required&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finteraction_required&state=0123456789#', $response->getHeader('Location')[0]);
+    }
+
+    public function testPromptNoneWithAuthenticatedUserAndConsentGiven()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'none',
+            'prompt'        => 'none',
+            'scope'         => 'openid email profile',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertEquals('http://example.com/test?good=false&state=0123456789#', $response->getHeader('Location')[0]);
+        $this->assertEquals(1, count($this->getNoneListener()->getAccessTokens()));
+
+        $access_tokens = $this->getNoneListener()->getAccessTokens();
+        $this->assertInstanceOf(AccessTokenInterface::class, $access_tokens[0]);
+    }
+
+    public function testPromptNoneAndLogin()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'none',
+            'prompt'        => 'none login',
+            'scope'         => 'openid email profile',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('{"error":"invalid_request","error_description":"Invalid parameter \"prompt\". Prompt value \"none\" must be used alone.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 }

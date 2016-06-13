@@ -69,6 +69,7 @@ use OAuth2\Test\Stub\DistributedClaimSource;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\NoneListener;
+use OAuth2\Test\Stub\PreConfiguredAuthorizationManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\TooManyRequestsExceptionFactory;
@@ -468,7 +469,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getUserManager(),
                 $this->getAuthorizationFactory(),
                 $this->getScopeManager(),
-                $this->getExceptionManager()
+                $this->getExceptionManager(),
+                $this->getPreConfiguredAuthorizationManager()
             );
         }
 
@@ -1048,6 +1050,23 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->claim_source_manager;
+    }
+
+    /**
+     * @var null|\OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManagerInterface|\OAuth2\Test\Stub\PreConfiguredAuthorizationManager
+     */
+    private $pre_configured_authorization_manager = null;
+
+    /**
+     * @return \OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManagerInterface|\OAuth2\Test\Stub\PreConfiguredAuthorizationManager
+     */
+    protected function getPreConfiguredAuthorizationManager()
+    {
+        if (null === $this->pre_configured_authorization_manager) {
+            $this->pre_configured_authorization_manager = new PreConfiguredAuthorizationManager();
+        }
+
+        return $this->pre_configured_authorization_manager;
     }
 
     /**
