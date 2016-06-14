@@ -173,7 +173,6 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         try {
             return $this->authorization_factory->createAuthorizationFromRequest($request);
         } catch (BaseExceptionInterface $e) {
-            // FIXME: Try to redirect if possible
             $e->getHttpResponse($response);
         }
     }

@@ -27,6 +27,21 @@ interface AuthorizationFactoryInterface
      * @param \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface $parameter_checker
      */
     public function addParameterChecker(ParameterCheckerInterface $parameter_checker);
+
+    /**
+     * @return bool
+     */
+    public function isResponseModeParameterSupported();
+
+    /**
+     * 
+     */
+    public function enableResponseModeParameterSupport();
+
+    /**
+     * 
+     */
+    public function disableResponseModeParameterSupport();
     
     /**
      * @return string[]

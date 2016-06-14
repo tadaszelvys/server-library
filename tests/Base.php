@@ -1090,7 +1090,9 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->set('registration_endpoint', 'https://my.server.com/register');
             $this->metadata->set('scopes_supported', $this->getScopeManager()->getSupportedScopes());
             $this->metadata->set('response_types_supported', $this->getAuthorizationFactory()->getResponseTypesSupported());
-            $this->metadata->set('response_modes_supported', $this->getAuthorizationFactory()->getResponseModesSupported());
+            if ($this->getAuthorizationFactory()->isResponseModeParameterSupported()) {
+                $this->metadata->set('response_modes_supported', $this->getAuthorizationFactory()->getResponseModesSupported());
+            }
             $this->metadata->set('grant_types_supported', $this->getTokenEndpoint()->getGrantTypesSupported());
             $this->metadata->set('acr_values_supported', []);
             $this->metadata->set('subject_types_supported', $this->getUserInfo()->isPairwiseSubjectIdentifierSupported() ? ['public', 'pairwise'] : ['public']);

@@ -372,16 +372,16 @@ class ImplicitGrantTypeTest extends Base
         $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported response mode \"foo_bar\".","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
-    public function testAccessTokenSuccessWithUnsupportedResponseModeParameter()
+    public function testAccessTokenSuccessWithDisabledResponseModeParameter()
     {
-        //$this->getAuthorizationEndpoint()->disallowResponseModeParameterInAuthorizationRequest();
+        $this->getAuthorizationFactory()->disableResponseModeParameterSupport();
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
             'client_id'             => 'foo',
             'response_type'         => 'token',
             'state'                 => '0123456789',
-            'response_mode'         => 'fragment',
+            'response_mode'         => 'query',
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
@@ -389,6 +389,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->getAuthorizationFactory()->enableResponseModeParameterSupport();
     }
 
     public function testAccessTokenSuccessWithUnsupportedResponseTypeCombination()

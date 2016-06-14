@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint\Authorization;
 
+use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
@@ -54,6 +55,11 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
     private $authorization_request_loader;
 
     /**
+     * @var bool
+     */
+    private $response_mode_parameter_in_authorization_request_enabled = true;
+
+    /**
      * AuthorizationFactory constructor.
      *
      * @param \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface $authorization_request_loader
@@ -73,6 +79,7 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
         $redirect_uri_storage_enforced = false,
         $response_mode_parameter_in_authorization_request_allowed = false
     ) {
+        Assertion::boolean($response_mode_parameter_in_authorization_request_allowed);
         $this->authorization_request_loader = $authorization_request_loader;
         $this->setExceptionManager($exception_manager);
 
@@ -91,6 +98,30 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
     public function addParameterChecker(ParameterCheckerInterface $parameter_checker)
     {
         $this->parameter_checkers[] = $parameter_checker;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isResponseModeParameterSupported()
+    {
+        return $this->response_mode_parameter_in_authorization_request_enabled;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function enableResponseModeParameterSupport()
+    {
+        $this->response_mode_parameter_in_authorization_request_enabled = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function disableResponseModeParameterSupport()
+    {
+        $this->response_mode_parameter_in_authorization_request_enabled = false;
     }
 
     /**
@@ -155,14 +186,8 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
     {
         $parameters = $this->authorization_request_loader->loadParametersFromRequest($request);
         $client = $parameters['client'];
-        
-        foreach ($this->parameter_checkers as $parameter_checker) {
-            try {
-                $parameter_checker->checkerParameter($client, $parameters);
-            } catch (\InvalidArgumentException $e) {
-                throw $this->getExceptionManager()->getBadRequestException($parameter_checker->getError(), $e->getMessage());
-            }
-        }
+
+        $this->checkParameters($client, $parameters);
 
         $types = $this->getResponseTypes($client, $parameters);
         $response_mode = $this->getResponseMode($parameters, $types);
@@ -171,6 +196,23 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
         $scope = array_key_exists('scope', $parameters) ? $parameters['scope'] : [];
 
         return new Authorization($parameters, $client, $types, $response_mode, $redirect_uri, $scope);
+    }
+
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param array                          $parameters
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     */
+    private function checkParameters(ClientInterface $client, array &$parameters)
+    {
+        foreach ($this->parameter_checkers as $parameter_checker) {
+            try {
+                $parameter_checker->checkerParameter($client, $parameters);
+            } catch (\InvalidArgumentException $e) {
+                throw $this->getExceptionManager()->getBadRequestException($parameter_checker->getError(), $e->getMessage());
+            }
+        }
     }
 
     /**
@@ -183,7 +225,7 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     private function getResponseMode(array $params, array $types)
     {
-        if (array_key_exists('response_mode', $params)) {
+        if (array_key_exists('response_mode', $params) && true === $this->isResponseModeParameterSupported()) {
             return $this->getResponseModeService($params['response_mode']);
         }
 
