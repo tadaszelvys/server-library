@@ -774,6 +774,47 @@ class OpenIDConnectTest extends Base
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+email\+profile&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
     }
 
+    public function testPromptLoginConsentWithFullyAuthenticatedUserAndConsentPreGiven()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'token',
+            'prompt'        => 'login consent',
+            'scope'         => 'openid email profile',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(null);
+        $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $response->getBody()->rewind();
+        $this->assertEquals('You are on the consent screen', $response->getBody()->getContents());
+    }
+
+    public function testPromptLoginConsentWithFullyAuthenticatedUserAndConsentGiven()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'foo',
+            'response_type' => 'token',
+            'prompt'        => 'login consent',
+            'scope'         => 'openid email profile',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+email\+profile&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+    }
+
     public function testPromptNoneWithNotFullyAuthenticatedUser()
     {
         $request = new ServerRequest();

@@ -92,23 +92,19 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         }
 
         $user = $this->getCurrentUser();
-        //If User is null
-            //If prompt none => error login required
-            //If login => login
-            //If consent => login
-            //If select_account => login
-        //If Use is logged in
-            //If prompt none => continue
-            //If login => login if not fully authenticated
-            //If consent => continue
-            //If select_account => continue
+        //If User is logged in
         if ($user instanceof UserInterface) {
+            //If prompt=login => login if not fully authenticated
             if ($authorization->hasPrompt('login') && !$this->isCurrentUserFullyAuthenticated()) {
                 $this->redirectToLoginPage($response);
                 
                 return;
             }
-        } else {
+            //If prompt=none => continue
+            //If prompt=consent => continue
+            //If prompt=select_account => continue
+        } else { //If User is null
+            //If prompt=none => error login required
             if ($authorization->hasPrompt('none')) {
                 $this->createRedirectionException(
                     $authorization,
@@ -118,24 +114,19 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
                 return;
             }
+            //If prompt=login => login
+            //If prompt=consent => login
+            //If prompt=select_account => login
             $this->redirectToLoginPage($response);
             
             return;
         }
         $authorization->setUser($user);
 
-        //Pre configured consent exist
-            //If prompt none => continue
-            //If login => continue
-            //If consent => consent
-            //If select_account => continue
-        //Pre configured consent does not exist
-            //If prompt none => error interaction required
-            //If login => consent
-            //If consent => consent
-            //If select_account => consent
         $pre_configured_authorization = $this->tryToFindPreConfiguredAuthorization($authorization);
+        //Pre configured consent exist
         if ($pre_configured_authorization instanceof PreConfiguredAuthorizationInterface) {
+            //If prompt=consent => consent
             if ($authorization->hasPrompt('consent')) {
                 //Show consent screen
 
@@ -143,11 +134,15 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
                 
                 return;
             }
+            //If prompt=none => continue
+            //If prompt=login => continue
+            //If prompt=select_account => continue
             $authorization->setAuthorized(true);
             $this->processAuthorization($authorization, $response);
 
             return;
-        } else {
+        } else { //Pre configured consent does not exist
+            //If prompt=prompt none => error interaction required
             if ($authorization->hasPrompt('none')) {
                 $this->createRedirectionException(
                     $authorization,
@@ -157,7 +152,10 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
                 return;
             }
-            
+
+            //If prompt=login => consent
+            //If prompt=consent => consent
+            //If prompt=select_account => consent
             $this->processConsentScreen($authorization, $request, $response);
 
             return;
