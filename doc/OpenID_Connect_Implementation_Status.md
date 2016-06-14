@@ -1,7 +1,7 @@
 OpenID Connect Implementeation Status
 =====================================
 
-* [ ] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
+* [x] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
     *  [x] [ID Token](http://openid.net/specs/openid-connect-core-1_0.html#IDToken)
     * [Response types](http://openid.net/specs/openid-connect-core-1_0.html#Authentication):
         * [x] `code`: Authorization Code Flow
@@ -11,7 +11,7 @@ OpenID Connect Implementeation Status
         * [x] `code token`: Hybrid Flow
         * [x] `code id_token token`: Hybrid Flow
     * [Initiating Login from third party](http://openid.net/specs/openid-connect-core-1_0.html#ThirdPartyInitiatedLogin) *RP side only*
-    * [ ] [Claims](http://openid.net/specs/openid-connect-core-1_0.html#Claims)
+    * [x] [Claims](http://openid.net/specs/openid-connect-core-1_0.html#Claims)
         * [x] [Standard Claims](http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims) and [Scope Claims](http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims)
             * [x] Scope `profile`
             * [x] Scope `email`

@@ -118,6 +118,24 @@ class UserManager implements UserManagerInterface
     {
         return array_key_exists($public_id, $this->users) ? $this->users[$public_id] : null;
     }
+    
+    /**
+     * This method is used by the OpenId Connect Discovery Service.
+     * If you do not want to use it, just return null
+     * This example allow the use of resource identifier such as public_id@server
+     *
+     * {@inheritdoc}
+     */
+    public function getUserFromResource($resource)
+    {
+        $pos = mb_strpos($resource, '@', 0, 'utf-8');
+        if (false === $pos || 0 === $pos) {
+            return;
+        }
+        $public_id = mb_substr($resource, 0, $pos, 'utf-8');
+        
+        return $this->getUser($public_id);
+    }
 }
 ```
 
