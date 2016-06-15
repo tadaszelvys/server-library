@@ -846,10 +846,10 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->bearer_token_type) {
             $this->bearer_token_type = new BearerToken();
 
-            $this->bearer_token_type->disallowAccessTokenFromQueryString();
-            $this->bearer_token_type->allowAccessTokenFromQueryString();
-            $this->bearer_token_type->disallowAccessTokenFromRequestBody();
-            $this->bearer_token_type->allowAccessTokenFromRequestBody();
+            $this->bearer_token_type->disallowTokenFromQueryString();
+            $this->bearer_token_type->allowTokenFromQueryString();
+            $this->bearer_token_type->disallowTokenFromRequestBody();
+            $this->bearer_token_type->allowTokenFromRequestBody();
         }
 
         return $this->bearer_token_type;
