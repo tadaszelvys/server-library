@@ -34,12 +34,12 @@ class BearerToken implements TokenTypeInterface
         return $this->token_from_request_body_allowed;
     }
 
-    public function allowAccessTokenFromRequestBody()
+    public function allowTokenFromRequestBody()
     {
         $this->token_from_request_body_allowed = true;
     }
 
-    public function disallowAccessTokenFromRequestBody()
+    public function disallowTokenFromRequestBody()
     {
         $this->token_from_request_body_allowed = false;
     }
@@ -47,17 +47,17 @@ class BearerToken implements TokenTypeInterface
     /**
      * @return bool
      */
-    public function isAccessTokenFromQueryStringAllowed()
+    public function isTokenFromQueryStringAllowed()
     {
         return $this->token_from_query_string_allowed;
     }
 
-    public function allowAccessTokenFromQueryString()
+    public function allowTokenFromQueryString()
     {
         $this->token_from_query_string_allowed = true;
     }
 
-    public function disallowAccessTokenFromQueryString()
+    public function disallowTokenFromQueryString()
     {
         $this->token_from_query_string_allowed = false;
     }
@@ -97,7 +97,7 @@ class BearerToken implements TokenTypeInterface
             'getTokenFromAuthorizationHeaders',
         ];
 
-        if (true === $this->isAccessTokenFromQueryStringAllowed()) {
+        if (true === $this->isTokenFromQueryStringAllowed()) {
             $methods[] = 'getTokenFromQuery';
         }
 
