@@ -207,7 +207,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $response->getBody()->rewind();
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessUsingSignedAndEncryptedRequest()
@@ -275,7 +275,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessUsingSignedRequestUri()
@@ -292,7 +292,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessUsingSignedAndEncryptedRequestUri()
@@ -309,7 +309,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithState()

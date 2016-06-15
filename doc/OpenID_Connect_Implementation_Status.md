@@ -56,6 +56,11 @@ OpenID Connect Implementeation Status
 * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
 * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
 * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
+    * [x] [OP iframe Endpoint](http://openid.net/specs/openid-connect-session-1_0.html#OPiframe)
+    * [ ] [Logout Endpoint](http://openid.net/specs/openid-connect-session-1_0.html#RPLogout)
+        * [ ] `id_token_hint` parameter
+        * [ ] `post_logout_redirect_uri` parameter
+        * [ ] `state` parameter
 * [ ] [Front-Channel logout](http://openid.net/specs/openid-connect-frontchannel-1_0.html)
 * [ ] [Back-Channel logout](http://openid.net/specs/openid-connect-backchannel-1_0.html)
 * [x] [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq)

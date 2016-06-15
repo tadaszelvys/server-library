@@ -53,7 +53,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789&session_state=[^"]+#$/', $response->getHeader('Location')[0]);
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
@@ -196,7 +196,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+offline_access&foo=bar&state=ABCDEF$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+offline_access&foo=bar&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -252,7 +252,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid&foo=bar&state=ABCDEF$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid&foo=bar&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -302,7 +302,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#state=ABCDEF&id_token=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -332,7 +332,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#state=ABCDEF&id_token=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -373,7 +373,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid&foo=bar&state=ABCDEF&id_token=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid&foo=bar&id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -406,7 +406,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid&foo=bar&state=ABCDEF&id_token=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid&foo=bar&id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -472,7 +472,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&state=ABCDEF&id_token=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
         $values = parse_url($response->getHeader('Location')[0]);
         parse_str($values['fragment'], $params);
 
@@ -772,7 +772,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+email\+profile&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+email\+profile&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testPromptLoginConsentWithFullyAuthenticatedUserAndConsentPreGiven()
@@ -813,7 +813,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+email\+profile&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+email\+profile&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testPromptNoneWithNotFullyAuthenticatedUser()
@@ -865,7 +865,7 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertEquals('http://example.com/test?good=false&state=0123456789#', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
         $this->assertEquals(1, count($this->getNoneListener()->getAccessTokens()));
 
         $access_tokens = $this->getNoneListener()->getAccessTokens();

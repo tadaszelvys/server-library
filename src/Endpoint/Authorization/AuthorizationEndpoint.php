@@ -13,6 +13,8 @@ namespace OAuth2\Endpoint\Authorization;
 
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasScopeManager;
+use OAuth2\Endpoint\Authorization\AuthorizationEndpointExtension\AuthorizationEndpointExtensionInterface;
+use OAuth2\Endpoint\Authorization\AuthorizationEndpointExtension\StateParameterExtension;
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface;
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface;
 use OAuth2\Exception\BaseExceptionInterface;
@@ -27,6 +29,11 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 {
     use HasExceptionManager;
     use HasScopeManager;
+
+    /**
+     * @var \OAuth2\Endpoint\Authorization\AuthorizationEndpointExtension\AuthorizationEndpointExtensionInterface[]
+     */
+    private $extensions = [];
 
     /**
      * @var \OAuth2\Endpoint\Authorization\AuthorizationFactoryInterface
@@ -56,6 +63,8 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $this->pre_configured_authorization_manager = $pre_configured_authorization_manager;
         $this->setExceptionManager($exception_manager);
         $this->setScopeManager($scope_manager);
+        
+        $this->addExtension(new StateParameterExtension());
     }
 
     /**
@@ -80,6 +89,13 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     abstract protected function processConsentScreen(AuthorizationInterface $authorization, ServerRequestInterface $request, ResponseInterface &$response);
 
+    /**
+     * {@inheritdoc}
+     */
+    public function addExtension(AuthorizationEndpointExtensionInterface $extension)
+    {
+        $this->extensions[] = $extension;
+    }
     /**
      * {@inheritdoc}
      */
@@ -138,7 +154,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             //If prompt=login => continue
             //If prompt=select_account => continue
             $authorization->setAuthorized(true);
-            $this->processAuthorization($authorization, $response);
+            $this->processAuthorization($request, $response, $authorization);
 
             return;
         } else { //Pre configured consent does not exist
@@ -178,10 +194,11 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     * @param \Psr\Http\Message\ServerRequestInterface              $request
      * @param \Psr\Http\Message\ResponseInterface                   $response
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
      */
-    protected function processAuthorization(AuthorizationInterface $authorization, ResponseInterface &$response)
+    protected function processAuthorization(ServerRequestInterface $request, ResponseInterface &$response, AuthorizationInterface $authorization)
     {
         if ($authorization->isAuthorized() === false) {
             $this->createRedirectionException(
@@ -201,11 +218,11 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
                 $type->prepareAuthorization($authorization)
             );
         }
-        if ($authorization->hasQueryParam(('state'))) {
-            $response_parameters['state'] = $authorization->getQueryParam('state');
-        }
         foreach ($authorization->getResponseTypes() as $type) {
             $type->finalizeAuthorization($response_parameters, $authorization, $authorization->getRedirectUri());
+        }
+        foreach ($this->extensions as $extension) {
+            $extension->process($response_parameters, $request, $response, $authorization);
         }
 
         $authorization->getResponseMode()->prepareResponse($authorization->getRedirectUri(), $response_parameters, $response);

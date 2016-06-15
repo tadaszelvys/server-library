@@ -131,7 +131,7 @@ class AuthorizationEndpoint extends Base
         if (is_bool($this->is_authorized)) {
 
             $authorization->setAuthorized($this->is_authorized);
-            $this->processAuthorization($authorization, $response);
+            $this->processAuthorization($request, $response, $authorization);
 
             return;
         }

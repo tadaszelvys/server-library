@@ -72,6 +72,7 @@ use OAuth2\Test\Stub\NoneListener;
 use OAuth2\Test\Stub\PreConfiguredAuthorizationManager;
 use OAuth2\Test\Stub\RefreshTokenManager;
 use OAuth2\Test\Stub\ScopeManager;
+use OAuth2\Test\Stub\SessionStateParameterExtension;
 use OAuth2\Test\Stub\TooManyRequestsExceptionFactory;
 use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Test\Stub\UserManager;
@@ -80,6 +81,10 @@ use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
+
+if (!isset($_SESSION)) {
+    $_SESSION = [];
+}
 
 class Base extends \PHPUnit_Framework_TestCase
 {
@@ -472,6 +477,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager(),
                 $this->getPreConfiguredAuthorizationManager()
             );
+
+            $this->authorization_endpoint->addExtension(new SessionStateParameterExtension('oauth2_session_state'));
         }
 
         return $this->authorization_endpoint;
