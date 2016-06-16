@@ -33,17 +33,7 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
     /**
      * @var string
      */
-    private $server;
-    
-    /**
-     * @var string
-     */
     private $computed_server;
-
-    /**
-     * @var string
-     */
-    private $computed_issuer;
 
     /**
      * IssuerDiscoveryEndpoint constructor.
@@ -63,9 +53,7 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
         $this->setUserManager($user_manager);
         $this->setExceptionManager($exception_manager);
         $this->issuer = $issuer;
-        $this->server = $server;
-        $this->computed_issuer = $this->getDomain($this->issuer);
-        $this->computed_server = $this->getDomain($this->server);
+        $this->computed_server = $this->getDomain($server);
     }
 
     /**
