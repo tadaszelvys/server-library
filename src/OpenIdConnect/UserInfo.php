@@ -153,24 +153,6 @@ final class UserInfo implements UserInfoInterface
     }
 
     /**
-     * @param null|array $config
-     *
-     * @return bool
-     */
-    private function isClaimEssential($config)
-    {
-        if (null === $config || !is_array($config)) {
-            return false;
-        }
-        if (array_key_exists('essential', $config) && is_bool($config['essential'])) {
-            return $config['essential'];
-        }
-
-        // We ignore the configuration if not correctly defined (no error is thrown as required by the specification
-        return false;
-    }
-
-    /**
      * @param string[] $scope
      *
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
