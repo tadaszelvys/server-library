@@ -196,7 +196,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => 'Mufasa',
             'response_type' => 'code',
             'state'         => '0123456789',
         ]);
@@ -210,11 +210,10 @@ class AuthCodeGrantTypeTest extends Base
 
     public function testAuthcodeSuccessToLocalHostAndSecuredRedirectUriEnforced()
     {
-        //$this->getAuthorizationEndpoint()->enableSecuredRedirectUriEnforcement();
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://127.0.0.1/',
-            'client_id'     => 'foo',
+            'client_id'     => 'Mufasa',
             'response_type' => 'code',
             'state'         => '0123456789',
         ]);
@@ -224,12 +223,12 @@ class AuthCodeGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertRegExp('/^http:\/\/127.0.0.1\/\?code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
-
-        //$this->getAuthorizationEndpoint()->disableSecuredRedirectUriEnforcement();
     }
 
     public function testAuthcodeAuthorizedToSupportedURN()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'urn:ietf:wg:oauth:2.0:oob:auto',
@@ -243,10 +242,14 @@ class AuthCodeGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertRegExp('/^urn\:\/\/ietf\:wg\:oauth\:2.0\:oob\:auto\?code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testAuthcodeSuccessUsingAnotherRedirectUri()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'https://another.uri/callback',
@@ -260,10 +263,14 @@ class AuthCodeGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertRegExp('/^https:\/\/another.uri\/callback\?code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testAuthcodeSuccessWithState()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
@@ -277,6 +284,8 @@ class AuthCodeGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789#$/', $response->getHeader('Location')[0]);
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     /**
@@ -284,6 +293,8 @@ class AuthCodeGrantTypeTest extends Base
      */
     public function testAuthcodeSuccessWithPKCEAndS256AndPublicClient()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -318,10 +329,14 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testAuthcodeSuccessWithPKCEAndPlainAndPublicClient()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -356,10 +371,14 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testAuthcodeSuccessWithPKCEAndDefaultMethodAndPublicClient()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -393,10 +412,13 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testAuthcodeFailedWithBadCodeVerifier()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -429,10 +451,13 @@ class AuthCodeGrantTypeTest extends Base
             $this->assertEquals('invalid_request', $e->getMessage());
             $this->assertEquals('Invalid parameter "code_verifier".', $e->getDescription());
         }
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testAuthcodeFailedWithPKCEBecauseCodeVerifierIsNotSet()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -465,10 +490,14 @@ class AuthCodeGrantTypeTest extends Base
             $this->assertEquals('invalid_request', $e->getMessage());
             $this->assertEquals('The parameter "code_verifier" is required.', $e->getDescription());
         }
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testAuthcodeFailedWithPKCEBecauseCodeChallengeMethodIsNotSupported()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -502,6 +531,8 @@ class AuthCodeGrantTypeTest extends Base
             $this->assertEquals('invalid_request', $e->getMessage());
             $this->assertEquals('Unsupported code challenge method "S512".', $e->getDescription());
         }
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testPublicClientWithoutPublicId()

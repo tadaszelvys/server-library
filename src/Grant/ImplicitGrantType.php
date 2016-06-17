@@ -12,29 +12,40 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAccessTokenManager;
+use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Behaviour\HasTokenTypeParameterSupport;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 
 final class ImplicitGrantType implements ResponseTypeInterface
 {
+    use HasExceptionManager;
     use HasTokenTypeManager;
     use HasAccessTokenManager;
     use HasTokenTypeParameterSupport;
 
     /**
+     * @var bool
+     */
+    private $confidential_clients_allowed = false;
+
+    /**
      * ImplicitGrantType constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface   $token_type_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
+     * @param \OAuth2\Token\TokenTypeManagerInterface     $token_type_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface   $access_token_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
-                                AccessTokenManagerInterface $access_token_manager
+                                AccessTokenManagerInterface $access_token_manager,
+                                ExceptionManagerInterface $exception_manager
     ) {
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
+        $this->setExceptionManager($exception_manager);
     }
 
     /**
@@ -58,7 +69,9 @@ final class ImplicitGrantType implements ResponseTypeInterface
      */
     public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
-        //Nothing to do
+        if (false === $this->confidential_clients_allowed && false === $authorization->getClient()->isPublic()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients are not allowed to use the implicit grant type.');
+        }
     }
 
     /**
@@ -82,5 +95,29 @@ final class ImplicitGrantType implements ResponseTypeInterface
         $authorization->setData('access_token', $token);
 
         return $token->toArray();
+    }
+
+    /**
+     * @return bool
+     */
+    public function areConfidentialClientsAllowed()
+    {
+        return $this->confidential_clients_allowed;
+    }
+
+    /**
+     * 
+     */
+    public function allowConfidentialClients()
+    {
+        $this->confidential_clients_allowed = true;
+    }
+
+    /**
+     * 
+     */
+    public function disallowConfidentialClients()
+    {
+        $this->confidential_clients_allowed = false;
     }
 }

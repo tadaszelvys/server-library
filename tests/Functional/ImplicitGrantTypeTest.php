@@ -163,6 +163,8 @@ class ImplicitGrantTypeTest extends Base
 
     public function testAccessTokenSuccessUsingSignedRequest()
     {
+        $this->getImplicitGrantType()->allowConfidentialClients();
+
         $jwk2 = new JWK([
             'kid' => 'JWK2',
             'use' => 'sig',
@@ -208,10 +210,14 @@ class ImplicitGrantTypeTest extends Base
 
         $response->getBody()->rewind();
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
+
+        $this->getImplicitGrantType()->disallowConfidentialClients();
     }
 
     public function testAccessTokenSuccessUsingSignedAndEncryptedRequest()
     {
+        $this->getImplicitGrantType()->allowConfidentialClients();
+
         $jwk1 = new JWK([
             'kid' => 'JWK1',
             'use' => 'enc',
@@ -276,10 +282,15 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
+
+        $this->getImplicitGrantType()->disallowConfidentialClients();
+
     }
 
     public function testAccessTokenSuccessUsingSignedRequestUri()
     {
+        $this->getImplicitGrantType()->allowConfidentialClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'request_uri'  => 'https://gist.githubusercontent.com/Spomky/23ca2a645f97584aaa22/raw/e9ff926a07940db9033c0ed7b8d623afee5f144a/signed.jwt',
@@ -291,12 +302,16 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
+
+        $this->getImplicitGrantType()->disallowConfidentialClients();
+
     }
 
     public function testAccessTokenSuccessUsingSignedAndEncryptedRequestUri()
     {
+        $this->getImplicitGrantType()->allowConfidentialClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'request_uri'  => 'https://gist.githubusercontent.com/Spomky/3f22bbdc279a05aaac62/raw/7bc47a71eb48b37296dc69c70ec81a2d782f8055/encrypted.jwt',
@@ -310,6 +325,9 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
+
+        $this->getImplicitGrantType()->disallowConfidentialClients();
+
     }
 
     public function testAccessTokenSuccessWithState()

@@ -43,6 +43,11 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
     private $pkce_for_public_clients_enforced = false;
 
     /**
+     * @var bool
+     */
+    private $public_clients_allowed = false;
+
+    /**
      * AuthorizationCodeGrantType constructor.
      *
      * @param \OAuth2\Token\AuthCodeManagerInterface      $auth_code_manager
@@ -59,6 +64,30 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
 
         $this->addPKCEMethod(new Plain());
         $this->addPKCEMethod(new S256());
+    }
+
+    /**
+     * @return bool
+     */
+    public function arePublicClientsAllowed()
+    {
+        return $this->public_clients_allowed;
+    }
+
+    /**
+     *
+     */
+    public function allowPublicClients()
+    {
+        $this->public_clients_allowed = true;
+    }
+
+    /**
+     *
+     */
+    public function disallowPublicClients()
+    {
+        $this->public_clients_allowed = false;
     }
 
     /**
@@ -110,7 +139,9 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
      */
     public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
-        //Nothing to do
+        if (false === $this->public_clients_allowed && true === $authorization->getClient()->isPublic()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Public clients are not allowed to use the authorization code grant type.');
+        }
     }
 
     /**

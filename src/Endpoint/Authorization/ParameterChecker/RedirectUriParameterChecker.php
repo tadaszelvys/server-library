@@ -21,12 +21,12 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
     /**
      * @var bool
      */
-    private $secured_redirect_uri_enforced = false;
+    private $secured_redirect_uri_enforced;
 
     /**
      * @var bool
      */
-    private $redirect_uri_storage_enforced = false;
+    private $redirect_uri_storage_enforced;
 
     /**
      * RedirectUriParameterChecker constructor.

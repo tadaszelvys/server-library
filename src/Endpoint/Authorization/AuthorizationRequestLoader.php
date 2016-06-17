@@ -20,6 +20,7 @@ use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Util\Uri;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
@@ -44,6 +45,11 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     private $key_encryption_key_set = null;
 
     /**
+     * @var bool
+     */
+    private $require_request_uri_registration = true;
+
+    /**
      * AuthorizationRequestLoader constructor.
      *
      * @param \OAuth2\Client\ClientManagerInterface       $client_manager
@@ -53,6 +59,30 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     {
         $this->setClientManager($client_manager);
         $this->setExceptionManager($exception_manager);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequestUriRegistrationRequired()
+    {
+        return $this->require_request_uri_registration;
+    }
+
+    /**
+     *
+     */
+    public function enableRequestUriRegistrationRequirement()
+    {
+        $this->require_request_uri_registration = true;
+    }
+
+    /**
+     *
+     */
+    public function disableRequestUriRegistrationRequirement()
+    {
+        $this->require_request_uri_registration = false;
     }
 
     /**
@@ -190,16 +220,42 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     private function createFromRequestUriParameter(array $params)
     {
         if (false === $this->isRequestObjectReferenceSupportEnabled()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_URI_NOT_SUPPORTED, 'The parameter "request" is not supported.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_URI_NOT_SUPPORTED, 'The parameter "request_uri" is not supported.');
         }
         $request_uri = $params['request_uri'];
         Assertion::url($request_uri, 'Invalid URL.');
 
         $content = $this->downloadContent($request_uri);
         $jws = $this->loadRequest($params, $content, $client);
+        if (true === $this->isRequestUriRegistrationRequired()) {
+            $this->checkRequestUri($client, $request_uri);
+        }
         $params = array_merge($params, $jws->getClaims(), ['client' => $client]);
 
         return $params;
+    }
+
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param string                         $request_uri
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     */
+    private function checkRequestUri(ClientInterface $client, $request_uri)
+    {
+        if (false === $client->has('request_uris') || empty($request_uris = $client->get('request_uris'))) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client must register at least one request Uri.');
+        }
+
+        foreach ($request_uris as $stored_request_uri) {
+            if (false === Uri::checkUrl($request_uri, false)) {
+                continue;
+            }
+            if (strcasecmp(mb_substr($request_uri, 0, mb_strlen($stored_request_uri, '8bit'), '8bit'), $stored_request_uri) === 0) {
+                return;
+            }
+        }
+        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_URI, 'The request Uri is not allowed.');
     }
 
     /**

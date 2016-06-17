@@ -180,6 +180,8 @@ class OpenIDConnectTest extends Base
 
     public function testCodeTokenSuccessWithRefreshToken()
     {
+        $this->getImplicitGrantType()->allowConfidentialClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -230,6 +232,9 @@ class OpenIDConnectTest extends Base
 
         $this->assertEquals(200, $introspection_response->getStatusCode());
         $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\,"offline_access"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
+
+        $this->getImplicitGrantType()->disallowConfidentialClients();
+
     }
 
     /**
@@ -237,6 +242,8 @@ class OpenIDConnectTest extends Base
      */
     public function testCodeTokenSuccessWithoutRefreshToken()
     {
+        $this->getImplicitGrantType()->allowConfidentialClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -284,6 +291,9 @@ class OpenIDConnectTest extends Base
 
         $this->assertEquals(200, $introspection_response->getStatusCode());
         $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
+
+        $this->getImplicitGrantType()->disallowConfidentialClients();
+
     }
 
     public function testIdTokenSuccess()
@@ -390,6 +400,8 @@ class OpenIDConnectTest extends Base
 
     public function testCodeIdTokenTokenSuccess()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -452,10 +464,13 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token2->hasClaim('at_hash'));
         $this->assertTrue($id_token2->hasClaim('c_hash'));
         $this->assertTrue($id_token->getClaim('c_hash') === $id_token2->getClaim('c_hash'));
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testCodeIdTokenSuccess()
     {
+        $this->getAuthorizationCodeGrantType()->allowPublicClients();
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
@@ -516,6 +531,8 @@ class OpenIDConnectTest extends Base
         $this->assertEquals('0123456789', $id_token2->getClaim('nonce'));
         $this->assertTrue($id_token2->hasClaim('c_hash'));
         $this->assertTrue($id_token->getClaim('c_hash') === $id_token2->getClaim('c_hash'));
+
+        $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
 
     public function testNoneGrantTypeSuccess()

@@ -179,7 +179,7 @@ final class Uri
      *
      * @return bool
      */
-    private static function checkUrl($url, $path_traversal_allowed)
+    public static function checkUrl($url, $path_traversal_allowed)
     {
         // If URI is not a valid URI, return false
         if (!filter_var($url, FILTER_VALIDATE_URL)) {

@@ -728,7 +728,8 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->implicit_grant_type) {
             $this->implicit_grant_type = new ImplicitGrantType(
                 $this->getTokenTypeManager(),
-                $this->getJWTAccessTokenManager()
+                $this->getJWTAccessTokenManager(),
+                $this->getExceptionManager()
             );
             $this->implicit_grant_type->disallowAccessTokenTypeParameter();
         }

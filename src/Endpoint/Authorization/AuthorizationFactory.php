@@ -74,9 +74,9 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
         AuthorizationRequestLoaderInterface $authorization_request_loader,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
-        $state_parameter_enforced = false,
-        $secured_redirect_uri_enforced = false,
-        $redirect_uri_storage_enforced = false,
+        $state_parameter_enforced = true,
+        $secured_redirect_uri_enforced = true,
+        $redirect_uri_storage_enforced = true,
         $response_mode_parameter_in_authorization_request_allowed = false
     ) {
         Assertion::boolean($response_mode_parameter_in_authorization_request_allowed);
