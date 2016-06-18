@@ -18,8 +18,6 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
-use OAuth2\Grant\PKCEMethod\Plain;
-use OAuth2\Grant\PKCEMethod\S256;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
@@ -61,9 +59,6 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
         $this->setAuthorizationCodeManager($auth_code_manager);
         $this->setExceptionManager($exception_manager);
         $this->setScopeManager($scope_manager);
-
-        $this->addPKCEMethod(new Plain());
-        $this->addPKCEMethod(new S256());
     }
 
     /**

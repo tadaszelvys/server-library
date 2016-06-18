@@ -243,19 +243,43 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
      */
     private function checkRequestUri(ClientInterface $client, $request_uri)
     {
-        if (false === $client->has('request_uris') || empty($request_uris = $client->get('request_uris'))) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client must register at least one request Uri.');
-        }
+        $this->checkRequestUriPathTraversal($request_uri);
+        $stored_request_uris = $this->getClientRequestUris($client);
 
-        foreach ($request_uris as $stored_request_uri) {
-            if (false === Uri::checkUrl($request_uri, false)) {
-                continue;
-            }
+        foreach ($stored_request_uris as $stored_request_uri) {
             if (strcasecmp(mb_substr($request_uri, 0, mb_strlen($stored_request_uri, '8bit'), '8bit'), $stored_request_uri) === 0) {
                 return;
             }
         }
         throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_URI, 'The request Uri is not allowed.');
+    }
+
+    /**
+     * @param string $request_uri
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     */
+    private function checkRequestUriPathTraversal($request_uri)
+    {
+        if (false === Uri::checkUrl($request_uri, false)) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The request Uri must not contain path traversal.');
+        }
+    }
+
+    /**
+     * @param \OAuth2\Client\ClientInterface $client
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     *
+     * @return string[]
+     */
+    private function getClientRequestUris(ClientInterface $client)
+    {
+        if (false === $client->has('request_uris') || empty($request_uris = $client->get('request_uris'))) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client must register at least one request Uri.');
+        }
+        
+        return $request_uris;
     }
 
     /**

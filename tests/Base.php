@@ -26,6 +26,8 @@ use OAuth2\Client\AuthenticationMethod\ClientSecretBasic;
 use OAuth2\Client\AuthenticationMethod\ClientSecretPost;
 use OAuth2\Client\AuthenticationMethod\None;
 use OAuth2\Endpoint\Authorization\AuthorizationRequestLoader;
+use OAuth2\Grant\PKCEMethod\Plain;
+use OAuth2\Grant\PKCEMethod\S256;
 use OAuth2\Test\Stub\AuthorizationEndpoint;
 use OAuth2\Endpoint\Authorization\AuthorizationFactory;
 use OAuth2\ResponseMode\FragmentResponseMode;
@@ -592,6 +594,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
             $this->authorization_code_grant_type->disablePKCEForPublicClientsEnforcement();
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
+            $this->authorization_code_grant_type->addPKCEMethod(new Plain());
+            $this->authorization_code_grant_type->addPKCEMethod(new S256());
         }
 
         return $this->authorization_code_grant_type;
