@@ -153,22 +153,20 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
      * @throws \InvalidArgumentException
      *
      * @return array
+     *
+     * @see http://tools.ietf.org/html/rfc6749#section-3.1.2.2
      */
     private function getClientRedirectUris(ClientInterface $client, array $parameters)
     {
-        $redirect_uris = $client->get('redirect_uris');
-        /*
-         * @see http://tools.ietf.org/html/rfc6749#section-3.1.2.2
-         */
-        if (!empty($redirect_uris)) {
-            return $redirect_uris;
+        if (!$client->has('redirect_uris') || empty($redirect_uris = $client->get('redirect_uris'))) {
+            $this->checkRedirectUriForAllClient();
+            $this->checkRedirectUriForNonConfidentialClient($client);
+            $this->checkRedirectUriForConfidentialClient($client, $parameters);
+
+            return [];
         }
 
-        $this->checkRedirectUriForAllClient();
-        $this->checkRedirectUriForNonConfidentialClient($client);
-        $this->checkRedirectUriForConfidentialClient($client, $parameters);
-
-        return [];
+        return $redirect_uris;
     }
 
     /**
