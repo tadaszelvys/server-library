@@ -78,9 +78,10 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     abstract protected function isCurrentUserFullyAuthenticated();
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface      $response
      */
-    abstract protected function redirectToLoginPage(ResponseInterface &$response);
+    abstract protected function redirectToLoginPage(ServerRequestInterface $request, ResponseInterface &$response);
 
     /**
      * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
@@ -112,7 +113,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         if ($user instanceof UserInterface) {
             //If prompt=login => login if not fully authenticated
             if ($authorization->hasPrompt('login') && !$this->isCurrentUserFullyAuthenticated()) {
-                $this->redirectToLoginPage($response);
+                $this->redirectToLoginPage($request, $response);
                 
                 return;
             }
@@ -133,7 +134,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             //If prompt=login => login
             //If prompt=consent => login
             //If prompt=select_account => login
-            $this->redirectToLoginPage($response);
+            $this->redirectToLoginPage($request, $response);
             
             return;
         }

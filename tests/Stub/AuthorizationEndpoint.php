@@ -117,7 +117,7 @@ class AuthorizationEndpoint extends Base
     /**
      * {@inheritdoc}
      */
-    protected function redirectToLoginPage(ResponseInterface &$response)
+    protected function redirectToLoginPage(ServerRequestInterface $request, ResponseInterface &$response)
     {
         $response->getBody()->rewind();
         $response->getBody()->write('You are redirected to the login page');
