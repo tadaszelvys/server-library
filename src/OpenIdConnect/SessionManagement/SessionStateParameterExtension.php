@@ -42,7 +42,7 @@ abstract class SessionStateParameterExtension implements AuthorizationEndpointEx
      *
      * @return string|null
      */
-    abstract function getBrowserState(ServerRequestInterface $request);
+    abstract protected function getBrowserState(ServerRequestInterface $request);
 
     /**
      * @param \Psr\Http\Message\ResponseInterface $response
