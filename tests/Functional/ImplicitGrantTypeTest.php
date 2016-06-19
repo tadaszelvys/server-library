@@ -418,11 +418,12 @@ class ImplicitGrantTypeTest extends Base
             'client_id'             => 'foo',
             'response_type'         => 'token code id_token',
             'state'                 => '0123456789',
+            'nonce'                 => '0123456789',
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $response->getBody()->rewind();
-        $this->assertEquals('{"error":"invalid_request","error_description":"Unsupported response type combination \"token code id_token\".","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Response type \"token code id_token\" is not supported by this server","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 }

@@ -91,6 +91,7 @@ class OpenIDConnectTest extends Base
                 'code id_token',
                 'id_token token',
                 'code id_token token',
+                'code token',
 
             ],
             $this->getAuthorizationFactory()->getResponseTypesSupported()

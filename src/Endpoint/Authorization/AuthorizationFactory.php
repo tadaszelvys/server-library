@@ -16,6 +16,7 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\Authorization\ParameterChecker\DisplayParameterChecker;
+use OAuth2\Endpoint\Authorization\ParameterChecker\NonceParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface;
 use OAuth2\Endpoint\Authorization\ParameterChecker\PromptParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\RedirectUriParameterChecker;
@@ -90,6 +91,7 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
         $this->addParameterChecker(new ScopeParameterChecker($scope_manager));
         $this->addParameterChecker(new RedirectUriParameterChecker($secured_redirect_uri_enforced, $redirect_uri_storage_enforced));
         $this->addParameterChecker(new ResponseModeParameterChecker($response_mode_parameter_in_authorization_request_allowed));
+        $this->addParameterChecker(new NonceParameterChecker());
     }
 
     /**
@@ -151,10 +153,9 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
             if (in_array('code', $types) && in_array('token', $types)) {
                 $types[] = 'code id_token token';
             }
-        } else {
-            if (in_array('code', $types) && in_array('token', $types)) {
-                $types[] = 'code token';
-            }
+        }
+        if (in_array('code', $types) && in_array('token', $types)) {
+            $types[] = 'code token';
         }
 
         return $types;
@@ -286,6 +287,12 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     private function getResponseTypes(ClientInterface $client, array $params)
     {
+        if (!in_array($params['response_type'], $this->getResponseTypesSupported())) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Response type "%s" is not supported by this server', $params['response_type']));
+        }
+        if (!$client->isResponseTypeAllowed($params['response_type'])) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$params['response_type'].'" is unauthorized for this client.');
+        }
         $response_types = explode(' ', $params['response_type']);
         if (count($response_types) > count(array_unique($response_types))) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing.');
@@ -293,13 +300,7 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
 
         $types = [];
         foreach ($response_types as $response_type) {
-            if (!array_key_exists($response_type, $this->response_types)) {
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Response type "%s" is not supported by this server', $response_type));
-            }
             $type = $this->response_types[$response_type];
-            if (!$client->isResponseTypeAllowed($type->getResponseType())) {
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$params['response_type'].'" is unauthorized for this client.');
-            }
             $types[] = $type;
         }
 

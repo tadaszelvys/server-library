@@ -50,7 +50,7 @@ class ClientManager extends Base
         $jwt1 = $this->createClient();
         $jwt1->set('redirect_uris', ['http://example.com/test?good=false']);
         $jwt1->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $jwt1->set('response_types', ['token', 'id_token', 'none', 'code']);
+        $jwt1->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
         $jwt1->setPublicId('jwt1');
         $jwt1->set('token_endpoint_auth_method', 'private_key_jwt');
         $jwt1->set('id_token_encrypted_response_alg', 'A256KW');
@@ -70,7 +70,7 @@ class ClientManager extends Base
         $bar->set('client_secret_expires_at', time() + 3600);
         $bar->set('redirect_uris', ['http://example.com/test?good=false']);
         $bar->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $bar->set('response_types', ['token', 'id_token', 'none', 'code']);
+        $bar->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
         $bar->setPublicId('bar');
         $bar->set('token_endpoint_auth_method', 'client_secret_jwt');
         $bar->set('scope_policy', 'none');
@@ -97,7 +97,7 @@ class ClientManager extends Base
         $mufasa->set('client_secret', 'Circle Of Life');
         $mufasa->set('redirect_uris', []);
         $mufasa->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $mufasa->set('response_types', ['token', 'id_token', 'none', 'code']);
+        $mufasa->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
         $mufasa->setPublicId('Mufasa');
         $mufasa->set('token_endpoint_auth_method', 'client_secret_basic');
         $mufasa->set('scope_policy', 'none');
@@ -107,7 +107,7 @@ class ClientManager extends Base
         $mufasa2->set('client_secret', 'Circle Of Life');
         $mufasa2->set('redirect_uris', []);
         $mufasa2->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $mufasa2->set('response_types', ['token', 'id_token', 'none', 'code']);
+        $mufasa2->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
         $mufasa2->setPublicId('Mufasa2');
         $mufasa2->set('token_endpoint_auth_method', 'client_secret_post');
         $mufasa2->set('scope_policy', 'none');
@@ -116,7 +116,7 @@ class ClientManager extends Base
         $mac->set('client_secret', 'secret');
         $mac->set('redirect_uris', ['http://example.com/test?good=false']);
         $mac->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $mac->set('response_types', ['token', 'id_token', 'none', 'code']);
+        $mac->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
         $mac->setPublicId('mac');
         $mac->set('token_types', ['MAC']);
         $mac->set('token_endpoint_auth_method', 'client_secret_basic');
@@ -127,7 +127,7 @@ class ClientManager extends Base
         $expired->set('client_secret_expires_at', time() - 3600);
         $expired->set('redirect_uris', ['http://example.com/test?good=false']);
         $expired->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $expired->set('response_types', ['token', 'id_token', 'none', 'code']);
+        $expired->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
         $expired->setPublicId('expired');
         $expired->set('token_endpoint_auth_method', 'client_secret_basic');
         $expired->set('scope_policy', 'none');
@@ -135,7 +135,7 @@ class ClientManager extends Base
         $foo = $this->createClient();
         $foo->setPublicId('foo');
         $foo->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code']);
-        $foo->set('response_types', ['token', 'id_token', 'none', 'code']);
+        $foo->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
         $foo->set('redirect_uris', ['http://example.com/test?good=false', 'http://127.0.0.1', 'https://another.uri/callback', 'urn:ietf:wg:oauth:2.0:oob', 'urn:ietf:wg:oauth:2.0:oob:auto']);
         $foo->set('token_endpoint_auth_method', 'none');
 
