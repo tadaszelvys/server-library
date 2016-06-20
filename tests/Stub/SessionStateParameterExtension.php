@@ -38,10 +38,10 @@ final class SessionStateParameterExtension extends Base
     /**
      * {@inheritdoc}
      */
-    function getBrowserState(ServerRequestInterface $request)
+    public function getBrowserState(ServerRequestInterface $request)
     {
         $browser_state = array_key_exists($this->storage_name, $_SESSION) ? $_SESSION[$this->storage_name] : null;
-        
+
         return $browser_state;
     }
 
@@ -53,7 +53,7 @@ final class SessionStateParameterExtension extends Base
         $_SESSION[$this->storage_name] = $browser_state;
 
         $cookie = new Cookie($this->storage_name, $browser_state);
-        $response = $response->withAddedHeader('Set-Cookie', (string)$cookie);
+        $response = $response->withAddedHeader('Set-Cookie', (string) $cookie);
     }
 
     /**
@@ -81,7 +81,7 @@ final class SessionStateParameterExtension extends Base
 
         return sprintf(
             '%s.%s',
-            $hash,$salt
+            $hash, $salt
         );
     }
 
@@ -95,10 +95,10 @@ final class SessionStateParameterExtension extends Base
         $url_parts = parse_url($redirect_uri);
 
         return sprintf(
-            "%s://%s%s",
+            '%s://%s%s',
             $url_parts['scheme'],
             $url_parts['host'],
-            isset($url_parts['port']) ? ':' . $url_parts['port'] : ''
+            isset($url_parts['port']) ? ':'.$url_parts['port'] : ''
         );
     }
 }

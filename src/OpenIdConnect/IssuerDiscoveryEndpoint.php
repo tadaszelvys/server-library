@@ -24,12 +24,12 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
 {
     use HasUserManager;
     use HasExceptionManager;
-    
+
     /**
      * @var string
      */
     private $issuer;
-    
+
     /**
      * @var string
      */
@@ -68,7 +68,6 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
             $this->checkUserFromResource($resource);
 
             $this->populateResponse($resource, $response);
-
         } catch (BaseExceptionInterface $e) {
             $e->getHttpResponse($response);
         }
@@ -86,17 +85,17 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
             'Pragma'        => 'no-cache',
         ];
         $response = $response->withStatus(200);
-        foreach ($headers as $key=>$value) {
+        foreach ($headers as $key => $value) {
             $response = $response->withHeader($key, $value);
         }
         $response->getBody()->write(json_encode([
             'subject' => $resource,
-            'links' => [
+            'links'   => [
                 [
-                    'rel' => 'http://openid.net/specs/connect/1.0/issuer',
-                    'href' => $this->issuer
-                ]
-            ]
+                    'rel'  => 'http://openid.net/specs/connect/1.0/issuer',
+                    'href' => $this->issuer,
+                ],
+            ],
         ]));
     }
 
@@ -186,7 +185,7 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
         $at = mb_strpos($resource, '@', null, 'utf-8');
         if (0 === $at) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported Extensible Resource Identifier (XRI) resource value.');
-        } elseif(false !== $at) {
+        } elseif (false !== $at) {
             $this->checkEmailResource($resource);
         } else {
             $this->checkUriResource($resource);

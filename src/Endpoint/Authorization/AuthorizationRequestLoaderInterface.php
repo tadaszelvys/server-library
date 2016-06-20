@@ -22,16 +22,12 @@ interface AuthorizationRequestLoaderInterface
      */
     public function isRequestUriRegistrationRequired();
 
-    /**
-     *
-     */
+
     public function enableRequestUriRegistrationRequirement();
 
-    /**
-     *
-     */
+
     public function disableRequestUriRegistrationRequirement();
-    
+
     /**
      * @return bool
      */
@@ -62,9 +58,7 @@ interface AuthorizationRequestLoaderInterface
      */
     public function enableRequestObjectSupport(JWTLoader $jwt_loader);
 
-    /**
-     * 
-     */
+
     public function enableRequestObjectReferenceSupport();
 
     /**

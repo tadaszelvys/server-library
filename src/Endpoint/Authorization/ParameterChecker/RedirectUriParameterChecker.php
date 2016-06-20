@@ -41,6 +41,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
         $this->secured_redirect_uri_enforced = $secured_redirect_uri_enforced;
         $this->redirect_uri_storage_enforced = $redirect_uri_storage_enforced;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -48,7 +49,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
     {
         $this->checkRedirectUriIsSet($parameters);
         $redirect_uri = $parameters['redirect_uri'];
-        
+
         $this->checkRedirectUriHasNoFragment($redirect_uri);
         $this->checkIfRedirectUriIsSecuredIfNeeded($redirect_uri);
         $this->checkRedirectUriForTheClient($client, $redirect_uri, $parameters);
@@ -125,7 +126,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
     private function isALocalUriOrAnUrn($redirect_uri)
     {
         $parsed = parse_url($redirect_uri);
-        
+
         return array_key_exists('scheme', $parsed) && array_key_exists('host', $parsed) && 'http' === $parsed['scheme'] && in_array($parsed['host'], ['[::1]', '127.0.0.1']);
     }
 
@@ -136,7 +137,6 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
      */
     public function checkRedirectUriForTheClient(ClientInterface $client, $redirect_uri, array $parameters)
     {
-
         $client_redirect_uris = $this->getClientRedirectUris($client, $parameters);
 
         if (!empty($client_redirect_uris) && false === Uri::isRedirectUriAllowed($redirect_uri, $client_redirect_uris)) {

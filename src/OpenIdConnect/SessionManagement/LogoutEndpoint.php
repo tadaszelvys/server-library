@@ -21,7 +21,7 @@ final class LogoutEndpoint implements LogoutEndpointInterface
      */
     public function handle(ServerRequestInterface $server, ResponseInterface &$response)
     {
-        /**
+        /*
          * This method is not supported as the id_token_hint is not yet supported
          */
         $response = $response->withStatus(403);

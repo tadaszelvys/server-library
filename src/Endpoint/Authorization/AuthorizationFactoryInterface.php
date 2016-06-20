@@ -33,16 +33,12 @@ interface AuthorizationFactoryInterface
      */
     public function isResponseModeParameterSupported();
 
-    /**
-     * 
-     */
+
     public function enableResponseModeParameterSupport();
 
-    /**
-     * 
-     */
+
     public function disableResponseModeParameterSupport();
-    
+
     /**
      * @return string[]
      */

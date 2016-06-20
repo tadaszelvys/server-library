@@ -29,7 +29,7 @@ class DistributedClaimSource implements ClaimSourceInterface
                 'access_token' => '0123456789',
                 'token_type'   => 'Bearer',
             ];
-            
+
             return new Source($claims, $source);
         }
     }

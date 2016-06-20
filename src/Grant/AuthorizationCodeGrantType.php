@@ -69,17 +69,13 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
         return $this->public_clients_allowed;
     }
 
-    /**
-     *
-     */
+
     public function allowPublicClients()
     {
         $this->public_clients_allowed = true;
     }
 
-    /**
-     *
-     */
+
     public function disallowPublicClients()
     {
         $this->public_clients_allowed = false;

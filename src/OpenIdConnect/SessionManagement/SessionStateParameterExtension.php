@@ -26,13 +26,13 @@ abstract class SessionStateParameterExtension implements AuthorizationEndpointEx
         if (!$authorization->hasScope('openid')) {
             return;
         }
-        
+
         $browser_state = $this->getBrowserState($request);
         if (null === $browser_state) {
             $browser_state = $this->generateBrowserState();
             $this->saveBrowserState($response, $browser_state);
         }
-        
+
         $session_state = $this->calculateSessionState($request, $authorization, $browser_state);
         $response_parameters['session_state'] = $session_state;
     }

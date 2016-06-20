@@ -22,7 +22,7 @@ interface PreConfiguredAuthorizationInterface
      * @param string $resource_owner_public_id
      */
     public function setResourceOwnerPublicId($resource_owner_public_id);
-    
+
     /**
      * @return string
      */
@@ -32,7 +32,7 @@ interface PreConfiguredAuthorizationInterface
      * @param string $client_public_id
      */
     public function setClientPublicId($client_public_id);
-    
+
     /**
      * @return string[]
      */

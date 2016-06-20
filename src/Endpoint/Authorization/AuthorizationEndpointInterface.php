@@ -21,7 +21,7 @@ interface AuthorizationEndpointInterface
      * @param \OAuth2\Endpoint\Authorization\AuthorizationEndpointExtension\AuthorizationEndpointExtensionInterface $extension
      */
     public function addExtension(AuthorizationEndpointExtensionInterface $extension);
-    
+
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface      $response

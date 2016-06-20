@@ -38,7 +38,6 @@ final class ResponseModeParameterChecker implements ParameterCheckerInterface
      */
     public function checkerParameter(ClientInterface $client, array &$parameters)
     {
-        
         if (false === array_key_exists('response_mode', $parameters)) {
             return;
         }

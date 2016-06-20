@@ -75,13 +75,13 @@ class UserManager implements UserManagerInterface
     {
         $server = 'my-service.com:9000';
         $length = mb_strlen($server, 'utf-8');
-        if ('https://'.$server.'/+' === mb_substr($resource, 0, $length+10, 'utf-8')) {
-            $resource = mb_substr($resource, $length+10, null, 'utf-8');
+        if ('https://'.$server.'/+' === mb_substr($resource, 0, $length + 10, 'utf-8')) {
+            $resource = mb_substr($resource, $length + 10, null, 'utf-8');
         }
-        if ('acct:' === mb_substr($resource, 0, 5, 'utf-8') && '@'.$server === mb_substr($resource, -($length+1), null, 'utf-8')) {
-            $resource = mb_substr($resource, 5, -($length+1), 'utf-8');
+        if ('acct:' === mb_substr($resource, 0, 5, 'utf-8') && '@'.$server === mb_substr($resource, -($length + 1), null, 'utf-8')) {
+            $resource = mb_substr($resource, 5, -($length + 1), 'utf-8');
         }
-        
+
         return isset($this->users[$resource]) ? $this->users[$resource] : null;
     }
 }

@@ -69,17 +69,13 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
         return $this->require_request_uri_registration;
     }
 
-    /**
-     *
-     */
+
     public function enableRequestUriRegistrationRequirement()
     {
         $this->require_request_uri_registration = true;
     }
 
-    /**
-     *
-     */
+
     public function disableRequestUriRegistrationRequirement()
     {
         $this->require_request_uri_registration = false;
@@ -179,7 +175,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
 
     /**
      * @param array $params
-     * 
+     *
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
      *
      * @return array
@@ -206,12 +202,12 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     private function createFromStandardRequest(array $params)
     {
         $client = $this->getClient($params);
-        
+
         return array_merge($params, ['client' => $client]);
     }
 
     /**
-     * @param array                      $params
+     * @param array $params
      *
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
      *
@@ -278,7 +274,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
         if (false === $client->has('request_uris') || empty($request_uris = $client->get('request_uris'))) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client must register at least one request Uri.');
         }
-        
+
         return $request_uris;
     }
 

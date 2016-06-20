@@ -105,17 +105,13 @@ final class ImplicitGrantType implements ResponseTypeInterface
         return $this->confidential_clients_allowed;
     }
 
-    /**
-     * 
-     */
+
     public function allowConfidentialClients()
     {
         $this->confidential_clients_allowed = true;
     }
 
-    /**
-     * 
-     */
+
     public function disallowConfidentialClients()
     {
         $this->confidential_clients_allowed = false;

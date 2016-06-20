@@ -20,7 +20,7 @@ use OAuth2\Scope\ScopeManagerInterface;
 final class ScopeParameterChecker implements ParameterCheckerInterface
 {
     use HasScopeManager;
-    
+
     public function __construct(ScopeManagerInterface $scope_manager)
     {
         $this->setScopeManager($scope_manager);

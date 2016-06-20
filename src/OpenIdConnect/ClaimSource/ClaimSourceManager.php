@@ -46,7 +46,7 @@ class ClaimSourceManager implements ClaimSourceManagerInterface
     public function getUserInfo(UserInterface $user, array $scope, array $claims)
     {
         $claims = [
-            '_claim_names' => [],
+            '_claim_names'   => [],
             '_claim_sources' => [],
         ];
         $i = 0;

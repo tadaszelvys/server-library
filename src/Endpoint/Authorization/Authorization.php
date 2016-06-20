@@ -128,7 +128,7 @@ final class Authorization implements AuthorizationInterface
         if (!$this->hasQueryParam('prompt')) {
             return [];
         }
-        
+
         return $this->getQueryParam('prompt');
     }
 

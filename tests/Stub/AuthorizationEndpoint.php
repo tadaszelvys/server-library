@@ -22,7 +22,6 @@ use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\User\UserManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response;
 
 class AuthorizationEndpoint extends Base
 {
@@ -42,7 +41,7 @@ class AuthorizationEndpoint extends Base
      * @var null|bool
      */
     private $is_authorized = null;
-    
+
     /**
      * AuthorizationEndpoint constructor.
      *
@@ -104,8 +103,6 @@ class AuthorizationEndpoint extends Base
         $this->is_authorized = $is_authorized;
     }
 
-
-
     /**
      * {@inheritdoc}
      */
@@ -129,7 +126,6 @@ class AuthorizationEndpoint extends Base
     protected function processConsentScreen(AuthorizationInterface $authorization, ServerRequestInterface $request, ResponseInterface &$response)
     {
         if (is_bool($this->is_authorized)) {
-
             $authorization->setAuthorized($this->is_authorized);
             $this->processAuthorization($request, $response, $authorization);
 

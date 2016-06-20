@@ -175,12 +175,12 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
         if (!$access_token->hasMetadata('requested_claims')) {
             return [];
         }
-        
+
         $requested_claims = $access_token->getMetadata('requested_claims');
         if (true === array_key_exists('userinfo', $requested_claims)) {
             return $requested_claims['userinfo'];
         }
-        
+
         return [];
     }
 
