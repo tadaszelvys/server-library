@@ -14,7 +14,7 @@ namespace OAuth2\OpenIdConnect\SessionManagement;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class IFrameEndpoint implements IFrameEndpointInterface
+class IFrameEndpoint implements IFrameEndpointInterface
 {
     /**
      * {@inheritdoc}

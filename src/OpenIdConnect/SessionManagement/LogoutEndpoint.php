@@ -14,7 +14,7 @@ namespace OAuth2\OpenIdConnect\SessionManagement;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class LogoutEndpoint implements LogoutEndpointInterface
+class LogoutEndpoint implements LogoutEndpointInterface
 {
     /**
      * {@inheritdoc}
