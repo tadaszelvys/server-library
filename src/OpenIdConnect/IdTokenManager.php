@@ -121,7 +121,7 @@ class IdTokenManager implements IdTokenManagerInterface
                 'exp'       => $exp,
             ]
         );
-        
+
         foreach (['at_hash' => $access_token, 'c_hash' => $auth_code] as $key => $token) {
             if (null !== $token) {
                 $claims[$key] = $this->getHash($token->getToken());

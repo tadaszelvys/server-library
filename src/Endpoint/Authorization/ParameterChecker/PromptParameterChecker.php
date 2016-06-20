@@ -21,7 +21,7 @@ final class PromptParameterChecker implements ParameterCheckerInterface
     const PROMPT_LOGIN = 'login';
     const PROMPT_CONSENT = 'consent';
     const PROMPT_SELECT_ACCOUNT = 'select_account';
-    
+
     /**
      * {@inheritdoc}
      */
@@ -30,12 +30,12 @@ final class PromptParameterChecker implements ParameterCheckerInterface
         if (!array_key_exists('prompt', $parameters)) {
             return;
         }
-        
+
         Assertion::true(
             empty(array_diff($parameters['prompt'], $this->getAllowedPromptValues())),
             sprintf('Invalid parameter "prompt". Allowed values are %s', json_encode($this->getAllowedPromptValues()))
         );
-        
+
         Assertion::false(
             in_array('none', $parameters['prompt']) && 1 !== count($parameters['prompt']),
             'Invalid parameter "prompt". Prompt value "none" must be used alone.'

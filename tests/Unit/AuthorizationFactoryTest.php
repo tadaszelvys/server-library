@@ -41,7 +41,7 @@ class AuthorizationFactoryTest extends Base
         $this->assertEquals('token', $authorization->getQueryParam('response_type'));
         $this->assertEquals('page', $authorization->getQueryParam('display'));
         $this->assertEquals(['none'], $authorization->getQueryParam('prompt'));
-        $this->assertEquals(['scope1','scope2'], $authorization->getQueryParam('scope'));
+        $this->assertEquals(['scope1', 'scope2'], $authorization->getQueryParam('scope'));
     }
 
     public function testPromptNoneMustBeUsedAlone()
@@ -90,15 +90,15 @@ class AuthorizationFactoryTest extends Base
     public function testCreateAuthorizationWithBadDisplay()
     {
         $params = [
-            'client_id' => 'foo',
-            'state' => '0123456789',
-            'scope' => 'scope1 scope2',
+            'client_id'     => 'foo',
+            'state'         => '0123456789',
+            'scope'         => 'scope1 scope2',
             'response_type' => 'token',
-            'display' => 'foo',
-            'prompt' => 'none',
-            'redirect_uri' => 'https://another.uri/callback',
+            'display'       => 'foo',
+            'prompt'        => 'none',
+            'redirect_uri'  => 'https://another.uri/callback',
         ];
-        $request = $this->createRequest('/?' . http_build_query($params));
+        $request = $this->createRequest('/?'.http_build_query($params));
         try {
             $this->getAuthorizationFactory()->createAuthorizationFromRequest($request);
             $this->fail('The expected exception was not thrown');

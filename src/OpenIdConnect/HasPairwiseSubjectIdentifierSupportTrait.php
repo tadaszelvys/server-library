@@ -93,7 +93,6 @@ trait HasPairwiseSubjectIdentifierSupportTrait
         }
 
         return $sub;
-
     }
 
     /**

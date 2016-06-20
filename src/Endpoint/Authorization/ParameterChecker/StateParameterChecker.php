@@ -16,8 +16,8 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
 /**
- * Class StateParameterChecker
- * 
+ * Class StateParameterChecker.
+ *
  * @see http://tools.ietf.org/html/rfc6749#section-3.1.2
  */
 final class StateParameterChecker implements ParameterCheckerInterface

@@ -33,7 +33,6 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
         $auth1->setRequestedScopes(['openid', 'email', 'profile']);
         $auth1->setValidatedScopes(['openid', 'email', 'profile']);
         $this->savePreConfiguredAuthorization($auth1);
-        
     }
 
     /**
@@ -42,7 +41,7 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     public function findOnePreConfiguredAuthorization($resource_owner_public_id, $client_public_id, array $requested_scope)
     {
         $hash = $this->calculateHash($resource_owner_public_id, $client_public_id, $requested_scope);
-        
+
         if (array_key_exists($hash, $this->pre_configured_authorizations)) {
             return $this->pre_configured_authorizations[$hash];
         }

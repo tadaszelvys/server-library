@@ -23,7 +23,6 @@ use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\User\UserInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response;
 
 abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 {
@@ -63,7 +62,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $this->pre_configured_authorization_manager = $pre_configured_authorization_manager;
         $this->setExceptionManager($exception_manager);
         $this->setScopeManager($scope_manager);
-        
+
         $this->addExtension(new StateParameterExtension());
     }
 
@@ -97,13 +96,14 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         $this->extensions[] = $extension;
     }
+
     /**
      * {@inheritdoc}
      */
     public function authorize(ServerRequestInterface $request, ResponseInterface &$response)
     {
         $authorization = $this->prepareAuthorization($request, $response);
-        
+
         if (null === $authorization) {
             return;
         }
@@ -114,7 +114,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             //If prompt=login => login if not fully authenticated
             if ($authorization->hasPrompt('login') && !$this->isCurrentUserFullyAuthenticated()) {
                 $this->redirectToLoginPage($request, $response);
-                
+
                 return;
             }
             //If prompt=none => continue
@@ -135,7 +135,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             //If prompt=consent => login
             //If prompt=select_account => login
             $this->redirectToLoginPage($request, $response);
-            
+
             return;
         }
         $authorization->setUser($user);
@@ -148,7 +148,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
                 //Show consent screen
 
                 $this->processConsentScreen($authorization, $request, $response);
-                
+
                 return;
             }
             //If prompt=none => continue
@@ -237,7 +237,6 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function tryToFindPreConfiguredAuthorization(AuthorizationInterface $authorization)
     {
         if (null !== $this->pre_configured_authorization_manager) {
-
             return $this->pre_configured_authorization_manager->findOnePreConfiguredAuthorization(
                 $authorization->getUser()->getPublicId(),
                 $authorization->getClient()->getPublicId(),
@@ -255,7 +254,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     private function createRedirectionException(AuthorizationInterface $authorization, ResponseInterface &$response, $error, $error_description = null)
     {
         $params = [
-            'response_mode' => $authorization->getResponseMode(),
+            'response_mode'  => $authorization->getResponseMode(),
             'redirect_uri'   => $authorization->getRedirectUri(),
         ];
         if (true === $authorization->hasQueryParam('state')) {

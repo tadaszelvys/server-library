@@ -22,9 +22,9 @@ use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Grant\GrantTypeInterface;
 use OAuth2\Grant\GrantTypeResponse;
 use OAuth2\Grant\GrantTypeResponseInterface;
-use OAuth2\Grant\GrantTypeInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
@@ -302,7 +302,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Client\ClientInterface $client
      *
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
-     * 
+     *
      * @return array
      */
     private function getTokenTypeInformation(array $request_parameters, ClientInterface $client)

@@ -97,4 +97,3 @@ class PreConfiguredAuthorization implements PreConfiguredAuthorizationInterface
         $this->validated_scopes = $validated_scopes;
     }
 }
-

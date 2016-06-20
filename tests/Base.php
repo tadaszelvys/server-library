@@ -25,13 +25,8 @@ use OAuth2\Client\AuthenticationMethod\ClientAssertionJwt;
 use OAuth2\Client\AuthenticationMethod\ClientSecretBasic;
 use OAuth2\Client\AuthenticationMethod\ClientSecretPost;
 use OAuth2\Client\AuthenticationMethod\None;
-use OAuth2\Endpoint\Authorization\AuthorizationRequestLoader;
-use OAuth2\Grant\PKCEMethod\Plain;
-use OAuth2\Grant\PKCEMethod\S256;
-use OAuth2\Test\Stub\AuthorizationEndpoint;
 use OAuth2\Endpoint\Authorization\AuthorizationFactory;
-use OAuth2\ResponseMode\FragmentResponseMode;
-use OAuth2\ResponseMode\QueryResponseMode;
+use OAuth2\Endpoint\Authorization\AuthorizationRequestLoader;
 use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationEndpoint;
@@ -43,10 +38,11 @@ use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\JWTBearerGrantType;
+use OAuth2\Grant\PKCEMethod\Plain;
+use OAuth2\Grant\PKCEMethod\S256;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManager;
-use OAuth2\ResponseMode\FormPostResponseMode;
 use OAuth2\OpenIdConnect\IdTokenGrantType;
 use OAuth2\OpenIdConnect\IdTokenManager;
 use OAuth2\OpenIdConnect\IssuerDiscoveryEndpoint;
@@ -60,12 +56,16 @@ use OAuth2\OpenIdConnect\UserinfoScopeSupport\AddressScopeSupport;
 use OAuth2\OpenIdConnect\UserinfoScopeSupport\EmailScopeSupport;
 use OAuth2\OpenIdConnect\UserinfoScopeSupport\PhoneScopeSupport;
 use OAuth2\OpenIdConnect\UserinfoScopeSupport\ProfilScopeSupport;
+use OAuth2\ResponseMode\FormPostResponseMode;
+use OAuth2\ResponseMode\FragmentResponseMode;
+use OAuth2\ResponseMode\QueryResponseMode;
 use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Security\EntryPoint;
 use OAuth2\Security\Handler\AccessTokenManagerHandler;
 use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\AuthCodeManager;
+use OAuth2\Test\Stub\AuthorizationEndpoint;
 use OAuth2\Test\Stub\ClientManager;
 use OAuth2\Test\Stub\DistributedClaimSource;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
@@ -182,7 +182,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 false,
                 true
             );
-            
+
             $this->authorization_factory->addResponseType($this->getAuthorizationCodeGrantType());
             $this->authorization_factory->addResponseType($this->getImplicitGrantType());
             $this->authorization_factory->addResponseType($this->getNoneResponseType());

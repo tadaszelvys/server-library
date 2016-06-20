@@ -21,7 +21,7 @@ final class DisplayParameterChecker implements ParameterCheckerInterface
     const DISPLAY_POPUP = 'popup';
     const DISPLAY_TOUCH = 'touch';
     const DISPLAY_WAP = 'wap';
-    
+
     /**
      * {@inheritdoc}
      */
@@ -43,7 +43,6 @@ final class DisplayParameterChecker implements ParameterCheckerInterface
     {
         return ExceptionManagerInterface::INVALID_REQUEST;
     }
-
 
     /**
      * @return string[]

@@ -217,7 +217,7 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
     }
 
     /**
-     * @param array                                        $params
+     * @param array                                 $params
      * @param \OAuth2\Grant\ResponseTypeInterface[] $types
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
@@ -237,7 +237,7 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
             //There are multiple response types
             $mode = $this->getResponseModeIfMultipleResponseTypes($params['response_type']);
         }
-        
+
         return $this->getResponseModeService($mode);
     }
 

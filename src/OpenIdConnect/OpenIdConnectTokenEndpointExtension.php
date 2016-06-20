@@ -72,9 +72,9 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
                 ['nonce' => $params['nonce']]
             );
         }
-        
+
         $requested_claims = $this->getIdTokenClaims($access_token);
-        
+
         $id_token = $this->id_token_manager->createIdToken(
             $client,
             $user,
@@ -136,7 +136,7 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
             $data['claims_locales'] = null;
             $data['requested_claims'] = [];
         }
-        
+
         return $data;
     }
 }

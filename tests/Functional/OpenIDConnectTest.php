@@ -128,7 +128,7 @@ class OpenIDConnectTest extends Base
 
         $userinfo = $this->getUserInfoEndpoint()->handle($access_token);
         $userinfo = $loader->load($userinfo);
-        
+
         $this->assertTrue($userinfo->hasClaim('website#fr_fr'));
         $this->assertTrue($userinfo->hasClaim('picture#de'));
         $this->assertFalse($userinfo->hasClaim('email'));
@@ -235,11 +235,10 @@ class OpenIDConnectTest extends Base
         $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\,"offline_access"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
-
     }
 
     /**
-     * Refresh token is not issued because the prompt=consent parameter is not set
+     * Refresh token is not issued because the prompt=consent parameter is not set.
      */
     public function testCodeTokenSuccessWithoutRefreshToken()
     {
@@ -294,7 +293,6 @@ class OpenIDConnectTest extends Base
         $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
-
     }
 
     public function testIdTokenSuccess()
