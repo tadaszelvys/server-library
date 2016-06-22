@@ -51,11 +51,6 @@ class Token implements TokenInterface
     protected $resource_owner_public_id;
 
     /**
-     * @var string|null
-     */
-    protected $redirect_uri = null;
-
-    /**
      * {@inheritdoc}
      */
     public function getClientPublicId()
