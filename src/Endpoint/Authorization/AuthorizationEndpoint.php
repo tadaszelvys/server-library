@@ -236,8 +236,8 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
      */
     private function tryToFindPreConfiguredAuthorization(AuthorizationInterface $authorization)
     {
-        if (null !== $this->pre_configured_authorization_manager) {
-            return $this->pre_configured_authorization_manager->findOnePreConfiguredAuthorization(
+        if (null !== $this->getPreConfiguredAuthorizationManager()) {
+            return $this->getPreConfiguredAuthorizationManager()->findOnePreConfiguredAuthorization(
                 $authorization->getUser()->getPublicId(),
                 $authorization->getClient()->getPublicId(),
                 $authorization->getScopes()
