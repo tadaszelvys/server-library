@@ -263,4 +263,12 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $exception = $this->getExceptionManager()->getRedirectException($error, $error_description, $params);
         $exception->getHttpResponse($response);
     }
+
+    /**
+     * @return null|\OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface
+     */
+    protected function getPreConfiguredAuthorizationManager()
+    {
+        return $this->pre_configured_authorization_manager;
+    }
 }
