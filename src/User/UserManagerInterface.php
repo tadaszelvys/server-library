@@ -24,13 +24,22 @@ interface UserManagerInterface
     public function checkUserPasswordCredentials(UserInterface $user, $password);
 
     /**
-     * Get the end-user with the specified username.
+     * Get the end-user with the specified Username.
      *
      * @param string $username Username
      *
      * @return \OAuth2\User\UserInterface|null
      */
-    public function getUser($username);
+    public function getUserByUsername($username);
+
+    /**
+     * Get the end-user with the specified public ID.
+     *
+     * @param string $public_id Public ID
+     *
+     * @return \OAuth2\User\UserInterface|null
+     */
+    public function getUserByPublicId($public_id);
 
     /**
      * Get the end-user with the specified username.

@@ -32,7 +32,7 @@ class AuthorizationFactoryTest extends Base
         ];
         $request = $this->createRequest('/?'.http_build_query($params));
         $authorization = $this->getAuthorizationFactory()->createAuthorizationFromRequest($request);
-        $authorization->setUser($this->getUserManager()->getUser('user1'));
+        $authorization->setUser($this->getUserManager()->getUserByUsername('user1'));
         $authorization->setAuthorized(true);
 
         $this->assertEquals('0123456789', $authorization->getQueryParam('state'));

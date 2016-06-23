@@ -213,7 +213,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      */
     private function getUser(AccessTokenInterface $access_token)
     {
-        $user = $this->getUserManager()->getUser($access_token->getResourceOwnerPublicId());
+        $user = $this->getUserManager()->getUserByPublicId($access_token->getResourceOwnerPublicId());
         if (null === $user) {
             throw $this->getExceptionManager()->getBadRequestException(
                 ExceptionManagerInterface::INVALID_REQUEST,

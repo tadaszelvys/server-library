@@ -63,7 +63,15 @@ class UserManager implements UserManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getUser($public_id)
+    public function getUserByUsername($username)
+    {
+        return $this->getUserByPublicId($username);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUserByPublicId($public_id)
     {
         return isset($this->users[$public_id]) ? $this->users[$public_id] : null;
     }

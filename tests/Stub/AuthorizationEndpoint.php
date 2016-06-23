@@ -67,7 +67,7 @@ class AuthorizationEndpoint extends Base
      */
     protected function getCurrentUser()
     {
-        return null === $this->current_user ? null : $this->getUserManager()->getUser($this->current_user);
+        return null === $this->current_user ? null : $this->getUserManager()->getUserByUsername($this->current_user);
     }
 
     /**

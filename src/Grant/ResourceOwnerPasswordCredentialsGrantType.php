@@ -81,7 +81,7 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
         $username = RequestBody::getParameter($request, 'username');
         $password = RequestBody::getParameter($request, 'password');
 
-        $user = $this->getUserManager()->getUser($username);
+        $user = $this->getUserManager()->getUserByUsername($username);
         if (null === $user || !$this->getUserManager()->checkUserPasswordCredentials($user, $password)) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Invalid username and password combination');
         }

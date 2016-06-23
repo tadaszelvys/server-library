@@ -54,7 +54,7 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
         if (false === $this->issueIdToken($grant_type_response)) {
             return;
         }
-        $user = $this->user_manager->getUser($grant_type_response->getResourceOwnerPublicId());
+        $user = $this->user_manager->getUserByPublicId($grant_type_response->getResourceOwnerPublicId());
         if (null === $user) {
             return;
         }

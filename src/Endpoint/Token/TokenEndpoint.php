@@ -430,7 +430,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         if (null !== $client) {
             return $client;
         }
-        $user = $this->getUserManager()->getUser($resource_owner_public_id);
+        $user = $this->getUserManager()->getUserByPublicId($resource_owner_public_id);
         if (null !== $user) {
             return $user;
         }
