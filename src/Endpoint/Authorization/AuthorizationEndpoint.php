@@ -19,6 +19,7 @@ use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthor
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\ResponseMode\QueryResponseMode;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\User\UserInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -190,7 +191,35 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         try {
             return $this->authorization_factory->createAuthorizationFromRequest($request);
         } catch (BaseExceptionInterface $e) {
-            $e->getHttpResponse($response);
+            $params = $request->getQueryParams();
+            if (array_key_exists('redirect_uri', $params)) {
+                if (array_key_exists('response_type', $params)) {
+                    try {
+                        $types = $this->authorization_factory->getResponseTypes($params);
+                        $response_mode= $this->authorization_factory->getResponseMode($params, $types);
+                    } catch (\Exception $e) {
+                        $response_mode = new QueryResponseMode();
+                    }
+                } else {
+                    $response_mode = new QueryResponseMode();
+                }
+                $data = [
+                    'redirect_uri' => $params['redirect_uri'],
+                    'response_mode' => $response_mode,
+                ];
+                if (array_key_exists('state', $params)) {
+                    $data['state'] = $params['state'];
+                }
+
+                $e2 = $this->getExceptionManager()->getRedirectException(
+                    $e->getMessage(),
+                    $e->getDescription(),
+                    $data
+                );
+                $e2->getHttpResponse($response);
+            } else {
+                $e->getHttpResponse($response);
+            }
         }
     }
 

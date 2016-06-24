@@ -903,7 +903,6 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUser('user1');
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $response->getBody()->rewind();
-        $this->assertEquals('{"error":"invalid_request","error_description":"Invalid parameter \"prompt\". Prompt value \"none\" must be used alone.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('http://example.com/test?good=false&error=invalid_request&error_description=Invalid+parameter+%22prompt%22.+Prompt+value+%22none%22+must+be+used+alone.&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request&state=0123456789#', $response->getHeader('Location')[0]);
     }
 }

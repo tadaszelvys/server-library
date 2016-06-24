@@ -60,4 +60,23 @@ interface AuthorizationFactoryInterface
      * @return \OAuth2\Endpoint\Authorization\AuthorizationInterface
      */
     public function createAuthorizationFromRequest(ServerRequestInterface $request);
+    
+    /**
+     * @param array                                 $params
+     * @param \OAuth2\Grant\ResponseTypeInterface[] $types
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\ResponseMode\ResponseModeInterface
+     */
+    public function getResponseMode(array $params, array $types);
+    
+    /**
+     * @param array $params
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return \OAuth2\Grant\ResponseTypeInterface[]
+     */
+    public function getResponseTypes(array $params);
 }

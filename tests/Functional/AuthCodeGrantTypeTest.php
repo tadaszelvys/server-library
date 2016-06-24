@@ -58,9 +58,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-
-        $response->getBody()->rewind();
-        $this->assertEquals('{"error":"invalid_request","error_description":"The specified redirect URI is not valid.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('http://example.com/bad.redirect?URI#error=invalid_request&error_description=The+specified+redirect+URI+is+not+valid.&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request&state=0123456', $response->getHeader('Location')[0]);
     }
 
     public function testStateParameterIsMissing()
@@ -73,9 +71,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-
-        $response->getBody()->rewind();
-        $this->assertEquals('{"error":"invalid_request","error_description":"The parameter \"state\" is mandatory.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('http://example.com/bad.redirect?URI#error=invalid_request&error_description=The+parameter+%22state%22+is+mandatory.&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request', $response->getHeader('Location')[0]);
     }
 
     public function testResponseTypeParameterIsNotSupported()
@@ -89,9 +85,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-
-        $response->getBody()->rewind();
-        $this->assertEquals('{"error":"invalid_request","error_description":"Response type \"bad_response_type\" is not supported by this server","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('http://example.com/test?good=false&error=invalid_request&error_description=Response+type+%22bad_response_type%22+is+not+supported+by+this+server&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request&state=0123456789#', $response->getHeader('Location')[0]);
     }
 
     public function testNonConfidentialClientMustRegisterAtLeastOneRedirectUri()
@@ -100,14 +94,12 @@ class AuthCodeGrantTypeTest extends Base
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
             'client_id'     => 'oof',
-            'response_type' => 'bad_response_type',
+            'response_type' => 'none',
             'state'         => '0123456',
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-
-        $response->getBody()->rewind();
-        $this->assertEquals('{"error":"invalid_request","error_description":"Non-confidential clients must register at least one redirect URI.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('http://example.com/test?good=false&error=invalid_request&error_description=Non-confidential+clients+must+register+at+least+one+redirect+URI.&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request&state=0123456#', $response->getHeader('Location')[0]);
     }
 
     public function testConfidentialClientWithRegisteredRedirectUriButUnsupportedResponseType()
@@ -121,9 +113,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-
-        $response->getBody()->rewind();
-        $this->assertEquals('{"error":"invalid_request","error_description":"Response type \"bad_response_type\" is not supported by this server","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('http://example.com/test?good=false&error=invalid_request&error_description=Response+type+%22bad_response_type%22+is+not+supported+by+this+server&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request&state=0123456789#', $response->getHeader('Location')[0]);
     }
 
     public function testConfidentialClientWithUnregisteredRedirectUri()
@@ -132,14 +122,12 @@ class AuthCodeGrantTypeTest extends Base
         $request = $request->withQueryParams([
             'redirect_uri'  => 'https://example.com/test?good=false',
             'client_id'     => 'bar',
-            'response_type' => 'bad_response_type',
+            'response_type' => 'none',
             'state'         => '0123456789',
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-
-        $response->getBody()->rewind();
-        $this->assertEquals('{"error":"invalid_request","error_description":"The specified redirect URI is not valid.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('https://example.com/test?good=false&error=invalid_request&error_description=The+specified+redirect+URI+is+not+valid.&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request&state=0123456789#', $response->getHeader('Location')[0]);
     }
 
     public function testConfidentialClientUsingTokenResponseTypeWithoutRedirectUriRegistered()
@@ -153,9 +141,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-
-        $response->getBody()->rewind();
-        $this->assertEquals('{"error":"invalid_request","error_description":"Confidential clients must register at least one redirect URI when using \"token\" response type.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
+        $this->assertEquals('http://example.com/test?good=false#error=invalid_request&error_description=Confidential+clients+must+register+at+least+one+redirect+URI+when+using+%22token%22+response+type.&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request&state=0123456789', $response->getHeader('Location')[0]);
     }
 
     public function testResponseTypeIsNotAuthorizedForTheClient()
@@ -169,9 +155,7 @@ class AuthCodeGrantTypeTest extends Base
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-
-        $response->getBody()->rewind();
-        $this->assertEquals('{"error":"unauthorized_client","error_description":"The response type \"code\" is unauthorized for this client.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/unauthorized_client"}', $response->getBody()->getContents());
+        $this->assertEquals('http://example.com/test?good=false&error=unauthorized_client&error_description=The+response+type+%22code%22+is+unauthorized+for+this+client.&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Funauthorized_client&state=0123456789#', $response->getHeader('Location')[0]);
     }
 
     public function testResourceOwnerDeniedAccess()

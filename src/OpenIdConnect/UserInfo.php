@@ -106,6 +106,8 @@ final class UserInfo implements UserInfoInterface
         $result = [];
         if (null === $claims_locales) {
             $claims_locales = [];
+        } elseif (true === is_string($claims_locales)) {
+            $claims_locales = explode(' ', $claims_locales);
         }
         $claims_locales[] = '';
         foreach ($claims as $claim => $config) {

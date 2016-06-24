@@ -138,6 +138,9 @@ class IdTokenManager implements IdTokenManagerInterface
             'typ'       => 'JWT',
             'alg'       => $this->getSignatureAlgorithm(),
         ];
+        if ($this->signature_key->has('kid')) {
+            $headers['kid'] = $this->signature_key->get('kid');
+        }
 
         if (!empty($id_token_claims)) {
             $claims = array_merge($claims, $id_token_claims);

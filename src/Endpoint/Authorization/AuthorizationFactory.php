@@ -190,7 +190,8 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
 
         $this->checkParameters($client, $parameters);
 
-        $types = $this->getResponseTypes($client, $parameters);
+        $types = $this->getResponseTypes($parameters);
+        $this->checkResponseTypeAllowedForTheClient($client, $parameters);
         $response_mode = $this->getResponseMode($parameters, $types);
 
         $redirect_uri = $parameters['redirect_uri'];
@@ -217,14 +218,9 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
     }
 
     /**
-     * @param array                                 $params
-     * @param \OAuth2\Grant\ResponseTypeInterface[] $types
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return \OAuth2\ResponseMode\ResponseModeInterface
+     * {@inheritdoc}
      */
-    private function getResponseMode(array $params, array $types)
+    public function getResponseMode(array $params, array $types)
     {
         if (array_key_exists('response_mode', $params) && true === $this->isResponseModeParameterSupported()) {
             return $this->getResponseModeService($params['response_mode']);
@@ -281,17 +277,22 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
      * @param \OAuth2\Client\ClientInterface $client
      * @param array                          $params
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     *
-     * @return \OAuth2\Grant\ResponseTypeInterface[]
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
      */
-    private function getResponseTypes(ClientInterface $client, array $params)
+    private function checkResponseTypeAllowedForTheClient(ClientInterface $client, array $params)
+    {
+        if (!$client->isResponseTypeAllowed($params['response_type'])) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$params['response_type'].'" is unauthorized for this client.');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseTypes(array $params)
     {
         if (!in_array($params['response_type'], $this->getResponseTypesSupported())) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Response type "%s" is not supported by this server', $params['response_type']));
-        }
-        if (!$client->isResponseTypeAllowed($params['response_type'])) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$params['response_type'].'" is unauthorized for this client.');
         }
         $response_types = explode(' ', $params['response_type']);
         if (count($response_types) > count(array_unique($response_types))) {
