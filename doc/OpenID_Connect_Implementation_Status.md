@@ -1,4 +1,4 @@
-OpenID Connect Implementeation Status
+OpenID Connect Implementation Status
 =====================================
 
 * [x] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
@@ -33,7 +33,6 @@ OpenID Connect Implementeation Status
             * [x] Hashed Subject Identifier
             * [x] Encrypted Subject Identifier
             * [x] Ability to support other Subject Identifier Calculation Algorithms
-        * [x] Ability to 
     * [x]  [Client Authentication](http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
         * [x] Authentication Methods:
             * [x] `client_secret_basic`
