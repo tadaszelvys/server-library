@@ -28,6 +28,7 @@ The following components are implemented:
 
 * Access Token Managers:
     * [x] JWT access token
+    * [ ] Random string access token
     * [x] Ability to use other Access Token managers
 * Access Token Types:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))

@@ -19,7 +19,6 @@ use Jose\Object\JWKSet;
 /**
  * Class ClientTrait.
  *
- * @method string getTokenEndpointAuthMethod()
  * @method string getJwksUri()
  * @method bool hasJwksUri()
  * @method array getJwks()
@@ -42,16 +41,6 @@ trait ClientTrait
      * @return mixed
      */
     abstract public function get($metadata);
-
-    /**
-     * @var int|null
-     */
-    protected $client_secret_expires_at = null;
-
-    /**
-     * @var string
-     */
-    protected $token_endpoint_auth_method = 'client_secret_basic';
 
     /**
      * {@inheritdoc}
@@ -101,15 +90,39 @@ trait ClientTrait
     }
 
     /**
+     * @return string
+     */
+    public function getTokenEndpointAuthMethod()
+    {
+        if ($this->has('token_endpoint_auth_method')) {
+            return $this->get('token_endpoint_auth_method');
+        }
+
+        return 'client_secret_basic';
+    }
+
+    /**
+     * @return int
+     */
+    public function getClientSecretExpiresAt()
+    {
+        if ($this->has('client_secret_expires_at')) {
+            return $this->get('client_secret_expires_at');
+        }
+        
+        return 0;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function areClientCredentialsExpired()
     {
-        if (empty($this->client_secret_expires_at)) {
+        if (0 === $this->getClientSecretExpiresAt()) {
             return false;
         }
 
-        return time() > $this->client_secret_expires_at;
+        return time() > $this->getClientSecretExpiresAt();
     }
 
     /**
