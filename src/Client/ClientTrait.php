@@ -44,9 +44,9 @@ trait ClientTrait
     abstract public function get($metadata);
 
     /**
-     * @var int
+     * @var int|null
      */
-    protected $client_secret_expires_at = 0;
+    protected $client_secret_expires_at = null;
 
     /**
      * @var string
@@ -105,7 +105,7 @@ trait ClientTrait
      */
     public function areClientCredentialsExpired()
     {
-        if (0 === $this->client_secret_expires_at) {
+        if (empty($this->client_secret_expires_at)) {
             return false;
         }
 

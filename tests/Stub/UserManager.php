@@ -31,6 +31,20 @@ class UserManager implements UserManagerInterface
             'locality'       => 'Paris',
             'country'        => 'France',
         ]);
+        $user1->set('name', 'John Doe');
+        $user1->set('given_name', 'John');
+        $user1->set('family_name', 'Doe');
+        $user1->set('middle_name', 'Jack');
+        $user1->set('nickname', 'Little John');
+        $user1->set('profile', 'https://profile.doe.fr/john/');
+        $user1->set('preferred_username', 'j-d');
+        $user1->set('gender', 'M');
+        $user1->set('phone_number', '+0123456789');
+        $user1->set('phone_number_verified', true);
+        $user1->set('updated_at', time()-1000);
+        $user1->set('zoneinfo', 'Europe/Paris');
+        $user1->set('locale', 'en');
+        $user1->set('picture', 'https://www.google.com');
         $user1->set('amr', ['password', 'otp']);
         $user1->set('birthdate', '1950-01-01');
         $user1->set('email', 'root@localhost.com');
@@ -43,7 +57,6 @@ class UserManager implements UserManagerInterface
 
         $user2 = new User('user2', 'password2');
         $user2->set('last_login_at', time() - 1000);
-
         $this->users['user1'] = $user1;
         $this->users['user2'] = $user2;
     }
