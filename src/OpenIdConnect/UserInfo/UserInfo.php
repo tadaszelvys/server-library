@@ -9,14 +9,14 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect;
+namespace OAuth2\OpenIdConnect\UserInfo;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManagerInterface;
-use OAuth2\OpenIdConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportInterface;
 use OAuth2\User\UserInterface;
 
 final class UserInfo implements UserInfoInterface
@@ -25,7 +25,7 @@ final class UserInfo implements UserInfoInterface
     use HasPairwiseSubjectIdentifierSupportTrait;
 
     /**
-     * @var \OAuth2\OpenIdConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface[]
+     * @var \OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportInterface[]
      */
     private $userinfo_scope_supports = [];
 
@@ -44,9 +44,9 @@ final class UserInfo implements UserInfoInterface
     }
 
     /**
-     * @param \OAuth2\OpenIdConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface $userinfo_scope_support
+     * @param \OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserinfoScopeSupportInterface $userinfo_scope_support
      */
-    public function addUserInfoScopeSupport(UserinfoScopeSupportInterface $userinfo_scope_support)
+    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfo_scope_support)
     {
         $scope = $userinfo_scope_support->getScope();
         Assertion::false(array_key_exists($scope, $this->userinfo_scope_supports), sprintf('The userinfo scope "%s" is already supported.', $scope));
@@ -170,7 +170,7 @@ final class UserInfo implements UserInfoInterface
     }
 
     /**
-     * @return \OAuth2\OpenIdConnect\UserinfoScopeSupport\UserinfoScopeSupportInterface[]
+     * @return \OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserinfoScopeSupportInterface[]
      */
     private function getSupportedUserInfoScopes()
     {

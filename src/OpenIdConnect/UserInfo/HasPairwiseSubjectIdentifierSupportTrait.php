@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect;
+namespace OAuth2\OpenIdConnect\UserInfo;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;

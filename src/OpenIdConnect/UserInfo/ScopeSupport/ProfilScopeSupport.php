@@ -9,9 +9,9 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect\UserinfoScopeSupport;
+namespace OAuth2\OpenIdConnect\UserInfo\ScopeSupport;
 
-final class ProfilScopeSupport implements UserinfoScopeSupportInterface
+final class ProfilScopeSupport implements UserInfoScopeSupportInterface
 {
     /**
      * {@inheritdoc}

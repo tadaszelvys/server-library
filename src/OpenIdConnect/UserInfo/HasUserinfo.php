@@ -9,17 +9,17 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect;
+namespace OAuth2\OpenIdConnect\UserInfo;
 
 trait HasUserinfo
 {
     /**
-     * @var \OAuth2\OpenIdConnect\UserInfoInterface
+     * @var \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface
      */
     private $userinfo;
 
     /**
-     * @return \OAuth2\OpenIdConnect\UserInfoInterface
+     * @return \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface
      */
     protected function getUserinfo()
     {
@@ -27,7 +27,7 @@ trait HasUserinfo
     }
 
     /**
-     * @param \OAuth2\OpenIdConnect\UserInfoInterface $userinfo
+     * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface $userinfo
      */
     private function setUserinfo(UserInfoInterface $userinfo)
     {

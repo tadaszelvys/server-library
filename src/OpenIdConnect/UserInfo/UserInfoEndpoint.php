@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect;
+namespace OAuth2\OpenIdConnect\UserInfo;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
@@ -51,10 +51,10 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param \OAuth2\User\UserManagerInterface           $user_manager
-     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
-     * @param \OAuth2\OpenIdConnect\UserInfoInterface     $userinfo
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\User\UserManagerInterface                $user_manager
+     * @param \OAuth2\Client\ClientManagerInterface            $client_manager
+     * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface $userinfo
+     * @param \OAuth2\Exception\ExceptionManagerInterface      $exception_manager
      */
     public function __construct(UserManagerInterface $user_manager,
                                 ClientManagerInterface $client_manager,

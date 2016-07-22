@@ -50,12 +50,12 @@ use OAuth2\OpenIdConnect\Metadata;
 use OAuth2\OpenIdConnect\NoneResponseType;
 use OAuth2\OpenIdConnect\OpenIdConnectTokenEndpointExtension;
 use OAuth2\OpenIdConnect\Pairwise\HashedSubjectIdentifier;
-use OAuth2\OpenIdConnect\UserInfo;
-use OAuth2\OpenIdConnect\UserInfoEndpoint;
-use OAuth2\OpenIdConnect\UserinfoScopeSupport\AddressScopeSupport;
-use OAuth2\OpenIdConnect\UserinfoScopeSupport\EmailScopeSupport;
-use OAuth2\OpenIdConnect\UserinfoScopeSupport\PhoneScopeSupport;
-use OAuth2\OpenIdConnect\UserinfoScopeSupport\ProfilScopeSupport;
+use OAuth2\OpenIdConnect\UserInfo\UserInfo;
+use OAuth2\OpenIdConnect\UserInfo\UserInfoEndpoint;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\AddressScopeSupport;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\EmailScopeSupport;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\PhoneScopeSupport;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\ProfilScopeSupport;
 use OAuth2\ResponseMode\FormPostResponseMode;
 use OAuth2\ResponseMode\FragmentResponseMode;
 use OAuth2\ResponseMode\QueryResponseMode;
@@ -257,12 +257,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIdConnect\UserInfoInterface
+     * @var null|\OAuth2\OpenIdConnect\UserInfo\UserInfoInterface
      */
     private $userinfo = null;
 
     /**
-     * @return \OAuth2\OpenIdConnect\UserInfoInterface
+     * @return \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface
      */
     protected function getUserInfo()
     {
@@ -307,12 +307,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIdConnect\UserInfoEndpointInterface
+     * @var null|\OAuth2\OpenIdConnect\UserInfo\UserInfoEndpointInterface
      */
     private $userinfo_endpoint = null;
 
     /**
-     * @return \OAuth2\OpenIdConnect\UserInfoEndpointInterface
+     * @return \OAuth2\OpenIdConnect\UserInfo\UserInfoEndpointInterface
      */
     protected function getUserInfoEndpoint()
     {
