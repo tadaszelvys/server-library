@@ -33,11 +33,17 @@ class JWTAccessTokenManager extends Base
      * @param string                    $signature_algorithm
      * @param \Jose\Object\JWKInterface $signature_key
      * @param string                    $issuer
+     * @param string                    $key_encryption_algorithm
+     * @param string                    $content_encryption_algorithm
+     * @param \Jose\Object\JWKInterface $key_encryption_key
      */
     public function __construct(JWTCreator $jwt_creator,
                                 JWTLoader $jwt_loader,
                                 $signature_algorithm,
                                 JWKInterface $signature_key,
+                                $key_encryption_algorithm,
+                                $content_encryption_algorithm,
+                                JWKInterface $key_encryption_key,
                                 $issuer
     ) {
         parent::__construct(
@@ -45,6 +51,9 @@ class JWTAccessTokenManager extends Base
             $jwt_loader,
             $signature_algorithm,
             $signature_key,
+            $key_encryption_algorithm,
+            $content_encryption_algorithm,
+            $key_encryption_key,
             $issuer
         );
 

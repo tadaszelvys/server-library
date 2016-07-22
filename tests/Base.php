@@ -826,10 +826,6 @@ class Base extends \PHPUnit_Framework_TestCase
                     'kty' => 'oct',
                     'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
                 ]),
-                $this->getIssuer()
-            );
-
-            $this->jwt_access_token_manager->enableAccessTokenEncryption(
                 'A256KW',
                 'A256CBC-HS512',
                 new JWK([
@@ -837,8 +833,10 @@ class Base extends \PHPUnit_Framework_TestCase
                     'use' => 'enc',
                     'kty' => 'oct',
                     'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ])
+                ]),
+                $this->getIssuer()
             );
+
             $this->jwt_access_token_manager->addTokenUpdater(new FooBarAccessTokenUpdater());
         }
 
