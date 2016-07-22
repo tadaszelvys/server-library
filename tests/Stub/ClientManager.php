@@ -12,6 +12,7 @@
 namespace OAuth2\Test\Stub;
 
 use Base64Url\Base64Url;
+use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManager as Base;
 use OAuth2\Exception\ExceptionManagerInterface;
 
@@ -185,5 +186,13 @@ class ClientManager extends Base
     public function getClient($client_id)
     {
         return isset($this->clients[$client_id]) ? $this->clients[$client_id] : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function saveClient(ClientInterface $client)
+    {
+        $this->clients[$client->getPublicId()] = $client;
     }
 }

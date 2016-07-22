@@ -36,12 +36,14 @@ use OAuth2\Endpoint\TokenType\RefreshToken;
 use OAuth2\Exception\ExceptionManager;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
+use OAuth2\Grant\GrantTypeManager;
 use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\JWTBearerGrantType;
 use OAuth2\Grant\PKCEMethod\Plain;
 use OAuth2\Grant\PKCEMethod\S256;
 use OAuth2\Grant\RefreshTokenGrantType;
 use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
+use OAuth2\Grant\ResponseTypeManager;
 use OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManager;
 use OAuth2\OpenIdConnect\IdTokenGrantType;
 use OAuth2\OpenIdConnect\IdTokenManager;
@@ -50,15 +52,16 @@ use OAuth2\OpenIdConnect\Metadata;
 use OAuth2\OpenIdConnect\NoneResponseType;
 use OAuth2\OpenIdConnect\OpenIdConnectTokenEndpointExtension;
 use OAuth2\OpenIdConnect\Pairwise\HashedSubjectIdentifier;
-use OAuth2\OpenIdConnect\UserInfo;
-use OAuth2\OpenIdConnect\UserInfoEndpoint;
-use OAuth2\OpenIdConnect\UserinfoScopeSupport\AddressScopeSupport;
-use OAuth2\OpenIdConnect\UserinfoScopeSupport\EmailScopeSupport;
-use OAuth2\OpenIdConnect\UserinfoScopeSupport\PhoneScopeSupport;
-use OAuth2\OpenIdConnect\UserinfoScopeSupport\ProfilScopeSupport;
+use OAuth2\OpenIdConnect\UserInfo\UserInfo;
+use OAuth2\OpenIdConnect\UserInfo\UserInfoEndpoint;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\AddressScopeSupport;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\EmailScopeSupport;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\PhoneScopeSupport;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\ProfilScopeSupport;
 use OAuth2\ResponseMode\FormPostResponseMode;
 use OAuth2\ResponseMode\FragmentResponseMode;
 use OAuth2\ResponseMode\QueryResponseMode;
+use OAuth2\ResponseMode\ResponseModeManager;
 use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Security\EntryPoint;
@@ -175,6 +178,8 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->authorization_factory) {
             $this->authorization_factory = new AuthorizationFactory(
                 $this->getAuthorizationRequestLoader(),
+                $this->getResponseTypeManager(),
+                $this->getResponseModeManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
                 true,
@@ -182,18 +187,52 @@ class Base extends \PHPUnit_Framework_TestCase
                 false,
                 true
             );
-
-            $this->authorization_factory->addResponseType($this->getAuthorizationCodeGrantType());
-            $this->authorization_factory->addResponseType($this->getImplicitGrantType());
-            $this->authorization_factory->addResponseType($this->getNoneResponseType());
-            $this->authorization_factory->addResponseType($this->getIdTokenGrantType());
-
-            $this->authorization_factory->addResponseMode(new QueryResponseMode());
-            $this->authorization_factory->addResponseMode(new FragmentResponseMode());
-            $this->authorization_factory->addResponseMode(new FormPostResponseMode());
         }
 
         return $this->authorization_factory;
+    }
+
+    /**
+     * @var null|\OAuth2\Grant\ResponseTypeManagerInterface
+     */
+    private $response_type_manager;
+
+    /**
+     * @return \OAuth2\Grant\ResponseTypeManagerInterface
+     */
+    protected function getResponseTypeManager()
+    {
+        if (null === $this->response_type_manager) {
+            $this->response_type_manager = new ResponseTypeManager();
+
+            $this->response_type_manager->addResponseType($this->getAuthorizationCodeGrantType());
+            $this->response_type_manager->addResponseType($this->getImplicitGrantType());
+            $this->response_type_manager->addResponseType($this->getNoneResponseType());
+            $this->response_type_manager->addResponseType($this->getIdTokenGrantType());
+        }
+
+        return $this->response_type_manager;
+    }
+
+    /**
+     * @var null|\OAuth2\ResponseMode\ResponseModeManagerInterface
+     */
+    private $response_mode_manager;
+
+    /**
+     * @return \OAuth2\ResponseMode\ResponseModeManagerInterface
+     */
+    protected function getResponseModeManager()
+    {
+        if (null === $this->response_mode_manager) {
+            $this->response_mode_manager = new ResponseModeManager();
+
+            $this->response_mode_manager->addResponseMode(new QueryResponseMode());
+            $this->response_mode_manager->addResponseMode(new FragmentResponseMode());
+            $this->response_mode_manager->addResponseMode(new FormPostResponseMode());
+        }
+
+        return $this->response_mode_manager;
     }
 
     /**
@@ -257,12 +296,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIdConnect\UserInfoInterface
+     * @var null|\OAuth2\OpenIdConnect\UserInfo\UserInfoInterface
      */
     private $userinfo = null;
 
     /**
-     * @return \OAuth2\OpenIdConnect\UserInfoInterface
+     * @return \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface
      */
     protected function getUserInfo()
     {
@@ -307,12 +346,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\OpenIdConnect\UserInfoEndpointInterface
+     * @var null|\OAuth2\OpenIdConnect\UserInfo\UserInfoEndpointInterface
      */
     private $userinfo_endpoint = null;
 
     /**
-     * @return \OAuth2\OpenIdConnect\UserInfoEndpointInterface
+     * @return \OAuth2\OpenIdConnect\UserInfo\UserInfoEndpointInterface
      */
     protected function getUserInfoEndpoint()
     {
@@ -417,6 +456,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->token_endpoint) {
             $this->token_endpoint = new TokenEndpoint(
+                $this->getGrantTypeManager(),
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManager(),
@@ -425,13 +465,6 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager(),
                 $this->getRefreshTokenManager()
             );
-
-            $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
-            $this->token_endpoint->addGrantType($this->getAuthorizationCodeGrantType());
-            $this->token_endpoint->addGrantType($this->getClientCredentialsGrantType());
-            $this->token_endpoint->addGrantType($this->getRefreshTokenGrantType());
-            $this->token_endpoint->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
-            $this->token_endpoint->addGrantType($this->getJWTBearerGrantType());
 
             $this->token_endpoint->addTokenEndpointExtension($this->getOpenIdConnectTokenEndpointExtension());
 
@@ -459,6 +492,30 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->openid_connect_token_endpoint_extension;
+    }
+
+    /**
+     * @var null|\OAuth2\Grant\GrantTypeManagerInterface
+     */
+    private $grant_type_manager = null;
+
+    /**
+     * @return \OAuth2\Grant\GrantTypeManagerInterface
+     */
+    protected function getGrantTypeManager()
+    {
+        if (null === $this->grant_type_manager) {
+            $this->grant_type_manager = new GrantTypeManager();
+
+            $this->grant_type_manager->addGrantType($this->getAuthorizationCodeGrantType());
+            $this->grant_type_manager->addGrantType($this->getAuthorizationCodeGrantType());
+            $this->grant_type_manager->addGrantType($this->getClientCredentialsGrantType());
+            $this->grant_type_manager->addGrantType($this->getRefreshTokenGrantType());
+            $this->grant_type_manager->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
+            $this->grant_type_manager->addGrantType($this->getJWTBearerGrantType());
+        }
+
+        return $this->grant_type_manager;
     }
 
     /**
@@ -1099,11 +1156,11 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->set('jwks_uri', 'https://my.server.com/jwks');
             $this->metadata->set('registration_endpoint', 'https://my.server.com/register');
             $this->metadata->set('scopes_supported', $this->getScopeManager()->getSupportedScopes());
-            $this->metadata->set('response_types_supported', $this->getAuthorizationFactory()->getResponseTypesSupported());
+            $this->metadata->set('response_types_supported', $this->getResponseTypeManager()->getSupportedResponseTypes());
             if ($this->getAuthorizationFactory()->isResponseModeParameterSupported()) {
-                $this->metadata->set('response_modes_supported', $this->getAuthorizationFactory()->getResponseModesSupported());
+                $this->metadata->set('response_modes_supported', $this->getResponseModeManager()->getSupportedResponseModes());
             }
-            $this->metadata->set('grant_types_supported', $this->getTokenEndpoint()->getGrantTypesSupported());
+            $this->metadata->set('grant_types_supported', $this->getGrantTypeManager()->getSupportedGrantTypes());
             $this->metadata->set('acr_values_supported', []);
             $this->metadata->set('subject_types_supported', $this->getUserInfo()->isPairwiseSubjectIdentifierSupported() ? ['public', 'pairwise'] : ['public']);
             $this->metadata->set('id_token_signing_alg_values_supported', $this->getIdTokenManager()->getSupportedSignatureAlgorithms());

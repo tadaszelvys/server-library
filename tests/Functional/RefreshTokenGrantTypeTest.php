@@ -61,7 +61,7 @@ class RefreshTokenGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
-            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
+            $this->assertEquals('The "grant_type" parameter is missing.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }
@@ -91,7 +91,7 @@ class RefreshTokenGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
-            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
+            $this->assertEquals('The grant type "bar" is not supported by this server.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }

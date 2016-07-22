@@ -156,4 +156,15 @@ trait ClientTrait
 
         return $jwk_set;
     }
+
+    /**
+     * @inheritdoc
+     */
+    function jsonSerialize()
+    {
+        return array_merge(
+            ['public_id' => $this->getPublicId()],
+            $this->all()
+        );
+    }
 }

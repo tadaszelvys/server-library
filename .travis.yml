@@ -1,20 +1,29 @@
 language: php
 
-php:
-    - 5.6
-    - 7.0
-    - nightly
-    - hhvm
+sudo: false
 
 matrix:
+    fast_finish: true
     allow_failures:
         - php: nightly
+    include:
+        - php: 5.6
+        - php: 5.6
+          env: deps=low
+        - php: 7.0
+        - php: 7.0
+          env: deps=low
+        - php: hhvm
+        - php: nightly
+        - php: nightly
+          env: deps=low
 
 before_script:
     - composer self-update
-    - composer install
+    - if [[ $deps = low ]]; then composer update --no-interaction --prefer-lowest ; fi
+    - if [[ !$deps ]]; then composer install --no-interaction ; fi
     - mkdir -p build/logs
- 
+
 script:
     - vendor/bin/phpunit --coverage-clover build/logs/clover.xml
  

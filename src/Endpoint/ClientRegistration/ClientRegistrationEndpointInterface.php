@@ -9,18 +9,21 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\Token;
+namespace OAuth2\Endpoint\ClientRegistration;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface TokenEndpointInterface
+interface ClientRegistrationEndpointInterface
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request  The request
      * @param \Psr\Http\Message\ResponseInterface      $response The response
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface If an error occurred
      */
-    public function getAccessToken(ServerRequestInterface $request, ResponseInterface &$response);
+    public function registerClient(ServerRequestInterface $request, ResponseInterface &$response);
+
+    /**
+     * @param \OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleInterface $rule
+     */
+    public function addRule(Rule\ClientRegistrationRuleInterface $rule);
 }

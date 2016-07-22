@@ -4,7 +4,7 @@ OAuth2 And OpenID Connect Framework Library for PHP
 [![Join the chat at https://gitter.im/Spomky-Labs/oauth2-server-library](https://badges.gitter.im/Spomky-Labs/oauth2-server-library.svg)](https://gitter.im/Spomky-Labs/oauth2-server-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/?branch=master)
-[![Coverage Status](https://coveralls.io/repos/Spomky-Labs/oauth2-server-library/badge.svg?branch=master&service=github)](https://coveralls.io/github/Spomky-Labs/oauth2-server-library?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/Spomky-Labs/oauth2-server-library/badge.svg?branch=master)](https://coveralls.io/github/Spomky-Labs/oauth2-server-library?branch=master)
 [![PSR-7 ready](https://img.shields.io/badge/PSR--7-ready-brightgreen.svg)](http://www.php-fig.org/psr/psr-7/)
 
 [![Build Status](https://travis-ci.org/Spomky-Labs/oauth2-server-library.svg?branch=master)](https://travis-ci.org/Spomky-Labs/oauth2-server-library)
@@ -87,7 +87,7 @@ The release process [is described here](doc/Release.md).
 
 This library needs at least ![PHP 5.6+](https://img.shields.io/badge/PHP-5.6%2B-ff69b4.svg).
 
-It has been successfully tested using `PHP 5.6`, `PHP 7` and `HHVM`.
+It has been successfully tested using `PHP 5.6`, `PHP 7.0`, `PHP 7.1` and `HHVM`.
 
 # Installation
 

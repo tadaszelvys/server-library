@@ -13,6 +13,7 @@ namespace OAuth2\Client;
 
 use Base64Url\Base64Url;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasTokenEndpointAuthMethod;
 use OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,11 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
 abstract class ClientManager implements ClientManagerInterface
 {
     use HasExceptionManager;
-
-    /**
-     * @var \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface[]
-     */
-    private $authentication_methods = [];
+    use HasTokenEndpointAuthMethod;
 
     /**
      * ClientManager constructor.
@@ -49,14 +46,6 @@ abstract class ClientManager implements ClientManagerInterface
         $client->set('secret', Base64Url::encode(random_bytes(30)));
 
         return $client;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addAuthenticationMethod(AuthenticationMethodInterface $authentication_method)
-    {
-        $this->authentication_methods[] = $authentication_method;
     }
 
     /**
@@ -141,29 +130,5 @@ abstract class ClientManager implements ClientManagerInterface
             $message,
             ['schemes' => $schemes]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedAuthenticationMethods()
-    {
-        $result = [];
-        foreach ($this->getAuthenticationMethods() as $method) {
-            $result = array_merge(
-                $result,
-                $method->getSupportedAuthenticationMethods()
-            );
-        }
-
-        return array_unique($result);
-    }
-
-    /**
-     * @return \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface[]
-     */
-    private function getAuthenticationMethods()
-    {
-        return $this->authentication_methods;
     }
 }

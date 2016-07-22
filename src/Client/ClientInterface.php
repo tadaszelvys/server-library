@@ -20,7 +20,7 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
  * A client is a resource owner with a set of allowed grant types and can perform requests against
  * available endpoints.
  */
-interface ClientInterface extends ResourceOwnerInterface
+interface ClientInterface extends ResourceOwnerInterface, \JsonSerializable
 {
     /**
      * Checks if the grant type is allowed for the client.

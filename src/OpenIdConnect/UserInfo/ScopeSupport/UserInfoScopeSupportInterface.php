@@ -9,9 +9,9 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect\UserinfoScopeSupport;
+namespace OAuth2\OpenIdConnect\UserInfo\ScopeSupport;
 
-interface UserinfoScopeSupportInterface
+interface UserInfoScopeSupportInterface
 {
     /**
      * @return string

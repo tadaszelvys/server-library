@@ -64,18 +64,6 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
     /**
      * {@inheritdoc}
      */
-    public function isSupported(array $request_parameters)
-    {
-        if (array_key_exists('grant_type', $request_parameters)) {
-            return $this->getGrantType() === $request_parameters['grant_type'];
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
     {
         // Nothing to do

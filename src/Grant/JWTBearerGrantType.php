@@ -21,6 +21,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
+use Webmozart\Assert\Assert;
 
 final class JWTBearerGrantType implements GrantTypeInterface
 {
@@ -88,41 +89,20 @@ final class JWTBearerGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isSupported(array $request_parameters)
-    {
-        if (array_key_exists('grant_type', $request_parameters)) {
-            return $this->getGrantType() === $request_parameters['grant_type'];
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
     {
         $assertion = RequestBody::getParameter($request, 'assertion');
-        if (null === $assertion) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "assertion" is missing.');
-        }
-
         try {
+            Assert::notNull($assertion, 'Parameter "assertion" is missing.');
             $jwt = $this->getJWTLoader()->load(
                 $assertion,
                 $this->key_encryption_key_set,
                 $this->encryption_required
             );
+            Assert::isInstanceOf($jwt, JWSInterface::class, 'Assertion does not contain signed claims.');
+            Assert::true($jwt->hasClaim('sub'), 'Assertion does not contain "sub" claims.');
         } catch (\Exception $e) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
-        }
-
-        if (!$jwt instanceof JWSInterface) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain signed claims.');
-        }
-
-        if (!$jwt->hasClaim('sub')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Assertion does not contain "sub" claims.');
         }
 
         //We modify the response:

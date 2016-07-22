@@ -31,9 +31,11 @@ interface ClientManagerInterface
     public function getClient($client_id);
 
     /**
-     * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
+     * Save the client
+     *
+     * @param \OAuth2\Client\ClientInterface $client
      */
-    public function addAuthenticationMethod(AuthenticationMethodInterface $authentication_method);
+    public function saveClient(ClientInterface $client);
 
     /**
      * Find a client ID using the request
@@ -54,6 +56,11 @@ interface ClientManagerInterface
      * @return \OAuth2\Exception\BaseExceptionInterface
      */
     public function buildAuthenticationException(ServerRequestInterface $request);
+
+    /**
+     * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
+     */
+    public function addAuthenticationMethod(AuthenticationMethodInterface $authentication_method);
 
     /**
      * @return string[]

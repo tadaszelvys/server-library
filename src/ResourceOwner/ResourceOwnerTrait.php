@@ -62,6 +62,14 @@ trait ResourceOwnerTrait
     /**
      * {@inheritdoc}
      */
+    public function all()
+    {
+        return $this->metadatas;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function has($key)
     {
         Assertion::string($key);

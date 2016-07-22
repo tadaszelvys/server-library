@@ -66,7 +66,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
-            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
+            $this->assertEquals('The "grant_type" parameter is missing.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }
@@ -96,7 +96,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
             $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
-            $this->assertEquals('Invalid or unsupported request.', $e->getDescription());
+            $this->assertEquals('The grant type "bar" is not supported by this server.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
     }
@@ -408,6 +408,50 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
         $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","scope":"scope1","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+    }
+
+    public function testMissingClaim()
+    {
+        $response = new Response();
+        $jwk2 = new JWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $jws = JWSFactory::createJWSToCompactJSON([
+                'exp' => time() + 3600,
+                'aud' => $this->getIssuer(),
+                'iss' => 'jwt1',
+                'sub' => 'jwt1',
+            ],
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+
+        $request = $this->createRequest(
+            '/',
+            'POST',
+            [
+                'grant_type'            => 'client_credentials',
+                'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+                'client_assertion'      => $jws,
+                'scope'                 => 'scope1',
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        try {
+            $this->getTokenEndpoint()->getAccessToken($request, $response);
+        } catch (BaseExceptionInterface $e) {
+            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals('The following claim(s) is/are mandatory: "["jti"]".', $e->getDescription());
+        }
     }
 
     public function testSignedAssertionForPasswordClientWithJWTBearerAuthentication()

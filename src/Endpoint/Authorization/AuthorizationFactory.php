@@ -14,6 +14,8 @@ namespace OAuth2\Endpoint\Authorization;
 use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
+use OAuth2\Behaviour\HasResponseModeManager;
+use OAuth2\Behaviour\HasResponseTypeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\Authorization\ParameterChecker\DisplayParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\NonceParameterChecker;
@@ -25,8 +27,8 @@ use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseTypeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ScopeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\StateParameterChecker;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Grant\ResponseTypeInterface;
-use OAuth2\ResponseMode\ResponseModeInterface;
+use OAuth2\Grant\ResponseTypeManagerInterface;
+use OAuth2\ResponseMode\ResponseModeManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -34,16 +36,8 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
 {
     use HasJWTLoader;
     use HasExceptionManager;
-
-    /**
-     * @var \OAuth2\ResponseMode\ResponseModeInterface[]
-     */
-    private $response_modes = [];
-
-    /**
-     * @var \OAuth2\Grant\ResponseTypeInterface[]
-     */
-    private $response_types = [];
+    use HasResponseModeManager;
+    use HasResponseTypeManager;
 
     /**
      * @var \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface[]
@@ -64,6 +58,8 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
      * AuthorizationFactory constructor.
      *
      * @param \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface $authorization_request_loader
+     * @param \OAuth2\Grant\ResponseTypeManagerInterface                         $response_type_manager
+     * @param \OAuth2\ResponseMode\ResponseModeManagerInterface                  $response_mode_manager
      * @param \OAuth2\Scope\ScopeManagerInterface                                $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface                        $exception_manager
      * @param bool                                                               $state_parameter_enforced
@@ -73,6 +69,8 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     public function __construct(
         AuthorizationRequestLoaderInterface $authorization_request_loader,
+        ResponseTypeManagerInterface $response_type_manager,
+        ResponseModeManagerInterface $response_mode_manager,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
         $state_parameter_enforced = true,
@@ -83,6 +81,8 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
         Assertion::boolean($response_mode_parameter_in_authorization_request_allowed);
         $this->authorization_request_loader = $authorization_request_loader;
         $this->setExceptionManager($exception_manager);
+        $this->setResponseTypeManager($response_type_manager);
+        $this->setResponseModeManager($response_mode_manager);
 
         $this->addParameterChecker(new DisplayParameterChecker());
         $this->addParameterChecker(new PromptParameterChecker());
@@ -124,60 +124,6 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
     public function disableResponseModeParameterSupport()
     {
         $this->response_mode_parameter_in_authorization_request_enabled = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addResponseType(ResponseTypeInterface $response_type)
-    {
-        $type = $response_type->getResponseType();
-        if (!array_key_exists($type, $this->response_types)) {
-            $this->response_types[$type] = $response_type;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getResponseTypesSupported()
-    {
-        $types = array_keys($this->response_types);
-        if (in_array('id_token', $types)) {
-            if (in_array('code', $types)) {
-                $types[] = 'code id_token';
-            }
-            if (in_array('token', $types)) {
-                $types[] = 'id_token token';
-            }
-            if (in_array('code', $types) && in_array('token', $types)) {
-                $types[] = 'code id_token token';
-            }
-        }
-        if (in_array('code', $types) && in_array('token', $types)) {
-            $types[] = 'code token';
-        }
-
-        return $types;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addResponseMode(ResponseModeInterface $response_mode)
-    {
-        $name = $response_mode->getName();
-        if (!array_key_exists($name, $this->response_modes)) {
-            $this->response_modes[$name] = $response_mode;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getResponseModesSupported()
-    {
-        return array_keys($this->response_modes);
     }
 
     /**
@@ -266,11 +212,11 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     private function getResponseModeService($mode)
     {
-        if (!array_key_exists($mode, $this->response_modes)) {
+        if (!$this->getResponseModeManager()->hasResponseMode($mode)) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported response mode "%s".', $mode));
         }
 
-        return $this->response_modes[$mode];
+        return $this->getResponseModeManager()->getResponseMode($mode);
     }
 
     /**
@@ -291,18 +237,14 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     public function getResponseTypes(array $params)
     {
-        if (!in_array($params['response_type'], $this->getResponseTypesSupported())) {
+        if (!$this->getResponseTypeManager()->isResponseTypeSupported($params['response_type'])) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Response type "%s" is not supported by this server', $params['response_type']));
         }
-        $response_types = explode(' ', $params['response_type']);
-        if (count($response_types) > count(array_unique($response_types))) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid "response_type" parameter or parameter is missing.');
-        }
 
-        $types = [];
-        foreach ($response_types as $response_type) {
-            $type = $this->response_types[$response_type];
-            $types[] = $type;
+        try {
+            $types = $this->getResponseTypeManager()->getResponseTypes($params['response_type']);
+        } catch (\InvalidArgumentException $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
 
         return $types;

@@ -18,6 +18,8 @@ use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
+use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
+use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\User\UserInterface;
@@ -50,11 +52,11 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * IdTokenManager constructor.
      *
-     * @param \Jose\JWTCreator                        $jwt_creator
-     * @param string                                  $issuer
-     * @param string                                  $signature_algorithm
-     * @param \Jose\Object\JWKInterface               $signature_key
-     * @param \OAuth2\OpenIdConnect\UserInfoInterface $userinfo
+     * @param \Jose\JWTCreator                                 $jwt_creator
+     * @param string                                           $issuer
+     * @param string                                           $signature_algorithm
+     * @param \Jose\Object\JWKInterface                        $signature_key
+     * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface $userinfo
      */
     public function __construct(JWTCreator $jwt_creator,
                                 $issuer,

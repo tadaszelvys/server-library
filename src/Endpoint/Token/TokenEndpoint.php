@@ -11,9 +11,11 @@
 
 namespace OAuth2\Endpoint\Token;
 
+use Assert\Assertion;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasGrantTypeManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
@@ -22,7 +24,7 @@ use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Grant\GrantTypeInterface;
+use OAuth2\Grant\GrantTypeManagerInterface;
 use OAuth2\Grant\GrantTypeResponse;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Scope\ScopeManagerInterface;
@@ -45,11 +47,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     use HasRefreshTokenManager;
     use HasTokenTypeManager;
     use HasTokenTypeParameterSupport;
-
-    /**
-     * @var \OAuth2\Grant\GrantTypeInterface[]
-     */
-    private $grant_types = [];
+    use HasGrantTypeManager;
 
     /**
      * @var \OAuth2\Endpoint\Token\TokenEndpointExtensionInterface[]
@@ -59,6 +57,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     /**
      * TokenEndpoint constructor.
      *
+     * @param \OAuth2\Grant\GrantTypeManagerInterface         $grant_type_manager
      * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
      * @param \OAuth2\Client\ClientManagerInterface           $client_manager
@@ -68,6 +67,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
      */
     public function __construct(
+        GrantTypeManagerInterface $grant_type_manager,
         TokenTypeManagerInterface $token_type_manager,
         AccessTokenManagerInterface $access_token_manager,
         ClientManagerInterface $client_manager,
@@ -82,6 +82,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         $this->setUserManager($user_manager);
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
+        $this->setGrantTypeManager($grant_type_manager);
         if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
             $this->setRefreshTokenManager($refresh_token_manager);
         }
@@ -93,25 +94,6 @@ final class TokenEndpoint implements TokenEndpointInterface
     public function addTokenEndpointExtension(TokenEndpointExtensionInterface $token_endpoint_extension)
     {
         $this->token_endpoint_extensions[] = $token_endpoint_extension;
-    }
-
-    /**
-     * @param \OAuth2\Grant\GrantTypeInterface $grant_type
-     */
-    public function addGrantType(GrantTypeInterface $grant_type)
-    {
-        $type = $grant_type->getGrantType();
-        if (!array_key_exists($type, $this->grant_types)) {
-            $this->grant_types[$type] = $grant_type;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getGrantTypesSupported()
-    {
-        return array_keys($this->grant_types);
     }
 
     /**
@@ -396,12 +378,15 @@ final class TokenEndpoint implements TokenEndpointInterface
      */
     private function getGrantType(array $request_parameters)
     {
-        foreach ($this->grant_types as $grant_type) {
-            if ($grant_type->isSupported($request_parameters)) {
-                return $grant_type;
-            }
+        try {
+            Assertion::keyExists($request_parameters, 'grant_type', 'The "grant_type" parameter is missing.');
+            Assertion::true($this->getGrantTypeManager()->hasGrantType($request_parameters['grant_type']), sprintf('The grant type "%s" is not supported by this server.', $request_parameters['grant_type']));
+
+            return $this->getGrantTypeManager()->getGrantType($request_parameters['grant_type']);
+        } catch (\InvalidArgumentException $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
-        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid or unsupported request.');
+
     }
 
     /**

@@ -23,6 +23,11 @@ interface ResourceOwnerInterface
     public function getPublicId();
 
     /**
+     * @return array
+     */
+    public function all();
+
+    /**
      * @param string $key
      *
      * @throws \InvalidArgumentException

@@ -94,7 +94,7 @@ class OpenIDConnectTest extends Base
                 'code token',
 
             ],
-            $this->getAuthorizationFactory()->getResponseTypesSupported()
+            $this->getResponseTypeManager()->getSupportedResponseTypes()
         );
 
         $this->assertFalse($id_token->hasClaim('website'));

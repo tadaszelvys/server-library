@@ -20,6 +20,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
+use Webmozart\Assert\Assert;
 
 class ClientAssertionJwt implements AuthenticationMethodInterface
 {
@@ -106,30 +107,24 @@ class ClientAssertionJwt implements AuthenticationMethodInterface
         }
 
         $client_assertion = RequestBody::getParameter($request, 'client_assertion');
-        //We verify the client assertion exists
-        if (null === $client_assertion) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_assertion" is missing.');
-        }
 
-        //We load the assertion
         try {
+            //We verify the client assertion exists
+            Assertion::notNull($client_assertion, 'Parameter "client_assertion" is missing.');
+
+            //We load the assertion
             $jwt = $this->getJWTLoader()->load(
                 $client_assertion,
                 $this->key_encryption_key_set,
                 $this->encryption_required
             );
+
+            $diff = array_diff(['iss', 'sub', 'aud', 'jti', 'exp'], array_keys($jwt->getClaims()));
+            Assert::isEmpty($diff, sprintf('The following claim(s) is/are mandatory: "%s".', json_encode(array_values($diff))));
+
+            Assert::eq($jwt->getClaim('sub'), $jwt->getClaim('iss'), 'The claims "sub" and "iss" must contain the client public ID.');
         } catch (\Exception $e) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
-        }
-
-        foreach (['iss', 'sub', 'aud', 'jti', 'exp'] as $claim) {
-            if (false === $jwt->hasClaim($claim)) {
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('The claim "%s" is mandatory.', $claim));
-            }
-        }
-
-        if ($jwt->getClaim('sub') !== $jwt->getClaim('iss')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The claims "sub" and "iss" must contain the client public ID.');
         }
 
         $client_credentials = $jwt;
