@@ -57,6 +57,14 @@ final class JWTBearerGrantType implements GrantTypeInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAssociatedResponseTypes()
+    {
+        return [];
+    }
+
+    /**
      * @param bool                         $encryption_required
      * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
      */

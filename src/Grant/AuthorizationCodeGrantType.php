@@ -62,6 +62,22 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAssociatedResponseTypes()
+    {
+        return ['code'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAssociatedGrantTypes()
+    {
+        return ['authorization_code'];
+    }
+
+    /**
      * @return bool
      */
     public function arePublicClientsAllowed()

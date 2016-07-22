@@ -38,6 +38,14 @@ final class ClientCredentialsGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getAssociatedResponseTypes()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getGrantType()
     {
         return 'client_credentials';

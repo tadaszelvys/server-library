@@ -43,6 +43,14 @@ final class IdTokenGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getAssociatedGrantTypes()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResponseType()
     {
         return 'id_token';
