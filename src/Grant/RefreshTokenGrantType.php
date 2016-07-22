@@ -40,6 +40,14 @@ final class RefreshTokenGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getAssociatedResponseTypes()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getGrantType()
     {
         return 'refresh_token';

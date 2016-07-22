@@ -51,6 +51,14 @@ final class ImplicitGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getAssociatedGrantTypes()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResponseType()
     {
         return 'token';

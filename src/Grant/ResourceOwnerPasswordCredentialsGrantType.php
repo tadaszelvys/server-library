@@ -48,6 +48,14 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
     /**
      * {@inheritdoc}
      */
+    public function getAssociatedResponseTypes()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getGrantType()
     {
         return 'password';

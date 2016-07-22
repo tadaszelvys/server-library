@@ -53,6 +53,14 @@ final class NoneResponseType implements ResponseTypeInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAssociatedGrantTypes()
+    {
+        return [];
+    }
+
+    /**
      * @param \OAuth2\OpenIdConnect\NoneResponseTypeListenerInterface $listener
      */
     public function addListener(NoneResponseTypeListenerInterface $listener)
