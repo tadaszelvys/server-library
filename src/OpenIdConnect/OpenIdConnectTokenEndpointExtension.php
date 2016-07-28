@@ -16,7 +16,7 @@ use OAuth2\Endpoint\Token\TokenEndpointExtensionInterface;
 use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
-use OAuth2\User\UserManagerInterface;
+use OAuth2\UserAccount\UserAccountManagerInterface;
 
 /**
  * Class OpenIdConnectTokenEndpointExtension.
@@ -29,21 +29,21 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
     private $id_token_manager;
 
     /**
-     * @var \OAuth2\User\UserManagerInterface
+     * @var \OAuth2\UserAccount\UserAccountManagerInterface
      */
-    private $user_manager;
+    private $user_account_manager;
 
     /**
      * OpenIdConnectTokenEndpointExtension constructor.
      *
-     * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface $id_token_manager
-     * @param \OAuth2\User\UserManagerInterface             $user_manager
+     * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface   $id_token_manager
+     * @param \OAuth2\UserAccount\UserAccountManagerInterface $user_account_manager
      */
     public function __construct(IdTokenManagerInterface $id_token_manager,
-                                UserManagerInterface $user_manager
+                                UserAccountManagerInterface $user_account_manager
     ) {
         $this->id_token_manager = $id_token_manager;
-        $this->user_manager = $user_manager;
+        $this->user_account_manager = $user_account_manager;
     }
 
     /**
@@ -54,8 +54,8 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
         if (false === $this->issueIdToken($grant_type_response)) {
             return;
         }
-        $user = $this->user_manager->getUserByPublicId($grant_type_response->getResourceOwnerPublicId());
-        if (null === $user) {
+        $user_account = $this->user_account_manager->getUserAccountByPublicId($grant_type_response->getResourceOwnerPublicId());
+        if (null === $user_account) {
             return;
         }
 
@@ -77,7 +77,7 @@ final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensio
 
         $id_token = $this->id_token_manager->createIdToken(
             $client,
-            $user,
+            $user_account,
             $access_token->getMetadata('redirect_uri'),
             $access_token->getMetadata('claims_locales'),
             $requested_claims,

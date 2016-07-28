@@ -21,7 +21,7 @@ use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResponseMode\QueryResponseMode;
 use OAuth2\Scope\ScopeManagerInterface;
-use OAuth2\User\UserInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -68,7 +68,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @return \OAuth2\User\UserInterface|null
+     * @return \OAuth2\UserAccount\UserAccountInterface|null
      */
     abstract protected function getCurrentUser();
 
@@ -111,7 +111,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
         $user = $this->getCurrentUser();
         //If User is logged in
-        if ($user instanceof UserInterface) {
+        if ($user instanceof UserAccountInterface) {
             //If prompt=login => login if not fully authenticated
             if ($authorization->hasPrompt('login') && !$this->isCurrentUserFullyAuthenticated()) {
                 $this->redirectToLoginPage($request, $response);
@@ -139,7 +139,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
             return;
         }
-        $authorization->setUser($user);
+        $authorization->setUserAccount($user);
 
         $pre_configured_authorization = $this->tryToFindPreConfiguredAuthorization($authorization);
         //Pre configured consent exist
@@ -267,7 +267,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         if (null !== $this->getPreConfiguredAuthorizationManager()) {
             return $this->getPreConfiguredAuthorizationManager()->findOnePreConfiguredAuthorization(
-                $authorization->getUser()->getPublicId(),
+                $authorization->getUserAccount()->getPublicId(),
                 $authorization->getClient()->getPublicId(),
                 $authorization->getScopes()
             );

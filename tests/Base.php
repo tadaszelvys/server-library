@@ -77,7 +77,7 @@ use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\SessionStateParameterExtension;
 use OAuth2\Test\Stub\TooManyRequestsExceptionFactory;
 use OAuth2\Test\Stub\UriExtension;
-use OAuth2\Test\Stub\UserManager;
+use OAuth2\Test\Stub\UserAccountManager;
 use OAuth2\Token\BearerToken;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
@@ -296,7 +296,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->issuer_discovery_endpoint) {
             $this->issuer_discovery_endpoint = new IssuerDiscoveryEndpoint(
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getExceptionManager(),
                 $this->getIssuer(),
                 'https://my-service.com:9000'
@@ -318,7 +318,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->userinfo_endpoint) {
             $this->userinfo_endpoint = new UserInfoEndpoint(
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getClientManager(),
                 $this->getUserInfo(),
                 $this->getExceptionManager()
@@ -420,7 +420,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManager(),
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
                 $this->getRefreshTokenManager()
@@ -454,7 +454,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->openid_connect_token_endpoint_extension) {
             $this->openid_connect_token_endpoint_extension = new OpenIdConnectTokenEndpointExtension(
                 $this->getIdTokenManager(),
-                $this->getUserManager()
+                $this->getUserAccountManager()
             );
         }
 
@@ -473,7 +473,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->authorization_endpoint) {
             $this->authorization_endpoint = new AuthorizationEndpoint(
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getAuthorizationFactory(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
@@ -511,12 +511,12 @@ class Base extends \PHPUnit_Framework_TestCase
     private $user_manager = null;
 
     /**
-     * @return \OAuth2\Test\Stub\UserManager
+     * @return \OAuth2\Test\Stub\UserAccountManager
      */
-    protected function getUserManager()
+    protected function getUserAccountManager()
     {
         if (null === $this->user_manager) {
-            $this->user_manager = new UserManager();
+            $this->user_manager = new UserAccountManager();
         }
 
         return $this->user_manager;
@@ -773,7 +773,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->resource_owner_password_credentials_grant_type) {
             $this->resource_owner_password_credentials_grant_type = new ResourceOwnerPasswordCredentialsGrantType(
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getExceptionManager()
             );
             $this->resource_owner_password_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();

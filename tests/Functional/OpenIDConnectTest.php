@@ -142,7 +142,7 @@ class OpenIDConnectTest extends Base
     public function testClaimSource()
     {
         $client = $this->getClientManager()->getClient('Mufasa');
-        $user = $this->getUserManager()->getUserByUsername('user2');
+        $user = $this->getUserAccountManager()->getUserAccountByUsername('user2');
         $result = $this->getUserInfo()->getUserinfo($client, $user, 'https://foo.bar/', null, [], ['openid', 'email']);
 
         $this->assertEquals('OkKmIBUobGzXso3FyJo3yY0XzMPRS0AD-DjTXjIGLaq6VPuJtfyYQX2JiSXmtisuGuON05BhHQj2jQ17I09lRQ', $result['sub']);
@@ -153,7 +153,7 @@ class OpenIDConnectTest extends Base
 
     public function testHashedPairwise()
     {
-        $user = $this->getUserManager()->getUserByUsername('user1');
+        $user = $this->getUserAccountManager()->getUserAccountByUsername('user1');
         $algorithm = new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData());
 
         $this->assertEquals(
@@ -167,7 +167,7 @@ class OpenIDConnectTest extends Base
 
     public function testEncryptedPairwise()
     {
-        $user = $this->getUserManager()->getUserByUsername('user1');
+        $user = $this->getUserAccountManager()->getUserAccountByUsername('user1');
         $algorithm = new EncryptedSubjectIdentifier($this->getPairwiseKey(), 'aes-128-cbc', $this->getPairwiseAdditionalData(), $this->getPairwiseAdditionalData());
 
         $this->assertEquals(
@@ -612,7 +612,7 @@ class OpenIDConnectTest extends Base
             $access_token = $this->getListener()->handle($request);
             $this->getUserInfo()->getUserinfo(
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
-                $this->getUserManager()->getUserByPublicId($access_token->getResourceOwnerPublicId()),
+                $this->getUserAccountManager()->getUserAccountByPublicId($access_token->getResourceOwnerPublicId()),
                 $access_token->getMetadata('redirect_uri'),
                 null,
                 [],
@@ -635,7 +635,7 @@ class OpenIDConnectTest extends Base
             $access_token = $this->getListener()->handle($request);
             $this->getUserInfo()->getUserinfo(
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
-                $this->getUserManager()->getUserByPublicId($access_token->getResourceOwnerPublicId()),
+                $this->getUserAccountManager()->getUserAccountByPublicId($access_token->getResourceOwnerPublicId()),
                 $access_token->getMetadata('redirect_uri'),
                 null,
                 [],

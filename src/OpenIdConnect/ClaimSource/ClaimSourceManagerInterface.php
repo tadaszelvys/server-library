@@ -11,16 +11,16 @@
 
 namespace OAuth2\OpenIdConnect\ClaimSource;
 
-use OAuth2\User\UserInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 
 interface ClaimSourceManagerInterface
 {
     /**
-     * @param \OAuth2\User\UserInterface $user
+     * @param \OAuth2\UserAccount\UserAccountInterface $user_account
      * @param string[]                   $scope
      * @param array                      $claims
      *
      * @return array
      */
-    public function getUserInfo(UserInterface $user, array $scope, array $claims);
+    public function getUserInfo(UserAccountInterface $user_account, array $scope, array $claims);
 }

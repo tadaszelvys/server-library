@@ -14,7 +14,7 @@ namespace OAuth2\OpenIdConnect\UserInfo;
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\OpenIdConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
-use OAuth2\User\UserInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 
 trait HasPairwiseSubjectIdentifierSupportTrait
 {
@@ -70,15 +70,15 @@ trait HasPairwiseSubjectIdentifierSupportTrait
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param \OAuth2\User\UserInterface     $user
-     * @param string                         $redirect_uri
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param \OAuth2\UserAccount\UserAccountInterface $user_account
+     * @param string                                   $redirect_uri
      *
      * @return string
      */
-    protected function calculateSubjectIdentifier(ClientInterface $client, UserInterface $user, $redirect_uri)
+    protected function calculateSubjectIdentifier(ClientInterface $client, UserAccountInterface $user_account, $redirect_uri)
     {
-        $sub = $user->getPublicId();
+        $sub = $user_account->getPublicId();
 
         if (false === $this->isPairwiseSubjectIdentifierSupported()) {
             return $sub;
@@ -87,7 +87,7 @@ trait HasPairwiseSubjectIdentifierSupportTrait
             $sector_identifier_host = $this->getSectorIdentifierHost($client, $redirect_uri);
 
             return $this->pairwise_algorithm->calculateSubjectIdentifier(
-                $user,
+                $user_account,
                 $sector_identifier_host
             );
         }

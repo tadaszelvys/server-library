@@ -11,19 +11,19 @@
 
 namespace OAuth2\Endpoint\Authorization;
 
-use OAuth2\User\UserInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 
 interface AuthorizationInterface
 {
     /**
-     * @param \OAuth2\User\UserInterface $user
+     * @param \OAuth2\UserAccount\UserAccountInterface $user_account
      */
-    public function setUser(UserInterface $user);
+    public function setUserAccount(UserAccountInterface $user_account);
 
     /**
-     * @return \OAuth2\User\UserInterface
+     * @return \OAuth2\UserAccount\UserAccountInterface
      */
-    public function getUser();
+    public function getUserAccount();
 
     /**
      * @return \OAuth2\Client\ClientInterface

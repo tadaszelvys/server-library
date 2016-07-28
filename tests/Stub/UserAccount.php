@@ -12,10 +12,10 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\User\IssueRefreshTokenExtensionInterface;
-use OAuth2\User\User as BaseUser;
+use OAuth2\UserAccount\IssueRefreshTokenExtensionInterface;
+use OAuth2\UserAccount\UserAccount as BaseUser;
 
-final class User extends BaseUser implements IssueRefreshTokenExtensionInterface
+final class UserAccount extends BaseUser implements IssueRefreshTokenExtensionInterface
 {
     /**
      * @var string

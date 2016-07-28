@@ -18,17 +18,17 @@ use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTCreator;
-use OAuth2\Behaviour\HasUserManager;
+use OAuth2\Behaviour\HasUserAccountManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
-use OAuth2\User\UserManagerInterface;
+use OAuth2\UserAccount\UserAccountManagerInterface;
 
 final class UserInfoEndpoint implements UserInfoEndpointInterface
 {
     use HasExceptionManager;
-    use HasUserManager;
+    use HasUserAccountManager;
     use HasClientManager;
     use HasUserinfo;
     use HasJWTCreator;
@@ -51,17 +51,17 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param \OAuth2\User\UserManagerInterface                $user_manager
+     * @param \OAuth2\UserAccount\UserAccountManagerInterface  $user_manager
      * @param \OAuth2\Client\ClientManagerInterface            $client_manager
      * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface $userinfo
      * @param \OAuth2\Exception\ExceptionManagerInterface      $exception_manager
      */
-    public function __construct(UserManagerInterface $user_manager,
+    public function __construct(UserAccountManagerInterface $user_manager,
                                 ClientManagerInterface $client_manager,
                                 UserInfoInterface $userinfo,
                                 ExceptionManagerInterface $exception_manager
     ) {
-        $this->setUserManager($user_manager);
+        $this->setUserAccountManager($user_manager);
         $this->setClientManager($client_manager);
         $this->setUserinfo($userinfo);
         $this->setExceptionManager($exception_manager);
@@ -134,12 +134,12 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
         $this->checkHasRedirectUri($access_token);
 
         $client = $this->getClient($access_token);
-        $user = $this->getUser($access_token);
+        $user_account = $this->getUserAccount($access_token);
         $endpoint_claims = $this->getEndpointClaims($access_token);
 
         $claims = $this->getUserinfo()->getUserinfo(
             $client,
-            $user,
+            $user_account,
             $access_token->getMetadata('redirect_uri'),
             $access_token->hasMetadata('claims_locales') ? $access_token->getMetadata('claims_locales') : null,
             $endpoint_claims,
@@ -209,19 +209,19 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      *
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
      *
-     * @return null|\OAuth2\User\UserInterface
+     * @return null|\OAuth2\UserAccount\UserAccountInterface
      */
-    private function getUser(AccessTokenInterface $access_token)
+    private function getUserAccount(AccessTokenInterface $access_token)
     {
-        $user = $this->getUserManager()->getUserByPublicId($access_token->getResourceOwnerPublicId());
-        if (null === $user) {
+        $user_account = $this->getUserAccountManager()->getUserAccountByPublicId($access_token->getResourceOwnerPublicId());
+        if (null === $user_account) {
             throw $this->getExceptionManager()->getBadRequestException(
                 ExceptionManagerInterface::INVALID_REQUEST,
                 'Unable to find the resource owner.'
             );
         }
 
-        return $user;
+        return $user_account;
     }
 
     /**
