@@ -11,19 +11,19 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\UserAccount\UserAccountInterface;
-use OAuth2\UserAccount\UserAccountManagerInterface;
+use OAuth2\User\UserInterface;
+use OAuth2\User\UserManagerInterface;
 
-class UserAccountManager implements UserAccountManagerInterface
+class UserManager implements UserManagerInterface
 {
     /**
-     * @var \OAuth2\UserAccount\UserAccountInterface[]
+     * @var \OAuth2\User\UserInterface[]
      */
     private $users = [];
 
     public function __construct()
     {
-        $user1 = new UserAccount('user1', 'password1');
+        $user1 = new User('user1', 'password1');
         $user1->set('address', [
             'street_address' => '5 rue Sainte Anne',
             'region'         => 'Île de France',
@@ -55,7 +55,7 @@ class UserAccountManager implements UserAccountManagerInterface
         $user1->set('website#fr', 'https://john.doe.fr');
         $user1->set('picture#de', 'https://john.doe.de/picture');
 
-        $user2 = new UserAccount('user2', 'password2');
+        $user2 = new User('user2', 'password2');
         $user2->set('last_login_at', time() - 1000);
         $this->users['user1'] = $user1;
         $this->users['user2'] = $user2;
@@ -64,9 +64,9 @@ class UserAccountManager implements UserAccountManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function checkUserAccountPasswordCredentials(UserAccountInterface $resource_owner, $password)
+    public function checkUserPasswordCredentials(UserInterface $resource_owner, $password)
     {
-        if (!$resource_owner instanceof UserAccount) {
+        if (!$resource_owner instanceof User) {
             return false;
         }
 
@@ -76,15 +76,15 @@ class UserAccountManager implements UserAccountManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getUserAccountByUsername($username)
+    public function getUserByUsername($username)
     {
-        return $this->getUserAccountByPublicId($username);
+        return $this->getUserByPublicId($username);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getUserAccountByPublicId($public_id)
+    public function getUserByPublicId($public_id)
     {
         return isset($this->users[$public_id]) ? $this->users[$public_id] : null;
     }
@@ -92,7 +92,7 @@ class UserAccountManager implements UserAccountManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getUserAccountFromResource($resource)
+    public function getUserFromResource($resource)
     {
         $server = 'my-service.com:9000';
         $length = mb_strlen($server, 'utf-8');

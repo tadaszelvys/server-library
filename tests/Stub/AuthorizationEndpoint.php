@@ -12,20 +12,20 @@
 namespace OAuth2\Test\Stub;
 
 use Assert\Assertion;
-use OAuth2\Behaviour\HasUserAccountManager;
+use OAuth2\Behaviour\HasUserManager;
 use OAuth2\Endpoint\Authorization\AuthorizationEndpoint as Base;
 use OAuth2\Endpoint\Authorization\AuthorizationFactoryInterface;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
-use OAuth2\UserAccount\UserAccountManagerInterface;
+use OAuth2\User\UserManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AuthorizationEndpoint extends Base
 {
-    use HasUserAccountManager;
+    use HasUserManager;
 
     /**
      * @var null|string
@@ -45,21 +45,21 @@ class AuthorizationEndpoint extends Base
     /**
      * AuthorizationEndpoint constructor.
      *
-     * @param \OAuth2\UserAccount\UserAccountManagerInterface                                                                         $user_manager
+     * @param \OAuth2\User\UserManagerInterface                                                                         $user_manager
      * @param \OAuth2\Endpoint\Authorization\AuthorizationFactoryInterface                                              $authorization_factory
      * @param \OAuth2\Scope\ScopeManagerInterface                                                                       $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface                                                               $exception_manager
      * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface|null $pre_configured_authorization_manager
      */
     public function __construct(
-        UserAccountManagerInterface $user_manager,
+        UserManagerInterface $user_manager,
         AuthorizationFactoryInterface $authorization_factory,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
         PreConfiguredAuthorizationManagerInterface $pre_configured_authorization_manager = null
     ) {
         parent::__construct($authorization_factory, $scope_manager, $exception_manager, $pre_configured_authorization_manager);
-        $this->setUserAccountManager($user_manager);
+        $this->setUserManager($user_manager);
     }
 
     /**
@@ -67,7 +67,7 @@ class AuthorizationEndpoint extends Base
      */
     protected function getCurrentUser()
     {
-        return null === $this->current_user ? null : $this->getUserAccountManager()->getUserAccountByUsername($this->current_user);
+        return null === $this->current_user ? null : $this->getUserManager()->getUserByUsername($this->current_user);
     }
 
     /**

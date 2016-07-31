@@ -15,7 +15,7 @@ use Assert\Assertion;
 use Base64Url\Base64Url;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
-use OAuth2\UserAccount\UserAccountInterface;
+use OAuth2\User\UserInterface;
 
 abstract class AuthCodeManager implements AuthCodeManagerInterface
 {
@@ -63,7 +63,7 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createAuthCode(ClientInterface $client, UserAccountInterface $resource_owner, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
+    public function createAuthCode(ClientInterface $client, UserInterface $resource_owner, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false)
     {
         $auth_code = $this->createEmptyAuthorizationCode();
         $auth_code->setScope($scope);

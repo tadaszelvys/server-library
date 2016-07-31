@@ -13,7 +13,7 @@ namespace OAuth2\OpenIdConnect\Pairwise;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
-use OAuth2\UserAccount\UserAccountInterface;
+use OAuth2\User\UserInterface as BaseUserInterface;
 
 class HashedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInterface
 {
@@ -53,12 +53,12 @@ class HashedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInter
     /**
      * {@inheritdoc}
      */
-    public function calculateSubjectIdentifier(UserAccountInterface $user_account, $sector_identifier_host)
+    public function calculateSubjectIdentifier(BaseUserInterface $user, $sector_identifier_host)
     {
         $prepared = sprintf(
             '%s%s%s',
             $sector_identifier_host,
-            $user_account->getPublicId(),
+            $user->getPublicId(),
             $this->salt
         );
 

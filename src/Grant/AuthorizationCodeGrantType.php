@@ -160,7 +160,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
 
         $code = $this->getAuthorizationCodeManager()->createAuthCode(
             $authorization->getClient(),
-            $authorization->getUserAccount(),
+            $authorization->getUser(),
             $authorization->getQueryParams(),
             $authorization->getQueryParam('redirect_uri') ? $authorization->getQueryParam('redirect_uri') : null,
             $authorization->getScopes(),

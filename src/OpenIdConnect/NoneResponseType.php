@@ -101,7 +101,7 @@ final class NoneResponseType implements ResponseTypeInterface
 
         $token = $this->getAccessTokenManager()->createAccessToken(
             $authorization->getClient(),
-            $authorization->getUserAccount(),
+            $authorization->getUser(),
             $token_type->getTokenTypeInformation(),
             $authorization->getQueryParams(),
             $authorization->getScopes(),

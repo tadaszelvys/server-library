@@ -13,14 +13,14 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\OpenIdConnect\ClaimSource\ClaimSourceInterface;
 use OAuth2\OpenIdConnect\ClaimSource\Source;
-use OAuth2\UserAccount\UserAccountInterface;
+use OAuth2\User\UserInterface;
 
 class DistributedClaimSource implements ClaimSourceInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getUserInfo(UserAccountInterface $user, array $scope, array $claims)
+    public function getUserInfo(UserInterface $user, array $scope, array $claims)
     {
         if ('user2' === $user->getPublicId()) {
             $claims = ['address', 'email', 'email_verified'];
