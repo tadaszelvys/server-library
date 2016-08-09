@@ -9,12 +9,12 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Client\AuthenticationMethod;
+namespace OAuth2\TokenEndpointAuthMethod;
 
 use OAuth2\Client\ClientInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface AuthenticationMethodInterface
+interface TokenEndpointAuthMethodInterface
 {
     /**
      * @return string[]

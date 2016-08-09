@@ -9,14 +9,28 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Client\AuthenticationMethod;
+namespace OAuth2\TokenEndpointAuthMethod;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ClientSecretPost implements AuthenticationMethodInterface
+class None implements TokenEndpointAuthMethodInterface
 {
+    /**
+     * @var string
+     */
+    private $header_name;
+
+    /**
+     * None constructor.
+     *
+     * @param string $header_name
+     */
+    public function __construct($header_name = 'X-OAuth2-Public-Client-ID')
+    {
+        $this->header_name = $header_name;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -30,13 +44,10 @@ class ClientSecretPost implements AuthenticationMethodInterface
      */
     public function findClient(ServerRequestInterface $request, &$client_credentials = null)
     {
-        $client_id = RequestBody::getParameter($request, 'client_id');
-        $client_secret = RequestBody::getParameter($request, 'client_secret');
+        $header = $request->getHeader($this->header_name);
 
-        if (!empty($client_id) && !empty($client_secret)) {
-            $client_credentials = $client_secret;
-
-            return $client_id;
+        if (is_array($header) && 1 === count($header)) {
+            return $header[0];
         }
     }
 
@@ -45,10 +56,6 @@ class ClientSecretPost implements AuthenticationMethodInterface
      */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
-        if (false === hash_equals($client->get('client_secret'), $client_credentials)) {
-            return false;
-        }
-
         return true;
     }
 
@@ -57,6 +64,6 @@ class ClientSecretPost implements AuthenticationMethodInterface
      */
     public function getSupportedAuthenticationMethods()
     {
-        return ['client_secret_post'];
+        return ['none'];
     }
 }

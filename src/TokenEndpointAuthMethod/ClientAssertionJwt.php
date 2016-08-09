@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Client\AuthenticationMethod;
+namespace OAuth2\TokenEndpointAuthMethod;
 
 use Assert\Assertion;
 use Jose\JWTLoader;
@@ -22,7 +22,7 @@ use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 use Webmozart\Assert\Assert;
 
-class ClientAssertionJwt implements AuthenticationMethodInterface
+class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
 {
     use HasJWTLoader;
     use HasExceptionManager;

@@ -12,11 +12,11 @@
 namespace OAuth2\Endpoint\ClientRegistration\Rule;
 
 use Assert\Assertion;
-use OAuth2\Behaviour\HasTokenEndpointAuthMethod;
+use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
 
 final class TokenEndpointAuthMethodEndpointRule implements ClientRegistrationRuleInterface
 {
-    use HasTokenEndpointAuthMethod;
+    use HasTokenEndpointAuthMethodManager;
 
     /**
      * {@inheritdoc}

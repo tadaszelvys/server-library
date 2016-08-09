@@ -21,10 +21,10 @@ use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use Jose\Signer;
 use Jose\Verifier;
-use OAuth2\Client\AuthenticationMethod\ClientAssertionJwt;
-use OAuth2\Client\AuthenticationMethod\ClientSecretBasic;
-use OAuth2\Client\AuthenticationMethod\ClientSecretPost;
-use OAuth2\Client\AuthenticationMethod\None;
+use OAuth2\TokenEndpointAuthMethod\ClientAssertionJwt;
+use OAuth2\TokenEndpointAuthMethod\ClientSecretBasic;
+use OAuth2\TokenEndpointAuthMethod\ClientSecretPost;
+use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\Endpoint\Authorization\AuthorizationFactory;
 use OAuth2\Endpoint\Authorization\AuthorizationRequestLoader;
 use OAuth2\Endpoint\Token\TokenEndpoint;
@@ -84,6 +84,7 @@ use OAuth2\Test\Stub\UserManager;
 use OAuth2\Token\BearerToken;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
+use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -580,12 +581,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Client\AuthenticationMethod\ClientAssertionJwt
+     * @var null|\OAuth2\TokenEndpointAuthMethod\ClientAssertionJwt
      */
     private $assertion_jwt_auth_method = null;
 
     /**
-     * @return \OAuth2\Client\AuthenticationMethod\ClientAssertionJwt
+     * @return \OAuth2\TokenEndpointAuthMethod\ClientAssertionJwt
      */
     protected function getAssertionJwtAuthMethod()
     {
@@ -597,17 +598,17 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Client\ClientManager
+     * @var null|\OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager
      */
-    private $client_manager = null;
+    private $token_endpoint_auth_method_manager = null;
 
     /**
-     * @return \OAuth2\Client\ClientManager
+     * @return \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager
      */
-    protected function getClientManager()
+    protected function getTokenEndpointAuthMethodManager()
     {
-        if (null === $this->client_manager) {
-            $this->client_manager = new ClientManager($this->getExceptionManager());
+        if (null == $this->token_endpoint_auth_method_manager) {
+            $this->token_endpoint_auth_method_manager = new TokenEndpointAuthMethodManager();
 
             $jwt_assertion = $this->getAssertionJwtAuthMethod();
             $jwt_assertion->enableEncryptedAssertions(
@@ -622,10 +623,31 @@ class Base extends \PHPUnit_Framework_TestCase
                 ]])
             );
 
-            $this->client_manager->addAuthenticationMethod(new None());
-            $this->client_manager->addAuthenticationMethod(new ClientSecretBasic($this->realm));
-            $this->client_manager->addAuthenticationMethod(new ClientSecretPost());
-            $this->client_manager->addAuthenticationMethod($jwt_assertion);
+            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethodManager(new None());
+            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethodManager(new ClientSecretBasic($this->realm));
+            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethodManager(new ClientSecretPost());
+            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethodManager($jwt_assertion);
+        }
+
+        return $this->token_endpoint_auth_method_manager;
+    }
+
+    /**
+     * @var null|\OAuth2\Client\ClientManager
+     */
+    private $client_manager = null;
+
+    /**
+     * @return \OAuth2\Client\ClientManager
+     */
+    protected function getClientManager()
+    {
+        if (null === $this->client_manager) {
+            $this->client_manager = new ClientManager(
+                $this->getTokenEndpointAuthMethodManager(),
+                $this->getExceptionManager()
+            );
+
         }
 
         return $this->client_manager;
@@ -1172,7 +1194,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->metadata->set('request_object_signing_alg_values_supported', $this->getJWTLoader()->getSupportedSignatureAlgorithms());
             $this->metadata->set('request_object_encryption_alg_values_supported', $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->set('request_object_encryption_enc_values_supported', $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());
-            $this->metadata->set('token_endpoint_auth_methods_supported', $this->getClientManager()->getSupportedAuthenticationMethods());
+            $this->metadata->set('token_endpoint_auth_methods_supported', $this->getTokenEndpointAuthMethodManager()->getSupportedTokenEndpointAuthMethods());
             $this->metadata->set('token_endpoint_auth_signing_alg_values_supported', $this->getAuthorizationRequestLoader()->getSupportedSignatureAlgorithms());
             $this->metadata->set('token_endpoint_auth_encryption_alg_values_supported', $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms());
             $this->metadata->set('token_endpoint_auth_encryption_enc_values_supported', $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms());

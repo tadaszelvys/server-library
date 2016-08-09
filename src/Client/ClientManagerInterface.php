@@ -11,7 +11,6 @@
 
 namespace OAuth2\Client;
 
-use OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface ClientManagerInterface
@@ -56,14 +55,4 @@ interface ClientManagerInterface
      * @return \OAuth2\Exception\BaseExceptionInterface
      */
     public function buildAuthenticationException(ServerRequestInterface $request);
-
-    /**
-     * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
-     */
-    public function addAuthenticationMethod(AuthenticationMethodInterface $authentication_method);
-
-    /**
-     * @return string[]
-     */
-    public function getSupportedAuthenticationMethods();
 }

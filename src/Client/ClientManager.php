@@ -13,23 +13,27 @@ namespace OAuth2\Client;
 
 use Base64Url\Base64Url;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasTokenEndpointAuthMethod;
-use OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface;
+use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface;
+use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class ClientManager implements ClientManagerInterface
 {
     use HasExceptionManager;
-    use HasTokenEndpointAuthMethod;
+    use HasTokenEndpointAuthMethodManager;
 
     /**
      * ClientManager constructor.
      *
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface                             $exception_manager
      */
-    public function __construct(ExceptionManagerInterface $exception_manager)
+    public function __construct(TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager,
+                                ExceptionManagerInterface $exception_manager)
     {
+        $this->setTokenEndpointAuthMethodManager($token_endpoint_auth_method_manager);
         $this->setExceptionManager($exception_manager);
     }
 
@@ -66,9 +70,9 @@ abstract class ClientManager implements ClientManagerInterface
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface                          $request
-     * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
-     * @param mixed                                                             $client_credentials    The client credentials found in the request
+     * @param \Psr\Http\Message\ServerRequestInterface                         $request
+     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface $authentication_method
+     * @param mixed                                                            $client_credentials    The client credentials found in the request
      *
      * @throws \OAuth2\Exception\BadRequestExceptionInterface
      *
@@ -78,7 +82,7 @@ abstract class ClientManager implements ClientManagerInterface
     {
         $client_id = null;
         $client_credentials = null;
-        foreach ($this->getAuthenticationMethods() as $method) {
+        foreach ($this->getTokenEndpointAuthMethodManager()->getTokenEndpointAuthMethods() as $method) {
             $temp = $method->findClient($request, $client_credentials);
             if (null !== $temp) {
                 if (null !== $client_id) {
@@ -95,14 +99,14 @@ abstract class ClientManager implements ClientManagerInterface
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface                          $request
-     * @param \OAuth2\Client\ClientInterface                                    $client
-     * @param \OAuth2\Client\AuthenticationMethod\AuthenticationMethodInterface $authentication_method
-     * @param mixed|null                                                        $client_credentials
+     * @param \Psr\Http\Message\ServerRequestInterface                         $request
+     * @param \OAuth2\Client\ClientInterface                                   $client
+     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface $authentication_method
+     * @param mixed|null                                                       $client_credentials
      *
      * @return true
      */
-    public function isClientAuthenticated(ServerRequestInterface $request, ClientInterface $client, AuthenticationMethodInterface $authentication_method, $client_credentials)
+    public function isClientAuthenticated(ServerRequestInterface $request, ClientInterface $client, TokenEndpointAuthMethodInterface $authentication_method, $client_credentials)
     {
         if (in_array($client->get('token_endpoint_auth_method'), $authentication_method->getSupportedAuthenticationMethods())) {
             if (false === $client->areClientCredentialsExpired()) {
@@ -120,7 +124,7 @@ abstract class ClientManager implements ClientManagerInterface
     {
         $schemes = [];
         $message = 'Client authentication failed.';
-        foreach ($this->getAuthenticationMethods() as $method) {
+        foreach ($this->getTokenEndpointAuthMethodManager()->getTokenEndpointAuthMethods() as $method) {
             $scheme = $method->getSchemesParameters();
             $schemes = array_merge($schemes, $scheme);
         }
