@@ -11,25 +11,16 @@
 
 namespace OAuth2\Endpoint\Authorization;
 
-use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
+use OAuth2\Behaviour\HasParameterCheckerManager;
 use OAuth2\Behaviour\HasResponseModeManager;
 use OAuth2\Behaviour\HasResponseTypeManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Endpoint\Authorization\ParameterChecker\DisplayParameterChecker;
-use OAuth2\Endpoint\Authorization\ParameterChecker\NonceParameterChecker;
-use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface;
-use OAuth2\Endpoint\Authorization\ParameterChecker\PromptParameterChecker;
-use OAuth2\Endpoint\Authorization\ParameterChecker\RedirectUriParameterChecker;
-use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseModeParameterChecker;
-use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseTypeParameterChecker;
-use OAuth2\Endpoint\Authorization\ParameterChecker\ScopeParameterChecker;
-use OAuth2\Endpoint\Authorization\ParameterChecker\StateParameterChecker;
+use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\ResponseTypeManagerInterface;
 use OAuth2\ResponseMode\ResponseModeManagerInterface;
-use OAuth2\Scope\ScopeManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationFactory implements AuthorizationFactoryInterface
@@ -38,11 +29,7 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
     use HasExceptionManager;
     use HasResponseModeManager;
     use HasResponseTypeManager;
-
-    /**
-     * @var \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface[]
-     */
-    private $parameter_checkers = [];
+    use HasParameterCheckerManager;
 
     /**
      * @var \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface
@@ -57,49 +44,24 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
     /**
      * AuthorizationFactory constructor.
      *
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface $authorization_request_loader
-     * @param \OAuth2\Grant\ResponseTypeManagerInterface                         $response_type_manager
-     * @param \OAuth2\ResponseMode\ResponseModeManagerInterface                  $response_mode_manager
-     * @param \OAuth2\Scope\ScopeManagerInterface                                $scope_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface                        $exception_manager
-     * @param bool                                                               $state_parameter_enforced
-     * @param bool                                                               $secured_redirect_uri_enforced
-     * @param bool                                                               $redirect_uri_storage_enforced
-     * @param bool                                                               $response_mode_parameter_in_authorization_request_allowed
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface               $authorization_request_loader
+     * @param \OAuth2\Grant\ResponseTypeManagerInterface                                       $response_type_manager
+     * @param \OAuth2\ResponseMode\ResponseModeManagerInterface                                $response_mode_manager
+     * @param \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface $parameter_checker_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface                                      $exception_manager
      */
     public function __construct(
         AuthorizationRequestLoaderInterface $authorization_request_loader,
         ResponseTypeManagerInterface $response_type_manager,
         ResponseModeManagerInterface $response_mode_manager,
-        ScopeManagerInterface $scope_manager,
-        ExceptionManagerInterface $exception_manager,
-        $state_parameter_enforced = true,
-        $secured_redirect_uri_enforced = true,
-        $redirect_uri_storage_enforced = true,
-        $response_mode_parameter_in_authorization_request_allowed = false
+        ParameterCheckerManagerInterface $parameter_checker_manager,
+        ExceptionManagerInterface $exception_manager
     ) {
-        Assertion::boolean($response_mode_parameter_in_authorization_request_allowed);
         $this->authorization_request_loader = $authorization_request_loader;
-        $this->setExceptionManager($exception_manager);
         $this->setResponseTypeManager($response_type_manager);
         $this->setResponseModeManager($response_mode_manager);
-
-        $this->addParameterChecker(new DisplayParameterChecker());
-        $this->addParameterChecker(new PromptParameterChecker());
-        $this->addParameterChecker(new ResponseTypeParameterChecker());
-        $this->addParameterChecker(new StateParameterChecker($state_parameter_enforced));
-        $this->addParameterChecker(new ScopeParameterChecker($scope_manager));
-        $this->addParameterChecker(new RedirectUriParameterChecker($secured_redirect_uri_enforced, $redirect_uri_storage_enforced));
-        $this->addParameterChecker(new ResponseModeParameterChecker($response_mode_parameter_in_authorization_request_allowed));
-        $this->addParameterChecker(new NonceParameterChecker());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addParameterChecker(ParameterCheckerInterface $parameter_checker)
-    {
-        $this->parameter_checkers[] = $parameter_checker;
+        $this->setParameterCheckerManager($parameter_checker_manager);
+        $this->setExceptionManager($exception_manager);
     }
 
     /**
@@ -134,7 +96,7 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
         $parameters = $this->authorization_request_loader->loadParametersFromRequest($request);
         $client = $parameters['client'];
 
-        $this->checkParameters($client, $parameters);
+        $this->getParameterCheckerManager()->checkParameters($client, $parameters);
 
         $types = $this->getResponseTypes($parameters);
         $this->checkResponseTypeAllowedForTheClient($client, $parameters);
@@ -144,23 +106,6 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
         $scope = array_key_exists('scope', $parameters) ? $parameters['scope'] : [];
 
         return new Authorization($parameters, $client, $types, $response_mode, $redirect_uri, $scope);
-    }
-
-    /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param array                          $parameters
-     *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
-     */
-    private function checkParameters(ClientInterface $client, array &$parameters)
-    {
-        foreach ($this->parameter_checkers as $parameter_checker) {
-            try {
-                $parameter_checker->checkerParameter($client, $parameters);
-            } catch (\InvalidArgumentException $e) {
-                throw $this->getExceptionManager()->getBadRequestException($parameter_checker->getError(), $e->getMessage());
-            }
-        }
     }
 
     /**

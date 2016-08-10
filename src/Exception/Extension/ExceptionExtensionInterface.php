@@ -17,9 +17,7 @@ interface ExceptionExtensionInterface
      * @param string      $type              The type of the exception
      * @param string      $error             Short name of the error
      * @param string|null $error_description Description of the error
-     * @param array       $data              Additional data sent to the exception
-     *
-     * @return array
+     * @param array       $data              Data sent to the exception
      */
-    public function getData($type, $error, $error_description, array $data);
+    public function process($type, $error, $error_description, array &$data);
 }

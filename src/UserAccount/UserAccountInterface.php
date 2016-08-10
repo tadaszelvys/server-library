@@ -9,14 +9,14 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\User;
+namespace OAuth2\UserAccount;
 
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
 /**
  * This interface must be implemented by end-user classes.
  */
-interface UserInterface extends ResourceOwnerInterface
+interface UserAccountInterface extends ResourceOwnerInterface
 {
     /**
      * @return int|null

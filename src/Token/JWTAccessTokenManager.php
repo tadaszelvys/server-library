@@ -95,7 +95,6 @@ class JWTAccessTokenManager extends AccessTokenManager
 
         $this->setJWTCreator($jwt_creator);
         $this->setJWTLoader($jwt_loader);
-
     }
 
     /**

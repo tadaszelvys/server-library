@@ -7,6 +7,8 @@ OAuth2 And OpenID Connect Framework Library for PHP
 [![Coverage Status](https://coveralls.io/repos/github/Spomky-Labs/oauth2-server-library/badge.svg?branch=master)](https://coveralls.io/github/Spomky-Labs/oauth2-server-library?branch=master)
 [![PSR-7 ready](https://img.shields.io/badge/PSR--7-ready-brightgreen.svg)](http://www.php-fig.org/psr/psr-7/)
 
+[![Dependency Status](https://www.versioneye.com/user/projects/57acac64fc2569003af85833/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57acac64fc2569003af85833)
+
 [![Build Status](https://travis-ci.org/Spomky-Labs/oauth2-server-library.svg?branch=master)](https://travis-ci.org/Spomky-Labs/oauth2-server-library)
 [![HHVM Status](http://hhvm.h4cc.de/badge/spomky-labs/oauth2-server-library.svg)](http://hhvm.h4cc.de/package/spomky-labs/oauth2-server-library)
 [![PHP 7 ready](http://php7ready.timesplinter.ch/Spomky-Labs/oauth2-server-library/badge.svg)](https://travis-ci.org/Spomky-Labs/oauth2-server-library)
@@ -51,7 +53,7 @@ The following components are implemented:
     * [x] Token ([RFC6749, section 3.2](https://tools.ietf.org/html/rfc6749#section-3.2))
     * [x] Token Revocation ([RFC7009](https://tools.ietf.org/html/rfc7009))
     * [x] Token Introspection ([RFC7662](https://tools.ietf.org/html/rfc7662))
-    * [ ] Dynamic Client Registration Protocol ([RFC7591](https://tools.ietf.org/html/rfc7591))
+    * [ ] Dynamic Client Registration Protocol ([RFC7591](https://tools.ietf.org/html/rfc7591)) - *Work In Progress*
     * [ ] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
     * [x] Ability to use other Endpoints
 * Grant types:

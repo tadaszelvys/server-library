@@ -50,6 +50,17 @@ interface ScopeManagerInterface
     public function getScopePolicyForClient(ClientInterface $client);
 
     /**
+     * This function returns the scope policy. If a valid ClientInterface object is set as parameter, the function will return scope policy for the client.
+     *
+     * @param string $scope_policy Scope policy
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \OAuth2\Scope\ScopePolicyInterface
+     */
+    public function getScopePolicy($scope_policy);
+
+    /**
      * This function check if the scopes respect the scope policy for the client.
      *
      * @param string[]                       $scope  The scopes

@@ -23,7 +23,7 @@ trait HasAccessTokenManager
     /**
      * @return \OAuth2\Token\AccessTokenManagerInterface
      */
-    protected function getAccessTokenManager()
+    private function getAccessTokenManager()
     {
         return $this->access_token_manager;
     }

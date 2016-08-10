@@ -23,7 +23,7 @@ trait HasScopeManager
     /**
      * {@inheritdoc}
      */
-    protected function getScopeManager()
+    private function getScopeManager()
     {
         return $this->scope_manager;
     }

@@ -23,7 +23,7 @@ trait HasExceptionManager
     /**
      * @return \OAuth2\Exception\ExceptionManagerInterface
      */
-    protected function getExceptionManager()
+    private function getExceptionManager()
     {
         return $this->exception_manager;
     }

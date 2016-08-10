@@ -30,7 +30,7 @@ interface ClientManagerInterface
     public function getClient($client_id);
 
     /**
-     * Save the client
+     * Save the client.
      *
      * @param \OAuth2\Client\ClientInterface $client
      */

@@ -23,7 +23,7 @@ trait HasClientManager
     /**
      * @return \OAuth2\Client\ClientManagerInterface
      */
-    protected function getClientManager()
+    private function getClientManager()
     {
         return $this->client_manager;
     }

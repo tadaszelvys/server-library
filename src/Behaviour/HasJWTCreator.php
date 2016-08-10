@@ -23,7 +23,7 @@ trait HasJWTCreator
     /**
      * @return \Jose\JWTCreator
      */
-    protected function getJWTCreator()
+    private function getJWTCreator()
     {
         return $this->jwt_creator;
     }

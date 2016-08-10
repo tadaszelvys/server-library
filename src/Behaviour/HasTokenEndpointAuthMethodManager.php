@@ -23,7 +23,7 @@ trait HasTokenEndpointAuthMethodManager
     /**
      * @return \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface
      */
-    protected function getTokenEndpointAuthMethodManager()
+    private function getTokenEndpointAuthMethodManager()
     {
         return $this->token_endpoint_auth_method_manager;
     }

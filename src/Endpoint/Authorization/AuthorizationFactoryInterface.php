@@ -11,24 +11,16 @@
 
 namespace OAuth2\Endpoint\Authorization;
 
-use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface AuthorizationFactoryInterface
 {
     /**
-     * @param \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface $parameter_checker
-     */
-    public function addParameterChecker(ParameterCheckerInterface $parameter_checker);
-
-    /**
      * @return bool
      */
     public function isResponseModeParameterSupported();
 
-
     public function enableResponseModeParameterSupport();
-
 
     public function disableResponseModeParameterSupport();
 
@@ -38,7 +30,7 @@ interface AuthorizationFactoryInterface
      * @return \OAuth2\Endpoint\Authorization\AuthorizationInterface
      */
     public function createAuthorizationFromRequest(ServerRequestInterface $request);
-    
+
     /**
      * @param array                                 $params
      * @param \OAuth2\Grant\ResponseTypeInterface[] $types
@@ -48,7 +40,7 @@ interface AuthorizationFactoryInterface
      * @return \OAuth2\ResponseMode\ResponseModeInterface
      */
     public function getResponseMode(array $params, array $types);
-    
+
     /**
      * @param array $params
      *

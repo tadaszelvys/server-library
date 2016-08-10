@@ -13,16 +13,16 @@ namespace OAuth2\OpenIdConnect;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasUserManager;
+use OAuth2\Behaviour\HasUserAccountManager;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\User\UserManagerInterface;
+use OAuth2\UserAccount\UserAccountManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
 {
-    use HasUserManager;
+    use HasUserAccountManager;
     use HasExceptionManager;
 
     /**
@@ -38,19 +38,19 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
     /**
      * IssuerDiscoveryEndpoint constructor.
      *
-     * @param \OAuth2\User\UserManagerInterface           $user_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param string                                      $issuer            The issuer of the resource
-     * @param string                                      $server            The server URI of this discovery service
+     * @param \OAuth2\UserAccount\UserAccountManagerInterface $user_account_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     * @param string                                          $issuer               The issuer of the resource
+     * @param string                                          $server               The server URI of this discovery service
      */
-    public function __construct(UserManagerInterface $user_manager,
+    public function __construct(UserAccountManagerInterface $user_account_manager,
                                 ExceptionManagerInterface $exception_manager,
                                 $issuer,
                                 $server
     ) {
         Assertion::url($issuer, 'The issuer must be an URL.');
         Assertion::url($server, 'The server must be an URL.');
-        $this->setUserManager($user_manager);
+        $this->setUserAccountManager($user_account_manager);
         $this->setExceptionManager($exception_manager);
         $this->issuer = $issuer;
         $this->computed_server = $this->getDomain($server);
@@ -130,7 +130,7 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
      */
     private function checkUserFromResource($resource)
     {
-        $user = $this->getUserManager()->getUserFromResource($resource);
+        $user = $this->getUserAccountManager()->getUserAccountFromResource($resource);
         if (null === $user) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The resource is not supported by this server.');
         }

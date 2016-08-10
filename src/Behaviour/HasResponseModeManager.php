@@ -23,7 +23,7 @@ trait HasResponseModeManager
     /**
      * @return \OAuth2\ResponseMode\ResponseModeManagerInterface
      */
-    public function getResponseModeManager()
+    private function getResponseModeManager()
     {
         return $this->response_mode_manager;
     }
@@ -31,7 +31,7 @@ trait HasResponseModeManager
     /**
      * @param \OAuth2\ResponseMode\ResponseModeManagerInterface $response_mode_manager
      */
-    public function setResponseModeManager(ResponseModeManagerInterface $response_mode_manager)
+    private function setResponseModeManager(ResponseModeManagerInterface $response_mode_manager)
     {
         $this->response_mode_manager = $response_mode_manager;
     }

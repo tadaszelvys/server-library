@@ -23,7 +23,7 @@ trait HasTokenTypeManager
     /**
      * @return \OAuth2\Token\TokenTypeManagerInterface
      */
-    protected function getTokenTypeManager()
+    private function getTokenTypeManager()
     {
         return $this->token_type_manager;
     }

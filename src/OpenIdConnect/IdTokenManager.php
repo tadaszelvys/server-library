@@ -17,12 +17,11 @@ use Jose\JWTCreator;
 use Jose\Object\JWKInterface;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
 use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
-use OAuth2\User\UserInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 
 class IdTokenManager implements IdTokenManagerInterface
 {
@@ -101,14 +100,14 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function createIdToken(ClientInterface $client, UserInterface $user, $redirect_uri, $claims_locales, array $request_claims, array $scope, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null)
+    public function createIdToken(ClientInterface $client, UserAccountInterface $user_account, $redirect_uri, $claims_locales, array $request_claims, array $scope, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null)
     {
         $id_token = $this->createEmptyIdToken();
         $exp = null !== $access_token ? $access_token->getExpiresAt() : time() + $this->getLifetime($client);
         $claims = array_merge(
             $this->userinfo->getUserinfo(
                 $client,
-                $user,
+                $user_account,
                 $redirect_uri,
                 $claims_locales,
                 $request_claims,
@@ -131,8 +130,8 @@ class IdTokenManager implements IdTokenManagerInterface
         }
 
         foreach (['last_login_at' => 'auth_time', 'amr' => 'amr', 'acr' => 'acr'] as $claim => $key) {
-            if ($user->has($claim)) {
-                $claims[$key] = $user->get($claim);
+            if ($user_account->has($claim)) {
+                $claims[$key] = $user_account->get($claim);
             }
         }
 
@@ -172,7 +171,7 @@ class IdTokenManager implements IdTokenManagerInterface
 
         $id_token->setExpiresAt($exp);
         $id_token->setClientPublicId($client->getPublicId());
-        $id_token->setResourceOwnerPublicId($user->getPublicId());
+        $id_token->setResourceOwnerPublicId($user_account->getPublicId());
 
         return $id_token;
     }
@@ -268,7 +267,7 @@ class IdTokenManager implements IdTokenManagerInterface
     private function getLifetime(ClientInterface $client)
     {
         $lifetime = $this->getIdTokenLifetime();
-        if ($client instanceof TokenLifetimeExtensionInterface && is_int($_lifetime = $client->getTokenLifetime('id_token'))) {
+        if (is_int($_lifetime = $client->getTokenLifetime('id_token'))) {
             return $_lifetime;
         }
 

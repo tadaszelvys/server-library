@@ -12,9 +12,11 @@
 namespace OAuth2\Endpoint\ClientRegistration;
 
 use OAuth2\Behaviour\HasClientManager;
+use OAuth2\Behaviour\HasClientRegistrationRuleManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
+use OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleManagerInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
@@ -25,36 +27,28 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
 {
     use HasExceptionManager;
     use HasClientManager;
-
-    /**
-     * @var \OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleInterface[]
-     */
-    private $rules = [];
+    use HasClientRegistrationRuleManager;
 
     /**
      * ClientRegistrationEndpoint constructor.
      *
-     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\Client\ClientManagerInterface                                           $client_manager
+     * @param \OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleManagerInterface $client_registration_rule_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface                                     $exception_manager
      */
-    public function __construct(ClientManagerInterface $client_manager, ExceptionManagerInterface $exception_manager)
-    {
+    public function __construct(ClientManagerInterface $client_manager,
+                                ClientRegistrationRuleManagerInterface $client_registration_rule_manager,
+                                ExceptionManagerInterface $exception_manager
+    ) {
         $this->setClientManager($client_manager);
+        $this->setClientRegistrationRuleManager($client_registration_rule_manager);
         $this->setExceptionManager($exception_manager);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addRule(Rule\ClientRegistrationRuleInterface $rule)
-    {
-        $this->rules[] = $rule;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerClient(ServerRequestInterface $request, ResponseInterface &$response)
+    public function register(ServerRequestInterface $request, ResponseInterface &$response)
     {
         try {
             if (false === $this->isRequestSecured($request)) {
@@ -68,6 +62,11 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
 
             $this->handleRequest($request, $response);
         } catch (BaseException $e) {
+            $e->getHttpResponse($response);
+
+            return;
+        } catch (\InvalidArgumentException $e) {
+            $e = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
             $e->getHttpResponse($response);
 
             return;
@@ -85,15 +84,8 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
         $request_parameters = RequestBody::getParameters($request);
         $metadatas = [];
 
-        foreach ($this->rules as $rule) {
-            $additional_metadatas = [];
-            $rule->checkRegistrationParameters($request_parameters, $additional_metadatas);
-            if (!empty($additional_metadatas)) {
-                $metadatas = array_merge(
-                    $additional_metadatas,
-                    $metadatas
-                );
-            }
+        foreach ($this->getClientRegistrationRuleManager()->getClientRegistrationRules() as $rule) {
+            $rule->checkRegistrationParameters($request_parameters, $metadatas);
         }
 
         $client = $this->getClientManager()->createClient();

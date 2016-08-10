@@ -23,7 +23,7 @@ trait HasResponseTypeManager
     /**
      * @return \OAuth2\Grant\ResponseTypeManagerInterface
      */
-    public function getResponseTypeManager()
+    private function getResponseTypeManager()
     {
         return $this->response_type_manager;
     }
@@ -31,7 +31,7 @@ trait HasResponseTypeManager
     /**
      * @param \OAuth2\Grant\ResponseTypeManagerInterface $response_type_manager
      */
-    public function setResponseTypeManager(ResponseTypeManagerInterface $response_type_manager)
+    private function setResponseTypeManager(ResponseTypeManagerInterface $response_type_manager)
     {
         $this->response_type_manager = $response_type_manager;
     }

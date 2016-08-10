@@ -12,6 +12,7 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
+use OAuth2\Client\ClientManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManager as Base;
@@ -25,26 +26,20 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
     private $refresh_tokens = [];
 
     /**
-     * ClientCredentialsGrantType constructor.
+     * RefreshTokenManager constructor.
+     *
+     * @param \OAuth2\Client\ClientManagerInterface $client_manager
      */
-    public function __construct()
+    public function __construct(ClientManagerInterface $client_manager)
     {
-        $bar = new Client();
-        $bar->set('secret', 'Circle Of Life');
-        $bar->set('redirect_uris', ['http://example.com/test?good=false']);
-        $bar->set('grant_types', ['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
-        $bar->setPublicId('Mufasa');
-
-        $foo = new Client();
-        $foo->set('redirect_uris', ['http://example.com/test?good=false', 'https://another.uri/callback']);
-        $foo->set('grant_types', ['client_credentials', 'password', 'token', 'refresh_token', 'code', 'authorization_code']);
-        $foo->setPublicId('foo');
+        $mufasa = $client_manager->getClient('Mufasa');
+        $foo = $client_manager->getClient('foo');
 
         $this->addRefreshToken(
             'VALID_REFRESH_TOKEN',
             time() + 10000,
-            $bar,
-            $bar,
+            $mufasa,
+            $mufasa,
             ['scope1', 'scope2', 'scope3']
         );
         $this->addRefreshToken(

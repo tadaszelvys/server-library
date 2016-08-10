@@ -21,7 +21,7 @@ use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResponseMode\QueryResponseMode;
 use OAuth2\Scope\ScopeManagerInterface;
-use OAuth2\User\UserInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -68,7 +68,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @return \OAuth2\User\UserInterface|null
+     * @return \OAuth2\UserAccount\UserAccountInterface|null
      */
     abstract protected function getCurrentUser();
 
@@ -109,9 +109,9 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             return;
         }
 
-        $user = $this->getCurrentUser();
-        //If User is logged in
-        if ($user instanceof UserInterface) {
+        $user_account = $this->getCurrentUser();
+        //If UserAccount is logged in
+        if ($user_account instanceof UserAccountInterface) {
             //If prompt=login => login if not fully authenticated
             if ($authorization->hasPrompt('login') && !$this->isCurrentUserFullyAuthenticated()) {
                 $this->redirectToLoginPage($request, $response);
@@ -121,7 +121,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             //If prompt=none => continue
             //If prompt=consent => continue
             //If prompt=select_account => continue
-        } else { //If User is null
+        } else { //If UserAccount is null
             //If prompt=none => error login required
             if ($authorization->hasPrompt('none')) {
                 $this->createRedirectionException(
@@ -139,7 +139,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
             return;
         }
-        $authorization->setUser($user);
+        $authorization->setUserAccount($user_account);
 
         $pre_configured_authorization = $this->tryToFindPreConfiguredAuthorization($authorization);
         //Pre configured consent exist
@@ -196,7 +196,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
                 if (array_key_exists('response_type', $params)) {
                     try {
                         $types = $this->authorization_factory->getResponseTypes($params);
-                        $response_mode= $this->authorization_factory->getResponseMode($params, $types);
+                        $response_mode = $this->authorization_factory->getResponseMode($params, $types);
                     } catch (\Exception $e) {
                         $response_mode = new QueryResponseMode();
                     }
@@ -204,7 +204,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
                     $response_mode = new QueryResponseMode();
                 }
                 $data = [
-                    'redirect_uri' => $params['redirect_uri'],
+                    'redirect_uri'  => $params['redirect_uri'],
                     'response_mode' => $response_mode,
                 ];
                 if (array_key_exists('state', $params)) {
@@ -267,7 +267,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         if (null !== $this->getPreConfiguredAuthorizationManager()) {
             return $this->getPreConfiguredAuthorizationManager()->findOnePreConfiguredAuthorization(
-                $authorization->getUser()->getPublicId(),
+                $authorization->getUserAccount()->getPublicId(),
                 $authorization->getClient()->getPublicId(),
                 $authorization->getScopes()
             );

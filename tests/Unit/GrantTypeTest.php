@@ -11,8 +11,6 @@
 
 namespace OAuth2\Test\Unit;
 
-use OAuth2\Exception\BaseExceptionInterface;
-use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Test\Base;
 
 /**

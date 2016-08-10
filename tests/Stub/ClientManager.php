@@ -11,7 +11,6 @@
 
 namespace OAuth2\Test\Stub;
 
-use Base64Url\Base64Url;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManager as Base;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -62,12 +61,22 @@ class ClientManager extends Base
         $jwt1->set('jwks', $keys);
         $jwt1->set('scope_policy', 'error');
         $jwt1->set('request_uris', ['https://gist.githubusercontent.com/Spomky/']);
+        $jwt1->set('token_lifetime', [
+            'authcode'      => 20,
+            'access_token'  => 0,
+            'refresh_token' => 2000,
+        ]);
 
         $jwt2 = $this->createClient();
         $jwt2->set('redirect_uris', []);
         $jwt2->set('grant_types', ['authorization_code']);
         $jwt2->set('token_endpoint_auth_method', 'private_key_jwt');
         $jwt2->setPublicId('jwt2');
+        $jwt2->set('token_lifetime', [
+            'authcode'      => 20,
+            'access_token'  => 0,
+            'refresh_token' => 2000,
+        ]);
 
         $bar = $this->createClient();
         $bar->set('client_secret', 'secret');
@@ -78,6 +87,11 @@ class ClientManager extends Base
         $bar->setPublicId('bar');
         $bar->set('token_endpoint_auth_method', 'client_secret_jwt');
         $bar->set('scope_policy', 'none');
+        $bar->set('token_lifetime', [
+            'authcode'      => 10,
+            'access_token'  => 1000,
+            'refresh_token' => 2000,
+        ]);
 
         $baz = $this->createClient();
         $baz->set('client_secret', 'secret');
@@ -87,6 +101,11 @@ class ClientManager extends Base
         $baz->setPublicId('baz');
         $baz->set('token_endpoint_auth_method', 'client_secret_basic');
         $baz->set('scope_policy', 'none');
+        $baz->set('token_lifetime', [
+            'authcode'      => 10,
+            'access_token'  => 1000,
+            'refresh_token' => 2000,
+        ]);
 
         $resource_server = $this->createClient();
         $resource_server->set('client_secret', 'secret');
@@ -96,6 +115,11 @@ class ClientManager extends Base
         $resource_server->setPublicId('resource_server');
         $resource_server->set('token_endpoint_auth_method', 'client_secret_basic');
         $resource_server->set('is_resource_server', true);
+        $resource_server->set('token_lifetime', [
+            'authcode'      => 10,
+            'access_token'  => 1000,
+            'refresh_token' => 2000,
+        ]);
 
         $mufasa = $this->createClient();
         $mufasa->set('client_secret', 'Circle Of Life');
@@ -106,6 +130,11 @@ class ClientManager extends Base
         $mufasa->set('token_endpoint_auth_method', 'client_secret_basic');
         $mufasa->set('scope_policy', 'none');
         $mufasa->set('subject_type', 'pairwise');
+        $mufasa->set('token_lifetime', [
+            'authcode'      => 10,
+            'access_token'  => 1000,
+            'refresh_token' => 2000,
+        ]);
 
         $mufasa2 = $this->createClient();
         $mufasa2->set('client_secret', 'Circle Of Life');
@@ -115,6 +144,11 @@ class ClientManager extends Base
         $mufasa2->setPublicId('Mufasa2');
         $mufasa2->set('token_endpoint_auth_method', 'client_secret_post');
         $mufasa2->set('scope_policy', 'none');
+        $mufasa2->set('token_lifetime', [
+            'authcode'      => 10,
+            'access_token'  => 1000,
+            'refresh_token' => 2000,
+        ]);
 
         $mac = $this->createClient();
         $mac->set('client_secret', 'secret');
@@ -125,6 +159,11 @@ class ClientManager extends Base
         $mac->set('token_types', ['MAC']);
         $mac->set('token_endpoint_auth_method', 'client_secret_basic');
         $mac->set('scope_policy', 'none');
+        $mac->set('token_lifetime', [
+            'authcode'      => 10,
+            'access_token'  => 1000,
+            'refresh_token' => 2000,
+        ]);
 
         $expired = $this->createClient();
         $expired->set('client_secret', 'secret');
@@ -135,6 +174,11 @@ class ClientManager extends Base
         $expired->setPublicId('expired');
         $expired->set('token_endpoint_auth_method', 'client_secret_basic');
         $expired->set('scope_policy', 'none');
+        $expired->set('token_lifetime', [
+            'authcode'      => 10,
+            'access_token'  => 1000,
+            'refresh_token' => 2000,
+        ]);
 
         $foo = $this->createClient();
         $foo->setPublicId('foo');
@@ -169,18 +213,6 @@ class ClientManager extends Base
         $this->clients['mac'] = $mac;
         $this->clients['expired'] = $expired;
         $this->clients['resource_server'] = $resource_server;
-    }
-
-    public function createClient()
-    {
-        $client = new Client();
-        $client->setPublicId(Base64Url::encode(random_bytes(50)));
-        $client->set('grant_types', ['authorization_code']);
-        $client->set('response_types', ['code']);
-        $client->set('token_endpoint_auth_method', 'client_basic_secret');
-        $client->set('secret', Base64Url::encode(random_bytes(30)));
-
-        return $client;
     }
 
     /**

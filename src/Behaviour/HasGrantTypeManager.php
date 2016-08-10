@@ -18,21 +18,21 @@ trait HasGrantTypeManager
     /**
      * @var \OAuth2\Grant\GrantTypeManagerInterface
      */
-    private $response_type_manager;
+    private $grant_type_manager;
 
     /**
      * @return \OAuth2\Grant\GrantTypeManagerInterface
      */
-    public function getGrantTypeManager()
+    private function getGrantTypeManager()
     {
-        return $this->response_type_manager;
+        return $this->grant_type_manager;
     }
 
     /**
-     * @param \OAuth2\Grant\GrantTypeManagerInterface $response_type_manager
+     * @param \OAuth2\Grant\GrantTypeManagerInterface $grant_type_manager
      */
-    public function setGrantTypeManager(GrantTypeManagerInterface $response_type_manager)
+    private function setGrantTypeManager(GrantTypeManagerInterface $grant_type_manager)
     {
-        $this->response_type_manager = $response_type_manager;
+        $this->grant_type_manager = $grant_type_manager;
     }
 }

@@ -59,6 +59,6 @@ final class DefaultScopePolicy implements ScopePolicyInterface
      */
     private function getDefaultScopesForClient(ClientInterface $client)
     {
-        return ($client->has('scope')) && null !== $client->get('scope') ? $client->get('scope') : $this->getDefaultScopes();
+        return ($client->has('default_scope')) && null !== $client->get('default_scope') ? $client->get('default_scope') : $this->getDefaultScopes();
     }
 }

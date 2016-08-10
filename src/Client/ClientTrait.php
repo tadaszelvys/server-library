@@ -29,6 +29,16 @@ use Jose\Object\JWKSet;
 trait ClientTrait
 {
     /**
+     * @return string
+     */
+    abstract public function getPublicId();
+
+    /**
+     * @return array
+     */
+    abstract public function all();
+
+    /**
      * @param string $metadata
      *
      * @return bool
@@ -48,7 +58,7 @@ trait ClientTrait
     public function isGrantTypeAllowed($grant_type)
     {
         Assertion::string($grant_type, 'Argument must be a string.');
-        $grant_types = $this->get('grant_types');
+        $grant_types = $this->has('grant_types') ? $this->get('grant_types') : [];
         Assertion::isArray($grant_types, 'The metadata "grant_types" must be an array.');
 
         return in_array($grant_type, $grant_types);
@@ -60,7 +70,7 @@ trait ClientTrait
     public function isResponseTypeAllowed($response_type)
     {
         Assertion::string($response_type, 'Argument must be a string.');
-        $response_types = $this->get('response_types');
+        $response_types = $this->has('response_types') ? $this->get('response_types') : [];
         Assertion::isArray($response_types, 'The metadata "response_types" must be an array.');
 
         return in_array($response_type, $response_types);
@@ -109,7 +119,7 @@ trait ClientTrait
         if ($this->has('client_secret_expires_at')) {
             return $this->get('client_secret_expires_at');
         }
-        
+
         return 0;
     }
 
@@ -134,7 +144,7 @@ trait ClientTrait
     }
 
     /**
-     * @return \Jose\Object\JWKSetInterface
+     * @return null|\Jose\Object\JWKSetInterface
      */
     public function getPublicKeySet()
     {
@@ -146,21 +156,35 @@ trait ClientTrait
         if ($this->hasJwksUri()) {
             return JWKFactory::createFromJKU($this->getJwksUri());
         }
+        if ($this->hasClientSecret()) {
+            $jwk_set = new JWKSet();
+            $jwk_set->addKey(new JWK([
+                'kty' => 'oct',
+                'use' => 'sig',
+                'k'   => $this->getClientSecret(),
+            ]));
 
-        $jwk_set = new JWKSet();
-        $jwk_set->addKey(new JWK([
-            'kty' => 'oct',
-            'use' => 'sig',
-            'k'   => $this->getClientSecret(),
-        ]));
-
-        return $jwk_set;
+            return $jwk_set;
+        }
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    function jsonSerialize()
+    public function getTokenLifetime($token)
+    {
+        if ($this->has('token_lifetime')) {
+            $token_lifetime = $this->get('token_lifetime');
+            if (is_array($token_lifetime) && array_key_exists($token, $token_lifetime)) {
+                return $token_lifetime[$token];
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
     {
         return array_merge(
             ['public_id' => $this->getPublicId()],

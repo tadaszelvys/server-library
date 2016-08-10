@@ -13,11 +13,12 @@ namespace OAuth2\Grant;
 
 use OAuth2\Behaviour\HasAuthorizationCodeManager;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasPKCEMethodManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
+use OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
@@ -29,11 +30,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
     use HasExceptionManager;
     use HasAuthorizationCodeManager;
     use HasScopeManager;
-
-    /**
-     * @var \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]
-     */
-    private $pkce_methods = [];
+    use HasPKCEMethodManager;
 
     /**
      * @var bool
@@ -48,17 +45,20 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
     /**
      * AuthorizationCodeGrantType constructor.
      *
-     * @param \OAuth2\Token\AuthCodeManagerInterface      $auth_code_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
-     * @param \OAuth2\Scope\ScopeManagerInterface         $scope_manager
+     * @param \OAuth2\Token\AuthCodeManagerInterface              $auth_code_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface         $exception_manager
+     * @param \OAuth2\Scope\ScopeManagerInterface                 $scope_manager
+     * @param \OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface $pkce_method_manager
      */
     public function __construct(AuthCodeManagerInterface $auth_code_manager,
                                 ExceptionManagerInterface $exception_manager,
-                                ScopeManagerInterface $scope_manager
+                                ScopeManagerInterface $scope_manager,
+                                PKCEMethodManagerInterface $pkce_method_manager
     ) {
         $this->setAuthorizationCodeManager($auth_code_manager);
         $this->setExceptionManager($exception_manager);
         $this->setScopeManager($scope_manager);
+        $this->setPKCEMethodManager($pkce_method_manager);
     }
 
     /**
@@ -85,44 +85,14 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
         return $this->public_clients_allowed;
     }
 
-
     public function allowPublicClients()
     {
         $this->public_clients_allowed = true;
     }
 
-
     public function disallowPublicClients()
     {
         $this->public_clients_allowed = false;
-    }
-
-    /**
-     * @param \OAuth2\Grant\PKCEMethod\PKCEMethodInterface $method
-     */
-    public function addPKCEMethod(PKCEMethodInterface $method)
-    {
-        if (!array_key_exists($method->getMethodName(), $this->pkce_methods)) {
-            $this->pkce_methods[$method->getMethodName()] = $method;
-        }
-    }
-
-    /**
-     * @return \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]
-     */
-    private function getPKCEMethods()
-    {
-        return $this->pkce_methods;
-    }
-
-    /**
-     * @param string $method
-     *
-     * @return \OAuth2\Grant\PKCEMethod\PKCEMethodInterface
-     */
-    private function getPKCEMethod($method)
-    {
-        return $this->pkce_methods[$method];
     }
 
     /**
@@ -156,11 +126,11 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
      */
     public function prepareAuthorization(AuthorizationInterface $authorization)
     {
-        $offline_access = $this->isOfflineAccessRequested($authorization);
+        $offline_access = $this->isOfflineAccess($authorization);
 
         $code = $this->getAuthorizationCodeManager()->createAuthCode(
             $authorization->getClient(),
-            $authorization->getUser(),
+            $authorization->getUserAccount(),
             $authorization->getQueryParams(),
             $authorization->getQueryParam('redirect_uri') ? $authorization->getQueryParam('redirect_uri') : null,
             $authorization->getScopes(),
@@ -277,28 +247,10 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
         $code_challenge_method = array_key_exists('code_challenge_method', $params) ? $params['code_challenge_method'] : 'plain';
         $code_verifier = RequestBody::getParameter($request, 'code_verifier');
 
-        $this->checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier);
-    }
-
-    /**
-     * @param string $code_challenge_method
-     * @param string $code_challenge
-     * @param string $code_verifier
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    private function checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier)
-    {
-        if (!array_key_exists($code_challenge_method, $this->getPKCEMethods())) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported code challenge method "%s".', $code_challenge_method));
-        }
-        $method = $this->getPKCEMethod($code_challenge_method);
-
-        if (null === $code_verifier) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "code_verifier" is required.');
-        }
-        if (!$method->isChallengeVerified($code_verifier, $code_challenge)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Invalid parameter "code_verifier".');
+        try {
+            $this->getPKCEMethodManager()->checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier);
+        } catch (\InvalidArgumentException $e) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
     }
 
@@ -361,7 +313,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
      *
      * @return bool
      */
-    private function isOfflineAccessRequested(AuthorizationInterface $authorization)
+    private function isOfflineAccess(AuthorizationInterface $authorization)
     {
         // The scope offline_access is not requested
         if (!in_array('offline_access', $authorization->getScopes())) {

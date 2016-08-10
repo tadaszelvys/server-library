@@ -282,7 +282,7 @@ class ImplicitGrantTypeTest extends Base
 
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'request_uri'  => 'https://gist.githubusercontent.com/Spomky/23ca2a645f97584aaa22/raw/e9ff926a07940db9033c0ed7b8d623afee5f144a/signed.jwt',
+            'request_uri'  => 'https://127.0.0.1/signed_request',
             'client_id'    => 'bad_client', // Wil be ignored as already set in the request object
             'redirect_uri' => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
             'scope'        => 'openid email profile address', // Wil be ignored as already set in the request object
@@ -302,7 +302,7 @@ class ImplicitGrantTypeTest extends Base
 
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'request_uri'  => 'https://gist.githubusercontent.com/Spomky/3f22bbdc279a05aaac62/raw/7bc47a71eb48b37296dc69c70ec81a2d782f8055/encrypted.jwt',
+            'request_uri'  => 'https://127.0.0.1/signed_and_encrypted_request',
             'client_id'    => 'bad_client', // Wil be ignored as already set in the request object
             'redirect_uri' => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
             'scope'        => 'openid email profile address', // Wil be ignored as already set in the request object

@@ -14,7 +14,7 @@ namespace OAuth2\Endpoint\Authorization;
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResponseMode\ResponseModeInterface;
-use OAuth2\User\UserInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 
 final class Authorization implements AuthorizationInterface
 {
@@ -29,9 +29,9 @@ final class Authorization implements AuthorizationInterface
     private $client;
 
     /**
-     * @var \OAuth2\User\UserInterface
+     * @var \OAuth2\UserAccount\UserAccountInterface
      */
-    private $user;
+    private $user_account;
 
     /**
      * @var array
@@ -91,17 +91,17 @@ final class Authorization implements AuthorizationInterface
     /**
      * {@inheritdoc}
      */
-    public function setUser(UserInterface $user)
+    public function setUserAccount(UserAccountInterface $user_account)
     {
-        $this->user = $user;
+        $this->user_account = $user_account;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getUser()
+    public function getUserAccount()
     {
-        return $this->user;
+        return $this->user_account;
     }
 
     /**

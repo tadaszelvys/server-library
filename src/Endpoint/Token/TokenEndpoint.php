@@ -20,7 +20,7 @@ use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Behaviour\HasTokenTypeParameterSupport;
-use OAuth2\Behaviour\HasUserManager;
+use OAuth2\Behaviour\HasUserAccountManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -32,14 +32,14 @@ use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
-use OAuth2\User\UserManagerInterface;
+use OAuth2\UserAccount\UserAccountManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class TokenEndpoint implements TokenEndpointInterface
 {
-    use HasUserManager;
+    use HasUserAccountManager;
     use HasScopeManager;
     use HasExceptionManager;
     use HasClientManager;
@@ -61,7 +61,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
      * @param \OAuth2\Client\ClientManagerInterface           $client_manager
-     * @param \OAuth2\User\UserManagerInterface               $user_manager
+     * @param \OAuth2\UserAccount\UserAccountManagerInterface $user_account_manager
      * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
@@ -71,7 +71,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         TokenTypeManagerInterface $token_type_manager,
         AccessTokenManagerInterface $access_token_manager,
         ClientManagerInterface $client_manager,
-        UserManagerInterface $user_manager,
+        UserAccountManagerInterface $user_account_manager,
         ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
         RefreshTokenManagerInterface $refresh_token_manager = null
@@ -79,7 +79,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
         $this->setClientManager($client_manager);
-        $this->setUserManager($user_manager);
+        $this->setUserAccountManager($user_account_manager);
         $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
         $this->setGrantTypeManager($grant_type_manager);
@@ -386,7 +386,6 @@ final class TokenEndpoint implements TokenEndpointInterface
         } catch (\InvalidArgumentException $e) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
-
     }
 
     /**
@@ -407,7 +406,7 @@ final class TokenEndpoint implements TokenEndpointInterface
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
-     * @return null|\OAuth2\Client\ClientInterface|\OAuth2\User\UserInterface
+     * @return null|\OAuth2\Client\ClientInterface|\OAuth2\UserAccount\UserAccountInterface
      */
     private function getResourceOwner($resource_owner_public_id)
     {
@@ -415,9 +414,9 @@ final class TokenEndpoint implements TokenEndpointInterface
         if (null !== $client) {
             return $client;
         }
-        $user = $this->getUserManager()->getUserByPublicId($resource_owner_public_id);
-        if (null !== $user) {
-            return $user;
+        $user_account = $this->getUserAccountManager()->getUserAccountByPublicId($resource_owner_public_id);
+        if (null !== $user_account) {
+            return $user_account;
         }
 
         throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');

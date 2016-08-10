@@ -13,7 +13,6 @@ namespace OAuth2\Token;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\Extension\TokenLifetimeExtensionInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
 abstract class AccessTokenManager implements AccessTokenManagerInterface
@@ -94,7 +93,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
     protected function getLifetime(ClientInterface $client)
     {
         $lifetime = $this->getAccessTokenLifetime();
-        if ($client instanceof TokenLifetimeExtensionInterface && is_int($_lifetime = $client->getTokenLifetime('access_token'))) {
+        if (is_int($_lifetime = $client->getTokenLifetime('access_token'))) {
             return $_lifetime;
         }
 

@@ -54,6 +54,14 @@ class None implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
+    public function checkClientConfiguration(array $client_configuration, array &$metadatas)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
         return true;

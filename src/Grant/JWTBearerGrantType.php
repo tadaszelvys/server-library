@@ -21,7 +21,6 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
-use Webmozart\Assert\Assert;
 
 final class JWTBearerGrantType implements GrantTypeInterface
 {
@@ -93,14 +92,14 @@ final class JWTBearerGrantType implements GrantTypeInterface
     {
         $assertion = RequestBody::getParameter($request, 'assertion');
         try {
-            Assert::notNull($assertion, 'Parameter "assertion" is missing.');
+            Assertion::notNull($assertion, 'Parameter "assertion" is missing.');
             $jwt = $this->getJWTLoader()->load(
                 $assertion,
                 $this->key_encryption_key_set,
                 $this->encryption_required
             );
-            Assert::isInstanceOf($jwt, JWSInterface::class, 'Assertion does not contain signed claims.');
-            Assert::true($jwt->hasClaim('sub'), 'Assertion does not contain "sub" claims.');
+            Assertion::isInstanceOf($jwt, JWSInterface::class, 'Assertion does not contain signed claims.');
+            Assertion::true($jwt->hasClaim('sub'), 'Assertion does not contain "sub" claims.');
         } catch (\Exception $e) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }

@@ -44,10 +44,6 @@ abstract class ClientManager implements ClientManagerInterface
     {
         $client = new Client();
         $client->setPublicId(Base64Url::encode(random_bytes(50)));
-        $client->set('grant_types', ['authorization_code']);
-        $client->set('response_types', ['code']);
-        $client->set('token_endpoint_auth_method', 'client_basic_secret');
-        $client->set('secret', Base64Url::encode(random_bytes(30)));
 
         return $client;
     }

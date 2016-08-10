@@ -12,6 +12,7 @@
 namespace OAuth2\Endpoint\Authorization;
 
 use Assert\Assertion;
+use GuzzleHttp\Client;
 use Jose\JWTLoader;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasClientManager;
@@ -28,6 +29,11 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     use HasJWTLoader;
     use HasClientManager;
     use HasExceptionManager;
+
+    /**
+     * @var bool
+     */
+    private $allow_unsecured_connections = false;
 
     /**
      * @var bool
@@ -62,20 +68,40 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
+     */
+    public function allowUnsecuredConnections()
+    {
+        $this->allow_unsecured_connections = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function disallowUnsecuredConnections()
+    {
+        $this->allow_unsecured_connections = false;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function isRequestUriRegistrationRequired()
     {
         return $this->require_request_uri_registration;
     }
 
-
+    /**
+     * {@inheritdoc}
+     */
     public function enableRequestUriRegistrationRequirement()
     {
         $this->require_request_uri_registration = true;
     }
 
-
+    /**
+     * {@inheritdoc}
+     */
     public function disableRequestUriRegistrationRequirement()
     {
         $this->require_request_uri_registration = false;
@@ -122,7 +148,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     }
 
     /**
-     * @param \Jose\JWTLoader $jwt_loader
+     * {@inheritdoc}
      */
     public function enableRequestObjectSupport(JWTLoader $jwt_loader)
     {
@@ -130,6 +156,9 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
         $this->request_object_allowed = true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function enableRequestObjectReferenceSupport()
     {
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
@@ -137,7 +166,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     }
 
     /**
-     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
+     * {@inheritdoc}
      */
     public function enableEncryptedRequestObjectSupport(JWKSetInterface $key_encryption_key_set)
     {
@@ -147,7 +176,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function isEncryptedRequestsSupportEnabled()
     {
@@ -219,7 +248,6 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_URI_NOT_SUPPORTED, 'The parameter "request_uri" is not supported.');
         }
         $request_uri = $params['request_uri'];
-        Assertion::url($request_uri, 'Invalid URL.');
 
         $content = $this->downloadContent($request_uri);
         $jws = $this->loadRequest($params, $content, $client);
@@ -316,25 +344,13 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
      */
     private function downloadContent($url)
     {
-        // The URL must be a valid URL and scheme must be https
-        Assertion::false(
-            false === filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED),
-            'Invalid URL.'
-        );
-        Assertion::false('https://' !==  mb_substr($url, 0, 8, '8bit'), 'Unsecured connection.');
+        $client = new Client([
+            'verify' => !$this->allow_unsecured_connections,
+        ]);
+        $response = $client->get($url);
+        Assertion::eq(200, $response->getStatusCode());
 
-        $curl_params = [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_URL            => $url,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-        ];
-
-        $ch = curl_init();
-        curl_setopt_array($ch, $curl_params);
-        $content = curl_exec($ch);
-        curl_close($ch);
-
+        $content = $response->getBody()->getContents();
         if (!is_string($content)) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_URI, 'Unable to get content.');
         }

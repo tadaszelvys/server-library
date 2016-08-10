@@ -17,7 +17,7 @@ use Psr\Http\Message\ServerRequestInterface;
 interface GrantTypeInterface
 {
     /**
-     * This function returns the list of associated response types
+     * This function returns the list of associated response types.
      *
      * @return string[]
      */

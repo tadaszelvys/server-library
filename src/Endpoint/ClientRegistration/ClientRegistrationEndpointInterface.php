@@ -20,10 +20,5 @@ interface ClientRegistrationEndpointInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request  The request
      * @param \Psr\Http\Message\ResponseInterface      $response The response
      */
-    public function registerClient(ServerRequestInterface $request, ResponseInterface &$response);
-
-    /**
-     * @param \OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleInterface $rule
-     */
-    public function addRule(Rule\ClientRegistrationRuleInterface $rule);
+    public function register(ServerRequestInterface $request, ResponseInterface &$response);
 }

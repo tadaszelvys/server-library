@@ -21,12 +21,28 @@ use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use Jose\Signer;
 use Jose\Verifier;
-use OAuth2\TokenEndpointAuthMethod\ClientAssertionJwt;
-use OAuth2\TokenEndpointAuthMethod\ClientSecretBasic;
-use OAuth2\TokenEndpointAuthMethod\ClientSecretPost;
-use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\Endpoint\Authorization\AuthorizationFactory;
 use OAuth2\Endpoint\Authorization\AuthorizationRequestLoader;
+use OAuth2\Endpoint\Authorization\ParameterChecker\DisplayParameterChecker;
+use OAuth2\Endpoint\Authorization\ParameterChecker\NonceParameterChecker;
+use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManager;
+use OAuth2\Endpoint\Authorization\ParameterChecker\PromptParameterChecker;
+use OAuth2\Endpoint\Authorization\ParameterChecker\RedirectUriParameterChecker;
+use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseModeParameterChecker;
+use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseTypeParameterChecker;
+use OAuth2\Endpoint\Authorization\ParameterChecker\ScopeParameterChecker;
+use OAuth2\Endpoint\Authorization\ParameterChecker\StateParameterChecker;
+use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
+use OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleManager;
+use OAuth2\Endpoint\ClientRegistration\Rule\GrantTypeFlowRule;
+use OAuth2\Endpoint\ClientRegistration\Rule\IdTokenAlgorithmsRule;
+use OAuth2\Endpoint\ClientRegistration\Rule\RedirectionUriRule;
+use OAuth2\Endpoint\ClientRegistration\Rule\RequestUriRule;
+use OAuth2\Endpoint\ClientRegistration\Rule\ResourceServerRule;
+use OAuth2\Endpoint\ClientRegistration\Rule\ScopeRule;
+use OAuth2\Endpoint\ClientRegistration\Rule\SectorIdentifierUriRule;
+use OAuth2\Endpoint\ClientRegistration\Rule\SubjectTypeRule;
+use OAuth2\Endpoint\ClientRegistration\Rule\TokenEndpointAuthMethodEndpointRule;
 use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationEndpoint;
@@ -39,6 +55,7 @@ use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\GrantTypeManager;
 use OAuth2\Grant\ImplicitGrantType;
 use OAuth2\Grant\JWTBearerGrantType;
+use OAuth2\Grant\PKCEMethod\PKCEMethodManager;
 use OAuth2\Grant\PKCEMethod\Plain;
 use OAuth2\Grant\PKCEMethod\S256;
 use OAuth2\Grant\RefreshTokenGrantType;
@@ -52,12 +69,13 @@ use OAuth2\OpenIdConnect\Metadata;
 use OAuth2\OpenIdConnect\NoneResponseType;
 use OAuth2\OpenIdConnect\OpenIdConnectTokenEndpointExtension;
 use OAuth2\OpenIdConnect\Pairwise\HashedSubjectIdentifier;
-use OAuth2\OpenIdConnect\UserInfo\UserInfo;
-use OAuth2\OpenIdConnect\UserInfo\UserInfoEndpoint;
 use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\AddressScopeSupport;
 use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\EmailScopeSupport;
 use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\PhoneScopeSupport;
 use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\ProfilScopeSupport;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportManager;
+use OAuth2\OpenIdConnect\UserInfo\UserInfo;
+use OAuth2\OpenIdConnect\UserInfo\UserInfoEndpoint;
 use OAuth2\ResponseMode\FormPostResponseMode;
 use OAuth2\ResponseMode\FragmentResponseMode;
 use OAuth2\ResponseMode\QueryResponseMode;
@@ -65,7 +83,7 @@ use OAuth2\ResponseMode\ResponseModeManager;
 use OAuth2\Scope\DefaultScopePolicy;
 use OAuth2\Scope\ErrorScopePolicy;
 use OAuth2\Security\EntryPoint;
-use OAuth2\Security\Handler\AccessTokenManagerHandler;
+use OAuth2\Security\Handler\AccessTokenHandler;
 use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\AuthorizationEndpoint;
@@ -80,10 +98,14 @@ use OAuth2\Test\Stub\ScopeManager;
 use OAuth2\Test\Stub\SessionStateParameterExtension;
 use OAuth2\Test\Stub\TooManyRequestsExceptionFactory;
 use OAuth2\Test\Stub\UriExtension;
-use OAuth2\Test\Stub\UserManager;
+use OAuth2\Test\Stub\UserAccountManager;
 use OAuth2\Token\BearerToken;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
+use OAuth2\TokenEndpointAuthMethod\ClientAssertionJwt;
+use OAuth2\TokenEndpointAuthMethod\ClientSecretBasic;
+use OAuth2\TokenEndpointAuthMethod\ClientSecretPost;
+use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -181,16 +203,38 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getAuthorizationRequestLoader(),
                 $this->getResponseTypeManager(),
                 $this->getResponseModeManager(),
-                $this->getScopeManager(),
-                $this->getExceptionManager(),
-                true,
-                false,
-                false,
-                true
+                $this->getParameterCheckerManager(),
+                $this->getExceptionManager()
             );
         }
 
         return $this->authorization_factory;
+    }
+
+    /**
+     * @var null|\OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface
+     */
+    private $parameter_checker_manager = null;
+
+    /**
+     * @return \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface
+     */
+    protected function getParameterCheckerManager()
+    {
+        if (null === $this->parameter_checker_manager) {
+            $this->parameter_checker_manager = new ParameterCheckerManager($this->getExceptionManager());
+
+            $this->parameter_checker_manager->addParameterChecker(new DisplayParameterChecker());
+            $this->parameter_checker_manager->addParameterChecker(new PromptParameterChecker());
+            $this->parameter_checker_manager->addParameterChecker(new ResponseTypeParameterChecker());
+            $this->parameter_checker_manager->addParameterChecker(new StateParameterChecker(true));
+            $this->parameter_checker_manager->addParameterChecker(new ScopeParameterChecker($this->getScopeManager()));
+            $this->parameter_checker_manager->addParameterChecker(new RedirectUriParameterChecker(false, false));
+            $this->parameter_checker_manager->addParameterChecker(new ResponseModeParameterChecker(true));
+            $this->parameter_checker_manager->addParameterChecker(new NonceParameterChecker());
+        }
+
+        return $this->parameter_checker_manager;
     }
 
     /**
@@ -239,25 +283,25 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @var \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface
      */
-    private $authorization__request_loader;
+    private $authorization_request_loader;
 
     /**
      * @return \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface
      */
     protected function getAuthorizationRequestLoader()
     {
-        if (null === $this->authorization__request_loader) {
-            $this->authorization__request_loader = new AuthorizationRequestLoader(
+        if (null === $this->authorization_request_loader) {
+            $this->authorization_request_loader = new AuthorizationRequestLoader(
                 $this->getClientManager(),
                 $this->getExceptionManager()
             );
 
-            $this->authorization__request_loader->enableRequestObjectSupport(
+            $this->authorization_request_loader->enableRequestObjectSupport(
                 $this->getJWTLoader()
             );
-            $this->authorization__request_loader->enableRequestObjectReferenceSupport();
+            $this->authorization_request_loader->enableRequestObjectReferenceSupport();
 
-            $this->authorization__request_loader->enableEncryptedRequestObjectSupport(
+            $this->authorization_request_loader->enableEncryptedRequestObjectSupport(
                 new JWKSet(['keys' => [
                     [
                         'kid' => 'JWK1',
@@ -267,9 +311,11 @@ class Base extends \PHPUnit_Framework_TestCase
                     ],
                 ]])
             );
+
+            $this->authorization_request_loader->allowUnsecuredConnections(); // We allow unsecured connections because we send request against the local server for all tests. Should not be used in production.
         }
 
-        return $this->authorization__request_loader;
+        return $this->authorization_request_loader;
     }
 
     /**
@@ -308,20 +354,38 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->userinfo) {
             $this->userinfo = new UserInfo(
+                $this->getUserInfoScopeSupportManager(),
                 $this->getClaimSourceManager(),
                 $this->getExceptionManager()
             );
-
-            $this->userinfo->addUserInfoScopeSupport(new ProfilScopeSupport());
-            $this->userinfo->addUserInfoScopeSupport(new AddressScopeSupport());
-            $this->userinfo->addUserInfoScopeSupport(new EmailScopeSupport());
-            $this->userinfo->addUserInfoScopeSupport(new PhoneScopeSupport());
 
             $this->userinfo->enablePairwiseSubject(new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData()));
             $this->userinfo->setPairwiseSubjectByDefault();
         }
 
         return $this->userinfo;
+    }
+
+    /**
+     * @var null|\OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportManagerInterface
+     */
+    private $userinfo_scope_support_manager = null;
+
+    /**
+     * @return \OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportManagerInterface
+     */
+    protected function getUserInfoScopeSupportManager()
+    {
+        if (null === $this->userinfo_scope_support_manager) {
+            $this->userinfo_scope_support_manager = new UserInfoScopeSupportManager();
+
+            $this->userinfo_scope_support_manager->addUserInfoScopeSupport(new ProfilScopeSupport());
+            $this->userinfo_scope_support_manager->addUserInfoScopeSupport(new AddressScopeSupport());
+            $this->userinfo_scope_support_manager->addUserInfoScopeSupport(new EmailScopeSupport());
+            $this->userinfo_scope_support_manager->addUserInfoScopeSupport(new PhoneScopeSupport());
+        }
+
+        return $this->userinfo_scope_support_manager;
     }
 
     /**
@@ -336,7 +400,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->issuer_discovery_endpoint) {
             $this->issuer_discovery_endpoint = new IssuerDiscoveryEndpoint(
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getExceptionManager(),
                 $this->getIssuer(),
                 'https://my-service.com:9000'
@@ -358,7 +422,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->userinfo_endpoint) {
             $this->userinfo_endpoint = new UserInfoEndpoint(
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getClientManager(),
                 $this->getUserInfo(),
                 $this->getExceptionManager()
@@ -393,7 +457,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->listener) {
             $this->listener = new Listener(
                 $this->getTokenTypeManager(),
-                new AccessTokenManagerHandler($this->getJWTAccessTokenManager()),
+                new AccessTokenHandler($this->getJWTAccessTokenManager()),
                 $this->getExceptionManager()
             );
         }
@@ -461,7 +525,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManager(),
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
                 $this->getRefreshTokenManager()
@@ -488,7 +552,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->openid_connect_token_endpoint_extension) {
             $this->openid_connect_token_endpoint_extension = new OpenIdConnectTokenEndpointExtension(
                 $this->getIdTokenManager(),
-                $this->getUserManager()
+                $this->getUserAccountManager()
             );
         }
 
@@ -531,7 +595,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->authorization_endpoint) {
             $this->authorization_endpoint = new AuthorizationEndpoint(
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getAuthorizationFactory(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
@@ -564,17 +628,17 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Test\Stub\UserManager
+     * @var null|\OAuth2\Test\Stub\UserAccountManager
      */
     private $user_manager = null;
 
     /**
-     * @return \OAuth2\Test\Stub\UserManager
+     * @return \OAuth2\Test\Stub\UserAccountManager
      */
-    protected function getUserManager()
+    protected function getUserAccountManager()
     {
         if (null === $this->user_manager) {
-            $this->user_manager = new UserManager();
+            $this->user_manager = new UserAccountManager();
         }
 
         return $this->user_manager;
@@ -647,7 +711,6 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenEndpointAuthMethodManager(),
                 $this->getExceptionManager()
             );
-
         }
 
         return $this->client_manager;
@@ -667,17 +730,36 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_code_grant_type = new AuthorizationCodeGrantType(
                 $this->getAuthCodeManager(),
                 $this->getExceptionManager(),
-                $this->getScopeManager()
+                $this->getScopeManager(),
+                $this->getPKCEMethodManager()
             );
 
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
             $this->authorization_code_grant_type->disablePKCEForPublicClientsEnforcement();
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
-            $this->authorization_code_grant_type->addPKCEMethod(new Plain());
-            $this->authorization_code_grant_type->addPKCEMethod(new S256());
         }
 
         return $this->authorization_code_grant_type;
+    }
+
+    /**
+     * @var null|\OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface
+     */
+    private $pkce_method_manager = null;
+
+    /**
+     * @return \OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface
+     */
+    protected function getPKCEMethodManager()
+    {
+        if (null === $this->pkce_method_manager) {
+            $this->pkce_method_manager = new PKCEMethodManager();
+
+            $this->pkce_method_manager->addPKCEMethod(new Plain());
+            $this->pkce_method_manager->addPKCEMethod(new S256());
+        }
+
+        return $this->pkce_method_manager;
     }
 
     /**
@@ -852,7 +934,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->resource_owner_password_credentials_grant_type) {
             $this->resource_owner_password_credentials_grant_type = new ResourceOwnerPasswordCredentialsGrantType(
-                $this->getUserManager(),
+                $this->getUserAccountManager(),
                 $this->getExceptionManager()
             );
             $this->resource_owner_password_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
@@ -999,7 +1081,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getRefreshTokenManager()
     {
         if (null === $this->refresh_token_manager) {
-            $this->refresh_token_manager = new RefreshTokenManager();
+            $this->refresh_token_manager = new RefreshTokenManager($this->getClientManager());
 
             $this->refresh_token_manager->setRefreshTokenMinLength(10);
             $this->refresh_token_manager->setRefreshTokenMaxLength(20);
@@ -1156,6 +1238,62 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->pre_configured_authorization_manager;
+    }
+
+    /**
+     * @var null|\OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleManagerInterface
+     */
+    private $client_registration_rule_manager = null;
+
+    /**
+     * @return \OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleManagerInterface
+     */
+    protected function getClientRegistrationRuleManager()
+    {
+        if (null === $this->client_registration_rule_manager) {
+            $this->client_registration_rule_manager = new ClientRegistrationRuleManager();
+
+            $this->client_registration_rule_manager->addClientRegistrationRule(new GrantTypeFlowRule(
+                $this->getGrantTypeManager(),
+                $this->getResponseTypeManager()
+            ));
+            $this->client_registration_rule_manager->addClientRegistrationRule(new RedirectionUriRule());
+            $this->client_registration_rule_manager->addClientRegistrationRule(new RequestUriRule());
+            $this->client_registration_rule_manager->addClientRegistrationRule(new ScopeRule($this->getScopeManager()));
+
+            $sector_identifier_uri_rule = new SectorIdentifierUriRule();
+            $sector_identifier_uri_rule->allowUnsecuredConnections(); // We allow unsecured connections because we send request against the local server for all tests. Should not be used in production.
+            $this->client_registration_rule_manager->addClientRegistrationRule($sector_identifier_uri_rule);
+            $this->client_registration_rule_manager->addClientRegistrationRule(new TokenEndpointAuthMethodEndpointRule(
+                $this->getTokenEndpointAuthMethodManager()
+            ));
+            $this->client_registration_rule_manager->addClientRegistrationRule(new IdTokenAlgorithmsRule($this->getIdTokenManager()));
+            $this->client_registration_rule_manager->addClientRegistrationRule(new SubjectTypeRule($this->getUserInfo()));
+            $this->client_registration_rule_manager->addClientRegistrationRule(new ResourceServerRule());
+        }
+
+        return $this->client_registration_rule_manager;
+    }
+
+    /**
+     * @var null|\OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpointInterface
+     */
+    private $client_registration_endpoint = null;
+
+    /**
+     * @return \OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpointInterface
+     */
+    protected function getClientRegistrationEndpoint()
+    {
+        if (null === $this->client_registration_endpoint) {
+            $this->client_registration_endpoint = new ClientRegistrationEndpoint(
+                $this->getClientManager(),
+                $this->getClientRegistrationRuleManager(),
+                $this->getExceptionManager()
+            );
+        }
+
+        return $this->client_registration_endpoint;
     }
 
     /**

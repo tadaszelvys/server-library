@@ -72,6 +72,16 @@ class ClientSecretBasic implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
+    public function checkClientConfiguration(array $client_configuration, array &$metadatas)
+    {
+        Assertion::keyExists('client_secret', $client_configuration, 'The parameter "client_secret" must be set.');
+        Assertion::string($client_configuration['client_secret'], 'The parameter "client_secret" must be a string.');
+        $metadatas['client_secret'] = $client_configuration['client_secret'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
         if (false === hash_equals($client->get('client_secret'), $client_credentials)) {

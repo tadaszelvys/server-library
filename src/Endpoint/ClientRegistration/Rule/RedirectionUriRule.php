@@ -11,12 +11,19 @@
 
 namespace OAuth2\Endpoint\ClientRegistration\Rule;
 
+use Assert\Assertion;
+
 final class RedirectionUriRule implements ClientRegistrationRuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$additional_metadatas)
+    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas)
     {
+        if (!array_key_exists('redirect_uris', $registration_parameters)) {
+            return;
+        }
+        Assertion::isArray($registration_parameters['redirect_uris'], 'The parameter "redirect_uris" must be a list of URI.');
+        Assertion::allUrl($registration_parameters['redirect_uris'], 'The parameter "redirect_uris" must be a list of URI.');
     }
 }

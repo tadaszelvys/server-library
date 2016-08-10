@@ -12,7 +12,9 @@
 namespace OAuth2\TokenEndpointAuthMethod;
 
 use Assert\Assertion;
+use Jose\Factory\JWKFactory;
 use Jose\JWTLoader;
+use Jose\Object\JWKSet;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
@@ -20,7 +22,6 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
-use Webmozart\Assert\Assert;
 
 class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
 {
@@ -120,9 +121,8 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
             );
 
             $diff = array_diff(['iss', 'sub', 'aud', 'jti', 'exp'], array_keys($jwt->getClaims()));
-            Assert::isEmpty($diff, sprintf('The following claim(s) is/are mandatory: "%s".', json_encode(array_values($diff))));
-
-            Assert::eq($jwt->getClaim('sub'), $jwt->getClaim('iss'), 'The claims "sub" and "iss" must contain the client public ID.');
+            Assertion::eq(0, count($diff), sprintf('The following claim(s) is/are mandatory: "%s".', json_encode(array_values($diff))));
+            Assertion::eq($jwt->getClaim('sub'), $jwt->getClaim('iss'), 'The claims "sub" and "iss" must contain the client public ID.');
         } catch (\Exception $e) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
         }
@@ -160,5 +160,29 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     public function getSupportedAuthenticationMethods()
     {
         return ['client_secret_jwt', 'private_key_jwt'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function checkClientConfiguration(array $client_configuration, array &$metadatas)
+    {
+        if ('client_secret_jwt' === $client_configuration['token_endpoint_auth_method']) {
+            Assertion::keyExists('client_secret', $client_configuration, 'The parameter "client_secret" must be set.');
+            Assertion::string($client_configuration['client_secret'], 'The parameter "client_secret" must be a string.');
+        } elseif ('private_key_jwt' === $client_configuration['token_endpoint_auth_method']) {
+            Assertion::true(array_key_exists('jwks', $client_configuration) xor array_key_exists('jwks_uri', $client_configuration), 'The parameter "jwks" or "jwks_uri" must be set.');
+            if (array_key_exists('jwks', $client_configuration)) {
+                $jwks = new JWKSet($client_configuration['jwks']);
+                Assertion::isInstanceOf($jwks, JWKSetInterface::class, 'The parameter "jwks" must be a valid JWKSet object.');
+                $metadatas['jwks'] = $client_configuration['jwks'];
+            } else {
+                $jwks = JWKFactory::createFromJKU($client_configuration['jwks_uri']);
+                Assertion::isInstanceOf($jwks, JWKSetInterface::class, 'The parameter "jwks_uri" must be a valid uri that provide a valid JWKSet.');
+                $metadatas['jwks_uri'] = $client_configuration['jwks_uri'];
+            }
+        } else {
+            throw new \InvalidArgumentException('Unsupported token endpoint authentication method.');
+        }
     }
 }

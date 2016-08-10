@@ -23,7 +23,7 @@ class ScopeManager implements ScopeManagerInterface
     /**
      * @var string[]
      */
-    private $available_scopes;
+    private $available_scopes = [];
 
     /**
      * @var \OAuth2\Scope\ScopePolicyInterface[]
@@ -82,11 +82,9 @@ class ScopeManager implements ScopeManagerInterface
     }
 
     /**
-     * @param string $scope_policy_name
-     *
-     * @return \OAuth2\Scope\ScopePolicyInterface
+     * {@inheritdoc}
      */
-    private function getScopePolicy($scope_policy_name)
+    public function getScopePolicy($scope_policy_name)
     {
         Assertion::keyExists($this->scope_policies, $scope_policy_name, sprintf('The scope policy with name "%s" is not supported', $scope_policy_name));
 

@@ -94,7 +94,8 @@ class ExceptionManager implements ExceptionManagerInterface
         Assertion::string($error);
         Assertion::nullOrString($error_description);
 
-        $error_data = $this->getAdditionalErrorData($type, $error, $error_description, $data);
+        $error_data = [];
+        $this->getAdditionalErrorData($type, $error, $error_description, $error_data);
 
         $factory = $this->getExceptionFactory($type);
 
@@ -106,20 +107,12 @@ class ExceptionManager implements ExceptionManagerInterface
      * @param string      $error
      * @param string|null $error_description
      * @param array       $data
-     *
-     * @return array
      */
-    private function getAdditionalErrorData($type, $error, $error_description, array $data)
+    private function getAdditionalErrorData($type, $error, $error_description, array &$data)
     {
-        $result = [];
         foreach ($this->extensions as $extension) {
-            $result = array_merge(
-                $result,
-                $extension->getData($type, $error, $error_description, $data)
-            );
+            $extension->process($type, $error, $error_description, $data);
         }
-
-        return $result;
     }
 
     /**

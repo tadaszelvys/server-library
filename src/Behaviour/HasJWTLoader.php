@@ -23,7 +23,7 @@ trait HasJWTLoader
     /**
      * @return \Jose\JWTLoader
      */
-    protected function getJWTLoader()
+    private function getJWTLoader()
     {
         return $this->jwt_loader;
     }

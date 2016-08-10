@@ -12,10 +12,10 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\User\IssueRefreshTokenExtensionInterface;
-use OAuth2\User\User as BaseUser;
+use OAuth2\UserAccount\IssueRefreshTokenExtensionInterface;
+use OAuth2\UserAccount\UserAccount as BaseUserAccount;
 
-final class User extends BaseUser implements IssueRefreshTokenExtensionInterface
+final class UserAccount extends BaseUserAccount implements IssueRefreshTokenExtensionInterface
 {
     /**
      * @var string
@@ -28,7 +28,7 @@ final class User extends BaseUser implements IssueRefreshTokenExtensionInterface
     private $password;
 
     /**
-     * User constructor.
+     * UserAccount constructor.
      *
      * @param string $username
      * @param string $password
@@ -41,7 +41,7 @@ final class User extends BaseUser implements IssueRefreshTokenExtensionInterface
         $this->password = $password;
     }
 
-    public function getUsername()
+    public function getUserAccountname()
     {
         return $this->username;
     }

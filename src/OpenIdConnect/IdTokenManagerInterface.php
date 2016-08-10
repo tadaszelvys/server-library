@@ -14,24 +14,24 @@ namespace OAuth2\OpenIdConnect;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
-use OAuth2\User\UserInterface as BaseUserInterface;
+use OAuth2\UserAccount\UserAccountInterface as BaseUserAccountInterface;
 
 interface IdTokenManagerInterface
 {
     /**
-     * @param \OAuth2\Client\ClientInterface          $client
-     * @param \OAuth2\User\UserInterface              $user
-     * @param string                                  $redirect_uri
-     * @param array|null                              $claims_locales
-     * @param array                                   $request_claims
-     * @param string[]                                $scope
-     * @param array                                   $id_token_claims
-     * @param \OAuth2\Token\AccessTokenInterface|null $access_token
-     * @param \OAuth2\Token\AuthCodeInterface|null    $auth_code
+     * @param \OAuth2\Client\ClientInterface           $client
+     * @param \OAuth2\UserAccount\UserAccountInterface $user_account_account
+     * @param string                                   $redirect_uri
+     * @param array|null                               $claims_locales
+     * @param array                                    $request_claims
+     * @param string[]                                 $scope
+     * @param array                                    $id_token_claims
+     * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
+     * @param \OAuth2\Token\AuthCodeInterface|null     $auth_code
      *
      * @return \OAuth2\OpenIdConnect\IdTokenInterface
      */
-    public function createIdToken(ClientInterface $client, BaseUserInterface $user, $redirect_uri, $claims_locales, array $request_claims, array $scope, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null);
+    public function createIdToken(ClientInterface $client, BaseUserAccountInterface $user_account_account, $redirect_uri, $claims_locales, array $request_claims, array $scope, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null);
 
     /**
      * @param \OAuth2\OpenIdConnect\IdTokenInterface $token The ID token to revoke

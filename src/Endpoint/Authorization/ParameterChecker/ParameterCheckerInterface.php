@@ -19,7 +19,7 @@ interface ParameterCheckerInterface
      * @param \OAuth2\Client\ClientInterface $client
      * @param array                          $parameters
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \InvalidArgumentException
      */
     public function checkerParameter(ClientInterface $client, array &$parameters);
 

@@ -28,7 +28,7 @@ interface ResponseTypeInterface
     public function getResponseType();
 
     /**
-     * This function returns the list of associated grant types
+     * This function returns the list of associated grant types.
      *
      * @return string[]
      */

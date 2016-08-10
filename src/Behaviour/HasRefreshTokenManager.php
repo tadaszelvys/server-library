@@ -23,7 +23,7 @@ trait HasRefreshTokenManager
     /**
      * @return \OAuth2\Token\RefreshTokenManagerInterface|null
      */
-    protected function getRefreshTokenManager()
+    private function getRefreshTokenManager()
     {
         return $this->refresh_token_manager;
     }

@@ -15,9 +15,9 @@ interface ClientRegistrationRuleInterface
 {
     /**
      * @param array $registration_parameters
-     * @param array $additional_metadatas
+     * @param array $metadatas
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface If an error occurred
+     * @throws \InvalidArgumentException If an error occurred
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$additional_metadatas);
+    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas);
 }

@@ -14,17 +14,17 @@ namespace OAuth2\Test\Stub;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Exception\Extension\ExceptionExtensionInterface;
 
-class UriExtension implements ExceptionExtensionInterface
+final class UriExtension implements ExceptionExtensionInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getData($type, $error, $error_description, array $data)
+    public function process($type, $error, $error_description, array &$data)
     {
         if ($type !== ExceptionManagerInterface::INTERNAL_SERVER_ERROR) {
-            return ['error_uri' => "https://foo.test/Error/$type/$error"];
+            $data['error_uri'] = "https://foo.test/Error/$type/$error";
+        } else {
+            $data['error_uri'] = "https://foo.test/Internal/$type/$error";
         }
-
-        return ['error_uri' => "https://foo.test/Internal/$type/$error"];
     }
 }

@@ -9,13 +9,14 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\User;
+namespace OAuth2\UserAccount;
+
 use Assert\Assertion;
 
 /**
- * Class UserTrait.
+ * Class UserAccountTrait.
  */
-trait UserTrait
+trait UserAccountTrait
 {
     /**
      * @var int|null

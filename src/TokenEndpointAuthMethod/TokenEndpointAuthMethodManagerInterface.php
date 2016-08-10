@@ -24,6 +24,22 @@ interface TokenEndpointAuthMethodManagerInterface
     public function getSupportedTokenEndpointAuthMethods();
 
     /**
+     * @param string $token_endpoint_auth_method
+     *
+     * @return bool
+     */
+    public function hasTokenEndpointAuthMethod($token_endpoint_auth_method);
+
+    /**
+     * @param string $token_endpoint_auth_method
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface
+     */
+    public function getTokenEndpointAuthMethod($token_endpoint_auth_method);
+
+    /**
      * @return \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface[]
      */
     public function getTokenEndpointAuthMethods();

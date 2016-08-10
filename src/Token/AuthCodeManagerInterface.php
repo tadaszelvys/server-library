@@ -12,7 +12,7 @@
 namespace OAuth2\Token;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\User\UserInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 
 interface AuthCodeManagerInterface
 {
@@ -23,16 +23,16 @@ interface AuthCodeManagerInterface
      * If storage fails for some reason, we're not currently checking for any sort of success/failure, so you should
      * bail out of the script and provide a descriptive fail message.
      *
-     * @param \OAuth2\Client\ClientInterface $client            The client associated with this authorization code.
-     * @param \OAuth2\User\UserInterface     $user              End user to associate with this authorization code.
-     * @param array                          $query_params      The authorization request query parameters.
-     * @param string                         $redirectUri       Redirect URI to be stored.
-     * @param string[]                       $scope             (optional) Scopes to be stored.
-     * @param bool                           $issueRefreshToken (optional) Issue a refresh token with the access token.
+     * @param \OAuth2\Client\ClientInterface           $client            The client associated with this authorization code.
+     * @param \OAuth2\UserAccount\UserAccountInterface $user_account      End user to associate with this authorization code.
+     * @param array                                    $query_params      The authorization request query parameters.
+     * @param string                                   $redirectUri       Redirect URI to be stored.
+     * @param string[]                                 $scope             (optional) Scopes to be stored.
+     * @param bool                                     $issueRefreshToken (optional) Issue a refresh token with the access token.
      *
      * @return null|AuthCodeInterface
      */
-    public function createAuthCode(ClientInterface $client, UserInterface $user, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false);
+    public function createAuthCode(ClientInterface $client, UserAccountInterface $user_account, array $query_params, $redirectUri, array $scope = [], $issueRefreshToken = false);
 
     /**
      * Retrieve the stored data for the given authorization code.

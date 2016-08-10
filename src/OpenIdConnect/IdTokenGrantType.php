@@ -88,7 +88,7 @@ final class IdTokenGrantType implements ResponseTypeInterface
         $requested_claims = $this->getIdTokenClaims($authorization);
         $id_token = $this->getIdTokenManager()->createIdToken(
             $authorization->getClient(),
-            $authorization->getUser(),
+            $authorization->getUserAccount(),
             $redirect_uri,
             $authorization->hasQueryParam('claims_locales') ? $authorization->getQueryParam('claims_locales') : null,
             $requested_claims,
