@@ -85,6 +85,19 @@ interface TokenInterface
     public function setResourceOwnerPublicId($resource_owner_public_id);
 
     /**
+     * The user account associated to the token.
+     * This information is available only is the resource owner is a user.
+     *
+     * @return string|null The public ID of the user account associated with the token
+     */
+    public function getUserAccountPublicId();
+
+    /**
+     * @param string $user_account_public_id
+     */
+    public function setUserAccountPublicId($user_account_public_id);
+
+    /**
      * Other parameters.
      *
      * @return array

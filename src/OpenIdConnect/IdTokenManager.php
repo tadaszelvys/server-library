@@ -171,7 +171,7 @@ class IdTokenManager implements IdTokenManagerInterface
 
         $id_token->setExpiresAt($exp);
         $id_token->setClientPublicId($client->getPublicId());
-        $id_token->setResourceOwnerPublicId($user_account->getPublicId());
+        $id_token->setResourceOwnerPublicId($user_account->getUserPublicId());
 
         return $id_token;
     }

@@ -15,6 +15,7 @@ use Assert\Assertion;
 use Base64Url\Base64Url;
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 
 abstract class RefreshTokenManager implements RefreshTokenManagerInterface
 {
@@ -66,7 +67,12 @@ abstract class RefreshTokenManager implements RefreshTokenManagerInterface
     {
         $refresh_token = $this->createEmptyRefreshToken();
         $refresh_token->setScope($scope);
-        $refresh_token->setResourceOwnerPublicId($resource_owner->getPublicId());
+        if ($resource_owner instanceof UserAccountInterface) {
+            $refresh_token->setResourceOwnerPublicId($resource_owner->getUserPublicId());
+            $refresh_token->setUserAccountPublicId($resource_owner->getPublicId());
+        } else {
+            $refresh_token->setResourceOwnerPublicId($resource_owner->getPublicId());
+        }
         $refresh_token->setClientPublicId($client->getPublicId());
         $refresh_token->setExpiresAt(time() + $this->getLifetime($client));
         $refresh_token->setToken($this->generateToken());

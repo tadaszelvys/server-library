@@ -49,6 +49,7 @@ class ObjectsTest extends Base
         $id_token->setNonce('nonce');
         $id_token->setParameters(['foo' => 'bar']);
         $id_token->setResourceOwnerPublicId('resource_owner');
+        $id_token->setUserAccountPublicId('user_account');
         $id_token->setScope([]);
         $id_token->setTokenType('type');
 
@@ -58,17 +59,19 @@ class ObjectsTest extends Base
         $this->assertEquals('nonce', $id_token->getNonce());
         $this->assertEquals('bar', $id_token->getParameter('foo'));
         $this->assertEquals('resource_owner', $id_token->getResourceOwnerPublicId());
+        $this->assertEquals('user_account', $id_token->getUserAccountPublicId());
         $this->assertEquals([], $id_token->getScope());
         $this->assertEquals('type', $id_token->getTokenType());
     }
 
     public function testUserAccount()
     {
-        $user = new UserAccount('user1', 'pass');
+        $user = new UserAccount('user1', 'pass', 'real_user1_public_id');
         $user->set('last_login_at', time() - 1000);
 
         $this->assertTrue($user->get('last_login_at') <= time() - 1000);
-        $this->assertEquals('user1', $user->getUserAccountname());
+        $this->assertEquals('user1', $user->getPublicId());
+        $this->assertEquals('real_user1_public_id', $user->getUserPublicId());
     }
 
     public function testAuthCodeQueryParams()

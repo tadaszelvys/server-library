@@ -51,6 +51,5 @@ after_success:
 after_failure:
     - cat build/logs/apache-access.log
     - cat build/logs/apache-error.log
-    - cat build/logs/cgi.log
     - sudo cat /var/log/apache2/access.log
     - sudo cat /var/log/apache2/error.log

@@ -20,6 +20,11 @@ final class UserAccount extends BaseUserAccount implements IssueRefreshTokenExte
     /**
      * @var string
      */
+    private $user_public_id;
+
+    /**
+     * @var string
+     */
     private $username;
 
     /**
@@ -32,16 +37,29 @@ final class UserAccount extends BaseUserAccount implements IssueRefreshTokenExte
      *
      * @param string $username
      * @param string $password
+     * @param string $user_public_id
      */
-    public function __construct($username, $password)
+    public function __construct($username, $password, $user_public_id)
     {
         parent::__construct();
         $this->setPublicId($username);
         $this->username = $username;
         $this->password = $password;
+        $this->user_public_id = $user_public_id;
     }
 
-    public function getUserAccountname()
+    /**
+     * {@inheritdoc}
+     */
+    public function getUserPublicId()
+    {
+        return $this->user_public_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername()
     {
         return $this->username;
     }

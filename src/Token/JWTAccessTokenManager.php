@@ -176,6 +176,7 @@ class JWTAccessTokenManager extends AccessTokenManager
             'token_type'     => $access_token->getTokenType(),
             'scp'            => $access_token->getScope(),
             'resource_owner' => $access_token->getResourceOwnerPublicId(),
+            'user_account'   => $access_token->getUserAccountPublicId(),
         ];
         $payload['metadatas'] = $access_token->getMetadatas();
         if (0 !== $expires_at = $access_token->getExpiresAt()) {
@@ -221,6 +222,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         $access_token->setClientPublicId($jwt->getClaim('sub'));
         $access_token->setTokenType($jwt->getClaim('token_type'));
         $access_token->setResourceOwnerPublicId($jwt->getClaim('resource_owner'));
+        $access_token->setUserAccountPublicId($jwt->getClaim('user_account'));
 
         if ($jwt->hasClaim('exp')) {
             $access_token->setExpiresAt($jwt->getClaim('exp'));

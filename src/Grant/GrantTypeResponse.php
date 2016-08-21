@@ -37,6 +37,11 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     private $resource_owner_public_id;
 
     /**
+     * @var string|null
+     */
+    private $user_account_public_id;
+
+    /**
      * @var string
      */
     private $client_public_id;
@@ -149,6 +154,22 @@ final class GrantTypeResponse implements GrantTypeResponseInterface
     public function getResourceOwnerPublicId()
     {
         return $this->resource_owner_public_id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUserAccountPublicId($user_account_public_id = null)
+    {
+        $this->user_account_public_id = $user_account_public_id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUserAccountPublicId()
+    {
+        return $this->user_account_public_id;
     }
 
     /**

@@ -17,6 +17,7 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManager as Base;
 use OAuth2\Token\RefreshTokenManagerInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 
 class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
 {
@@ -71,6 +72,7 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
         $refresh_token->setToken($token);
         $refresh_token->setClientPublicId($client->getPublicId());
         $refresh_token->setResourceOwnerPublicId(null === $resourceOwner ? null : $resourceOwner->getPublicId());
+        $refresh_token->setUserAccountPublicId(!$resourceOwner instanceof UserAccountInterface ? null : $resourceOwner->getUserPublicId());
         $refresh_token->setScope($scope);
 
         $this->saveRefreshToken($refresh_token);

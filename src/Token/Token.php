@@ -51,6 +51,11 @@ class Token implements TokenInterface
     protected $resource_owner_public_id;
 
     /**
+     * @var string|null
+     */
+    protected $user_account_public_id;
+
+    /**
      * {@inheritdoc}
      */
     public function getClientPublicId()
@@ -120,6 +125,22 @@ class Token implements TokenInterface
     public function setResourceOwnerPublicId($resource_owner_public_id)
     {
         $this->resource_owner_public_id = $resource_owner_public_id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUserAccountPublicId()
+    {
+        return $this->user_account_public_id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUserAccountPublicId($user_account_public_id)
+    {
+        $this->user_account_public_id = $user_account_public_id;
     }
 
     /**

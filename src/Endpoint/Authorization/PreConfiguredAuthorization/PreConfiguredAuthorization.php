@@ -21,6 +21,11 @@ class PreConfiguredAuthorization implements PreConfiguredAuthorizationInterface
     /**
      * @var string
      */
+    private $user_account_public_id;
+
+    /**
+     * @var string
+     */
     private $client_public_id;
 
     /**
@@ -47,6 +52,22 @@ class PreConfiguredAuthorization implements PreConfiguredAuthorizationInterface
     public function setResourceOwnerPublicId($resource_owner_public_id)
     {
         $this->resource_owner_public_id = $resource_owner_public_id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUserAccountPublicId()
+    {
+        return $this->user_account_public_id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUserAccountPublicId($user_account_public_id)
+    {
+        $this->user_account_public_id = $user_account_public_id;
     }
 
     /**

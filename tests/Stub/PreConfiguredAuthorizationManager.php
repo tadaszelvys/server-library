@@ -29,7 +29,8 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     {
         $auth1 = $this->createPreConfiguredAuthorization();
         $auth1->setClientPublicId('foo');
-        $auth1->setResourceOwnerPublicId('user1');
+        $auth1->setResourceOwnerPublicId('real_user1_public_id');
+        $auth1->setUserAccountPublicId('user1');
         $auth1->setRequestedScopes(['openid', 'email', 'profile']);
         $auth1->setValidatedScopes(['openid', 'email', 'profile']);
         $this->savePreConfiguredAuthorization($auth1);

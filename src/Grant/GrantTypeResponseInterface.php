@@ -93,6 +93,19 @@ interface GrantTypeResponseInterface
     public function setResourceOwnerPublicId($resource_owner_public_id);
 
     /**
+     * The user account associated with the access token.
+     * This value is available only if the resource owner is a user.
+     *
+     * @return string
+     */
+    public function getUserAccountPublicId();
+
+    /**
+     * @param string|null $user_account_public_id
+     */
+    public function setUserAccountPublicId($user_account_public_id);
+
+    /**
      * @return bool If true, a refresh token is requested
      */
     public function isRefreshTokenIssued();

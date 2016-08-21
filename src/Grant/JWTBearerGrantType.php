@@ -133,6 +133,7 @@ final class JWTBearerGrantType implements GrantTypeInterface
         $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
 
         $grant_type_response->setResourceOwnerPublicId($client->getPublicId());
+        $grant_type_response->setUserAccountPublicId(null);
         $grant_type_response->setRefreshTokenIssued($issue_refresh_token);
         $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
     }

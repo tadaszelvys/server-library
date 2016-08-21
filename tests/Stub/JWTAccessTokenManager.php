@@ -60,6 +60,7 @@ class JWTAccessTokenManager extends Base
         $abcd = new AccessToken();
         $abcd->setExpiresAt(time() + 3600);
         $abcd->setResourceOwnerPublicId('Mufasa');
+        $abcd->setUserAccountPublicId(null);
         $abcd->setScope([]);
         $abcd->setClientPublicId('Mufasa');
         $abcd->setRefreshToken(null);
@@ -71,6 +72,7 @@ class JWTAccessTokenManager extends Base
         $efgh = new AccessToken();
         $efgh->setExpiresAt(time() + 3600);
         $efgh->setResourceOwnerPublicId('foo');
+        $efgh->setUserAccountPublicId(null);
         $efgh->setScope([]);
         $efgh->setClientPublicId('foo');
         $efgh->setRefreshToken('REFRESH_EFGH');
@@ -79,7 +81,8 @@ class JWTAccessTokenManager extends Base
 
         $no_user_info = new AccessToken();
         $no_user_info->setExpiresAt(time() + 3600);
-        $no_user_info->setResourceOwnerPublicId('user1');
+        $no_user_info->setResourceOwnerPublicId('real_user1_public_id');
+        $no_user_info->setUserAccountPublicId('user1');
         $no_user_info->setScope(['scope1']);
         $no_user_info->setClientPublicId('foo');
         $no_user_info->setToken('NO_USER_INFO');
@@ -90,7 +93,8 @@ class JWTAccessTokenManager extends Base
 
         $user_info = new AccessToken();
         $user_info->setExpiresAt(time() + 3600);
-        $user_info->setResourceOwnerPublicId('user1');
+        $user_info->setResourceOwnerPublicId('real_user1_public_id');
+        $user_info->setUserAccountPublicId('user1');
         $user_info->setScope(['openid', 'profile', 'address', 'phone']);
         $user_info->setClientPublicId('foo');
         $user_info->setToken('USER_INFO');
@@ -101,7 +105,8 @@ class JWTAccessTokenManager extends Base
 
         $user_info2 = new AccessToken();
         $user_info2->setExpiresAt(time() + 3600);
-        $user_info2->setResourceOwnerPublicId('user1');
+        $user_info2->setResourceOwnerPublicId('real_user1_public_id');
+        $user_info2->setUserAccountPublicId('user1');
         $user_info2->setScope(['openid', 'profile', 'address', 'phone']);
         $user_info2->setClientPublicId('jwt1');
         $user_info2->setToken('USER_INFO2');
@@ -112,7 +117,8 @@ class JWTAccessTokenManager extends Base
 
         $user_info_mac = new AccessToken();
         $user_info_mac->setExpiresAt(time() + 3600);
-        $user_info_mac->setResourceOwnerPublicId('user1');
+        $user_info_mac->setResourceOwnerPublicId('real_user1_public_id');
+        $user_info_mac->setUserAccountPublicId('user1');
         $user_info_mac->setScope(['openid', 'profile', 'address', 'phone']);
         $user_info_mac->setClientPublicId('jwt1');
         $user_info_mac->setToken('USER_INFO_MAC');

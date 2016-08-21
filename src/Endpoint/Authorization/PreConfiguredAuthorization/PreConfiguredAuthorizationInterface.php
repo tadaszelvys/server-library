@@ -26,6 +26,16 @@ interface PreConfiguredAuthorizationInterface
     /**
      * @return string
      */
+    public function getUserAccountPublicId();
+
+    /**
+     * @param string $user_account_public_id
+     */
+    public function setUserAccountPublicId($user_account_public_id);
+
+    /**
+     * @return string
+     */
     public function getClientPublicId();
 
     /**
