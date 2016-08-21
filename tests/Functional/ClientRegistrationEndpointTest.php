@@ -106,7 +106,7 @@ class ClientRegistrationEndpointTest extends Base
 
     public function testEmptySectorIdentifierUriResponse()
     {
-        $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1/empty_sector_identifier_uri', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1:8181/empty_sector_identifier_uri', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
 
         $response = new Response();
         $this->getClientRegistrationEndpoint()->register($request, $response);
@@ -119,7 +119,7 @@ class ClientRegistrationEndpointTest extends Base
 
     public function testSectorIdentifierUriContainsBadValues()
     {
-        $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1/sector_identifier_uri_with_bad_values', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1:8181/sector_identifier_uri_with_bad_values', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
 
         $response = new Response();
         $this->getClientRegistrationEndpoint()->register($request, $response);
@@ -132,7 +132,7 @@ class ClientRegistrationEndpointTest extends Base
 
     public function testSectorIdentifierUriContainsUriWithBadScheme()
     {
-        $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1/sector_identifier_uri_with_bad_scheme', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1:8181/sector_identifier_uri_with_bad_scheme', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
 
         $response = new Response();
         $this->getClientRegistrationEndpoint()->register($request, $response);
@@ -145,7 +145,7 @@ class ClientRegistrationEndpointTest extends Base
 
     public function testSectorIdentifierUriResponse()
     {
-        $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1/sector_identifier_uri', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1:8181/sector_identifier_uri', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
 
         $response = new Response();
         $this->getClientRegistrationEndpoint()->register($request, $response);
@@ -159,7 +159,7 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertTrue(array_key_exists('sector_identifier_uri', $client_config));
         $this->assertTrue(array_key_exists('token_endpoint_auth_method', $client_config));
         $this->assertEquals('none', $client_config['token_endpoint_auth_method']);
-        $this->assertEquals('https://127.0.0.1/sector_identifier_uri', $client_config['sector_identifier_uri']);
+        $this->assertEquals('https://127.0.0.1:8181/sector_identifier_uri', $client_config['sector_identifier_uri']);
     }
 
     public function testInvalidCharacterInTheScope()

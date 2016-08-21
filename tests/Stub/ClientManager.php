@@ -60,7 +60,7 @@ class ClientManager extends Base
         $jwt1->set('id_token_encrypted_response_enc', 'A256CBC-HS512');
         $jwt1->set('jwks', $keys);
         $jwt1->set('scope_policy', 'error');
-        $jwt1->set('request_uris', ['https://127.0.0.1/']);
+        $jwt1->set('request_uris', ['https://127.0.0.1:8181/']);
         $jwt1->set('token_lifetime', [
             'authcode'      => 20,
             'access_token'  => 0,
