@@ -70,7 +70,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * @return \OAuth2\UserAccount\UserAccountInterface|null
      */
-    abstract protected function getCurrentUser();
+    abstract protected function getCurrentUserAccount();
 
     /**
      * @return bool
@@ -109,7 +109,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             return;
         }
 
-        $user_account = $this->getCurrentUser();
+        $user_account = $this->getCurrentUserAccount();
         //If UserAccount is logged in
         if ($user_account instanceof UserAccountInterface) {
             //If prompt=login => login if not fully authenticated
@@ -267,7 +267,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         if (null !== $this->getPreConfiguredAuthorizationManager()) {
             return $this->getPreConfiguredAuthorizationManager()->findOnePreConfiguredAuthorization(
-                $authorization->getUserAccount()->getPublicId(),
+                $authorization->getUserAccount()->getUserPublicId(),
                 $authorization->getClient()->getPublicId(),
                 $authorization->getScopes()
             );

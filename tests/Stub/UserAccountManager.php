@@ -19,11 +19,11 @@ class UserAccountManager implements UserAccountManagerInterface
     /**
      * @var \OAuth2\UserAccount\UserAccountInterface[]
      */
-    private $users = [];
+    private $user_accounts = [];
 
     public function __construct()
     {
-        $user1 = new UserAccount('user1', 'password1');
+        $user1 = new UserAccount('user1', 'password1', 'real_user1_public_id');
         $user1->set('address', [
             'street_address' => '5 rue Sainte Anne',
             'region'         => 'Île de France',
@@ -55,10 +55,31 @@ class UserAccountManager implements UserAccountManagerInterface
         $user1->set('website#fr', 'https://john.doe.fr');
         $user1->set('picture#de', 'https://john.doe.de/picture');
 
-        $user2 = new UserAccount('user2', 'password2');
+        $user2 = new UserAccount('user2', 'password2', 'real_user2_public_id');
         $user2->set('last_login_at', time() - 1000);
-        $this->users['user1'] = $user1;
-        $this->users['user2'] = $user2;
+
+        // This account belongs to the real_user1_public_id.
+        // Claims are not identical
+
+        $user3 = new UserAccount('user3', 'password1', 'real_user1_public_id');
+        $user3->set('name', 'John Doe');
+        $user3->set('given_name', 'John');
+        $user3->set('family_name', 'Doe');
+        $user3->set('middle_name', 'Jack');
+        $user3->set('nickname', 'Little John');
+        $user3->set('profile', 'https://profile2.doe.fr/john/');
+        $user3->set('preferred_username', 'j-d');
+        $user3->set('gender', 'M');
+        $user3->set('updated_at', time() - 1000);
+        $user3->set('locale', 'en');
+        $user3->set('amr', ['otp', 'eye']);
+        $user3->set('email', 'root@test.org');
+        $user3->set('email_verified', false);
+        $user3->set('last_login_at', time() - 100);
+
+        $this->user_accounts['user1'] = $user1;
+        $this->user_accounts['user2'] = $user2;
+        $this->user_accounts['user3'] = $user3;
     }
 
     /**
@@ -86,7 +107,7 @@ class UserAccountManager implements UserAccountManagerInterface
      */
     public function getUserAccountByPublicId($public_id)
     {
-        return isset($this->users[$public_id]) ? $this->users[$public_id] : null;
+        return isset($this->user_accounts[$public_id]) ? $this->user_accounts[$public_id] : null;
     }
 
     /**
@@ -103,6 +124,6 @@ class UserAccountManager implements UserAccountManagerInterface
             $resource = mb_substr($resource, 5, -($length + 1), 'utf-8');
         }
 
-        return isset($this->users[$resource]) ? $this->users[$resource] : null;
+        return isset($this->user_accounts[$resource]) ? $this->user_accounts[$resource] : null;
     }
 }

@@ -28,7 +28,8 @@ class AuthCodeManager extends Base
         $valid_auth_code1->setIssueRefreshToken(true);
         $valid_auth_code1->setMetadata('redirect_uri', 'http://example.com/redirect_uri/');
         $valid_auth_code1->setClientPublicId('Mufasa');
-        $valid_auth_code1->setResourceOwnerPublicId('user1');
+        $valid_auth_code1->setResourceOwnerPublicId('real_user1_public_id');
+        $valid_auth_code1->setUserAccountPublicId('user1');
         $valid_auth_code1->setExpiresAt(time() + 3000);
         $valid_auth_code1->setScope([
                 'scope1',
@@ -40,7 +41,8 @@ class AuthCodeManager extends Base
         $valid_auth_code2->setIssueRefreshToken(true);
         $valid_auth_code2->setMetadata('redirect_uri', 'http://example.com/redirect_uri/');
         $valid_auth_code2->setClientPublicId('foo');
-        $valid_auth_code2->setResourceOwnerPublicId('user1');
+        $valid_auth_code2->setResourceOwnerPublicId('real_user1_public_id');
+        $valid_auth_code2->setUserAccountPublicId('user1');
         $valid_auth_code2->setExpiresAt(time() + 3000);
         $valid_auth_code2->setScope([
                 'scope1',
@@ -56,6 +58,7 @@ class AuthCodeManager extends Base
         $expired_auth_code->setIssueRefreshToken(true);
         $expired_auth_code->setMetadata('redirect_uri', 'http://example.com/redirect_uri/');
         $expired_auth_code->setClientPublicId('Mufasa');
+        $expired_auth_code->setResourceOwnerPublicId('real_user1_public_id');
         $expired_auth_code->setResourceOwnerPublicId('user1');
         $expired_auth_code->setExpiresAt(time() - 1);
         $expired_auth_code->setScope([

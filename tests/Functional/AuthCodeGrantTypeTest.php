@@ -168,7 +168,7 @@ class AuthCodeGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(false);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -185,7 +185,7 @@ class AuthCodeGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -202,7 +202,7 @@ class AuthCodeGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -221,7 +221,7 @@ class AuthCodeGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -242,7 +242,7 @@ class AuthCodeGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -263,7 +263,7 @@ class AuthCodeGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -289,7 +289,7 @@ class AuthCodeGrantTypeTest extends Base
             'code_challenge_method' => 'S256',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -331,7 +331,7 @@ class AuthCodeGrantTypeTest extends Base
             'code_challenge_method' => 'plain',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -372,7 +372,7 @@ class AuthCodeGrantTypeTest extends Base
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -412,7 +412,7 @@ class AuthCodeGrantTypeTest extends Base
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -451,7 +451,7 @@ class AuthCodeGrantTypeTest extends Base
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -492,7 +492,7 @@ class AuthCodeGrantTypeTest extends Base
             'code_challenge_method' => 'S512',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 

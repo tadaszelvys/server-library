@@ -14,6 +14,7 @@ namespace OAuth2\Token;
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 
 abstract class AccessTokenManager implements AccessTokenManagerInterface
 {
@@ -65,7 +66,12 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
         $access_token = $this->createEmptyAccessToken();
         $access_token->setExpiresAt(time() + $this->getLifetime($client));
         $access_token->setScope($scope);
-        $access_token->setResourceOwnerPublicId($resource_owner->getPublicId());
+        if ($resource_owner instanceof UserAccountInterface) {
+            $access_token->setResourceOwnerPublicId($resource_owner->getUserPublicId());
+            $access_token->setUserAccountPublicId($resource_owner->getPublicId());
+        } else {
+            $access_token->setResourceOwnerPublicId($resource_owner->getPublicId());
+        }
         $access_token->setClientPublicId($client->getPublicId());
         $access_token->setRefreshToken(null === $refresh_token ? null : $refresh_token->getToken());
         $access_token->setMetadatas($metadatas);

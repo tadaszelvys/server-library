@@ -82,7 +82,8 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Invalid username and password combination');
         }
 
-        $grant_type_response->setResourceOwnerPublicId($user_account->getPublicId());
+        $grant_type_response->setResourceOwnerPublicId($user_account->getUserPublicId());
+        $grant_type_response->setUserAccountPublicId($user_account->getPublicId());
         $grant_type_response->setRefreshTokenIssued($this->getIssueRefreshToken($client, $user_account));
         $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
     }

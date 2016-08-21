@@ -179,6 +179,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
         $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
         $grant_type_response->setAvailableScope($authCode->getScope());
         $grant_type_response->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
+        $grant_type_response->setUserAccountPublicId($authCode->getUserAccountPublicId());
         $grant_type_response->setRedirectUri($authCode->getMetadata('redirect_uri'));
 
         // Refresh Token

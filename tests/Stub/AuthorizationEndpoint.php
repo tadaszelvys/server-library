@@ -30,7 +30,7 @@ class AuthorizationEndpoint extends Base
     /**
      * @var null|string
      */
-    private $current_user = null;
+    private $current_user_account = null;
 
     /**
      * @var bool
@@ -65,17 +65,17 @@ class AuthorizationEndpoint extends Base
     /**
      * {@inheritdoc}
      */
-    protected function getCurrentUser()
+    protected function getCurrentUserAccount()
     {
-        return null === $this->current_user ? null : $this->getUserAccountManager()->getUserAccountByUsername($this->current_user);
+        return null === $this->current_user_account ? null : $this->getUserAccountManager()->getUserAccountByUsername($this->current_user_account);
     }
 
     /**
-     * @param string $current_user
+     * @param string $current_user_account
      */
-    public function setCurrentUser($current_user)
+    public function setCurrentUserAccount($current_user_account)
     {
-        $this->current_user = $current_user;
+        $this->current_user_account = $current_user_account;
     }
 
     /**

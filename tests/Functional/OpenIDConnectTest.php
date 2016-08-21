@@ -50,7 +50,7 @@ class OpenIDConnectTest extends Base
             'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['website' => ['essential' => false], 'picture' => ['essential' => false]]],
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789&session_state=[^"]+#$/', $response->getHeader('Location')[0]);
@@ -92,7 +92,6 @@ class OpenIDConnectTest extends Base
                 'id_token token',
                 'code id_token token',
                 'code token',
-
             ],
             $this->getResponseTypeManager()->getSupportedResponseTypes()
         );
@@ -124,7 +123,8 @@ class OpenIDConnectTest extends Base
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
         $this->assertEquals('Mufasa', $access_token->getClientPublicId());
-        $this->assertEquals('user1', $access_token->getResourceOwnerPublicId());
+        $this->assertEquals('real_user1_public_id', $access_token->getResourceOwnerPublicId());
+        $this->assertEquals('user1', $access_token->getUserAccountPublicId());
 
         $userinfo = $this->getUserInfoEndpoint()->handle($access_token);
         $userinfo = $loader->load($userinfo);
@@ -165,7 +165,7 @@ class OpenIDConnectTest extends Base
         );
     }
 
-    public function testEncryptedPairwise()
+    public function testEncryptedPairwiseForUser1Account()
     {
         $user = $this->getUserAccountManager()->getUserAccountByUsername('user1');
         $algorithm = new EncryptedSubjectIdentifier($this->getPairwiseKey(), 'aes-128-cbc', $this->getPairwiseAdditionalData(), $this->getPairwiseAdditionalData());
@@ -177,6 +177,19 @@ class OpenIDConnectTest extends Base
                 'example.com'
             )
         );
+    }
+
+    public function testEncryptedPairwiseUser2Account()
+    {
+        $user = $this->getUserAccountManager()->getUserAccountByUsername('user3');
+        $algorithm = new EncryptedSubjectIdentifier($this->getPairwiseKey(), 'aes-128-cbc', $this->getPairwiseAdditionalData(), $this->getPairwiseAdditionalData());
+
+        $sub = $algorithm->calculateSubjectIdentifier(
+            $user,
+            'example.com'
+        );
+        $this->assertEquals('uy1climA7Ruoi3HKyb5vrgwNG7y1KCwwnI1utBHqKSpPYklAc55-6klNbzaePHdy', $sub);
+        $this->assertNotEquals('uy1climA7Ruoi3HKyb5vrgygYnO2uL6Wp7xxT1FuYjGRr52Dqqv1Kk27M-gGrrAH', $sub);
     }
 
     public function testCodeTokenSuccessWithRefreshToken()
@@ -196,7 +209,7 @@ class OpenIDConnectTest extends Base
             'prompt'                => 'consent',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid\+offline_access&foo=bar&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
@@ -256,7 +269,7 @@ class OpenIDConnectTest extends Base
             'nonce'                 => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid&foo=bar&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
@@ -308,7 +321,7 @@ class OpenIDConnectTest extends Base
             'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
@@ -338,7 +351,7 @@ class OpenIDConnectTest extends Base
             'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
@@ -379,7 +392,7 @@ class OpenIDConnectTest extends Base
             'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid&foo=bar&id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
@@ -414,7 +427,7 @@ class OpenIDConnectTest extends Base
             'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=openid&foo=bar&id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
@@ -483,7 +496,7 @@ class OpenIDConnectTest extends Base
             'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]]],
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#code=[^"]+&id_token=[^"]+&state=ABCDEF&session_state=[^"]+$/', $response->getHeader('Location')[0]);
@@ -544,7 +557,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -612,7 +625,7 @@ class OpenIDConnectTest extends Base
             $access_token = $this->getListener()->handle($request);
             $this->getUserInfo()->getUserinfo(
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
-                $this->getUserAccountManager()->getUserAccountByPublicId($access_token->getResourceOwnerPublicId()),
+                $this->getUserAccountManager()->getUserAccountByPublicId($access_token->getUserAccountPublicId()),
                 $access_token->getMetadata('redirect_uri'),
                 null,
                 [],
@@ -635,7 +648,7 @@ class OpenIDConnectTest extends Base
             $access_token = $this->getListener()->handle($request);
             $this->getUserInfo()->getUserinfo(
                 $this->getClientManager()->getClient($access_token->getClientPublicId()),
-                $this->getUserAccountManager()->getUserAccountByPublicId($access_token->getResourceOwnerPublicId()),
+                $this->getUserAccountManager()->getUserAccountByPublicId($access_token->getUserAccountPublicId()),
                 $access_token->getMetadata('redirect_uri'),
                 null,
                 [],
@@ -720,7 +733,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(false);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -739,7 +752,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
@@ -762,7 +775,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(null);
         $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
@@ -783,7 +796,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(null);
         $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
@@ -803,7 +816,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(null);
         $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
@@ -824,7 +837,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
@@ -859,7 +872,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertEquals('http://example.com/test?good=false&error=interaction_required&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finteraction_required&state=0123456789#', $response->getHeader('Location')[0]);
@@ -877,7 +890,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -900,7 +913,7 @@ class OpenIDConnectTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUser('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertEquals('http://example.com/test?good=false&error=invalid_request&error_description=Invalid+parameter+%22prompt%22.+Prompt+value+%22none%22+must+be+used+alone.&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request&state=0123456789#', $response->getHeader('Location')[0]);

@@ -24,6 +24,11 @@ interface UserAccountInterface extends ResourceOwnerInterface
     public function getLastLoginAt();
 
     /**
+     * @return string
+     */
+    public function getUserPublicId();
+
+    /**
      * @param int|null $last_login_at
      */
     public function setLastLoginAt($last_login_at);

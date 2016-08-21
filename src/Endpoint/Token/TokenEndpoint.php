@@ -348,7 +348,10 @@ final class TokenEndpoint implements TokenEndpointInterface
     private function createAccessToken(ClientInterface $client, GrantTypeResponseInterface $grant_type_response, array $request_parameters, array $token_type_information, array $metadatas)
     {
         $refresh_token = null;
-        $resource_owner = $this->getResourceOwner($grant_type_response->getResourceOwnerPublicId());
+        $resource_owner = $this->getResourceOwner(
+            $grant_type_response->getResourceOwnerPublicId(),
+            $grant_type_response->getUserAccountPublicId()
+        );
         if (null !== $this->getRefreshTokenManager()) {
             if (true === $grant_type_response->isRefreshTokenIssued()) {
                 $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $resource_owner, $grant_type_response->getRefreshTokenScope(), $metadatas);
@@ -402,23 +405,24 @@ final class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param string $resource_owner_public_id
+     * @param string      $resource_owner_public_id
+     * @param string|null $user_account_public_id
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      *
      * @return null|\OAuth2\Client\ClientInterface|\OAuth2\UserAccount\UserAccountInterface
      */
-    private function getResourceOwner($resource_owner_public_id)
+    private function getResourceOwner($resource_owner_public_id, $user_account_public_id)
     {
-        $client = $this->getClientManager()->getClient($resource_owner_public_id);
-        if (null !== $client) {
-            return $client;
+        if (null !== $user_account_public_id) {
+            $resource_owner = $this->getUserAccountManager()->getUserAccountByPublicId($user_account_public_id);
+        } else {
+            $resource_owner = $this->getClientManager()->getClient($resource_owner_public_id);
         }
-        $user_account = $this->getUserAccountManager()->getUserAccountByPublicId($resource_owner_public_id);
-        if (null !== $user_account) {
-            return $user_account;
+        if (null === $resource_owner) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
         }
 
-        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
+        return $resource_owner;
     }
 }

@@ -66,7 +66,8 @@ abstract class AuthCodeManager implements AuthCodeManagerInterface
     {
         $auth_code = $this->createEmptyAuthorizationCode();
         $auth_code->setScope($scope);
-        $auth_code->setResourceOwnerPublicId($resource_owner->getPublicId());
+        $auth_code->setResourceOwnerPublicId($resource_owner->getUserPublicId());
+        $auth_code->setUserAccountPublicId($resource_owner->getPublicId());
         $auth_code->setClientPublicId($client->getPublicId());
         $auth_code->setExpiresAt(time() + $this->getLifetime($client));
         $auth_code->setToken($this->generateAuthorizationCode());

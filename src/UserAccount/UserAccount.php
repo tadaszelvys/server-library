@@ -16,7 +16,7 @@ use OAuth2\ResourceOwner\ResourceOwner;
 /**
  * This interface must be implemented by end-user classes.
  */
-class UserAccount extends ResourceOwner implements UserAccountInterface
+abstract class UserAccount extends ResourceOwner implements UserAccountInterface
 {
     use UserAccountTrait;
 }
