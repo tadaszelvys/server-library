@@ -687,10 +687,10 @@ class Base extends \PHPUnit_Framework_TestCase
                 ]])
             );
 
-            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethodManager(new None());
-            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethodManager(new ClientSecretBasic($this->realm));
-            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethodManager(new ClientSecretPost());
-            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethodManager($jwt_assertion);
+            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethod(new None());
+            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethod(new ClientSecretBasic($this->realm));
+            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethod(new ClientSecretPost());
+            $this->token_endpoint_auth_method_manager->addTokenEndpointAuthMethod($jwt_assertion);
         }
 
         return $this->token_endpoint_auth_method_manager;

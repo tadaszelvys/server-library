@@ -30,7 +30,7 @@ final class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodMan
     /**
      * {@inheritdoc}
      */
-    public function addTokenEndpointAuthMethodManager(TokenEndpointAuthMethodInterface $token_endpoint_auth_method)
+    public function addTokenEndpointAuthMethod(TokenEndpointAuthMethodInterface $token_endpoint_auth_method)
     {
         $this->token_endpoint_auth_methods[] = $token_endpoint_auth_method;
         foreach ($token_endpoint_auth_method->getSupportedAuthenticationMethods() as $method_name) {

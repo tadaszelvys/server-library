@@ -16,7 +16,7 @@ interface TokenEndpointAuthMethodManagerInterface
     /**
      * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface $token_endpoint_auth_method
      */
-    public function addTokenEndpointAuthMethodManager(TokenEndpointAuthMethodInterface $token_endpoint_auth_method);
+    public function addTokenEndpointAuthMethod(TokenEndpointAuthMethodInterface $token_endpoint_auth_method);
 
     /**
      * @return string[]
