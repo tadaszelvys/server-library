@@ -18,5 +18,4 @@ use OAuth2\ResourceOwner\ResourceOwner;
  */
 abstract class UserAccount extends ResourceOwner implements UserAccountInterface
 {
-    use UserAccountTrait;
 }

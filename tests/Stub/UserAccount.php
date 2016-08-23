@@ -11,6 +11,7 @@
 
 namespace OAuth2\Test\Stub;
 
+use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\UserAccount\IssueRefreshTokenExtensionInterface;
 use OAuth2\UserAccount\UserAccount as BaseUserAccount;
@@ -31,6 +32,11 @@ final class UserAccount extends BaseUserAccount implements IssueRefreshTokenExte
      * @var string
      */
     private $password;
+
+    /**
+     * @var int|null
+     */
+    protected $last_login_at = null;
 
     /**
      * UserAccount constructor.
@@ -78,5 +84,22 @@ final class UserAccount extends BaseUserAccount implements IssueRefreshTokenExte
     public function isRefreshTokenIssuanceAllowed(ClientInterface $client, $grant_type)
     {
         return !$client->isPublic();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLastLoginAt()
+    {
+        return $this->last_login_at;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLastLoginAt($last_login_at)
+    {
+        Assertion::nullOrInteger($last_login_at);
+        $this->last_login_at = $last_login_at;
     }
 }
