@@ -13,9 +13,6 @@ namespace OAuth2\UserAccount;
 
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 
-/**
- * This interface must be implemented by end-user classes.
- */
 interface UserAccountInterface extends ResourceOwnerInterface
 {
     /**
