@@ -325,7 +325,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
      */
     private function loadRequest(array $params, $request, ClientInterface &$client = null)
     {
-        $jwt = $this->getJWTLoader()->load($request, $this->key_encryption_key_set, false);
+        $jwt = $this->getJWTLoader()->load($request, $this->key_encryption_key_set, $this->require_encryption);
 
         try {
             Assertion::true($jwt->hasClaims(), 'The request object does not contain claims.');
