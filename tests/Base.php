@@ -309,7 +309,8 @@ class Base extends \PHPUnit_Framework_TestCase
                         'kty' => 'oct',
                         'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
                     ],
-                ]])
+                ]]),
+                false
             );
 
             $this->authorization_request_loader->allowUnsecuredConnections(); // We allow unsecured connections because we send request against the local server for all tests. Should not be used in production.

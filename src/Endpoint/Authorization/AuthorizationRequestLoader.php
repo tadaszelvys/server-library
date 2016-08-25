@@ -56,6 +56,11 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     private $require_request_uri_registration = true;
 
     /**
+     * @var bool
+     */
+    private $require_encryption = false;
+
+    /**
      * AuthorizationRequestLoader constructor.
      *
      * @param \OAuth2\Client\ClientManagerInterface       $client_manager
@@ -168,10 +173,13 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     /**
      * {@inheritdoc}
      */
-    public function enableEncryptedRequestObjectSupport(JWKSetInterface $key_encryption_key_set)
+    public function enableEncryptedRequestObjectSupport(JWKSetInterface $key_encryption_key_set, $require_encryption)
     {
+        Assertion::boolean($require_encryption);
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
+        Assertion::notEmpty($key_encryption_key_set, 'The key set must contain at least one key.');
 
+        $this->require_encryption = $require_encryption;
         $this->key_encryption_key_set = $key_encryption_key_set;
     }
 

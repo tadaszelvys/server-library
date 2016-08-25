@@ -64,8 +64,9 @@ interface AuthorizationRequestLoaderInterface
 
     /**
      * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
+     * @param bool                         $require_encryption)
      */
-    public function enableEncryptedRequestObjectSupport(JWKSetInterface $key_encryption_key_set);
+    public function enableEncryptedRequestObjectSupport(JWKSetInterface $key_encryption_key_set, $require_encryption);
 
     /**
      * @return bool
