@@ -78,10 +78,11 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     abstract protected function isCurrentUserFullyAuthenticated();
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Psr\Http\Message\ResponseInterface      $response
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     * @param \Psr\Http\Message\ServerRequestInterface              $request
+     * @param \Psr\Http\Message\ResponseInterface                   $response
      */
-    abstract protected function redirectToLoginPage(ServerRequestInterface $request, ResponseInterface &$response);
+    abstract protected function redirectToLoginPage(AuthorizationInterface $authorization, ServerRequestInterface $request, ResponseInterface &$response);
 
     /**
      * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
