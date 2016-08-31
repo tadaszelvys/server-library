@@ -113,9 +113,15 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         $user_account = $this->getCurrentUserAccount();
         //If UserAccount is logged in
         if ($user_account instanceof UserAccountInterface) {
-            //If prompt=login => login if not fully authenticated
+            // Whatever the prompt is, if the max_age constraint is not satisfied, the user is redirected to the login page
+            if ($authorization->hasQueryParam('max_age') && time() - $user_account->getLastLoginAt() > $authorization->getQueryParam('max_age')) {
+                $this->redirectToLoginPage($authorization, $request, $response);
+
+                return;
+            }
+            //If prompt=login => login required
             if ($authorization->hasPrompt('login') && !$this->isCurrentUserFullyAuthenticated()) {
-                $this->redirectToLoginPage($request, $response);
+                $this->redirectToLoginPage($authorization, $request, $response);
 
                 return;
             }
@@ -136,7 +142,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             //If prompt=login => login
             //If prompt=consent => login
             //If prompt=select_account => login
-            $this->redirectToLoginPage($request, $response);
+            $this->redirectToLoginPage($authorization, $request, $response);
 
             return;
         }
