@@ -19,12 +19,35 @@ class BearerToken implements TokenTypeInterface
     /**
      * @var bool
      */
+    private $token_from_authorization_header_allowed = true;
+
+    /**
+     * @var bool
+     */
     private $token_from_request_body_allowed = false;
 
     /**
      * @var bool
      */
     private $token_from_query_string_allowed = false;
+
+    /**
+     * @return bool
+     */
+    public function isTokenFromAuthorizationHeaderAllowed()
+    {
+        return $this->token_from_authorization_header_allowed;
+    }
+
+    public function allowTokenFromAuthorizationHeader()
+    {
+        $this->token_from_authorization_header_allowed = true;
+    }
+
+    public function disallowTokenFromAuthorizationHeader()
+    {
+        $this->token_from_authorization_header_allowed = false;
+    }
 
     /**
      * @return bool
@@ -94,19 +117,13 @@ class BearerToken implements TokenTypeInterface
     public function findToken(ServerRequestInterface $request, array &$additional_credential_values)
     {
         $methods = [
-            'getTokenFromAuthorizationHeaders',
+            'isTokenFromAuthorizationHeaderAllowed' => 'getTokenFromAuthorizationHeaders',
+            'isTokenFromQueryStringAllowed' => 'getTokenFromQuery',
+            'isTokenFromRequestBodyAllowed' => 'getTokenFromRequestBody',
         ];
 
-        if (true === $this->isTokenFromQueryStringAllowed()) {
-            $methods[] = 'getTokenFromQuery';
-        }
-
-        if (true === $this->isTokenFromRequestBodyAllowed()) {
-            $methods[] = 'getTokenFromRequestBody';
-        }
-
-        foreach ($methods as $method) {
-            if (null !== $token = $this->$method($request)) {
+        foreach ($methods as $test => $method) {
+            if (true === $this->$test() && null !== $token = $this->$method($request)) {
                 return $token;
             }
         }
