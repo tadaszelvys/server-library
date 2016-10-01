@@ -27,13 +27,38 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
      */
     public function __construct()
     {
-        $auth1 = $this->createPreConfiguredAuthorization();
-        $auth1->setClientPublicId('foo');
-        $auth1->setResourceOwnerPublicId('real_user1_public_id');
-        $auth1->setUserAccountPublicId('user1');
-        $auth1->setRequestedScopes(['openid', 'email', 'profile']);
-        $auth1->setValidatedScopes(['openid', 'email', 'profile']);
-        $this->savePreConfiguredAuthorization($auth1);
+        foreach ($this->getPreConfiguredAuthorizations() as $preConfiguredAuthorization) {
+            $auth = $this->createPreConfiguredAuthorization();
+            $auth->setClientPublicId($preConfiguredAuthorization['client_public_id']);
+            $auth->setResourceOwnerPublicId($preConfiguredAuthorization['resource_owner_public_id']);
+            $auth->setUserAccountPublicId($preConfiguredAuthorization['user_account_public_id']);
+            $auth->setRequestedScopes($preConfiguredAuthorization['requested_scopes']);
+            $auth->setValidatedScopes($preConfiguredAuthorization['validated_scopes']);
+            $this->savePreConfiguredAuthorization($auth);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getPreConfiguredAuthorizations()
+    {
+        return [
+            [
+                'client_public_id'         => 'foo',
+                'resource_owner_public_id' => 'real_user1_public_id',
+                'user_account_public_id'   => 'user1',
+                'requested_scopes'         => ['openid', 'email', 'profile'],
+                'validated_scopes'         => ['openid', 'email', 'profile'],
+            ],
+            [
+                'client_public_id'         => 'Mufasa',
+                'resource_owner_public_id' => 'real_user1_public_id',
+                'user_account_public_id'   => 'user1',
+                'requested_scopes'         => ['openid', 'email', 'profile'],
+                'validated_scopes'         => ['openid', 'email', 'profile'],
+            ],
+        ];
     }
 
     /**
@@ -42,7 +67,6 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     public function findOnePreConfiguredAuthorization($resource_owner_public_id, $client_public_id, array $requested_scope)
     {
         $hash = $this->calculateHash($resource_owner_public_id, $client_public_id, $requested_scope);
-
         if (array_key_exists($hash, $this->pre_configured_authorizations)) {
             return $this->pre_configured_authorizations[$hash];
         }

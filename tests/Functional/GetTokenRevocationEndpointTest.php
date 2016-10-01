@@ -119,7 +119,7 @@ class GetTokenRevocationEndpointTest extends Base
         $this->assertNull($this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
     }
 
-    public function testRefreshTokenRevokedForAuthenticatedConfidentialClient()
+    public function testRefreshTokenRevokedForAuthenticatedPublicClient()
     {
         $request = $this->createRequest('/?token=EXPIRED_REFRESH_TOKEN', 'GET', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
@@ -131,6 +131,20 @@ class GetTokenRevocationEndpointTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('', $response->getBody()->getContents());
         $this->assertNull($this->getRefreshTokenManager()->getRefreshToken('EXPIRED_REFRESH_TOKEN'));
+    }
+
+    public function testAuthCodeRevokedForAuthenticatedPublicClient()
+    {
+        $request = $this->createRequest('/?token=VALID_AUTH_CODE_TO_BE_REVOKED', 'GET', [], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        $this->assertInstanceOf(AccessTokenInterface::class, $this->getJWTAccessTokenManager()->getAccessToken('ABCD'));
+        $response = new Response();
+        $this->getRevocationTokenEndpoint()->revoke($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('', $response->getBody()->getContents());
+        $this->assertNull($this->getAuthCodeManager()->getAuthCode('VALID_AUTH_CODE_TO_BE_REVOKED'));
     }
 
     public function testAccessTokenRevokedForAuthenticatedConfidentialClientWithCallback()

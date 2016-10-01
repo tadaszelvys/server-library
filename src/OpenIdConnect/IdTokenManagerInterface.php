@@ -34,9 +34,23 @@ interface IdTokenManagerInterface
     public function createIdToken(ClientInterface $client, BaseUserAccountInterface $user_account_account, $redirect_uri, $claims_locales, array $request_claims, array $scope, array $id_token_claims = [], AccessTokenInterface $access_token = null, AuthCodeInterface $auth_code = null);
 
     /**
+     * @param string $id_token
+     *
+     * @return \Jose\Object\JWSInterface
+     */
+    public function loadIdToken($id_token);
+
+    /**
      * @param \OAuth2\OpenIdConnect\IdTokenInterface $token The ID token to revoke
      */
     public function revokeIdToken(IdTokenInterface $token);
+
+    /**
+     * @param string $subject_identifier
+     *
+     * @return string|null
+     */
+    public function getPublicIdFromSubjectIdentifier($subject_identifier);
 
     /**
      * @return string[]

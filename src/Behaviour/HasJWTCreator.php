@@ -11,17 +11,17 @@
 
 namespace OAuth2\Behaviour;
 
-use Jose\JWTCreator;
+use Jose\JWTCreatorInterface;
 
 trait HasJWTCreator
 {
     /**
-     * @var \Jose\JWTCreator
+     * @var \Jose\JWTCreatorInterface
      */
     private $jwt_creator;
 
     /**
-     * @return \Jose\JWTCreator
+     * @return \Jose\JWTCreatorInterface
      */
     private function getJWTCreator()
     {
@@ -29,9 +29,9 @@ trait HasJWTCreator
     }
 
     /**
-     * @param \Jose\JWTCreator $jwt_creator
+     * @param \Jose\JWTCreatorInterface $jwt_creator
      */
-    private function setJWTCreator(JWTCreator $jwt_creator)
+    private function setJWTCreator(JWTCreatorInterface $jwt_creator)
     {
         $this->jwt_creator = $jwt_creator;
     }

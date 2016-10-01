@@ -13,7 +13,7 @@ namespace OAuth2\TokenEndpointAuthMethod;
 
 use Assert\Assertion;
 use Jose\Factory\JWKFactory;
-use Jose\JWTLoader;
+use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSet;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasExceptionManager;
@@ -41,10 +41,10 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     /**
      * PasswordClientManager constructor.
      *
-     * @param \Jose\JWTLoader                             $jwt_loader
+     * @param \Jose\JWTLoaderInterface                    $jwt_loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
-    public function __construct(JWTLoader $jwt_loader, ExceptionManagerInterface $exception_manager)
+    public function __construct(JWTLoaderInterface $jwt_loader, ExceptionManagerInterface $exception_manager)
     {
         $this->setJWTLoader($jwt_loader);
         $this->setExceptionManager($exception_manager);
@@ -64,7 +64,7 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getSupportedSignatureAlgorithms()
     {
@@ -72,7 +72,7 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getSupportedContentEncryptionAlgorithms()
     {
@@ -80,7 +80,7 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getSupportedKeyEncryptionAlgorithms()
     {

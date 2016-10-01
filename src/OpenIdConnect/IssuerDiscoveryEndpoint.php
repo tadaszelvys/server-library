@@ -13,6 +13,7 @@ namespace OAuth2\OpenIdConnect;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasIssuer;
 use OAuth2\Behaviour\HasUserAccountManager;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
@@ -24,11 +25,7 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
 {
     use HasUserAccountManager;
     use HasExceptionManager;
-
-    /**
-     * @var string
-     */
-    private $issuer;
+    use HasIssuer;
 
     /**
      * @var string
@@ -52,7 +49,7 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
         Assertion::url($server, 'The server must be an URL.');
         $this->setUserAccountManager($user_account_manager);
         $this->setExceptionManager($exception_manager);
-        $this->issuer = $issuer;
+        $this->setIssuer($issuer);
         $this->computed_server = $this->getDomain($server);
     }
 
@@ -93,7 +90,7 @@ final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
             'links'   => [
                 [
                     'rel'  => 'http://openid.net/specs/connect/1.0/issuer',
-                    'href' => $this->issuer,
+                    'href' => $this->getIssuer(),
                 ],
             ],
         ]));

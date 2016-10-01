@@ -58,14 +58,6 @@ class BaseException extends \Exception implements BaseExceptionInterface
     /**
      * {@inheritdoc}
      */
-    public function getUri()
-    {
-        return array_key_exists('error_uri', $this->errorData) ? urldecode($this->errorData['error_uri']) : null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getHttpResponse(ResponseInterface &$response)
     {
         $response->getBody()->write($this->getResponseBody());

@@ -23,7 +23,7 @@ trait HasUserAccountManager
     /**
      * @return \OAuth2\UserAccount\UserAccountManagerInterface
      */
-    private function getUserAccountManager()
+    protected function getUserAccountManager()
     {
         return $this->user_account_manager;
     }

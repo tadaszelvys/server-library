@@ -11,7 +11,7 @@
 
 namespace OAuth2\Endpoint\Authorization;
 
-use Jose\JWTLoader;
+use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -56,9 +56,9 @@ interface AuthorizationRequestLoaderInterface
     public function getSupportedContentEncryptionAlgorithms();
 
     /**
-     * @param \Jose\JWTLoader $jwt_loader
+     * @param \Jose\JWTLoaderInterface $jwt_loader
      */
-    public function enableRequestObjectSupport(JWTLoader $jwt_loader);
+    public function enableRequestObjectSupport(JWTLoaderInterface $jwt_loader);
 
     public function enableRequestObjectReferenceSupport();
 

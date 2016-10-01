@@ -13,9 +13,12 @@ namespace OAuth2\OpenIdConnect;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
-use Jose\JWTCreator;
-use Jose\Object\JWKInterface;
+use Jose\JWTCreatorInterface;
+use Jose\JWTLoaderInterface;
+use Jose\Object\JWKSetInterface;
+use OAuth2\Behaviour\HasIssuer;
 use OAuth2\Behaviour\HasJWTCreator;
+use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
 use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
@@ -26,7 +29,9 @@ use OAuth2\UserAccount\UserAccountInterface;
 class IdTokenManager implements IdTokenManagerInterface
 {
     use HasJWTCreator;
+    use HasJWTLoader;
     use HasUserinfo;
+    use HasIssuer;
 
     /**
      * @var int
@@ -36,41 +41,66 @@ class IdTokenManager implements IdTokenManagerInterface
     /**
      * @var string
      */
-    private $issuer;
-
-    /**
-     * @var string
-     */
     private $signature_algorithm;
 
     /**
-     * @var \Jose\Object\JWKInterface
+     * @var \Jose\Object\JWKSetInterface|null
      */
-    private $signature_key;
+    private $signature_key_set = null;
+
+    /**
+     * @var \Jose\Object\JWKSetInterface|null
+     */
+    private $encryption_key_set = null;
+
+    /**
+     * @var bool
+     */
+    private $encryption_required = false;
 
     /**
      * IdTokenManager constructor.
      *
-     * @param \Jose\JWTCreator                                 $jwt_creator
+     * @param \Jose\JWTCreatorInterface                        $jwt_creator
+     * @param \Jose\JWTLoaderInterface                         $jwt_loader
      * @param string                                           $issuer
      * @param string                                           $signature_algorithm
-     * @param \Jose\Object\JWKInterface                        $signature_key
+     * @param \Jose\Object\JWKSetInterface                     $signature_key_set
+     * @param \Jose\Object\JWKSetInterface                     $encryption_key_set
      * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface $userinfo
      */
-    public function __construct(JWTCreator $jwt_creator,
+    public function __construct(JWTCreatorInterface $jwt_creator,
+                                JWTLoaderInterface $jwt_loader,
                                 $issuer,
                                 $signature_algorithm,
-                                JWKInterface $signature_key,
+                                JWKSetInterface $signature_key_set,
+                                JWKSetInterface $encryption_key_set,
                                 UserInfoInterface $userinfo
     ) {
         Assertion::string($signature_algorithm);
-        Assertion::string($issuer);
-        $this->issuer = $issuer;
+        Assertion::greaterThan($signature_key_set->countKeys(), 0, 'The signature key set must have at least one key.');
+        Assertion::greaterThan($encryption_key_set->countKeys(), 0, 'The encryption key set must have at least one key.');
+        $this->setIssuer($issuer);
         $this->signature_algorithm = $signature_algorithm;
-        $this->signature_key = $signature_key;
-        $this->userinfo = $userinfo;
+        $this->signature_key_set = $signature_key_set;
+        $this->encryption_key_set = $encryption_key_set;
+        $this->setUserinfo($userinfo);
 
         $this->setJWTCreator($jwt_creator);
+        $this->setJWTLoader($jwt_loader);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublicIdFromSubjectIdentifier($subject_identifier)
+    {
+        $algorithm = $this->getUserinfo()->getPairwiseSubjectIdentifierAlgorithm();
+        if (null === $algorithm) {
+            return $subject_identifier;
+        }
+
+        return $algorithm->getPublicIdFromSubjectIdentifier($subject_identifier);
     }
 
     /**
@@ -105,7 +135,7 @@ class IdTokenManager implements IdTokenManagerInterface
         $id_token = $this->createEmptyIdToken();
         $exp = null !== $access_token ? $access_token->getExpiresAt() : time() + $this->getLifetime($client);
         $claims = array_merge(
-            $this->userinfo->getUserinfo(
+            $this->getUserinfo()->getUserinfo(
                 $client,
                 $user_account,
                 $redirect_uri,
@@ -115,8 +145,8 @@ class IdTokenManager implements IdTokenManagerInterface
             ),
             [
                 'jti'       => Base64Url::encode(random_bytes(25)),
-                'iss'       => $this->issuer,
-                'aud'       => $client->getPublicId(),
+                'iss'       => $this->getIssuer(),
+                'aud'       => [$client->getPublicId(), $this->getIssuer()],
                 'iat'       => time(),
                 'nbf'       => time(),
                 'exp'       => $exp,
@@ -139,15 +169,16 @@ class IdTokenManager implements IdTokenManagerInterface
             'typ'       => 'JWT',
             'alg'       => $this->getSignatureAlgorithm(),
         ];
-        if ($this->signature_key->has('kid')) {
-            $headers['kid'] = $this->signature_key->get('kid');
+        $signature_key = $this->signature_key_set->getKey(0);
+        if ($signature_key->has('kid')) {
+            $headers['kid'] = $signature_key->get('kid');
         }
 
         if (!empty($id_token_claims)) {
             $claims = array_merge($claims, $id_token_claims);
         }
 
-        $jwt = $this->jwt_creator->sign($claims, $headers, $this->signature_key);
+        $jwt = $this->jwt_creator->sign($claims, $headers, $signature_key);
 
         if ($client->hasPublicKeySet() && $client->has('id_token_encrypted_response_alg') && $client->has('id_token_encrypted_response_enc')) {
             $key_set = $client->getPublicKeySet();
@@ -174,6 +205,26 @@ class IdTokenManager implements IdTokenManagerInterface
         $id_token->setResourceOwnerPublicId($user_account->getUserPublicId());
 
         return $id_token;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadIdToken($id_token)
+    {
+        try {
+            $jwt = $this->getJWTLoader()->load(
+                $id_token,
+                $this->encryption_key_set,
+                $this->encryption_required
+            );
+
+            $this->jwt_loader->verify($jwt, $this->signature_key_set);
+        } catch (\Exception $e) {
+            return;
+        }
+
+        return $jwt;
     }
 
     /**
@@ -253,10 +304,9 @@ class IdTokenManager implements IdTokenManagerInterface
             'PS512' => 32,
         ];
 
-        if (array_key_exists($this->signature_algorithm, $map)) {
-            return $map[$this->signature_algorithm];
-        }
-        throw new \InvalidArgumentException(sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
+        Assertion::keyExists($map, $this->signature_algorithm, sprintf('Algorithm "%s" is not supported', $this->signature_algorithm));
+
+        return $map[$this->signature_algorithm];
     }
 
     /**

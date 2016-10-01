@@ -21,31 +21,6 @@ class Metadata implements \JsonSerializable
     private $values = [];
 
     /**
-     * @param string $name
-     * @param $arguments
-     *
-     * @return mixed
-     */
-    public function __call($name, array $arguments)
-    {
-        if (method_exists($this, $name)) {
-            return call_user_func([$this, $name], $arguments);
-        }
-
-        $method = mb_substr($name, 0, 3, '8bit');
-        if (in_array($method, ['get', 'set'])) {
-            $key = $this->decamelize(mb_substr($name, 3, null, '8bit'));
-            $arguments = array_merge(
-                [$key],
-                $arguments
-            );
-
-            return call_user_func_array([$this, $method], $arguments);
-        }
-        throw new \BadMethodCallException(sprintf('Method "%s" does not exists.', $name));
-    }
-
-    /**
      * @param string $key
      *
      * @return bool
@@ -87,22 +62,6 @@ class Metadata implements \JsonSerializable
         if (true === $this->has($key)) {
             unset($this->values[$key]);
         }
-    }
-
-    /**
-     * @param string $word
-     *
-     * @return string
-     */
-    private function decamelize($word)
-    {
-        return preg_replace_callback(
-            '/(^|[a-z])([A-Z])/',
-            function ($m) {
-                return mb_strtolower(mb_strlen($m[1], '8bit') ? sprintf('%s_%s', $m[1], $m[2]) : $m[2], '8bit');
-            },
-            $word
-        );
     }
 
     /**

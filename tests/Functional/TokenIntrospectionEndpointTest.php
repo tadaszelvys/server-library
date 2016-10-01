@@ -82,6 +82,18 @@ class TokenIntrospectionEndpointTest extends Base
         $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[0-9]+,"sub":"foo"}', $response->getBody()->getContents());
     }
 
+    public function testAuthCodeIntrospectionAllowedForAuthenticatedPublicClient()
+    {
+        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_AUTH_CODE_TO_BE_REVOKED'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+
+        $response = new Response();
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertRegExp('/{"active"\:true,"client_id"\:"foo","exp"\:[0-9]+,"scp"\:\["scope1","scope2"\]}/', $response->getBody()->getContents());
+    }
+
     public function testAccessTokenIntrospectionRefusedForUnauthenticatedPublicClient()
     {
         $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'bam']);

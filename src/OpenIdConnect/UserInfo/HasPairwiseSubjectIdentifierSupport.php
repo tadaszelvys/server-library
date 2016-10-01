@@ -64,6 +64,14 @@ trait HasPairwiseSubjectIdentifierSupport
     /**
      * {@inheritdoc}
      */
+    public function getPairwiseSubjectIdentifierAlgorithm()
+    {
+        return $this->pairwise_algorithm;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isPairwiseSubjectDefault()
     {
         return $this->is_pairwise_subject_default;

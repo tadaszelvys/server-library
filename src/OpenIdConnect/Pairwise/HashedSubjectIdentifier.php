@@ -64,4 +64,11 @@ class HashedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInter
 
         return Base64Url::encode(hash_hmac($this->algorithm, $prepared, $this->pairwise_hash_key, true));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublicIdFromSubjectIdentifier($subject_identifier)
+    {
+    }
 }

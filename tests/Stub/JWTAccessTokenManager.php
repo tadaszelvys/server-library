@@ -11,9 +11,9 @@
 
 namespace OAuth2\Test\Stub;
 
-use Jose\JWTCreator;
-use Jose\JWTLoader;
-use Jose\Object\JWKInterface;
+use Jose\JWTCreatorInterface;
+use Jose\JWTLoaderInterface;
+use Jose\Object\JWKSetInterface;
 use OAuth2\Token\AccessToken;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\JWTAccessTokenManager as Base;
@@ -28,32 +28,32 @@ class JWTAccessTokenManager extends Base
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \Jose\JWTCreator          $jwt_creator
-     * @param \Jose\JWTLoader           $jwt_loader
-     * @param string                    $signature_algorithm
-     * @param \Jose\Object\JWKInterface $signature_key
-     * @param string                    $issuer
-     * @param string                    $key_encryption_algorithm
-     * @param string                    $content_encryption_algorithm
-     * @param \Jose\Object\JWKInterface $key_encryption_key
+     * @param \Jose\JWTCreatorInterface    $jwt_creator
+     * @param \Jose\JWTLoaderInterface     $jwt_loader
+     * @param string                       $signature_algorithm
+     * @param \Jose\Object\JWKSetInterface $signature_key_set
+     * @param string                       $issuer
+     * @param string                       $key_encryption_algorithm
+     * @param string                       $content_encryption_algorithm
+     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
      */
-    public function __construct(JWTCreator $jwt_creator,
-                                JWTLoader $jwt_loader,
+    public function __construct(JWTCreatorInterface $jwt_creator,
+                                JWTLoaderInterface $jwt_loader,
                                 $signature_algorithm,
-                                JWKInterface $signature_key,
+                                JWKSetInterface $signature_key_set,
                                 $key_encryption_algorithm,
                                 $content_encryption_algorithm,
-                                JWKInterface $key_encryption_key,
+                                JWKSetInterface $key_encryption_key_set,
                                 $issuer
     ) {
         parent::__construct(
             $jwt_creator,
             $jwt_loader,
             $signature_algorithm,
-            $signature_key,
+            $signature_key_set,
             $key_encryption_algorithm,
             $content_encryption_algorithm,
-            $key_encryption_key,
+            $key_encryption_key_set,
             $issuer
         );
 

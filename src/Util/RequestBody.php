@@ -39,16 +39,4 @@ final class RequestBody
 
         return array_key_exists($parameter, $parameters) ? $parameters[$parameter] : null;
     }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return array|null
-     */
-    public static function getJsonObject(ServerRequestInterface $request)
-    {
-        $content = json_decode($request->getBody()->getContents());
-
-        return is_array($content) ? $content : null;
-    }
 }

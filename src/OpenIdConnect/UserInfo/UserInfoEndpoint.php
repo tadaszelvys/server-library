@@ -13,10 +13,11 @@ namespace OAuth2\OpenIdConnect\UserInfo;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
-use Jose\JWTCreator;
-use Jose\Object\JWKInterface;
+use Jose\JWTCreatorInterface;
+use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasIssuer;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasUserAccountManager;
 use OAuth2\Client\ClientInterface;
@@ -32,21 +33,17 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     use HasClientManager;
     use HasUserinfo;
     use HasJWTCreator;
-
-    /**
-     * @var string|null
-     */
-    private $issuer = null;
-
-    /**
-     * @var \Jose\Object\JWKInterface|null
-     */
-    private $signature_key = null;
+    use HasIssuer;
 
     /**
      * @var string|null
      */
     private $signature_algorithm = null;
+
+    /**
+     * @var \Jose\Object\JWKSetInterface|null
+     */
+    private $signature_key_set = null;
 
     /**
      * UserInfoEndpoint constructor.
@@ -68,22 +65,23 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     }
 
     /**
-     * @param \Jose\JWTCreator          $jwt_creator
-     * @param string                    $issuer
-     * @param string                    $signature_algorithm
-     * @param \Jose\Object\JWKInterface $signature_key
+     * @param \Jose\JWTCreatorInterface    $jwt_creator
+     * @param string                       $issuer
+     * @param string                       $signature_algorithm
+     * @param \Jose\Object\JWKSetInterface $signature_key_set
      */
-    public function enableSignedResponsesSupport(JWTCreator $jwt_creator,
+    public function enableSignedResponsesSupport(JWTCreatorInterface $jwt_creator,
                                                  $issuer,
                                                  $signature_algorithm,
-                                                 JWKInterface $signature_key
+                                                 JWKSetInterface $signature_key_set
     ) {
         Assertion::string($issuer);
         Assertion::inArray($signature_algorithm, $jwt_creator->getSupportedSignatureAlgorithms());
+        Assertion::greaterThan($signature_key_set->countKeys(), 0, 'The signature key set must have at least one key.');
         $this->setJWTCreator($jwt_creator);
 
-        $this->issuer = $issuer;
-        $this->signature_key = $signature_key;
+        $this->setIssuer($issuer);
+        $this->signature_key_set = $signature_key_set;
         $this->signature_algorithm = $signature_algorithm;
     }
 
@@ -151,8 +149,8 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
                 $claims,
                 [
                     'jti'       => Base64Url::encode(random_bytes(25)),
-                    'iss'       => $this->issuer,
-                    'aud'       => $client->getPublicId(),
+                    'iss'       => $this->getIssuer(),
+                    'aud'       => [$this->getIssuer(), $client->getPublicId()],
                     'iat'       => time(),
                     'nbf'       => time(),
                     'exp'       => $access_token->getExpiresAt(),
@@ -232,13 +230,14 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      */
     private function signAndEncrypt($claims, ClientInterface $client)
     {
+        $signature_key = $this->signature_key_set->getKey(0);
         $jwt = $this->getJWTCreator()->sign(
             $claims,
             [
                 'typ' => 'JWT',
                 'alg' => $this->signature_algorithm,
             ],
-            $this->signature_key
+            $signature_key
         );
 
         if ($client->hasPublicKeySet() && $client->has('id_token_encrypted_response_alg') && $client->has('id_token_encrypted_response_enc')) {
