@@ -25,6 +25,8 @@ use OAuth2\OpenIdConnect\Pairwise\HashedSubjectIdentifier;
 use OAuth2\Test\Base;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\RefreshTokenInterface;
+use PHPHtmlParser\Dom;
+use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
@@ -102,7 +104,7 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->hasClaim('email_verified'));
         $this->assertTrue($id_token->hasClaim('iss'));
         $this->assertTrue($id_token->hasClaim('sub'));
-        $this->assertEquals('iu6KK2l_kPf4_mOdpWE668f9bc6fk-2auRRZi4lWhi_zpypYTW45N6SpsahXSqbzQNjcbd30f8srPLf7XEdCKA', $id_token->getClaim('sub'));
+        $this->assertEquals('uy1climA7Ruoi3HKyb5vrgygYnO2uL6Wp7xxT1FuYjGRr52Dqqv1Kk27M-gGrrAH', $id_token->getClaim('sub'));
         $this->assertTrue($id_token->hasClaim('aud'));
         $this->assertTrue($id_token->hasClaim('exp'));
         $this->assertTrue($id_token->hasClaim('iat'));
@@ -116,10 +118,10 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->hasClaim('c_hash'));
 
         $this->assertEquals($this->getIssuer(), $id_token->getClaim('iss'));
-        $this->assertEquals('Mufasa', $id_token->getClaim('aud'));
+        $this->assertEquals(['Mufasa', 'https://server.example.com'], $id_token->getClaim('aud'));
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
 
-        $this->assertEquals('iu6KK2l_kPf4_mOdpWE668f9bc6fk-2auRRZi4lWhi_zpypYTW45N6SpsahXSqbzQNjcbd30f8srPLf7XEdCKA', $id_token->getClaim('sub'));
+        $this->assertEquals('uy1climA7Ruoi3HKyb5vrgygYnO2uL6Wp7xxT1FuYjGRr52Dqqv1Kk27M-gGrrAH', $id_token->getClaim('sub'));
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
         $this->assertEquals('Mufasa', $access_token->getClientPublicId());
@@ -136,7 +138,75 @@ class OpenIDConnectTest extends Base
         $this->assertEquals($userinfo->getClaim('sub'), $id_token->getClaim('sub'));
         $this->assertEquals($userinfo->getClaim('exp'), $id_token->getClaim('exp'));
         $this->assertEquals($userinfo->getClaim('iss'), $id_token->getClaim('iss'));
-        $this->assertEquals($userinfo->getClaim('aud'), $id_token->getClaim('aud'));
+    }
+
+    public function testIdTokenHintProcessSuccessWithLoggedOutUser()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'id_token_hint' => $this->getValidIdToken(),
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => 'Mufasa',
+            'response_type' => 'id_token',
+            'prompt'        => 'none',
+            'scope'         => 'openid email profile',
+            'state'         => '0123456789',
+            'nonce'         => '0123456789',
+        ]);
+
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount(null);
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+        $response->getBody()->rewind();
+        $this->assertTrue($response->hasHeader('Location'));
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#id_token=[^"]+&state=[^"]+&session_state=[^"]+$/', $response->getHeader('Location')[0]);
+    }
+
+    public function getValidIdToken()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'          => 'http://example.com/test?good=false',
+            'client_id'             => 'Mufasa',
+            'response_type'         => 'code',
+            'scope'                 => 'openid email profile',
+            'nonce'                 => 'foo/bar',
+            'state'                 => '0123456789',
+            'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            'code_challenge_method' => 'plain',
+            'claims_locales'        => ['fr_fr', 'fr', 'de', 'en'],
+            'claims'                => ['id_token' => ['email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['website' => ['essential' => false], 'picture' => ['essential' => false]]],
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false&code=[^"]+&state=0123456789&session_state=[^"]+#$/', $response->getHeader('Location')[0]);
+
+        $uri = new Uri($response->getHeader('Location')[0]);
+        parse_str($uri->getQuery(), $result);
+        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
+
+        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
+        $this->assertEquals('Mufasa', $authcode->getClientPublicId());
+
+        $response = new Response();
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+
+        $this->getTokenEndpoint()->getAccessToken($request, $response);
+        $response->getBody()->rewind();
+
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+        $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
+        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"[^"]+","foo":"bar","id_token":"[^"]+"}', $response->getBody()->getContents());
+
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        return $json['id_token'];
     }
 
     public function testClaimSource()
@@ -145,7 +215,7 @@ class OpenIDConnectTest extends Base
         $user = $this->getUserAccountManager()->getUserAccountByUsername('user2');
         $result = $this->getUserInfo()->getUserinfo($client, $user, 'https://foo.bar/', null, [], ['openid', 'email']);
 
-        $this->assertEquals('OkKmIBUobGzXso3FyJo3yY0XzMPRS0AD-DjTXjIGLaq6VPuJtfyYQX2JiSXmtisuGuON05BhHQj2jQ17I09lRQ', $result['sub']);
+        $this->assertEquals('eyjXNBVVsj-bjZm-qRZOSSy1m_HwKn4lT7cw1TpNfic', $result['sub']);
         $this->assertArrayHasKey('_claim_names', $result);
         $this->assertArrayHasKey('email', $result['_claim_names']);
         $this->assertArrayHasKey('_claim_sources', $result);
@@ -163,6 +233,8 @@ class OpenIDConnectTest extends Base
                 'example.com'
             )
         );
+
+        $this->assertNull($algorithm->getPublicIdFromSubjectIdentifier('iu6KK2l_kPf4_mOdpWE668f9bc6fk-2auRRZi4lWhi_zpypYTW45N6SpsahXSqbzQNjcbd30f8srPLf7XEdCKA'));
     }
 
     public function testEncryptedPairwiseForUser1Account()
@@ -177,6 +249,7 @@ class OpenIDConnectTest extends Base
                 'example.com'
             )
         );
+        $this->assertEquals($user->getPublicId(), $algorithm->getPublicIdFromSubjectIdentifier('uy1climA7Ruoi3HKyb5vrgygYnO2uL6Wp7xxT1FuYjGRr52Dqqv1Kk27M-gGrrAH'));
     }
 
     public function testEncryptedPairwiseUser2Account()
@@ -189,7 +262,7 @@ class OpenIDConnectTest extends Base
             'example.com'
         );
         $this->assertEquals('uy1climA7Ruoi3HKyb5vrgwNG7y1KCwwnI1utBHqKSpPYklAc55-6klNbzaePHdy', $sub);
-        $this->assertNotEquals('uy1climA7Ruoi3HKyb5vrgygYnO2uL6Wp7xxT1FuYjGRr52Dqqv1Kk27M-gGrrAH', $sub);
+        $this->assertEquals($user->getPublicId(), $algorithm->getPublicIdFromSubjectIdentifier('uy1climA7Ruoi3HKyb5vrgwNG7y1KCwwnI1utBHqKSpPYklAc55-6klNbzaePHdy'));
     }
 
     public function testCodeTokenSuccessWithRefreshToken()
@@ -245,7 +318,7 @@ class OpenIDConnectTest extends Base
         $introspection_response->getBody()->rewind();
 
         $this->assertEquals(200, $introspection_response->getStatusCode());
-        $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\,"offline_access"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
+        $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\,"offline_access"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":\["[^"]+"\],"iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
     }
@@ -303,7 +376,7 @@ class OpenIDConnectTest extends Base
         $introspection_response->getBody()->rewind();
 
         $this->assertEquals(200, $introspection_response->getStatusCode());
-        $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":"[^"]+","iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
+        $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":\["[^"]+"\],"iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
     }
@@ -757,11 +830,99 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->setUserFullyAuthenticated(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertEquals('http://example.com/test?good=false&state=0123456789#', $response->getHeader('Location')[0]);
+        $this->assertResponseHasLocationWithQueryParameterAndValue($response, 'good', 'false');
+        $this->assertResponseHasLocationWithQueryParameterAndValue($response, 'state', '0123456789');
         $this->assertEquals(1, count($this->getNoneListener()->getAccessTokens()));
 
         $access_tokens = $this->getNoneListener()->getAccessTokens();
         $this->assertInstanceOf(AccessTokenInterface::class, $access_tokens[0]);
+    }
+
+    /**
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param string                              $param
+     */
+    protected function assertResponseHasLocationWithQueryParameter(ResponseInterface $response, $param)
+    {
+        $this->assertTrue($response->hasHeader('Location'));
+        $locations = $response->getHeader('Location');
+        $this->assertEquals(1, count($locations));
+        $url = parse_url($locations[0]);
+        $this->assertArrayHasKey('query', $url);
+
+        parse_str($url['query'], $query);
+        $this->assertArrayHasParameter($query, $param);
+    }
+
+    /**
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param string                              $param
+     */
+    protected function assertResponseHasLocationWithFragmentParameter(ResponseInterface $response, $param)
+    {
+        $this->assertTrue($response->hasHeader('Location'));
+        $locations = $response->getHeader('Location');
+        $this->assertEquals(1, count($locations));
+        $url = parse_url($locations[0]);
+        $this->assertArrayHasKey('fragment', $url);
+
+        parse_str($url['fragment'], $query);
+        $this->assertArrayHasParameter($query, $param);
+    }
+
+    /**
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param string                              $param
+     * @param string                              $value
+     */
+    protected function assertResponseHasLocationWithQueryParameterAndValue(ResponseInterface $response, $param, $value)
+    {
+        $this->assertResponseHasLocationWithQueryParameter($response, $param);
+        $locations = $response->getHeader('Location');
+        $this->assertEquals(1, count($locations));
+        $url = parse_url($locations[0]);
+        $this->assertArrayHasKey('query', $url);
+
+        parse_str($url['query'], $query);
+        $this->assertArrayHasParameterWithValue($query, $param, $value);
+    }
+
+    /**
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param string                              $param
+     * @param string                              $value
+     */
+    protected function assertResponseHasLocationWithFragmentParameterAndValue(ResponseInterface $response, $param, $value)
+    {
+        $this->assertResponseHasLocationWithFragmentParameter($response, $param);
+        $locations = $response->getHeader('Location');
+        $this->assertEquals(1, count($locations));
+        $url = parse_url($locations[0]);
+        $this->assertArrayHasKey('fragment', $url);
+
+        parse_str($url['fragment'], $query);
+        $this->assertArrayHasParameterWithValue($query, $param, $value);
+    }
+
+    /**
+     * @param array  $params
+     * @param string $param
+     */
+    protected function assertArrayHasParameter(array $params, $param)
+    {
+        $this->assertNotEmpty($params);
+        $this->assertArrayHasKey($param, $params);
+    }
+
+    /**
+     * @param array  $params
+     * @param string $param
+     * @param string $value
+     */
+    protected function assertArrayHasParameterWithValue(array $params, $param, $value)
+    {
+        $this->assertArrayHasParameter($params, $param);
+        $this->assertEquals($value, $params[$param]);
     }
 
     public function testPromptLoginWithFullyAuthenticatedUserButConsentNotGiven()
@@ -917,5 +1078,18 @@ class OpenIDConnectTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertEquals('http://example.com/test?good=false&error=invalid_request&error_description=Invalid+parameter+%22prompt%22.+Prompt+value+%22none%22+must+be+used+alone.&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_request&state=0123456789#', $response->getHeader('Location')[0]);
+    }
+
+    public function testSessionManagementIFrameIsAvailable()
+    {
+        $request = new ServerRequest();
+        $response = new Response();
+        $this->getIFrameEndpointInterface()->handle($request, $response);
+
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $dom = new Dom();
+        $dom->load($content);
     }
 }

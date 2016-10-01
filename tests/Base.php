@@ -17,7 +17,6 @@ use Jose\Encrypter;
 use Jose\Factory\CheckerManagerFactory;
 use Jose\JWTCreator;
 use Jose\JWTLoader;
-use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use Jose\Signer;
 use Jose\Verifier;
@@ -68,7 +67,8 @@ use OAuth2\OpenIdConnect\IssuerDiscoveryEndpoint;
 use OAuth2\OpenIdConnect\Metadata;
 use OAuth2\OpenIdConnect\NoneResponseType;
 use OAuth2\OpenIdConnect\OpenIdConnectTokenEndpointExtension;
-use OAuth2\OpenIdConnect\Pairwise\HashedSubjectIdentifier;
+use OAuth2\OpenIdConnect\Pairwise\EncryptedSubjectIdentifier;
+use OAuth2\OpenIdConnect\SessionManagement\IFrameEndpoint;
 use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\AddressScopeSupport;
 use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\EmailScopeSupport;
 use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\PhoneScopeSupport;
@@ -109,10 +109,6 @@ use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
-
-if (!isset($_SESSION)) {
-    $_SESSION = [];
-}
 
 class Base extends \PHPUnit_Framework_TestCase
 {
@@ -360,7 +356,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager()
             );
 
-            $this->userinfo->enablePairwiseSubject(new HashedSubjectIdentifier($this->getPairwiseKey(), 'sha512', $this->getPairwiseAdditionalData()));
+            $this->userinfo->enablePairwiseSubject(new EncryptedSubjectIdentifier($this->getPairwiseKey(), 'aes-128-cbc', $this->getPairwiseAdditionalData(), $this->getPairwiseAdditionalData()));
             $this->userinfo->setPairwiseSubjectByDefault();
         }
 
@@ -433,12 +429,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getJWTCreator(),
                 $this->getIssuer(),
                 'HS512',
-                new JWK([
-                    'kid' => 'JWK2',
-                    'use' => 'sig',
-                    'kty' => 'oct',
-                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ])
+                $this->getSignatureKeySet()
             );
         }
 
@@ -600,7 +591,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getAuthorizationFactory(),
                 $this->getScopeManager(),
                 $this->getExceptionManager(),
-                $this->getPreConfiguredAuthorizationManager()
+                $this->getPreConfiguredAuthorizationManager(),
+                $this->getIdTokenManager()
             );
 
             $this->authorization_endpoint->addExtension(new SessionStateParameterExtension('oauth2_session_state'));
@@ -982,20 +974,10 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getJWTCreator(),
                 $this->getJWTLoader(),
                 'HS512',
-                new JWK([
-                    'kid' => 'JWK2',
-                    'use' => 'sig',
-                    'kty' => 'oct',
-                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ]),
+                $this->getSignatureKeySet(),
                 'A256KW',
                 'A256CBC-HS512',
-                new JWK([
-                    'kid' => 'JWK1',
-                    'use' => 'enc',
-                    'kty' => 'oct',
-                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-                ]),
+                $this->getEncryptionKeySet(),
                 $this->getIssuer()
             );
 
@@ -1126,14 +1108,11 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->id_token_manager) {
             $this->id_token_manager = new IdTokenManager(
                 $this->getJWTCreator(),
+                $this->getJWTLoader(),
                 $this->getIssuer(),
                 'HS512',
-                new JWK([
-                    'kid' => 'JWK2',
-                    'use' => 'sig',
-                    'kty' => 'oct',
-                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-                ]),
+                $this->getSignatureKeySet(),
+                $this->getEncryptionKeySet(),
                 $this->getUserInfo()
             );
         }
@@ -1300,6 +1279,23 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @var null|\OAuth2\OpenIdConnect\Metadata
      */
+    private $i_frame_endpoint = null;
+
+    /**
+     * @return \OAuth2\OpenIdConnect\SessionManagement\IFrameEndpointInterface
+     */
+    protected function getIFrameEndpointInterface()
+    {
+        if (null === $this->i_frame_endpoint) {
+            $this->i_frame_endpoint = new IFrameEndpoint();
+        }
+
+        return $this->i_frame_endpoint;
+    }
+
+    /**
+     * @var null|\OAuth2\OpenIdConnect\SessionManagement\IFrameEndpointInterface
+     */
     private $metadata = null;
 
     /**
@@ -1385,5 +1381,53 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthCodeType()
     {
         return new AuthCode($this->getAuthCodeManager());
+    }
+
+    /**
+     * @var null|\Jose\Object\JWKSetInterface
+     */
+    private $signature_key_set = null;
+
+    /**
+     * @return \Jose\Object\JWKSetInterface
+     */
+    private function getSignatureKeySet()
+    {
+        if (null === $this->signature_key_set) {
+            $this->signature_key_set = new JWKSet(['keys' => [
+                [
+                    'kid' => 'JWK2',
+                    'use' => 'sig',
+                    'kty' => 'oct',
+                    'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+                ],
+            ]]);
+        }
+
+        return $this->signature_key_set;
+    }
+
+    /**
+     * @var null|\Jose\Object\JWKSetInterface
+     */
+    private $encryption_key_set = null;
+
+    /**
+     * @return \Jose\Object\JWKSetInterface
+     */
+    private function getEncryptionKeySet()
+    {
+        if (null === $this->encryption_key_set) {
+            $this->encryption_key_set = new JWKSet(['keys' => [
+                [
+                    'kid' => 'JWK1',
+                    'use' => 'enc',
+                    'kty' => 'oct',
+                    'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+                ],
+            ]]);
+        }
+
+        return $this->encryption_key_set;
     }
 }

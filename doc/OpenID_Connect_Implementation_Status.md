@@ -61,7 +61,7 @@ OpenID Connect Implementation Status
         * [ ] `post_logout_redirect_uri` parameter
         * [ ] `state` parameter
 * [ ] [Front-Channel logout](http://openid.net/specs/openid-connect-frontchannel-1_0.html)
-* [ ] [Back-Channel logout](http://openid.net/specs/openid-connect-backchannel-1_0.html)
+* [ ] [Back-Channel logout](http://openid.net/specs/openid-connect-backchannel-1_0.html) *Experimental*
 * [x] [JWT Authorization Request](https://tools.ietf.org/html/draft-ietf-oauth-jwsreq)
     * [x] Request Objects support (this feature is disabled by default)
     * [x] Request Object References support (this feature is disabled by default)

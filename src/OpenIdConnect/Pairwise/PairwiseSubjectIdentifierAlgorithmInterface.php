@@ -22,4 +22,11 @@ interface PairwiseSubjectIdentifierAlgorithmInterface
      * @return string
      */
     public function calculateSubjectIdentifier(UserAccountInterface $user, $sector_identifier_uri);
+
+    /**
+     * @param string $subject_identifier
+     *
+     * @return string|null
+     */
+    public function getPublicIdFromSubjectIdentifier($subject_identifier);
 }

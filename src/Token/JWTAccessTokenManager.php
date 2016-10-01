@@ -13,10 +13,10 @@ namespace OAuth2\Token;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
-use Jose\JWTCreator;
-use Jose\JWTLoader;
-use Jose\Object\JWKInterface;
-use Jose\Object\JWKSet;
+use Jose\JWTCreatorInterface;
+use Jose\JWTLoaderInterface;
+use Jose\Object\JWKSetInterface;
+use OAuth2\Behaviour\HasIssuer;
 use OAuth2\Behaviour\HasJWTCreator;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
@@ -26,11 +26,7 @@ class JWTAccessTokenManager extends AccessTokenManager
 {
     use HasJWTLoader;
     use HasJWTCreator;
-
-    /**
-     * @var string
-     */
-    private $issuer;
+    use HasIssuer;
 
     /**
      * @var string
@@ -38,9 +34,9 @@ class JWTAccessTokenManager extends AccessTokenManager
     private $signature_algorithm;
 
     /**
-     * @var \Jose\Object\JWKInterface
+     * @var \Jose\Object\JWKSetInterface
      */
-    private $signature_key;
+    private $signature_key_set;
 
     /**
      * @var string
@@ -53,45 +49,46 @@ class JWTAccessTokenManager extends AccessTokenManager
     private $content_encryption_algorithm;
 
     /**
-     * @var \Jose\Object\JWKInterface
+     * @var \Jose\Object\JWKSetInterface
      */
-    private $key_encryption_key;
+    private $key_encryption_key_set;
 
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \Jose\JWTCreator          $jwt_creator
-     * @param \Jose\JWTLoader           $jwt_loader
-     * @param string                    $signature_algorithm
-     * @param \Jose\Object\JWKInterface $signature_key
-     * @param string                    $issuer
-     * @param string                    $key_encryption_algorithm
-     * @param string                    $content_encryption_algorithm
-     * @param \Jose\Object\JWKInterface $key_encryption_key
+     * @param \Jose\JWTCreatorInterface    $jwt_creator
+     * @param \Jose\JWTLoaderInterface     $jwt_loader
+     * @param string                       $signature_algorithm
+     * @param \Jose\Object\JWKSetInterface $signature_key_set
+     * @param string                       $issuer
+     * @param string                       $key_encryption_algorithm
+     * @param string                       $content_encryption_algorithm
+     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
      */
-    public function __construct(JWTCreator $jwt_creator,
-                                JWTLoader $jwt_loader,
+    public function __construct(JWTCreatorInterface $jwt_creator,
+                                JWTLoaderInterface $jwt_loader,
                                 $signature_algorithm,
-                                JWKInterface $signature_key,
+                                JWKSetInterface $signature_key_set,
                                 $key_encryption_algorithm,
                                 $content_encryption_algorithm,
-                                JWKInterface $key_encryption_key,
+                                JWKSetInterface $key_encryption_key_set,
                                 $issuer
     ) {
-        Assertion::string($issuer);
         Assertion::string($signature_algorithm);
         Assertion::string($key_encryption_algorithm);
         Assertion::string($content_encryption_algorithm);
+        Assertion::greaterThan($signature_key_set->countKeys(), 0, 'The signature key set must have at least one key.');
+        Assertion::greaterThan($key_encryption_key_set->countKeys(), 0, 'The encryption key set must have at least one key.');
         Assertion::inArray($signature_algorithm, $jwt_creator->getSupportedSignatureAlgorithms());
         Assertion::inArray($key_encryption_algorithm, $jwt_creator->getSupportedKeyEncryptionAlgorithms());
         Assertion::inArray($content_encryption_algorithm, $jwt_creator->getSupportedContentEncryptionAlgorithms());
 
         $this->signature_algorithm = $signature_algorithm;
-        $this->signature_key = $signature_key;
         $this->key_encryption_algorithm = $key_encryption_algorithm;
         $this->content_encryption_algorithm = $content_encryption_algorithm;
-        $this->key_encryption_key = $key_encryption_key;
-        $this->issuer = $issuer;
+        $this->setIssuer($issuer);
+        $this->signature_key_set = $signature_key_set;
+        $this->key_encryption_key_set = $key_encryption_key_set;
 
         $this->setJWTCreator($jwt_creator);
         $this->setJWTLoader($jwt_loader);
@@ -104,10 +101,12 @@ class JWTAccessTokenManager extends AccessTokenManager
     {
         $payload = $this->preparePayload($access_token, $resource_server);
         $signature_header = $this->prepareSignatureHeader();
-        $jwt = $this->getJWTCreator()->sign($payload, $signature_header, $this->signature_key);
+        $signature_key = $this->signature_key_set->getKey(0);
+        $encryption_key = $this->key_encryption_key_set->getKey(0);
+        $jwt = $this->getJWTCreator()->sign($payload, $signature_header, $signature_key);
 
         $encryption_header = $this->prepareEncryptionHeader($client, $resource_server);
-        $recipient_key = $this->key_encryption_key;
+        $recipient_key = $encryption_key;
         $jwt = $this->getJWTCreator()->encrypt($jwt, $encryption_header, $recipient_key);
 
         $access_token->setToken($jwt);
@@ -126,7 +125,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         $header = array_merge(
             [
                 'jti' => Base64Url::encode(random_bytes(25)),
-                'iss' => $this->issuer,
+                'iss' => $this->getIssuer(),
                 'iat' => time(),
                 'nbf' => time(),
                 'typ' => 'JWT',
@@ -137,7 +136,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         if (0 !== $lifetime = $this->getLifetime($client)) {
             $header['exp'] = time() + $lifetime;
         }
-        $header['aud'] = null === $resource_server ? $this->issuer : $resource_server->getPublicId();
+        $header['aud'] = null === $resource_server ? $this->getIssuer() : $resource_server->getPublicId();
 
         return $header;
     }
@@ -165,10 +164,14 @@ class JWTAccessTokenManager extends AccessTokenManager
      */
     protected function preparePayload(AccessTokenInterface $access_token, ClientInterface $resource_server = null)
     {
+        $aud = [$this->getIssuer()];
+        if (null !== $resource_server) {
+            $access_token[] = $resource_server->getPublicId();
+        }
         $payload = [
             'jti'            => Base64Url::encode(random_bytes(25)),
-            'iss'            => $this->issuer,
-            'aud'            => null === $resource_server ? $this->issuer : $resource_server->getPublicId(),
+            'iss'            => $this->getIssuer(),
+            'aud'            => $aud,
             'iat'            => time(),
             'nbf'            => time(),
             'exp'            => $access_token->getExpiresAt(),
@@ -201,17 +204,8 @@ class JWTAccessTokenManager extends AccessTokenManager
     public function getAccessToken($assertion)
     {
         try {
-            $jwk_set = new JWKSet();
-            $jwk_set->addKey($this->key_encryption_key);
-            $jwt = $this->getJWTLoader()->load(
-                $assertion,
-                $jwk_set,
-                true
-            );
-
-            $jwk_set = new JWKSet();
-            $jwk_set->addKey($this->signature_key);
-            $this->jwt_loader->verify($jwt, $jwk_set);
+            $jwt = $this->getJWTLoader()->load($assertion, $this->key_encryption_key_set, true);
+            $this->jwt_loader->verify($jwt, $this->signature_key_set);
         } catch (\Exception $e) {
             return;
         }

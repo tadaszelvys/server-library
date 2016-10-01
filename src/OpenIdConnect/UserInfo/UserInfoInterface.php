@@ -28,6 +28,11 @@ interface UserInfoInterface
     public function isPairwiseSubjectIdentifierSupported();
 
     /**
+     * @return \OAuth2\OpenIdConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface|null
+     */
+    public function getPairwiseSubjectIdentifierAlgorithm();
+
+    /**
      * @param \OAuth2\Client\ClientInterface           $client
      * @param \OAuth2\UserAccount\UserAccountInterface $user_account
      * @param string                                   $redirect_uri

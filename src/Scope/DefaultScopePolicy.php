@@ -47,7 +47,7 @@ final class DefaultScopePolicy implements ScopePolicyInterface
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     private function getDefaultScopes()
     {

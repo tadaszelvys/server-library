@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint\Authorization;
 
 use Assert\Assertion;
 use GuzzleHttp\Client;
-use Jose\JWTLoader;
+use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
@@ -155,7 +155,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     /**
      * {@inheritdoc}
      */
-    public function enableRequestObjectSupport(JWTLoader $jwt_loader)
+    public function enableRequestObjectSupport(JWTLoaderInterface $jwt_loader)
     {
         $this->setJWTLoader($jwt_loader);
         $this->request_object_allowed = true;
@@ -177,7 +177,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     {
         Assertion::boolean($require_encryption);
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
-        Assertion::notEmpty($key_encryption_key_set, 'The key set must contain at least one key.');
+        Assertion::greaterThan($key_encryption_key_set->countKeys(), 0, 'The encryption key set must have at least one key.');
 
         $this->require_encryption = $require_encryption;
         $this->key_encryption_key_set = $key_encryption_key_set;

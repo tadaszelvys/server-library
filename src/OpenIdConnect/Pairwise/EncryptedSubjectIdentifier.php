@@ -72,4 +72,18 @@ class EncryptedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmIn
 
         return Base64Url::encode(openssl_encrypt($prepared, $this->algorithm, $this->pairwise_encryption_key, OPENSSL_RAW_DATA, $this->iv));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublicIdFromSubjectIdentifier($subject_identifier)
+    {
+        $decoded = openssl_decrypt(Base64Url::decode($subject_identifier), $this->algorithm, $this->pairwise_encryption_key, OPENSSL_RAW_DATA, $this->iv);
+        $parts = explode(':', $decoded);
+        if (3 !== count($parts)) {
+            return;
+        }
+
+        return $parts[1];
+    }
 }

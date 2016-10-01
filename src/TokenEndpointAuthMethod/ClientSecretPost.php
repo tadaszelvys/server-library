@@ -56,11 +56,7 @@ class ClientSecretPost implements TokenEndpointAuthMethodInterface
      */
     public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
     {
-        if (false === hash_equals($client->get('client_secret'), $client_credentials)) {
-            return false;
-        }
-
-        return true;
+        return hash_equals($client->get('client_secret'), $client_credentials);
     }
 
     /**

@@ -27,13 +27,6 @@ interface BaseExceptionInterface
     public function getDescription();
 
     /**
-     * Get the uri to a human-readable web page with more information about the error.
-     *
-     * @return string
-     */
-    public function getUri();
-
-    /**
      * Get HTTP code (30x, 40x, 50x…).
      *
      * @return int
