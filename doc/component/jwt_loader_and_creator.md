@@ -8,7 +8,7 @@ and claims you want to check.
 
 # The JWTCreator
 
-This service will create JWS (signed JWT) or JWE (encrypted JWT) if enabled.
+This service will create JWS (signed JWT) or JWE (encrypted JWT) if encryption is enabled.
 
 ```php
 use OAuth2\Util\JWTCreator;
