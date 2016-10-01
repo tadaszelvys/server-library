@@ -32,3 +32,7 @@ Please read [this page](refresh_token.md) to know how to create and use this gra
 # JWT Bearer Token Grant Type
 
 Please read [this page](jwt_bearer.md) to know how to create and use this grant type.
+
+# None Grant Type
+
+Please read [this page](jwt_none.md) to know how to create and use this grant type.

@@ -59,7 +59,7 @@ This manager will handle token types enabled in your authorization server.
 
 Please read [this page](component/token_type/manager.md) to know how to create and use this component.
 
-# User Accounts
+# Users and Accounts
 
 Please read [this page](component/user_manager.md) to know how to create and use this component.
 
