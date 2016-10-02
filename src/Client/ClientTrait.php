@@ -29,6 +29,11 @@ use Jose\Object\JWKSet;
 trait ClientTrait
 {
     /**
+     * @var null|string
+     */
+    protected $owner_public_id = null;
+
+    /**
      * @return string
      */
     abstract public function getPublicId();
@@ -51,6 +56,22 @@ trait ClientTrait
      * @return mixed
      */
     abstract public function get($metadata);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResourceOwnerPublicId()
+    {
+        return $this->owner_public_id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setResourceOwnerPublicId($owner_public_id)
+    {
+        $this->owner_public_id = $owner_public_id;
+    }
 
     /**
      * {@inheritdoc}
