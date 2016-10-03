@@ -23,6 +23,16 @@ use OAuth2\ResourceOwner\ResourceOwnerInterface;
 interface ClientInterface extends ResourceOwnerInterface, \JsonSerializable
 {
     /**
+     * @return string|null
+     */
+    public function getResourceOwnerPublicId();
+
+    /**
+     * @param string $owner_public_id
+     */
+    public function setResourceOwnerPublicId($owner_public_id);
+
+    /**
      * Checks if the grant type is allowed for the client.
      *
      * @param string $grant_type The grant type

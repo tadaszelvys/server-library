@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint\ClientRegistration;
 
+use Assert\Assertion;
 use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasClientRegistrationRuleManager;
 use OAuth2\Behaviour\HasExceptionManager;
@@ -19,6 +20,7 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleManagerInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -30,37 +32,45 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     use HasClientRegistrationRuleManager;
 
     /**
+     * @var bool
+     */
+    private $isInitialAccessTokenRequired = false;
+
+    /**
      * ClientRegistrationEndpoint constructor.
      *
      * @param \OAuth2\Client\ClientManagerInterface                                           $client_manager
      * @param \OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleManagerInterface $client_registration_rule_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface                                     $exception_manager
      */
-    public function __construct(ClientManagerInterface $client_manager,
-                                ClientRegistrationRuleManagerInterface $client_registration_rule_manager,
-                                ExceptionManagerInterface $exception_manager
-    ) {
+    public function __construct(ClientManagerInterface $client_manager, ClientRegistrationRuleManagerInterface $client_registration_rule_manager, ExceptionManagerInterface $exception_manager)
+    {
         $this->setClientManager($client_manager);
         $this->setClientRegistrationRuleManager($client_registration_rule_manager);
         $this->setExceptionManager($exception_manager);
     }
 
+    public function allowRegistrationWithoutInitialAccessToken()
+    {
+        $this->isInitialAccessTokenRequired = false;
+    }
+
+    public function disallowRegistrationWithoutInitialAccessToken()
+    {
+        $this->isInitialAccessTokenRequired = true;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function register(ServerRequestInterface $request, ResponseInterface &$response)
+    public function register(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null)
     {
         try {
-            if (false === $this->isRequestSecured($request)) {
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
-            }
-            if ('POST' !== $request->getMethod()) {
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Method must be POST.');
-            }
+            Assertion::true($this->isRequestSecured($request), 'The request must be secured.');
+            Assertion::eq('POST', $request->getMethod(), 'Method must be POST.');
+            Assertion::false(null === $access_token && true === $this->isInitialAccessTokenRequired, 'Initial access token required.');
 
-            // Add Initial Access Token check here
-
-            $this->handleRequest($request, $response);
+            $this->handleRequest($request, $response, $access_token);
         } catch (BaseException $e) {
             $e->getHttpResponse($response);
 
@@ -76,10 +86,11 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface      $response
+     * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response)
+    private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null)
     {
         $request_parameters = RequestBody::getParameters($request);
         $metadatas = [];
@@ -88,13 +99,29 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
             $rule->checkRegistrationParameters($request_parameters, $metadatas);
         }
 
+        $client = $this->createAndSaveClient($metadatas, $access_token);
+
+        $this->processResponse($response, $client);
+    }
+
+    /**
+     * @param array                                   $metadatas
+     * @param \OAuth2\Token\AccessTokenInterface|null $access_token
+     *
+     * @return \OAuth2\Client\ClientInterface
+     */
+    private function createAndSaveClient(array $metadatas, AccessTokenInterface $access_token = null)
+    {
         $client = $this->getClientManager()->createClient();
         foreach ($metadatas as $metadata => $value) {
             $client->set($metadata, $value);
         }
+        if (null !== $access_token) {
+            $client->setResourceOwnerPublicId($access_token->getResourceOwnerPublicId());
+        }
         $this->getClientManager()->saveClient($client);
 
-        $this->processResponse($response, $client);
+        return $client;
     }
 
     /**
