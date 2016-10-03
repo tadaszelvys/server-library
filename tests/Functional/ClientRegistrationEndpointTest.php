@@ -197,4 +197,62 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertEquals('default', $client_config['scope_policy']);
         $this->assertEquals('read', $client_config['default_scope']);
     }
+
+    public function testClientCreatedWithCommonParameters()
+    {
+        $request = $this->createRequest(
+            '/',
+            'POST',
+            [
+                'scope' => 'read write',
+                'default_scope' => 'read',
+                'scope_policy' => 'default',
+                'token_endpoint_auth_method' => 'none',
+                'client_name' => 'My Example',
+                'client_name#fr' => 'Mon Exemple',
+                'software_id' => 'ABCD0123',
+                'software_version' => '10.2',
+                'policy_uri' => 'http://www.example.com/policy',
+                'policy_uri#fr' => 'http://www.example.com/vie_privee',
+                'tos_uri' => 'http://www.example.com/tos',
+                'tos_uri#fr' => 'http://www.example.com/termes_de_service',
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        $response = new Response();
+        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $client_config = json_decode($content, true);
+
+        $this->assertTrue(array_key_exists('client_name', $client_config));
+        $this->assertTrue(array_key_exists('client_name#fr', $client_config));
+        $this->assertTrue(array_key_exists('policy_uri', $client_config));
+        $this->assertTrue(array_key_exists('policy_uri#fr', $client_config));
+        $this->assertTrue(array_key_exists('tos_uri', $client_config));
+        $this->assertTrue(array_key_exists('tos_uri#fr', $client_config));
+        $this->assertTrue(array_key_exists('software_id', $client_config));
+        $this->assertTrue(array_key_exists('software_version', $client_config));
+        $this->assertTrue(array_key_exists('public_id', $client_config));
+        $this->assertTrue(array_key_exists('scope', $client_config));
+        $this->assertTrue(array_key_exists('scope_policy', $client_config));
+        $this->assertTrue(array_key_exists('default_scope', $client_config));
+        $this->assertTrue(array_key_exists('token_endpoint_auth_method', $client_config));
+        $this->assertEquals('none', $client_config['token_endpoint_auth_method']);
+        $this->assertEquals('read write', $client_config['scope']);
+        $this->assertEquals('default', $client_config['scope_policy']);
+        $this->assertEquals('read', $client_config['default_scope']);
+
+        $this->assertEquals('ABCD0123', $client_config['software_id']);
+        $this->assertEquals('10.2', $client_config['software_version']);
+        $this->assertEquals('My Example', $client_config['client_name']);
+        $this->assertEquals('Mon Exemple', $client_config['client_name#fr']);
+        $this->assertEquals('http://www.example.com/tos', $client_config['tos_uri']);
+        $this->assertEquals('http://www.example.com/termes_de_service', $client_config['tos_uri#fr']);
+        $this->assertEquals('http://www.example.com/policy', $client_config['policy_uri']);
+        $this->assertEquals('http://www.example.com/vie_privee', $client_config['policy_uri#fr']);
+    }
 }

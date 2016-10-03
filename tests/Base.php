@@ -33,6 +33,7 @@ use OAuth2\Endpoint\Authorization\ParameterChecker\ScopeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\StateParameterChecker;
 use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
 use OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleManager;
+use OAuth2\Endpoint\ClientRegistration\Rule\CommonParametersRule;
 use OAuth2\Endpoint\ClientRegistration\Rule\GrantTypeFlowRule;
 use OAuth2\Endpoint\ClientRegistration\Rule\IdTokenAlgorithmsRule;
 use OAuth2\Endpoint\ClientRegistration\Rule\RedirectionUriRule;
@@ -40,6 +41,7 @@ use OAuth2\Endpoint\ClientRegistration\Rule\RequestUriRule;
 use OAuth2\Endpoint\ClientRegistration\Rule\ResourceServerRule;
 use OAuth2\Endpoint\ClientRegistration\Rule\ScopeRule;
 use OAuth2\Endpoint\ClientRegistration\Rule\SectorIdentifierUriRule;
+use OAuth2\Endpoint\ClientRegistration\Rule\SoftwareRule;
 use OAuth2\Endpoint\ClientRegistration\Rule\SubjectTypeRule;
 use OAuth2\Endpoint\ClientRegistration\Rule\TokenEndpointAuthMethodEndpointRule;
 use OAuth2\Endpoint\Token\TokenEndpoint;
@@ -1250,6 +1252,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_registration_rule_manager->addClientRegistrationRule(new IdTokenAlgorithmsRule($this->getIdTokenManager()));
             $this->client_registration_rule_manager->addClientRegistrationRule(new SubjectTypeRule($this->getUserInfo()));
             $this->client_registration_rule_manager->addClientRegistrationRule(new ResourceServerRule());
+            $this->client_registration_rule_manager->addClientRegistrationRule(new CommonParametersRule());
+            $this->client_registration_rule_manager->addClientRegistrationRule(new SoftwareRule());
         }
 
         return $this->client_registration_rule_manager;

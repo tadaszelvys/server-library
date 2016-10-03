@@ -23,4 +23,9 @@ interface ClientRegistrationEndpointInterface
      * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
      */
     public function register(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null);
+
+    /**
+     * @return bool
+     */
+    public function isSoftwareStatementSupported();
 }

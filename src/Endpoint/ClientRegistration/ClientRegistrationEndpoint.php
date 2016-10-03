@@ -12,9 +12,12 @@
 namespace OAuth2\Endpoint\ClientRegistration;
 
 use Assert\Assertion;
+use Jose\JWTLoaderInterface;
+use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasClientRegistrationRuleManager;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Endpoint\ClientRegistration\Rule\ClientRegistrationRuleManagerInterface;
@@ -30,7 +33,17 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     use HasExceptionManager;
     use HasClientManager;
     use HasClientRegistrationRuleManager;
+    use HasJWTLoader;
 
+    /**
+     * @var bool
+     */
+    private $is_software_statement_required = false;
+
+    /**
+     * @var \Jose\Object\JWKSetInterface
+     */
+    private $signature_key_set;
     /**
      * @var bool
      */
@@ -58,6 +71,36 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     public function disallowRegistrationWithoutInitialAccessToken()
     {
         $this->isInitialAccessTokenRequired = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSoftwareStatementSupported()
+    {
+        return null === $this->signature_key_set;
+    }
+
+    /**
+     * @param \Jose\JWTLoaderInterface     $jwt_loader
+     * @param \Jose\Object\JWKSetInterface $signature_key_set
+     */
+    public function enableSoftwareStatementSupport(JWTLoaderInterface $jwt_loader, JWKSetInterface $signature_key_set)
+    {
+        $this->setJWTLoader($jwt_loader);
+        $this->signature_key_set = $signature_key_set;
+    }
+
+    public function allowRegistrationWithoutSoftwareStatement()
+    {
+        Assertion::true($this->isSoftwareStatementSupported(), 'Software Statement not supported.');
+        $this->is_software_statement_required = false;
+    }
+
+    public function disallowRegistrationWithoutSoftwareStatement()
+    {
+        Assertion::true($this->isSoftwareStatementSupported(), 'Software Statement not supported.');
+        $this->is_software_statement_required = true;
     }
 
     /**
@@ -93,6 +136,7 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null)
     {
         $request_parameters = RequestBody::getParameters($request);
+        $this->checkSoftwareStatement($request_parameters);
         $metadatas = [];
 
         foreach ($this->getClientRegistrationRuleManager()->getClientRegistrationRules() as $rule) {
@@ -102,6 +146,39 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
         $client = $this->createAndSaveClient($metadatas, $access_token);
 
         $this->processResponse($response, $client);
+    }
+
+    /**
+     * @param array $request_parameters
+     */
+    private function checkSoftwareStatement(array &$request_parameters)
+    {
+        if ($this->isSoftwareStatementSupported()) {
+            Assertion::false(false === array_key_exists('software_statement', $request_parameters) && true === $this->is_software_statement_required, 'Software Statement required.');
+
+            if (array_key_exists('software_statement', $request_parameters)) {
+                $this->updateRequestParametersWithSoftwareStatement($request_parameters);
+            }
+
+        } elseif (array_key_exists('software_statement', $request_parameters)) {
+            unset($request_parameters['software_statement']);
+
+            return;
+        }
+    }
+
+    /**
+     * @param array $request_parameters
+     */
+    private function updateRequestParametersWithSoftwareStatement(array &$request_parameters)
+    {
+        $jws = $this->getJWTLoader()->load($request_parameters['software_statement']);
+        $this->getJWTLoader()->verify($jws, $this->signature_key_set);
+
+        $request_parameters = array_merge(
+            $request_parameters,
+            $jws->getClaims()
+        );
     }
 
     /**
