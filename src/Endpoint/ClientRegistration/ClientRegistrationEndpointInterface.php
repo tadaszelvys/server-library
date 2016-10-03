@@ -11,6 +11,8 @@
 
 namespace OAuth2\Endpoint\ClientRegistration;
 
+use Jose\JWTLoaderInterface;
+use Jose\Object\JWKSetInterface;
 use OAuth2\Token\AccessTokenInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,6 +25,12 @@ interface ClientRegistrationEndpointInterface
      * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
      */
     public function register(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null);
+
+    /**
+     * @param \Jose\JWTLoaderInterface     $jwt_loader
+     * @param \Jose\Object\JWKSetInterface $signature_key_set
+     */
+    public function enableSoftwareStatementSupport(JWTLoaderInterface $jwt_loader, JWKSetInterface $signature_key_set);
 
     /**
      * @return bool

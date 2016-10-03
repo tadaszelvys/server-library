@@ -78,12 +78,11 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
      */
     public function isSoftwareStatementSupported()
     {
-        return null === $this->signature_key_set;
+        return null !== $this->signature_key_set;
     }
 
     /**
-     * @param \Jose\JWTLoaderInterface     $jwt_loader
-     * @param \Jose\Object\JWKSetInterface $signature_key_set
+     * {@inheritdoc}
      */
     public function enableSoftwareStatementSupport(JWTLoaderInterface $jwt_loader, JWKSetInterface $signature_key_set)
     {
@@ -161,9 +160,7 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
             }
 
         } elseif (array_key_exists('software_statement', $request_parameters)) {
-            unset($request_parameters['software_statement']);
-
-            return;
+            throw new \InvalidArgumentException('Software Statement parameter not supported.');
         }
     }
 

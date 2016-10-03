@@ -255,4 +255,30 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertEquals('http://www.example.com/policy', $client_config['policy_uri']);
         $this->assertEquals('http://www.example.com/vie_privee', $client_config['policy_uri#fr']);
     }
+
+    public function testClientCreatedWithUnsupportedSoftwareStatement()
+    {
+        $request = $this->createRequest('/', 'POST',
+            [
+                'scope' => 'read write',
+                'default_scope' => 'read',
+                'scope_policy' => 'default',
+                'token_endpoint_auth_method' => 'none',
+                'client_name' => 'My Example',
+                'client_name#fr' => 'Mon Exemple',
+                'software_statement' => 'Hello',
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        $response = new Response();
+        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertFalse($this->getClientRegistrationEndpoint()->isSoftwareStatementSupported());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Software Statement parameter not supported.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $content);
+
+    }
 }
