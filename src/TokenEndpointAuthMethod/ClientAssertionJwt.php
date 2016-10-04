@@ -23,7 +23,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
+abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
 {
     use HasJWTLoader;
     use HasExceptionManager;
@@ -178,10 +178,8 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     public function checkClientConfiguration(array $client_configuration, array &$metadatas)
     {
         if ('client_secret_jwt' === $client_configuration['token_endpoint_auth_method']) {
-            Assertion::keyExists($client_configuration, 'client_secret', 'The parameter "client_secret" must be set.');
-            Assertion::string($client_configuration['client_secret'], 'The parameter "client_secret" must be a string.');
-
-            $metadatas['client_secret'] = $client_configuration['client_secret'];
+            $metadatas['client_secret'] = $this->createClientSecret();
+            $metadatas['client_secret_expires_at'] = 0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime;
         } elseif ('private_key_jwt' === $client_configuration['token_endpoint_auth_method']) {
             Assertion::true(array_key_exists('jwks', $client_configuration) xor array_key_exists('jwks_uri', $client_configuration), 'The parameter "jwks" or "jwks_uri" must be set.');
             if (array_key_exists('jwks', $client_configuration)) {
@@ -196,7 +194,10 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
         } else {
             throw new \InvalidArgumentException('Unsupported token endpoint authentication method.');
         }
-
-        $metadatas['client_secret_expires_at'] = 0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime;
     }
+
+    /**
+     * @return string
+     */
+    abstract protected function createClientSecret();
 }

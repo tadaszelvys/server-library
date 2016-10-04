@@ -16,7 +16,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ClientSecretPost implements TokenEndpointAuthMethodInterface
+abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
 {
     /**
      * @var int
@@ -59,9 +59,7 @@ class ClientSecretPost implements TokenEndpointAuthMethodInterface
      */
     public function checkClientConfiguration(array $client_configuration, array &$metadatas)
     {
-        Assertion::keyExists('client_secret', $client_configuration, 'The parameter "client_secret" must be set.');
-        Assertion::string($client_configuration['client_secret'], 'The parameter "client_secret" must be a string.');
-        $metadatas['client_secret'] = $client_configuration['client_secret'];
+        $metadatas['client_secret'] = $this->createClientSecret();
         $metadatas['client_secret_expires_at'] = 0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime;
     }
 
@@ -80,4 +78,9 @@ class ClientSecretPost implements TokenEndpointAuthMethodInterface
     {
         return ['client_secret_post'];
     }
+
+    /**
+     * @return string
+     */
+    abstract protected function createClientSecret();
 }

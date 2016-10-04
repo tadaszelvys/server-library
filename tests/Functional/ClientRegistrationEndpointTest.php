@@ -359,7 +359,6 @@ class ClientRegistrationEndpointTest extends Base
                 'default_scope' => 'read',
                 'scope_policy' => 'default',
                 'token_endpoint_auth_method' => 'client_secret_jwt',
-                'client_secret' => '0123456789',
                 'software_statement' => $software_statement,
                 'client_name' => 'My Bad Example',
                 'client_name#fr' => 'Mon Exemple',
@@ -379,6 +378,8 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertTrue(array_key_exists('software_version', $client_config));
         $this->assertTrue(array_key_exists('software_statement', $client_config));
         $this->assertTrue(array_key_exists('client_name', $client_config));
+        $this->assertTrue(array_key_exists('client_secret', $client_config));
+        $this->assertTrue(array_key_exists('client_secret_expires_at', $client_config));
         $this->assertEquals('This is my software ID', $client_config['software_id']);
         $this->assertEquals('10.2', $client_config['software_version']);
         $this->assertEquals($software_statement, $client_config['software_statement']);
