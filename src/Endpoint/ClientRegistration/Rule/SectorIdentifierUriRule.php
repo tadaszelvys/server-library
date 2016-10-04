@@ -14,7 +14,7 @@ namespace OAuth2\Endpoint\ClientRegistration\Rule;
 use Assert\Assertion;
 use GuzzleHttp\Client;
 
-final class SectorIdentifierUriRule implements ClientRegistrationRuleInterface
+final class SectorIdentifierUriRule implements ParameterRuleInterface
 {
     /**
      * @var bool
@@ -61,7 +61,7 @@ final class SectorIdentifierUriRule implements ClientRegistrationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas)
+    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
     {
         if (!array_key_exists('sector_identifier_uri', $registration_parameters)) {
             return;

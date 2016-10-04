@@ -15,7 +15,7 @@ use Assert\Assertion;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Scope\ScopeManagerInterface;
 
-final class ScopeRule implements ClientRegistrationRuleInterface
+final class ScopeRule implements ParameterRuleInterface
 {
     use HasScopeManager;
 
@@ -27,7 +27,7 @@ final class ScopeRule implements ClientRegistrationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas)
+    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
     {
         if (array_key_exists('scope', $registration_parameters)) {
             Assertion::regex($registration_parameters['scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the "scope" parameter.');

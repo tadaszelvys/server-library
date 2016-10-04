@@ -15,7 +15,7 @@ use Assert\Assertion;
 use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
 use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
 
-final class SubjectTypeRule implements ClientRegistrationRuleInterface
+final class SubjectTypeRule implements ParameterRuleInterface
 {
     use HasUserinfo;
 
@@ -32,7 +32,7 @@ final class SubjectTypeRule implements ClientRegistrationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas)
+    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
     {
         if (!array_key_exists('subject_type', $registration_parameters)) {
             return;

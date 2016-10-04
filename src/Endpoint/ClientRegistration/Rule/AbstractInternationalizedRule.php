@@ -11,7 +11,7 @@
 
 namespace OAuth2\Endpoint\ClientRegistration\Rule;
 
-abstract class AbstractInternationalizedRule implements ClientRegistrationRuleInterface
+abstract class AbstractInternationalizedRule implements ParameterRuleInterface
 {
     /**
      * @param array    $request_parameters

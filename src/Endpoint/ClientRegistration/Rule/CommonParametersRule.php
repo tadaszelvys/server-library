@@ -18,7 +18,7 @@ final class CommonParametersRule extends AbstractInternationalizedRule
     /**
      * {@inheritdoc}
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas)
+    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
     {
         foreach ($this->getSupportedParameters() as $parameter => $closure) {
             $metadatas = array_merge(

@@ -11,13 +11,14 @@
 
 namespace OAuth2\Endpoint\ClientRegistration\Rule;
 
-interface ClientRegistrationRuleInterface
+interface ParameterRuleInterface
 {
     /**
      * @param array $registration_parameters
      * @param array $metadatas
+     * @param array $previous_metadata
      *
      * @throws \InvalidArgumentException If an error occurred
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas);
+    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = []);
 }

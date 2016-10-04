@@ -15,7 +15,7 @@ use Assert\Assertion;
 use OAuth2\OpenIdConnect\HasIdTokenManager;
 use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 
-final class IdTokenAlgorithmsRule implements ClientRegistrationRuleInterface
+final class IdTokenAlgorithmsRule implements ParameterRuleInterface
 {
     use HasIdTokenManager;
 
@@ -32,7 +32,7 @@ final class IdTokenAlgorithmsRule implements ClientRegistrationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas)
+    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
     {
         if (!array_key_exists('id_token_encrypted_response_alg', $registration_parameters) || !array_key_exists('id_token_encrypted_response_enc', $registration_parameters)) {
             return;

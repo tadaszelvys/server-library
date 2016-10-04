@@ -11,12 +11,12 @@
 
 namespace OAuth2\Endpoint\ClientRegistration\Rule;
 
-final class SoftwareRule implements ClientRegistrationRuleInterface
+final class SoftwareRule implements ParameterRuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas)
+    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
     {
         foreach (['software_id', 'software_version', 'software_statement'] as $key) {
             if (array_key_exists($key, $registration_parameters)) {

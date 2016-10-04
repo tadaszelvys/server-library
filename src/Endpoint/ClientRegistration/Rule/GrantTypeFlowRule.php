@@ -17,7 +17,7 @@ use OAuth2\Behaviour\HasResponseTypeManager;
 use OAuth2\Grant\GrantTypeManagerInterface;
 use OAuth2\Grant\ResponseTypeManagerInterface;
 
-final class GrantTypeFlowRule implements ClientRegistrationRuleInterface
+final class GrantTypeFlowRule implements ParameterRuleInterface
 {
     use HasResponseTypeManager;
     use HasGrantTypeManager;
@@ -31,7 +31,7 @@ final class GrantTypeFlowRule implements ClientRegistrationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function checkRegistrationParameters(array $registration_parameters, array &$metadatas)
+    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
     {
         if (array_key_exists('grant_types', $registration_parameters)) {
             $this->checkGrantTypes($registration_parameters, $metadatas);
