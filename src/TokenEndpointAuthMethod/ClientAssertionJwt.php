@@ -39,15 +39,25 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     private $key_encryption_key_set = null;
 
     /**
-     * PasswordClientManager constructor.
+     * @var int
+     */
+    private $secret_lifetime;
+
+    /**
+     * ClientAssertionJwt constructor.
      *
      * @param \Jose\JWTLoaderInterface                    $jwt_loader
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param int                                         $secret_lifetime
      */
-    public function __construct(JWTLoaderInterface $jwt_loader, ExceptionManagerInterface $exception_manager)
+    public function __construct(JWTLoaderInterface $jwt_loader, ExceptionManagerInterface $exception_manager, $secret_lifetime = 0)
     {
         $this->setJWTLoader($jwt_loader);
         $this->setExceptionManager($exception_manager);
+        Assertion::integer($secret_lifetime);
+        Assertion::greaterOrEqualThan($secret_lifetime, 0);
+
+        $this->secret_lifetime = $secret_lifetime;
     }
 
     /**
@@ -168,8 +178,10 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     public function checkClientConfiguration(array $client_configuration, array &$metadatas)
     {
         if ('client_secret_jwt' === $client_configuration['token_endpoint_auth_method']) {
-            Assertion::keyExists('client_secret', $client_configuration, 'The parameter "client_secret" must be set.');
+            Assertion::keyExists($client_configuration, 'client_secret', 'The parameter "client_secret" must be set.');
             Assertion::string($client_configuration['client_secret'], 'The parameter "client_secret" must be a string.');
+
+            $metadatas['client_secret'] = $client_configuration['client_secret'];
         } elseif ('private_key_jwt' === $client_configuration['token_endpoint_auth_method']) {
             Assertion::true(array_key_exists('jwks', $client_configuration) xor array_key_exists('jwks_uri', $client_configuration), 'The parameter "jwks" or "jwks_uri" must be set.');
             if (array_key_exists('jwks', $client_configuration)) {
@@ -184,5 +196,7 @@ class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
         } else {
             throw new \InvalidArgumentException('Unsupported token endpoint authentication method.');
         }
+
+        $metadatas['client_secret_expires_at'] = 0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime;
     }
 }

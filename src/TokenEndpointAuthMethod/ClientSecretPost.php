@@ -19,6 +19,19 @@ use Psr\Http\Message\ServerRequestInterface;
 class ClientSecretPost implements TokenEndpointAuthMethodInterface
 {
     /**
+     * @var int
+     */
+    private $secret_lifetime;
+
+    public function __construct($secret_lifetime = 0)
+    {
+        Assertion::integer($secret_lifetime);
+        Assertion::greaterOrEqualThan($secret_lifetime, 0);
+
+        $this->secret_lifetime = $secret_lifetime;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getSchemesParameters()
@@ -49,6 +62,7 @@ class ClientSecretPost implements TokenEndpointAuthMethodInterface
         Assertion::keyExists('client_secret', $client_configuration, 'The parameter "client_secret" must be set.');
         Assertion::string($client_configuration['client_secret'], 'The parameter "client_secret" must be a string.');
         $metadatas['client_secret'] = $client_configuration['client_secret'];
+        $metadatas['client_secret_expires_at'] = 0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime;
     }
 
     /**

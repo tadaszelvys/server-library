@@ -23,14 +23,24 @@ class ClientSecretBasic implements TokenEndpointAuthMethodInterface
     private $realm;
 
     /**
-     * PasswordClientManager constructor.
+     * @var int
+     */
+    private $secret_lifetime;
+
+    /**
+     * ClientSecretBasic constructor.
      *
      * @param string $realm
+     * @param int    $secret_lifetime
      */
-    public function __construct($realm)
+    public function __construct($realm, $secret_lifetime = 0)
     {
         Assertion::string($realm);
+        Assertion::integer($secret_lifetime);
+        Assertion::greaterOrEqualThan($secret_lifetime, 0);
+
         $this->realm = $realm;
+        $this->secret_lifetime = $secret_lifetime;
     }
 
     /**
@@ -77,6 +87,7 @@ class ClientSecretBasic implements TokenEndpointAuthMethodInterface
         Assertion::keyExists('client_secret', $client_configuration, 'The parameter "client_secret" must be set.');
         Assertion::string($client_configuration['client_secret'], 'The parameter "client_secret" must be a string.');
         $metadatas['client_secret'] = $client_configuration['client_secret'];
+        $metadatas['client_secret_expires_at'] = 0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime;
     }
 
     /**

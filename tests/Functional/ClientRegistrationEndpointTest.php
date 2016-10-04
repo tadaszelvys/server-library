@@ -11,6 +11,7 @@
 
 namespace OAuth2\Test\Functional;
 
+use OAuth2\Client\ClientInterface;
 use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
 
@@ -84,7 +85,7 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $client_config = json_decode($content, true);
 
-        $this->assertTrue(array_key_exists('public_id', $client_config));
+        $this->assertTrue(array_key_exists('client_id', $client_config));
         $this->assertTrue(array_key_exists('jwks', $client_config));
         $this->assertTrue(array_key_exists('token_endpoint_auth_method', $client_config));
         $this->assertEquals('private_key_jwt', $client_config['token_endpoint_auth_method']);
@@ -155,7 +156,7 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $client_config = json_decode($content, true);
 
-        $this->assertTrue(array_key_exists('public_id', $client_config));
+        $this->assertTrue(array_key_exists('client_id', $client_config));
         $this->assertTrue(array_key_exists('sector_identifier_uri', $client_config));
         $this->assertTrue(array_key_exists('token_endpoint_auth_method', $client_config));
         $this->assertEquals('none', $client_config['token_endpoint_auth_method']);
@@ -187,7 +188,7 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertEquals(200, $response->getStatusCode());
         $client_config = json_decode($content, true);
 
-        $this->assertTrue(array_key_exists('public_id', $client_config));
+        $this->assertTrue(array_key_exists('client_id', $client_config));
         $this->assertTrue(array_key_exists('scope', $client_config));
         $this->assertTrue(array_key_exists('scope_policy', $client_config));
         $this->assertTrue(array_key_exists('default_scope', $client_config));
@@ -238,7 +239,7 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertTrue(array_key_exists('tos_uri#fr', $client_config));
         $this->assertTrue(array_key_exists('software_id', $client_config));
         $this->assertTrue(array_key_exists('software_version', $client_config));
-        $this->assertTrue(array_key_exists('public_id', $client_config));
+        $this->assertTrue(array_key_exists('client_id', $client_config));
         $this->assertTrue(array_key_exists('scope', $client_config));
         $this->assertTrue(array_key_exists('scope_policy', $client_config));
         $this->assertTrue(array_key_exists('default_scope', $client_config));
@@ -256,6 +257,10 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertEquals('http://www.example.com/termes_de_service', $client_config['tos_uri#fr']);
         $this->assertEquals('http://www.example.com/policy', $client_config['policy_uri']);
         $this->assertEquals('http://www.example.com/vie_privee', $client_config['policy_uri#fr']);
+
+        // We verify the client is available through the client manager
+        $client = $this->getClientManager()->getClient($client_config['client_id']);
+        $this->assertInstanceOf(ClientInterface::class, $client);
     }
 
     public function testFailedBecauseBadSoftwareStatement()
@@ -353,7 +358,8 @@ class ClientRegistrationEndpointTest extends Base
                 'scope' => 'read write',
                 'default_scope' => 'read',
                 'scope_policy' => 'default',
-                'token_endpoint_auth_method' => 'none',
+                'token_endpoint_auth_method' => 'client_secret_jwt',
+                'client_secret' => '0123456789',
                 'software_statement' => $software_statement,
                 'client_name' => 'My Bad Example',
                 'client_name#fr' => 'Mon Exemple',
@@ -368,6 +374,7 @@ class ClientRegistrationEndpointTest extends Base
 
         $this->assertEquals(200, $response->getStatusCode());
         $client_config = json_decode($content, true);
+
         $this->assertTrue(array_key_exists('software_id', $client_config));
         $this->assertTrue(array_key_exists('software_version', $client_config));
         $this->assertTrue(array_key_exists('software_statement', $client_config));

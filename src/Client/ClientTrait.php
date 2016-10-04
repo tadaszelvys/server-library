@@ -34,11 +34,6 @@ trait ClientTrait
     protected $owner_public_id = null;
 
     /**
-     * @return string
-     */
-    abstract public function getPublicId();
-
-    /**
      * @return array
      */
     abstract public function all();
@@ -56,6 +51,11 @@ trait ClientTrait
      * @return mixed
      */
     abstract public function get($metadata);
+
+    public function getPublicId()
+    {
+        return $this->get('client_id');
+    }
 
     /**
      * {@inheritdoc}
@@ -207,9 +207,6 @@ trait ClientTrait
      */
     public function jsonSerialize()
     {
-        return array_merge(
-            ['public_id' => $this->getPublicId()],
-            $this->all()
-        );
+        return $this->all();
     }
 }
