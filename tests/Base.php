@@ -1275,9 +1275,22 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getClientRegistrationRuleManager(),
                 $this->getExceptionManager()
             );
+            $this->client_registration_endpoint->enableSoftwareStatementSupport(
+                $this->getJWTLoader(),
+                $this->getSignatureKeySet()
+            );
         }
 
         return $this->client_registration_endpoint;
+    }
+
+    protected function enableSoftwareStatementSupport()
+    {
+        $client_registration_endpoint = $this->getClientRegistrationEndpoint();
+        $client_registration_endpoint->enableSoftwareStatementSupport(
+            $this->getJWTLoader(),
+            $this->getSignatureKeySet()
+        );
     }
 
     /**
@@ -1395,7 +1408,7 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @return \Jose\Object\JWKSetInterface
      */
-    private function getSignatureKeySet()
+    protected function getSignatureKeySet()
     {
         if (null === $this->signature_key_set) {
             $this->signature_key_set = new JWKSet(['keys' => [
@@ -1419,7 +1432,7 @@ class Base extends \PHPUnit_Framework_TestCase
     /**
      * @return \Jose\Object\JWKSetInterface
      */
-    private function getEncryptionKeySet()
+    protected function getEncryptionKeySet()
     {
         if (null === $this->encryption_key_set) {
             $this->encryption_key_set = new JWKSet(['keys' => [

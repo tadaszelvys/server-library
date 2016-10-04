@@ -212,6 +212,8 @@ class ClientRegistrationEndpointTest extends Base
                 'client_name#fr' => 'Mon Exemple',
                 'software_id' => 'ABCD0123',
                 'software_version' => '10.2',
+                'redirect_uris' => ['https://www.example.com/callback1', 'https://www.example.com/callback2'],
+                'request_uris' => ['https://www.example.com/request1', 'https://www.example.com/request2'],
                 'policy_uri' => 'http://www.example.com/policy',
                 'policy_uri#fr' => 'http://www.example.com/vie_privee',
                 'tos_uri' => 'http://www.example.com/tos',
@@ -256,8 +258,13 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertEquals('http://www.example.com/vie_privee', $client_config['policy_uri#fr']);
     }
 
-    public function testClientCreatedWithUnsupportedSoftwareStatement()
+    public function testFailedBecauseBadSoftwareStatement()
     {
+        $this->enableSoftwareStatementSupport();
+        $this->getClientRegistrationEndpoint()->disallowRegistrationWithoutInitialAccessToken();
+        $this->getClientRegistrationEndpoint()->allowRegistrationWithoutInitialAccessToken();
+        $this->getClientRegistrationEndpoint()->disallowRegistrationWithoutSoftwareStatement();
+        $this->getClientRegistrationEndpoint()->allowRegistrationWithoutSoftwareStatement();
         $request = $this->createRequest('/', 'POST',
             [
                 'scope' => 'read write',
@@ -277,8 +284,97 @@ class ClientRegistrationEndpointTest extends Base
         $content = $response->getBody()->getContents();
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertFalse($this->getClientRegistrationEndpoint()->isSoftwareStatementSupported());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Software Statement parameter not supported.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $content);
+        $this->assertTrue($this->getClientRegistrationEndpoint()->isSoftwareStatementSupported());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Invalid Software Statement","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $content);
+    }
 
+    public function testFailedBecauseNoSoftwareStatement()
+    {
+        $this->getClientRegistrationEndpoint()->disallowRegistrationWithoutSoftwareStatement();
+        $request = $this->createRequest('/', 'POST',
+            [
+                'scope' => 'read write',
+                'default_scope' => 'read',
+                'scope_policy' => 'default',
+                'token_endpoint_auth_method' => 'none',
+                'client_name' => 'My Example',
+                'client_name#fr' => 'Mon Exemple',
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        $response = new Response();
+        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertTrue($this->getClientRegistrationEndpoint()->isSoftwareStatementSupported());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Software Statement required.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $content);
+    }
+
+    public function testFailedBecauseNoInitialAccessToken()
+    {
+        $this->getClientRegistrationEndpoint()->disallowRegistrationWithoutInitialAccessToken();
+        $request = $this->createRequest('/', 'POST',
+            [
+                'scope' => 'read write',
+                'default_scope' => 'read',
+                'scope_policy' => 'default',
+                'token_endpoint_auth_method' => 'none',
+                'client_name' => 'My Example',
+                'client_name#fr' => 'Mon Exemple',
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        $response = new Response();
+        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Initial access token required.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $content);
+    }
+
+    public function testSuccessWithValidSoftwareStatement()
+    {
+        $this->getClientRegistrationEndpoint()->allowRegistrationWithoutInitialAccessToken();
+        $software_statement = $this->getJWTCreator()->sign(
+            [
+                'software_id'      => 'This is my software ID',
+                'software_version' => '10.2',
+                'client_name' => 'My Example',
+            ],
+            ['alg' => 'HS512',],
+            $this->getSignatureKeySet()[0]);
+        $request = $this->createRequest('/', 'POST',
+            [
+                'scope' => 'read write',
+                'default_scope' => 'read',
+                'scope_policy' => 'default',
+                'token_endpoint_auth_method' => 'none',
+                'software_statement' => $software_statement,
+                'client_name' => 'My Bad Example',
+                'client_name#fr' => 'Mon Exemple',
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        $response = new Response();
+        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $client_config = json_decode($content, true);
+        $this->assertTrue(array_key_exists('software_id', $client_config));
+        $this->assertTrue(array_key_exists('software_version', $client_config));
+        $this->assertTrue(array_key_exists('software_statement', $client_config));
+        $this->assertTrue(array_key_exists('client_name', $client_config));
+        $this->assertEquals('This is my software ID', $client_config['software_id']);
+        $this->assertEquals('10.2', $client_config['software_version']);
+        $this->assertEquals($software_statement, $client_config['software_statement']);
+        $this->assertEquals('My Example', $client_config['client_name']);
     }
 }

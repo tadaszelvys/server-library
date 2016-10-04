@@ -63,6 +63,14 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
         $this->setExceptionManager($exception_manager);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function isInitialAccessTokenRequired()
+    {
+        return $this->isInitialAccessTokenRequired;
+    }
+
     public function allowRegistrationWithoutInitialAccessToken()
     {
         $this->isInitialAccessTokenRequired = false;
@@ -79,6 +87,14 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     public function isSoftwareStatementSupported()
     {
         return null !== $this->signature_key_set;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSoftwareStatementRequired()
+    {
+        return $this->is_software_statement_required;
     }
 
     /**
@@ -169,9 +185,12 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
      */
     private function updateRequestParametersWithSoftwareStatement(array &$request_parameters)
     {
-        $jws = $this->getJWTLoader()->load($request_parameters['software_statement']);
-        $this->getJWTLoader()->verify($jws, $this->signature_key_set);
-
+        try {
+            $jws = $this->getJWTLoader()->load($request_parameters['software_statement']);
+            $this->getJWTLoader()->verify($jws, $this->signature_key_set);
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException('Invalid Software Statement', $e->getCode(), $e);
+        }
         $request_parameters = array_merge(
             $request_parameters,
             $jws->getClaims()

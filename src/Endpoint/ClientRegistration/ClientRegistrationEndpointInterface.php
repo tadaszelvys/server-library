@@ -27,6 +27,11 @@ interface ClientRegistrationEndpointInterface
     public function register(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null);
 
     /**
+     * @return bool
+     */
+    public function isInitialAccessTokenRequired();
+
+    /**
      * @param \Jose\JWTLoaderInterface     $jwt_loader
      * @param \Jose\Object\JWKSetInterface $signature_key_set
      */
@@ -36,4 +41,9 @@ interface ClientRegistrationEndpointInterface
      * @return bool
      */
     public function isSoftwareStatementSupported();
+
+    /**
+     * @return bool
+     */
+    public function isSoftwareStatementRequired();
 }
