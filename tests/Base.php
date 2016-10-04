@@ -107,6 +107,7 @@ use OAuth2\Token\TokenTypeManager;
 use OAuth2\Test\Stub\ClientAssertionJwt;
 use OAuth2\Test\Stub\ClientSecretBasic;
 use OAuth2\Test\Stub\ClientSecretPost;
+use OAuth2\Test\Stub\ClientRegistrationManagementRule;
 use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
@@ -1254,6 +1255,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_registration_rule_manager->addParameterRule(new ResourceServerRule());
             $this->client_registration_rule_manager->addParameterRule(new CommonParametersRule());
             $this->client_registration_rule_manager->addParameterRule(new SoftwareRule());
+            $this->client_registration_rule_manager->addParameterRule(new ClientRegistrationManagementRule());
         }
 
         return $this->client_registration_rule_manager;

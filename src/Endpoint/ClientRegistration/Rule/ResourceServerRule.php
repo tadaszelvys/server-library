@@ -12,13 +12,14 @@
 namespace OAuth2\Endpoint\ClientRegistration\Rule;
 
 use Assert\Assertion;
+use OAuth2\Client\ClientInterface;
 
 final class ResourceServerRule implements ParameterRuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
+    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         Assertion::false(array_key_exists('is_resource_server', $registration_parameters), 'Resource server registration is forbidden.');
     }

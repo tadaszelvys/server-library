@@ -43,11 +43,12 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     /**
      * @var \Jose\Object\JWKSetInterface
      */
-    private $signature_key_set;
+    private $software_statement_signature_key_set;
+
     /**
      * @var bool
      */
-    private $isInitialAccessTokenRequired = false;
+    private $is_initial_access_token_required = false;
 
     /**
      * ClientRegistrationEndpoint constructor.
@@ -68,17 +69,17 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
      */
     public function isInitialAccessTokenRequired()
     {
-        return $this->isInitialAccessTokenRequired;
+        return $this->is_initial_access_token_required;
     }
 
     public function allowRegistrationWithoutInitialAccessToken()
     {
-        $this->isInitialAccessTokenRequired = false;
+        $this->is_initial_access_token_required = false;
     }
 
     public function disallowRegistrationWithoutInitialAccessToken()
     {
-        $this->isInitialAccessTokenRequired = true;
+        $this->is_initial_access_token_required = true;
     }
 
     /**
@@ -86,7 +87,7 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
      */
     public function isSoftwareStatementSupported()
     {
-        return null !== $this->signature_key_set;
+        return null !== $this->software_statement_signature_key_set;
     }
 
     /**
@@ -103,7 +104,7 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     public function enableSoftwareStatementSupport(JWTLoaderInterface $jwt_loader, JWKSetInterface $signature_key_set)
     {
         $this->setJWTLoader($jwt_loader);
-        $this->signature_key_set = $signature_key_set;
+        $this->software_statement_signature_key_set = $signature_key_set;
     }
 
     public function allowRegistrationWithoutSoftwareStatement()
@@ -124,10 +125,7 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     public function register(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null)
     {
         try {
-            Assertion::true($this->isRequestSecured($request), 'The request must be secured.');
-            Assertion::eq('POST', $request->getMethod(), 'Method must be POST.');
-            Assertion::false(null === $access_token && true === $this->isInitialAccessTokenRequired, 'Initial access token required.');
-
+            $this->checkRequest($request, $access_token);
             $this->handleRequest($request, $response, $access_token);
         } catch (BaseException $e) {
             $e->getHttpResponse($response);
@@ -143,6 +141,19 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function checkRequest(ServerRequestInterface $request, AccessTokenInterface $access_token = null)
+    {
+        Assertion::true($this->isRequestSecured($request), 'The request must be secured.');
+        Assertion::eq('POST', $request->getMethod(), 'Method must be POST.');
+        Assertion::false(null === $access_token && true === $this->is_initial_access_token_required, 'Initial access token required.');
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface      $response
      * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
      *
@@ -152,14 +163,15 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     {
         $request_parameters = RequestBody::getParameters($request);
         $this->checkSoftwareStatement($request_parameters);
-        $metadatas = [];
+        $client = $this->getClientManager()->createClient();
 
+        $metadatas = [];
         foreach ($this->getParameterRuleManager()->getParameterRules() as $rule) {
-            $rule->checkParameters($request_parameters, $metadatas);
+            $rule->checkParameters($client, $request_parameters, $metadatas);
         }
 
-        $client = $this->createAndSaveClient($metadatas, $access_token);
-
+        $this->updateClient($client, $metadatas, $access_token);
+        $this->getClientManager()->saveClient($client);
         $this->processResponse($response, $client);
     }
 
@@ -187,7 +199,7 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     {
         try {
             $jws = $this->getJWTLoader()->load($request_parameters['software_statement']);
-            $this->getJWTLoader()->verify($jws, $this->signature_key_set);
+            $this->getJWTLoader()->verify($jws, $this->software_statement_signature_key_set);
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Invalid Software Statement', $e->getCode(), $e);
         }
@@ -198,23 +210,18 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     }
 
     /**
+     * @param \OAuth2\Client\ClientInterface          $client
      * @param array                                   $metadatas
      * @param \OAuth2\Token\AccessTokenInterface|null $access_token
-     *
-     * @return \OAuth2\Client\ClientInterface
      */
-    private function createAndSaveClient(array $metadatas, AccessTokenInterface $access_token = null)
+    private function updateClient(ClientInterface $client, array $metadatas, AccessTokenInterface $access_token = null)
     {
-        $client = $this->getClientManager()->createClient();
         foreach ($metadatas as $metadata => $value) {
             $client->set($metadata, $value);
         }
         if (null !== $access_token) {
             $client->setResourceOwnerPublicId($access_token->getResourceOwnerPublicId());
         }
-        $this->getClientManager()->saveClient($client);
-
-        return $client;
     }
 
     /**

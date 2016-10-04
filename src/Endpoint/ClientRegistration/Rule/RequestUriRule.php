@@ -12,13 +12,14 @@
 namespace OAuth2\Endpoint\ClientRegistration\Rule;
 
 use Assert\Assertion;
+use OAuth2\Client\ClientInterface;
 
 final class RequestUriRule implements ParameterRuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
+    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         if (!array_key_exists('request_uris', $registration_parameters)) {
             return;

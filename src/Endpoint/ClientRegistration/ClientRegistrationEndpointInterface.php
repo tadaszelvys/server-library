@@ -31,6 +31,10 @@ interface ClientRegistrationEndpointInterface
      */
     public function isInitialAccessTokenRequired();
 
+    public function allowRegistrationWithoutInitialAccessToken();
+
+    public function disallowRegistrationWithoutInitialAccessToken();
+
     /**
      * @param \Jose\JWTLoaderInterface     $jwt_loader
      * @param \Jose\Object\JWKSetInterface $signature_key_set
@@ -46,4 +50,8 @@ interface ClientRegistrationEndpointInterface
      * @return bool
      */
     public function isSoftwareStatementRequired();
+
+    public function allowRegistrationWithoutSoftwareStatement();
+
+    public function disallowRegistrationWithoutSoftwareStatement();
 }

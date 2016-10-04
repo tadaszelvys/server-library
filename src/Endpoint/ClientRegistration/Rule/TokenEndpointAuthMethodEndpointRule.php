@@ -13,6 +13,7 @@ namespace OAuth2\Endpoint\ClientRegistration\Rule;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
+use OAuth2\Client\ClientInterface;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 
 final class TokenEndpointAuthMethodEndpointRule implements ParameterRuleInterface
@@ -27,7 +28,7 @@ final class TokenEndpointAuthMethodEndpointRule implements ParameterRuleInterfac
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(array $registration_parameters, array &$metadatas, array $previous_metadata = [])
+    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         Assertion::keyExists($registration_parameters, 'token_endpoint_auth_method', 'The parameter "token_endpoint_auth_method" is missing.');
         Assertion::string($registration_parameters['token_endpoint_auth_method'], 'The parameter "token_endpoint_auth_method" must be a string.');
