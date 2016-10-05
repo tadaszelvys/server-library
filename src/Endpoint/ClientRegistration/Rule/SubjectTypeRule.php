@@ -39,12 +39,13 @@ final class SubjectTypeRule implements ParameterRuleInterface
             return;
         }
 
-        $supported_type = ['public'];
+        Assertion::string($registration_parameters['subject_type'], 'Invalid parameter "subject_type". The value must be a string.');
+        $supported_types = ['public'];
         if ($this->getUserinfo()->isPairwiseSubjectIdentifierSupported()) {
-            $supported_type[] = 'pairwise';
+            $supported_types[] = 'pairwise';
         }
 
-        Assertion::inArray($registration_parameters['subject_type'], $supported_type, sprintf('The subject type "%s" is not supported. Please use one of the following value: %s', $registration_parameters['subject_type'], $supported_type));
+        Assertion::inArray($registration_parameters['subject_type'], $supported_types, sprintf('The subject type "%s" is not supported. Please use one of the following value: %s', $registration_parameters['subject_type'], json_encode($supported_types)));
 
         $metadatas['subject_type'] = $registration_parameters['subject_type'];
     }

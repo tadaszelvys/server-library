@@ -39,8 +39,10 @@ final class IdTokenAlgorithmsRule implements ParameterRuleInterface
             return;
         }
 
-        Assertion::inArray($registration_parameters['id_token_encrypted_response_alg'], $this->getIdTokenManager()->getSupportedKeyEncryptionAlgorithms(), sprintf('The ID Token content encryption algorithm "%s" is not supported. Please choose one of the following algorithm: %s', $registration_parameters['id_token_encrypted_response_alg'], $this->getIdTokenManager()->getSupportedContentEncryptionAlgorithms()));
-        Assertion::inArray($registration_parameters['id_token_encrypted_response_enc'], $this->getIdTokenManager()->getSupportedContentEncryptionAlgorithms(), sprintf('The ID Token key encryption algorithm "%s" is not supported. Please choose one of the following algorithm: %s', $registration_parameters['id_token_encrypted_response_enc'], $this->getIdTokenManager()->getSupportedKeyEncryptionAlgorithms()));
+        Assertion::string($registration_parameters['id_token_encrypted_response_alg'], 'Invalid parameter "id_token_encrypted_response_alg". The value must be a string.');
+        Assertion::string($registration_parameters['id_token_encrypted_response_enc'], 'Invalid parameter "id_token_encrypted_response_enc". The value must be a string.');
+        Assertion::inArray($registration_parameters['id_token_encrypted_response_alg'], $this->getIdTokenManager()->getSupportedKeyEncryptionAlgorithms(), sprintf('The ID Token content encryption algorithm "%s" is not supported. Please choose one of the following algorithm: %s', $registration_parameters['id_token_encrypted_response_alg'], json_encode($this->getIdTokenManager()->getSupportedContentEncryptionAlgorithms())));
+        Assertion::inArray($registration_parameters['id_token_encrypted_response_enc'], $this->getIdTokenManager()->getSupportedContentEncryptionAlgorithms(), sprintf('The ID Token key encryption algorithm "%s" is not supported. Please choose one of the following algorithm: %s', $registration_parameters['id_token_encrypted_response_enc'], json_encode($this->getIdTokenManager()->getSupportedKeyEncryptionAlgorithms())));
 
         $metadatas['id_token_encrypted_response_alg'] = $registration_parameters['id_token_encrypted_response_alg'];
         $metadatas['id_token_encrypted_response_enc'] = $registration_parameters['id_token_encrypted_response_enc'];

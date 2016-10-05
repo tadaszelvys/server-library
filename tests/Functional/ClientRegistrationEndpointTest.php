@@ -356,6 +356,11 @@ class ClientRegistrationEndpointTest extends Base
         $request = $this->createRequest('/', 'POST',
             [
                 'scope' => 'read write',
+                'grant_types' => ['authorization_code'],
+                'response_types' => ['token'],
+                'subject_type' => 'pairwise',
+                'id_token_encrypted_response_alg' => 'RSA1_5',
+                'id_token_encrypted_response_enc' => 'A256GCM',
                 'default_scope' => 'read',
                 'scope_policy' => 'default',
                 'token_endpoint_auth_method' => 'client_secret_jwt',
@@ -380,6 +385,16 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertTrue(array_key_exists('client_name', $client_config));
         $this->assertTrue(array_key_exists('client_secret', $client_config));
         $this->assertTrue(array_key_exists('client_secret_expires_at', $client_config));
+        $this->assertTrue(array_key_exists('grant_types', $client_config));
+        $this->assertTrue(array_key_exists('response_types', $client_config));
+        $this->assertTrue(array_key_exists('subject_type', $client_config));
+        $this->assertTrue(array_key_exists('id_token_encrypted_response_alg', $client_config));
+        $this->assertTrue(array_key_exists('id_token_encrypted_response_enc', $client_config));
+        $this->assertEquals('pairwise', $client_config['subject_type']);
+        $this->assertEquals('RSA1_5', $client_config['id_token_encrypted_response_alg']);
+        $this->assertEquals('A256GCM', $client_config['id_token_encrypted_response_enc']);
+        $this->assertEquals(['authorization_code'], $client_config['grant_types']);
+        $this->assertEquals(['code', 'token'], $client_config['response_types']);
         $this->assertEquals('This is my software ID', $client_config['software_id']);
         $this->assertEquals('10.2', $client_config['software_version']);
         $this->assertEquals($software_statement, $client_config['software_statement']);
