@@ -116,7 +116,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
      */
     public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
-        if (false === $this->public_clients_allowed && true === $authorization->getClient()->isPublic()) {
+        if (false === $this->arePublicClientsAllowed() && true === $authorization->getClient()->isPublic()) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Public clients are not allowed to use the authorization code grant type.');
         }
     }
