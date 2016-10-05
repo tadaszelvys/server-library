@@ -112,3 +112,8 @@ Please make sure to [follow these best practices](doc/Contributing.md).
 # Licence
 
 This library is release under [MIT licence](LICENSE).
+
+## Support on Beerpay
+Hey dude! Help me out for a couple of :beers:!
+
+[![Beerpay](https://beerpay.io/Spomky-Labs/oauth2-server-library/badge.svg?style=beer-square)](https://beerpay.io/Spomky-Labs/oauth2-server-library)  [![Beerpay](https://beerpay.io/Spomky-Labs/oauth2-server-library/make-wish.svg?style=flat-square)](https://beerpay.io/Spomky-Labs/oauth2-server-library?focus=wish)
