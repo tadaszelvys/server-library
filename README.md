@@ -1,6 +1,12 @@
 OAuth2 And OpenID Connect Framework Library for PHP
 ===================================================
 
+Help me out for a couple of :beers:!
+
+[![Beerpay](https://beerpay.io/Spomky-Labs/oauth2-server-library/badge.svg?style=beer-square)](https://beerpay.io/Spomky-Labs/oauth2-server-library)  [![Beerpay](https://beerpay.io/Spomky-Labs/oauth2-server-library/make-wish.svg?style=flat-square)](https://beerpay.io/Spomky-Labs/oauth2-server-library?focus=wish)
+
+----
+
 [![Join the chat at https://gitter.im/Spomky-Labs/oauth2-server-library](https://badges.gitter.im/Spomky-Labs/oauth2-server-library.svg)](https://gitter.im/Spomky-Labs/oauth2-server-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/?branch=master)
@@ -112,8 +118,3 @@ Please make sure to [follow these best practices](doc/Contributing.md).
 # Licence
 
 This library is release under [MIT licence](LICENSE).
-
-## Support on Beerpay
-Hey dude! Help me out for a couple of :beers:!
-
-[![Beerpay](https://beerpay.io/Spomky-Labs/oauth2-server-library/badge.svg?style=beer-square)](https://beerpay.io/Spomky-Labs/oauth2-server-library)  [![Beerpay](https://beerpay.io/Spomky-Labs/oauth2-server-library/make-wish.svg?style=flat-square)](https://beerpay.io/Spomky-Labs/oauth2-server-library?focus=wish)

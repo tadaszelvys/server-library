@@ -312,7 +312,15 @@ class Base extends \PHPUnit_Framework_TestCase
                 false
             );
 
+            $this->authorization_request_loader->enableRequestUriRegistrationRequirement();
+            $this->authorization_request_loader->disableRequestUriRegistrationRequirement();
+            $this->authorization_request_loader->disallowUnsecuredConnections();
             $this->authorization_request_loader->allowUnsecuredConnections(); // We allow unsecured connections because we send request against the local server for all tests. Should not be used in production.
+
+            $this->assertTrue($this->authorization_request_loader->isEncryptedRequestsSupportEnabled());
+            $this->assertEquals(['HS256', 'HS512', 'RS256', 'RS512'], $this->authorization_request_loader->getSupportedSignatureAlgorithms());
+            $this->assertEquals(['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'], $this->authorization_request_loader->getSupportedKeyEncryptionAlgorithms());
+            $this->assertEquals(['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512'], $this->authorization_request_loader->getSupportedContentEncryptionAlgorithms());
         }
 
         return $this->authorization_request_loader;
