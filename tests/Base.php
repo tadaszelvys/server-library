@@ -1017,6 +1017,9 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->bearer_token_type->allowTokenFromQueryString();
             $this->bearer_token_type->disallowTokenFromRequestBody();
             $this->bearer_token_type->allowTokenFromRequestBody();
+
+            $this->bearer_token_type->disallowTokenFromAuthorizationHeader();
+            $this->bearer_token_type->allowTokenFromAuthorizationHeader();
         }
 
         return $this->bearer_token_type;
