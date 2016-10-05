@@ -390,6 +390,8 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertTrue(array_key_exists('subject_type', $client_config));
         $this->assertTrue(array_key_exists('id_token_encrypted_response_alg', $client_config));
         $this->assertTrue(array_key_exists('id_token_encrypted_response_enc', $client_config));
+        $this->assertTrue(array_key_exists('client_secret', $client_config));
+        $this->assertTrue(array_key_exists('client_secret_expires_at', $client_config));
         $this->assertEquals('pairwise', $client_config['subject_type']);
         $this->assertEquals('RSA1_5', $client_config['id_token_encrypted_response_alg']);
         $this->assertEquals('A256GCM', $client_config['id_token_encrypted_response_enc']);
@@ -398,6 +400,58 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertEquals('This is my software ID', $client_config['software_id']);
         $this->assertEquals('10.2', $client_config['software_version']);
         $this->assertEquals($software_statement, $client_config['software_statement']);
+        $this->assertEquals('My Example', $client_config['client_name']);
+    }
+
+    public function testSuccessWithClientSecretPost()
+    {
+        $request = $this->createRequest('/', 'POST',
+            [
+                'token_endpoint_auth_method' => 'client_secret_post',
+                'client_name' => 'My Example',
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        $response = new Response();
+        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $client_config = json_decode($content, true);
+
+        $this->assertTrue(array_key_exists('token_endpoint_auth_method', $client_config));
+        $this->assertTrue(array_key_exists('client_name', $client_config));
+        $this->assertTrue(array_key_exists('client_secret', $client_config));
+        $this->assertTrue(array_key_exists('client_secret_expires_at', $client_config));
+        $this->assertEquals('client_secret_post', $client_config['token_endpoint_auth_method']);
+        $this->assertEquals('My Example', $client_config['client_name']);
+    }
+
+    public function testSuccessWithClientSecretBasic()
+    {
+        $request = $this->createRequest('/', 'POST',
+            [
+                'token_endpoint_auth_method' => 'client_secret_basic',
+                'client_name' => 'My Example',
+            ],
+            ['HTTPS' => 'on']
+        );
+
+        $response = new Response();
+        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $client_config = json_decode($content, true);
+
+        $this->assertTrue(array_key_exists('token_endpoint_auth_method', $client_config));
+        $this->assertTrue(array_key_exists('client_name', $client_config));
+        $this->assertTrue(array_key_exists('client_secret', $client_config));
+        $this->assertTrue(array_key_exists('client_secret_expires_at', $client_config));
+        $this->assertEquals('client_secret_basic', $client_config['token_endpoint_auth_method']);
         $this->assertEquals('My Example', $client_config['client_name']);
     }
 }
