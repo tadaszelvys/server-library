@@ -360,7 +360,9 @@ class Base extends \PHPUnit_Framework_TestCase
             );
 
             $this->userinfo->enablePairwiseSubject(new EncryptedSubjectIdentifier($this->getPairwiseKey(), 'aes-128-cbc', $this->getPairwiseAdditionalData(), $this->getPairwiseAdditionalData()));
+            $this->userinfo->setPublicSubjectByDefault();
             $this->userinfo->setPairwiseSubjectByDefault();
+            $this->assertTrue($this->userinfo->isPairwiseSubjectDefault());
         }
 
         return $this->userinfo;
@@ -1245,6 +1247,9 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_registration_rule_manager->addParameterRule(new ScopeRule($this->getScopeManager()));
 
             $sector_identifier_uri_rule = new SectorIdentifierUriRule();
+            $sector_identifier_uri_rule->disallowHttpConnections();
+            $sector_identifier_uri_rule->allowHttpConnections(); // We allow http connections
+            $sector_identifier_uri_rule->disallowUnsecuredConnections();
             $sector_identifier_uri_rule->allowUnsecuredConnections(); // We allow unsecured connections because we send request against the local server for all tests. Should not be used in production.
             $this->client_registration_rule_manager->addParameterRule($sector_identifier_uri_rule);
             $this->client_registration_rule_manager->addParameterRule(new TokenEndpointAuthMethodEndpointRule(

@@ -37,6 +37,19 @@ class ObjectsTest extends Base
         $this->assertEquals(['https://foo.com'], $client->get('redirect_uris'));
         $this->assertTrue($client->isGrantTypeAllowed('foo'));
         $this->assertFalse($client->isGrantTypeAllowed('baz'));
+
+        $client->remove('grant_types');
+        $this->assertFalse($client->has('grant_types'));
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedException 'Method "sayHello" does not exist.'
+     */
+    public function testClientBadCall()
+    {
+        $client = new Client();
+        $client->sayHello();
     }
 
     public function testIdToken()
