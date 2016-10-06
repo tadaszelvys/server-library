@@ -24,6 +24,11 @@ interface AuthorizationRequestLoaderInterface
     /**
      * @return bool
      */
+    public function areUnsecuredConnectionsAllowed();
+
+    /**
+     * @return bool
+     */
     public function isRequestUriRegistrationRequired();
 
     public function enableRequestUriRegistrationRequirement();

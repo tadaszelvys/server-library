@@ -278,6 +278,7 @@ class ImplicitGrantTypeTest extends Base
 
     public function testAccessTokenSuccessUsingSignedRequestUri()
     {
+        $this->getAuthorizationRequestLoader()->enableRequestUriRegistrationRequirement();
         $this->getImplicitGrantType()->allowConfidentialClients();
 
         $request = new ServerRequest();
@@ -294,6 +295,7 @@ class ImplicitGrantTypeTest extends Base
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
+        $this->getAuthorizationRequestLoader()->disableRequestUriRegistrationRequirement();
     }
 
     public function testAccessTokenSuccessUsingSignedAndEncryptedRequestUri()

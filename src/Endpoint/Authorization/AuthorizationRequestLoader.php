@@ -91,9 +91,9 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     /**
      * {@inheritdoc}
      */
-    public function isRequestUriRegistrationRequired()
+    public function areUnsecuredConnectionsAllowed()
     {
-        return $this->require_request_uri_registration;
+        return $this->allow_unsecured_connections;
     }
 
     /**
@@ -110,6 +110,14 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     public function disableRequestUriRegistrationRequirement()
     {
         $this->require_request_uri_registration = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRequestUriRegistrationRequired()
+    {
+        return $this->require_request_uri_registration;
     }
 
     /**
@@ -353,7 +361,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     private function downloadContent($url)
     {
         $client = new Client([
-            'verify' => !$this->allow_unsecured_connections,
+            'verify' => !$this->areUnsecuredConnectionsAllowed(),
         ]);
         $response = $client->get($url);
         Assertion::eq(200, $response->getStatusCode());
