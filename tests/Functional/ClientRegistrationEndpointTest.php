@@ -357,7 +357,7 @@ class ClientRegistrationEndpointTest extends Base
             [
                 'scope' => 'read write',
                 'grant_types' => ['authorization_code'],
-                'response_types' => ['token'],
+                'response_types' => ['code', 'token'],
                 'subject_type' => 'pairwise',
                 'id_token_encrypted_response_alg' => 'RSA1_5',
                 'id_token_encrypted_response_enc' => 'A256GCM',
