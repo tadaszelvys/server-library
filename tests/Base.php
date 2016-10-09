@@ -662,6 +662,9 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null == $this->assertion_jwt_auth_method) {
             $this->assertion_jwt_auth_method = new ClientAssertionJwt($this->getJWTLoader(), $this->getExceptionManager(), 3600);
+            $this->assertEquals(['HS256', 'HS512', 'RS256', 'RS512'], $this->assertion_jwt_auth_method->getSupportedSignatureAlgorithms());
+            $this->assertEquals(['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256',], $this->assertion_jwt_auth_method->getSupportedKeyEncryptionAlgorithms());
+            $this->assertEquals(['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512',], $this->assertion_jwt_auth_method->getSupportedContentEncryptionAlgorithms());
         }
 
         return $this->assertion_jwt_auth_method;
@@ -994,6 +997,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getIssuer()
             );
 
+            $this->jwt_access_token_manager->setAccessTokenLifetime(1000);
             $this->jwt_access_token_manager->addTokenUpdater(new FooBarAccessTokenUpdater());
         }
 

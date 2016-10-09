@@ -130,13 +130,23 @@ class ObjectsTest extends Base
         $access_token->setExpiresAt(0);
         $access_token->setToken('foo');
         $access_token->setTokenType('bar');
+        $access_token->setScope(['bar', 'baz']);
+        $this->assertFalse($access_token->hasScope('foo'));
+        $this->assertTrue($access_token->hasScope('bar'));
 
         $this->assertEquals([
             'access_token' => 'foo',
             'token_type'   => 'bar',
+            'scope'        => 'bar baz',
         ], $access_token->toArray());
 
         $this->assertFalse($access_token->hasExpired());
+
+        $access_token->setMetadata('foo', 'bar');
+        $this->assertTrue($access_token->hasMetadata('foo'));
+        $this->assertEquals('bar', $access_token->getMetadata('foo'));
+        $access_token->unsetMetadata('foo');
+        $this->assertFalse($access_token->hasMetadata('foo'));
     }
 
     public function testRefreshTokenToArray()
