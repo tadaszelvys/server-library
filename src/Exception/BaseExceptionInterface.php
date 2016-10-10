@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseInterface;
  * OAuth2 Exception that requires termination of process.
  * This exception is the base of all other exceptions. It might not be used directly.
  */
-interface BaseExceptionInterface
+interface BaseExceptionInterface extends \Throwable
 {
     /**
      * Get the description of the exception.
