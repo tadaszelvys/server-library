@@ -2,7 +2,18 @@ How to use
 ==========
 
 This library provides all components to build an authorization server base on the OAuth2 Framework protocol.
-The following components must be created, configured to create a fully featured authorization server.
+
+Not all components are needed; it mainly depends on the features your authorization server has to provide.
+However, you must at least the following ones:
+
+* An exception manager
+* A Scope manager
+* A Client manager
+* An User Account manager
+* An Access Token manager
+* At least one token type and the token type manager
+* At least one grant type
+* Depending on the grant types, at least one endpoint
 
 # Exceptions and Exception Manager
 
