@@ -59,7 +59,7 @@ The following components are implemented:
     * [x] Token ([RFC6749, section 3.2](https://tools.ietf.org/html/rfc6749#section-3.2))
     * [x] Token Revocation ([RFC7009](https://tools.ietf.org/html/rfc7009))
     * [x] Token Introspection ([RFC7662](https://tools.ietf.org/html/rfc7662))
-    * [ ] Dynamic Client Registration Protocol ([RFC7591](https://tools.ietf.org/html/rfc7591)) - *Work In Progress*
+    * [x] Dynamic Client Registration Protocol ([RFC7591](https://tools.ietf.org/html/rfc7591))
     * [ ] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
     * [x] Ability to use other Endpoints
 * Grant types:
