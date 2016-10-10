@@ -5,117 +5,126 @@ This access token manager will create access tokens based on JSON Web Token (JWT
 It does not need a database as they contain digitally signed claims.
 The Authorization and Resource servers can directly verify signature using key materials.
 
-These tokens can also be encrypted to prevent leak of sensitive data. *We highly recommend to enable the access token encryption feature, especially if you use the OpenId Connect extension with pairwise subject support*.
+These tokens are also encrypted to prevent leak of sensitive data.
 
 # Algorithms and Keys
 
-To use this access token manager, you have to define an algorithm and a key (private or symmetric) to digitally sign the tokens.
+To use this access token manager, you have to define,
+- A signature algorithm,
+- A key encryption algorithm,
+- A content encryption algorithm,
+- A key set with all signature keys (at least one key in the key set),
+- A key set with all key encryption keys (at least one key in the key set).
 
-## Access Token Signature
+## Signature Algorithm
 
 Thanks to [spomky-labs/jose](https://github.com/Spomky-Labs/jose), this library is able to support the following signature algorithms:
 
-* HS256, HS384, HS512 (require symmetric key)
-* ES256, ES384, ES512 (require private EC key)
-* RS256, RS384, RS512 (require private RSA key)
-* PS256, PS384, PS512 (require private RSA key)
-* Ed25519 (require octet key pair key)
+* HS256, HS384, HS512 (require `oct` keys).
+* ES256, ES384, ES512 (require `EC` keys).
+* RS256, RS384, RS512 (require `RSA` keys).
+* PS256, PS384, PS512 (require `RSA` keys).
+* EdDSA with Ed25519 curve (requires `OKP` keys).
 
-We recommend you to use `RS512` algorithm as it is quite fast, secured and uses a public/private (RSA) key pair.
+We recommend you to use `RS512` algorithm as it is quite fast and secured.
 
-### Signature Keys
+## Key Encryption Algorithm
 
-The key used to sign the access tokens must be in `JWK` format. Again, thanks to [spomky-labs/jose](https://github.com/Spomky-Labs/jose), you will be able to create such keys using the `Jose\Factory\JWKFactory` from various sources.
+The following key encryption algorithms:
 
-#### Symmetric Keys
+* dir (requires `oct` keys).
+* RSA1_5, RSA-OAEP, RSA-OAEP-256 (require `RSA` keys).
+* ECDH-ES, ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW (require `EC` keys).
+* A128KW, A192KW, A256KW (require `oct` keys).
+* PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW (require `oct` keys).
+* A128GCMKW, A192GCMKW, A256GCMKW (require `oct` keys). For performance, this [third party extension is highly recommended](https://github.com/bukka/php-crypto).
+* EdDSA with X25519 curve (requires `OKP` keys). [Third party extension required](https://github.com/encedo/php-curve25519-ext).
 
-*If you decide to use this kind of keys, we highly recommend you to encrypt the access tokens.*
+We recommend you to use the `AxxxGCMKW` algorithm if you have the third party extension installed, otherwise the `RSA1_5` algorithm.
 
-Examples:
+## Content Encryption Algorithms
+
+* A128CBC-HS256, A192CBC-HS384, A256CBC-HS512
+* A128GCM, A192GCM, A256GCM. For performance, this [third party extension is highly recommended](https://github.com/bukka/php-crypto).
+
+We recommend you to use the `AxxGCM` algorithm if you have the third party extension installed, otherwise any other algorithm.
+
+## Key Sets Creation
+
+The key set configuration you have to set depends on the algorithm you choose.
+Hereafter some example of configurations you may use.
+
+We highly recommend you to:
+- Create rotatable key sets with at least 2 keys to allow you to change your keys without service interruption.
+- Define additional parameters for your keys such as the `alg` and the `use` ones.
+
+Please refer to the [spomky-labs/jose](https://github.com/Spomky-Labs/jose) documentation for more information.
+
+### `RSA` Key Set
+
+With the following example, we will have a key set with 3 RSA keys.
+Each key has 4096 bits size and is dedicated to signature operation with the `RS512` algorithm.
 
 ```php
-use Jose\Object\JWK;
-use Base64Url\Base64Url;
+<?php
 
-$symmetric_key = new JWK(
-    'kty' => 'oct',   // The type of the key. Must not be changed.
-    'kid' => 'key1',  // Key ID. Not mandatory but highly recommended.
-    'use' => 'sig',   // Indicates that the key is used to sign. Not mandatory but highly recommended.
-    'alg' => 'HS256', // Indicates that the key can only be used with HS256 algorithm. Not mandatory but highly recommended.
-    'k'   => Base64Url::encode('This is my super secret key with a lot of entropy.'), // The key encoded in Base64 Url Safe
-);
-```
+use Jose\Factory\JWKFactory;
 
-#### Private RSA Keys
-
-Example:
-
-```php
-$private_key = JWKFactory::createFromKeyFile(
-    '/path/to/my/RSA/private.key',     // Path to your key file
-    'password',                        // Password if the key is encrypted (else null)
+$signature_key_set = JWKFactory::createRotatableKeySet(
+    '/path/to/the/keyset',
     [
-        'kid' => 'My Private RSA key', // Key ID. Not mandatory but highly recommended.
-        'use' => 'sig',                // Indicates that the key is used to sign. Not mandatory but highly recommended.
-        'alg' => 'RS256',              // Indicates that the key can only be used with RS256 algorithm. Not mandatory but highly recommended.
-    ]
+        'kty'  => 'RSA',
+        'use'  => 'sig',
+        'alg'  => 'RS512',
+        'size' => 4096,
+    ],
+    3
 );
 ```
 
-#### Private EC Keys
+### `oct` Key Set
 
-Example:
+With the following example, we will have a key set with 3 RSA keys.
+Each key has 4096 bits size and is dedicated to signature/verification operations with the `RS512` algorithm.
 
 ```php
-$private_key = JWKFactory::createFromKeyFile(
-    '/path/to/my/EC/private.key',      // Path to your key file
-    'password',                        // Password if the key is encrypted (else null)
+<?php
+
+use Jose\Factory\JWKFactory;
+
+$encryption_key_set = JWKFactory::createRotatableKeySet(
+    '/path/to/the/keyset',
     [
-        'kid' => 'My Private RSA key', // Key ID. Not mandatory but highly recommended.
-        'use' => 'sig',                // Indicates that the key is used to sign. Not mandatory but highly recommended.
-        'alg' => 'ES256',              // Indicates that the key can only be used with RS256 algorithm. Not mandatory but highly recommended.
-    ]
+        'kty'  => 'oct',
+        'use'  => 'enc',
+        'alg'  => 'A256GCMKW',
+        'size' => 256,
+    ],
+    3
 );
 ```
 
-# The JWT Access Token Manager
+With the following example, we will have a key set with 3 octet keys.
+Each key has 256 bits size and is dedicated to encryption/decryption operations with the `A256GCMKW` algorithm.
 
-Now you have your keys, you can create an instance of the JWT Access Token Manager `OAuth2\Token\JWTAccessTokenManager`.
+# The JWT Access Token Manager Object
+
+Now that you have all algorithms and key sets, then you have to create an instance of the `OAuth2\Token\JWTAccessTokenManager` class.
 
 ```php
+<?php
+
 use OAuth2\Token\JWTAccessTokenManager;
 
 $jwt_access_manager = new JWTAccessTokenManager(
-    $jwt_creator, // The JWT Creator service
-    $jwt_loader,  // The JWT Loader service
-    'HS512',      // The algorithm used to sign our JWT Access Tokens
-    new JWK([     // The key used to sign
-        'kid' => 'My signature key',
-        'use' => 'sig',
-        'alg' => 'HS512',
-        'kty' => 'oct',
-        'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-    ]),
-    $this->issuer // The issuer of the token (i.e. the authorization serve URL).
-);
-```
-
-*Important note: the JWTLoader and JWTCreator services MUST support the signature algorithm you want to use*
-
-## Encrypted Access Tokens
-
-You can enable the access token encryption if you want to protect information stored in the payload.
-
-```php
-$jwt_access_manager->enableAccessTokenEncryption(
-    'A256KW',        // Key encryption algorithm
-    'A256CBC-HS512', // Content encryption algorithm
-    new JWK([        // Key used to encrypt
-        'kid' => 'JWK1',
-        'use' => 'enc',
-        'kty' => 'oct',
-        'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-    ])
+    $jwt_creator,              // The JWT Creator service
+    $jwt_loader,               // The JWT Loader service
+    'HS512',                   // The algorithm used to sign our JWT Access Tokens
+    $signature_key_set,        // The signature key set
+    'A256GCMKW',               // The key encryption algorithm
+    'AGCMKW',                  // The content encryption algorithm
+    $encryption_key_set,       // The signature key set
+    'https://www.example.com/' // The issuer of the token (i.e. the authorization server URL).
 );
 ```
 

@@ -42,13 +42,13 @@ class UriExtension implements ExceptionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getData($type, $error, $error_description, array $data)
+    public function process($type, $error, $error_description, array &$data)
     {
-        if ($type === ExceptionManagerInterface::BAD_REQUEST) {
-            return ['error_uri' => urlencode("https://foo.test/Error/$type/$error")];
+        if ($type !== ExceptionManagerInterface::INTERNAL_SERVER_ERROR) {
+            $data['error_uri'] = "https://foo.test/Error/$type/$error";
+        } else {
+            $data['error_uri'] = "https://foo.test/Internal/$type/$error";
         }
-
-        return [];
     }
 }
 ```
@@ -76,9 +76,9 @@ class TooManyRequestsException extends BaseException
     /**
      * {@inheritdoc}
      */
-    public function __construct($error, $error_description, array $error_data, array $data])
+    public function __construct($error, $error_description, array $error_data)
     {
-        parent::__construct(429, $error, $error_description, $error_data, $data);
+        parent::__construct(429, $error, $error_description, $error_data);
     }
 }
 ```
@@ -122,6 +122,6 @@ Now, you are able to throw your new exception type:
 
 ```php
 throw $exception_manager->getException('TooManyRequests', 'unauthorized_client', 'Only 300 requests/day');
-// Or better
+// Or
 throw $exception_manager->getTooManyRequestsException('unauthorized_client', 'Only 300 requests/day');
 ```

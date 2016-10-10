@@ -34,7 +34,7 @@ The Access token Manager is one of the most important component in the OAuth2 Fr
 This library is able to support any kind of access token managers.
 You can create your own access token manager. It just has to implement `OAuth2\Token\AccessTokenManagerInterface`.
 
-Or you can use the following implementation.
+Or you can use the following implementations.
 
 ## Random String Access Token Manager
 
@@ -43,9 +43,8 @@ Or you can use the following implementation.
 ## JWT Access Token Manager
 
 This manager will produce access tokens based on JSON Web Token (JWT).
-The tokens do not need a database and are digitally signed by the authorization server.
-They can also be encrypted in order to protect confidential information leak.
-The encryption is performed using the encryption key of the resource server or, if not available, of the authorization server.
+The tokens do not need a database and are digitally signed and encrypted by the authorization server.
+Encryption is required in order to protect confidential information leak.
 
 Please read [this page](component/jwt_access_token_manager.md) to know how to create and use this component.
 
@@ -60,18 +59,11 @@ This manager will handle token types enabled in your authorization server.
 
 Please read [this page](component/token_type/manager.md) to know how to create and use this component.
 
-# Users
+# Users and Accounts
 
 Please read [this page](component/user_manager.md) to know how to create and use this component.
 
-# Client Manager Supervisor and Client Managers
-
-## Client Manager Supervisor
-
-The role of the client manager supervisor is to manager all client managers you need.
-It will handle requests and try to identify which client is sending requests against the authorization server.
-
-Please read [this page](component/client/manager_supervisor.md) to know how to create and use this component.
+# Clients and Client Manager
 
 # Resource Servers
 
@@ -84,3 +76,7 @@ Please read [this page](component/endpoint/endpoints.md) to know how to create a
 # Grant types
 
 Please read [this page](component/grant/types.md) to know how to create and use the grant types provided by this library.
+
+# OpenID Connect
+
+To be written

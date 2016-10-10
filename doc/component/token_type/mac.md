@@ -8,6 +8,7 @@ The `MAC Token Type` allow clients to sign their requests using a shared algorit
 Examples:
 
 ```php
+<?php
 use OAuth2\Token\MacToken;
 
 $mac_token = new MacToken();
@@ -31,10 +32,10 @@ Now, when access tokens are issued, additional values are set:
 You can change the `mac_algorithm` parameter, length and the charset of the `mac_key` if needed:
 
 ```php
+<?php
 use OAuth2\Token\MacToken;
 
 $mac_token = new MacToken();
-$mac_token->setMacKeyCharset('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 $mac_token->setMacKeyMinLength(40);
 $mac_token->setMacKeyMaxLength(50);
 $mac_token->setMacAlgorithm('hmac-sha-256');
@@ -47,6 +48,7 @@ Examples of clients requests are available in the [IETF specification, draft ver
 For more security, you can change the validity period of the timestamp. By default it is 30 seconds.
 
 ```php
+<?php
 use OAuth2\Token\MacToken;
 
 $mac_token = new MacToken();
