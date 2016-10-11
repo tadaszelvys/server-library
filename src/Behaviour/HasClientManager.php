@@ -11,27 +11,38 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use OAuth2\Client\ClientManagerInterface;
 
 trait HasClientManager
 {
     /**
-     * @var \OAuth2\Client\ClientManagerInterface
+     * @var \OAuth2\Client\ClientManagerInterface|null
      */
-    private $client_manager;
+    private $client_manager = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasClientManager()
+    {
+        return null !== $this->client_manager;
+    }
 
     /**
      * @return \OAuth2\Client\ClientManagerInterface
      */
-    private function getClientManager()
+    protected function getClientManager()
     {
+        Assertion::true($this->hasClientManager(), 'The client manager is not available.');
+
         return $this->client_manager;
     }
 
     /**
      * @param \OAuth2\Client\ClientManagerInterface $client_manager
      */
-    private function setClientManager(ClientManagerInterface $client_manager)
+    protected function setClientManager(ClientManagerInterface $client_manager)
     {
         $this->client_manager = $client_manager;
     }

@@ -11,27 +11,38 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use OAuth2\Token\AccessTokenManagerInterface;
 
 trait HasAccessTokenManager
 {
     /**
-     * @var \OAuth2\Token\AccessTokenManagerInterface
+     * @var \OAuth2\Token\AccessTokenManagerInterface|null
      */
-    private $access_token_manager;
+    private $access_token_manager = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasAccessTokenManager()
+    {
+        return null !== $this->access_token_manager;
+    }
 
     /**
      * @return \OAuth2\Token\AccessTokenManagerInterface
      */
-    private function getAccessTokenManager()
+    protected function getAccessTokenManager()
     {
+        Assertion::true($this->hasAccessTokenManager(), 'The access token manager is not available.');
+
         return $this->access_token_manager;
     }
 
     /**
      * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
      */
-    private function setAccessTokenManager(AccessTokenManagerInterface $access_token_manager)
+    protected function setAccessTokenManager(AccessTokenManagerInterface $access_token_manager)
     {
         $this->access_token_manager = $access_token_manager;
     }

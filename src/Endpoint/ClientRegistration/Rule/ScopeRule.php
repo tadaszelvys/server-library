@@ -20,7 +20,10 @@ final class ScopeRule implements ParameterRuleInterface
 {
     use HasScopeManager;
 
-    public function __construct(ScopeManagerInterface $scope_manager)
+    /**
+     * @param \OAuth2\Scope\ScopeManagerInterface $scope_manager
+     */
+    public function enableScopeSupport(ScopeManagerInterface $scope_manager)
     {
         $this->setScopeManager($scope_manager);
     }
@@ -30,6 +33,9 @@ final class ScopeRule implements ParameterRuleInterface
      */
     public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
+        if (!$this->hasScopeManager()) {
+            return;
+        }
         if (array_key_exists('scope', $registration_parameters)) {
             Assertion::regex($registration_parameters['scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the "scope" parameter.');
             $metadatas['scope'] = $registration_parameters['scope'];

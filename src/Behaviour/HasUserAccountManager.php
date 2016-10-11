@@ -11,27 +11,38 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use OAuth2\UserAccount\UserAccountManagerInterface;
 
 trait HasUserAccountManager
 {
     /**
-     * @var \OAuth2\UserAccount\UserAccountManagerInterface
+     * @var \OAuth2\UserAccount\UserAccountManagerInterface|null
      */
-    private $user_account_manager;
+    private $user_account_manager = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasUserAccountManager()
+    {
+        return null !== $this->user_account_manager;
+    }
 
     /**
      * @return \OAuth2\UserAccount\UserAccountManagerInterface
      */
     protected function getUserAccountManager()
     {
+        Assertion::true($this->hasUserAccountManager(), 'The user account manager is not available.');
+
         return $this->user_account_manager;
     }
 
     /**
      * @param \OAuth2\UserAccount\UserAccountManagerInterface $user_account_manager
      */
-    private function setUserAccountManager(UserAccountManagerInterface $user_account_manager)
+    protected function setUserAccountManager(UserAccountManagerInterface $user_account_manager)
     {
         $this->user_account_manager = $user_account_manager;
     }

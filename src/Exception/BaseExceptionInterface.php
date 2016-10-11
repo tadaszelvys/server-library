@@ -19,6 +19,79 @@ use Psr\Http\Message\ResponseInterface;
  */
 interface BaseExceptionInterface
 {
+
+    /**
+     * Gets the message.
+     * This method comes from the \Throwable interface available since PHP 7.0
+     *
+     * @link http://php.net/manual/en/throwable.getmessage.php
+     * @return string
+     */
+    public function getMessage();
+
+    /**
+     * Gets the exception code.
+     * This method comes from the \Throwable interface available since PHP 7.0
+     *
+     * @link http://php.net/manual/en/throwable.getcode.php
+     * @return int
+     */
+    public function getCode();
+
+    /**
+     * Gets the file in which the exception occurred.
+     * This method comes from the \Throwable interface available since PHP 7.0
+     *
+     * @link http://php.net/manual/en/throwable.getfile.php
+     * @return string Returns the name of the file from which the object was thrown.
+     */
+    public function getFile();
+
+    /**
+     * Gets the line on which the object was instantiated.
+     * This method comes from the \Throwable interface available since PHP 7.0
+     *
+     * @link http://php.net/manual/en/throwable.getline.php
+     * @return int Returns the line number where the thrown object was instantiated.
+     */
+    public function getLine();
+
+    /**
+     * Gets the stack trace.
+     * This method comes from the \Throwable interface available since PHP 7.0
+     *
+     * @link http://php.net/manual/en/throwable.gettrace.php
+     * @return array
+     */
+    public function getTrace();
+
+    /**
+     * Gets the stack trace as a string.
+     * This method comes from the \Throwable interface available since PHP 7.0
+     *
+     * @link http://php.net/manual/en/throwable.gettraceasstring.php
+     * @return string Returns the stack trace as a string.
+     */
+    public function getTraceAsString();
+
+    /**
+     * Returns the previous Throwable.
+     * This method comes from the \Throwable interface available since PHP 7.0
+     *
+     * @link http://php.net/manual/en/throwable.getprevious.php
+     * @return \OAuth2\Exception\BaseExceptionInterface|\Exception|null
+     */
+    public function getPrevious();
+
+    /**
+     * Gets a string representation of the thrown object.
+     * This method comes from the \Throwable interface available since PHP 7.0
+     *
+     * @link http://php.net/manual/en/throwable.tostring.php
+     * @return string
+     */
+    public function __toString();
+
     /**
      * Get the description of the exception.
      *

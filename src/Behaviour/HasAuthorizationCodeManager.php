@@ -11,27 +11,38 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use OAuth2\Token\AuthCodeManagerInterface;
 
 trait HasAuthorizationCodeManager
 {
     /**
-     * @var \OAuth2\Token\AuthCodeManagerInterface
+     * @var \OAuth2\Token\AuthCodeManagerInterface|null
      */
-    private $authorization_code_manager;
+    private $authorization_code_manager = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasAuthorizationCodeManager()
+    {
+        return null !== $this->authorization_code_manager;
+    }
 
     /**
      * @return \OAuth2\Token\AuthCodeManagerInterface
      */
-    private function getAuthorizationCodeManager()
+    protected function getAuthorizationCodeManager()
     {
+        Assertion::true($this->hasAuthorizationCodeManager(), 'The authorization code manager is not available.');
+
         return $this->authorization_code_manager;
     }
 
     /**
      * @param \OAuth2\Token\AuthCodeManagerInterface $authorization_code_manager
      */
-    private function setAuthorizationCodeManager(AuthCodeManagerInterface $authorization_code_manager)
+    protected function setAuthorizationCodeManager(AuthCodeManagerInterface $authorization_code_manager)
     {
         $this->authorization_code_manager = $authorization_code_manager;
     }

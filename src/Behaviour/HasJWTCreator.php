@@ -11,27 +11,38 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use Jose\JWTCreatorInterface;
 
 trait HasJWTCreator
 {
     /**
-     * @var \Jose\JWTCreatorInterface
+     * @var \Jose\JWTCreatorInterface|null
      */
-    private $jwt_creator;
+    private $jwt_creator = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasJWTCreator()
+    {
+        return null !== $this->jwt_creator;
+    }
 
     /**
      * @return \Jose\JWTCreatorInterface
      */
-    private function getJWTCreator()
+    protected function getJWTCreator()
     {
+        Assertion::true($this->hasJWTCreator(), 'The JWT Creator is not available.');
+
         return $this->jwt_creator;
     }
 
     /**
      * @param \Jose\JWTCreatorInterface $jwt_creator
      */
-    private function setJWTCreator(JWTCreatorInterface $jwt_creator)
+    protected function setJWTCreator(JWTCreatorInterface $jwt_creator)
     {
         $this->jwt_creator = $jwt_creator;
     }

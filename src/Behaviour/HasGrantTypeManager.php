@@ -11,27 +11,38 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use OAuth2\Grant\GrantTypeManagerInterface;
 
 trait HasGrantTypeManager
 {
     /**
-     * @var \OAuth2\Grant\GrantTypeManagerInterface
+     * @var \OAuth2\Grant\GrantTypeManagerInterface|null
      */
-    private $grant_type_manager;
+    private $grant_type_manager = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasGrantTypeManager()
+    {
+        return null !== $this->grant_type_manager;
+    }
 
     /**
      * @return \OAuth2\Grant\GrantTypeManagerInterface
      */
-    private function getGrantTypeManager()
+    protected function getGrantTypeManager()
     {
+        Assertion::true($this->hasGrantTypeManager(), 'The grant type manager is not available.');
+
         return $this->grant_type_manager;
     }
 
     /**
      * @param \OAuth2\Grant\GrantTypeManagerInterface $grant_type_manager
      */
-    private function setGrantTypeManager(GrantTypeManagerInterface $grant_type_manager)
+    protected function setGrantTypeManager(GrantTypeManagerInterface $grant_type_manager)
     {
         $this->grant_type_manager = $grant_type_manager;
     }

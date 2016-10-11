@@ -47,18 +47,23 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
      *
      * @param \OAuth2\Token\AuthCodeManagerInterface              $auth_code_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface         $exception_manager
-     * @param \OAuth2\Scope\ScopeManagerInterface                 $scope_manager
      * @param \OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface $pkce_method_manager
      */
     public function __construct(AuthCodeManagerInterface $auth_code_manager,
                                 ExceptionManagerInterface $exception_manager,
-                                ScopeManagerInterface $scope_manager,
                                 PKCEMethodManagerInterface $pkce_method_manager
     ) {
         $this->setAuthorizationCodeManager($auth_code_manager);
         $this->setExceptionManager($exception_manager);
-        $this->setScopeManager($scope_manager);
         $this->setPKCEMethodManager($pkce_method_manager);
+    }
+
+    /**
+     * @param \OAuth2\Scope\ScopeManagerInterface $scope_manager
+     */
+    public function enableScopeSupport(ScopeManagerInterface $scope_manager)
+    {
+        $this->setScopeManager($scope_manager);
     }
 
     /**
@@ -176,15 +181,17 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
 
         $this->getAuthorizationCodeManager()->markAuthCodeAsUsed($authCode);
 
-        $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
-        $grant_type_response->setAvailableScope($authCode->getScope());
+        if ($this->hasScopeManager()) {
+            $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
+            $grant_type_response->setAvailableScope($authCode->getScope());
+            $grant_type_response->setRefreshTokenScope($authCode->getScope());
+        }
         $grant_type_response->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
         $grant_type_response->setUserAccountPublicId($authCode->getUserAccountPublicId());
         $grant_type_response->setRedirectUri($authCode->getMetadata('redirect_uri'));
 
         // Refresh Token
         $grant_type_response->setRefreshTokenIssued($authCode->getIssueRefreshToken());
-        $grant_type_response->setRefreshTokenScope($authCode->getScope());
         $grant_type_response->setAdditionalData('auth_code', $authCode);
     }
 

@@ -21,7 +21,10 @@ final class ScopeParameterChecker implements ParameterCheckerInterface
 {
     use HasScopeManager;
 
-    public function __construct(ScopeManagerInterface $scope_manager)
+    /**
+     * @param \OAuth2\Scope\ScopeManagerInterface $scope_manager
+     */
+    public function enableScopeSupport(ScopeManagerInterface $scope_manager)
     {
         $this->setScopeManager($scope_manager);
     }
@@ -31,6 +34,10 @@ final class ScopeParameterChecker implements ParameterCheckerInterface
      */
     public function checkerParameter(ClientInterface $client, array &$parameters)
     {
+        if (!$this->hasScopeManager()) {
+            return;
+        }
+
         $scope = $this->getScopeManager()->checkScopePolicy($parameters['scope'], $client);
         $available_scope = $this->getScopeManager()->getAvailableScopesForClient($client);
 

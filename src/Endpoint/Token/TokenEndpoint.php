@@ -62,7 +62,6 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
      * @param \OAuth2\Client\ClientManagerInterface           $client_manager
      * @param \OAuth2\UserAccount\UserAccountManagerInterface $user_account_manager
-     * @param \OAuth2\Scope\ScopeManagerInterface             $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
      */
@@ -72,7 +71,6 @@ final class TokenEndpoint implements TokenEndpointInterface
         AccessTokenManagerInterface $access_token_manager,
         ClientManagerInterface $client_manager,
         UserAccountManagerInterface $user_account_manager,
-        ScopeManagerInterface $scope_manager,
         ExceptionManagerInterface $exception_manager,
         RefreshTokenManagerInterface $refresh_token_manager = null
     ) {
@@ -80,12 +78,19 @@ final class TokenEndpoint implements TokenEndpointInterface
         $this->setAccessTokenManager($access_token_manager);
         $this->setClientManager($client_manager);
         $this->setUserAccountManager($user_account_manager);
-        $this->setScopeManager($scope_manager);
         $this->setExceptionManager($exception_manager);
         $this->setGrantTypeManager($grant_type_manager);
         if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
             $this->setRefreshTokenManager($refresh_token_manager);
         }
+    }
+
+    /**
+     * @param \OAuth2\Scope\ScopeManagerInterface $scope_manager
+     */
+    public function enableScopeSupport(ScopeManagerInterface $scope_manager)
+    {
+        $this->setScopeManager($scope_manager);
     }
 
     /**
@@ -143,24 +148,28 @@ final class TokenEndpoint implements TokenEndpointInterface
 
         $grant_type_response->setClientPublicId($client->getPublicId());
 
-        $this->populateScope($request, $grant_type_response);
+        if ($this->hasScopeManager()) {
+            $this->populateScope($request, $grant_type_response);
+        }
 
         $token_type_information = $this->getTokenTypeInformation($request_parameters, $client);
 
         $type->grantAccessToken($request, $client, $grant_type_response);
 
-        $grant_type_response->setAvailableScope($grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopesForClient($client));
+        if ($this->hasScopeManager()) {
+            $grant_type_response->setAvailableScope($grant_type_response->getAvailableScope() ?: $this->getScopeManager()->getAvailableScopesForClient($client));
 
-        //Modify the scope according to the scope policy
-        try {
-            $requested_scope = $this->getScopeManager()->checkScopePolicy($grant_type_response->getRequestedScope(), $client);
-        } catch (\InvalidArgumentException $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, $e->getMessage());
+            //Modify the scope according to the scope policy
+            try {
+                $requested_scope = $this->getScopeManager()->checkScopePolicy($grant_type_response->getRequestedScope(), $client);
+            } catch (\InvalidArgumentException $e) {
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, $e->getMessage());
+            }
+            $grant_type_response->setRequestedScope($requested_scope);
+
+            //Check if scope requested are within the available scope
+            $this->checkRequestedScope($grant_type_response);
         }
-        $grant_type_response->setRequestedScope($requested_scope);
-
-        //Check if scope requested are within the available scope
-        $this->checkRequestedScope($grant_type_response);
 
         //Call extensions to add metadatas to the Access Token
         $metadatas = $this->preAccessTokenCreation(
@@ -352,7 +361,7 @@ final class TokenEndpoint implements TokenEndpointInterface
             $grant_type_response->getResourceOwnerPublicId(),
             $grant_type_response->getUserAccountPublicId()
         );
-        if (null !== $this->getRefreshTokenManager()) {
+        if (true === $this->hasRefreshTokenManager()) {
             if (true === $grant_type_response->isRefreshTokenIssued()) {
                 $refresh_token = $this->getRefreshTokenManager()->createRefreshToken($client, $resource_owner, $grant_type_response->getRefreshTokenScope(), $metadatas);
             }

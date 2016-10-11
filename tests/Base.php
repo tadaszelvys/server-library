@@ -223,11 +223,14 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->parameter_checker_manager) {
             $this->parameter_checker_manager = new ParameterCheckerManager($this->getExceptionManager());
 
+            $scope_checker = new ScopeParameterChecker();
+            $scope_checker->enableScopeSupport($this->getScopeManager());
+
             $this->parameter_checker_manager->addParameterChecker(new DisplayParameterChecker());
             $this->parameter_checker_manager->addParameterChecker(new PromptParameterChecker());
             $this->parameter_checker_manager->addParameterChecker(new ResponseTypeParameterChecker());
             $this->parameter_checker_manager->addParameterChecker(new StateParameterChecker(true));
-            $this->parameter_checker_manager->addParameterChecker(new ScopeParameterChecker($this->getScopeManager()));
+            $this->parameter_checker_manager->addParameterChecker($scope_checker);
             $this->parameter_checker_manager->addParameterChecker(new RedirectUriParameterChecker(false, false));
             $this->parameter_checker_manager->addParameterChecker(new ResponseModeParameterChecker(true));
             $this->parameter_checker_manager->addParameterChecker(new NonceParameterChecker());
@@ -531,13 +534,12 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManager(),
                 $this->getUserAccountManager(),
-                $this->getScopeManager(),
                 $this->getExceptionManager(),
                 $this->getRefreshTokenManager()
             );
 
+            $this->token_endpoint->enableScopeSupport($this->getScopeManager());
             $this->token_endpoint->addTokenEndpointExtension($this->getOpenIdConnectTokenEndpointExtension());
-
             $this->token_endpoint->allowAccessTokenTypeParameter();
         }
 
@@ -602,11 +604,11 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_endpoint = new AuthorizationEndpoint(
                 $this->getUserAccountManager(),
                 $this->getAuthorizationFactory(),
-                $this->getScopeManager(),
-                $this->getExceptionManager(),
-                $this->getPreConfiguredAuthorizationManager(),
-                $this->getIdTokenManager()
+                $this->getExceptionManager()
             );
+
+            $this->authorization_endpoint->enableIdTokenSupport($this->getIdTokenManager());
+            $this->authorization_endpoint->enablePreConfiguredAuthorizationSupport($this->getPreConfiguredAuthorizationManager());
 
             $this->authorization_endpoint->addExtension(new SessionStateParameterExtension('oauth2_session_state'));
         }
@@ -739,10 +741,10 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_code_grant_type = new AuthorizationCodeGrantType(
                 $this->getAuthCodeManager(),
                 $this->getExceptionManager(),
-                $this->getScopeManager(),
                 $this->getPKCEMethodManager()
             );
 
+            $this->authorization_code_grant_type->enableScopeSupport($this->getScopeManager());
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
             $this->authorization_code_grant_type->disablePKCEForPublicClientsEnforcement();
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
@@ -1257,9 +1259,13 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getGrantTypeManager(),
                 $this->getResponseTypeManager()
             ));
+
+            $scope_rule = new ScopeRule();
+            $scope_rule->enableScopeSupport($this->getScopeManager());
+
             $this->client_registration_rule_manager->addParameterRule(new RedirectionUriRule());
             $this->client_registration_rule_manager->addParameterRule(new RequestUriRule());
-            $this->client_registration_rule_manager->addParameterRule(new ScopeRule($this->getScopeManager()));
+            $this->client_registration_rule_manager->addParameterRule($scope_rule);
 
             $sector_identifier_uri_rule = new SectorIdentifierUriRule();
             $sector_identifier_uri_rule->disallowHttpConnections();

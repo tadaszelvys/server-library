@@ -70,7 +70,7 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
         if ($token instanceof AccessTokenInterface) {
             if (true === $this->areRefreshTokensRevokedWithAccessTokens()
                 && null !== $token->getRefreshToken()
-                && $this->getRefreshTokenManager() instanceof RefreshTokenManagerInterface) {
+                && true === $this->hasRefreshTokenManager()) {
                 $refresh_token = $this->getRefreshTokenManager()->getRefreshToken($token->getRefreshToken());
                 if ($refresh_token instanceof RefreshTokenInterface) {
                     $this->getRefreshTokenManager()->revokeRefreshToken($refresh_token);

@@ -11,28 +11,39 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface;
 
 trait HasParameterRuleManager
 {
     /**
-     * @var \OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface
+     * @var \OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface|null
      */
-    private $client_registration_rule_manager;
+    private $parameter_rule_manager = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasParameterRuleManager()
+    {
+        return null !== $this->parameter_rule_manager;
+    }
 
     /**
      * @return \OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface
      */
-    private function getParameterRuleManager()
+    protected function getParameterRuleManager()
     {
-        return $this->client_registration_rule_manager;
+        Assertion::true($this->hasParameterRuleManager(), 'The parameter rule manager is not available.');
+
+        return $this->parameter_rule_manager;
     }
 
     /**
-     * @param \OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface $client_registration_rule_manager
+     * @param \OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface $parameter_rule_manager
      */
-    private function setParameterRuleManager(ParameterRuleManagerInterface $client_registration_rule_manager)
+    protected function setParameterRuleManager(ParameterRuleManagerInterface $parameter_rule_manager)
     {
-        $this->client_registration_rule_manager = $client_registration_rule_manager;
+        $this->parameter_rule_manager = $parameter_rule_manager;
     }
 }

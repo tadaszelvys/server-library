@@ -11,27 +11,38 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use Jose\JWTLoaderInterface;
 
 trait HasJWTLoader
 {
     /**
-     * @var \Jose\JWTLoaderInterface
+     * @var \Jose\JWTLoaderInterface|null
      */
-    private $jwt_loader;
+    private $jwt_loader = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasJWTLoader()
+    {
+        return null !== $this->jwt_loader;
+    }
 
     /**
      * @return \Jose\JWTLoaderInterface
      */
-    private function getJWTLoader()
+    protected function getJWTLoader()
     {
+        Assertion::true($this->hasJWTLoader(), 'The JWT Loader is not available.');
+
         return $this->jwt_loader;
     }
 
     /**
      * @param \Jose\JWTLoaderInterface $jwt_loader
      */
-    private function setJWTLoader(JWTLoaderInterface $jwt_loader)
+    protected function setJWTLoader(JWTLoaderInterface $jwt_loader)
     {
         $this->jwt_loader = $jwt_loader;
     }

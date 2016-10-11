@@ -13,7 +13,6 @@ namespace OAuth2\Endpoint\Authorization;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Behaviour\HasUserAccountManager;
 use OAuth2\Endpoint\Authorization\AuthorizationEndpointExtension\AuthorizationEndpointExtensionInterface;
 use OAuth2\Endpoint\Authorization\AuthorizationEndpointExtension\StateParameterExtension;
@@ -24,7 +23,6 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\OpenIdConnect\HasIdTokenManager;
 use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 use OAuth2\ResponseMode\QueryResponseMode;
-use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\UserAccount\UserAccountInterface;
 use OAuth2\UserAccount\UserAccountManagerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -34,7 +32,6 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 {
     use HasExceptionManager;
     use HasIdTokenManager;
-    use HasScopeManager;
     use HasUserAccountManager;
 
     /**
@@ -57,29 +54,33 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @param \OAuth2\UserAccount\UserAccountManagerInterface                                                           $user_account_manager
      * @param \OAuth2\Endpoint\Authorization\AuthorizationFactoryInterface                                              $authorization_factory
-     * @param \OAuth2\Scope\ScopeManagerInterface                                                                       $scope_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface                                                               $exception_manager
-     * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface|null $pre_configured_authorization_manager
-     * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface|null                                                        $id_token_manager
      */
     public function __construct(
         UserAccountManagerInterface $user_account_manager,
         AuthorizationFactoryInterface $authorization_factory,
-        ScopeManagerInterface $scope_manager,
-        ExceptionManagerInterface $exception_manager,
-        PreConfiguredAuthorizationManagerInterface $pre_configured_authorization_manager = null,
-        IdTokenManagerInterface $id_token_manager = null
+        ExceptionManagerInterface $exception_manager
     ) {
         $this->authorization_factory = $authorization_factory;
-        $this->pre_configured_authorization_manager = $pre_configured_authorization_manager;
         $this->setUserAccountManager($user_account_manager);
         $this->setExceptionManager($exception_manager);
-        $this->setScopeManager($scope_manager);
-        if (null !== $id_token_manager) {
-            $this->setIdTokenManager($id_token_manager);
-        }
-
         $this->addExtension(new StateParameterExtension());
+    }
+
+    /**
+     * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface $pre_configured_authorization_manager
+     */
+    public function enablePreConfiguredAuthorizationSupport(PreConfiguredAuthorizationManagerInterface $pre_configured_authorization_manager)
+    {
+        $this->pre_configured_authorization_manager = $pre_configured_authorization_manager;
+    }
+
+    /**
+     * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface $id_token_manager
+     */
+    public function enableIdTokenSupport(IdTokenManagerInterface $id_token_manager)
+    {
+        $this->setIdTokenManager($id_token_manager);
     }
 
     /**

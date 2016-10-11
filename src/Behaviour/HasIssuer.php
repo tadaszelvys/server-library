@@ -16,22 +16,32 @@ use Assert\Assertion;
 trait HasIssuer
 {
     /**
-     * @var string
+     * @var string|null
      */
-    private $issuer;
+    private $issuer = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasIssuer()
+    {
+        return null !== $this->issuer;
+    }
 
     /**
      * @return string
      */
-    private function getIssuer()
+    protected function getIssuer()
     {
+        Assertion::true($this->hasIssuer(), 'The issuer is not available.');
+
         return $this->issuer;
     }
 
     /**
      * @param string $issuer
      */
-    private function setIssuer($issuer)
+    protected function setIssuer($issuer)
     {
         Assertion::string($issuer);
         $this->issuer = $issuer;

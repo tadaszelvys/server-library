@@ -141,7 +141,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
      */
     public function getSupportedSignatureAlgorithms()
     {
-        return null === $this->getJWTLoader() ? [] : $this->getJWTLoader()->getSupportedSignatureAlgorithms();
+        return false === $this->hasJWTLoader() ? [] : $this->getJWTLoader()->getSupportedSignatureAlgorithms();
     }
 
     /**
@@ -149,7 +149,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
      */
     public function getSupportedKeyEncryptionAlgorithms()
     {
-        return null === $this->getJWTLoader() ? [] : $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms();
+        return false === $this->hasJWTLoader() ? [] : $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms();
     }
 
     /**
@@ -157,7 +157,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
      */
     public function getSupportedContentEncryptionAlgorithms()
     {
-        return null === $this->getJWTLoader() ? [] : $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms();
+        return false === $this->hasJWTLoader() ? [] : $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms();
     }
 
     /**

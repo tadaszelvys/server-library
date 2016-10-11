@@ -90,7 +90,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
      */
     public function isSignedResponsesSupportEnabled()
     {
-        return null !== $this->getJWTCreator();
+        return $this->hasJWTCreator();
     }
 
     /**

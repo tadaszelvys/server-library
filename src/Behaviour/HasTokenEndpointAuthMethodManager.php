@@ -11,27 +11,38 @@
 
 namespace OAuth2\Behaviour;
 
+use Assert\Assertion;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 
 trait HasTokenEndpointAuthMethodManager
 {
     /**
-     * @var \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface
+     * @var \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface|null
      */
-    private $token_endpoint_auth_method_manager;
+    private $token_endpoint_auth_method_manager = null;
+
+    /**
+     * @return bool
+     */
+    protected function hasTokenEndpointAuthMethodManager()
+    {
+        return null !== $this->token_endpoint_auth_method_manager;
+    }
 
     /**
      * @return \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface
      */
-    private function getTokenEndpointAuthMethodManager()
+    protected function getTokenEndpointAuthMethodManager()
     {
+        Assertion::true($this->hasTokenEndpointAuthMethodManager(), 'The token endpoint authentication method code manager is not available.');
+
         return $this->token_endpoint_auth_method_manager;
     }
 
     /**
      * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager
      */
-    private function setTokenEndpointAuthMethodManager(TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager)
+    protected function setTokenEndpointAuthMethodManager(TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager)
     {
         $this->token_endpoint_auth_method_manager = $token_endpoint_auth_method_manager;
     }
