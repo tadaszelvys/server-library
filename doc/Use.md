@@ -11,9 +11,9 @@ However, you must at least the following ones:
 * A Client manager
 * An User Account manager
 * An Access Token manager
-* At least one token type and the token type manager
+* A Token Type manager with at least one token type
 * At least one grant type
-* Depending on the grant types, at least one endpoint
+* At least one endpoint (endpoints depend on the grant types)
 
 # Exceptions and Exception Manager
 
@@ -21,15 +21,6 @@ The exception manager manages all exception types thrown during the authorizatio
 It is used by almost all other components.
 
 Please read [this page](component/exception.md) to know how to create and use this component.
-
-# JWTLoader And JWTCreator
-
-For components that need to create JWT or to load them, you will have to inject a `JWTLoader` or a `JWTCreator` object.
-
-In general, you do not need to use them as they are directly used by components. You just have to indicate algorithms you want to support
-and claims you want to check.
-
-Please read [this page](component/jwt_loader_and_creator.md) to know how to create and use these components.
 
 # Scope And Scope manager
 
@@ -49,7 +40,7 @@ Or you can use the following implementations.
 
 ## Random String Access Token Manager
 
-**This access token manager has been removed. Please use JWT Access Token Manager instead.**
+*To be written*
 
 ## JWT Access Token Manager
 
@@ -64,17 +55,17 @@ Please read [this page](component/jwt_access_token_manager.md) to know how to cr
 When calling a protected resource, your client will have to demonstrate it is in possession of an access token.
 To do so, each issued access token has a token type. The demonstration made by the client will vary depending on that type.
 
-This library supports this token type and is able to support any kind of token type through a `Token Type Manager`.
-
-This manager will handle token types enabled in your authorization server.
+This library is able to support any kind of token type through a `Token Type Manager`.
 
 Please read [this page](component/token_type/manager.md) to know how to create and use this component.
 
 # Users and Accounts
 
-Please read [this page](component/user_manager.md) to know how to create and use this component.
+Please read [this page](component/user/manager.md) to know how to create and use this component.
 
 # Clients and Client Manager
+
+Please read [this page](component/client/manager.md) to know how to create and use this component.
 
 # Resource Servers
 
@@ -87,6 +78,19 @@ Please read [this page](component/endpoint/endpoints.md) to know how to create a
 # Grant types
 
 Please read [this page](component/grant/types.md) to know how to create and use the grant types provided by this library.
+
+# Response Modes
+
+Please read [this page](component/response_mode/manager.md) to know how to create and use the response modes provided by this library.
+
+# JWTLoader And JWTCreator
+
+For components that need to create JWT or to load them, you will have to inject a `JWTLoader` or a `JWTCreator` object.
+
+In general, you do not need to use them as they are directly used by components. You just have to indicate algorithms you want to support
+and claims you want to check.
+
+Please read [this page](component/jwt_loader_and_creator.md) to know how to create and use these components.
 
 # OpenID Connect
 
