@@ -51,7 +51,7 @@ Please read [this page](component/token_type/manager.md) to know how to create a
 
 ## Users and Accounts
 
-Please read [this page](component/user/manager.md) to know how to create and use this component.
+Please read [this page](component/user_account/manager.md) to know how to create and use this component.
 
 ## Clients and Client Manager
 

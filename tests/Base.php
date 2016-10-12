@@ -948,9 +948,15 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getUserAccountManager(),
                 $this->getExceptionManager()
             );
-            $this->resource_owner_password_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
-            $this->resource_owner_password_credentials_grant_type->disableRefreshTokenIssuanceWithAccessToken();
-            $this->resource_owner_password_credentials_grant_type->enableRefreshTokenIssuanceWithAccessToken();
+            $this->resource_owner_password_credentials_grant_type->disallowRefreshTokenIssuance();
+            $this->assertFalse($this->resource_owner_password_credentials_grant_type->isRefreshTokenIssuanceAllowed());
+            $this->resource_owner_password_credentials_grant_type->allowRefreshTokenIssuance();
+            $this->assertTrue($this->resource_owner_password_credentials_grant_type->isRefreshTokenIssuanceAllowed());
+
+            $this->resource_owner_password_credentials_grant_type->allowRefreshTokenIssuanceForPublicClients();
+            $this->assertTrue($this->resource_owner_password_credentials_grant_type->isRefreshTokenIssuanceForPublicClientsAllowed());
+            $this->resource_owner_password_credentials_grant_type->disallowRefreshTokenIssuanceForPublicClients();
+            $this->assertFalse($this->resource_owner_password_credentials_grant_type->isRefreshTokenIssuanceForPublicClientsAllowed());
         }
 
         return $this->resource_owner_password_credentials_grant_type;

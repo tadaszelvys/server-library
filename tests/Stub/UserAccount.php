@@ -12,11 +12,9 @@
 namespace OAuth2\Test\Stub;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
-use OAuth2\UserAccount\IssueRefreshTokenExtensionInterface;
 use OAuth2\UserAccount\UserAccount as BaseUserAccount;
 
-final class UserAccount extends BaseUserAccount implements IssueRefreshTokenExtensionInterface
+final class UserAccount extends BaseUserAccount
 {
     /**
      * @var string
@@ -76,14 +74,6 @@ final class UserAccount extends BaseUserAccount implements IssueRefreshTokenExte
     public function getPassword()
     {
         return $this->password;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isRefreshTokenIssuanceAllowed(ClientInterface $client, $grant_type)
-    {
-        return !$client->isPublic();
     }
 
     /**

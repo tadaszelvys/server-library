@@ -15,8 +15,6 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasUserAccountManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\UserAccount\IssueRefreshTokenExtensionInterface;
-use OAuth2\UserAccount\UserAccountInterface;
 use OAuth2\UserAccount\UserAccountManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
@@ -29,7 +27,12 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
     /**
      * @var bool
      */
-    private $issue_refresh_token_with_access_token = true;
+    private $refresh_token_issuance_allowed = false;
+
+    /**
+     * @var bool
+     */
+    private $refresh_token_issuance_for_public_clients_allowed = false;
 
     /**
      * ResourceOwnerPasswordCredentialsGrantType constructor.
@@ -43,6 +46,42 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
     ) {
         $this->setUserAccountManager($user_account_manager);
         $this->setExceptionManager($exception_manager);
+    }
+
+    public function allowRefreshTokenIssuance()
+    {
+        $this->refresh_token_issuance_allowed = true;
+    }
+
+    public function disallowRefreshTokenIssuance()
+    {
+        $this->refresh_token_issuance_allowed = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRefreshTokenIssuanceAllowed()
+    {
+        return $this->refresh_token_issuance_allowed;
+    }
+
+    public function allowRefreshTokenIssuanceForPublicClients()
+    {
+        $this->refresh_token_issuance_for_public_clients_allowed = true;
+    }
+
+    public function disallowRefreshTokenIssuanceForPublicClients()
+    {
+        $this->refresh_token_issuance_for_public_clients_allowed = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRefreshTokenIssuanceForPublicClientsAllowed()
+    {
+        return $this->refresh_token_issuance_for_public_clients_allowed;
     }
 
     /**
@@ -84,40 +123,25 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
 
         $grant_type_response->setResourceOwnerPublicId($user_account->getUserPublicId());
         $grant_type_response->setUserAccountPublicId($user_account->getPublicId());
-        $grant_type_response->setRefreshTokenIssued($this->getIssueRefreshToken($client, $user_account));
+        $grant_type_response->setRefreshTokenIssued($this->issueRefreshToken($client));
         $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface           $client
-     * @param \OAuth2\UserAccount\UserAccountInterface $user_account
+     * @param \OAuth2\Client\ClientInterface $client
      *
      * @return bool
      */
-    private function getIssueRefreshToken(ClientInterface $client, UserAccountInterface $user_account)
+    private function issueRefreshToken(ClientInterface $client)
     {
-        if ($user_account instanceof IssueRefreshTokenExtensionInterface && false === $user_account->isRefreshTokenIssuanceAllowed($client, 'password')) {
+        if (!$this->isRefreshTokenIssuanceAllowed()) {
             return false;
         }
 
-        return $this->isRefreshTokenIssuedWithAccessToken();
-    }
+        if (true === $client->isPublic()) {
+            return $this->isRefreshTokenIssuanceForPublicClientsAllowed();
+        }
 
-    /**
-     * @return bool
-     */
-    public function isRefreshTokenIssuedWithAccessToken()
-    {
-        return $this->issue_refresh_token_with_access_token;
-    }
-
-    public function enableRefreshTokenIssuanceWithAccessToken()
-    {
-        $this->issue_refresh_token_with_access_token = true;
-    }
-
-    public function disableRefreshTokenIssuanceWithAccessToken()
-    {
-        $this->issue_refresh_token_with_access_token = false;
+        return true;
     }
 }
