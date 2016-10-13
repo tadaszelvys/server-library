@@ -1,2 +1,1 @@
-Issuer Discovery
-================
+# Issuer Discovery

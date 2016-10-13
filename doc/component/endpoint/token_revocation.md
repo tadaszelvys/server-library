@@ -1,4 +1,3 @@
-Token Revocation Endpoint
-=========================
+# Token Revocation Endpoint
 
-To be written
+

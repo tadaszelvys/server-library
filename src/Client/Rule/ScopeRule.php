@@ -9,14 +9,14 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 
-final class ScopeRule implements ParameterRuleInterface
+final class ScopeRule implements RuleInterface
 {
     use HasScopeManager;
 
@@ -31,7 +31,7 @@ final class ScopeRule implements ParameterRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         if (!$this->hasScopeManager()) {
             return;

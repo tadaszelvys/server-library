@@ -9,11 +9,11 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use OAuth2\Client\ClientInterface;
 
-interface ParameterRuleInterface
+interface RuleInterface
 {
     /**
      * @param \OAuth2\Client\ClientInterface $client
@@ -22,5 +22,5 @@ interface ParameterRuleInterface
      *
      * @throws \InvalidArgumentException If an error occurred
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas);
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas);
 }

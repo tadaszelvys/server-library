@@ -9,17 +9,17 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 
-final class ResourceServerRule implements ParameterRuleInterface
+final class ResourceServerRule implements RuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         Assertion::false(array_key_exists('is_resource_server', $registration_parameters), 'Resource server registration is forbidden.');
     }

@@ -1,2 +1,1 @@
-Userinfo Endpoint
-=================
+# Userinfo Endpoint

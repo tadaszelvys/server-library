@@ -1,5 +1,4 @@
-JWT Access Token Manager
-========================
+# JWT Access Token Manager
 
 This access token manager will create access tokens based on JSON Web Token (JWT).
 It does not need a database as they contain digitally signed claims.
@@ -7,7 +6,7 @@ The Authorization and Resource servers can directly verify signature using key m
 
 These tokens are also encrypted to prevent leak of sensitive data.
 
-# Algorithms and Keys
+## Algorithms and Keys
 
 To use this access token manager, you have to define,
 - A signature algorithm,
@@ -16,7 +15,7 @@ To use this access token manager, you have to define,
 - A key set with all signature keys (at least one key in the key set),
 - A key set with all key encryption keys (at least one key in the key set).
 
-## Signature Algorithm
+### Signature Algorithm
 
 Thanks to [spomky-labs/jose](https://github.com/Spomky-Labs/jose), this library is able to support the following signature algorithms:
 
@@ -28,7 +27,7 @@ Thanks to [spomky-labs/jose](https://github.com/Spomky-Labs/jose), this library 
 
 We recommend you to use `RS512` algorithm as it is quite fast and secured.
 
-## Key Encryption Algorithm
+### Key Encryption Algorithm
 
 The following key encryption algorithms:
 
@@ -42,14 +41,14 @@ The following key encryption algorithms:
 
 We recommend you to use the `AxxxGCMKW` algorithm if you have the third party extension installed, otherwise the `RSA1_5` algorithm.
 
-## Content Encryption Algorithms
+### Content Encryption Algorithms
 
 * A128CBC-HS256, A192CBC-HS384, A256CBC-HS512
 * A128GCM, A192GCM, A256GCM. For performance, this [third party extension is highly recommended](https://github.com/bukka/php-crypto).
 
 We recommend you to use the `AxxGCM` algorithm if you have the third party extension installed, otherwise any other algorithm.
 
-## Key Sets Creation
+### Key Sets Creation
 
 The key set configuration you have to set depends on the algorithm you choose.
 Hereafter some example of configurations you may use.
@@ -60,7 +59,7 @@ We highly recommend you to:
 
 Please refer to the [spomky-labs/jose](https://github.com/Spomky-Labs/jose) documentation for more information.
 
-### `RSA` Key Set
+#### `RSA` Key Set
 
 With the following example, we will have a key set with 3 RSA keys.
 Each key has 4096 bits size and is dedicated to signature operation with the `RS512` algorithm.
@@ -82,7 +81,7 @@ $signature_key_set = JWKFactory::createRotatableKeySet(
 );
 ```
 
-### `oct` Key Set
+#### `oct` Key Set
 
 With the following example, we will have a key set with 3 RSA keys.
 Each key has 4096 bits size and is dedicated to signature/verification operations with the `RS512` algorithm.
@@ -107,7 +106,7 @@ $encryption_key_set = JWKFactory::createRotatableKeySet(
 With the following example, we will have a key set with 3 octet keys.
 Each key has 256 bits size and is dedicated to encryption/decryption operations with the `A256GCMKW` algorithm.
 
-# The JWT Access Token Manager Object
+## The JWT Access Token Manager Object
 
 Now that you have all algorithms and key sets, then you have to create an instance of the `OAuth2\Token\JWTAccessTokenManager` class.
 
@@ -128,7 +127,7 @@ $jwt_access_manager = new JWTAccessTokenManager(
 );
 ```
 
-## Encryption And Resource Servers
+### Encryption And Resource Servers
 
 This library is designed to allow multiple resource servers to receive access tokens, but this feature is not yet supported.
 When resource servers need to know if the access token is still valid, they must use the introspection endpoint.

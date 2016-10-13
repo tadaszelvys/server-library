@@ -1,4 +1,3 @@
-Token Endpoint
-==============
+# Token Endpoint
 
 To be written

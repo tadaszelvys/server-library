@@ -1,2 +1,1 @@
-None Grant Type
-===============
+# None Grant Type

@@ -32,18 +32,17 @@ use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseTypeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ScopeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\StateParameterChecker;
 use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
-use OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManager;
-use OAuth2\Endpoint\ClientRegistration\Rule\CommonParametersRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\GrantTypeFlowRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\IdTokenAlgorithmsRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\RedirectionUriRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\RequestUriRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\ResourceServerRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\ScopeRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\SectorIdentifierUriRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\SoftwareRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\SubjectTypeRule;
-use OAuth2\Endpoint\ClientRegistration\Rule\TokenEndpointAuthMethodEndpointRule;
+use OAuth2\Client\Rule\CommonParametersRule;
+use OAuth2\Client\Rule\GrantTypeFlowRule;
+use OAuth2\Client\Rule\IdTokenAlgorithmsRule;
+use OAuth2\Client\Rule\RedirectionUriRule;
+use OAuth2\Client\Rule\RequestUriRule;
+use OAuth2\Client\Rule\ResourceServerRule;
+use OAuth2\Client\Rule\ScopeRule;
+use OAuth2\Client\Rule\SectorIdentifierUriRule;
+use OAuth2\Client\Rule\SoftwareRule;
+use OAuth2\Client\Rule\SubjectTypeRule;
+use OAuth2\Client\Rule\TokenEndpointAuthMethodEndpointRule;
 use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationEndpoint;
@@ -722,6 +721,33 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenEndpointAuthMethodManager(),
                 $this->getExceptionManager()
             );
+            $this->client_manager->addRule(new GrantTypeFlowRule(
+                $this->getGrantTypeManager(),
+                $this->getResponseTypeManager()
+            ));
+
+            $scope_rule = new ScopeRule();
+            $scope_rule->enableScopeSupport($this->getScopeManager());
+
+            $this->client_manager->addRule(new RedirectionUriRule());
+            $this->client_manager->addRule(new RequestUriRule());
+            $this->client_manager->addRule($scope_rule);
+
+            $sector_identifier_uri_rule = new SectorIdentifierUriRule();
+            $sector_identifier_uri_rule->disallowHttpConnections();
+            $sector_identifier_uri_rule->allowHttpConnections(); // We allow http connections
+            $sector_identifier_uri_rule->disallowUnsecuredConnections();
+            $sector_identifier_uri_rule->allowUnsecuredConnections(); // We allow unsecured connections because we send request against the local server for all tests. Should not be used in production.
+            $this->client_manager->addRule($sector_identifier_uri_rule);
+            $this->client_manager->addRule(new TokenEndpointAuthMethodEndpointRule(
+                $this->getTokenEndpointAuthMethodManager()
+            ));
+            $this->client_manager->addRule(new IdTokenAlgorithmsRule($this->getIdTokenManager()));
+            $this->client_manager->addRule(new SubjectTypeRule($this->getUserInfo()));
+            $this->client_manager->addRule(new ResourceServerRule());
+            $this->client_manager->addRule(new CommonParametersRule());
+            $this->client_manager->addRule(new SoftwareRule());
+            $this->client_manager->addRule(new ClientRegistrationManagementRule());
         }
 
         return $this->client_manager;
@@ -1249,51 +1275,6 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface
-     */
-    private $client_registration_rule_manager = null;
-
-    /**
-     * @return \OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface
-     */
-    protected function getParameterRuleManager()
-    {
-        if (null === $this->client_registration_rule_manager) {
-            $this->client_registration_rule_manager = new ParameterRuleManager();
-
-            $this->client_registration_rule_manager->addParameterRule(new GrantTypeFlowRule(
-                $this->getGrantTypeManager(),
-                $this->getResponseTypeManager()
-            ));
-
-            $scope_rule = new ScopeRule();
-            $scope_rule->enableScopeSupport($this->getScopeManager());
-
-            $this->client_registration_rule_manager->addParameterRule(new RedirectionUriRule());
-            $this->client_registration_rule_manager->addParameterRule(new RequestUriRule());
-            $this->client_registration_rule_manager->addParameterRule($scope_rule);
-
-            $sector_identifier_uri_rule = new SectorIdentifierUriRule();
-            $sector_identifier_uri_rule->disallowHttpConnections();
-            $sector_identifier_uri_rule->allowHttpConnections(); // We allow http connections
-            $sector_identifier_uri_rule->disallowUnsecuredConnections();
-            $sector_identifier_uri_rule->allowUnsecuredConnections(); // We allow unsecured connections because we send request against the local server for all tests. Should not be used in production.
-            $this->client_registration_rule_manager->addParameterRule($sector_identifier_uri_rule);
-            $this->client_registration_rule_manager->addParameterRule(new TokenEndpointAuthMethodEndpointRule(
-                $this->getTokenEndpointAuthMethodManager()
-            ));
-            $this->client_registration_rule_manager->addParameterRule(new IdTokenAlgorithmsRule($this->getIdTokenManager()));
-            $this->client_registration_rule_manager->addParameterRule(new SubjectTypeRule($this->getUserInfo()));
-            $this->client_registration_rule_manager->addParameterRule(new ResourceServerRule());
-            $this->client_registration_rule_manager->addParameterRule(new CommonParametersRule());
-            $this->client_registration_rule_manager->addParameterRule(new SoftwareRule());
-            $this->client_registration_rule_manager->addParameterRule(new ClientRegistrationManagementRule());
-        }
-
-        return $this->client_registration_rule_manager;
-    }
-
-    /**
      * @var null|\OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpointInterface
      */
     private $client_registration_endpoint = null;
@@ -1306,7 +1287,6 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->client_registration_endpoint) {
             $this->client_registration_endpoint = new ClientRegistrationEndpoint(
                 $this->getClientManager(),
-                $this->getParameterRuleManager(),
                 $this->getExceptionManager()
             );
             $this->client_registration_endpoint->enableSoftwareStatementSupport(

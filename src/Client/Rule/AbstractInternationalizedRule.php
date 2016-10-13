@@ -9,9 +9,9 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
-abstract class AbstractInternationalizedRule implements ParameterRuleInterface
+abstract class AbstractInternationalizedRule implements RuleInterface
 {
     /**
      * @param array    $request_parameters

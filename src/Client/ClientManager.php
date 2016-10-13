@@ -14,6 +14,7 @@ namespace OAuth2\Client;
 use Base64Url\Base64Url;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
+use OAuth2\Client\Rule\RuleInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
@@ -23,6 +24,11 @@ abstract class ClientManager implements ClientManagerInterface
 {
     use HasExceptionManager;
     use HasTokenEndpointAuthMethodManager;
+
+    /**
+     * @var \OAuth2\Client\Rule\RuleInterface[]
+     */
+    private $rules = [];
 
     /**
      * ClientManager constructor.
@@ -45,6 +51,23 @@ abstract class ClientManager implements ClientManagerInterface
         $client = new Client();
         $client->set('client_id', Base64Url::encode(random_bytes(50)));
         $client->set('client_id_issued_at', time());
+
+        return $client;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createClientFromParameters(array $parameters)
+    {
+        $client = $this->createClient();
+        $metadatas = [];
+        foreach ($this->rules as $rule) {
+            $rule->check($client, $parameters, $metadatas);
+        }
+        foreach ($metadatas as $metadata => $value) {
+            $client->set($metadata, $value);
+        }
 
         return $client;
     }
@@ -131,5 +154,21 @@ abstract class ClientManager implements ClientManagerInterface
             $message,
             ['schemes' => $schemes]
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addRule(RuleInterface $rule)
+    {
+        $this->rules[] = $rule;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRules()
+    {
+        return $this->rules;
     }
 }

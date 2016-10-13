@@ -1,5 +1,4 @@
-OpenID Connect Implementation Status
-=====================================
+# OpenID Connect Implementation Status
 
 * [x] [Core](http://openid.net/specs/openid-connect-core-1_0.html)
     *  [x] [ID Token](http://openid.net/specs/openid-connect-core-1_0.html#IDToken)

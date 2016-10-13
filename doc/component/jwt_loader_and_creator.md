@@ -1,12 +1,11 @@
-JWT Creator And JWT Loader
-==========================
+# JWT Creator And JWT Loader
 
 For components that need to create JWT or to load them, you will have to inject a `JWTLoader` or a `JWTCreator` object.
 
 In general, you do not need to use them as they are directly used by components. You just have to indicate algorithms you want to support
 and claims you want to check.
 
-# The JWTCreator
+## The JWTCreator
 
 This service will create JWS (signed JWT) or JWE (encrypted JWT) if encryption is enabled.
 
@@ -24,7 +23,7 @@ $jwt_creator->enableEncryptionSupport(
 );
 ```
 
-# The JWTLoader
+## The JWTLoader
 
 This service is used to load assertions or tokens. Its instantiation is very similar to the JWTCreator, except that you need
 to inject a service to verify claims.

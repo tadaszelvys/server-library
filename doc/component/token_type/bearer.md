@@ -1,5 +1,4 @@
-Bearer Token Type
-=================
+# Bearer Token Type
 
 The `Bearer Token Type` (see [RFC6750](https://tools.ietf.org/html/rfc6750)) is most common token type.
 

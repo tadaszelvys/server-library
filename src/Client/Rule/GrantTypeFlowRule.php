@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasGrantTypeManager;
@@ -18,7 +18,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Grant\GrantTypeManagerInterface;
 use OAuth2\Grant\ResponseTypeManagerInterface;
 
-final class GrantTypeFlowRule implements ParameterRuleInterface
+final class GrantTypeFlowRule implements RuleInterface
 {
     use HasResponseTypeManager;
     use HasGrantTypeManager;
@@ -32,7 +32,7 @@ final class GrantTypeFlowRule implements ParameterRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         $metadatas['response_types'] = [];
         $metadatas['grant_types'] = [];

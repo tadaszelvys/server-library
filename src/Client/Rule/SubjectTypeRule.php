@@ -9,14 +9,14 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
 use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
 
-final class SubjectTypeRule implements ParameterRuleInterface
+final class SubjectTypeRule implements RuleInterface
 {
     use HasUserinfo;
 
@@ -33,7 +33,7 @@ final class SubjectTypeRule implements ParameterRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         if (!array_key_exists('subject_type', $registration_parameters)) {
             return;

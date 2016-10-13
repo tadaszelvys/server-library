@@ -1,4 +1,3 @@
-Token Introspection Endpoint
-============================
+# Token Introspection Endpoint
 
 To be written

@@ -1,2 +1,1 @@
-Response Mode Manager
-=====================
+# Response Mode Manager

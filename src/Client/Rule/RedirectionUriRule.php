@@ -9,17 +9,17 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 
-final class RedirectionUriRule implements ParameterRuleInterface
+final class RedirectionUriRule implements RuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         if (!array_key_exists('redirect_uris', $registration_parameters)) {
             return;

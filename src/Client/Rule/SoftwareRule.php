@@ -9,16 +9,16 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use OAuth2\Client\ClientInterface;
 
-final class SoftwareRule implements ParameterRuleInterface
+final class SoftwareRule implements RuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         foreach (['software_id', 'software_version', 'software_statement'] as $key) {
             if (array_key_exists($key, $registration_parameters)) {

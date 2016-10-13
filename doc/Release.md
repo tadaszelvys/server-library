@@ -1,5 +1,4 @@
-The Release Process
-===================
+# The Release Process
 
 We manage its releases through features and time-based models.
 
@@ -11,8 +10,7 @@ The meaning of "patch" "minor" and "major" comes from the Semantic [Versioning s
 
 This release process applies from version 1.0.x.
 
-Backwards Compatibility
------------------------
+## Backwards Compatibility
 
 We allow developers to upgrade with confidence from one minor version to the next one.
 

@@ -1,5 +1,4 @@
-Token Type Manager
-==================
+# Token Type Manager
 
 The token type manager must implement the `OAuth2\Token\TokenTypeManagerInterface` interface.
 This library provides a fully featured manager. You just have to create an instance of `OAuth2\Token\TokenTypeManager`:
@@ -12,7 +11,7 @@ use OAuth2\Token\TokenTypeManager;
 $token_type_manager = new TokenTypeManager($exception_manager); // We suppose that $exception_manager is a valid exception manager
 ```
 
-# Multiple Token Type Support
+## Multiple Token Type Support
 
 This manager is able to support multiple token types.
 You must add at least one token type.
@@ -25,13 +24,13 @@ You must add at least one token type.
 $token_type_manager->addTokenType($token_type, true);
 ```
 
-##  Bearer Token Type
+### Bearer Token Type
 
 The `Bearer Token Type` (see [RFC6750](https://tools.ietf.org/html/rfc6750)) is most common token type.
 
 Please read [this page](bearer.md) to know how to create and use this component.
 
-##  MAC Token Type
+### MAC Token Type
 
 The `MAC Token Type` is an authentication scheme that uses a message authentication code (MAC) algorithm to provide cryptographic verification of the HTTP requests.
 It is more secured than the previous token type as each request is signed by the client.
@@ -42,7 +41,7 @@ This library provides a MAC Token Type support, but it is limited to the [revisi
 
 Please read [this page](mac.md) to know how to create and use this component.
 
-##  POP Token Type
+### POP Token Type
 
 This token type is not supported at the moment.
 

@@ -1,18 +1,17 @@
-Endpoints
-=========
+# Endpoints
 
-# Authorization Endpoint
+## Authorization Endpoint
 
 Please read [this page](authorization.md) to know how to create and use the authorization endpoint.
 
-# Token Endpoint
+## Token Endpoint
 
 Please read [this page](token.md) to know how to create and use the token endpoint.
 
-# Token Revocation Endpoint
+## Token Revocation Endpoint
 
 Please read [this page](token_revocation.md) to know how to create and use the token revocation endpoint.
 
-# Token Introspection Endpoint
+## Token Introspection Endpoint
 
 Please read [this page](token_introspection.md) to know how to create and use the token introspection endpoint.

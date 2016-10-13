@@ -1,4 +1,3 @@
-Client Credentials Grant Type
-=============================
+# Client Credentials Grant Type
 
 To be written

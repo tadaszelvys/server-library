@@ -1,4 +1,3 @@
-JWT Bearer Grant Type
-=====================
+# JWT Bearer Grant Type
 
 To be written

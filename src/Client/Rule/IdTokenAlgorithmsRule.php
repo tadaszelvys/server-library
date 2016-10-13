@@ -9,14 +9,14 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\OpenIdConnect\HasIdTokenManager;
 use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 
-final class IdTokenAlgorithmsRule implements ParameterRuleInterface
+final class IdTokenAlgorithmsRule implements RuleInterface
 {
     use HasIdTokenManager;
 
@@ -33,7 +33,7 @@ final class IdTokenAlgorithmsRule implements ParameterRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         if (!array_key_exists('id_token_encrypted_response_alg', $registration_parameters) || !array_key_exists('id_token_encrypted_response_enc', $registration_parameters)) {
             return;

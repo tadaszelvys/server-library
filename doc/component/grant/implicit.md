@@ -1,4 +1,3 @@
-Implicit Grant Type
-===================
+# Implicit Grant Type
 
 To be written

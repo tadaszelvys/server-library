@@ -11,14 +11,32 @@
 
 namespace OAuth2\Client;
 
+use OAuth2\Client\Rule\RuleInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface ClientManagerInterface
 {
     /**
+     * @param \OAuth2\Client\Rule\RuleInterface $rule
+     */
+    public function addRule(RuleInterface $rule);
+
+    /**
+     * @return \OAuth2\Client\Rule\RuleInterface[]
+     */
+    public function getRules();
+
+    /**
      * @return \OAuth2\Client\ClientInterface Return a new client object.
      */
     public function createClient();
+
+    /**
+     * @param array $parameters
+     *
+     * @return \OAuth2\Client\ClientInterface
+     */
+    public function createClientFromParameters(array $parameters);
 
     /**
      * Get a client using its Id.

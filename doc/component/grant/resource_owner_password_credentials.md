@@ -1,4 +1,3 @@
-Resource Owner Password Credentials Grant Type
-==============================================
+# Resource Owner Password Credentials Grant Type
 
 To be written

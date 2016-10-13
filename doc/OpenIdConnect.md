@@ -1,20 +1,19 @@
-OpenID Connect
-==============
+# OpenID Connect
 
-# Users
+## Users
 
-## Address
-
-# ID Token
-
-# Response Types
+### Address
 
 ## ID Token
 
-## None
+## Response Types
 
-# Response Mode
+### ID Token
 
-## Form Post Response Mode
+### None
 
-# UserInfo Endpoint
+## Response Mode
+
+### Form Post Response Mode
+
+## UserInfo Endpoint

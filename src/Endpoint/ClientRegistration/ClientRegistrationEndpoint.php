@@ -15,12 +15,10 @@ use Assert\Assertion;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Behaviour\HasClientManager;
-use OAuth2\Behaviour\HasParameterRuleManager;
 use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManagerInterface;
-use OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
@@ -32,7 +30,6 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
 {
     use HasExceptionManager;
     use HasClientManager;
-    use HasParameterRuleManager;
     use HasJWTLoader;
 
     /**
@@ -53,14 +50,12 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     /**
      * ClientRegistrationEndpoint constructor.
      *
-     * @param \OAuth2\Client\ClientManagerInterface                                           $client_manager
-     * @param \OAuth2\Endpoint\ClientRegistration\Rule\ParameterRuleManagerInterface $client_registration_rule_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface                                     $exception_manager
+     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
-    public function __construct(ClientManagerInterface $client_manager, ParameterRuleManagerInterface $client_registration_rule_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct(ClientManagerInterface $client_manager, ExceptionManagerInterface $exception_manager)
     {
         $this->setClientManager($client_manager);
-        $this->setParameterRuleManager($client_registration_rule_manager);
         $this->setExceptionManager($exception_manager);
     }
 
@@ -163,14 +158,10 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     {
         $request_parameters = RequestBody::getParameters($request);
         $this->checkSoftwareStatement($request_parameters);
-        $client = $this->getClientManager()->createClient();
-
-        $metadatas = [];
-        foreach ($this->getParameterRuleManager()->getParameterRules() as $rule) {
-            $rule->checkParameters($client, $request_parameters, $metadatas);
+        $client = $this->getClientManager()->createClientFromParameters($request_parameters);
+        if (null !== $access_token) {
+            $client->setResourceOwnerPublicId($access_token->getResourceOwnerPublicId());
         }
-
-        $this->updateClient($client, $metadatas, $access_token);
         $this->getClientManager()->saveClient($client);
         $this->processResponse($response, $client);
     }
@@ -207,21 +198,6 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
             $request_parameters,
             $jws->getClaims()
         );
-    }
-
-    /**
-     * @param \OAuth2\Client\ClientInterface          $client
-     * @param array                                   $metadatas
-     * @param \OAuth2\Token\AccessTokenInterface|null $access_token
-     */
-    private function updateClient(ClientInterface $client, array $metadatas, AccessTokenInterface $access_token = null)
-    {
-        foreach ($metadatas as $metadata => $value) {
-            $client->set($metadata, $value);
-        }
-        if (null !== $access_token) {
-            $client->setResourceOwnerPublicId($access_token->getResourceOwnerPublicId());
-        }
     }
 
     /**

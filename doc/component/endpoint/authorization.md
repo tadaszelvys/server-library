@@ -1,4 +1,3 @@
-Authorization Endpoint
-======================
+# Authorization Endpoint
 
 To be written

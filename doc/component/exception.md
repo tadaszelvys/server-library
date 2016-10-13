@@ -1,5 +1,4 @@
-Exceptions and Exception Manager
-================================
+# Exceptions and Exception Manager
 
 The exception manager manages all exception types thrown during the authorization process.
 It is used by almost all other components.
@@ -14,9 +13,9 @@ $exception_manager = new ExceptionManager();
 
 Now the variable `$exception_manager` can be injected to all other components that require an exception manager.
 
-# Advanced
+## Advanced
 
-## Extensions
+### Extensions
 
 The exception manager allow you to add error data using extensions.
 For example, your authorization server may provide pages containing human readable error descriptions.
@@ -59,7 +58,7 @@ Then, we add this extension to the exception manager:
 $exception_manager->addExtension(new UriExtension());
 ```
 
-## Custom Exception Type
+### Custom Exception Type
 
 When you create a new endpoint, grant type or any other component, you may need to return a custom exception.
 The exception manager is able to support new exception types.

@@ -1,5 +1,4 @@
-MAC Token Type
-==============
+# MAC Token Type
 
 > Please note that this token type is based on the following [IETF specification, draft version 2](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-02).
 

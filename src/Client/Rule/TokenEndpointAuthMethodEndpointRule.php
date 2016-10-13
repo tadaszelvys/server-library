@@ -9,14 +9,14 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 
-final class TokenEndpointAuthMethodEndpointRule implements ParameterRuleInterface
+final class TokenEndpointAuthMethodEndpointRule implements RuleInterface
 {
     use HasTokenEndpointAuthMethodManager;
 
@@ -28,7 +28,7 @@ final class TokenEndpointAuthMethodEndpointRule implements ParameterRuleInterfac
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         Assertion::keyExists($registration_parameters, 'token_endpoint_auth_method', 'The parameter "token_endpoint_auth_method" is missing.');
         Assertion::string($registration_parameters['token_endpoint_auth_method'], 'The parameter "token_endpoint_auth_method" must be a string.');

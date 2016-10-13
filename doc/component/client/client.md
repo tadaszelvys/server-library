@@ -1,4 +1,0 @@
-Client
-======
-
-To be written

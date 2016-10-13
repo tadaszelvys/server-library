@@ -9,16 +9,16 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration\Rule;
+namespace OAuth2\Client\Rule;
 
 use OAuth2\Client\ClientInterface;
 
-abstract class ClientRegistrationManagementRule implements ParameterRuleInterface
+abstract class ClientRegistrationManagementRule implements RuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function checkParameters(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
     {
         $metadatas['registration_client_uri'] = $this->getRegistrationClientUri($client);
         $metadatas['registration_access_token'] = $this->getRegistrationAccessToken($client);
