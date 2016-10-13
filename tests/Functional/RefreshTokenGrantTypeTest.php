@@ -84,7 +84,7 @@ class RefreshTokenGrantTypeTest extends Base
     public function testUnsupportedGrantType()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -114,7 +114,7 @@ class RefreshTokenGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -129,7 +129,7 @@ class RefreshTokenGrantTypeTest extends Base
     public function testRefreshTokenParameterIsMissing()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -144,7 +144,7 @@ class RefreshTokenGrantTypeTest extends Base
     public function testRefreshTokenExpired()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'EXPIRED_REFRESH_TOKEN'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'EXPIRED_REFRESH_TOKEN'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -159,7 +159,7 @@ class RefreshTokenGrantTypeTest extends Base
     public function testWrongClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -174,7 +174,7 @@ class RefreshTokenGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientAndRefreshTokenCanStillBeUsed()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -198,7 +198,7 @@ class RefreshTokenGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientWithReducedScope()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN', 'scope' => 'scope2'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token', 'refresh_token' => 'VALID_REFRESH_TOKEN', 'scope' => 'scope2'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();

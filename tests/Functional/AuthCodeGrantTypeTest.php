@@ -14,7 +14,6 @@ namespace OAuth2\Test\Functional;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Test\Base;
 use OAuth2\Token\AccessTokenInterface;
-use OAuth2\Token\AuthCodeInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
@@ -38,7 +37,7 @@ class AuthCodeGrantTypeTest extends Base
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'client_id' => 'foo',
+            'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'state'     => '0123456789',
         ]);
         $response = new Response();
@@ -54,7 +53,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = $request->withQueryParams([
             'response_type' => 'token',
             'redirect_uri'  => 'http://example.com/bad.redirect?URI',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'state'         => '0123456',
         ]);
         $response = new Response();
@@ -68,7 +67,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = $request->withQueryParams([
             'response_type' => 'token',
             'redirect_uri'  => 'http://example.com/bad.redirect?URI',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
@@ -80,7 +79,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'bad_response_type',
             'state'         => '0123456789',
         ]);
@@ -94,7 +93,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'oof',
+            'client_id'     => $this->getClientManager()->getClientByName('oof')->getPublicId(),
             'response_type' => 'none',
             'state'         => '0123456',
         ]);
@@ -108,7 +107,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'bar',
+            'client_id'     => $this->getClientManager()->getClientByName('bar')->getPublicId(),
             'response_type' => 'bad_response_type',
             'state'         => '0123456789',
         ]);
@@ -122,7 +121,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'https://example.com/test?good=false',
-            'client_id'     => 'bar',
+            'client_id'     => $this->getClientManager()->getClientByName('bar')->getPublicId(),
             'response_type' => 'none',
             'state'         => '0123456789',
         ]);
@@ -136,7 +135,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'baz',
+            'client_id'     => $this->getClientManager()->getClientByName('baz')->getPublicId(),
             'response_type' => 'token',
             'state'         => '0123456789',
         ]);
@@ -150,7 +149,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'baz',
+            'client_id'     => $this->getClientManager()->getClientByName('baz')->getPublicId(),
             'response_type' => 'code',
             'state'         => '0123456789',
         ]);
@@ -164,7 +163,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'code',
             'state'         => '0123456789',
         ]);
@@ -181,7 +180,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'Mufasa',
+            'client_id'     => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(),
             'response_type' => 'code',
             'state'         => '0123456789',
         ]);
@@ -198,7 +197,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://127.0.0.1/',
-            'client_id'     => 'Mufasa',
+            'client_id'     => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(),
             'response_type' => 'code',
             'state'         => '0123456789',
         ]);
@@ -217,7 +216,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'urn:ietf:wg:oauth:2.0:oob:auto',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'code',
             'state'         => '0123456789',
         ]);
@@ -238,7 +237,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'https://another.uri/callback',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'code',
             'state'         => '0123456789',
         ]);
@@ -259,7 +258,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'code',
             'state'         => '0123456789',
         ]);
@@ -283,7 +282,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'code',
             'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
@@ -300,7 +299,7 @@ class AuthCodeGrantTypeTest extends Base
         parse_str($uri->getQuery(), $result);
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -321,7 +320,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'code',
             'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
@@ -338,7 +337,7 @@ class AuthCodeGrantTypeTest extends Base
         parse_str($uri->getQuery(), $result);
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -359,7 +358,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'code',
             'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
@@ -375,7 +374,7 @@ class AuthCodeGrantTypeTest extends Base
         parse_str($uri->getQuery(), $result);
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -395,7 +394,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'code',
             'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
@@ -411,7 +410,7 @@ class AuthCodeGrantTypeTest extends Base
         parse_str($uri->getQuery(), $result);
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'Bad PKCE'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'Bad PKCE'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -430,7 +429,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'code',
             'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
@@ -446,7 +445,7 @@ class AuthCodeGrantTypeTest extends Base
         parse_str($uri->getQuery(), $result);
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code']], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code']], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -466,7 +465,7 @@ class AuthCodeGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'code',
             'state'                 => '0123456789',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
@@ -483,7 +482,7 @@ class AuthCodeGrantTypeTest extends Base
         parse_str($uri->getQuery(), $result);
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code']], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code']], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -499,7 +498,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testPublicClientWithoutPublicId()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -513,7 +512,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testPublicClientWithMultipleAuthenticationProcess()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -527,7 +526,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testParameterCodeIsMissing()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -541,7 +540,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testParameterCodeIsMissing2()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('baz')->getPublicId(), 'PHP_AUTH_PW' => 'secret']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -555,7 +554,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testExpiredAuthcode()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'EXPIRED_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'EXPIRED_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -569,7 +568,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testRedirectUriMismatch()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -583,7 +582,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthCodeDoesNotExists()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'DO_NOT_EXIST', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'DO_NOT_EXIST', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -597,7 +596,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testAuthCodeNotForTheClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/bad/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('baz')->getPublicId(), 'PHP_AUTH_PW' => 'secret']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -611,7 +610,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testPublicClientGranted()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['client_id' => 'foo', 'grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE_PUBLIC_CLIENT', 'redirect_uri' => 'http://example.com/redirect_uri/', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE_PUBLIC_CLIENT', 'redirect_uri' => 'http://example.com/redirect_uri/', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -634,7 +633,7 @@ class AuthCodeGrantTypeTest extends Base
     public function testPrivateClientGranted()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => 'VALID_AUTH_CODE', 'redirect_uri' => 'http://example.com/redirect_uri/'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();

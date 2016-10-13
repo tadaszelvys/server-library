@@ -89,7 +89,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testUnsupportedGrantType()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -104,7 +104,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeUnauthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('baz')->getPublicId(), 'PHP_AUTH_PW' => 'secret']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -119,7 +119,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -149,7 +149,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientWithMacAccessToken()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials', 'token_type' => 'MAC'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'mac', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials', 'token_type' => 'MAC'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('mac')->getPublicId(), 'PHP_AUTH_PW' => 'secret']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -165,7 +165,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testTokenTypeNotAuthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials', 'token_type' => 'Bearer'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'mac', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials', 'token_type' => 'Bearer'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('mac')->getPublicId(), 'PHP_AUTH_PW' => 'secret']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -180,7 +180,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeader()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('Mufasa:Circle Of Life')]);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode($this->getClientManager()->getClientByName('Mufasa')->getPublicId().':Circle Of Life')]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -195,7 +195,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButMissingPassword()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('bar:')]);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode($this->getClientManager()->getClientByName('bar')->getPublicId().':')]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -208,7 +208,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButBadPassword()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode('Mufasa:foo')]);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['Authorization' => 'Basic '.base64_encode($this->getClientManager()->getClientByName('Mufasa')->getPublicId().':foo')]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -221,7 +221,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientUsingQueryRequest()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials', 'client_id' => 'Mufasa2', 'client_secret' => 'Circle Of Life'], ['HTTPS' => 'on']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials', 'client_id' => $this->getClientManager()->getClientByName('Mufasa2')->getPublicId(), 'client_secret' => 'Circle Of Life'], ['HTTPS' => 'on']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -236,7 +236,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientAndJWTAccessToken()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -263,7 +263,7 @@ class ClientCredentialsGrantTypeTest extends Base
     public function testClientNotConfidential()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'client_credentials'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -289,8 +289,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() - 1,
                 'aud' => $this->getIssuer(),
-                'iss' => 'jwt1',
-                'sub' => 'jwt1',
+                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -333,8 +333,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => 'Bad Audience',
-                'iss' => 'jwt1',
-                'sub' => 'jwt1',
+                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -377,8 +377,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'jwt1',
-                'sub' => 'jwt1',
+                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -423,8 +423,8 @@ class ClientCredentialsGrantTypeTest extends Base
         $jws = JWSFactory::createJWSToCompactJSON([
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'jwt1',
-                'sub' => 'jwt1',
+                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -520,8 +520,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'jwt1',
-                'sub' => 'jwt1',
+                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -541,8 +541,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'enc' => 'A256CBC-HS512',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'jwt1',
-                'sub' => 'jwt1',
+                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ]
         );
 
@@ -590,8 +590,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'jwt1',
-                'sub' => 'jwt1',
+                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -611,8 +611,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'enc' => 'A256CBC-HS512',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'jwt1',
-                'sub' => 'jwt1',
+                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ]
         );
 

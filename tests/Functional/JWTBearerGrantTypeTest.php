@@ -44,7 +44,7 @@ class JWTBearerGrantTypeTest extends Base
                 'exp' => time() + 3600,
                 'aud' => 'Bad audience',
                 'iss' => 'My JWT issuer',
-                'sub' => 'jwt1',
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -65,7 +65,7 @@ class JWTBearerGrantTypeTest extends Base
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
-                'sub' => 'jwt1',
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ]
         );
 
@@ -101,7 +101,7 @@ class JWTBearerGrantTypeTest extends Base
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
-                'sub' => 'jwt1',
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -149,7 +149,7 @@ class JWTBearerGrantTypeTest extends Base
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
-                'sub' => 'jwt1',
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -169,7 +169,7 @@ class JWTBearerGrantTypeTest extends Base
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
-                'sub' => 'jwt1',
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ]
         );
 

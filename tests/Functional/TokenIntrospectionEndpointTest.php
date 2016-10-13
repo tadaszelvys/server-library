@@ -23,7 +23,7 @@ class TokenIntrospectionEndpointTest extends Base
 {
     public function testRequestNotSecured()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -35,7 +35,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testMissingTokenParameter()
     {
-        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -47,7 +47,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testAccessTokenIntrospectionAllowedForAuthenticatedConfidentialClient()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -59,7 +59,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testAccessTokenIntrospectionAllowedForResourceServer()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'resource_server', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'ABCD'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('resource_server')->getPublicId(), 'PHP_AUTH_PW' => 'secret']);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -72,7 +72,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testAccessTokenIntrospectionAllowedForAuthenticatedPublicClient()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -84,7 +84,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testAuthCodeIntrospectionAllowedForAuthenticatedPublicClient()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_AUTH_CODE_TO_BE_REVOKED'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_AUTH_CODE_TO_BE_REVOKED'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -112,7 +112,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testAccessTokenIntrospectionNotForAuthenticatedPublicClientAndTypeHint()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'Bearer'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'Bearer'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -124,7 +124,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testAccessTokenNotIntrospectionNotForAuthenticatedPublicClientAndTypeHint()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'refresh_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'EFGH', 'token_type_hint' => 'refresh_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -153,7 +153,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testRefreshTokenIntrospection()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_REFRESH_TOKEN'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -165,7 +165,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testTokenNotFound()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => '__BAD_TOKEN__'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['token' => '__BAD_TOKEN__'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
@@ -177,7 +177,7 @@ class TokenIntrospectionEndpointTest extends Base
 
     public function testFooTokenNotSupported()
     {
-        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_REFRESH_TOKEN', 'token_type_hint' => 'foo_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['token' => 'VALID_REFRESH_TOKEN', 'token_type_hint' => 'foo_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($request, $response);

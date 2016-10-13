@@ -84,7 +84,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
     public function testUnsupportedGrantType()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'bar'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -99,7 +99,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
     public function testGrantTypeUnauthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('baz')->getPublicId(), 'PHP_AUTH_PW' => 'secret']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -114,7 +114,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user1', 'password' => 'password1'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user1', 'password' => 'password1'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -129,7 +129,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientButNoRefreshToken()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user1', 'password' => 'password1'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user1', 'password' => 'password1'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -144,7 +144,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
     public function testGrantTypeAuthorizedForClientButScopeInvalid()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user1', 'password' => 'password1', 'scope' => 'scope12'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user1', 'password' => 'password1', 'scope' => 'scope12'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -178,7 +178,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
     public function testWrongUsername()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user2', 'password' => 'password1'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user2', 'password' => 'password1'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -193,7 +193,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeTest extends Base
     public function testWrongPassword()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user1', 'password' => 'password2'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'password', 'username' => 'user1', 'password' => 'password2'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);

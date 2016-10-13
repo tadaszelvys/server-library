@@ -41,7 +41,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'Mufasa',
+            'client_id'             => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(),
             'response_type'         => 'code',
             'scope'                 => 'openid',
             'nonce'                 => 'foo/bar',
@@ -62,10 +62,10 @@ class OpenIDConnectTest extends Base
         $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
 
         $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
-        $this->assertEquals('Mufasa', $authcode->getClientPublicId());
+        $this->assertEquals($this->getClientManager()->getClientByName('Mufasa')->getPublicId(), $authcode->getClientPublicId());
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -118,13 +118,13 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->hasClaim('c_hash'));
 
         $this->assertEquals($this->getIssuer(), $id_token->getClaim('iss'));
-        $this->assertEquals(['Mufasa', 'https://server.example.com'], $id_token->getClaim('aud'));
+        $this->assertEquals([$this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'https://server.example.com'], $id_token->getClaim('aud'));
         $this->assertEquals('foo/bar', $id_token->getClaim('nonce'));
 
         $this->assertEquals('uy1climA7Ruoi3HKyb5vrgygYnO2uL6Wp7xxT1FuYjGRr52Dqqv1Kk27M-gGrrAH', $id_token->getClaim('sub'));
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($json['access_token']);
-        $this->assertEquals('Mufasa', $access_token->getClientPublicId());
+        $this->assertEquals($this->getClientManager()->getClientByName('Mufasa')->getPublicId(), $access_token->getClientPublicId());
         $this->assertEquals('real_user1_public_id', $access_token->getResourceOwnerPublicId());
         $this->assertEquals('user1', $access_token->getUserAccountPublicId());
 
@@ -146,7 +146,7 @@ class OpenIDConnectTest extends Base
         $request = $request->withQueryParams([
             'id_token_hint' => $this->getValidIdToken(),
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'Mufasa',
+            'client_id'     => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(),
             'response_type' => 'id_token',
             'prompt'        => 'none',
             'scope'         => 'openid email profile',
@@ -168,7 +168,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'Mufasa',
+            'client_id'             => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(),
             'response_type'         => 'code',
             'scope'                 => 'openid email profile',
             'nonce'                 => 'foo/bar',
@@ -189,10 +189,10 @@ class OpenIDConnectTest extends Base
         $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
 
         $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
-        $this->assertEquals('Mufasa', $authcode->getClientPublicId());
+        $this->assertEquals($this->getClientManager()->getClientByName('Mufasa')->getPublicId(), $authcode->getClientPublicId());
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -272,7 +272,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'Mufasa',
+            'client_id'             => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(),
             'response_type'         => 'code token',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
@@ -290,7 +290,7 @@ class OpenIDConnectTest extends Base
         parse_str($values['fragment'], $params);
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -311,7 +311,7 @@ class OpenIDConnectTest extends Base
         $this->assertInstanceOf(RefreshTokenInterface::class, $refresh_token);
         $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
 
-        $introspection_request = $this->createRequest('/', 'POST', ['token' => $json['access_token']], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $introspection_request = $this->createRequest('/', 'POST', ['token' => $json['access_token']], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $introspection_response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($introspection_request, $introspection_response);
@@ -333,7 +333,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'Mufasa',
+            'client_id'             => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(),
             'response_type'         => 'code token',
             'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
             'code_challenge_method' => 'plain',
@@ -350,7 +350,7 @@ class OpenIDConnectTest extends Base
         parse_str($values['fragment'], $params);
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -369,7 +369,7 @@ class OpenIDConnectTest extends Base
         $this->assertInstanceOf(AccessTokenInterface::class, $access_token);
         $this->assertTrue($this->getJWTAccessTokenManager()->isAccessTokenValid($access_token));
 
-        $introspection_request = $this->createRequest('/', 'POST', ['token' => $json['access_token']], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'Mufasa', 'PHP_AUTH_PW' => 'Circle Of Life']);
+        $introspection_request = $this->createRequest('/', 'POST', ['token' => $json['access_token']], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(), 'PHP_AUTH_PW' => 'Circle Of Life']);
 
         $introspection_response = new Response();
         $this->getTokenIntrospectionEndpoint()->introspection($introspection_request, $introspection_response);
@@ -386,7 +386,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'id_token',
             'nonce'                 => '0123456789',
             'state'                 => 'ABCDEF',
@@ -455,7 +455,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'id_token token',
             'nonce'                 => '0123456789',
             'state'                 => 'ABCDEF',
@@ -490,7 +490,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'code id_token token',
             'state'                 => 'ABCDEF',
             'scope'                 => 'openid',
@@ -519,7 +519,7 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->hasClaim('c_hash'));
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['client_id' => 'foo', 'grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -559,7 +559,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'code id_token',
             'state'                 => 'ABCDEF',
             'scope'                 => 'openid',
@@ -587,7 +587,7 @@ class OpenIDConnectTest extends Base
         $this->assertTrue($id_token->hasClaim('c_hash'));
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['client_id' => 'foo', 'grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(), 'grant_type' => 'authorization_code', 'code' => $params['code'], 'redirect_uri' => 'http://example.com/test?good=false', 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -625,7 +625,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'none',
             'state'         => '0123456789',
         ]);
@@ -800,7 +800,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'none',
             'prompt'        => 'login',
             'state'         => '0123456789',
@@ -819,7 +819,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'none',
             'prompt'        => 'login',
             'state'         => '0123456789',
@@ -930,7 +930,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'none',
             'prompt'        => 'login',
             'state'         => '0123456789',
@@ -950,7 +950,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'token',
             'prompt'        => 'login',
             'scope'         => 'openid email profile',
@@ -970,7 +970,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'token',
             'prompt'        => 'login consent',
             'scope'         => 'openid email profile',
@@ -991,7 +991,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'token',
             'prompt'        => 'login consent',
             'scope'         => 'openid email profile',
@@ -1011,7 +1011,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'none',
             'prompt'        => 'none',
             'state'         => '0123456789',
@@ -1027,7 +1027,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'none',
             'prompt'        => 'none',
             'state'         => '0123456789',
@@ -1044,7 +1044,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'none',
             'prompt'        => 'none',
             'scope'         => 'openid email profile',
@@ -1067,7 +1067,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'none',
             'prompt'        => 'none login',
             'scope'         => 'openid email profile',
