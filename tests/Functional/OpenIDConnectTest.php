@@ -318,7 +318,7 @@ class OpenIDConnectTest extends Base
         $introspection_response->getBody()->rewind();
 
         $this->assertEquals(200, $introspection_response->getStatusCode());
-        $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\,"offline_access"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":\["[^"]+"\],"iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
+        $this->assertRegExp('/^{"active":true,"client_id":"[^"]+","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\,"offline_access"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":\["[^"]+"\],"iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
     }
@@ -376,7 +376,7 @@ class OpenIDConnectTest extends Base
         $introspection_response->getBody()->rewind();
 
         $this->assertEquals(200, $introspection_response->getStatusCode());
-        $this->assertRegExp('/^{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":\["[^"]+"\],"iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
+        $this->assertRegExp('/^{"active":true,"client_id":"[^"]+","token_type":"Bearer","exp":[\d]+,"scp":\["openid"\],"jti":"[^"]+","iat":[\d]+,"nbf":[\d]+,"aud":\["[^"]+"\],"iss":"[^"]+"}$/', $introspection_response->getBody()->getContents());
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
     }

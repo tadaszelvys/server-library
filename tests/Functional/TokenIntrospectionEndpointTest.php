@@ -54,7 +54,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertRegExp('{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[0-9]+}', $response->getBody()->getContents());
+        $this->assertRegExp('{"active":true,"client_id":"[^"]+","token_type":"Bearer","exp":[0-9]+}', $response->getBody()->getContents());
     }
 
     public function testAccessTokenIntrospectionAllowedForResourceServer()
@@ -67,7 +67,7 @@ class TokenIntrospectionEndpointTest extends Base
         $content = $response->getBody()->getContents();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertRegExp('{"active":true,"client_id":"Mufasa","token_type":"Bearer","exp":[0-9]+,"sub":"Mufasa","metadatas":\["plic","ploc","pluc"\],"parameters":{"foo":"bar"}}', $content);
+        $this->assertRegExp('{"active":true,"client_id":"[^"]+","token_type":"Bearer","exp":[0-9]+,"sub":"[^"]+","metadatas":\["plic","ploc","pluc"\],"parameters":{"foo":"bar"}}', $content);
     }
 
     public function testAccessTokenIntrospectionAllowedForAuthenticatedPublicClient()
@@ -79,7 +79,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertRegExp('{"active":true,"client_id":"foo","token_type":"Bearer","exp":[0-9]+,"sub":"foo"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"active":true,"client_id":"[^"]+","token_type":"Bearer","exp":[0-9]+,"sub":"[^"]+"}', $response->getBody()->getContents());
     }
 
     public function testAuthCodeIntrospectionAllowedForAuthenticatedPublicClient()
@@ -160,7 +160,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertRegExp('{"active":true,"client_id":"Mufasa","exp":[0-9]+,"scp":\["scope1","scope2","scope3"\]}', $response->getBody()->getContents());
+        $this->assertRegExp('{"active":true,"client_id":"[^"]+","exp":[0-9]+,"scp":\["scope1","scope2","scope3"\]}', $response->getBody()->getContents());
     }
 
     public function testTokenNotFound()
