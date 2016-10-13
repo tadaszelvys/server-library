@@ -24,6 +24,11 @@ class ClientManager extends Base
     private $clients = [];
 
     /**
+     * @var \OAuth2\Client\Client[]
+     */
+    private $client_ids = [];
+
+    /**
      * ClientManager constructor.
      *
      * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager
@@ -199,20 +204,35 @@ class ClientManager extends Base
         $fii->set('redirect_uris', ['http://example.com/test?good=false']);
         $fii->set('token_endpoint_auth_method', 'none');
 
-        $this->clients['foo'] = $foo;
-        $this->clients['oof'] = $oof;
-        $this->clients['fii'] = $fii;
+        $clients = [
+            'foo'             => $foo,
+            'oof'             => $oof,
+            'fii'             => $fii,
+            'jwt1'            => $jwt1,
+            'jwt2'            => $jwt2,
+            'bar'             => $bar,
+            'baz'             => $baz,
+            'Mufasa'          => $mufasa,
+            'Mufasa2'         => $mufasa2,
+            'mac'             => $mac,
+            'expired'         => $expired,
+            'resource_server' => $resource_server,
+        ];
 
-        $this->clients['jwt1'] = $jwt1;
-        $this->clients['jwt2'] = $jwt2;
+        foreach ($clients as $name => $client) {
+            $this->clients[$name] = $client;
+            $this->client_ids[$client->getPublicId()] = $client;
+        }
+    }
 
-        $this->clients['bar'] = $bar;
-        $this->clients['baz'] = $baz;
-        $this->clients['Mufasa'] = $mufasa;
-        $this->clients['Mufasa2'] = $mufasa2;
-        $this->clients['mac'] = $mac;
-        $this->clients['expired'] = $expired;
-        $this->clients['resource_server'] = $resource_server;
+    /**
+     * @param string $name
+     *
+     * @return null|\OAuth2\Client\Client
+     */
+    public function getClientByName($name)
+    {
+        return array_key_exists($name, $this->clients) ? $this->clients[$name] : null;
     }
 
     /**
@@ -220,7 +240,7 @@ class ClientManager extends Base
      */
     public function getClient($client_id)
     {
-        return isset($this->clients[$client_id]) ? $this->clients[$client_id] : null;
+        return array_key_exists($client_id, $this->client_ids) ? $this->client_ids[$client_id] : null;
     }
 
     /**
@@ -228,6 +248,6 @@ class ClientManager extends Base
      */
     public function saveClient(ClientInterface $client)
     {
-        $this->clients[$client->getPublicId()] = $client;
+        $this->client_ids[$client->getPublicId()] = $client;
     }
 }

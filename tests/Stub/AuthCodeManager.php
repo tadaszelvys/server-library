@@ -17,17 +17,22 @@ use OAuth2\Token\AuthCodeManager as Base;
 
 class AuthCodeManager extends Base
 {
+    /**
+     * @var \OAuth2\Token\AuthCode[]
+     */
     private $auth_codes = [];
 
     /**
      * AuthCodeManager constructor.
+     *
+     * @param \OAuth2\Test\Stub\ClientManager $client_manager
      */
-    public function __construct()
+    public function __construct(ClientManager $client_manager)
     {
         $valid_auth_code1 = new AuthCode();
         $valid_auth_code1->setIssueRefreshToken(true);
         $valid_auth_code1->setMetadata('redirect_uri', 'http://example.com/redirect_uri/');
-        $valid_auth_code1->setClientPublicId('Mufasa');
+        $valid_auth_code1->setClientPublicId($client_manager->getClientByName('Mufasa')->getPublicId());
         $valid_auth_code1->setResourceOwnerPublicId('real_user1_public_id');
         $valid_auth_code1->setUserAccountPublicId('user1');
         $valid_auth_code1->setExpiresAt(time() + 3000);
@@ -40,7 +45,7 @@ class AuthCodeManager extends Base
         $valid_auth_code_to_be_revoked = new AuthCode();
         $valid_auth_code_to_be_revoked->setIssueRefreshToken(true);
         $valid_auth_code_to_be_revoked->setMetadata('redirect_uri', 'http://example.com/redirect_uri/');
-        $valid_auth_code_to_be_revoked->setClientPublicId('foo');
+        $valid_auth_code_to_be_revoked->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
         $valid_auth_code_to_be_revoked->setResourceOwnerPublicId('real_user1_public_id');
         $valid_auth_code_to_be_revoked->setUserAccountPublicId('user1');
         $valid_auth_code_to_be_revoked->setExpiresAt(time() + 3000);
@@ -53,7 +58,7 @@ class AuthCodeManager extends Base
         $valid_auth_code2 = new AuthCode();
         $valid_auth_code2->setIssueRefreshToken(true);
         $valid_auth_code2->setMetadata('redirect_uri', 'http://example.com/redirect_uri/');
-        $valid_auth_code2->setClientPublicId('foo');
+        $valid_auth_code2->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
         $valid_auth_code2->setResourceOwnerPublicId('real_user1_public_id');
         $valid_auth_code2->setUserAccountPublicId('user1');
         $valid_auth_code2->setExpiresAt(time() + 3000);
@@ -70,7 +75,7 @@ class AuthCodeManager extends Base
         $expired_auth_code = new AuthCode();
         $expired_auth_code->setIssueRefreshToken(true);
         $expired_auth_code->setMetadata('redirect_uri', 'http://example.com/redirect_uri/');
-        $expired_auth_code->setClientPublicId('Mufasa');
+        $expired_auth_code->setClientPublicId($client_manager->getClientByName('Mufasa')->getPublicId());
         $expired_auth_code->setResourceOwnerPublicId('real_user1_public_id');
         $expired_auth_code->setResourceOwnerPublicId('user1');
         $expired_auth_code->setExpiresAt(time() - 1);
@@ -99,7 +104,7 @@ class AuthCodeManager extends Base
      */
     public function getAuthCode($code)
     {
-        if (isset($this->auth_codes[$code])) {
+        if (array_key_exists($code, $this->auth_codes)) {
             return $this->auth_codes[$code];
         }
     }
@@ -117,7 +122,7 @@ class AuthCodeManager extends Base
      */
     public function revokeAuthCode(AuthCodeInterface $code)
     {
-        if (isset($this->auth_codes[$code->getToken()])) {
+        if (array_key_exists($code->getToken(), $this->auth_codes)) {
             unset($this->auth_codes[$code->getToken()]);
         }
     }

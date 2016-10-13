@@ -707,12 +707,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @var null|\OAuth2\Client\ClientManager
+     * @var null|\OAuth2\Test\Stub\ClientManager
      */
     private $client_manager = null;
 
     /**
-     * @return \OAuth2\Client\ClientManager
+     * @return \OAuth2\Test\Stub\ClientManager
      */
     protected function getClientManager()
     {
@@ -774,6 +774,8 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
             $this->authorization_code_grant_type->disablePKCEForPublicClientsEnforcement();
             $this->authorization_code_grant_type->enablePKCEForPublicClientsEnforcement();
+            $this->authorization_code_grant_type->disallowPublicClients();
+            $this->authorization_code_grant_type->allowPublicClients();
         }
 
         return $this->authorization_code_grant_type;
@@ -933,7 +935,10 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getJWTAccessTokenManager(),
                 $this->getExceptionManager()
             );
+            $this->implicit_grant_type->allowAccessTokenTypeParameter();
             $this->implicit_grant_type->disallowAccessTokenTypeParameter();
+            $this->implicit_grant_type->disallowConfidentialClients();
+            $this->implicit_grant_type->allowConfidentialClients();
         }
 
         return $this->implicit_grant_type;
@@ -1021,6 +1026,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->jwt_access_token_manager) {
             $this->jwt_access_token_manager = new JWTAccessTokenManager(
+                $this->getClientManager(),
                 $this->getJWTCreator(),
                 $this->getJWTLoader(),
                 'HS512',
@@ -1139,7 +1145,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAuthCodeManager()
     {
         if (null === $this->auth_code_manager) {
-            $this->auth_code_manager = new AuthCodeManager();
+            $this->auth_code_manager = new AuthCodeManager($this->getClientManager());
 
             $this->auth_code_manager->setAuthorizationCodeMinLength(10);
             $this->auth_code_manager->setAuthorizationCodeMaxLength(20);
@@ -1399,19 +1405,37 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @var null|\OAuth2\Endpoint\TokenType\RefreshToken
+     */
+    private $refresh_token_type = null;
+
+    /**
      * @return \OAuth2\Endpoint\TokenType\RefreshToken
      */
     protected function getRefreshTokenType()
     {
-        return new RefreshToken($this->getRefreshTokenManager());
+        if (null === $this->refresh_token_type) {
+            $this->refresh_token_type = new RefreshToken($this->getRefreshTokenManager());
+        }
+
+        return $this->refresh_token_type;
     }
+
+    /**
+     * @var null|\OAuth2\Endpoint\TokenType\AuthCode
+     */
+    private $auth_code_type = null;
 
     /**
      * @return \OAuth2\Endpoint\TokenType\AuthCode
      */
     protected function getAuthCodeType()
     {
-        return new AuthCode($this->getAuthCodeManager());
+        if (null === $this->auth_code_type) {
+            $this->auth_code_type = new AuthCode($this->getAuthCodeManager());
+        }
+
+        return $this->auth_code_type;
     }
 
     /**

@@ -12,7 +12,6 @@
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ClientManagerInterface;
 use OAuth2\ResourceOwner\ResourceOwnerInterface;
 use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManager as Base;
@@ -29,12 +28,12 @@ class RefreshTokenManager extends Base implements RefreshTokenManagerInterface
     /**
      * RefreshTokenManager constructor.
      *
-     * @param \OAuth2\Client\ClientManagerInterface $client_manager
+     * @param \OAuth2\Test\Stub\ClientManager $client_manager
      */
-    public function __construct(ClientManagerInterface $client_manager)
+    public function __construct(ClientManager $client_manager)
     {
-        $mufasa = $client_manager->getClient('Mufasa');
-        $foo = $client_manager->getClient('foo');
+        $mufasa = $client_manager->getClientByName('Mufasa');
+        $foo = $client_manager->getClientByName('foo');
 
         $this->addRefreshToken(
             'VALID_REFRESH_TOKEN',

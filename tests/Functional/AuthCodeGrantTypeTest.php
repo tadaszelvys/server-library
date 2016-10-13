@@ -14,6 +14,7 @@ namespace OAuth2\Test\Functional;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Test\Base;
 use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Token\AuthCodeInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
@@ -297,13 +298,9 @@ class AuthCodeGrantTypeTest extends Base
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
-        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
-
-        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
-        $this->assertEquals('foo', $authcode->getClientPublicId());
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -339,13 +336,9 @@ class AuthCodeGrantTypeTest extends Base
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
-        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
-
-        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
-        $this->assertEquals('foo', $authcode->getClientPublicId());
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -380,13 +373,9 @@ class AuthCodeGrantTypeTest extends Base
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
-        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
-
-        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
-        $this->assertEquals('foo', $authcode->getClientPublicId());
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -420,13 +409,9 @@ class AuthCodeGrantTypeTest extends Base
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
-        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
-
-        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
-        $this->assertEquals('foo', $authcode->getClientPublicId());
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken(), 'code_verifier' => 'Bad PKCE'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code'], 'code_verifier' => 'Bad PKCE'], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -459,13 +444,9 @@ class AuthCodeGrantTypeTest extends Base
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
-        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
-
-        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
-        $this->assertEquals('foo', $authcode->getClientPublicId());
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken()], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code']], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
@@ -500,13 +481,9 @@ class AuthCodeGrantTypeTest extends Base
 
         $uri = new Uri($response->getHeader('Location')[0]);
         parse_str($uri->getQuery(), $result);
-        $authcode = $this->getAuthCodeManager()->getAuthCode($result['code']);
-
-        $this->assertTrue($authcode->getExpiresAt() <= time() + 100);
-        $this->assertEquals('foo', $authcode->getClientPublicId());
 
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $authcode->getToken()], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'authorization_code', 'client_id' => 'foo', 'redirect_uri' => 'http://example.com/test?good=false', 'code' => $result['code']], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => 'foo']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);

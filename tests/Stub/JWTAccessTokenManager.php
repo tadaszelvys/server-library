@@ -28,16 +28,18 @@ class JWTAccessTokenManager extends Base
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \Jose\JWTCreatorInterface    $jwt_creator
-     * @param \Jose\JWTLoaderInterface     $jwt_loader
-     * @param string                       $signature_algorithm
-     * @param \Jose\Object\JWKSetInterface $signature_key_set
-     * @param string                       $issuer
-     * @param string                       $key_encryption_algorithm
-     * @param string                       $content_encryption_algorithm
-     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
+     * @param \OAuth2\Test\Stub\ClientManager $client_manager
+     * @param \Jose\JWTCreatorInterface       $jwt_creator
+     * @param \Jose\JWTLoaderInterface        $jwt_loader
+     * @param string                          $signature_algorithm
+     * @param \Jose\Object\JWKSetInterface    $signature_key_set
+     * @param string                          $key_encryption_algorithm
+     * @param string                          $content_encryption_algorithm
+     * @param \Jose\Object\JWKSetInterface    $key_encryption_key_set
+     * @param string                          $issuer
      */
-    public function __construct(JWTCreatorInterface $jwt_creator,
+    public function __construct(ClientManager $client_manager,
+                                JWTCreatorInterface $jwt_creator,
                                 JWTLoaderInterface $jwt_loader,
                                 $signature_algorithm,
                                 JWKSetInterface $signature_key_set,
@@ -59,10 +61,10 @@ class JWTAccessTokenManager extends Base
 
         $abcd = new AccessToken();
         $abcd->setExpiresAt(time() + 3600);
-        $abcd->setResourceOwnerPublicId('Mufasa');
+        $abcd->setResourceOwnerPublicId($client_manager->getClientByName('Mufasa')->getPublicId());
         $abcd->setUserAccountPublicId(null);
         $abcd->setScope([]);
-        $abcd->setClientPublicId('Mufasa');
+        $abcd->setClientPublicId($client_manager->getClientByName('Mufasa')->getPublicId());
         $abcd->setRefreshToken(null);
         $abcd->setToken('ABCD');
         $abcd->setTokenType('Bearer');
@@ -71,10 +73,10 @@ class JWTAccessTokenManager extends Base
 
         $efgh = new AccessToken();
         $efgh->setExpiresAt(time() + 3600);
-        $efgh->setResourceOwnerPublicId('foo');
+        $efgh->setResourceOwnerPublicId($client_manager->getClientByName('foo')->getPublicId());
         $efgh->setUserAccountPublicId(null);
         $efgh->setScope([]);
-        $efgh->setClientPublicId('foo');
+        $efgh->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
         $efgh->setRefreshToken('REFRESH_EFGH');
         $efgh->setToken('EFGH');
         $efgh->setTokenType('Bearer');
@@ -84,7 +86,7 @@ class JWTAccessTokenManager extends Base
         $no_user_info->setResourceOwnerPublicId('real_user1_public_id');
         $no_user_info->setUserAccountPublicId('user1');
         $no_user_info->setScope(['scope1']);
-        $no_user_info->setClientPublicId('foo');
+        $no_user_info->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
         $no_user_info->setToken('NO_USER_INFO');
         $no_user_info->setTokenType('Bearer');
         $no_user_info->setMetadata('redirect_uri', 'https://example.com');
@@ -96,7 +98,7 @@ class JWTAccessTokenManager extends Base
         $user_info->setResourceOwnerPublicId('real_user1_public_id');
         $user_info->setUserAccountPublicId('user1');
         $user_info->setScope(['openid', 'profile', 'address', 'phone']);
-        $user_info->setClientPublicId('foo');
+        $user_info->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
         $user_info->setToken('USER_INFO');
         $user_info->setTokenType('Bearer');
         $user_info->setMetadata('redirect_uri', 'https://example.com');
@@ -108,7 +110,7 @@ class JWTAccessTokenManager extends Base
         $user_info2->setResourceOwnerPublicId('real_user1_public_id');
         $user_info2->setUserAccountPublicId('user1');
         $user_info2->setScope(['openid', 'profile', 'address', 'phone']);
-        $user_info2->setClientPublicId('jwt1');
+        $user_info2->setClientPublicId($client_manager->getClientByName('jwt1')->getPublicId());
         $user_info2->setToken('USER_INFO2');
         $user_info2->setTokenType('Bearer');
         $user_info2->setMetadata('redirect_uri', 'https://example2.com');
@@ -120,7 +122,7 @@ class JWTAccessTokenManager extends Base
         $user_info_mac->setResourceOwnerPublicId('real_user1_public_id');
         $user_info_mac->setUserAccountPublicId('user1');
         $user_info_mac->setScope(['openid', 'profile', 'address', 'phone']);
-        $user_info_mac->setClientPublicId('jwt1');
+        $user_info_mac->setClientPublicId($client_manager->getClientByName('jwt1')->getPublicId());
         $user_info_mac->setToken('USER_INFO_MAC');
         $user_info_mac->setTokenType('MAC');
         $user_info_mac->setParameters([
