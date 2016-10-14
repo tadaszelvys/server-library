@@ -246,6 +246,17 @@ class ClientManager extends Base
                 ],
             ],
             [
+                'name' => 'foo2',
+                'data' => [
+                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code'],
+                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'redirect_uris' => ['http://example.com/test?good=false', 'http://127.0.0.1', 'https://another.uri/callback', 'urn:ietf:wg:oauth:2.0:oob', 'urn:ietf:wg:oauth:2.0:oob:auto'],
+                    'token_endpoint_auth_method' => 'none',
+                    'sector_identifier_uri' => 'https://www.foo.com',
+                    'subject_type' => 'pairwise',
+                ],
+            ],
+            [
                 'name' => 'fii',
                 'data' => [
                     'grant_types' => [],

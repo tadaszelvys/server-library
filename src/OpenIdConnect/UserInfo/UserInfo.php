@@ -151,10 +151,7 @@ final class UserInfo implements UserInfoInterface
     private function checkScope($scope)
     {
         if (!in_array('openid', $scope)) {
-            throw $this->getExceptionManager()->getBadRequestException(
-                ExceptionManagerInterface::INVALID_REQUEST,
-                'Access token does not contain the "openid" scope.'
-            );
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Access token does not contain the "openid" scope.');
         }
     }
 }
