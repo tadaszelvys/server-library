@@ -36,168 +36,14 @@ class ClientManager extends Base
      */
     public function __construct(TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager, ExceptionManagerInterface $exception_manager)
     {
-        parent::__construct(
-            $token_endpoint_auth_method_manager,
-            $exception_manager
-        );
+        parent::__construct($token_endpoint_auth_method_manager, $exception_manager);
 
-        $keys = ['keys' => [[
-                'kid' => 'JWK1',
-                'use' => 'enc',
-                'kty' => 'oct',
-                'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
-            ],
-            [
-                'kid' => 'JWK2',
-                'use' => 'sig',
-                'kty' => 'oct',
-                'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
-            ],
-        ]];
-
-        $jwt1 = $this->createClient();
-        $jwt1->set('redirect_uris', ['http://example.com/test?good=false']);
-        $jwt1->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $jwt1->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
-        $jwt1->set('token_endpoint_auth_method', 'private_key_jwt');
-        $jwt1->set('id_token_encrypted_response_alg', 'A256KW');
-        $jwt1->set('id_token_encrypted_response_enc', 'A256CBC-HS512');
-        $jwt1->set('jwks', $keys);
-        $jwt1->set('scope_policy', 'error');
-        $jwt1->set('request_uris', ['https://127.0.0.1:8181/']);
-        $jwt1->set('token_lifetime', [
-            'authcode'      => 20,
-            'access_token'  => 0,
-            'refresh_token' => 2000,
-        ]);
-
-        $bar = $this->createClient();
-        $bar->set('client_secret', 'secret');
-        $bar->set('client_secret_expires_at', time() + 3600);
-        $bar->set('redirect_uris', ['http://example.com/test?good=false']);
-        $bar->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $bar->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
-        $bar->set('token_endpoint_auth_method', 'client_secret_jwt');
-        $bar->set('scope_policy', 'none');
-        $bar->set('token_lifetime', [
-            'authcode'      => 10,
-            'access_token'  => 1000,
-            'refresh_token' => 2000,
-        ]);
-
-        $baz = $this->createClient();
-        $baz->set('client_secret', 'secret');
-        $baz->set('redirect_uris', []);
-        $baz->set('grant_types', ['authorization_code']);
-        $baz->set('response_types', []);
-        $baz->set('token_endpoint_auth_method', 'client_secret_basic');
-        $baz->set('scope_policy', 'none');
-        $baz->set('token_lifetime', [
-            'authcode'      => 10,
-            'access_token'  => 1000,
-            'refresh_token' => 2000,
-        ]);
-
-        $resource_server = $this->createClient();
-        $resource_server->set('client_secret', 'secret');
-        $resource_server->set('redirect_uris', []);
-        $resource_server->set('grant_types', []);
-        $resource_server->set('response_types', []);
-        $resource_server->set('token_endpoint_auth_method', 'client_secret_basic');
-        $resource_server->set('is_resource_server', true);
-        $resource_server->set('token_lifetime', [
-            'authcode'      => 10,
-            'access_token'  => 1000,
-            'refresh_token' => 2000,
-        ]);
-
-        $mufasa = $this->createClient();
-        $mufasa->set('client_secret', 'Circle Of Life');
-        $mufasa->set('redirect_uris', []);
-        $mufasa->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $mufasa->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
-        $mufasa->set('token_endpoint_auth_method', 'client_secret_basic');
-        $mufasa->set('scope_policy', 'none');
-        $mufasa->set('subject_type', 'pairwise');
-        $mufasa->set('token_lifetime', [
-            'authcode'      => 10,
-            'access_token'  => 1000,
-            'refresh_token' => 2000,
-        ]);
-
-        $mufasa2 = $this->createClient();
-        $mufasa2->set('client_secret', 'Circle Of Life');
-        $mufasa2->set('redirect_uris', []);
-        $mufasa2->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $mufasa2->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
-        $mufasa2->set('token_endpoint_auth_method', 'client_secret_post');
-        $mufasa2->set('scope_policy', 'none');
-        $mufasa2->set('token_lifetime', [
-            'authcode'      => 10,
-            'access_token'  => 1000,
-            'refresh_token' => 2000,
-        ]);
-
-        $mac = $this->createClient();
-        $mac->set('client_secret', 'secret');
-        $mac->set('redirect_uris', ['http://example.com/test?good=false']);
-        $mac->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $mac->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
-        $mac->set('token_types', ['MAC']);
-        $mac->set('token_endpoint_auth_method', 'client_secret_basic');
-        $mac->set('scope_policy', 'none');
-        $mac->set('token_lifetime', [
-            'authcode'      => 10,
-            'access_token'  => 1000,
-            'refresh_token' => 2000,
-        ]);
-
-        $expired = $this->createClient();
-        $expired->set('client_secret', 'secret');
-        $expired->set('client_secret_expires_at', time() - 3600);
-        $expired->set('redirect_uris', ['http://example.com/test?good=false']);
-        $expired->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer']);
-        $expired->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
-        $expired->set('token_endpoint_auth_method', 'client_secret_basic');
-        $expired->set('scope_policy', 'none');
-        $expired->set('token_lifetime', [
-            'authcode'      => 10,
-            'access_token'  => 1000,
-            'refresh_token' => 2000,
-        ]);
-
-        $foo = $this->createClient();
-        $foo->set('grant_types', ['client_credentials', 'password', 'refresh_token', 'authorization_code']);
-        $foo->set('response_types', ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token']);
-        $foo->set('redirect_uris', ['http://example.com/test?good=false', 'http://127.0.0.1', 'https://another.uri/callback', 'urn:ietf:wg:oauth:2.0:oob', 'urn:ietf:wg:oauth:2.0:oob:auto']);
-        $foo->set('token_endpoint_auth_method', 'none');
-
-        $oof = $this->createClient();
-        $oof->set('grant_types', []);
-        $oof->set('redirect_uris', []);
-        $oof->set('token_endpoint_auth_method', 'none');
-
-        $fii = $this->createClient();
-        $fii->set('grant_types', []);
-        $fii->set('redirect_uris', ['http://example.com/test?good=false']);
-        $fii->set('token_endpoint_auth_method', 'none');
-
-        $clients = [
-            'foo'             => $foo,
-            'oof'             => $oof,
-            'fii'             => $fii,
-            'jwt1'            => $jwt1,
-            'bar'             => $bar,
-            'baz'             => $baz,
-            'Mufasa'          => $mufasa,
-            'Mufasa2'         => $mufasa2,
-            'mac'             => $mac,
-            'expired'         => $expired,
-            'resource_server' => $resource_server,
-        ];
-
-        foreach ($clients as $name => $client) {
-            $this->clients[$name] = $client;
+        foreach ($this->getClientInformation() as $info) {
+            $client = $this->createClient();
+            foreach ($info['data'] as $k=>$v) {
+                $client->set($k, $v);
+            }
+            $this->clients[$info['name']] = $client;
             $this->client_ids[$client->getPublicId()] = $client;
         }
     }
@@ -226,5 +72,195 @@ class ClientManager extends Base
     public function saveClient(ClientInterface $client)
     {
         $this->client_ids[$client->getPublicId()] = $client;
+    }
+
+    /**
+     * @return array
+     */
+    private function getKeys()
+    {
+        return ['keys' => [
+            [
+                'kid' => 'JWK1',
+                'use' => 'enc',
+                'kty' => 'oct',
+                'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+            ],
+            [
+                'kid' => 'JWK2',
+                'use' => 'sig',
+                'kty' => 'oct',
+                'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+            ],
+        ]];
+    }
+
+    /**
+     * @return array
+     */
+    private function getClientInformation()
+    {
+        return [
+            [
+                'name' => 'jwt1',
+                'data' => [
+                    'redirect_uris'                   => ['http://example.com/test?good=false'],
+                    'grant_types'                     => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types'                  => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'token_endpoint_auth_method'      => 'private_key_jwt',
+                    'id_token_encrypted_response_alg' => 'A256KW',
+                    'id_token_encrypted_response_enc' => 'A256CBC-HS512',
+                    'jwks'                            => $this->getKeys(),
+                    'scope_policy'                    => 'error',
+                    'request_uris'                    => ['https://127.0.0.1:8181/'],
+                    'token_lifetime'                  => [
+                        'authcode'      => 20,
+                        'access_token'  => 0,
+                        'refresh_token' => 2000,
+                    ],
+                ],
+            ],
+            [
+                'name' => 'bar',
+                'data' => [
+                    'client_secret'              => 'secret',
+                    'client_secret_expires_at'   => time() + 3600,
+                    'redirect_uris'              => ['http://example.com/test?good=false'],
+                    'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types'             => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'token_endpoint_auth_method' => 'client_secret_jwt',
+                    'scope_policy'               => 'none',
+                    'token_lifetime'             => [
+                        'authcode'      => 10,
+                        'access_token'  => 1000,
+                        'refresh_token' => 2000,
+                    ],
+                ],
+            ],
+            [
+                'name' => 'baz',
+                'data' => [
+                    'client_secret' => 'secret',
+                    'redirect_uris' => [],
+                    'grant_types' => ['authorization_code'],
+                    'response_types' => [],
+                    'token_endpoint_auth_method' => 'client_secret_basic',
+                    'scope_policy' => 'none',
+                    'token_lifetime' => [
+                        'authcode'      => 10,
+                        'access_token'  => 1000,
+                        'refresh_token' => 2000,
+                    ],
+                ],
+            ],
+            [
+                'name' => 'resource_server',
+                'data' => [
+                    'client_secret' => 'secret',
+                    'redirect_uris' => [],
+                    'grant_types' => [],
+                    'response_types' => [],
+                    'token_endpoint_auth_method' => 'client_secret_basic',
+                    'is_resource_server' => true,
+                    'token_lifetime' => [
+                        'authcode'      => 10,
+                        'access_token'  => 1000,
+                        'refresh_token' => 2000,
+                    ],
+                ],
+            ],
+            [
+                'name' => 'Mufasa',
+                'data' => [
+                    'client_secret' => 'Circle Of Life',
+                    'redirect_uris' => [],
+                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'token_endpoint_auth_method' => 'client_secret_basic',
+                    'scope_policy' => 'none',
+                    'subject_type' => 'pairwise',
+                    'token_lifetime' => [
+                        'authcode'      => 10,
+                        'access_token'  => 1000,
+                        'refresh_token' => 2000,
+                    ],
+                ],
+            ],
+            [
+                'name' => 'Mufasa2',
+                'data' => [
+                    'client_secret' => 'Circle Of Life',
+                    'redirect_uris' => [],
+                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'token_endpoint_auth_method' => 'client_secret_post',
+                    'scope_policy' => 'none',
+                    'token_lifetime' => [
+                        'authcode'      => 10,
+                        'access_token'  => 1000,
+                        'refresh_token' => 2000,
+                    ],
+                ],
+            ],
+            [
+                'name' => 'mac',
+                'data' => [
+                    'client_secret' => 'secret',
+                    'redirect_uris' => ['http://example.com/test?good=false'],
+                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'token_types' => ['MAC'],
+                    'token_endpoint_auth_method' => 'client_secret_basic',
+                    'scope_policy' => 'none',
+                    'token_lifetime' => [
+                        'authcode'      => 10,
+                        'access_token'  => 1000,
+                        'refresh_token' => 2000,
+                    ],
+                ],
+            ],
+            [
+                'name' => 'expired',
+                'data' => [
+                    'client_secret' => 'secret',
+                    'client_secret_expires_at' => time() - 3600,
+                    'redirect_uris' => ['http://example.com/test?good=false'],
+                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'token_endpoint_auth_method' => 'client_secret_basic',
+                    'scope_policy' => 'none',
+                    'token_lifetime' => [
+                        'authcode'      => 10,
+                        'access_token'  => 1000,
+                        'refresh_token' => 2000,
+                    ],
+                ],
+            ],
+            [
+                'name' => 'foo',
+                'data' => [
+                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code'],
+                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'redirect_uris' => ['http://example.com/test?good=false', 'http://127.0.0.1', 'https://another.uri/callback', 'urn:ietf:wg:oauth:2.0:oob', 'urn:ietf:wg:oauth:2.0:oob:auto'],
+                    'token_endpoint_auth_method' => 'none',
+                ],
+            ],
+            [
+                'name' => 'fii',
+                'data' => [
+                    'grant_types' => [],
+                    'redirect_uris' => ['http://example.com/test?good=false'],
+                    'token_endpoint_auth_method' => 'none',
+                ],
+            ],
+            [
+                'name' => 'oof',
+                'data' => [
+                    'grant_types' => [],
+                    'redirect_uris' => [],
+                    'token_endpoint_auth_method' => 'none',
+                ],
+            ],
+        ];
     }
 }
