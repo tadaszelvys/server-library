@@ -65,7 +65,10 @@ interface AuthorizationRequestLoaderInterface
      */
     public function enableRequestObjectSupport(JWTLoaderInterface $jwt_loader);
 
-    public function enableRequestObjectReferenceSupport();
+    /**
+     * @param string[] $mandatory_claims
+     */
+    public function enableRequestObjectReferenceSupport(array $mandatory_claims = []);
 
     /**
      * @param \Jose\Object\JWKSetInterface $key_encryption_key_set

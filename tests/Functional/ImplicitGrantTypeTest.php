@@ -166,7 +166,7 @@ class ImplicitGrantTypeTest extends Base
             'iat'           => time(),
             'nbf'           => time(),
             'exp'           => time() + 120,
-            'iss'           => 'jwt1',
+            'iss'           => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             'aud'           => 'https://server.example.com',
             'response_type' => 'token',
             'client_id'     => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
@@ -225,7 +225,7 @@ class ImplicitGrantTypeTest extends Base
             'iat'           => time(),
             'nbf'           => time(),
             'exp'           => time() + 120,
-            'iss'           => 'jwt1',
+            'iss'           => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             'aud'           => 'https://server.example.com',
             'response_type' => 'token',
             'client_id'     => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
@@ -252,9 +252,6 @@ class ImplicitGrantTypeTest extends Base
                 'cty' => 'JWT',
                 'alg' => 'A256KW',
                 'enc' => 'A256CBC-HS512',
-                'exp' => time() + 120,
-                'aud' => $this->getIssuer(),
-                'iss' => 'jwt1',
             ]
         );
 
@@ -281,6 +278,37 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationRequestLoader()->enableRequestUriRegistrationRequirement();
         $this->getImplicitGrantType()->allowConfidentialClients();
 
+        $jwk2 = new JWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $claims = [
+            'iat'           => time(),
+            'nbf'           => time(),
+            'exp'           => time() + 120,
+            'iss'           => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+            'aud'           => 'https://server.example.com',
+            'response_type' => 'token',
+            'client_id'     => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'scope'         => 'openid scope1 scope2',
+            'nonce'         => 'n-0S6_WzA2Mj',
+        ];
+
+        $jws = JWSFactory::createJWSToCompactJSON(
+            $claims,
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+        file_put_contents(__DIR__.'/../signed_request', $jws);
+
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'request_uri'  => 'https://127.0.0.1:8181/signed_request',
@@ -296,11 +324,60 @@ class ImplicitGrantTypeTest extends Base
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
         $this->getAuthorizationRequestLoader()->disableRequestUriRegistrationRequirement();
+        unlink(__DIR__.'/../signed_request');
     }
 
     public function testAccessTokenSuccessUsingSignedAndEncryptedRequestUri()
     {
         $this->getImplicitGrantType()->allowConfidentialClients();
+
+        $jwk1 = new JWK([
+            'kid' => 'JWK1',
+            'use' => 'enc',
+            'kty' => 'oct',
+            'k'   => 'ABEiM0RVZneImaq7zN3u_wABAgMEBQYHCAkKCwwNDg8',
+        ]);
+        $jwk2 = new JWK([
+            'kid' => 'JWK2',
+            'use' => 'sig',
+            'kty' => 'oct',
+            'k'   => 'AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow',
+        ]);
+
+        $claims = [
+            'iat'           => time(),
+            'nbf'           => time(),
+            'exp'           => time() + 120,
+            'iss'           => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+            'aud'           => 'https://server.example.com',
+            'response_type' => 'token',
+            'client_id'     => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'scope'         => 'openid scope1 scope2',
+            'nonce'         => 'n-0S6_WzA2Mj',
+        ];
+
+        $jws = JWSFactory::createJWSToCompactJSON(
+            $claims,
+            $jwk2,
+            [
+                'kid' => 'JWK2',
+                'cty' => 'JWT',
+                'alg' => 'HS512',
+            ]
+        );
+
+        $jwe = JWEFactory::createJWEToCompactJSON(
+            $jws,
+            $jwk1,
+            [
+                'kid' => 'JWK1',
+                'cty' => 'JWT',
+                'alg' => 'A256KW',
+                'enc' => 'A256CBC-HS512',
+            ]
+        );
+        file_put_contents(__DIR__.'/../signed_and_encrypted_request', $jwe);
 
         $request = new ServerRequest();
         $request = $request->withQueryParams([
@@ -317,6 +394,7 @@ class ImplicitGrantTypeTest extends Base
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
+        unlink(__DIR__.'/../signed_and_encrypted_request');
     }
 
     public function testAccessTokenSuccessWithState()

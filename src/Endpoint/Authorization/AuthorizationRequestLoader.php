@@ -61,6 +61,11 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     private $require_encryption = false;
 
     /**
+     * @var string[]
+     */
+    private $mandatory_claims = [];
+
+    /**
      * AuthorizationRequestLoader constructor.
      *
      * @param \OAuth2\Client\ClientManagerInterface       $client_manager
@@ -172,10 +177,12 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     /**
      * {@inheritdoc}
      */
-    public function enableRequestObjectReferenceSupport()
+    public function enableRequestObjectReferenceSupport(array $mandatory_claims = [])
     {
+        Assertion::allString($mandatory_claims, 'The mandatory claims array should contain only claims.');
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
         $this->request_object_reference_allowed = true;
+        $this->mandatory_claims = $mandatory_claims;
     }
 
     /**
@@ -235,6 +242,7 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
 
         $jws = $this->loadRequest($params, $request, $client);
         $params = array_merge($params, $jws->getClaims(), ['client' => $client]);
+        $this->checkIssuerAndClientId($params);
 
         return $params;
     }
@@ -271,8 +279,21 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
             $this->checkRequestUri($client, $request_uri);
         }
         $params = array_merge($params, $jws->getClaims(), ['client' => $client]);
+        $this->checkIssuerAndClientId($params);
 
         return $params;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     */
+    private function checkIssuerAndClientId(array $params)
+    {
+        if (array_key_exists('iss', $params) && array_key_exists('client_id', $params)) {
+            Assertion::eq($params['iss'], $params['client_id'], 'The issuer of the request object is not the client who requests the authorization.');
+        }
     }
 
     /**
@@ -344,6 +365,8 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
             Assertion::notNull($public_key_set, 'The client does not have signature capabilities.');
 
             $this->getJWTLoader()->verify($jwt, $public_key_set);
+            $missing_claims = array_keys(array_diff_key(array_flip($this->mandatory_claims), $jwt->getClaims()));
+            Assertion::true(0 === count($missing_claims), 'The following mandatory claims are missing: %s.', json_encode($missing_claims));
         } catch (\Exception $e) {
             throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_OBJECT, $e->getMessage());
         }
