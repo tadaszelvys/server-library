@@ -21,6 +21,9 @@ final class ParameterCheckerManager implements ParameterCheckerManagerInterface
     use HasScopeManager;
     use HasExceptionManager;
 
+    /**
+     * @var \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface[]
+     */
     private $parameter_checkers = [];
 
     /**

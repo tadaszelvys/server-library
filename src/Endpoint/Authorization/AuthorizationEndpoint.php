@@ -52,15 +52,12 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * AuthorizationEndpoint constructor.
      *
-     * @param \OAuth2\UserAccount\UserAccountManagerInterface                                                           $user_account_manager
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationFactoryInterface                                              $authorization_factory
-     * @param \OAuth2\Exception\ExceptionManagerInterface                                                               $exception_manager
+     * @param \OAuth2\UserAccount\UserAccountManagerInterface              $user_account_manager
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationFactoryInterface $authorization_factory
+     * @param \OAuth2\Exception\ExceptionManagerInterface                  $exception_manager
      */
-    public function __construct(
-        UserAccountManagerInterface $user_account_manager,
-        AuthorizationFactoryInterface $authorization_factory,
-        ExceptionManagerInterface $exception_manager
-    ) {
+    public function __construct(UserAccountManagerInterface $user_account_manager, AuthorizationFactoryInterface $authorization_factory, ExceptionManagerInterface $exception_manager)
+    {
         $this->authorization_factory = $authorization_factory;
         $this->setUserAccountManager($user_account_manager);
         $this->setExceptionManager($exception_manager);
@@ -145,12 +142,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
                     }
                 }
             } catch (\Exception $e) {
-                $this->createRedirectionException(
-                    $authorization,
-                    $response,
-                    ExceptionManagerInterface::BAD_REQUEST,
-                    $e->getMessage()
-                );
+                $this->createRedirectionException($authorization, $response, ExceptionManagerInterface::BAD_REQUEST, $e->getMessage());
 
                 return;
             }
@@ -176,11 +168,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         } else { //If UserAccount is null
             //If prompt=none => error login required
             if ($authorization->hasPrompt('none')) {
-                $this->createRedirectionException(
-                    $authorization,
-                    $response,
-                    ExceptionManagerInterface::LOGIN_REQUIRED
-                );
+                $this->createRedirectionException($authorization, $response, ExceptionManagerInterface::LOGIN_REQUIRED);
 
                 return;
             }
@@ -214,11 +202,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         } else { //Pre configured consent does not exist
             //If prompt=prompt none => error interaction required
             if ($authorization->hasPrompt('none')) {
-                $this->createRedirectionException(
-                    $authorization,
-                    $response,
-                    ExceptionManagerInterface::INTERACTION_REQUIRED
-                );
+                $this->createRedirectionException($authorization, $response, ExceptionManagerInterface::INTERACTION_REQUIRED);
 
                 return;
             }

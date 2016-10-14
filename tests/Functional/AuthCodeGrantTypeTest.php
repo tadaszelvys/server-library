@@ -175,6 +175,24 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('http://example.com/test?good=false&error=access_denied&error_description=The+resource+owner+denied+access+to+your+client&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Faccess_denied&state=0123456789#', $response->getHeader('Location')[0]);
     }
 
+    public function testUnsupportedScopeRequested()
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams([
+            'redirect_uri'  => 'http://example.com/test?good=false',
+            'client_id'     => $this->getClientManager()->getClientByName('Mufasa')->getPublicId(),
+            'response_type' => 'code',
+            'scope'         => 'unsupported_scope',
+            'state'         => '0123456789',
+        ]);
+        $response = new Response();
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $this->getAuthorizationEndpoint()->setIsAuthorized(true);
+        $this->getAuthorizationEndpoint()->authorize($request, $response);
+
+        $this->assertEquals('http://example.com/test?good=false&error=invalid_scope&error_description=An+unsupported+scope+was+requested.+Available+scopes+for+the+client+are+scope1%2Cscope2%2Cscope3%2Cscope4%2Copenid%2Cprofile%2Cemail%2Cphone%2Caddress%2Coffline_access&error_uri=https%3A%2F%2Ffoo.test%2FError%2FRedirect%2Finvalid_scope&state=0123456789#', $response->getHeader('Location')[0]);
+    }
+
     public function testAuthcodeSuccess()
     {
         $request = new ServerRequest();

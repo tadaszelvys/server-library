@@ -289,7 +289,6 @@ class Base extends \PHPUnit_Framework_TestCase
 
             $this->authorization_request_loader->enableRequestObjectSupport($this->getJWTLoader());
             $this->authorization_request_loader->enableRequestObjectReferenceSupport(['iat', 'nbf', 'exp', 'iss', 'aud']);
-
             $this->authorization_request_loader->enableEncryptedRequestObjectSupport(
                 new JWKSet(['keys' => [
                     [

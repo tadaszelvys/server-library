@@ -34,18 +34,9 @@ final class ScopeParameterChecker implements ParameterCheckerInterface
      */
     public function checkerParameter(ClientInterface $client, array &$parameters)
     {
-        if (!$this->hasScopeManager()) {
-            return;
-        }
-
         $scope = $this->getScopeManager()->checkScopePolicy($parameters['scope'], $client);
         $available_scope = $this->getScopeManager()->getAvailableScopesForClient($client);
-
-        Assertion::true(
-            $this->getScopeManager()->areRequestScopesAvailable($scope, $available_scope),
-            sprintf('An unsupported scope was requested. Available scopes for the client are %s', implode(',', $available_scope))
-        );
-
+        Assertion::true($this->getScopeManager()->areRequestScopesAvailable($scope, $available_scope), sprintf('An unsupported scope was requested. Available scopes for the client are %s', implode(',', $available_scope)));
         $parameters['scope'] = $scope;
     }
 
