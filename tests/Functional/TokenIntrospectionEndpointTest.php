@@ -91,7 +91,7 @@ class TokenIntrospectionEndpointTest extends Base
         $response->getBody()->rewind();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertRegExp('/{"active"\:true,"client_id"\:"foo","exp"\:[0-9]+,"scp"\:\["scope1","scope2"\]}/', $response->getBody()->getContents());
+        $this->assertRegExp('/{"active"\:true,"client_id"\:"[^"]+","exp"\:[0-9]+,"scp"\:\["scope1","scope2"\]}/', $response->getBody()->getContents());
     }
 
     public function testAccessTokenIntrospectionRefusedForUnauthenticatedPublicClient()

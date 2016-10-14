@@ -23,11 +23,13 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     private $pre_configured_authorizations = [];
 
     /**
-     * AuthCodeManager constructor.
+     * PreConfiguredAuthorizationManager constructor.
+     *
+     * @param \OAuth2\Test\Stub\ClientManager $client_manager
      */
-    public function __construct()
+    public function __construct(ClientManager $client_manager)
     {
-        foreach ($this->getPreConfiguredAuthorizations() as $preConfiguredAuthorization) {
+        foreach ($this->getPreConfiguredAuthorizations($client_manager) as $preConfiguredAuthorization) {
             $auth = $this->createPreConfiguredAuthorization();
             $auth->setClientPublicId($preConfiguredAuthorization['client_public_id']);
             $auth->setResourceOwnerPublicId($preConfiguredAuthorization['resource_owner_public_id']);
@@ -39,20 +41,22 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     }
 
     /**
+     * @param \OAuth2\Test\Stub\ClientManager $client_manager
+     *
      * @return array
      */
-    protected function getPreConfiguredAuthorizations()
+    protected function getPreConfiguredAuthorizations(ClientManager $client_manager)
     {
         return [
             [
-                'client_public_id'         => 'foo',
+                'client_public_id'         => $client_manager->getClientByName('foo')->getPublicId(),
                 'resource_owner_public_id' => 'real_user1_public_id',
                 'user_account_public_id'   => 'user1',
                 'requested_scopes'         => ['openid', 'email', 'profile'],
                 'validated_scopes'         => ['openid', 'email', 'profile'],
             ],
             [
-                'client_public_id'         => 'Mufasa',
+                'client_public_id'         => $client_manager->getClientByName('Mufasa')->getPublicId(),
                 'resource_owner_public_id' => 'real_user1_public_id',
                 'user_account_public_id'   => 'user1',
                 'requested_scopes'         => ['openid', 'email', 'profile'],

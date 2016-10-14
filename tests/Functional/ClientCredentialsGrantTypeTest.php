@@ -254,8 +254,8 @@ class ClientCredentialsGrantTypeTest extends Base
 
         $access_token = $this->getJWTAccessTokenManager()->getAccessToken($values['access_token']);
         $this->assertInstanceOf(JWTAccessTokenInterface::class, $access_token);
-        $this->assertEquals('Mufasa', $access_token->getClientPublicId());
-        $this->assertEquals('Mufasa', $access_token->getResourceOwnerPublicId());
+        $this->assertEquals($this->getClientManager()->getClientByName('Mufasa')->getPublicId(), $access_token->getClientPublicId());
+        $this->assertEquals($this->getClientManager()->getClientByName('Mufasa')->getPublicId(), $access_token->getResourceOwnerPublicId());
         $this->assertInstanceOf(JWSInterface::class, $access_token->getJWS());
         $this->assertTrue($access_token->getExpiresIn() <= 3600);
     }
@@ -468,8 +468,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' => 'bar',
-                'sub' => 'bar',
+                'iss' => $this->getClientManager()->getClientByName('bar')->getPublicId(),
+                'sub' => $this->getClientManager()->getClientByName('bar')->getPublicId(),
             ],
             $jwk2,
             [

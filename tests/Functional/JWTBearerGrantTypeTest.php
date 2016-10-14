@@ -212,7 +212,7 @@ class JWTBearerGrantTypeTest extends Base
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
                 'iss' => 'My JWT issuer',
-                'sub' => 'bar',
+                'sub' => $this->getClientManager()->getClientByName('bar')->getPublicId(),
             ],
             $jwk2,
             [

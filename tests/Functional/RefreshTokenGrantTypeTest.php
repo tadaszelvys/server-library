@@ -99,7 +99,7 @@ class RefreshTokenGrantTypeTest extends Base
     public function testGrantTypeUnauthorizedForClient()
     {
         $response = new Response();
-        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => 'baz', 'PHP_AUTH_PW' => 'secret']);
+        $request = $this->createRequest('/', 'POST', ['grant_type' => 'refresh_token'], ['HTTPS' => 'on', 'PHP_AUTH_USER' => $this->getClientManager()->getClientByName('baz')->getPublicId(), 'PHP_AUTH_PW' => 'secret']);
 
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);

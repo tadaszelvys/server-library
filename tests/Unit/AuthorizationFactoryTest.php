@@ -22,7 +22,7 @@ class AuthorizationFactoryTest extends Base
     public function testCreateValidAuthorization()
     {
         $params = [
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'state'         => '0123456789',
             'scope'         => 'scope1 scope2',
             'response_type' => 'token',
@@ -36,8 +36,8 @@ class AuthorizationFactoryTest extends Base
         $authorization->setAuthorized(true);
 
         $this->assertEquals('0123456789', $authorization->getQueryParam('state'));
-        $this->assertEquals('foo', $authorization->getQueryParam('client_id'));
-        $this->assertEquals('foo', $authorization->getClient()->getPublicId());
+        $this->assertEquals($this->getClientManager()->getClientByName('foo')->getPublicId(), $authorization->getQueryParam('client_id'));
+        $this->assertEquals($this->getClientManager()->getClientByName('foo')->getPublicId(), $authorization->getClient()->getPublicId());
         $this->assertEquals('token', $authorization->getQueryParam('response_type'));
         $this->assertEquals('page', $authorization->getQueryParam('display'));
         $this->assertEquals(['none'], $authorization->getQueryParam('prompt'));
@@ -47,7 +47,7 @@ class AuthorizationFactoryTest extends Base
     public function testPromptNoneMustBeUsedAlone()
     {
         $params = [
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'state'         => '0123456789',
             'scope'         => 'scope1 scope2',
             'response_type' => 'token',
@@ -69,7 +69,7 @@ class AuthorizationFactoryTest extends Base
     public function testCreateAuthorizationWithBadPrompt()
     {
         $params = [
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'state'         => '0123456789',
             'scope'         => 'scope1 scope2',
             'response_type' => 'token',
@@ -90,7 +90,7 @@ class AuthorizationFactoryTest extends Base
     public function testCreateAuthorizationWithBadDisplay()
     {
         $params = [
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'state'         => '0123456789',
             'scope'         => 'scope1 scope2',
             'response_type' => 'token',

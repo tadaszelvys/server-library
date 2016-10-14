@@ -1274,7 +1274,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getPreConfiguredAuthorizationManager()
     {
         if (null === $this->pre_configured_authorization_manager) {
-            $this->pre_configured_authorization_manager = new PreConfiguredAuthorizationManager();
+            $this->pre_configured_authorization_manager = new PreConfiguredAuthorizationManager($this->getClientManager());
         }
 
         return $this->pre_configured_authorization_manager;

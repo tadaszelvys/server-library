@@ -211,7 +211,7 @@ class OpenIDConnectTest extends Base
 
     public function testClaimSource()
     {
-        $client = $this->getClientManager()->getClient('Mufasa');
+        $client = $this->getClientManager()->getClientByName('Mufasa');
         $user = $this->getUserAccountManager()->getUserAccountByUsername('user2');
         $result = $this->getUserInfo()->getUserinfo($client, $user, 'https://foo.bar/', null, [], ['openid', 'email']);
 
@@ -416,7 +416,7 @@ class OpenIDConnectTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'jwt1',
+            'client_id'             => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             'response_type'         => 'id_token',
             'nonce'                 => '0123456789',
             'state'                 => 'ABCDEF',

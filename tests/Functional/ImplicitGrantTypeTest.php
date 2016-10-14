@@ -38,7 +38,7 @@ class ImplicitGrantTypeTest extends Base
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams([
-            'client_id' => 'foo',
+            'client_id' => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'state'     => '0123456789',
         ]);
         $response = new Response();
@@ -54,7 +54,7 @@ class ImplicitGrantTypeTest extends Base
         $request = $request->withQueryParams([
             'response_type' => 'token',
             'redirect_uri'  => 'http://example.com/test?good=true',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->authorize($request, $response);
@@ -67,7 +67,7 @@ class ImplicitGrantTypeTest extends Base
         $request = $request->withQueryParams([
             'response_type' => 'token',
             'redirect_uri'  => 'http://example.com/test?good=true',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'state'         => '0123456789',
         ]);
         $response = new Response();
@@ -80,7 +80,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'bad_response_type',
             'state'         => '0123456789',
         ]);
@@ -94,7 +94,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'oof',
+            'client_id'     => $this->getClientManager()->getClientByName('oof')->getPublicId(),
             'response_type' => 'none',
             'state'         => '0123456789',
         ]);
@@ -108,7 +108,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'fii',
+            'client_id'     => $this->getClientManager()->getClientByName('fii')->getPublicId(),
             'response_type' => 'token',
             'state'         => '0123456789',
         ]);
@@ -122,7 +122,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'token',
             'state'         => '0123456789',
         ]);
@@ -139,7 +139,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'  => 'http://example.com/test?good=false',
-            'client_id'     => 'foo',
+            'client_id'     => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type' => 'token',
             'state'         => '0123456789',
         ]);
@@ -169,7 +169,7 @@ class ImplicitGrantTypeTest extends Base
             'iss'           => 'jwt1',
             'aud'           => 'https://server.example.com',
             'response_type' => 'token',
-            'client_id'     => 'jwt1',
+            'client_id'     => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             'redirect_uri'  => 'http://example.com/test?good=false',
             'scope'         => 'openid scope1 scope2',
             'nonce'         => 'n-0S6_WzA2Mj',
@@ -228,7 +228,7 @@ class ImplicitGrantTypeTest extends Base
             'iss'           => 'jwt1',
             'aud'           => 'https://server.example.com',
             'response_type' => 'token',
-            'client_id'     => 'jwt1',
+            'client_id'     => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             'redirect_uri'  => 'http://example.com/test?good=false',
             'scope'         => 'openid scope1 scope2',
             'nonce'         => 'n-0S6_WzA2Mj',
@@ -324,7 +324,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'token',
             'state'                 => '0123456789',
         ]);
@@ -341,7 +341,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'token',
             'state'                 => '0123456789',
             'response_mode'         => 'form_post',
@@ -367,7 +367,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'token',
             'state'                 => '0123456789',
             'response_mode'         => 'foo_bar',
@@ -384,7 +384,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'token',
             'state'                 => '0123456789',
             'response_mode'         => 'query',
@@ -403,7 +403,7 @@ class ImplicitGrantTypeTest extends Base
         $request = new ServerRequest();
         $request = $request->withQueryParams([
             'redirect_uri'          => 'http://example.com/test?good=false',
-            'client_id'             => 'foo',
+            'client_id'             => $this->getClientManager()->getClientByName('foo')->getPublicId(),
             'response_type'         => 'token code id_token',
             'state'                 => '0123456789',
             'nonce'                 => '0123456789',
