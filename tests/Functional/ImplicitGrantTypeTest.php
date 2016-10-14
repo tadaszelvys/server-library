@@ -315,6 +315,7 @@ class ImplicitGrantTypeTest extends Base
             'client_id'    => 'bad_client', // Wil be ignored as already set in the request object
             'redirect_uri' => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
             'scope'        => 'openid email profile address', // Wil be ignored as already set in the request object
+            'state'        => '012345679',
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
@@ -385,6 +386,7 @@ class ImplicitGrantTypeTest extends Base
             'client_id'    => 'bad_client', // Wil be ignored as already set in the request object
             'redirect_uri' => 'http://bad.example.com/test?good=false', // Wil be ignored as already set in the request object
             'scope'        => 'openid email profile address', // Wil be ignored as already set in the request object
+            'state'        => '012345679',
         ]);
         $response = new Response();
         $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
