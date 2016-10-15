@@ -30,10 +30,7 @@ final class DisplayParameterChecker implements ParameterCheckerInterface
         if (!array_key_exists('display', $parameters)) {
             return;
         }
-        Assertion::true(
-            in_array($parameters['display'], $this->getAllowedDisplayValues()),
-            sprintf('Invalid parameter "display". Allowed values are %s', json_encode($this->getAllowedDisplayValues()))
-        );
+        Assertion::true(in_array($parameters['display'], $this->getAllowedDisplayValues()), sprintf('Invalid parameter "display". Allowed values are %s', json_encode($this->getAllowedDisplayValues())));
     }
 
     /**

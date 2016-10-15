@@ -116,14 +116,3 @@ To enable this feature, your client must have a parameter `default_scope` with t
 //We suppose that the variable $client is a valid object that implements \OAuth2\Client\ClientInterface
 $client->set('default_scope', 'openid');
 ```
-
-## My OAuth2 Server Does Not Need Scope
-
-Even if you do not want to add this feature, you must create a scope manager.
-You just have to create an instance of the interface `ScopeManagerInterface` and inject it.
-
-```php
-use OAuth2\Scope\ScopeManager;
-
-$scope_manager = new ScopeManager($exception_manager);
-```

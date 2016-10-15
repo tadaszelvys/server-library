@@ -41,10 +41,7 @@ final class ResponseModeParameterChecker implements ParameterCheckerInterface
         if (false === array_key_exists('response_mode', $parameters)) {
             return;
         }
-        Assertion::true(
-            $this->isResponseModeParameterInAuthorizationRequestAllowed(),
-            'The parameter "response_mode" is not allowed.'
-        );
+        Assertion::true($this->isResponseModeParameterInAuthorizationRequestAllowed(), 'The parameter "response_mode" is not allowed.');
     }
 
     /**

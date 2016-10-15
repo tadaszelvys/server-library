@@ -30,10 +30,7 @@ final class NonceParameterChecker implements ParameterCheckerInterface
         if (false === strpos($parameters['response_type'], 'id_token')) {
             return;
         }
-        Assertion::true(
-            array_key_exists('nonce', $parameters),
-            'The parameter "nonce" is mandatory.'
-        );
+        Assertion::true(array_key_exists('nonce', $parameters), 'The parameter "nonce" is mandatory.');
     }
 
     /**

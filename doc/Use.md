@@ -23,8 +23,8 @@ Please read [this page](component/exception.md) to know how to create and use th
 
 ## Scope And Scope manager
 
-Access tokens issued by this library may have a limited scope.
-The scope is used by the resource servers .
+Tokens issued by this library may have a limited scope.
+The scope is used by the resource servers for example for operation limitations.
 
 Please read [this page](component/scope.md) to know how to create and use this component.
 

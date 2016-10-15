@@ -70,11 +70,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
      */
     private function checkRedirectUriIsSet(array $parameters)
     {
-        Assertion::keyExists(
-            $parameters,
-            'redirect_uri',
-            'The parameter "redirect_uri" is mandatory.'
-        );
+        Assertion::keyExists($parameters, 'redirect_uri', 'The parameter "redirect_uri" is mandatory.');
     }
 
     /**
@@ -89,10 +85,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
     private function checkRedirectUriHasNoFragment($redirect_uri)
     {
         $uri = parse_url($redirect_uri);
-        Assertion::false(
-            isset($uri['fragment']),
-            'The parameter "redirect_uri" must not contain fragment'
-        );
+        Assertion::false(isset($uri['fragment']), 'The parameter "redirect_uri" must not contain fragment');
     }
 
     /**
@@ -110,9 +103,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
             return;
         }
         if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== mb_substr($redirect_uri, 0, 5, '8bit')) {
-            if (!$this->isALocalUriOrAnUrn($redirect_uri)) {
-                throw new \InvalidArgumentException('The parameter "redirect_uri" must be a secured URI.');
-            }
+            Assertion::true($this->isALocalUriOrAnUrn($redirect_uri), 'The parameter "redirect_uri" must be a secured URI.');
         }
     }
 
@@ -139,9 +130,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
     {
         $client_redirect_uris = $this->getClientRedirectUris($client, $parameters);
 
-        if (!empty($client_redirect_uris) && false === Uri::isRedirectUriAllowed($redirect_uri, $client_redirect_uris)) {
-            throw new \InvalidArgumentException('The specified redirect URI is not valid.');
-        }
+        Assertion::false(!empty($client_redirect_uris) && false === Uri::isRedirectUriAllowed($redirect_uri, $client_redirect_uris), 'The specified redirect URI is not valid.');
     }
 
     /**
@@ -176,10 +165,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
      */
     private function checkRedirectUriForNonConfidentialClient(ClientInterface $client)
     {
-        Assertion::false(
-            $client->isPublic(),
-            'Non-confidential clients must register at least one redirect URI.'
-        );
+        Assertion::false($client->isPublic(), 'Non-confidential clients must register at least one redirect URI.');
     }
 
     /**
@@ -190,10 +176,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
      */
     private function checkRedirectUriForConfidentialClient(ClientInterface $client, array $parameters)
     {
-        Assertion::false(
-            !$client->isPublic() && array_key_exists('response_type', $parameters) && $parameters['response_type'] === 'token',
-            'Confidential clients must register at least one redirect URI when using "token" response type.'
-        );
+        Assertion::false(!$client->isPublic() && array_key_exists('response_type', $parameters) && $parameters['response_type'] === 'token', 'Confidential clients must register at least one redirect URI when using "token" response type.');
     }
 
     /**
@@ -201,10 +184,7 @@ final class RedirectUriParameterChecker implements ParameterCheckerInterface
      */
     private function checkRedirectUriForAllClient()
     {
-        Assertion::false(
-            $this->isRedirectUriStorageEnforced(),
-            'Clients must register at least one redirect URI.'
-        );
+        Assertion::false($this->isRedirectUriStorageEnforced(), 'Clients must register at least one redirect URI.');
     }
 
     /**

@@ -46,10 +46,7 @@ final class StateParameterChecker implements ParameterCheckerInterface
         if (false === $this->state_parameter_enforced) {
             return;
         }
-        Assertion::true(
-            array_key_exists('state', $parameters),
-            'The parameter "state" is mandatory.'
-        );
+        Assertion::true(array_key_exists('state', $parameters), 'The parameter "state" is mandatory.');
     }
 
     /**

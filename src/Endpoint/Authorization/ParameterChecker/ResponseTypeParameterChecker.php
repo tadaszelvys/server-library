@@ -25,11 +25,7 @@ final class ResponseTypeParameterChecker implements ParameterCheckerInterface
         /*
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.1
          */
-        Assertion::keyExists(
-            $parameters,
-            'response_type',
-            'The parameter "response_type" is mandatory.'
-        );
+        Assertion::keyExists($parameters, 'response_type', 'The parameter "response_type" is mandatory.');
     }
 
     /**
