@@ -10,6 +10,25 @@ Authorization endpoint can load extensions to enhance it. Some extensions are pr
 
 ## The Authorization Request Loader
 
+The Authorization Request Loader will try to load the authorization request from the server request.
+If loaded, the result is an instance of the `OAuth2\Endpoint\Authorization\Authorization` class.
+
+The Authorization Request Loader must implement the `OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface` interface.
+This library provide the `OAuth2\Endpoint\Authorization\AuthorizationRequestLoader` that implements this interface.
+
+```php
+<?php
+
+use OAuth2\Endpoint\Authorization\AuthorizationRequestLoader;
+
+$request_loader = new AuthorizationRequestLoader($client_manager, $exception_manager);
+$request_loader->
+```
+
+### Authorization Request Object Support
+
+### Authorization Request Object By Reference Support
+
 ## The Authorization Factory
 
 ## The Authorization Endpoint
