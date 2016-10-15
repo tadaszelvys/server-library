@@ -11,13 +11,22 @@
 
 namespace OAuth2\OpenIdConnect\SessionManagement;
 
-use OAuth2\Endpoint\Authorization\AuthorizationEndpointExtension\AuthorizationEndpointExtensionInterface;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization\Extension\AuthorizationEndpointExtensionInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class SessionStateParameterExtension implements AuthorizationEndpointExtensionInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function processUserAccount(ServerRequestInterface $request, ResponseInterface &$response, AuthorizationInterface $authorization, UserAccountInterface &$user_account = null)
+    {
+        // Nothing to do
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -35,6 +44,30 @@ abstract class SessionStateParameterExtension implements AuthorizationEndpointEx
 
         $session_state = $this->calculateSessionState($request, $authorization, $browser_state);
         $response_parameters['session_state'] = $session_state;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processUserAccountIsAvailable(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    {
+        //Nothing to do
     }
 
     /**

@@ -20,8 +20,14 @@ use Jose\JWTLoader;
 use Jose\Object\JWKSet;
 use Jose\Signer;
 use Jose\Verifier;
+use OAuth2\Client\Rule;
 use OAuth2\Endpoint\Authorization\AuthorizationFactory;
 use OAuth2\Endpoint\Authorization\AuthorizationRequestLoader;
+use OAuth2\Endpoint\Authorization\Extension\IdTokenHintExtension;
+use OAuth2\Endpoint\Authorization\Extension\LoginParameterExtension;
+use OAuth2\Endpoint\Authorization\Extension\MaxAgeExtension;
+use OAuth2\Endpoint\Authorization\Extension\NoneParameterExtension;
+use OAuth2\Endpoint\Authorization\Extension\PreConfiguredAuthorizationExtension;
 use OAuth2\Endpoint\Authorization\ParameterChecker\DisplayParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\NonceParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManager;
@@ -32,7 +38,6 @@ use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseTypeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ScopeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\StateParameterChecker;
 use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
-use OAuth2\Client\Rule;
 use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationEndpoint;
@@ -78,7 +83,11 @@ use OAuth2\Security\Handler\AccessTokenHandler;
 use OAuth2\Security\Listener;
 use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\AuthorizationEndpoint;
+use OAuth2\Test\Stub\ClientAssertionJwt;
 use OAuth2\Test\Stub\ClientManager;
+use OAuth2\Test\Stub\ClientRegistrationManagementRule;
+use OAuth2\Test\Stub\ClientSecretBasic;
+use OAuth2\Test\Stub\ClientSecretPost;
 use OAuth2\Test\Stub\DistributedClaimSource;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
@@ -93,10 +102,6 @@ use OAuth2\Test\Stub\UserAccountManager;
 use OAuth2\Token\BearerToken;
 use OAuth2\Token\MacToken;
 use OAuth2\Token\TokenTypeManager;
-use OAuth2\Test\Stub\ClientAssertionJwt;
-use OAuth2\Test\Stub\ClientSecretBasic;
-use OAuth2\Test\Stub\ClientSecretPost;
-use OAuth2\Test\Stub\ClientRegistrationManagementRule;
 use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
@@ -593,9 +598,14 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager()
             );
 
-            $this->authorization_endpoint->enableIdTokenSupport($this->getIdTokenManager());
-            $this->authorization_endpoint->enablePreConfiguredAuthorizationSupport($this->getPreConfiguredAuthorizationManager());
-
+            $this->authorization_endpoint->addExtension(new IdTokenHintExtension(
+                $this->getIdTokenManager(),
+                $this->getUserAccountManager()
+            ));
+            $this->authorization_endpoint->addExtension(new MaxAgeExtension());
+            $this->authorization_endpoint->addExtension(new LoginParameterExtension());
+            $this->authorization_endpoint->addExtension(new NoneParameterExtension());
+            $this->authorization_endpoint->addExtension(new PreConfiguredAuthorizationExtension($this->getPreConfiguredAuthorizationManager()));
             $this->authorization_endpoint->addExtension(new SessionStateParameterExtension('oauth2_session_state'));
         }
 
@@ -651,8 +661,8 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null == $this->assertion_jwt_auth_method) {
             $this->assertion_jwt_auth_method = new ClientAssertionJwt($this->getJWTLoader(), $this->getExceptionManager(), 3600);
             $this->assertEquals(['HS256', 'HS512', 'RS256', 'RS512'], $this->assertion_jwt_auth_method->getSupportedSignatureAlgorithms());
-            $this->assertEquals(['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256',], $this->assertion_jwt_auth_method->getSupportedKeyEncryptionAlgorithms());
-            $this->assertEquals(['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512',], $this->assertion_jwt_auth_method->getSupportedContentEncryptionAlgorithms());
+            $this->assertEquals(['A128KW', 'A256KW', 'A128GCMKW', 'A256GCMKW', 'PBES2-HS256+A128KW', 'PBES2-HS512+A256KW', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'], $this->assertion_jwt_auth_method->getSupportedKeyEncryptionAlgorithms());
+            $this->assertEquals(['A128GCM', 'A256GCM', 'A128CBC-HS256', 'A256CBC-HS512'], $this->assertion_jwt_auth_method->getSupportedContentEncryptionAlgorithms());
         }
 
         return $this->assertion_jwt_auth_method;

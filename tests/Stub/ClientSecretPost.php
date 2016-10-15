@@ -14,7 +14,6 @@ namespace OAuth2\Test\Stub;
 use Base64Url\Base64Url;
 use OAuth2\TokenEndpointAuthMethod\ClientSecretPost as Base;
 
-
 class ClientSecretPost extends Base
 {
     /**

@@ -35,11 +35,12 @@ final class CommonParametersRule extends AbstractInternationalizedRule
     private function getSupportedParameters()
     {
         return [
-            'client_name' => function($k, $v) {},
-            'client_uri' => $this->getUriVerificationClosure(),
-            'logo_uri' => $this->getUriVerificationClosure(),
-            'tos_uri' => $this->getUriVerificationClosure(),
-            'policy_uri' => $this->getUriVerificationClosure(),
+            'client_name' => function ($k, $v) {
+            },
+            'client_uri'  => $this->getUriVerificationClosure(),
+            'logo_uri'    => $this->getUriVerificationClosure(),
+            'tos_uri'     => $this->getUriVerificationClosure(),
+            'policy_uri'  => $this->getUriVerificationClosure(),
         ];
     }
 

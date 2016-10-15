@@ -94,6 +94,7 @@ function getSignedRequest()
 {
     return function () {
         $jws = file_get_contents(__DIR__.'/../signed_request');
+
         return new Response($jws);
     };
 }
@@ -102,6 +103,7 @@ function getSignedAndEncryptedRequest()
 {
     return function () {
         $jwe = file_get_contents(__DIR__.'/../signed_and_encrypted_request');
+
         return new Response($jwe);
     };
 }

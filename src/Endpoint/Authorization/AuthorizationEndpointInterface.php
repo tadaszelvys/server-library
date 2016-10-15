@@ -11,14 +11,14 @@
 
 namespace OAuth2\Endpoint\Authorization;
 
-use OAuth2\Endpoint\Authorization\AuthorizationEndpointExtension\AuthorizationEndpointExtensionInterface;
+use OAuth2\Endpoint\Authorization\Extension\AuthorizationEndpointExtensionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface AuthorizationEndpointInterface
 {
     /**
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationEndpointExtension\AuthorizationEndpointExtensionInterface $extension
+     * @param \OAuth2\Endpoint\Authorization\Extension\AuthorizationEndpointExtensionInterface $extension
      */
     public function addExtension(AuthorizationEndpointExtensionInterface $extension);
 

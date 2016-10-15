@@ -205,20 +205,20 @@ class ClientRegistrationEndpointTest extends Base
             '/',
             'POST',
             [
-                'scope' => 'read write',
-                'default_scope' => 'read',
-                'scope_policy' => 'default',
+                'scope'                      => 'read write',
+                'default_scope'              => 'read',
+                'scope_policy'               => 'default',
                 'token_endpoint_auth_method' => 'none',
-                'client_name' => 'My Example',
-                'client_name#fr' => 'Mon Exemple',
-                'software_id' => 'ABCD0123',
-                'software_version' => '10.2',
-                'redirect_uris' => ['https://www.example.com/callback1', 'https://www.example.com/callback2'],
-                'request_uris' => ['https://www.example.com/request1', 'https://www.example.com/request2'],
-                'policy_uri' => 'http://www.example.com/policy',
-                'policy_uri#fr' => 'http://www.example.com/vie_privee',
-                'tos_uri' => 'http://www.example.com/tos',
-                'tos_uri#fr' => 'http://www.example.com/termes_de_service',
+                'client_name'                => 'My Example',
+                'client_name#fr'             => 'Mon Exemple',
+                'software_id'                => 'ABCD0123',
+                'software_version'           => '10.2',
+                'redirect_uris'              => ['https://www.example.com/callback1', 'https://www.example.com/callback2'],
+                'request_uris'               => ['https://www.example.com/request1', 'https://www.example.com/request2'],
+                'policy_uri'                 => 'http://www.example.com/policy',
+                'policy_uri#fr'              => 'http://www.example.com/vie_privee',
+                'tos_uri'                    => 'http://www.example.com/tos',
+                'tos_uri#fr'                 => 'http://www.example.com/termes_de_service',
             ],
             ['HTTPS' => 'on']
         );
@@ -272,13 +272,13 @@ class ClientRegistrationEndpointTest extends Base
         $this->getClientRegistrationEndpoint()->allowRegistrationWithoutSoftwareStatement();
         $request = $this->createRequest('/', 'POST',
             [
-                'scope' => 'read write',
-                'default_scope' => 'read',
-                'scope_policy' => 'default',
+                'scope'                      => 'read write',
+                'default_scope'              => 'read',
+                'scope_policy'               => 'default',
                 'token_endpoint_auth_method' => 'none',
-                'client_name' => 'My Example',
-                'client_name#fr' => 'Mon Exemple',
-                'software_statement' => 'Hello',
+                'client_name'                => 'My Example',
+                'client_name#fr'             => 'Mon Exemple',
+                'software_statement'         => 'Hello',
             ],
             ['HTTPS' => 'on']
         );
@@ -298,12 +298,12 @@ class ClientRegistrationEndpointTest extends Base
         $this->getClientRegistrationEndpoint()->disallowRegistrationWithoutSoftwareStatement();
         $request = $this->createRequest('/', 'POST',
             [
-                'scope' => 'read write',
-                'default_scope' => 'read',
-                'scope_policy' => 'default',
+                'scope'                      => 'read write',
+                'default_scope'              => 'read',
+                'scope_policy'               => 'default',
                 'token_endpoint_auth_method' => 'none',
-                'client_name' => 'My Example',
-                'client_name#fr' => 'Mon Exemple',
+                'client_name'                => 'My Example',
+                'client_name#fr'             => 'Mon Exemple',
             ],
             ['HTTPS' => 'on']
         );
@@ -323,12 +323,12 @@ class ClientRegistrationEndpointTest extends Base
         $this->getClientRegistrationEndpoint()->disallowRegistrationWithoutInitialAccessToken();
         $request = $this->createRequest('/', 'POST',
             [
-                'scope' => 'read write',
-                'default_scope' => 'read',
-                'scope_policy' => 'default',
+                'scope'                      => 'read write',
+                'default_scope'              => 'read',
+                'scope_policy'               => 'default',
                 'token_endpoint_auth_method' => 'none',
-                'client_name' => 'My Example',
-                'client_name#fr' => 'Mon Exemple',
+                'client_name'                => 'My Example',
+                'client_name#fr'             => 'Mon Exemple',
             ],
             ['HTTPS' => 'on']
         );
@@ -349,24 +349,24 @@ class ClientRegistrationEndpointTest extends Base
             [
                 'software_id'      => 'This is my software ID',
                 'software_version' => '10.2',
-                'client_name' => 'My Example',
+                'client_name'      => 'My Example',
             ],
-            ['alg' => 'HS512',],
+            ['alg' => 'HS512'],
             $this->getSignatureKeySet()[0]);
         $request = $this->createRequest('/', 'POST',
             [
-                'scope' => 'read write',
-                'grant_types' => ['authorization_code'],
-                'response_types' => ['code', 'token'],
-                'subject_type' => 'pairwise',
+                'scope'                           => 'read write',
+                'grant_types'                     => ['authorization_code'],
+                'response_types'                  => ['code', 'token'],
+                'subject_type'                    => 'pairwise',
                 'id_token_encrypted_response_alg' => 'RSA1_5',
                 'id_token_encrypted_response_enc' => 'A256GCM',
-                'default_scope' => 'read',
-                'scope_policy' => 'default',
-                'token_endpoint_auth_method' => 'client_secret_jwt',
-                'software_statement' => $software_statement,
-                'client_name' => 'My Bad Example',
-                'client_name#fr' => 'Mon Exemple',
+                'default_scope'                   => 'read',
+                'scope_policy'                    => 'default',
+                'token_endpoint_auth_method'      => 'client_secret_jwt',
+                'software_statement'              => $software_statement,
+                'client_name'                     => 'My Bad Example',
+                'client_name#fr'                  => 'Mon Exemple',
             ],
             ['HTTPS' => 'on']
         );
@@ -408,7 +408,7 @@ class ClientRegistrationEndpointTest extends Base
         $request = $this->createRequest('/', 'POST',
             [
                 'token_endpoint_auth_method' => 'client_secret_post',
-                'client_name' => 'My Example',
+                'client_name'                => 'My Example',
             ],
             ['HTTPS' => 'on']
         );
@@ -434,7 +434,7 @@ class ClientRegistrationEndpointTest extends Base
         $request = $this->createRequest('/', 'POST',
             [
                 'token_endpoint_auth_method' => 'client_secret_basic',
-                'client_name' => 'My Example',
+                'client_name'                => 'My Example',
             ],
             ['HTTPS' => 'on']
         );

@@ -289,8 +289,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() - 1,
                 'aud' => $this->getIssuer(),
-                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
-                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'iss' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -333,8 +333,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => 'Bad Audience',
-                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
-                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'iss' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -377,8 +377,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
-                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'iss' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -423,8 +423,8 @@ class ClientCredentialsGrantTypeTest extends Base
         $jws = JWSFactory::createJWSToCompactJSON([
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
-                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'iss' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -520,8 +520,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
-                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'iss' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -541,8 +541,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'enc' => 'A256CBC-HS512',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
-                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'iss' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ]
         );
 
@@ -590,8 +590,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'jti' => '0123456789',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
-                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'iss' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ],
             $jwk2,
             [
@@ -611,8 +611,8 @@ class ClientCredentialsGrantTypeTest extends Base
                 'enc' => 'A256CBC-HS512',
                 'exp' => time() + 3600,
                 'aud' => $this->getIssuer(),
-                'iss' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
-                'sub' =>$this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'iss' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
+                'sub' => $this->getClientManager()->getClientByName('jwt1')->getPublicId(),
             ]
         );
 

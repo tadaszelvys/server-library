@@ -40,7 +40,7 @@ class ClientManager extends Base
 
         foreach ($this->getClientInformation() as $info) {
             $client = $this->createClient();
-            foreach ($info['data'] as $k=>$v) {
+            foreach ($info['data'] as $k => $v) {
                 $client->set($k, $v);
             }
             $this->clients[$info['name']] = $client;
@@ -140,13 +140,13 @@ class ClientManager extends Base
             [
                 'name' => 'baz',
                 'data' => [
-                    'client_secret' => 'secret',
-                    'redirect_uris' => [],
-                    'grant_types' => ['authorization_code'],
-                    'response_types' => [],
+                    'client_secret'              => 'secret',
+                    'redirect_uris'              => [],
+                    'grant_types'                => ['authorization_code'],
+                    'response_types'             => [],
                     'token_endpoint_auth_method' => 'client_secret_basic',
-                    'scope_policy' => 'none',
-                    'token_lifetime' => [
+                    'scope_policy'               => 'none',
+                    'token_lifetime'             => [
                         'authcode'      => 10,
                         'access_token'  => 1000,
                         'refresh_token' => 2000,
@@ -156,13 +156,13 @@ class ClientManager extends Base
             [
                 'name' => 'resource_server',
                 'data' => [
-                    'client_secret' => 'secret',
-                    'redirect_uris' => [],
-                    'grant_types' => [],
-                    'response_types' => [],
+                    'client_secret'              => 'secret',
+                    'redirect_uris'              => [],
+                    'grant_types'                => [],
+                    'response_types'             => [],
                     'token_endpoint_auth_method' => 'client_secret_basic',
-                    'is_resource_server' => true,
-                    'token_lifetime' => [
+                    'is_resource_server'         => true,
+                    'token_lifetime'             => [
                         'authcode'      => 10,
                         'access_token'  => 1000,
                         'refresh_token' => 2000,
@@ -172,14 +172,14 @@ class ClientManager extends Base
             [
                 'name' => 'Mufasa',
                 'data' => [
-                    'client_secret' => 'Circle Of Life',
-                    'redirect_uris' => [],
-                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
-                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'client_secret'              => 'Circle Of Life',
+                    'redirect_uris'              => [],
+                    'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types'             => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
                     'token_endpoint_auth_method' => 'client_secret_basic',
-                    'scope_policy' => 'none',
-                    'subject_type' => 'pairwise',
-                    'token_lifetime' => [
+                    'scope_policy'               => 'none',
+                    'subject_type'               => 'pairwise',
+                    'token_lifetime'             => [
                         'authcode'      => 10,
                         'access_token'  => 1000,
                         'refresh_token' => 2000,
@@ -189,13 +189,13 @@ class ClientManager extends Base
             [
                 'name' => 'Mufasa2',
                 'data' => [
-                    'client_secret' => 'Circle Of Life',
-                    'redirect_uris' => [],
-                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
-                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'client_secret'              => 'Circle Of Life',
+                    'redirect_uris'              => [],
+                    'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types'             => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
                     'token_endpoint_auth_method' => 'client_secret_post',
-                    'scope_policy' => 'none',
-                    'token_lifetime' => [
+                    'scope_policy'               => 'none',
+                    'token_lifetime'             => [
                         'authcode'      => 10,
                         'access_token'  => 1000,
                         'refresh_token' => 2000,
@@ -205,14 +205,14 @@ class ClientManager extends Base
             [
                 'name' => 'mac',
                 'data' => [
-                    'client_secret' => 'secret',
-                    'redirect_uris' => ['http://example.com/test?good=false'],
-                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
-                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
-                    'token_types' => ['MAC'],
+                    'client_secret'              => 'secret',
+                    'redirect_uris'              => ['http://example.com/test?good=false'],
+                    'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types'             => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'token_types'                => ['MAC'],
                     'token_endpoint_auth_method' => 'client_secret_basic',
-                    'scope_policy' => 'none',
-                    'token_lifetime' => [
+                    'scope_policy'               => 'none',
+                    'token_lifetime'             => [
                         'authcode'      => 10,
                         'access_token'  => 1000,
                         'refresh_token' => 2000,
@@ -222,14 +222,14 @@ class ClientManager extends Base
             [
                 'name' => 'expired',
                 'data' => [
-                    'client_secret' => 'secret',
-                    'client_secret_expires_at' => time() - 3600,
-                    'redirect_uris' => ['http://example.com/test?good=false'],
-                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
-                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'client_secret'              => 'secret',
+                    'client_secret_expires_at'   => time() - 3600,
+                    'redirect_uris'              => ['http://example.com/test?good=false'],
+                    'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    'response_types'             => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
                     'token_endpoint_auth_method' => 'client_secret_basic',
-                    'scope_policy' => 'none',
-                    'token_lifetime' => [
+                    'scope_policy'               => 'none',
+                    'token_lifetime'             => [
                         'authcode'      => 10,
                         'access_token'  => 1000,
                         'refresh_token' => 2000,
@@ -239,36 +239,36 @@ class ClientManager extends Base
             [
                 'name' => 'foo',
                 'data' => [
-                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code'],
-                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
-                    'redirect_uris' => ['http://example.com/test?good=false', 'http://127.0.0.1', 'https://another.uri/callback', 'urn:ietf:wg:oauth:2.0:oob', 'urn:ietf:wg:oauth:2.0:oob:auto'],
+                    'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code'],
+                    'response_types'             => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'redirect_uris'              => ['http://example.com/test?good=false', 'http://127.0.0.1', 'https://another.uri/callback', 'urn:ietf:wg:oauth:2.0:oob', 'urn:ietf:wg:oauth:2.0:oob:auto'],
                     'token_endpoint_auth_method' => 'none',
                 ],
             ],
             [
                 'name' => 'foo2',
                 'data' => [
-                    'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code'],
-                    'response_types' => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
-                    'redirect_uris' => ['http://example.com/test?good=false', 'http://127.0.0.1', 'https://another.uri/callback', 'urn:ietf:wg:oauth:2.0:oob', 'urn:ietf:wg:oauth:2.0:oob:auto'],
+                    'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code'],
+                    'response_types'             => ['token', 'id_token', 'none', 'code', 'code id_token', 'id_token token', 'code token', 'code id_token token'],
+                    'redirect_uris'              => ['http://example.com/test?good=false', 'http://127.0.0.1', 'https://another.uri/callback', 'urn:ietf:wg:oauth:2.0:oob', 'urn:ietf:wg:oauth:2.0:oob:auto'],
                     'token_endpoint_auth_method' => 'none',
-                    'sector_identifier_uri' => 'https://www.foo.com',
-                    'subject_type' => 'pairwise',
+                    'sector_identifier_uri'      => 'https://www.foo.com',
+                    'subject_type'               => 'pairwise',
                 ],
             ],
             [
                 'name' => 'fii',
                 'data' => [
-                    'grant_types' => [],
-                    'redirect_uris' => ['http://example.com/test?good=false'],
+                    'grant_types'                => [],
+                    'redirect_uris'              => ['http://example.com/test?good=false'],
                     'token_endpoint_auth_method' => 'none',
                 ],
             ],
             [
                 'name' => 'oof',
                 'data' => [
-                    'grant_types' => [],
-                    'redirect_uris' => [],
+                    'grant_types'                => [],
+                    'redirect_uris'              => [],
                     'token_endpoint_auth_method' => 'none',
                 ],
             ],

@@ -23,8 +23,8 @@ abstract class AbstractInternationalizedRule implements RuleInterface
     protected function getInternationalizedParameters(array $request_parameters, $base, $closure)
     {
         $result = [];
-        foreach ($request_parameters as $k=>$v) {
-            if ($base === $k ) {
+        foreach ($request_parameters as $k => $v) {
+            if ($base === $k) {
                 $closure($k, $v);
                 $result[$k] = $v;
 

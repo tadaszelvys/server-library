@@ -28,6 +28,7 @@ trait HasExceptionManager
     {
         return null !== $this->exception_manager;
     }
+
     /**
      * @return \OAuth2\Exception\ExceptionManagerInterface
      */

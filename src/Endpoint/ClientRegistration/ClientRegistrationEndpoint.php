@@ -177,7 +177,6 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
             if (array_key_exists('software_statement', $request_parameters)) {
                 $this->updateRequestParametersWithSoftwareStatement($request_parameters);
             }
-
         } elseif (array_key_exists('software_statement', $request_parameters)) {
             throw new \InvalidArgumentException('Software Statement parameter not supported.');
         }

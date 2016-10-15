@@ -12,9 +12,8 @@
 namespace OAuth2\Test\Stub;
 
 use Base64Url\Base64Url;
-use OAuth2\Client\Rule\ClientRegistrationManagementRule as Base;
-
 use OAuth2\Client\ClientInterface;
+use OAuth2\Client\Rule\ClientRegistrationManagementRule as Base;
 
 class ClientRegistrationManagementRule extends Base
 {
