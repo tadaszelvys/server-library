@@ -141,3 +141,75 @@ This rule should be used only if the server support Referenced Request Objects.
 Supported parameters is:
 
 - `request_uris`
+
+#### Sector Identifier Uri Rule
+
+The class `OAuth2\Client\Rule\SectorIdentifierUriRule` will allow you to define sector identifier Uris for your client.
+This rule should be used only if the server support OpenID Connect functionality.
+
+Supported parameters is:
+
+- `sector_identifier_uri`
+
+#### Software Rule
+
+The class `OAuth2\Client\Rule\SoftwareRule` will allow you to support the Software Statement.
+This rule should be used only if you enabled the Software Statement functionality on the Client Registration Endpoint.
+
+Supported parameters is:
+
+- `software_statement`
+
+#### Subject Type Rule
+
+The class `OAuth2\Client\Rule\SubjectTypeRule` will allow you to choose the subject type used by your client.
+This rule should be used only if you enabled the OpenID Connect and custom subject type (e.g. pairwise) are enabled.
+
+Supported parameters is:
+
+- `subject_type`
+
+#### Client Registration Management Rule
+
+The abstract class `OAuth2\Client\Rule\ClientRegistrationManagementRule` will allow your clients to be managed using a dedicated Uri.
+As this management Uri is not yet available, this rule is not described here.
+
+#### Custom Rule
+
+You can define any type of rule by implementing the interface `OAuth2\Client\Rule\RuleInterface`.
+If the parameter you want to check can be internationalized, then we recommend you to extend the class `OAuth2\Client\Rule\AbstractInternationalizedRule`.
+
+Hereafter an example with a `description` parameter.
+With this simple class you will be able to set an internationalized description parameter (`description`, `description#en`, `description#fr_FR`...) for each of your clients.
+
+Note that we use a closure (optional) to check the key and the value of the parameter.
+In this example, we check check the parameter is a string.
+
+```php
+<?php
+
+namespace App\Rule;
+
+use Assert\Assertion;
+use OAuth2\Client\ClientInterface;
+use OAuth2\Client\Rule\AbstractInternationalizedRule;
+
+final class DescriptionRule extends AbstractInternationalizedRule
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function check(ClientInterface $client, array $registration_parameters)
+    {
+        $parameters = $this->getInternationalizedParameters(
+            $registration_parameters, // The parameters
+            'description',            // The internationalized parameter the rule is looking for
+            function($k, $v) {Assertion::url($v, sprintf('The parameter with key "%s" is not a valid URL.', $k));}
+        );
+        
+        foreach ($parameters as $k => $v) {
+            $client->set($k, $v);
+        }
+    }
+}
+```

@@ -33,7 +33,7 @@ final class CommonParametersRule extends AbstractInternationalizedRule
         }
     }
 
-    /**
+    /**a
      * @return array
      */
     private function getSupportedParameters()

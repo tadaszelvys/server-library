@@ -39,13 +39,9 @@ abstract class ClientManager implements ClientManagerInterface
     public function createClientFromParameters(array $parameters)
     {
         $client = $this->createClient();
-        //$metadatas = [];
         foreach ($this->rules as $rule) {
             $rule->check($client, $parameters);
         }
-        /*foreach ($metadatas as $metadata => $value) {
-            $client->set($metadata, $value);
-        }*/
 
         return $client;
     }

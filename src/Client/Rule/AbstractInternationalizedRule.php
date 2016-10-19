@@ -14,13 +14,13 @@ namespace OAuth2\Client\Rule;
 abstract class AbstractInternationalizedRule implements RuleInterface
 {
     /**
-     * @param array    $request_parameters
-     * @param string   $base
-     * @param \closure $closure
+     * @param array         $request_parameters
+     * @param string        $base
+     * @param \closure|null $closure
      *
      * @return array
      */
-    protected function getInternationalizedParameters(array $request_parameters, $base, $closure)
+    protected function getInternationalizedParameters(array $request_parameters, $base, $closure = null)
     {
         $result = [];
         foreach ($request_parameters as $k => $v) {
@@ -33,7 +33,9 @@ abstract class AbstractInternationalizedRule implements RuleInterface
 
             $sub = mb_substr($k, 0, mb_strlen($base, '8bit') + 1, '8bit');
             if (sprintf('%s#', $base) === $sub && !empty(mb_substr($k, mb_strlen($base, '8bit') + 1, null, '8bit'))) {
-                $closure($k, $v);
+                if (null !== $closure) {
+                    $closure($k, $v);
+                }
                 $result[$k] = $v;
 
                 continue;

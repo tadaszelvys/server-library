@@ -12,7 +12,6 @@
 namespace OAuth2\Client;
 
 use OAuth2\Client\Rule\RuleInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 interface ClientManagerInterface
 {
