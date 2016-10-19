@@ -1052,7 +1052,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getBearerTokenType()
     {
         if (null === $this->bearer_token_type) {
-            $this->bearer_token_type = new BearerToken();
+            $this->bearer_token_type = new BearerToken($this->realm);
 
             $this->bearer_token_type->disallowTokenFromQueryString();
             $this->bearer_token_type->allowTokenFromQueryString();

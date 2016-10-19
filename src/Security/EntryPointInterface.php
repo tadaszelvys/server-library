@@ -19,6 +19,7 @@ interface EntryPointInterface
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface      $response
+     * @param array                                    $additional_authentication_parameters
      */
-    public function start(ServerRequestInterface $request, ResponseInterface &$response);
+    public function start(ServerRequestInterface $request, ResponseInterface &$response, array $additional_authentication_parameters = []);
 }

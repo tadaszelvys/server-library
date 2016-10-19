@@ -35,10 +35,8 @@ final class Listener implements ListenerInterface
      * @param \OAuth2\Security\Handler\AccessTokenHandlerInterface $access_token_handler
      * @param \OAuth2\Exception\ExceptionManagerInterface          $exception_manager
      */
-    public function __construct(TokenTypeManagerInterface $token_type_manager,
-                                AccessTokenHandlerInterface $access_token_handler,
-                                ExceptionManagerInterface $exception_manager
-    ) {
+    public function __construct(TokenTypeManagerInterface $token_type_manager, AccessTokenHandlerInterface $access_token_handler, ExceptionManagerInterface $exception_manager)
+    {
         $this->setTokenTypeManager($token_type_manager);
         $this->access_token_handler = $access_token_handler;
         $this->setExceptionManager($exception_manager);
@@ -47,13 +45,13 @@ final class Listener implements ListenerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request, array $additional_authentication_parameters = [])
     {
         $this->checkRequestIsSecured($request);
 
         $additional_credential_values = [];
         $token = $this->getTokenTypeManager()->findToken($request, $additional_credential_values, $type);
-        $this->checkToken($token);
+        $this->checkToken($token, $additional_authentication_parameters);
         $access_token = $this->access_token_handler->getAccessToken($token);
         $this->checkAccessToken($type, $access_token, $request, $additional_credential_values);
 
@@ -97,16 +95,17 @@ final class Listener implements ListenerInterface
 
     /**
      * @param null|string $token
+     * @param array       $additional_authentication_parameters
      *
      * @throws \OAuth2\Exception\AuthenticateExceptionInterface
      */
-    private function checkToken($token)
+    private function checkToken($token, array $additional_authentication_parameters)
     {
         if (null === $token) {
             throw $this->getExceptionManager()->getAuthenticateException(
                 ExceptionManagerInterface::INVALID_TOKEN,
                 'Access token required.',
-                ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes()]
+                ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes($additional_authentication_parameters)]
             );
         }
     }

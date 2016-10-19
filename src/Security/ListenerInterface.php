@@ -17,8 +17,9 @@ interface ListenerInterface
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param array                                    $additional_authentication_parameters
      *
      * @return \OAuth2\Token\AccessTokenInterface
      */
-    public function handle(ServerRequestInterface $request);
+    public function handle(ServerRequestInterface $request, array $additional_authentication_parameters = []);
 }

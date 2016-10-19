@@ -55,7 +55,9 @@ interface TokenTypeManagerInterface
     public function findToken(ServerRequestInterface $request, array &$additional_credential_values, TokenTypeInterface &$type);
 
     /**
+     * @param array $additional_authentication_parameters
+     *
      * @return array
      */
-    public function getTokenTypeSchemes();
+    public function getTokenTypeSchemes(array $additional_authentication_parameters = []);
 }

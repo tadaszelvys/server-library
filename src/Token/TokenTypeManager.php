@@ -110,13 +110,39 @@ class TokenTypeManager implements TokenTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getTokenTypeSchemes()
+    public function getTokenTypeSchemes(array $additional_authentication_parameters = [])
     {
         $schemes = [];
         foreach ($this->getTokenTypes() as $type) {
-            $schemes[] = $type->getTokenTypeScheme();
+            $schemes[] = $this->computeScheme(trim($type->getTokenTypeScheme()), $additional_authentication_parameters);
         }
 
         return $schemes;
+    }
+
+    /**
+     * @param string $scheme
+     * @param array  $additional_authentication_parameters
+     *
+     * @return string
+     */
+    private function computeScheme($scheme, array $additional_authentication_parameters)
+    {
+        if (0 === count($additional_authentication_parameters)) {
+            return $scheme;
+        }
+        $position = mb_strpos($scheme, ' ', null, 'utf-8');
+        $add_comma = false === $position ? false : true;
+
+        foreach ($additional_authentication_parameters as $key => $value) {
+            if (false === $add_comma) {
+                $add_comma = true;
+                $scheme = sprintf('%s %s=%s', $scheme, $key, $value);
+            } else {
+                $scheme = sprintf('%s,%s=%s', $scheme, $key, $value);
+            }
+        }
+
+        return $scheme;
     }
 }

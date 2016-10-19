@@ -670,7 +670,33 @@ class OpenIDConnectTest extends Base
 
         $this->getEntryPoint()->start($request, $response);
         $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals(['Bearer', 'MAC'], $response->getHeader('www-authenticate'));
+
+        $expected_authentication_header = [
+            'Bearer realm="testrealm@host.com"',
+            'MAC',
+        ];
+        $this->assertEquals($expected_authentication_header, $response->getHeader('www-authenticate'));
+        $this->assertEquals(['no-store'], $response->getHeader('cache-control'));
+        $this->assertEquals(['no-cache'], $response->getHeader('pragma'));
+    }
+
+    public function testEntryPointWithAdditionalAuthenticationParameters()
+    {
+        $request = $this->createRequest();
+        $response = new Response();
+
+        $parameters = [
+            'scope'  => '"scope1 scope2"',
+            'client' => '"confidential"',
+        ];
+        $this->getEntryPoint()->start($request, $response, $parameters);
+        $this->assertEquals(401, $response->getStatusCode());
+
+        $expected_authentication_header = [
+            'Bearer realm="testrealm@host.com",scope="scope1 scope2",client="confidential"',
+            'MAC scope="scope1 scope2",client="confidential"',
+        ];
+        $this->assertEquals($expected_authentication_header, $response->getHeader('www-authenticate'));
         $this->assertEquals(['no-store'], $response->getHeader('cache-control'));
         $this->assertEquals(['no-cache'], $response->getHeader('pragma'));
     }
@@ -684,6 +710,32 @@ class OpenIDConnectTest extends Base
             $this->fail('Should throw an Exception');
         } catch (BaseException $e) {
             $this->assertInstanceOf(AuthenticateExceptionInterface::class, $e);
+            $this->assertEquals('invalid_token', $e->getMessage());
+            $this->assertEquals('Access token required.', $e->getDescription());
+            $this->assertEquals(401, $e->getCode());
+        }
+    }
+
+    public function testUserInfoRequestWithoutAccessTokenWithAdditionalHeaderParameters()
+    {
+        $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer']);
+        $parameters = [
+            'scope'  => '"scope1 scope2"',
+            'client' => '"confidential"',
+        ];
+
+        try {
+            $this->getListener()->handle($request, $parameters);
+            $this->fail('Should throw an Exception');
+        } catch (BaseException $e) {
+            $this->assertInstanceOf(AuthenticateExceptionInterface::class, $e);
+            $this->assertArrayHasKey('WWW-Authenticate', $e->getResponseHeaders());
+
+            $expected_authentication_header = [
+                'Bearer realm="testrealm@host.com",scope="scope1 scope2",client="confidential"',
+                'MAC scope="scope1 scope2",client="confidential"',
+            ];
+            $this->assertEquals($expected_authentication_header, $e->getResponseHeaders()['WWW-Authenticate']);
             $this->assertEquals('invalid_token', $e->getMessage());
             $this->assertEquals('Access token required.', $e->getDescription());
             $this->assertEquals(401, $e->getCode());

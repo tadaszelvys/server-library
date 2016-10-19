@@ -11,11 +11,17 @@
 
 namespace OAuth2\Token;
 
+use Assert\Assertion;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 class BearerToken implements TokenTypeInterface
 {
+    /**
+     * @var null|string
+     */
+    private $realm = null;
+
     /**
      * @var bool
      */
@@ -30,6 +36,17 @@ class BearerToken implements TokenTypeInterface
      * @var bool
      */
     private $token_from_query_string_allowed = false;
+
+    /**
+     * BearerToken constructor.
+     *
+     * @param null|string $realm
+     */
+    public function __construct($realm = null)
+    {
+        Assertion::nullOrString($realm, 'The "realm" should be null or a string');
+        $this->realm = $realm;
+    }
 
     /**
      * @return bool
@@ -98,7 +115,12 @@ class BearerToken implements TokenTypeInterface
      */
     public function getTokenTypeScheme()
     {
-        return $this->getTokenTypeName();
+        $scheme = $this->getTokenTypeName();
+        if (null !== $this->realm) {
+            $scheme = sprintf('%s realm="%s"', $scheme, $this->realm);
+        }
+
+        return $scheme;
     }
 
     /**

@@ -29,9 +29,8 @@ final class EntryPoint implements EntryPointInterface
      * @param \OAuth2\Token\TokenTypeManagerInterface     $token_type_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
-    public function __construct(TokenTypeManagerInterface $token_type_manager,
-                                ExceptionManagerInterface $exception_manager
-    ) {
+    public function __construct(TokenTypeManagerInterface $token_type_manager, ExceptionManagerInterface $exception_manager)
+    {
         $this->setTokenTypeManager($token_type_manager);
         $this->setExceptionManager($exception_manager);
     }
@@ -39,12 +38,12 @@ final class EntryPoint implements EntryPointInterface
     /**
      * {@inheritdoc}
      */
-    public function start(ServerRequestInterface $request, ResponseInterface &$response)
+    public function start(ServerRequestInterface $request, ResponseInterface &$response, array $additional_authentication_parameters = [])
     {
         $exception = $this->getExceptionManager()->getAuthenticateException(
             ExceptionManagerInterface::UNAUTHORIZED_CLIENT,
             null,
-            ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes()]
+            ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes($additional_authentication_parameters)]
         );
 
         $exception->getHttpResponse($response);
