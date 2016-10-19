@@ -31,26 +31,26 @@ final class ScopeRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
         if (!$this->hasScopeManager()) {
             return;
         }
         if (array_key_exists('scope', $registration_parameters)) {
             Assertion::regex($registration_parameters['scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the "scope" parameter.');
-            $metadatas['scope'] = $registration_parameters['scope'];
+            $client->set('scope', $registration_parameters['scope']);
         }
         if (array_key_exists('scope_policy', $registration_parameters)) {
             Assertion::inArray($registration_parameters['scope_policy'], $this->getScopeManager()->getSupportedScopePolicies(), sprintf('The scope policy "%s" is not supported. Please choose one of the following policy: "%s".', $registration_parameters['scope_policy'], json_encode($this->getScopeManager()->getSupportedScopePolicies())));
-            $metadatas['scope_policy'] = $registration_parameters['scope_policy'];
+            $client->set('scope_policy', $registration_parameters['scope_policy']);
         }
 
         /*
          * Should be handled by the scope policy itself
          */
         if (array_key_exists('default_scope', $registration_parameters)) {
-            Assertion::regex($registration_parameters['scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the "default_scope" parameter.');
-            $metadatas['default_scope'] = $registration_parameters['default_scope'];
+            Assertion::regex($registration_parameters['default_scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the "default_scope" parameter.');
+            $client->set('default_scope', $registration_parameters['default_scope']);
         }
     }
 }

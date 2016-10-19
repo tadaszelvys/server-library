@@ -17,24 +17,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 interface AuthorizationRequestLoaderInterface
 {
-    public function allowUnsecuredConnections();
-
-    public function disallowUnsecuredConnections();
-
-    /**
-     * @return bool
-     */
-    public function areUnsecuredConnectionsAllowed();
-
-    /**
-     * @return bool
-     */
-    public function isRequestUriRegistrationRequired();
-
-    public function enableRequestUriRegistrationRequirement();
-
-    public function disableRequestUriRegistrationRequirement();
-
     /**
      * @return bool
      */
@@ -62,13 +44,11 @@ interface AuthorizationRequestLoaderInterface
 
     /**
      * @param \Jose\JWTLoaderInterface $jwt_loader
+     * @param string[]                 $mandatory_claims
      */
-    public function enableRequestObjectSupport(JWTLoaderInterface $jwt_loader);
+    public function enableRequestObjectSupport(JWTLoaderInterface $jwt_loader, array $mandatory_claims = []);
 
-    /**
-     * @param string[] $mandatory_claims
-     */
-    public function enableRequestObjectReferenceSupport(array $mandatory_claims = []);
+    public function enableRequestObjectReferenceSupport();
 
     /**
      * @param \Jose\Object\JWKSetInterface $key_encryption_key_set

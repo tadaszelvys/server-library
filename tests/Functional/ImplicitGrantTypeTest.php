@@ -149,6 +149,22 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+
+        // We get the access token
+        $location = parse_url($response->getHeader('Location')[0]);
+        parse_str($location['fragment'], $fragment);
+
+        // We get the information of the access token.
+        // As the client is not a resource server, then the sub claim and metadata/parameters should not be available
+        $request = $this->createRequest('/', 'POST', ['token' => $fragment['access_token']], ['HTTPS' => 'on'], ['X-OAuth2-Public-Client-ID' => $this->getClientManager()->getClientByName('foo')->getPublicId()]);
+
+        $response = new Response();
+        $this->getTokenIntrospectionEndpoint()->introspection($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertRegExp('{"active":true,"client_id":"[^"]+","token_type":"Bearer","exp":[0-9]+,"scp":\["scope1","scope2"\],"jti":"[^"]+","iat":[0-9]+,"nbf":[0-9]+,"aud":\["[^"]+"\],"iss":"[^"]+"}', $content);
     }
 
     public function testAccessTokenSuccessUsingSignedRequest()

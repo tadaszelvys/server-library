@@ -168,21 +168,21 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
     /**
      * {@inheritdoc}
      */
-    public function enableRequestObjectSupport(JWTLoaderInterface $jwt_loader)
+    public function enableRequestObjectSupport(JWTLoaderInterface $jwt_loader, array $mandatory_claims = [])
     {
+        Assertion::allString($mandatory_claims, 'The mandatory claims array should contain only claims.');
         $this->setJWTLoader($jwt_loader);
         $this->request_object_allowed = true;
+        $this->mandatory_claims = $mandatory_claims;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function enableRequestObjectReferenceSupport(array $mandatory_claims = [])
+    public function enableRequestObjectReferenceSupport()
     {
-        Assertion::allString($mandatory_claims, 'The mandatory claims array should contain only claims.');
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
         $this->request_object_reference_allowed = true;
-        $this->mandatory_claims = $mandatory_claims;
     }
 
     /**
@@ -193,7 +193,6 @@ final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInte
         Assertion::boolean($require_encryption);
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
         Assertion::greaterThan($key_encryption_key_set->countKeys(), 0, 'The encryption key set must have at least one key.');
-
         $this->require_encryption = $require_encryption;
         $this->key_encryption_key_set = $key_encryption_key_set;
     }

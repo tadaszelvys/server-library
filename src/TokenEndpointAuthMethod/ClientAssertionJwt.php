@@ -175,21 +175,21 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function checkClientConfiguration(array $client_configuration, array &$metadatas)
+    public function checkClientConfiguration(array $client_configuration, ClientInterface $client)
     {
         if ('client_secret_jwt' === $client_configuration['token_endpoint_auth_method']) {
-            $metadatas['client_secret'] = $this->createClientSecret();
-            $metadatas['client_secret_expires_at'] = 0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime;
+            $client->set('client_secret', $this->createClientSecret());
+            $client->set('client_secret_expires_at', (0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime));
         } elseif ('private_key_jwt' === $client_configuration['token_endpoint_auth_method']) {
             Assertion::true(array_key_exists('jwks', $client_configuration) xor array_key_exists('jwks_uri', $client_configuration), 'The parameter "jwks" or "jwks_uri" must be set.');
             if (array_key_exists('jwks', $client_configuration)) {
                 $jwks = new JWKSet($client_configuration['jwks']);
                 Assertion::isInstanceOf($jwks, JWKSetInterface::class, 'The parameter "jwks" must be a valid JWKSet object.');
-                $metadatas['jwks'] = $client_configuration['jwks'];
+                $client->set('jwks', $client_configuration['jwks']);
             } else {
                 $jwks = JWKFactory::createFromJKU($client_configuration['jwks_uri']);
                 Assertion::isInstanceOf($jwks, JWKSetInterface::class, 'The parameter "jwks_uri" must be a valid uri that provide a valid JWKSet.');
-                $metadatas['jwks_uri'] = $client_configuration['jwks_uri'];
+                $client->set('jwks_uri', $client_configuration['jwks_uri']);
             }
         } else {
             throw new \InvalidArgumentException('Unsupported token endpoint authentication method.');

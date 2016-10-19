@@ -13,8 +13,6 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManager as Base;
-use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 
 class ClientManager extends Base
 {
@@ -30,14 +28,9 @@ class ClientManager extends Base
 
     /**
      * ClientManager constructor.
-     *
-     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface                             $exception_manager
      */
-    public function __construct(TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct()
     {
-        parent::__construct($token_endpoint_auth_method_manager, $exception_manager);
-
         foreach ($this->getClientInformation() as $info) {
             $client = $this->createClient();
             foreach ($info['data'] as $k => $v) {

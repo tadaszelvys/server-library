@@ -67,7 +67,7 @@ class TokenIntrospectionEndpointTest extends Base
         $content = $response->getBody()->getContents();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertRegExp('{"active":true,"client_id":"[^"]+","token_type":"Bearer","exp":[0-9]+,"sub":"[^"]+","metadatas":\["plic","ploc","pluc"\],"parameters":{"foo":"bar"}}', $content);
+        $this->assertRegExp('{"active":true,"client_id":"[^"]+","token_type":"Bearer","exp":[0-9]+,"sub":"[^"]+"}', $content);
     }
 
     public function testAccessTokenIntrospectionAllowedForAuthenticatedPublicClient()

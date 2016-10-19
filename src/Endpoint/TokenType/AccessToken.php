@@ -109,8 +109,6 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
         // If the client is a resource server, we return all the information stored in the access token including the metadata
         if ($client->has('is_resource_server') && true === $client->get('is_resource_server')) {
             $result['sub'] = $token->getResourceOwnerPublicId();
-            $result['metadatas'] = $token->getMetadatas();
-            $result['parameters'] = $token->getParameters();
         }
 
         if (!empty($token->getScope())) {

@@ -16,7 +16,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\OpenIdConnect\HasIdTokenManager;
 use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 
-final class IdTokenAlgorithmsRule implements RuleInterface
+final class IdTokenEncryptionAlgorithmsRule implements RuleInterface
 {
     use HasIdTokenManager;
 
@@ -33,7 +33,7 @@ final class IdTokenAlgorithmsRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
         if (!array_key_exists('id_token_encrypted_response_alg', $registration_parameters) || !array_key_exists('id_token_encrypted_response_enc', $registration_parameters)) {
             return;
@@ -44,7 +44,7 @@ final class IdTokenAlgorithmsRule implements RuleInterface
         Assertion::inArray($registration_parameters['id_token_encrypted_response_alg'], $this->getIdTokenManager()->getSupportedKeyEncryptionAlgorithms(), sprintf('The ID Token content encryption algorithm "%s" is not supported. Please choose one of the following algorithm: %s', $registration_parameters['id_token_encrypted_response_alg'], json_encode($this->getIdTokenManager()->getSupportedContentEncryptionAlgorithms())));
         Assertion::inArray($registration_parameters['id_token_encrypted_response_enc'], $this->getIdTokenManager()->getSupportedContentEncryptionAlgorithms(), sprintf('The ID Token key encryption algorithm "%s" is not supported. Please choose one of the following algorithm: %s', $registration_parameters['id_token_encrypted_response_enc'], json_encode($this->getIdTokenManager()->getSupportedKeyEncryptionAlgorithms())));
 
-        $metadatas['id_token_encrypted_response_alg'] = $registration_parameters['id_token_encrypted_response_alg'];
-        $metadatas['id_token_encrypted_response_enc'] = $registration_parameters['id_token_encrypted_response_enc'];
+        $client->set('id_token_encrypted_response_alg', $registration_parameters['id_token_encrypted_response_alg']);
+        $client->set('id_token_encrypted_response_enc', $registration_parameters['id_token_encrypted_response_enc']);
     }
 }

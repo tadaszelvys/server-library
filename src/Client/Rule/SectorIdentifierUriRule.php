@@ -62,7 +62,7 @@ final class SectorIdentifierUriRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
         if (!array_key_exists('sector_identifier_uri', $registration_parameters)) {
             return;
@@ -70,8 +70,7 @@ final class SectorIdentifierUriRule implements RuleInterface
 
         Assertion::url($registration_parameters['sector_identifier_uri'], sprintf('The sector identifier URI "%s" is not valid.', $registration_parameters['sector_identifier_uri']));
         $this->checkSectorIdentifierUri($registration_parameters['sector_identifier_uri']);
-
-        $metadatas['sector_identifier_uri'] = $registration_parameters['sector_identifier_uri'];
+        $client->set('sector_identifier_uri', $registration_parameters['sector_identifier_uri']);
     }
 
     /**

@@ -19,13 +19,17 @@ final class CommonParametersRule extends AbstractInternationalizedRule
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
+        $metadatas = [];
         foreach ($this->getSupportedParameters() as $parameter => $closure) {
             $metadatas = array_merge(
                 $metadatas,
                 $this->getInternationalizedParameters($registration_parameters, $parameter, $closure)
             );
+        }
+        foreach ($metadatas as $k => $v) {
+            $client->set($k, $v);
         }
     }
 

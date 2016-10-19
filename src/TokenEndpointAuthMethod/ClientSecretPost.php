@@ -57,10 +57,10 @@ abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function checkClientConfiguration(array $client_configuration, array &$metadatas)
+    public function checkClientConfiguration(array $client_configuration, ClientInterface $client)
     {
-        $metadatas['client_secret'] = $this->createClientSecret();
-        $metadatas['client_secret_expires_at'] = 0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime;
+        $client->set('client_secret', $this->createClientSecret());
+        $client->set('client_secret_expires_at', (0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime));
     }
 
     /**

@@ -54,7 +54,7 @@ class None implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function checkClientConfiguration(array $client_configuration, array &$metadatas)
+    public function checkClientConfiguration(array $client_configuration, ClientInterface $client)
     {
         //Nothing to do
     }

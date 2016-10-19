@@ -18,6 +18,7 @@ use OAuth2\Behaviour\HasExceptionManager;
 use OAuth2\Behaviour\HasGrantTypeManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
 use OAuth2\Behaviour\HasScopeManager;
+use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
 use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Behaviour\HasTokenTypeParameterSupport;
 use OAuth2\Behaviour\HasUserAccountManager;
@@ -32,6 +33,7 @@ use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
+use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 use OAuth2\UserAccount\UserAccountManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
@@ -42,6 +44,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     use HasUserAccountManager;
     use HasScopeManager;
     use HasExceptionManager;
+    use HasTokenEndpointAuthMethodManager;
     use HasClientManager;
     use HasAccessTokenManager;
     use HasRefreshTokenManager;
@@ -57,19 +60,21 @@ final class TokenEndpoint implements TokenEndpointInterface
     /**
      * TokenEndpoint constructor.
      *
-     * @param \OAuth2\Grant\GrantTypeManagerInterface         $grant_type_manager
-     * @param \OAuth2\Token\TokenTypeManagerInterface         $token_type_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
-     * @param \OAuth2\Client\ClientManagerInterface           $client_manager
-     * @param \OAuth2\UserAccount\UserAccountManagerInterface $user_account_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
-     * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
+     * @param \OAuth2\Grant\GrantTypeManagerInterface                                 $grant_type_manager
+     * @param \OAuth2\Token\TokenTypeManagerInterface                                 $token_type_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface                               $access_token_manager
+     * @param \OAuth2\Client\ClientManagerInterface                                   $client_manager
+     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager
+     * @param \OAuth2\UserAccount\UserAccountManagerInterface                         $user_account_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface                             $exception_manager
+     * @param \OAuth2\Token\RefreshTokenManagerInterface|null                         $refresh_token_manager
      */
     public function __construct(
         GrantTypeManagerInterface $grant_type_manager,
         TokenTypeManagerInterface $token_type_manager,
         AccessTokenManagerInterface $access_token_manager,
         ClientManagerInterface $client_manager,
+        TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager,
         UserAccountManagerInterface $user_account_manager,
         ExceptionManagerInterface $exception_manager,
         RefreshTokenManagerInterface $refresh_token_manager = null
@@ -77,6 +82,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
         $this->setClientManager($client_manager);
+        $this->setTokenEndpointAuthMethodManager($token_endpoint_auth_manager);
         $this->setUserAccountManager($user_account_manager);
         $this->setExceptionManager($exception_manager);
         $this->setGrantTypeManager($grant_type_manager);
@@ -331,13 +337,13 @@ final class TokenEndpoint implements TokenEndpointInterface
     private function findClient(ServerRequestInterface $request, GrantTypeResponseInterface $grant_type_response)
     {
         if (null === $grant_type_response->getClientPublicId()) {
-            $client = $this->getClientManager()->findClient($request);
+            $client = $this->getTokenEndpointAuthMethodManager()->findClient($request);
         } else {
             $client_public_id = $grant_type_response->getClientPublicId();
             $client = $this->getClientManager()->getClient($client_public_id);
         }
         if (!$client instanceof ClientInterface) {
-            throw $this->getClientManager()->buildAuthenticationException($request);
+            throw $this->getTokenEndpointAuthMethodManager()->buildAuthenticationException($request);
         }
 
         return $client;

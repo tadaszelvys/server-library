@@ -32,10 +32,10 @@ final class GrantTypeFlowRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
-        $metadatas['response_types'] = [];
-        $metadatas['grant_types'] = [];
+        $client->set('response_types', []);
+        $client->set('grant_types', []);
 
         if (!array_key_exists('grant_types', $registration_parameters)) {
             $registration_parameters['grant_types'] = [];
@@ -43,50 +43,56 @@ final class GrantTypeFlowRule implements RuleInterface
         if (!array_key_exists('response_types', $registration_parameters)) {
             $registration_parameters['response_types'] = [];
         }
-        $this->checkGrantTypes($registration_parameters, $metadatas);
-        $this->checkResponseTypes($registration_parameters, $metadatas);
+        $this->checkGrantTypes($client, $registration_parameters);
+        $this->checkResponseTypes($client, $registration_parameters);
     }
 
     /**
-     * {@inheritdoc}
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param array                          $registration_parameters
      */
-    private function checkGrantTypes(array $registration_parameters, array &$metadatas)
+    private function checkGrantTypes(ClientInterface $client, array $registration_parameters)
     {
         Assertion::isArray($registration_parameters['grant_types'], 'The parameter "grant_types" must be an array of strings.');
         Assertion::allString($registration_parameters['grant_types'], 'The parameter "grant_types" must be an array of strings.');
 
         foreach ($registration_parameters['grant_types'] as $grant_type) {
             $type = $this->getGrantTypeManager()->getGrantType($grant_type);
-            if (!in_array($grant_type, $metadatas['grant_types'])) {
-                $metadatas['grant_types'][] = $grant_type;
+            if (!in_array($grant_type, $client->get('grant_types'))) {
+                $grant_types = $client->get('grant_types');
+                $grant_types[] = $grant_type;
+                $client->set('grant_types', $grant_types);
             }
             $associated_response_types = $type->getAssociatedResponseTypes();
             $diff = array_diff($associated_response_types, $registration_parameters['response_types']);
             Assertion::true(empty($diff), sprintf('The grant type "%s" is associated with the response types "%s" but this response type is missing.', $type->getGrantType(), json_encode($diff)));
 
-            $metadatas['response_types'] = array_unique(array_merge($metadatas['response_types'], $associated_response_types));
+            $client->set('response_types', array_unique(array_merge($client->get('response_types'), $associated_response_types)));
         }
     }
 
     /**
-     * {@inheritdoc}
+     * @param \OAuth2\Client\ClientInterface $client
+     * @param array                          $registration_parameters
      */
-    private function checkResponseTypes(array $registration_parameters, array &$metadatas)
+    private function checkResponseTypes(ClientInterface $client, array $registration_parameters)
     {
         Assertion::isArray($registration_parameters['response_types'], 'The parameter "response_types" must be an array of strings.');
         Assertion::allString($registration_parameters['response_types'], 'The parameter "grant_types" must be an array of strings.');
 
         foreach ($registration_parameters['response_types'] as $response_type) {
             $types = $this->getResponseTypeManager()->getResponseTypes($response_type);
-            if (!in_array($response_type, $metadatas['response_types'])) {
-                $metadatas['response_types'][] = $response_type;
+            if (!in_array($response_type, $client->get('response_types'))) {
+                $response_types = $client->get('response_types');
+                $response_types[] = $response_type;
+                $client->set('response_types', $response_types);
             }
             foreach ($types as $type) {
                 $associated_grant_types = $type->getAssociatedGrantTypes();
                 $diff = array_diff($associated_grant_types, $registration_parameters['grant_types']);
                 Assertion::true(empty($diff), sprintf('The response type "%s" is associated with the grant types "%s" but this response type is missing.', $type->getResponseType(), json_encode($diff)));
 
-                $metadatas['grant_types'] = array_unique(array_merge($metadatas['grant_types'], $associated_grant_types));
+                $client->set('grant_types', array_unique(array_merge($client->get('grant_types'), $associated_grant_types)));
             }
         }
     }

@@ -7,6 +7,7 @@ However, you must at least the following ones:
 
 * [An exception manager](#exceptions-and-exception-manager)
 * [A Scope manager](#scope-and-scope-manager)
+* [A Token Endpoint Authorization ]
 * [A Client manager](#clients-and-client-manager)
 * [An User Account manager](#users-and-accounts)
 * [An Access Token manager](#access-token-manager)

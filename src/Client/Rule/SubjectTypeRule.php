@@ -33,7 +33,7 @@ final class SubjectTypeRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
         if (!array_key_exists('subject_type', $registration_parameters)) {
             return;
@@ -47,6 +47,6 @@ final class SubjectTypeRule implements RuleInterface
 
         Assertion::inArray($registration_parameters['subject_type'], $supported_types, sprintf('The subject type "%s" is not supported. Please use one of the following value: %s', $registration_parameters['subject_type'], json_encode($supported_types)));
 
-        $metadatas['subject_type'] = $registration_parameters['subject_type'];
+        $client->set('subject_type', $registration_parameters['subject_type']);
     }
 }

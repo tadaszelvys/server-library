@@ -18,9 +18,8 @@ interface RuleInterface
     /**
      * @param \OAuth2\Client\ClientInterface $client
      * @param array                          $registration_parameters
-     * @param array                          $metadatas
      *
      * @throws \InvalidArgumentException If an error occurred
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas);
+    public function check(ClientInterface $client, array $registration_parameters);
 }

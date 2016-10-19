@@ -18,11 +18,11 @@ final class SoftwareRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
         foreach (['software_id', 'software_version', 'software_statement'] as $key) {
             if (array_key_exists($key, $registration_parameters)) {
-                $metadatas[$key] = $registration_parameters[$key];
+                $client->set($key,$registration_parameters[$key]);
             }
         }
     }

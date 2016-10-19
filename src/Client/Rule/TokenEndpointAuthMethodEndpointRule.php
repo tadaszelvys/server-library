@@ -28,15 +28,15 @@ final class TokenEndpointAuthMethodEndpointRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
         Assertion::keyExists($registration_parameters, 'token_endpoint_auth_method', 'The parameter "token_endpoint_auth_method" is missing.');
         Assertion::string($registration_parameters['token_endpoint_auth_method'], 'The parameter "token_endpoint_auth_method" must be a string.');
         Assertion::true($this->getTokenEndpointAuthMethodManager()->hasTokenEndpointAuthMethod($registration_parameters['token_endpoint_auth_method']), sprintf('The token endpoint authentication method "%s" is not supported. Please use one of the following values: %s', $registration_parameters['token_endpoint_auth_method'], json_encode($this->getTokenEndpointAuthMethodManager()->getSupportedTokenEndpointAuthMethods())));
 
         $token_endpoint_auth_method = $this->getTokenEndpointAuthMethodManager()->getTokenEndpointAuthMethod($registration_parameters['token_endpoint_auth_method']);
-        $token_endpoint_auth_method->checkClientConfiguration($registration_parameters, $metadatas);
+        $token_endpoint_auth_method->checkClientConfiguration($registration_parameters, $client);
 
-        $metadatas['token_endpoint_auth_method'] = $registration_parameters['token_endpoint_auth_method'];
+        $client->set('token_endpoint_auth_method', $registration_parameters['token_endpoint_auth_method']);
     }
 }

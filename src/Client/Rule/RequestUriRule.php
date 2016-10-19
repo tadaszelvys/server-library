@@ -19,12 +19,13 @@ final class RequestUriRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
         if (!array_key_exists('request_uris', $registration_parameters)) {
             return;
         }
         Assertion::isArray($registration_parameters['request_uris'], 'The parameter "request_uris" must be a list of URI.');
         Assertion::allUrl($registration_parameters['request_uris'], 'The parameter "request_uris" must be a list of URI.');
+        $client->set('request_uris', $registration_parameters['request_uris']);
     }
 }

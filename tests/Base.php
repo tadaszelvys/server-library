@@ -292,8 +292,8 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getExceptionManager()
             );
 
-            $this->authorization_request_loader->enableRequestObjectSupport($this->getJWTLoader());
-            $this->authorization_request_loader->enableRequestObjectReferenceSupport(['iat', 'nbf', 'exp', 'iss', 'aud']);
+            $this->authorization_request_loader->enableRequestObjectSupport($this->getJWTLoader(), ['iat', 'nbf', 'exp', 'iss', 'aud']);
+            $this->authorization_request_loader->enableRequestObjectReferenceSupport();
             $this->authorization_request_loader->enableEncryptedRequestObjectSupport(
                 new JWKSet(['keys' => [
                     [
@@ -332,7 +332,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->revocation_endpoint) {
             $this->revocation_endpoint = new TokenRevocationEndpoint(
-                $this->getClientManager(),
+                $this->getTokenEndpointAuthMethodManager(),
                 $this->getExceptionManager()
             );
 
@@ -496,7 +496,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->token_introspection_endpoint) {
             $this->token_introspection_endpoint = new TokenIntrospectionEndpoint(
-                $this->getClientManager(),
+                $this->getTokenEndpointAuthMethodManager(),
                 $this->getExceptionManager()
             );
 
@@ -524,6 +524,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getTokenTypeManager(),
                 $this->getJWTAccessTokenManager(),
                 $this->getClientManager(),
+                $this->getTokenEndpointAuthMethodManager(),
                 $this->getUserAccountManager(),
                 $this->getExceptionManager(),
                 $this->getRefreshTokenManager()
@@ -679,7 +680,10 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getTokenEndpointAuthMethodManager()
     {
         if (null == $this->token_endpoint_auth_method_manager) {
-            $this->token_endpoint_auth_method_manager = new TokenEndpointAuthMethodManager();
+            $this->token_endpoint_auth_method_manager = new TokenEndpointAuthMethodManager(
+                $this->getClientManager(),
+                $this->getExceptionManager()
+            );
 
             $jwt_assertion = $this->getAssertionJwtAuthMethod();
             $jwt_assertion->enableEncryptedAssertions(
@@ -714,10 +718,7 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getClientManager()
     {
         if (null === $this->client_manager) {
-            $this->client_manager = new ClientManager(
-                $this->getTokenEndpointAuthMethodManager(),
-                $this->getExceptionManager()
-            );
+            $this->client_manager = new ClientManager();
             $this->client_manager->addRule(new Rule\GrantTypeFlowRule(
                 $this->getGrantTypeManager(),
                 $this->getResponseTypeManager()
@@ -739,7 +740,7 @@ class Base extends \PHPUnit_Framework_TestCase
             $this->client_manager->addRule(new Rule\TokenEndpointAuthMethodEndpointRule(
                 $this->getTokenEndpointAuthMethodManager()
             ));
-            $this->client_manager->addRule(new Rule\IdTokenAlgorithmsRule($this->getIdTokenManager()));
+            $this->client_manager->addRule(new Rule\IdTokenEncryptionAlgorithmsRule($this->getIdTokenManager()));
             $this->client_manager->addRule(new Rule\SubjectTypeRule($this->getUserInfo()));
             $this->client_manager->addRule(new Rule\CommonParametersRule());
             $this->client_manager->addRule(new Rule\SoftwareRule());

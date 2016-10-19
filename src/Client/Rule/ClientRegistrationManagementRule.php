@@ -18,10 +18,10 @@ abstract class ClientRegistrationManagementRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters, array &$metadatas)
+    public function check(ClientInterface $client, array $registration_parameters)
     {
-        $metadatas['registration_client_uri'] = $this->getRegistrationClientUri($client);
-        $metadatas['registration_access_token'] = $this->getRegistrationAccessToken($client);
+        $client->set('registration_client_uri', $this->getRegistrationClientUri($client));
+        $client->set('registration_access_token', $this->getRegistrationAccessToken($client));
     }
 
     /**

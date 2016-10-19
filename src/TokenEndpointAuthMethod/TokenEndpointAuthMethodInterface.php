@@ -33,12 +33,12 @@ interface TokenEndpointAuthMethodInterface
     public function findClient(ServerRequestInterface $request, &$client_credentials = null);
 
     /**
-     * @param array $client_configuration
-     * @param array $metadatas
+     * @param array                          $client_configuration
+     * @param \OAuth2\Client\ClientInterface $client
      *
      * @throws \InvalidArgumentException
      */
-    public function checkClientConfiguration(array $client_configuration, array &$metadatas);
+    public function checkClientConfiguration(array $client_configuration, ClientInterface $client);
 
     /**
      * This method verifies the client credentials in the request.

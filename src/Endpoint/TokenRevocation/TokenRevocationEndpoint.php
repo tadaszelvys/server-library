@@ -11,14 +11,14 @@
 
 namespace OAuth2\Endpoint\TokenRevocation;
 
-use OAuth2\Behaviour\HasClientManager;
 use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface;
 use OAuth2\Exception\AuthenticateExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\TokenInterface;
+use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,7 +26,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
 {
     use HasExceptionManager;
-    use HasClientManager;
+    use HasTokenEndpointAuthMethodManager;
 
     /**
      * @var \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface[]
@@ -34,16 +34,16 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
     private $token_types = [];
 
     /**
-     * RevocationEndpoint constructor.
+     * TokenRevocationEndpoint constructor.
      *
-     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager
+     * @param \OAuth2\Exception\ExceptionManagerInterface                             $exception_manager
      */
     public function __construct(
-        ClientManagerInterface $client_manager,
+        TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager,
         ExceptionManagerInterface $exception_manager
     ) {
-        $this->setClientManager($client_manager);
+        $this->setTokenEndpointAuthMethodManager($token_endpoint_auth_manager);
         $this->setExceptionManager($exception_manager);
     }
 
@@ -97,7 +97,7 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
         }
         $client = null;
         try {
-            $client = $this->getClientManager()->findClient($request);
+            $client = $this->getTokenEndpointAuthMethodManager()->findClient($request);
         } catch (AuthenticateExceptionInterface $e) {
             $e->getHttpResponse($response);
 
