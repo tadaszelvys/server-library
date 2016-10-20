@@ -24,9 +24,9 @@ interface UserAccountManagerInterface
     public function checkUserAccountPasswordCredentials(UserAccountInterface $user, $password);
 
     /**
-     * Get the end-user with the specified UserAccountname.
+     * Get the end-user with the specified User Account Name.
      *
-     * @param string $username UserAccountname
+     * @param string $username User Account Name
      *
      * @return \OAuth2\UserAccount\UserAccountInterface|null
      */

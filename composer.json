@@ -42,13 +42,9 @@
             "OAuth2\\Test\\": "tests/"
         }
     },
-    "scripts":{
-        "test": "phpunit",
-        "test-with-coverage": "phpunit --coverage-clover build/logs/clover.xml"
-    },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "2.0.x-dev"
         }
     }
 }
