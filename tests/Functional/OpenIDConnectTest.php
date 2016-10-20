@@ -686,8 +686,10 @@ class OpenIDConnectTest extends Base
         $response = new Response();
 
         $parameters = [
-            'scope'  => '"scope1 scope2"',
-            'client' => '"confidential"',
+            'all' => [
+                'scope'  => '"scope1 scope2"',
+                'client' => '"confidential"',
+            ],
         ];
         $this->getEntryPoint()->start($request, $response, $parameters);
         $this->assertEquals(401, $response->getStatusCode());
@@ -720,8 +722,10 @@ class OpenIDConnectTest extends Base
     {
         $request = $this->createRequest('/', 'GET', [], ['HTTPS' => 'on'], ['authorization' => 'Bearer']);
         $parameters = [
-            'scope'  => '"scope1 scope2"',
-            'client' => '"confidential"',
+            'all' => [
+                'scope'  => '"scope1 scope2"',
+                'client' => '"confidential"',
+            ],
         ];
 
         try {
@@ -732,8 +736,8 @@ class OpenIDConnectTest extends Base
             $this->assertArrayHasKey('WWW-Authenticate', $e->getResponseHeaders());
 
             $expected_authentication_header = [
-                'Bearer realm="testrealm@host.com",scope="scope1 scope2",client="confidential"',
-                'MAC scope="scope1 scope2",client="confidential"',
+                'Bearer realm="testrealm@host.com",scope="scope1 scope2",client="confidential",error="invalid_token",error_description="Access token required."',
+                'MAC scope="scope1 scope2",client="confidential",error="invalid_token",error_description="Access token required."',
             ];
             $this->assertEquals($expected_authentication_header, $e->getResponseHeaders()['WWW-Authenticate']);
             $this->assertEquals('invalid_token', $e->getMessage());

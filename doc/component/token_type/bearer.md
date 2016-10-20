@@ -33,3 +33,13 @@ $token_type_manager->addTokenType($bearer_token);
 ```
 
 Examples of clients requests are available in the [RFC6750 section 2.1, 2.2 and 2.3](https://tools.ietf.org/html/rfc6750#section-2).
+
+In case you want to indicate the realm, you can set it as first argument of the constructor:
+
+```php
+use OAuth2\Token\BearerToken;
+
+$bearer_token = new BearerToken('My Realm');
+```
+
+The `realm` parameter is described in the [RFC6750 section 3](https://tools.ietf.org/html/rfc6750#section-3).

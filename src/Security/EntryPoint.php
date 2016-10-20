@@ -40,12 +40,7 @@ final class EntryPoint implements EntryPointInterface
      */
     public function start(ServerRequestInterface $request, ResponseInterface &$response, array $additional_authentication_parameters = [])
     {
-        $exception = $this->getExceptionManager()->getAuthenticateException(
-            ExceptionManagerInterface::UNAUTHORIZED_CLIENT,
-            null,
-            ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes($additional_authentication_parameters)]
-        );
-
+        $exception = $this->getExceptionManager()->getAuthenticateException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, null, ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes($additional_authentication_parameters)]);
         $exception->getHttpResponse($response);
     }
 }

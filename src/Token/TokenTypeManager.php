@@ -114,27 +114,46 @@ class TokenTypeManager implements TokenTypeManagerInterface
     {
         $schemes = [];
         foreach ($this->getTokenTypes() as $type) {
-            $schemes[] = $this->computeScheme(trim($type->getTokenTypeScheme()), $additional_authentication_parameters);
+            $schemes[] = $this->computeScheme($type, $additional_authentication_parameters);
         }
 
         return $schemes;
     }
 
     /**
-     * @param string $scheme
-     * @param array  $additional_authentication_parameters
+     * @param \OAuth2\Token\TokenTypeInterface $type
+     * @param array                            $additional_authentication_parameters
      *
      * @return string
      */
-    private function computeScheme($scheme, array $additional_authentication_parameters)
+    private function computeScheme(TokenTypeInterface $type, array $additional_authentication_parameters)
     {
+        $scheme = trim($type->getTokenTypeScheme());
         if (0 === count($additional_authentication_parameters)) {
             return $scheme;
         }
+
+        foreach (['all', $type->getTokenTypeName()] as $key) {
+            if (array_key_exists($key, $additional_authentication_parameters)) {
+                $scheme = $this->appendParameters($scheme, $additional_authentication_parameters[$key]);
+            }
+        }
+
+        return $scheme;
+    }
+
+    /**
+     * @param string $scheme
+     * @param array  $parameters
+     *
+     * @return string|void
+     */
+    private function appendParameters($scheme, array $parameters)
+    {
         $position = mb_strpos($scheme, ' ', null, 'utf-8');
         $add_comma = false === $position ? false : true;
 
-        foreach ($additional_authentication_parameters as $key => $value) {
+        foreach ($parameters as $key => $value) {
             if (false === $add_comma) {
                 $add_comma = true;
                 $scheme = sprintf('%s %s=%s', $scheme, $key, $value);
