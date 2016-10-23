@@ -54,11 +54,6 @@ class IdTokenManager implements IdTokenManagerInterface
     private $encryption_key_set = null;
 
     /**
-     * @var bool
-     */
-    private $encryption_required = false;
-
-    /**
      * IdTokenManager constructor.
      *
      * @param \Jose\JWTCreatorInterface                        $jwt_creator
@@ -66,28 +61,28 @@ class IdTokenManager implements IdTokenManagerInterface
      * @param string                                           $issuer
      * @param string                                           $signature_algorithm
      * @param \Jose\Object\JWKSetInterface                     $signature_key_set
-     * @param \Jose\Object\JWKSetInterface                     $encryption_key_set
      * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface $userinfo
      */
-    public function __construct(JWTCreatorInterface $jwt_creator,
-                                JWTLoaderInterface $jwt_loader,
-                                $issuer,
-                                $signature_algorithm,
-                                JWKSetInterface $signature_key_set,
-                                JWKSetInterface $encryption_key_set,
-                                UserInfoInterface $userinfo
-    ) {
+    public function __construct(JWTCreatorInterface $jwt_creator, JWTLoaderInterface $jwt_loader, $issuer, $signature_algorithm, JWKSetInterface $signature_key_set, UserInfoInterface $userinfo)
+    {
         Assertion::string($signature_algorithm);
         Assertion::greaterThan($signature_key_set->countKeys(), 0, 'The signature key set must have at least one key.');
-        Assertion::greaterThan($encryption_key_set->countKeys(), 0, 'The encryption key set must have at least one key.');
         $this->setIssuer($issuer);
         $this->signature_algorithm = $signature_algorithm;
         $this->signature_key_set = $signature_key_set;
-        $this->encryption_key_set = $encryption_key_set;
         $this->setUserinfo($userinfo);
 
         $this->setJWTCreator($jwt_creator);
         $this->setJWTLoader($jwt_loader);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function enableEncryptionSupport(JWKSetInterface $encryption_key_set)
+    {
+        Assertion::greaterThan($encryption_key_set->countKeys(), 0, 'The encryption key set must have at least one key.');
+        $this->encryption_key_set = $encryption_key_set;
     }
 
     /**
@@ -135,14 +130,7 @@ class IdTokenManager implements IdTokenManagerInterface
         $id_token = $this->createEmptyIdToken();
         $exp = null !== $access_token ? $access_token->getExpiresAt() : time() + $this->getLifetime($client);
         $claims = array_merge(
-            $this->getUserinfo()->getUserinfo(
-                $client,
-                $user_account,
-                $redirect_uri,
-                $claims_locales,
-                $request_claims,
-                $scope
-            ),
+            $this->getUserinfo()->getUserinfo($client, $user_account, $redirect_uri, $claims_locales, $request_claims, $scope),
             [
                 'jti'       => Base64Url::encode(random_bytes(25)),
                 'iss'       => $this->getIssuer(),
@@ -191,11 +179,7 @@ class IdTokenManager implements IdTokenManagerInterface
                     'enc'       => $client->get('id_token_encrypted_response_enc'),
                 ];
 
-                $jwt = $this->jwt_creator->encrypt(
-                    $jwt,
-                    $headers,
-                    $key
-                );
+                $jwt = $this->jwt_creator->encrypt($jwt, $headers, $key);
             }
         }
         $id_token->setToken($jwt);
@@ -213,11 +197,7 @@ class IdTokenManager implements IdTokenManagerInterface
     public function loadIdToken($id_token)
     {
         try {
-            $jwt = $this->getJWTLoader()->load(
-                $id_token,
-                $this->encryption_key_set,
-                $this->encryption_required
-            );
+            $jwt = $this->getJWTLoader()->load($id_token, $this->encryption_key_set, false);
 
             $this->jwt_loader->verify($jwt, $this->signature_key_set);
         } catch (\Exception $e) {

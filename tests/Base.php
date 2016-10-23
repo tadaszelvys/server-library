@@ -1167,9 +1167,10 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getIssuer(),
                 'HS512',
                 $this->getSignatureKeySet(),
-                $this->getEncryptionKeySet(),
                 $this->getUserInfo()
             );
+
+            $this->id_token_manager->enableEncryptionSupport($this->getEncryptionKeySet());
         }
 
         return $this->id_token_manager;

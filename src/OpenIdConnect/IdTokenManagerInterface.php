@@ -11,6 +11,7 @@
 
 namespace OAuth2\OpenIdConnect;
 
+use Jose\Object\JWKSetInterface;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AuthCodeInterface;
@@ -44,6 +45,11 @@ interface IdTokenManagerInterface
      * @param \OAuth2\OpenIdConnect\IdTokenInterface $token The ID token to revoke
      */
     public function revokeIdToken(IdTokenInterface $token);
+
+    /**
+     * @param \Jose\Object\JWKSetInterface $encryption_key_set
+     */
+    public function enableEncryptionSupport(JWKSetInterface $encryption_key_set);
 
     /**
      * @param string $subject_identifier
