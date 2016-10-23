@@ -23,7 +23,7 @@ final class ScopeRule implements RuleInterface
     /**
      * @param \OAuth2\Scope\ScopeManagerInterface $scope_manager
      */
-    public function enableScopeSupport(ScopeManagerInterface $scope_manager)
+    public function __construct(ScopeManagerInterface $scope_manager)
     {
         $this->setScopeManager($scope_manager);
     }

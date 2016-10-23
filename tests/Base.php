@@ -217,8 +217,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->parameter_checker_manager) {
             $this->parameter_checker_manager = new ParameterCheckerManager($this->getExceptionManager());
 
-            $scope_checker = new ScopeParameterChecker();
-            $scope_checker->enableScopeSupport($this->getScopeManager());
+            $scope_checker = new ScopeParameterChecker($this->getScopeManager());
 
             $this->parameter_checker_manager->addParameterChecker(new DisplayParameterChecker());
             $this->parameter_checker_manager->addParameterChecker(new PromptParameterChecker());
@@ -724,8 +723,7 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getResponseTypeManager()
             ));
 
-            $scope_rule = new Rule\ScopeRule();
-            $scope_rule->enableScopeSupport($this->getScopeManager());
+            $scope_rule = new Rule\ScopeRule($this->getScopeManager());
 
             $this->client_manager->addRule(new Rule\RedirectionUriRule());
             $this->client_manager->addRule(new Rule\RequestUriRule());
