@@ -67,7 +67,6 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager
      * @param \OAuth2\UserAccount\UserAccountManagerInterface                         $user_account_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface                             $exception_manager
-     * @param \OAuth2\Token\RefreshTokenManagerInterface|null                         $refresh_token_manager
      */
     public function __construct(
         GrantTypeManagerInterface $grant_type_manager,
@@ -76,8 +75,7 @@ final class TokenEndpoint implements TokenEndpointInterface
         ClientManagerInterface $client_manager,
         TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager,
         UserAccountManagerInterface $user_account_manager,
-        ExceptionManagerInterface $exception_manager,
-        RefreshTokenManagerInterface $refresh_token_manager = null
+        ExceptionManagerInterface $exception_manager
     ) {
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
@@ -86,13 +84,18 @@ final class TokenEndpoint implements TokenEndpointInterface
         $this->setUserAccountManager($user_account_manager);
         $this->setExceptionManager($exception_manager);
         $this->setGrantTypeManager($grant_type_manager);
-        if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
-            $this->setRefreshTokenManager($refresh_token_manager);
-        }
     }
 
     /**
-     * @param \OAuth2\Scope\ScopeManagerInterface $scope_manager
+     * {@inheritdoc}
+     */
+    public function enableRefreshTokenSupport(RefreshTokenManagerInterface $refresh_token_manager)
+    {
+        $this->setRefreshTokenManager($refresh_token_manager);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function enableScopeSupport(ScopeManagerInterface $scope_manager)
     {
@@ -100,7 +103,7 @@ final class TokenEndpoint implements TokenEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Endpoint\Token\TokenEndpointExtensionInterface $token_endpoint_extension
+     * {@inheritdoc}
      */
     public function addTokenEndpointExtension(TokenEndpointExtensionInterface $token_endpoint_extension)
     {

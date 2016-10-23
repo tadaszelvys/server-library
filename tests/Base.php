@@ -526,10 +526,10 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getClientManager(),
                 $this->getTokenEndpointAuthMethodManager(),
                 $this->getUserAccountManager(),
-                $this->getExceptionManager(),
-                $this->getRefreshTokenManager()
+                $this->getExceptionManager()
             );
 
+            $this->token_endpoint->enableRefreshTokenSupport($this->getRefreshTokenManager());
             $this->token_endpoint->enableScopeSupport($this->getScopeManager());
             $this->token_endpoint->addTokenEndpointExtension($this->getOpenIdConnectTokenEndpointExtension());
             $this->token_endpoint->allowAccessTokenTypeParameter();
@@ -1390,10 +1390,10 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getAccessTokenType()
     {
         $access_token_type = new AccessToken(
-            $this->getJWTAccessTokenManager(),
-            $this->getRefreshTokenManager()
+            $this->getJWTAccessTokenManager()
         );
 
+        $access_token_type->enableRefreshTokenSupport($this->getRefreshTokenManager());
         $access_token_type->enableRefreshTokensRevocationWithAccessTokens();
         $access_token_type->disableRefreshTokensRevocationWithAccessTokens();
         $access_token_type->enableRefreshTokensRevocationWithAccessTokens();

@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint\TokenType;
 
+use Assert\Assertion;
 use Jose\Object\JWTInterface;
 use OAuth2\Behaviour\HasAccessTokenManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
@@ -36,14 +37,18 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
      * AccessToken constructor.
      *
      * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
-     * @param \OAuth2\Token\RefreshTokenManagerInterface|null $refresh_token_manager
      */
-    public function __construct(AccessTokenManagerInterface $access_token_manager, RefreshTokenManagerInterface $refresh_token_manager = null)
+    public function __construct(AccessTokenManagerInterface $access_token_manager)
     {
         $this->setAccessTokenManager($access_token_manager);
-        if ($refresh_token_manager instanceof RefreshTokenManagerInterface) {
-            $this->setRefreshTokenManager($refresh_token_manager);
-        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function enableRefreshTokenSupport(RefreshTokenManagerInterface $refresh_token_manager)
+    {
+        $this->setRefreshTokenManager($refresh_token_manager);
     }
 
     /**
@@ -145,6 +150,7 @@ final class AccessToken implements IntrospectionTokenTypeInterface, RevocationTo
 
     public function enableRefreshTokensRevocationWithAccessTokens()
     {
+        Assertion::true($this->hasRefreshTokenManager(), 'The refresh token support is not enabled.');
         $this->refresh_tokens_revoked_with_access_tokens = true;
     }
 
