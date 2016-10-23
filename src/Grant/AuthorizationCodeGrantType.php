@@ -49,10 +49,8 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
      * @param \OAuth2\Exception\ExceptionManagerInterface         $exception_manager
      * @param \OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface $pkce_method_manager
      */
-    public function __construct(AuthCodeManagerInterface $auth_code_manager,
-                                ExceptionManagerInterface $exception_manager,
-                                PKCEMethodManagerInterface $pkce_method_manager
-    ) {
+    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager, PKCEMethodManagerInterface $pkce_method_manager)
+    {
         $this->setAuthorizationCodeManager($auth_code_manager);
         $this->setExceptionManager($exception_manager);
         $this->setPKCEMethodManager($pkce_method_manager);

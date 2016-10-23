@@ -49,7 +49,7 @@ abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
     public function getSchemesParameters()
     {
         return [
-            sprintf('Basic realm="%s",charset=UTF-8', $this->getRealm()),
+            sprintf('Basic realm="%s",charset="UTF-8"', $this->getRealm()),
         ];
     }
 

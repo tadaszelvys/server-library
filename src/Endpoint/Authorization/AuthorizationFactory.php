@@ -50,13 +50,8 @@ final class AuthorizationFactory implements AuthorizationFactoryInterface
      * @param \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface $parameter_checker_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface                                      $exception_manager
      */
-    public function __construct(
-        AuthorizationRequestLoaderInterface $authorization_request_loader,
-        ResponseTypeManagerInterface $response_type_manager,
-        ResponseModeManagerInterface $response_mode_manager,
-        ParameterCheckerManagerInterface $parameter_checker_manager,
-        ExceptionManagerInterface $exception_manager
-    ) {
+    public function __construct(AuthorizationRequestLoaderInterface $authorization_request_loader, ResponseTypeManagerInterface $response_type_manager, ResponseModeManagerInterface $response_mode_manager, ParameterCheckerManagerInterface $parameter_checker_manager, ExceptionManagerInterface $exception_manager)
+    {
         $this->authorization_request_loader = $authorization_request_loader;
         $this->setResponseTypeManager($response_type_manager);
         $this->setResponseModeManager($response_mode_manager);

@@ -39,10 +39,8 @@ final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
      * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface                             $exception_manager
      */
-    public function __construct(
-        TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager,
-        ExceptionManagerInterface $exception_manager
-    ) {
+    public function __construct(TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager, ExceptionManagerInterface $exception_manager)
+    {
         $this->setTokenEndpointAuthMethodManager($token_endpoint_auth_manager);
         $this->setExceptionManager($exception_manager);
     }

@@ -41,7 +41,6 @@ final class RedirectException extends BaseException implements RedirectException
         Assertion::keyExists($data, 'response_mode', 'invalid_response_mode');
         Assertion::isInstanceOf($data['response_mode'], ResponseModeInterface::class, 'invalid_response_mode');
         $this->response_mode = $data['response_mode'];
-
         $this->redirect_uri = $data['redirect_uri'];
 
         if (array_key_exists('state', $data) && null !== $data['state']) {

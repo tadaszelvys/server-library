@@ -39,10 +39,8 @@ final class ImplicitGrantType implements ResponseTypeInterface
      * @param \OAuth2\Token\AccessTokenManagerInterface   $access_token_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
-    public function __construct(TokenTypeManagerInterface $token_type_manager,
-                                AccessTokenManagerInterface $access_token_manager,
-                                ExceptionManagerInterface $exception_manager
-    ) {
+    public function __construct(TokenTypeManagerInterface $token_type_manager, AccessTokenManagerInterface $access_token_manager, ExceptionManagerInterface $exception_manager)
+    {
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
         $this->setExceptionManager($exception_manager);

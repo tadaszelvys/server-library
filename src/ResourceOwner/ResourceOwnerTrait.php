@@ -49,10 +49,7 @@ trait ResourceOwnerTrait
         $method = mb_substr($name, 0, 3, '8bit');
         if (in_array($method, ['get', 'set', 'has'])) {
             $key = $this->decamelize(mb_substr($name, 3, null, '8bit'));
-            $arguments = array_merge(
-                [$key],
-                $arguments
-            );
+            $arguments = array_merge([$key], $arguments);
 
             return call_user_func_array([$this, $method], $arguments);
         }

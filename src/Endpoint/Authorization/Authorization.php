@@ -73,13 +73,8 @@ final class Authorization implements AuthorizationInterface
      * @param string                                     $redirect_uri
      * @param string[]                                   $scopes
      */
-    public function __construct(array $query_params,
-                                ClientInterface $client,
-                                array $response_types,
-                                ResponseModeInterface $response_mode,
-                                $redirect_uri,
-                                array $scopes
-    ) {
+    public function __construct(array $query_params, ClientInterface $client, array $response_types, ResponseModeInterface $response_mode, $redirect_uri, array $scopes)
+    {
         $this->scopes = $scopes;
         $this->client = $client;
         $this->query_params = $query_params;

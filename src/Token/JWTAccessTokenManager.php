@@ -65,15 +65,8 @@ class JWTAccessTokenManager extends AccessTokenManager
      * @param string                       $content_encryption_algorithm
      * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
      */
-    public function __construct(JWTCreatorInterface $jwt_creator,
-                                JWTLoaderInterface $jwt_loader,
-                                $signature_algorithm,
-                                JWKSetInterface $signature_key_set,
-                                $key_encryption_algorithm,
-                                $content_encryption_algorithm,
-                                JWKSetInterface $key_encryption_key_set,
-                                $issuer
-    ) {
+    public function __construct(JWTCreatorInterface $jwt_creator, JWTLoaderInterface $jwt_loader, $signature_algorithm, JWKSetInterface $signature_key_set, $key_encryption_algorithm, $content_encryption_algorithm, JWKSetInterface $key_encryption_key_set, $issuer)
+    {
         Assertion::string($signature_algorithm);
         Assertion::string($key_encryption_algorithm);
         Assertion::string($content_encryption_algorithm);

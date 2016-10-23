@@ -68,15 +68,8 @@ final class TokenEndpoint implements TokenEndpointInterface
      * @param \OAuth2\UserAccount\UserAccountManagerInterface                         $user_account_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface                             $exception_manager
      */
-    public function __construct(
-        GrantTypeManagerInterface $grant_type_manager,
-        TokenTypeManagerInterface $token_type_manager,
-        AccessTokenManagerInterface $access_token_manager,
-        ClientManagerInterface $client_manager,
-        TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager,
-        UserAccountManagerInterface $user_account_manager,
-        ExceptionManagerInterface $exception_manager
-    ) {
+    public function __construct(GrantTypeManagerInterface $grant_type_manager, TokenTypeManagerInterface $token_type_manager, AccessTokenManagerInterface $access_token_manager, ClientManagerInterface $client_manager, TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager, UserAccountManagerInterface $user_account_manager, ExceptionManagerInterface $exception_manager)
+    {
         $this->setTokenTypeManager($token_type_manager);
         $this->setAccessTokenManager($access_token_manager);
         $this->setClientManager($client_manager);
@@ -181,28 +174,13 @@ final class TokenEndpoint implements TokenEndpointInterface
         }
 
         //Call extensions to add metadatas to the Access Token
-        $metadatas = $this->preAccessTokenCreation(
-            $client,
-            $grant_type_response,
-            $token_type_information
-        );
+        $metadatas = $this->preAccessTokenCreation($client, $grant_type_response, $token_type_information);
 
         //The access token can be created
-        $access_token = $this->createAccessToken(
-            $client,
-            $grant_type_response,
-            $request_parameters,
-            $token_type_information,
-            $metadatas
-        );
+        $access_token = $this->createAccessToken($client, $grant_type_response, $request_parameters, $token_type_information, $metadatas);
 
         //The result is processed using the access token and the other information
-        $data = $this->postAccessTokenCreation(
-            $client,
-            $grant_type_response,
-            $token_type_information,
-            $access_token
-        );
+        $data = $this->postAccessTokenCreation($client, $grant_type_response, $token_type_information, $access_token);
 
         //The response is updated
         $this->processResponse($response, $data);

@@ -40,10 +40,8 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
      * @param \OAuth2\UserAccount\UserAccountManagerInterface $user_account_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
      */
-    public function __construct(
-        UserAccountManagerInterface $user_account_manager,
-        ExceptionManagerInterface $exception_manager
-    ) {
+    public function __construct(UserAccountManagerInterface $user_account_manager, ExceptionManagerInterface $exception_manager)
+    {
         $this->setUserAccountManager($user_account_manager);
         $this->setExceptionManager($exception_manager);
     }
