@@ -26,4 +26,30 @@ interface PKCEMethodManagerInterface
      * @throws \InvalidArgumentException
      */
     public function checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier);
+
+    /**
+     * @param string $method_name
+     *
+     * @return bool
+     */
+    public function hasPKCEMethod($method_name);
+
+    /**
+     * @param string $method_name
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \OAuth2\Grant\PKCEMethod\PKCEMethodInterface
+     */
+    public function getPKCEMethod($method_name);
+
+    /**
+     * @return \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]
+     */
+    public function getPKCEMethods();
+
+    /**
+     * @return string[]
+     */
+    public function getPKCEMethodNames();
 }
