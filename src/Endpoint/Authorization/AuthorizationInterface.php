@@ -48,6 +48,11 @@ interface AuthorizationInterface
     public function hasPrompt($prompt);
 
     /**
+     * @param array $scope
+     */
+    public function setScopes(array $scope);
+
+    /**
      * @return array
      */
     public function getScopes();
@@ -62,7 +67,12 @@ interface AuthorizationInterface
     /**
      * @param string $scope
      */
-    public function unsetScope($scope);
+    public function removeScope($scope);
+
+    /**
+     * @param string $scope
+     */
+    public function addScope($scope);
 
     /**
      * @return bool

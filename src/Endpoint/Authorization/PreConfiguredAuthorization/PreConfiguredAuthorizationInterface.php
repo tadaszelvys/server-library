@@ -46,20 +46,10 @@ interface PreConfiguredAuthorizationInterface
     /**
      * @return string[]
      */
-    public function getRequestedScopes();
+    public function getScopes();
 
     /**
-     * @param string[] $requested_scopes
+     * @param string[] $scopes
      */
-    public function setRequestedScopes(array $requested_scopes);
-
-    /**
-     * @return string[]
-     */
-    public function getValidatedScopes();
-
-    /**
-     * @param string[] $validated_scopes
-     */
-    public function setValidatedScopes(array $validated_scopes);
+    public function setScopes(array $scopes);
 }

@@ -31,12 +31,7 @@ class PreConfiguredAuthorization implements PreConfiguredAuthorizationInterface
     /**
      * @var string[]
      */
-    private $requested_scopes;
-
-    /**
-     * @var string[]
-     */
-    private $validated_scopes;
+    private $scopes;
 
     /**
      * {@inheritdoc}
@@ -89,32 +84,16 @@ class PreConfiguredAuthorization implements PreConfiguredAuthorizationInterface
     /**
      * {@inheritdoc}
      */
-    public function getRequestedScopes()
+    public function getScopes()
     {
-        return $this->requested_scopes;
+        return $this->scopes;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setRequestedScopes(array $requested_scopes)
+    public function setScopes(array $scopes)
     {
-        $this->requested_scopes = $requested_scopes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getValidatedScopes()
-    {
-        return $this->validated_scopes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setValidatedScopes(array $validated_scopes)
-    {
-        $this->validated_scopes = $validated_scopes;
+        $this->scopes = $scopes;
     }
 }

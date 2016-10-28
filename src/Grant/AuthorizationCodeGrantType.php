@@ -329,7 +329,7 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
         // The scope offline_access is requested but prompt is not consent
         // The scope offline_access is ignored
         if (!$authorization->hasQueryParam('prompt') || !in_array('consent', $authorization->getQueryParam('prompt'))) {
-            $authorization->unsetScope('offline_access');
+            $authorization->removeScope('offline_access');
 
             return false;
         }

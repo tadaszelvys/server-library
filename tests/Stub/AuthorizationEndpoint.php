@@ -101,7 +101,9 @@ class AuthorizationEndpoint extends Base
             $authorization->setAuthorized($this->is_authorized);
             $this->processAuthorization($request, $response, $authorization);
 
-            return;
+            return [
+                'save_authorization' => true,
+            ];
         }
 
         $response->getBody()->rewind();

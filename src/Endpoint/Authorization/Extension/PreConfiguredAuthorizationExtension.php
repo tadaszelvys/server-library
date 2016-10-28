@@ -105,7 +105,7 @@ final class PreConfiguredAuthorizationExtension implements AuthorizationEndpoint
      */
     public function processAfterConsentScreenIsAccepted(AuthorizationInterface $authorization, array $form_data)
     {
-        if (!array_key_exists('save_authorization', $form_data) || false === $form_data['save_authorization']) {
+        if (!array_key_exists('save_authorization', $form_data) || true !== $form_data['save_authorization']) {
             return;
         }
 
@@ -113,8 +113,7 @@ final class PreConfiguredAuthorizationExtension implements AuthorizationEndpoint
         $configuration->setClientPublicId($authorization->getClient()->getPublicId());
         $configuration->setResourceOwnerPublicId($authorization->getUserAccount()->getUserPublicId());
         $configuration->setUserAccountPublicId($authorization->getUserAccount()->getPublicId());
-        $configuration->setRequestedScopes($authorization->getScopes());
-        //$configuration->setValidatedScopes($authorization->getValidatedScopes());
+        $configuration->setScopes($authorization->getScopes());
         $this->getPreConfiguredAuthorizationManager()->savePreConfiguredAuthorization($configuration);
     }
 

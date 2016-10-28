@@ -34,8 +34,7 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
             $auth->setClientPublicId($preConfiguredAuthorization['client_public_id']);
             $auth->setResourceOwnerPublicId($preConfiguredAuthorization['resource_owner_public_id']);
             $auth->setUserAccountPublicId($preConfiguredAuthorization['user_account_public_id']);
-            $auth->setRequestedScopes($preConfiguredAuthorization['requested_scopes']);
-            $auth->setValidatedScopes($preConfiguredAuthorization['validated_scopes']);
+            $auth->setScopes($preConfiguredAuthorization['scopes']);
             $this->savePreConfiguredAuthorization($auth);
         }
     }
@@ -52,14 +51,14 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
                 'client_public_id'         => $client_manager->getClientByName('foo')->getPublicId(),
                 'resource_owner_public_id' => 'real_user1_public_id',
                 'user_account_public_id'   => 'user1',
-                'requested_scopes'         => ['openid', 'email', 'profile'],
+                'scopes'         => ['openid', 'email', 'profile'],
                 'validated_scopes'         => ['openid', 'email', 'profile'],
             ],
             [
                 'client_public_id'         => $client_manager->getClientByName('Mufasa')->getPublicId(),
                 'resource_owner_public_id' => 'real_user1_public_id',
                 'user_account_public_id'   => 'user1',
-                'requested_scopes'         => ['openid', 'email', 'profile'],
+                'scopes'                   => ['openid', 'email', 'profile'],
                 'validated_scopes'         => ['openid', 'email', 'profile'],
             ],
         ];
@@ -68,9 +67,9 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     /**
      * {@inheritdoc}
      */
-    public function findOnePreConfiguredAuthorization($resource_owner_public_id, $client_public_id, array $requested_scope)
+    public function findOnePreConfiguredAuthorization($resource_owner_public_id, $client_public_id, array $scope)
     {
-        $hash = $this->calculateHash($resource_owner_public_id, $client_public_id, $requested_scope);
+        $hash = $this->calculateHash($resource_owner_public_id, $client_public_id, $scope);
         if (array_key_exists($hash, $this->pre_configured_authorizations)) {
             return $this->pre_configured_authorizations[$hash];
         }
@@ -92,20 +91,19 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
         $hash = $this->calculateHash(
             $pre_configured_authorization->getResourceOwnerPublicId(),
             $pre_configured_authorization->getClientPublicId(),
-            $pre_configured_authorization->getRequestedScopes()
+            $pre_configured_authorization->getScopes()
         );
-
         $this->pre_configured_authorizations[$hash] = $pre_configured_authorization;
     }
 
     /**
      * @param string   $resource_owner_public_id
      * @param string   $client_public_id
-     * @param string[] $requested_scope
+     * @param string[] $scope
      *
      * @return string
      */
-    private function calculateHash($resource_owner_public_id, $client_public_id, array $requested_scope)
+    private function calculateHash($resource_owner_public_id, $client_public_id, array $scope)
     {
         return hash(
             'sha512',
@@ -113,7 +111,7 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
                 '%s%s%s',
                 $resource_owner_public_id,
                 $client_public_id,
-                implode(' ', $requested_scope)
+                implode(' ', $scope)
             )
         );
     }

@@ -24,13 +24,11 @@ class PreConfiguredAuthorizationTest extends \PHPUnit_Framework_TestCase
         $pca->setClientPublicId('foo');
         $pca->setResourceOwnerPublicId('bar');
         $pca->setUserAccountPublicId('baz');
-        $pca->setRequestedScopes(['scope']);
-        $pca->setValidatedScopes([]);
+        $pca->setScopes(['scope']);
 
         $this->assertEquals('foo', $pca->getClientPublicId());
         $this->assertEquals('bar', $pca->getResourceOwnerPublicId());
         $this->assertEquals('baz', $pca->getUserAccountPublicId());
-        $this->assertEquals(['scope'], $pca->getRequestedScopes());
-        $this->assertEquals([], $pca->getValidatedScopes());
+        $this->assertEquals(['scope'], $pca->getScopes());
     }
 }

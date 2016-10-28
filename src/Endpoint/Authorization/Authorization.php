@@ -140,6 +140,14 @@ final class Authorization implements AuthorizationInterface
     /**
      * {@inheritdoc}
      */
+    public function setScopes(array $scope)
+    {
+        $this->scopes = $scope;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getScopes()
     {
         return $this->scopes;
@@ -158,10 +166,20 @@ final class Authorization implements AuthorizationInterface
     /**
      * {@inheritdoc}
      */
-    public function unsetScope($scope)
+    public function removeScope($scope)
     {
         if (true === $this->hasScope($scope)) {
             unset($this->scopes[array_search($scope, $this->scopes)]);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addScope($scope)
+    {
+        if (false === $this->hasScope($scope)) {
+            $this->scopes[] = $scope;
         }
     }
 
