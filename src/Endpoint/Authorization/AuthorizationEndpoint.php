@@ -74,6 +74,8 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
      * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
      * @param \Psr\Http\Message\ServerRequestInterface              $request
      * @param \Psr\Http\Message\ResponseInterface                   $response
+     *
+     * @return array
      */
     abstract protected function processConsentScreen(AuthorizationInterface $authorization, ServerRequestInterface $request, ResponseInterface &$response);
 
@@ -97,7 +99,9 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         } catch (Exception\CreateRedirectionException $e) {
             $this->createRedirectionException($e->getAuthorization(), $response, $e->getMessage(), $e->getDescription());
         } catch (Exception\ShowConsentScreenException $e) {
-            $this->processConsentScreen($e->getAuthorization(), $request, $response);
+            $form_data = $this->processConsentScreen($e->getAuthorization(), $request, $response);
+            $form_data = $form_data ? : [];
+            $this->processAfterConsentScreenIsAccepted($e->getAuthorization(), $form_data);
         } catch (Exception\RedirectToLoginPageException $e) {
             $this->redirectToLoginPage($e->getAuthorization(), $request, $response);
         } catch (Exception\AuthorizationException $e) {
@@ -292,6 +296,32 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     {
         foreach ($this->extensions as $extension) {
             $extension->processAfterUserAccountComputation($user_account, $is_fully_authenticated, $request, $response, $authorization);
+        }
+    }
+
+    /**
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     *
+     * @return array
+     */
+    protected function processConsentScreenOptions(AuthorizationInterface $authorization)
+    {
+        $option = [];
+        foreach ($this->extensions as $extension) {
+            $extension->processConsentScreenOptions($authorization, $option);
+        }
+
+        return $option;
+    }
+
+    /**
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     * @param array                                                 $form_data
+     */
+    protected function processAfterConsentScreenIsAccepted(AuthorizationInterface $authorization, array $form_data)
+    {
+        foreach ($this->extensions as $extension) {
+            $extension->processAfterConsentScreenIsAccepted($authorization, $form_data);
         }
     }
 }

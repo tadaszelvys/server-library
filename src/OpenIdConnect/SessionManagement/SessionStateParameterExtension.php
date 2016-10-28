@@ -65,6 +65,22 @@ abstract class SessionStateParameterExtension implements AuthorizationEndpointEx
     /**
      * {@inheritdoc}
      */
+    public function processConsentScreenOptions(AuthorizationInterface $authorization, array &$options)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processAfterConsentScreenIsAccepted(AuthorizationInterface $authorization, array $form_data)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
     {
         //Nothing to do

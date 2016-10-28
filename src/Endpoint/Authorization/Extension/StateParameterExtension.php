@@ -59,4 +59,20 @@ final class StateParameterExtension implements AuthorizationEndpointExtensionInt
     {
         //Nothing to do
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processConsentScreenOptions(AuthorizationInterface $authorization, array &$options)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processAfterConsentScreenIsAccepted(AuthorizationInterface $authorization, array $form_data)
+    {
+        //Nothing to do
+    }
 }

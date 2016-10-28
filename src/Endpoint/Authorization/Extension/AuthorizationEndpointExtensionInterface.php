@@ -58,4 +58,16 @@ interface AuthorizationEndpointExtensionInterface
      * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
      */
     public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization);
+
+    /**
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     * @param array                                                 $options
+     */
+    public function processConsentScreenOptions(AuthorizationInterface $authorization, array &$options);
+
+    /**
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     * @param array                                                 $form_data
+     */
+    public function processAfterConsentScreenIsAccepted(AuthorizationInterface $authorization, array $form_data);
 }

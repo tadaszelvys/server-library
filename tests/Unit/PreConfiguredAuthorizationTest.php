@@ -27,7 +27,6 @@ class PreConfiguredAuthorizationTest extends \PHPUnit_Framework_TestCase
         $pca->setRequestedScopes(['scope']);
         $pca->setValidatedScopes([]);
 
-
         $this->assertEquals('foo', $pca->getClientPublicId());
         $this->assertEquals('bar', $pca->getResourceOwnerPublicId());
         $this->assertEquals('baz', $pca->getUserAccountPublicId());

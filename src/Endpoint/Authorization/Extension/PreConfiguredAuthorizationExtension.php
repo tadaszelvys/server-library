@@ -93,6 +93,32 @@ final class PreConfiguredAuthorizationExtension implements AuthorizationEndpoint
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function processConsentScreenOptions(AuthorizationInterface $authorization, array &$options)
+    {
+        $options['is_pre_configured_authorization_enabled'] = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processAfterConsentScreenIsAccepted(AuthorizationInterface $authorization, array $form_data)
+    {
+        if (!array_key_exists('save_authorization', $form_data) || false === $form_data['save_authorization']) {
+            return;
+        }
+
+        $configuration = $this->getPreConfiguredAuthorizationManager()->createPreConfiguredAuthorization();
+        $configuration->setClientPublicId($authorization->getClient()->getPublicId());
+        $configuration->setResourceOwnerPublicId($authorization->getUserAccount()->getUserPublicId());
+        $configuration->setUserAccountPublicId($authorization->getUserAccount()->getPublicId());
+        $configuration->setRequestedScopes($authorization->getScopes());
+        //$configuration->setValidatedScopes($authorization->getValidatedScopes());
+        $this->getPreConfiguredAuthorizationManager()->savePreConfiguredAuthorization($configuration);
+    }
+
+    /**
      * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
      *
      * @return null|\OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface
