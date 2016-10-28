@@ -593,7 +593,6 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->authorization_endpoint) {
             $this->authorization_endpoint = new AuthorizationEndpoint(
-                $this->getUserAccountManager(),
                 $this->getAuthorizationFactory(),
                 $this->getExceptionManager()
             );

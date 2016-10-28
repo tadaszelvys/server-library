@@ -127,7 +127,8 @@ class ImplicitGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $user_account = $this->getUserAccountManager()->getUserAccountByUsername('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(false);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -144,7 +145,8 @@ class ImplicitGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $user_account = $this->getUserAccountManager()->getUserAccountByUsername('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -210,7 +212,8 @@ class ImplicitGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $user_account = $this->getUserAccountManager()->getUserAccountByUsername('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -280,7 +283,8 @@ class ImplicitGrantTypeTest extends Base
             'state'         => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $user_account = $this->getUserAccountManager()->getUserAccountByUsername('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -334,7 +338,8 @@ class ImplicitGrantTypeTest extends Base
             'state'        => '012345679',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $user_account = $this->getUserAccountManager()->getUserAccountByUsername('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
         $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
@@ -405,7 +410,8 @@ class ImplicitGrantTypeTest extends Base
             'state'        => '012345679',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $user_account = $this->getUserAccountManager()->getUserAccountByUsername('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -425,7 +431,8 @@ class ImplicitGrantTypeTest extends Base
             'state'                 => '0123456789',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $user_account = $this->getUserAccountManager()->getUserAccountByUsername('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -443,7 +450,8 @@ class ImplicitGrantTypeTest extends Base
             'response_mode'         => 'form_post',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $user_account = $this->getUserAccountManager()->getUserAccountByUsername('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
@@ -486,7 +494,8 @@ class ImplicitGrantTypeTest extends Base
             'response_mode'         => 'query',
         ]);
         $response = new Response();
-        $this->getAuthorizationEndpoint()->setCurrentUserAccount('user1');
+        $user_account = $this->getUserAccountManager()->getUserAccountByUsername('user1');
+        $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 

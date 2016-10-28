@@ -14,13 +14,14 @@ namespace OAuth2\Test\Stub;
 use Assert\Assertion;
 use OAuth2\Endpoint\Authorization\AuthorizationEndpoint as Base;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\UserAccount\UserAccountInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AuthorizationEndpoint extends Base
 {
     /**
-     * @var null|string
+     * @var null|\OAuth2\UserAccount\UserAccountInterface
      */
     private $current_user_account = null;
 
@@ -39,13 +40,13 @@ class AuthorizationEndpoint extends Base
      */
     protected function getCurrentUserAccount()
     {
-        return null === $this->current_user_account ? null : $this->getUserAccountManager()->getUserAccountByUsername($this->current_user_account);
+        return $this->current_user_account;
     }
 
     /**
-     * @param string $current_user_account
+     * @param \OAuth2\UserAccount\UserAccountInterface|null $current_user_account
      */
-    public function setCurrentUserAccount($current_user_account)
+    public function setCurrentUserAccount(UserAccountInterface $current_user_account = null)
     {
         $this->current_user_account = $current_user_account;
     }

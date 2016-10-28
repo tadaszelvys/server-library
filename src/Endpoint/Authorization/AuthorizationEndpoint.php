@@ -12,21 +12,18 @@
 namespace OAuth2\Endpoint\Authorization;
 
 use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasUserAccountManager;
 use OAuth2\Endpoint\Authorization\Extension\AuthorizationEndpointExtensionInterface;
 use OAuth2\Endpoint\Authorization\Extension\StateParameterExtension;
 use OAuth2\Exception\BaseExceptionInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\ResponseMode\QueryResponseMode;
 use OAuth2\UserAccount\UserAccountInterface;
-use OAuth2\UserAccount\UserAccountManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 {
     use HasExceptionManager;
-    use HasUserAccountManager;
 
     /**
      * @var \OAuth2\Endpoint\Authorization\Extension\AuthorizationEndpointExtensionInterface[]
@@ -41,14 +38,12 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * AuthorizationEndpoint constructor.
      *
-     * @param \OAuth2\UserAccount\UserAccountManagerInterface              $user_account_manager
      * @param \OAuth2\Endpoint\Authorization\AuthorizationFactoryInterface $authorization_factory
      * @param \OAuth2\Exception\ExceptionManagerInterface                  $exception_manager
      */
-    public function __construct(UserAccountManagerInterface $user_account_manager, AuthorizationFactoryInterface $authorization_factory, ExceptionManagerInterface $exception_manager)
+    public function __construct(AuthorizationFactoryInterface $authorization_factory, ExceptionManagerInterface $exception_manager)
     {
         $this->authorization_factory = $authorization_factory;
-        $this->setUserAccountManager($user_account_manager);
         $this->setExceptionManager($exception_manager);
         $this->addExtension(new StateParameterExtension());
     }
