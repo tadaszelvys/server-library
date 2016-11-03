@@ -95,7 +95,9 @@ class JWTAccessTokenManager extends AccessTokenManager
         $payload = $this->preparePayload($access_token, $resource_server);
         $signature_header = $this->prepareSignatureHeader();
         $signature_key = $this->signature_key_set->getKey(0);
+        Assertion::notNull($signature_key, 'Unable to find a key to sign the Access Token. Please verify the selected key set contains suitable keys.');
         $encryption_key = $this->key_encryption_key_set->getKey(0);
+        Assertion::notNull($signature_key, 'Unable to find a key to encrypt the Access Token. Please verify the selected key set contains suitable keys.');
         $jwt = $this->getJWTCreator()->sign($payload, $signature_header, $signature_key);
 
         $encryption_header = $this->prepareEncryptionHeader($client, $resource_server);

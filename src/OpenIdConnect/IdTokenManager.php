@@ -157,7 +157,8 @@ class IdTokenManager implements IdTokenManagerInterface
             'typ'       => 'JWT',
             'alg'       => $this->getSignatureAlgorithm(),
         ];
-        $signature_key = $this->signature_key_set->getKey(0);
+        $signature_key = $this->signature_key_set->selectKey('sig', $this->getSignatureAlgorithm());
+        Assertion::notNull($signature_key, 'Unable to find a key to sign the ID Token. Please verify the selected key set contains suitable keys.');
         if ($signature_key->has('kid')) {
             $headers['kid'] = $signature_key->get('kid');
         }

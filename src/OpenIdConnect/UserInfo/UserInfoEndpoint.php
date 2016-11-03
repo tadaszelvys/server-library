@@ -219,6 +219,7 @@ final class UserInfoEndpoint implements UserInfoEndpointInterface
     private function signAndEncrypt($claims, ClientInterface $client)
     {
         $signature_key = $this->signature_key_set->getKey(0);
+        Assertion::notNull($signature_key, 'Unable to find a key to sign the userinfo response. Please verify the selected key set contains suitable keys.');
         $jwt = $this->getJWTCreator()->sign(
             $claims,
             [
