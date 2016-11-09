@@ -11,7 +11,6 @@
 
 namespace OAuth2\Client;
 
-use Base64Url\Base64Url;
 use OAuth2\Client\Rule\RuleInterface;
 
 abstract class ClientManager implements ClientManagerInterface
