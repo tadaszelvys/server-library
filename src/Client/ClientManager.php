@@ -27,7 +27,6 @@ abstract class ClientManager implements ClientManagerInterface
     public function createClient()
     {
         $client = new Client();
-        $client->set('client_id', Base64Url::encode(random_bytes(50)));
         $client->set('client_id_issued_at', time());
 
         return $client;

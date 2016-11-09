@@ -52,11 +52,6 @@ trait ClientTrait
      */
     abstract public function get($metadata);
 
-    public function getPublicId()
-    {
-        return $this->get('client_id');
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -207,6 +202,9 @@ trait ClientTrait
      */
     public function jsonSerialize()
     {
-        return $this->all();
+        $all = $this->all();
+        $all['client_id'] = $this->getPublicId();
+
+        return $all;
     }
 }
