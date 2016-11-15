@@ -74,7 +74,7 @@ This method just create an empty client. By default only the `client_id` and the
 
 You can populate the client with your own parameters before you save it.
 This is not the recommended method unless you know exactly what your are doing with clients.
-The preferred way is to add rules and use the method `createClientFromParameters`.
+The preferred way is to use the Rule Manager and the method `processParametersForClient`.
 
 ### Rules
 

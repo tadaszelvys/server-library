@@ -706,6 +706,49 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @var null|\OAuth2\Client\Rule\RuleManager
+     */
+    private $client_rule_manager = null;
+
+    /**
+     * @return null|\OAuth2\Client\Rule\RuleManager
+     */
+    protected function getClientRuleManager()
+    {
+        if (null === $this->client_rule_manager) {
+            $this->client_rule_manager = new Rule\RuleManager();
+
+            $this->client_rule_manager->addRule(new Rule\GrantTypeFlowRule(
+                $this->getGrantTypeManager(),
+                $this->getResponseTypeManager()
+            ));
+
+            $scope_rule = new Rule\ScopeRule($this->getScopeManager());
+
+            $this->client_rule_manager->addRule(new Rule\RedirectionUriRule());
+            $this->client_rule_manager->addRule(new Rule\RequestUriRule());
+            $this->client_rule_manager->addRule($scope_rule);
+
+            $sector_identifier_uri_rule = new Rule\SectorIdentifierUriRule();
+            $sector_identifier_uri_rule->disallowHttpConnections();
+            $sector_identifier_uri_rule->allowHttpConnections(); // We allow http connections
+            $sector_identifier_uri_rule->disallowUnsecuredConnections();
+            $sector_identifier_uri_rule->allowUnsecuredConnections(); // We allow unsecured connections because we send request against the local server for all tests. Should not be used in production.
+            $this->client_rule_manager->addRule($sector_identifier_uri_rule);
+            $this->client_rule_manager->addRule(new Rule\TokenEndpointAuthMethodEndpointRule(
+                $this->getTokenEndpointAuthMethodManager()
+            ));
+            $this->client_rule_manager->addRule(new Rule\IdTokenEncryptionAlgorithmsRule($this->getIdTokenManager()));
+            $this->client_rule_manager->addRule(new Rule\SubjectTypeRule($this->getUserInfo()));
+            $this->client_rule_manager->addRule(new Rule\CommonParametersRule());
+            $this->client_rule_manager->addRule(new Rule\SoftwareRule());
+            $this->client_rule_manager->addRule(new ClientRegistrationManagementRule());
+        }
+
+        return $this->client_rule_manager;
+    }
+
+    /**
      * @var null|\OAuth2\Test\Stub\ClientManager
      */
     private $client_manager = null;
@@ -717,31 +760,6 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->client_manager) {
             $this->client_manager = new ClientManager();
-            $this->client_manager->addRule(new Rule\GrantTypeFlowRule(
-                $this->getGrantTypeManager(),
-                $this->getResponseTypeManager()
-            ));
-
-            $scope_rule = new Rule\ScopeRule($this->getScopeManager());
-
-            $this->client_manager->addRule(new Rule\RedirectionUriRule());
-            $this->client_manager->addRule(new Rule\RequestUriRule());
-            $this->client_manager->addRule($scope_rule);
-
-            $sector_identifier_uri_rule = new Rule\SectorIdentifierUriRule();
-            $sector_identifier_uri_rule->disallowHttpConnections();
-            $sector_identifier_uri_rule->allowHttpConnections(); // We allow http connections
-            $sector_identifier_uri_rule->disallowUnsecuredConnections();
-            $sector_identifier_uri_rule->allowUnsecuredConnections(); // We allow unsecured connections because we send request against the local server for all tests. Should not be used in production.
-            $this->client_manager->addRule($sector_identifier_uri_rule);
-            $this->client_manager->addRule(new Rule\TokenEndpointAuthMethodEndpointRule(
-                $this->getTokenEndpointAuthMethodManager()
-            ));
-            $this->client_manager->addRule(new Rule\IdTokenEncryptionAlgorithmsRule($this->getIdTokenManager()));
-            $this->client_manager->addRule(new Rule\SubjectTypeRule($this->getUserInfo()));
-            $this->client_manager->addRule(new Rule\CommonParametersRule());
-            $this->client_manager->addRule(new Rule\SoftwareRule());
-            $this->client_manager->addRule(new ClientRegistrationManagementRule());
         }
 
         return $this->client_manager;
@@ -1288,6 +1306,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->client_registration_endpoint) {
             $this->client_registration_endpoint = new ClientRegistrationEndpoint(
                 $this->getClientManager(),
+                $this->getClientRuleManager(),
                 $this->getExceptionManager()
             );
             $this->client_registration_endpoint->enableSoftwareStatementSupport(

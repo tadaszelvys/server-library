@@ -11,15 +11,8 @@
 
 namespace OAuth2\Client;
 
-use OAuth2\Client\Rule\RuleInterface;
-
 abstract class ClientManager implements ClientManagerInterface
 {
-    /**
-     * @var \OAuth2\Client\Rule\RuleInterface[]
-     */
-    private $rules = [];
-
     /**
      * {@inheritdoc}
      */
@@ -29,34 +22,5 @@ abstract class ClientManager implements ClientManagerInterface
         $client->set('client_id_issued_at', time());
 
         return $client;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createClientFromParameters(array $parameters)
-    {
-        $client = $this->createClient();
-        foreach ($this->rules as $rule) {
-            $rule->check($client, $parameters);
-        }
-
-        return $client;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addRule(RuleInterface $rule)
-    {
-        $this->rules[] = $rule;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRules()
-    {
-        return $this->rules;
     }
 }
