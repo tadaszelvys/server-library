@@ -209,7 +209,6 @@ class JWTAccessTokenManager extends AccessTokenManager
         $access_token->setToken($assertion);
         $access_token->setJWS($jwt);
         $access_token->setClientPublicId($jwt->getClaim('sub'));
-        $access_token->setTokenType($jwt->getClaim('token_type'));
         $access_token->setResourceOwnerPublicId($jwt->getClaim('resource_owner'));
         $access_token->setUserAccountPublicId($jwt->getClaim('user_account'));
 
@@ -219,6 +218,7 @@ class JWTAccessTokenManager extends AccessTokenManager
         if ($jwt->hasClaim('other')) {
             $access_token->setParameters($jwt->getClaim('other'));
         }
+        $access_token->setParameter('token_type', $jwt->getClaim('token_type'));
         if ($jwt->hasClaim('cnf')) {
             $access_token->setParameter('cnf', $jwt->getClaim('cnf'));
         }

@@ -129,10 +129,11 @@ class ObjectsTest extends Base
         $access_token = new AccessToken();
         $access_token->setExpiresAt(0);
         $access_token->setToken('foo');
-        $access_token->setTokenType('bar');
+        $access_token->setParameter('token_type', 'bar');
         $access_token->setScope(['bar', 'baz']);
         $this->assertFalse($access_token->hasScope('foo'));
         $this->assertTrue($access_token->hasScope('bar'));
+        $this->assertEquals('bar', $access_token->getTokenType());
 
         $this->assertEquals([
             'access_token' => 'foo',

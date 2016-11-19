@@ -11,7 +11,7 @@
 
 namespace OAuth2\Token;
 
-interface AccessTokenInterface extends TokenInterface, \JsonSerializable
+interface AccessTokenInterface extends OAuth2TokenInterface, \JsonSerializable
 {
     /**
      * The token type (bearer, mac...).
@@ -19,23 +19,6 @@ interface AccessTokenInterface extends TokenInterface, \JsonSerializable
      * @return string
      */
     public function getTokenType();
-
-    /**
-     * @param string $token_type
-     */
-    public function setTokenType($token_type);
-
-    /**
-     * The unique token string to identify the Access Token.
-     *
-     * @return string
-     */
-    public function getToken();
-
-    /**
-     * @param string $token
-     */
-    public function setToken($token);
 
     /**
      * The refresh token associated with the access token.

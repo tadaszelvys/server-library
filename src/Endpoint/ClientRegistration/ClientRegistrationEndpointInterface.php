@@ -13,18 +13,18 @@ namespace OAuth2\Endpoint\ClientRegistration;
 
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
-use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Token\InitialAccessTokenInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface ClientRegistrationEndpointInterface
 {
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Psr\Http\Message\ResponseInterface      $response
-     * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
+     * @param \Psr\Http\Message\ServerRequestInterface        $request
+     * @param \Psr\Http\Message\ResponseInterface             $response
+     * @param \OAuth2\Token\InitialAccessTokenInterface|null  $initial_access_token
      */
-    public function register(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null);
+    public function register(ServerRequestInterface $request, ResponseInterface &$response, InitialAccessTokenInterface $initial_access_token = null);
 
     /**
      * @return bool

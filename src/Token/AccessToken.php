@@ -13,7 +13,7 @@ namespace OAuth2\Token;
 
 use Assert\Assertion;
 
-class AccessToken extends Token implements AccessTokenInterface
+class AccessToken extends OAuth2Token implements AccessTokenInterface
 {
     /**
      * @var string
@@ -30,16 +30,7 @@ class AccessToken extends Token implements AccessTokenInterface
      */
     public function getTokenType()
     {
-        return $this->token_type;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setTokenType($token_type)
-    {
-        Assertion::string($token_type);
-        $this->token_type = $token_type;
+        return $this->getParameter('token_type');
     }
 
     /**

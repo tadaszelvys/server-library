@@ -21,24 +21,9 @@ class Token implements TokenInterface
     protected $parameters = [];
 
     /**
-     * @var array
-     */
-    protected $metadatas = [];
-
-    /**
-     * @var array
-     */
-    protected $scope = [];
-
-    /**
      * @var string
      */
     protected $token;
-
-    /**
-     * @var string
-     */
-    protected $client_public_id;
 
     /**
      * @var int
@@ -46,30 +31,9 @@ class Token implements TokenInterface
     protected $expires_at;
 
     /**
-     * @var string
-     */
-    protected $resource_owner_public_id;
-
-    /**
      * @var string|null
      */
     protected $user_account_public_id;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getClientPublicId()
-    {
-        return $this->client_public_id;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setClientPublicId($client_public_id)
-    {
-        $this->client_public_id = $client_public_id;
-    }
 
     /**
      * {@inheritdoc}
@@ -85,46 +49,6 @@ class Token implements TokenInterface
     public function setToken($token)
     {
         $this->token = $token;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasScope($scope)
-    {
-        return in_array($scope, $this->getScope());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getScope()
-    {
-        return $this->scope;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setScope(array $scope)
-    {
-        $this->scope = $scope;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getResourceOwnerPublicId()
-    {
-        return $this->resource_owner_public_id;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setResourceOwnerPublicId($resource_owner_public_id)
-    {
-        $this->resource_owner_public_id = $resource_owner_public_id;
     }
 
     /**
@@ -240,62 +164,6 @@ class Token implements TokenInterface
         Assertion::string($key);
         if (array_key_exists($key, $this->parameters)) {
             unset($this->parameters[$key]);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadatas()
-    {
-        return $this->metadatas;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setMetadatas(array $metadatas)
-    {
-        $this->metadatas = $metadatas;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setMetadata($key, $value)
-    {
-        Assertion::string($key);
-        $this->metadatas[$key] = $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadata($key)
-    {
-        Assertion::true($this->hasMetadata($key), sprintf('Metadata with key "%s" does not exist.', $key));
-
-        return $this->metadatas[$key];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasMetadata($key)
-    {
-        Assertion::string($key);
-
-        return array_key_exists($key, $this->metadatas);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unsetMetadata($key)
-    {
-        Assertion::string($key);
-        if (array_key_exists($key, $this->metadatas)) {
-            unset($this->metadatas[$key]);
         }
     }
 }

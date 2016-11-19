@@ -67,7 +67,7 @@ class JWTAccessTokenManager extends Base
         $abcd->setClientPublicId($client_manager->getClientByName('Mufasa')->getPublicId());
         $abcd->setRefreshToken(null);
         $abcd->setToken('ABCD');
-        $abcd->setTokenType('Bearer');
+        $abcd->setParameter('token_type', 'Bearer');
         $abcd->setParameter('foo', 'bar');
         $abcd->setMetadatas(['plic', 'ploc', 'pluc']);
 
@@ -79,7 +79,7 @@ class JWTAccessTokenManager extends Base
         $efgh->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
         $efgh->setRefreshToken('REFRESH_EFGH');
         $efgh->setToken('EFGH');
-        $efgh->setTokenType('Bearer');
+        $efgh->setParameter('token_type', 'Bearer');
 
         $initial_access_token = new AccessToken();
         $initial_access_token->setExpiresAt(time() + 3600);
@@ -88,7 +88,7 @@ class JWTAccessTokenManager extends Base
         $initial_access_token->setScope(['urn:oauth:v2:client:registration']);
         $initial_access_token->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
         $initial_access_token->setToken('INITIAL_ACCESS_TOKEN');
-        $initial_access_token->setTokenType('Bearer');
+        $initial_access_token->setParameter('token_type', 'Bearer');
 
         $no_user_info = new AccessToken();
         $no_user_info->setExpiresAt(time() + 3600);
@@ -97,7 +97,7 @@ class JWTAccessTokenManager extends Base
         $no_user_info->setScope(['scope1']);
         $no_user_info->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
         $no_user_info->setToken('NO_USER_INFO');
-        $no_user_info->setTokenType('Bearer');
+        $no_user_info->setParameter('token_type', 'Bearer');
         $no_user_info->setMetadata('redirect_uri', 'https://example.com');
         $no_user_info->setMetadata('claims_locales', null);
         $no_user_info->setMetadata('requested_claims', ['id_token' => ['website' => ['essential' => false], 'picture' => ['essential' => false], 'email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['website' => ['essential' => false], 'picture' => ['essential' => false], 'email' => ['essential' => true], 'email_verified' => ['essential' => true]]]);
@@ -109,7 +109,7 @@ class JWTAccessTokenManager extends Base
         $user_info->setScope(['openid', 'profile', 'address', 'phone']);
         $user_info->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
         $user_info->setToken('USER_INFO');
-        $user_info->setTokenType('Bearer');
+        $user_info->setParameter('token_type', 'Bearer');
         $user_info->setMetadata('redirect_uri', 'https://example.com');
         $user_info->setMetadata('claims_locales', ['fr_fr', 'fr']);
         $user_info->setMetadata('requested_claims', ['id_token' => ['website' => ['essential' => false], 'picture' => ['essential' => false], 'email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['website' => ['essential' => false], 'picture' => ['essential' => false], 'email' => ['essential' => true], 'email_verified' => ['essential' => true]]]);
@@ -121,7 +121,7 @@ class JWTAccessTokenManager extends Base
         $user_info2->setScope(['openid', 'profile', 'address', 'phone']);
         $user_info2->setClientPublicId($client_manager->getClientByName('jwt1')->getPublicId());
         $user_info2->setToken('USER_INFO2');
-        $user_info2->setTokenType('Bearer');
+        $user_info2->setParameter('token_type', 'Bearer');
         $user_info2->setMetadata('redirect_uri', 'https://example2.com');
         $user_info2->setMetadata('claims_locales', null);
         $user_info2->setMetadata('requested_claims', ['id_token' => ['website' => ['essential' => false], 'picture' => ['essential' => false], 'email' => ['essential' => true], 'email_verified' => ['essential' => true]], 'userinfo' => ['website' => ['essential' => false], 'picture' => ['essential' => false], 'email' => ['essential' => true], 'email_verified' => ['essential' => true]]]);
@@ -133,8 +133,8 @@ class JWTAccessTokenManager extends Base
         $user_info_mac->setScope(['openid', 'profile', 'address', 'phone']);
         $user_info_mac->setClientPublicId($client_manager->getClientByName('jwt1')->getPublicId());
         $user_info_mac->setToken('USER_INFO_MAC');
-        $user_info_mac->setTokenType('MAC');
         $user_info_mac->setParameters([
+            'token_type'    => 'MAC',
             'mac_key'       => 'Ajpw1Q2mebV8kz4',
             'mac_algorithm' => 'hmac-sha-256',
         ]);

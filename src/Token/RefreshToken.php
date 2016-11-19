@@ -11,6 +11,6 @@
 
 namespace OAuth2\Token;
 
-class RefreshToken extends Token implements RefreshTokenInterface
+class RefreshToken extends OAuth2Token implements RefreshTokenInterface
 {
 }

@@ -11,7 +11,7 @@
 
 namespace OAuth2\Token;
 
-interface AuthCodeInterface extends TokenInterface
+interface AuthCodeInterface extends OAuth2TokenInterface
 {
     /**
      * @return bool A refresh token is asked and authorized by the resource owner and/or the authorization server

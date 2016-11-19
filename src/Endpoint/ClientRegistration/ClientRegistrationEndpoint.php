@@ -23,12 +23,12 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Client\Rule\RuleManagerInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Token\AccessTokenInterface;
+use OAuth2\Token\InitialAccessTokenInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
+class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
 {
     use HasExceptionManager;
     use HasClientManager;
@@ -122,11 +122,11 @@ abstract class ClientRegistrationEndpoint implements ClientRegistrationEndpointI
     /**
      * {@inheritdoc}
      */
-    public function register(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null)
+    public function register(ServerRequestInterface $request, ResponseInterface &$response, InitialAccessTokenInterface $initial_access_token = null)
     {
         try {
-            $this->checkRequest($request, $access_token);
-            $this->handleRequest($request, $response, $access_token);
+            $this->checkRequest($request, $initial_access_token);
+            $this->handleRequest($request, $response, $initial_access_token);
         } catch (BaseException $e) {
             $e->getHttpResponse($response);
 
@@ -140,41 +140,37 @@ abstract class ClientRegistrationEndpoint implements ClientRegistrationEndpointI
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface $access_token
-     *
-     * @return bool
-     */
-    abstract protected function isAccessTokenForClientRegistration(AccessTokenInterface $access_token);
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
+     * @param \Psr\Http\Message\ServerRequestInterface        $request
+     * @param \OAuth2\Token\InitialAccessTokenInterface|null  $initial_access_token
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function checkRequest(ServerRequestInterface $request, AccessTokenInterface $access_token = null)
+    private function checkRequest(ServerRequestInterface $request, InitialAccessTokenInterface $initial_access_token = null)
     {
         Assertion::true($this->isRequestSecured($request), 'The request must be secured.');
         Assertion::eq('POST', $request->getMethod(), 'Method must be POST.');
-        Assertion::false(null === $access_token && true === $this->is_initial_access_token_required, 'Initial access token required.');
+        if (null === $initial_access_token) {
+            Assertion::false($this->isInitialAccessTokenRequired(), 'Initial access token required.');
+        } else {
+            Assertion::false($initial_access_token->hasExpired(), 'Expired initial access token.');
+        }
     }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface      $response
-     * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
+     * @param \OAuth2\Token\InitialAccessTokenInterface|null  $initial_access_token
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response, AccessTokenInterface $access_token = null)
+    private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response, InitialAccessTokenInterface $initial_access_token = null)
     {
         $request_parameters = RequestBody::getParameters($request);
         $this->checkSoftwareStatement($request_parameters);
         $client = $this->getClientManager()->createClient();
         $this->getClientRuleManager()->processParametersForClient($client, $request_parameters);
-        if (null !== $access_token) {
-            Assertion::true($this->isAccessTokenForClientRegistration($access_token), 'Invalid Initial Access Token.');
-            $client->setResourceOwnerPublicId($access_token->getResourceOwnerPublicId());
+        if (null !== $initial_access_token) {
+            $client->setResourceOwnerPublicId($initial_access_token->getUserAccountPublicId());
         } else {
             Assertion::false($this->isInitialAccessTokenRequired(), 'Initial Access Token required.');
         }

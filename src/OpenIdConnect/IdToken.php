@@ -11,9 +11,9 @@
 
 namespace OAuth2\OpenIdConnect;
 
-use OAuth2\Token\Token;
+use OAuth2\Token\OAuth2Token;
 
-class IdToken extends Token implements IdTokenInterface
+class IdToken extends OAuth2Token implements IdTokenInterface
 {
     /**
      * @var string

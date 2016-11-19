@@ -37,6 +37,7 @@ use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseModeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseTypeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ScopeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\StateParameterChecker;
+use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
 use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationEndpoint;
@@ -84,12 +85,12 @@ use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\AuthorizationEndpoint;
 use OAuth2\Test\Stub\ClientAssertionJwt;
 use OAuth2\Test\Stub\ClientManager;
-use OAuth2\Test\Stub\ClientRegistrationEndpoint;
 use OAuth2\Test\Stub\ClientRegistrationManagementRule;
 use OAuth2\Test\Stub\ClientSecretBasic;
 use OAuth2\Test\Stub\ClientSecretPost;
 use OAuth2\Test\Stub\DistributedClaimSource;
 use OAuth2\Test\Stub\FooBarAccessTokenUpdater;
+use OAuth2\Test\Stub\InitialAccessTokenManager;
 use OAuth2\Test\Stub\JWTAccessTokenManager;
 use OAuth2\Test\Stub\NoneListener;
 use OAuth2\Test\Stub\PreConfiguredAuthorizationManager;
@@ -1291,6 +1292,23 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->pre_configured_authorization_manager;
+    }
+
+    /**
+     * @var null|\OAuth2\Test\Stub\InitialAccessTokenManager
+     */
+    private $initial_access_token_manager = null;
+
+    /**
+     * @return \OAuth2\Test\Stub\InitialAccessTokenManager
+     */
+    protected function getInitialAccessTokenManager()
+    {
+        if (null === $this->initial_access_token_manager) {
+            $this->initial_access_token_manager = new InitialAccessTokenManager();
+        }
+
+        return $this->initial_access_token_manager;
     }
 
     /**

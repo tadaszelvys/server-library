@@ -11,7 +11,7 @@
 
 namespace OAuth2\Token;
 
-class AuthCode extends Token implements AuthCodeInterface
+class AuthCode extends OAuth2Token implements AuthCodeInterface
 {
     /**
      * @var bool

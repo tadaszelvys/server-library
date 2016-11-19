@@ -24,16 +24,6 @@ interface TokenInterface
     public function setToken($token);
 
     /**
-     * @return string The public ID of the client associated with the token
-     */
-    public function getClientPublicId();
-
-    /**
-     * @param string $client_public_id
-     */
-    public function setClientPublicId($client_public_id);
-
-    /**
      * @return int
      */
     public function getExpiresAt();
@@ -52,37 +42,6 @@ interface TokenInterface
      * @return int Seconds before the token expiration date
      */
     public function getExpiresIn();
-
-    /**
-     * @param string $scope
-     *
-     * @return bool
-     */
-    public function hasScope($scope);
-
-    /**
-     * The scopes associated with the token.
-     *
-     * @return string[] An array of scope
-     */
-    public function getScope();
-
-    /**
-     * @param string[] $scope
-     */
-    public function setScope(array $scope);
-
-    /**
-     * The resource owner associated to the token.
-     *
-     * @return string The public ID of the resource owner associated with the token
-     */
-    public function getResourceOwnerPublicId();
-
-    /**
-     * @param string $resource_owner_public_id
-     */
-    public function setResourceOwnerPublicId($resource_owner_public_id);
 
     /**
      * The user account associated to the token.
@@ -135,37 +94,4 @@ interface TokenInterface
      * @param string $key
      */
     public function unsetParameter($key);
-
-    /**
-     * @return array
-     */
-    public function getMetadatas();
-
-    /**
-     * @param array $metadatas
-     */
-    public function setMetadatas(array $metadatas);
-
-    /**
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return mixed
-     */
-    public function setMetadata($key, $value);
-
-    /**
-     * @param string $key
-     */
-    public function getMetadata($key);
-
-    /**
-     * @param string $key
-     */
-    public function hasMetadata($key);
-
-    /**
-     * @param string $key
-     */
-    public function unsetMetadata($key);
 }

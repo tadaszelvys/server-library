@@ -77,11 +77,7 @@ abstract class AccessTokenManager implements AccessTokenManagerInterface
         $access_token->setMetadatas($metadatas);
 
         foreach ($token_type_parameters as $key => $value) {
-            if ('token_type' === $key) {
-                $access_token->setTokenType($value);
-            } else {
-                $access_token->setParameter($key, $value);
-            }
+            $access_token->setParameter($key, $value);
         }
 
         $this->updateAccessToken($access_token);
