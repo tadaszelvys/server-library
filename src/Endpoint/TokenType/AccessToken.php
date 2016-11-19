@@ -36,7 +36,7 @@ class AccessToken implements IntrospectionTokenTypeInterface, RevocationTokenTyp
     /**
      * AccessToken constructor.
      *
-     * @param \OAuth2\Token\AccessTokenManagerInterface       $access_token_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
      */
     public function __construct(AccessTokenManagerInterface $access_token_manager)
     {

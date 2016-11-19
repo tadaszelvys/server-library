@@ -9,30 +9,22 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration;
+namespace OAuth2\Endpoint\ClientConfiguration;
 
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
+use OAuth2\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface ClientRegistrationEndpointInterface
+interface ClientConfigurationEndpointInterface
 {
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface       $request
-     * @param \Psr\Http\Message\ResponseInterface            $response
-     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface|null $initial_access_token
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface      $response
+     * @param \OAuth2\Client\ClientInterface           $client
      */
-    public function register(ServerRequestInterface $request, ResponseInterface &$response, InitialAccessTokenInterface $initial_access_token = null);
-
-    /**
-     * @return bool
-     */
-    public function isInitialAccessTokenRequired();
-
-    public function allowRegistrationWithoutInitialAccessToken();
-
-    public function disallowRegistrationWithoutInitialAccessToken();
+    public function handle(ServerRequestInterface $request, ResponseInterface &$response, ClientInterface $client);
 
     /**
      * @param \Jose\JWTLoaderInterface     $jwt_loader

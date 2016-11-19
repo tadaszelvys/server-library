@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\ClientRegistration;
+namespace OAuth2\Endpoint\ClientConfiguration;
 
 use Assert\Assertion;
 use Jose\JWTLoaderInterface;
@@ -23,16 +23,22 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Client\Rule\RuleManagerInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Token\BearerToken;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
+class ClientConfigurationEndpoint implements ClientConfigurationEndpointInterface
 {
     use HasExceptionManager;
     use HasClientManager;
     use HasClientRuleManager;
     use HasJWTLoader;
+
+    /**
+     * @var \OAuth2\Token\BearerToken
+     */
+    private $bearer_token;
 
     /**
      * @var bool
@@ -45,40 +51,19 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
     private $software_statement_signature_key_set;
 
     /**
-     * @var bool
-     */
-    private $is_initial_access_token_required = false;
-
-    /**
-     * ClientRegistrationEndpoint constructor.
+     * ClientConfigurationEndpoint constructor.
      *
+     * @param \OAuth2\Token\BearerToken                   $bearer_token
      * @param \OAuth2\Client\ClientManagerInterface       $client_manager
      * @param \OAuth2\Client\Rule\RuleManagerInterface    $client_rule_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
-    public function __construct(ClientManagerInterface $client_manager, RuleManagerInterface $client_rule_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct(BearerToken $bearer_token, ClientManagerInterface $client_manager, RuleManagerInterface $client_rule_manager, ExceptionManagerInterface $exception_manager)
     {
+        $this->bearer_token = $bearer_token;
         $this->setClientManager($client_manager);
         $this->setClientRuleManager($client_rule_manager);
         $this->setExceptionManager($exception_manager);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isInitialAccessTokenRequired()
-    {
-        return $this->is_initial_access_token_required;
-    }
-
-    public function allowRegistrationWithoutInitialAccessToken()
-    {
-        $this->is_initial_access_token_required = false;
-    }
-
-    public function disallowRegistrationWithoutInitialAccessToken()
-    {
-        $this->is_initial_access_token_required = true;
     }
 
     /**
@@ -121,11 +106,23 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function register(ServerRequestInterface $request, ResponseInterface &$response, InitialAccessTokenInterface $initial_access_token = null)
+    public function handle(ServerRequestInterface $request, ResponseInterface &$response, ClientInterface $client)
     {
         try {
-            $this->checkRequest($request, $initial_access_token);
-            $this->handleRequest($request, $response, $initial_access_token);
+            $this->checkRequestAndClient($request, $client);
+            switch ($request->getMethod()) {
+                case 'GET':
+                    $this->handleGet($response, $client);
+                    break;
+                case 'PUT':
+                    $this->handlePut($request, $response, $client);
+                    break;
+                case 'DELETE':
+                    $this->handleDelete($response, $client);
+                    break;
+                default:
+                    throw new \InvalidArgumentException('Unsupported method.');
+            }
         } catch (BaseException $e) {
             $e->getHttpResponse($response);
         } catch (\InvalidArgumentException $e) {
@@ -134,43 +131,50 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
         }
     }
 
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface                             $request
-     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface|null $initial_access_token
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    private function checkRequest(ServerRequestInterface $request, InitialAccessTokenInterface $initial_access_token = null)
+    private function checkRequestAndClient(ServerRequestInterface $request, ClientInterface $client)
     {
         Assertion::true($this->isRequestSecured($request), 'The request must be secured.');
-        Assertion::eq('POST', $request->getMethod(), 'Method must be POST.');
-        if (null === $initial_access_token) {
-            Assertion::false($this->isInitialAccessTokenRequired(), 'Initial access token required.');
-        } else {
-            Assertion::false($initial_access_token->hasExpired(), 'Expired initial access token.');
-        }
+        Assertion::true($client->has('registration_access_token'), 'Invalid client.');
+        $token = $this->bearer_token->findToken($request, $values);
+        Assertion::notNull($token, '');
+        Assertion::eq($token, $client->get('registration_access_token'), 'Invalid access token.');
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface                             $request
-     * @param \Psr\Http\Message\ResponseInterface                                  $response
-     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface|null $initial_access_token
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @return bool
      */
-    private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response, InitialAccessTokenInterface $initial_access_token = null)
+    private function isRequestSecured(ServerRequestInterface $request)
+    {
+        $server_params = $request->getServerParams();
+
+        return !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
+    }
+
+    /**
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param \OAuth2\Client\ClientInterface      $client
+     */
+    private function handleGet(ResponseInterface &$response, ClientInterface $client)
+    {
+        $this->processResponseWithClient($response, $client);
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface      $response
+     * @param \OAuth2\Client\ClientInterface           $client
+     */
+    private function handlePut(ServerRequestInterface $request, ResponseInterface &$response, ClientInterface $client)
     {
         $request_parameters = RequestBody::getParameters($request);
+        $this->checkPreservedParameters($request_parameters);
         $this->checkSoftwareStatement($request_parameters);
-        $client = $this->getClientManager()->createClient();
+        /*$client = $this->getClientManager()->createClient();
         $this->getClientRuleManager()->processParametersForClient($client, $request_parameters);
-        if (null !== $initial_access_token) {
-            $client->setResourceOwnerPublicId($initial_access_token->getUserAccountPublicId());
-        } else {
-            Assertion::false($this->isInitialAccessTokenRequired(), 'Initial Access Token required.');
-        }
         $this->getClientManager()->saveClient($client);
-        $this->processResponse($response, $client);
+        $this->processResponseWithClient($response, $client);*/
     }
 
     /**
@@ -186,6 +190,17 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
             }
         } elseif (array_key_exists('software_statement', $request_parameters)) {
             throw new \InvalidArgumentException('Software Statement parameter not supported.');
+        }
+    }
+
+    /**
+     * @param array $request_parameters
+     */
+    private function checkPreservedParameters(array $request_parameters)
+    {
+        $preserved_parameters = ['registration_access_token', 'registration_client_uri', 'client_secret_expires_at', 'client_id_issued_at'];
+        foreach ($preserved_parameters as $preserved_parameter) {
+            Assertion::keyNotExists($request_parameters, $preserved_parameter, sprintf('The parameters "%s" is not allowed.', $preserved_parameter));
         }
     }
 
@@ -210,7 +225,25 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
      * @param \Psr\Http\Message\ResponseInterface $response
      * @param \OAuth2\Client\ClientInterface      $client
      */
-    private function processResponse(ResponseInterface &$response, ClientInterface $client)
+    private function handleDelete(ResponseInterface &$response, ClientInterface $client)
+    {
+        $this->getClientManager()->deleteClient($client);
+        $response->getBody()->write(json_encode($client));
+        $headers = [
+            'Cache-Control' => 'no-store, private',
+            'Pragma'        => 'no-cache',
+        ];
+        foreach ($headers as $key => $value) {
+            $response = $response->withHeader($key, $value);
+        }
+        $response = $response->withStatus(204);
+    }
+
+    /**
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param \OAuth2\Client\ClientInterface      $client
+     */
+    private function processResponseWithClient(ResponseInterface &$response, ClientInterface $client)
     {
         $response->getBody()->write(json_encode($client));
         $headers = [
@@ -222,17 +255,5 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
             $response = $response->withHeader($key, $value);
         }
         $response = $response->withStatus(200);
-    }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return bool
-     */
-    private function isRequestSecured(ServerRequestInterface $request)
-    {
-        $server_params = $request->getServerParams();
-
-        return !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
     }
 }

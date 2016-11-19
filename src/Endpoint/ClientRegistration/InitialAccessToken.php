@@ -9,7 +9,9 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Token;
+namespace OAuth2\Endpoint\ClientRegistration;
+
+use OAuth2\Token\Token;
 
 class InitialAccessToken extends Token implements InitialAccessTokenInterface
 {

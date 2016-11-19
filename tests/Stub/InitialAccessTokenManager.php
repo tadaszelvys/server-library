@@ -11,9 +11,9 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Token\InitialAccessToken;
-use OAuth2\Token\InitialAccessTokenInterface;
-use OAuth2\Token\InitialAccessTokenManager as Base;
+use OAuth2\Endpoint\ClientRegistration\InitialAccessToken;
+use OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface;
+use OAuth2\Endpoint\ClientRegistration\InitialAccessTokenManager as Base;
 
 class InitialAccessTokenManager extends Base
 {

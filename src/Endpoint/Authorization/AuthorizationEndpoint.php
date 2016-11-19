@@ -95,7 +95,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             $this->createRedirectionException($e->getAuthorization(), $response, $e->getMessage(), $e->getDescription());
         } catch (Exception\ShowConsentScreenException $e) {
             $form_data = $this->processConsentScreen($e->getAuthorization(), $request, $response);
-            $form_data = $form_data ? : [];
+            $form_data = $form_data ?: [];
             $this->processAfterConsentScreenIsAccepted($e->getAuthorization(), $form_data);
         } catch (Exception\RedirectToLoginPageException $e) {
             $this->redirectToLoginPage($e->getAuthorization(), $request, $response);

@@ -51,7 +51,7 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
                 'client_public_id'         => $client_manager->getClientByName('foo')->getPublicId(),
                 'resource_owner_public_id' => 'real_user1_public_id',
                 'user_account_public_id'   => 'user1',
-                'scopes'         => ['openid', 'email', 'profile'],
+                'scopes'                   => ['openid', 'email', 'profile'],
                 'validated_scopes'         => ['openid', 'email', 'profile'],
             ],
             [

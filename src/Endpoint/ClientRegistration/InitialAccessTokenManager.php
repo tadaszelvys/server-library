@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Token;
+namespace OAuth2\Endpoint\ClientRegistration;
 
 use Assert\Assertion;
 use OAuth2\UserAccount\UserAccountInterface;
@@ -22,7 +22,7 @@ abstract class InitialAccessTokenManager implements InitialAccessTokenManagerInt
     private $initial_access_token_lifetime = 3600;
 
     /**
-     * @return \OAuth2\Token\InitialAccessTokenInterface
+     * @return \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface
      */
     protected function createEmptyInitialAccessToken()
     {

@@ -85,11 +85,11 @@ class Listener implements ListenerInterface
     private function checkAccessToken($type, $access_token, ServerRequestInterface $request, array $additional_credential_values)
     {
         if (null === $access_token) {
-            $schemes = ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes(['all' => ['error' => sprintf('"%s"', ExceptionManagerInterface::INVALID_TOKEN), 'error_description' => '"Access token does not exist or is not valid."',]])];
+            $schemes = ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes(['all' => ['error' => sprintf('"%s"', ExceptionManagerInterface::INVALID_TOKEN), 'error_description' => '"Access token does not exist or is not valid."']])];
             throw $this->getExceptionManager()->getAuthenticateException(ExceptionManagerInterface::INVALID_TOKEN, 'Access token does not exist or is not valid.', $schemes);
         }
         if (false === $type->isTokenRequestValid($access_token, $request, $additional_credential_values)) {
-            $schemes = ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes([$type->getTokenTypeName() => ['error' => sprintf('"%s"', ExceptionManagerInterface::INVALID_TOKEN), 'error_description' => '"Access token does not exist or is not valid."',]])];
+            $schemes = ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes([$type->getTokenTypeName() => ['error' => sprintf('"%s"', ExceptionManagerInterface::INVALID_TOKEN), 'error_description' => '"Access token does not exist or is not valid."']])];
             throw $this->getExceptionManager()->getAuthenticateException(ExceptionManagerInterface::INVALID_TOKEN, 'Access token does not exist or is not valid.', $schemes);
         }
     }
@@ -103,7 +103,7 @@ class Listener implements ListenerInterface
     private function checkToken($token, array $additional_authentication_parameters)
     {
         if (null === $token) {
-            $this->mergeAdditionalAuthenticationParameters('all', $additional_authentication_parameters, ['error' => sprintf('"%s"', ExceptionManagerInterface::INVALID_TOKEN), 'error_description' => '"Access token required."',]);
+            $this->mergeAdditionalAuthenticationParameters('all', $additional_authentication_parameters, ['error' => sprintf('"%s"', ExceptionManagerInterface::INVALID_TOKEN), 'error_description' => '"Access token required."']);
             throw $this->getExceptionManager()->getAuthenticateException(ExceptionManagerInterface::INVALID_TOKEN, 'Access token required.', ['schemes' => $this->getTokenTypeManager()->getTokenTypeSchemes($additional_authentication_parameters)]);
         }
     }

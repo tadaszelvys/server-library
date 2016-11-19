@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Token;
+namespace OAuth2\Endpoint\ClientRegistration;
 
 use OAuth2\UserAccount\UserAccountInterface;
 
@@ -21,19 +21,19 @@ interface InitialAccessTokenManagerInterface
      * @param \OAuth2\UserAccount\UserAccountInterface $owner                 Resource owner associated with the initial access token.
      * @param array                                    $token_type_parameters The parameters from token type to add to the initial access token
      *
-     * @return \OAuth2\Token\InitialAccessTokenInterface
+     * @return \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface
      */
     public function createInitialAccessToken(UserAccountInterface $owner, array $token_type_parameters);
 
     /**
-     * @param \OAuth2\Token\InitialAccessTokenInterface $initial_access_token
+     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface $initial_access_token
      */
     public function saveInitialAccessToken(InitialAccessTokenInterface $initial_access_token);
 
     /**
      * This function revoke an initial access token.
      *
-     * @param \OAuth2\Token\InitialAccessTokenInterface $token The initial access token to revoke
+     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface $token The initial access token to revoke
      */
     public function revokeInitialAccessToken(InitialAccessTokenInterface $token);
 
@@ -43,12 +43,12 @@ interface InitialAccessTokenManagerInterface
      *
      * @param string $initial_access_token The initial access token
      *
-     * @return \OAuth2\Token\InitialAccessTokenInterface|null Return the initial access token or null if the argument is not a valid initial access token
+     * @return \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface|null Return the initial access token or null if the argument is not a valid initial access token
      */
     public function getInitialAccessToken($initial_access_token);
 
     /**
-     * @param \OAuth2\Token\InitialAccessTokenInterface $token
+     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface $token
      *
      * @return bool True if the initial access token is valid, else false
      */

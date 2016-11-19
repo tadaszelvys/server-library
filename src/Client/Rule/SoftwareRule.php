@@ -22,7 +22,7 @@ class SoftwareRule implements RuleInterface
     {
         foreach (['software_id', 'software_version', 'software_statement'] as $key) {
             if (array_key_exists($key, $registration_parameters)) {
-                $client->set($key,$registration_parameters[$key]);
+                $client->set($key, $registration_parameters[$key]);
             }
         }
     }

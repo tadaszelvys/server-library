@@ -11,6 +11,7 @@
 
 namespace OAuth2\Test\Stub;
 
+use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Client\ClientManager as Base;
 
@@ -65,6 +66,15 @@ class ClientManager extends Base
     public function saveClient(ClientInterface $client)
     {
         $this->client_ids[$client->getPublicId()] = $client;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteClient(ClientInterface $client)
+    {
+        Assertion::keyExists($client->getPublicId(), $this->client_ids);
+        unset($this->client_ids[$client->getPublicId()]);
     }
 
     /**

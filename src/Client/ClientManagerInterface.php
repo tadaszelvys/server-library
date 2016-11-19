@@ -33,4 +33,11 @@ interface ClientManagerInterface
      * @param \OAuth2\Client\ClientInterface $client
      */
     public function saveClient(ClientInterface $client);
+
+    /**
+     * Delete the client.
+     *
+     * @param \OAuth2\Client\ClientInterface $client
+     */
+    public function deleteClient(ClientInterface $client);
 }
