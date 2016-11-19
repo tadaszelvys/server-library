@@ -67,6 +67,14 @@ final class IdTokenGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function checkAuthorization(AuthorizationInterface $authorization)
+    {
+        //Nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function prepareAuthorization(AuthorizationInterface $authorization)
     {
         if (!in_array('openid', $authorization->getScopes())) {

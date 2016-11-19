@@ -73,6 +73,16 @@ final class ImplicitGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function checkAuthorization(AuthorizationInterface $authorization)
+    {
+        if (false === $this->areConfidentialClientsAllowed() && false === $authorization->getClient()->isPublic()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients are not allowed to use the implicit grant type.');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
         //Nothing to do
@@ -83,9 +93,6 @@ final class ImplicitGrantType implements ResponseTypeInterface
      */
     public function prepareAuthorization(AuthorizationInterface $authorization)
     {
-        if (false === $this->areConfidentialClientsAllowed() && false === $authorization->getClient()->isPublic()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients are not allowed to use the implicit grant type.');
-        }
         $token_type = $this->getTokenTypeFromRequest($authorization->getQueryParams());
 
         $token = $this->getAccessTokenManager()->createAccessToken(

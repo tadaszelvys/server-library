@@ -140,7 +140,10 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     protected function prepareAuthorization(ServerRequestInterface $request, ResponseInterface &$response)
     {
         try {
-            return $this->authorization_factory->createAuthorizationFromRequest($request);
+            $authorization = $this->authorization_factory->createAuthorizationFromRequest($request);
+            $this->checkAuthorization($authorization);
+
+            return $authorization;
         } catch (BaseExceptionInterface $e) {
             $params = $request->getQueryParams();
             if (array_key_exists('redirect_uri', $params)) {
@@ -169,6 +172,19 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             }
         }
         throw new Exception\AuthorizationException();
+    }
+
+    /**
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     *
+     * @throws \OAuth2\Endpoint\Authorization\Exception\CreateRedirectionException
+     */
+    protected function checkAuthorization(AuthorizationInterface $authorization)
+    {
+        $types = $authorization->getResponseTypes();
+        foreach ($types as $type) {
+            $type->checkAuthorization($authorization);
+        }
     }
 
     /**

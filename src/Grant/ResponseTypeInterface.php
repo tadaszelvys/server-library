@@ -43,6 +43,17 @@ interface ResponseTypeInterface
     public function getResponseMode();
 
     /**
+     * This function checks the authorization.
+     *
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization The authorization object
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     *
+     * @return array
+     */
+    public function checkAuthorization(AuthorizationInterface $authorization);
+
+    /**
      * This function checks the request and prepare the authorization response.
      *
      * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization The authorization object

@@ -117,6 +117,16 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
     /**
      * {@inheritdoc}
      */
+    public function checkAuthorization(AuthorizationInterface $authorization)
+    {
+        if (false === $this->arePublicClientsAllowed() && true === $authorization->getClient()->isPublic()) {
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Public clients are not allowed to use the authorization code grant type.');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
         //Nothing to do
@@ -127,9 +137,6 @@ final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTy
      */
     public function prepareAuthorization(AuthorizationInterface $authorization)
     {
-        if (false === $this->arePublicClientsAllowed() && true === $authorization->getClient()->isPublic()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Public clients are not allowed to use the authorization code grant type.');
-        }
         $offline_access = $this->isOfflineAccess($authorization);
 
         $code = $this->getAuthorizationCodeManager()->createAuthCode(
