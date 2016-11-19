@@ -37,7 +37,6 @@ use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseModeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseTypeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ScopeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\StateParameterChecker;
-use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
 use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationEndpoint;
@@ -85,6 +84,7 @@ use OAuth2\Test\Stub\AuthCodeManager;
 use OAuth2\Test\Stub\AuthorizationEndpoint;
 use OAuth2\Test\Stub\ClientAssertionJwt;
 use OAuth2\Test\Stub\ClientManager;
+use OAuth2\Test\Stub\ClientRegistrationEndpoint;
 use OAuth2\Test\Stub\ClientRegistrationManagementRule;
 use OAuth2\Test\Stub\ClientSecretBasic;
 use OAuth2\Test\Stub\ClientSecretPost;
@@ -1313,6 +1313,11 @@ class Base extends \PHPUnit_Framework_TestCase
                 $this->getJWTLoader(),
                 $this->getSignatureKeySet()
             );
+
+            $this->client_registration_endpoint->allowRegistrationWithoutInitialAccessToken();
+            $this->client_registration_endpoint->disallowRegistrationWithoutInitialAccessToken();
+            $this->client_registration_endpoint->disallowRegistrationWithoutSoftwareStatement();
+            $this->client_registration_endpoint->allowRegistrationWithoutSoftwareStatement();
         }
 
         return $this->client_registration_endpoint;

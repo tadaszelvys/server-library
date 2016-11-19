@@ -18,7 +18,7 @@ use OAuth2\Security\Handler\AccessTokenHandlerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class Listener implements ListenerInterface
+class Listener implements ListenerInterface
 {
     use HasExceptionManager;
     use HasTokenTypeManager;

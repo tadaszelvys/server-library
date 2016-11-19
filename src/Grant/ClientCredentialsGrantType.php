@@ -16,7 +16,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class ClientCredentialsGrantType implements GrantTypeInterface
+class ClientCredentialsGrantType implements GrantTypeInterface
 {
     use HasExceptionManager;
 

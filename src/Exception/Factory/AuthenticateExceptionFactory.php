@@ -13,7 +13,7 @@ namespace OAuth2\Exception\Factory;
 
 use OAuth2\Exception\AuthenticateException;
 
-final class AuthenticateExceptionFactory implements ExceptionFactoryInterface
+class AuthenticateExceptionFactory implements ExceptionFactoryInterface
 {
     /**
      * {@inheritdoc}

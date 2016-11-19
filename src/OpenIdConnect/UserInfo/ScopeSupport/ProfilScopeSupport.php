@@ -11,7 +11,7 @@
 
 namespace OAuth2\OpenIdConnect\UserInfo\ScopeSupport;
 
-final class ProfilScopeSupport implements UserInfoScopeSupportInterface
+class ProfilScopeSupport implements UserInfoScopeSupportInterface
 {
     /**
      * {@inheritdoc}

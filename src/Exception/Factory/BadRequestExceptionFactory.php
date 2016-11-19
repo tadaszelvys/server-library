@@ -13,7 +13,7 @@ namespace OAuth2\Exception\Factory;
 
 use OAuth2\Exception\BadRequestException;
 
-final class BadRequestExceptionFactory implements ExceptionFactoryInterface
+class BadRequestExceptionFactory implements ExceptionFactoryInterface
 {
     /**
      * {@inheritdoc}

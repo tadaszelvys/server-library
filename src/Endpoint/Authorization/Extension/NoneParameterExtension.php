@@ -18,7 +18,7 @@ use OAuth2\UserAccount\UserAccountInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
+class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
 {
     /**
      * {@inheritdoc}

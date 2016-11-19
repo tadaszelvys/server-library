@@ -18,7 +18,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Grant\GrantTypeManagerInterface;
 use OAuth2\Grant\ResponseTypeManagerInterface;
 
-final class GrantTypeFlowRule implements RuleInterface
+class GrantTypeFlowRule implements RuleInterface
 {
     use HasResponseTypeManager;
     use HasGrantTypeManager;

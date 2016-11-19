@@ -17,7 +17,7 @@ use OAuth2\Token\RefreshTokenInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Token\TokenInterface;
 
-final class RefreshToken implements IntrospectionTokenTypeInterface, RevocationTokenTypeInterface
+class RefreshToken implements IntrospectionTokenTypeInterface, RevocationTokenTypeInterface
 {
     use HasRefreshTokenManager;
 

@@ -21,7 +21,7 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerInterface
+class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerInterface
 {
     use HasClientManager;
     use HasExceptionManager;

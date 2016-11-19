@@ -16,7 +16,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\ResponseMode\ResponseModeInterface;
 use OAuth2\UserAccount\UserAccountInterface;
 
-final class Authorization implements AuthorizationInterface
+class Authorization implements AuthorizationInterface
 {
     /**
      * @var bool

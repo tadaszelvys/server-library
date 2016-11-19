@@ -16,7 +16,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
 use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
 
-final class SubjectTypeRule implements RuleInterface
+class SubjectTypeRule implements RuleInterface
 {
     use HasUserinfo;
 

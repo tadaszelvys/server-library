@@ -14,7 +14,7 @@ namespace OAuth2\Client\Rule;
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 
-final class CommonParametersRule extends AbstractInternationalizedRule
+class CommonParametersRule extends AbstractInternationalizedRule
 {
     /**
      * {@inheritdoc}

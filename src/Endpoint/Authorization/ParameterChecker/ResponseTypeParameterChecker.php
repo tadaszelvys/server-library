@@ -15,7 +15,7 @@ use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
-final class ResponseTypeParameterChecker implements ParameterCheckerInterface
+class ResponseTypeParameterChecker implements ParameterCheckerInterface
 {
     /**
      * {@inheritdoc}

@@ -26,7 +26,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\UserAccount\UserAccountManagerInterface;
 
-final class UserInfoEndpoint implements UserInfoEndpointInterface
+class UserInfoEndpoint implements UserInfoEndpointInterface
 {
     use HasExceptionManager;
     use HasUserAccountManager;

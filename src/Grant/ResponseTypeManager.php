@@ -13,7 +13,7 @@ namespace OAuth2\Grant;
 
 use Assert\Assertion;
 
-final class ResponseTypeManager implements ResponseTypeManagerInterface
+class ResponseTypeManager implements ResponseTypeManagerInterface
 {
     /**
      * @var \OAuth2\Grant\ResponseTypeInterface[]

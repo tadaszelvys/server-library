@@ -13,7 +13,7 @@ namespace OAuth2\Client\Rule;
 
 use OAuth2\Client\ClientInterface;
 
-final class SoftwareRule implements RuleInterface
+class SoftwareRule implements RuleInterface
 {
     /**
      * {@inheritdoc}

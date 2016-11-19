@@ -13,7 +13,7 @@ namespace OAuth2\OpenIdConnect\UserInfo\ScopeSupport;
 
 use Assert\Assertion;
 
-final class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterface
+class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterface
 {
     /**
      * @var \OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportInterface[]

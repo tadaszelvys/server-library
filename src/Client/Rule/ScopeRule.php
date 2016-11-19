@@ -16,7 +16,7 @@ use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Scope\ScopeManagerInterface;
 
-final class ScopeRule implements RuleInterface
+class ScopeRule implements RuleInterface
 {
     use HasScopeManager;
 

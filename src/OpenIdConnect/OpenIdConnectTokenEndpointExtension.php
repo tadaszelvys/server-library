@@ -21,7 +21,7 @@ use OAuth2\UserAccount\UserAccountManagerInterface;
 /**
  * Class OpenIdConnectTokenEndpointExtension.
  */
-final class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensionInterface
+class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensionInterface
 {
     /**
      * @var \OAuth2\OpenIdConnect\IdTokenManagerInterface

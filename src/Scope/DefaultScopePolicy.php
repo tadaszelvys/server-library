@@ -13,7 +13,7 @@ namespace OAuth2\Scope;
 
 use OAuth2\Client\ClientInterface;
 
-final class DefaultScopePolicy implements ScopePolicyInterface
+class DefaultScopePolicy implements ScopePolicyInterface
 {
     /**
      * @var string[]

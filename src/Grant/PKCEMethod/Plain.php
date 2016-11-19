@@ -11,7 +11,7 @@
 
 namespace OAuth2\Grant\PKCEMethod;
 
-final class Plain implements PKCEMethodInterface
+class Plain implements PKCEMethodInterface
 {
     /**
      * {@inheritdoc}

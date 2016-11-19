@@ -23,7 +23,7 @@ use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
+class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
 {
     use HasExceptionManager;
     use HasTokenEndpointAuthMethodManager;

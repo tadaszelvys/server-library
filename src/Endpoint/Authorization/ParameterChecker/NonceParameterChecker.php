@@ -20,7 +20,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
  *
  * @see http://tools.ietf.org/html/rfc6749#section-3.1.2
  */
-final class NonceParameterChecker implements ParameterCheckerInterface
+class NonceParameterChecker implements ParameterCheckerInterface
 {
     /**
      * {@inheritdoc}

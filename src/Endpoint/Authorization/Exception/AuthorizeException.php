@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint\Authorization\Exception;
 
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 
-final class AuthorizeException extends \Exception
+class AuthorizeException extends \Exception
 {
     /**
      * @var \OAuth2\Endpoint\Authorization\AuthorizationInterface

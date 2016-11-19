@@ -13,7 +13,7 @@ namespace OAuth2\Util;
 
 use Assert\Assertion;
 
-final class Uri
+class Uri
 {
     /**
      * @param string $uri    The URI

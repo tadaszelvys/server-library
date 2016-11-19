@@ -15,7 +15,7 @@ use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
-final class ResponseModeParameterChecker implements ParameterCheckerInterface
+class ResponseModeParameterChecker implements ParameterCheckerInterface
 {
     /**
      * @var bool

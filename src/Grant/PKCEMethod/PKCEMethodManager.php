@@ -13,7 +13,7 @@ namespace OAuth2\Grant\PKCEMethod;
 
 use Assert\Assertion;
 
-final class PKCEMethodManager implements PKCEMethodManagerInterface
+class PKCEMethodManager implements PKCEMethodManagerInterface
 {
     /**
      * @var \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]

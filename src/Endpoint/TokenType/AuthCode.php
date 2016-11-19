@@ -17,7 +17,7 @@ use OAuth2\Token\AuthCodeInterface;
 use OAuth2\Token\AuthCodeManagerInterface;
 use OAuth2\Token\TokenInterface;
 
-final class AuthCode implements IntrospectionTokenTypeInterface, RevocationTokenTypeInterface
+class AuthCode implements IntrospectionTokenTypeInterface, RevocationTokenTypeInterface
 {
     use HasAuthorizationCodeManager;
 

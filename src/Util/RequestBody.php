@@ -13,7 +13,7 @@ namespace OAuth2\Util;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-final class RequestBody
+class RequestBody
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request The request

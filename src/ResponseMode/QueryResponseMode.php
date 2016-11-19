@@ -15,7 +15,7 @@ use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
 
-final class QueryResponseMode implements ResponseModeInterface
+class QueryResponseMode implements ResponseModeInterface
 {
     /**
      * {@inheritdoc}

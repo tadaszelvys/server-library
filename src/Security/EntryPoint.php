@@ -18,7 +18,7 @@ use OAuth2\Token\TokenTypeManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class EntryPoint implements EntryPointInterface
+class EntryPoint implements EntryPointInterface
 {
     use HasExceptionManager;
     use HasTokenTypeManager;

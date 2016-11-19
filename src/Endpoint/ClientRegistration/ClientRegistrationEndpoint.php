@@ -28,7 +28,7 @@ use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
+abstract class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
 {
     use HasExceptionManager;
     use HasClientManager;
@@ -140,6 +140,13 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
     }
 
     /**
+     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     *
+     * @return bool
+     */
+    abstract protected function isAccessTokenForClientRegistration(AccessTokenInterface $access_token);
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \OAuth2\Token\AccessTokenInterface|null  $access_token
      *
@@ -166,7 +173,10 @@ final class ClientRegistrationEndpoint implements ClientRegistrationEndpointInte
         $client = $this->getClientManager()->createClient();
         $this->getClientRuleManager()->processParametersForClient($client, $request_parameters);
         if (null !== $access_token) {
+            Assertion::true($this->isAccessTokenForClientRegistration($access_token), 'Invalid Initial Access Token.');
             $client->setResourceOwnerPublicId($access_token->getResourceOwnerPublicId());
+        } else {
+            Assertion::false($this->isInitialAccessTokenRequired(), 'Initial Access Token required.');
         }
         $this->getClientManager()->saveClient($client);
         $this->processResponse($response, $client);

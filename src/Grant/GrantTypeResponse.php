@@ -14,7 +14,7 @@ namespace OAuth2\Grant;
 use Assert\Assertion;
 use OAuth2\Token\RefreshTokenInterface;
 
-final class GrantTypeResponse implements GrantTypeResponseInterface
+class GrantTypeResponse implements GrantTypeResponseInterface
 {
     /**
      * @var array|null

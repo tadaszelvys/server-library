@@ -23,7 +23,7 @@ use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInterface
+class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInterface
 {
     use HasExceptionManager;
     use HasTokenEndpointAuthMethodManager;

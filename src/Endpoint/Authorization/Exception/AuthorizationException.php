@@ -11,6 +11,6 @@
 
 namespace OAuth2\Endpoint\Authorization\Exception;
 
-final class AuthorizationException extends \Exception
+class AuthorizationException extends \Exception
 {
 }

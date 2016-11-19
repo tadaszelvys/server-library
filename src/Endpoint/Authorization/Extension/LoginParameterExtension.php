@@ -17,7 +17,7 @@ use OAuth2\UserAccount\UserAccountInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class LoginParameterExtension implements AuthorizationEndpointExtensionInterface
+class LoginParameterExtension implements AuthorizationEndpointExtensionInterface
 {
     /**
      * {@inheritdoc}

@@ -20,7 +20,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 
-final class ImplicitGrantType implements ResponseTypeInterface
+class ImplicitGrantType implements ResponseTypeInterface
 {
     use HasExceptionManager;
     use HasTokenTypeManager;

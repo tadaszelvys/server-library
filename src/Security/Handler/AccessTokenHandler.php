@@ -21,7 +21,7 @@ use OAuth2\Token\AccessTokenManagerInterface;
  * If the resource server and the authorization server are on different applications, then you should use the
  * IntrospectionEndpointHandler class (to be written).
  */
-final class AccessTokenHandler implements AccessTokenHandlerInterface
+class AccessTokenHandler implements AccessTokenHandlerInterface
 {
     use HasAccessTokenManager;
 

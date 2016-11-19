@@ -32,12 +32,26 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertEquals('{"error":"invalid_request","error_description":"The request must be secured.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $response->getBody()->getContents());
     }
 
-    public function testNoAuthenticationMethod()
+    public function testNoInitialAccessToken()
     {
         $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on']);
 
         $response = new Response();
         $this->getClientRegistrationEndpoint()->register($request, $response);
+        $response->getBody()->rewind();
+        $content = $response->getBody()->getContents();
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('{"error":"invalid_request","error_description":"Initial access token required.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $content);
+    }
+
+    public function testNoAuthenticationMethod()
+    {
+        $request = $this->createRequest('/', 'POST', [], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
+
+        $response = new Response();
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -48,9 +62,10 @@ class ClientRegistrationEndpointTest extends Base
     public function testUnsupportedAuthenticationMethod()
     {
         $request = $this->createRequest('/', 'POST', ['token_endpoint_auth_method' => 'foo'], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -61,9 +76,10 @@ class ClientRegistrationEndpointTest extends Base
     public function testKeysNotSetForPrivateKeyJWTAuthenticationMethod()
     {
         $request = $this->createRequest('/', 'POST', ['token_endpoint_auth_method' => 'private_key_jwt'], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -76,9 +92,10 @@ class ClientRegistrationEndpointTest extends Base
         $keyset_as_array = json_decode('{"keys":[{"kid":"KEY","kty":"RSA","n":"3nsn7a7nHV_tfNlbH11p_9Bw6ZVDEjT6K4_GD9iTJ8wmYpbOSFFaqEdckeWa5GJThIAUrxjwXLDt41kldYuT295Rmr4EUG5fp-kzgXM4Y7TrWdevHY7kVddz8FWMU7CerJfVjqS3Z1u-V1ODdG_JtAoxdn0xBnab2a-lzCLeoPqKebJnfGKOUaJjwuKz8VkMMRPgT186z8TE-tBTgkGUF_qXF4P51_wZgsR1G-hc7p8WFzBcfX6SOKzyaRmxEhLAH-bpZwSLAG--7Hss0Rkfm7lub4xaG0V8OlePXjN0_E1u66splePcTswFQaXqIxEzWtCJKytF4OQViGNj8-ENew","e":"AQAB"}]}', true);
 
         $request = $this->createRequest('/', 'POST', ['token_endpoint_auth_method' => 'private_key_jwt', 'jwks' => $keyset_as_array], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -95,9 +112,10 @@ class ClientRegistrationEndpointTest extends Base
     public function testBadSectorIdentifierUriResponse()
     {
         $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://www.google.com', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -108,9 +126,10 @@ class ClientRegistrationEndpointTest extends Base
     public function testEmptySectorIdentifierUriResponse()
     {
         $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1:8181/empty_sector_identifier_uri', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -121,9 +140,10 @@ class ClientRegistrationEndpointTest extends Base
     public function testSectorIdentifierUriContainsBadValues()
     {
         $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1:8181/sector_identifier_uri_with_bad_values', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -134,9 +154,10 @@ class ClientRegistrationEndpointTest extends Base
     public function testSectorIdentifierUriContainsUriWithBadScheme()
     {
         $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1:8181/sector_identifier_uri_with_bad_scheme', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -147,9 +168,10 @@ class ClientRegistrationEndpointTest extends Base
     public function testSectorIdentifierUriResponse()
     {
         $request = $this->createRequest('/', 'POST', ['sector_identifier_uri' => 'https://127.0.0.1:8181/sector_identifier_uri', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -166,9 +188,10 @@ class ClientRegistrationEndpointTest extends Base
     public function testInvalidCharacterInTheScope()
     {
         $request = $this->createRequest('/', 'POST', ['scope' => 'read write &é~', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -179,9 +202,10 @@ class ClientRegistrationEndpointTest extends Base
     public function testClientCreatedWithScopeAndScopePolicy()
     {
         $request = $this->createRequest('/', 'POST', ['scope' => 'read write', 'default_scope' => 'read', 'scope_policy' => 'default', 'token_endpoint_auth_method' => 'none'], ['HTTPS' => 'on']);
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -222,9 +246,10 @@ class ClientRegistrationEndpointTest extends Base
             ],
             ['HTTPS' => 'on']
         );
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -307,39 +332,16 @@ class ClientRegistrationEndpointTest extends Base
             ],
             ['HTTPS' => 'on']
         );
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertTrue($this->getClientRegistrationEndpoint()->isSoftwareStatementSupported());
         $this->assertEquals('{"error":"invalid_request","error_description":"Software Statement required.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $content);
-    }
-
-    public function testFailedBecauseNoInitialAccessToken()
-    {
-        $this->getClientRegistrationEndpoint()->disallowRegistrationWithoutInitialAccessToken();
-        $request = $this->createRequest('/', 'POST',
-            [
-                'scope'                      => 'read write',
-                'default_scope'              => 'read',
-                'scope_policy'               => 'default',
-                'token_endpoint_auth_method' => 'none',
-                'client_name'                => 'My Example',
-                'client_name#fr'             => 'Mon Exemple',
-            ],
-            ['HTTPS' => 'on']
-        );
-
-        $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
-        $response->getBody()->rewind();
-        $content = $response->getBody()->getContents();
-
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('{"error":"invalid_request","error_description":"Initial access token required.","error_uri":"https:\/\/foo.test\/Error\/BadRequest\/invalid_request"}', $content);
     }
 
     public function testSuccessWithValidSoftwareStatement()
@@ -370,9 +372,10 @@ class ClientRegistrationEndpointTest extends Base
             ],
             ['HTTPS' => 'on']
         );
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -412,9 +415,10 @@ class ClientRegistrationEndpointTest extends Base
             ],
             ['HTTPS' => 'on']
         );
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 
@@ -438,9 +442,10 @@ class ClientRegistrationEndpointTest extends Base
             ],
             ['HTTPS' => 'on']
         );
+        $initial_access_token = $this->getJWTAccessTokenManager()->getAccessToken('INITIAL_ACCESS_TOKEN');
 
         $response = new Response();
-        $this->getClientRegistrationEndpoint()->register($request, $response);
+        $this->getClientRegistrationEndpoint()->register($request, $response, $initial_access_token);
         $response->getBody()->rewind();
         $content = $response->getBody()->getContents();
 

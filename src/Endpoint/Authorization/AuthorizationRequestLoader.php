@@ -24,7 +24,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
+class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
 {
     use HasJWTLoader;
     use HasClientManager;

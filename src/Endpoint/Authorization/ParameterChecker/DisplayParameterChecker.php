@@ -15,7 +15,7 @@ use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
-final class DisplayParameterChecker implements ParameterCheckerInterface
+class DisplayParameterChecker implements ParameterCheckerInterface
 {
     const DISPLAY_PAGE = 'page';
     const DISPLAY_POPUP = 'popup';

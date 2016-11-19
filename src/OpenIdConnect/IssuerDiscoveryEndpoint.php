@@ -21,7 +21,7 @@ use OAuth2\UserAccount\UserAccountManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
+class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
 {
     use HasUserAccountManager;
     use HasExceptionManager;

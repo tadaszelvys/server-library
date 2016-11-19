@@ -15,7 +15,7 @@ use Assert\Assertion;
 use OAuth2\ResponseMode\ResponseModeInterface;
 use Psr\Http\Message\ResponseInterface;
 
-final class RedirectException extends BaseException implements RedirectExceptionInterface
+class RedirectException extends BaseException implements RedirectExceptionInterface
 {
     /**
      * @var string

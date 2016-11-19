@@ -16,7 +16,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\OpenIdConnect\HasIdTokenManager;
 use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 
-final class IdTokenEncryptionAlgorithmsRule implements RuleInterface
+class IdTokenEncryptionAlgorithmsRule implements RuleInterface
 {
     use HasIdTokenManager;
 

@@ -16,7 +16,7 @@ use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Util\Uri;
 
-final class RedirectUriParameterChecker implements ParameterCheckerInterface
+class RedirectUriParameterChecker implements ParameterCheckerInterface
 {
     /**
      * @var bool

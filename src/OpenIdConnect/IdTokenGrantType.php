@@ -18,7 +18,7 @@ use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Token\TokenTypeManagerInterface;
 
-final class IdTokenGrantType implements ResponseTypeInterface
+class IdTokenGrantType implements ResponseTypeInterface
 {
     use HasTokenTypeManager;
     use HasIdTokenManager;

@@ -81,6 +81,15 @@ class JWTAccessTokenManager extends Base
         $efgh->setToken('EFGH');
         $efgh->setTokenType('Bearer');
 
+        $initial_access_token = new AccessToken();
+        $initial_access_token->setExpiresAt(time() + 3600);
+        $initial_access_token->setResourceOwnerPublicId('real_user1_public_id');
+        $initial_access_token->setUserAccountPublicId('user1');
+        $initial_access_token->setScope(['urn:oauth:v2:client:registration']);
+        $initial_access_token->setClientPublicId($client_manager->getClientByName('foo')->getPublicId());
+        $initial_access_token->setToken('INITIAL_ACCESS_TOKEN');
+        $initial_access_token->setTokenType('Bearer');
+
         $no_user_info = new AccessToken();
         $no_user_info->setExpiresAt(time() + 3600);
         $no_user_info->setResourceOwnerPublicId('real_user1_public_id');
@@ -139,6 +148,7 @@ class JWTAccessTokenManager extends Base
         $this->access_tokens[$user_info2->getToken()] = $user_info2;
         $this->access_tokens[$user_info_mac->getToken()] = $user_info_mac;
         $this->access_tokens[$no_user_info->getToken()] = $no_user_info;
+        $this->access_tokens[$initial_access_token->getToken()] = $initial_access_token;
     }
 
     /**

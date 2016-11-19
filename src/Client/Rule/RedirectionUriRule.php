@@ -14,7 +14,7 @@ namespace OAuth2\Client\Rule;
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 
-final class RedirectionUriRule implements RuleInterface
+class RedirectionUriRule implements RuleInterface
 {
     /**
      * {@inheritdoc}

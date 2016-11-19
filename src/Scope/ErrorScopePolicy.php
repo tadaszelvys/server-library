@@ -14,7 +14,7 @@ namespace OAuth2\Scope;
 use OAuth2\Client\ClientInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class ErrorScopePolicy implements ScopePolicyInterface
+class ErrorScopePolicy implements ScopePolicyInterface
 {
     /**
      * {@inheritdoc}

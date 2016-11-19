@@ -16,7 +16,7 @@ use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
-final class ParameterCheckerManager implements ParameterCheckerManagerInterface
+class ParameterCheckerManager implements ParameterCheckerManagerInterface
 {
     use HasScopeManager;
     use HasExceptionManager;

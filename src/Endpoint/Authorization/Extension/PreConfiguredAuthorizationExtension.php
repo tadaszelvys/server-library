@@ -22,7 +22,7 @@ use OAuth2\UserAccount\UserAccountInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtensionInterface
+class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtensionInterface
 {
     /**
      * @var \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface

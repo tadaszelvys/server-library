@@ -15,7 +15,7 @@ use Assert\Assertion;
 use GuzzleHttp\Client;
 use OAuth2\Client\ClientInterface;
 
-final class SectorIdentifierUriRule implements RuleInterface
+class SectorIdentifierUriRule implements RuleInterface
 {
     /**
      * @var bool

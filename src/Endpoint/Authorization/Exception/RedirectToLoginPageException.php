@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint\Authorization\Exception;
 
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 
-final class RedirectToLoginPageException extends \Exception
+class RedirectToLoginPageException extends \Exception
 {
     /**
      * @var \OAuth2\Endpoint\Authorization\AuthorizationInterface

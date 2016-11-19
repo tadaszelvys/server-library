@@ -25,7 +25,7 @@ use OAuth2\Token\AuthCodeManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInterface
+class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInterface
 {
     use HasExceptionManager;
     use HasAuthorizationCodeManager;

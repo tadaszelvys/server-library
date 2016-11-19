@@ -23,7 +23,7 @@ use OAuth2\Grant\ResponseTypeManagerInterface;
 use OAuth2\ResponseMode\ResponseModeManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class AuthorizationFactory implements AuthorizationFactoryInterface
+class AuthorizationFactory implements AuthorizationFactoryInterface
 {
     use HasJWTLoader;
     use HasExceptionManager;

@@ -28,7 +28,7 @@ use OAuth2\Token\TokenTypeManagerInterface;
  *
  * @see http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#none
  */
-final class NoneResponseType implements ResponseTypeInterface
+class NoneResponseType implements ResponseTypeInterface
 {
     use HasTokenTypeManager;
     use HasAccessTokenManager;

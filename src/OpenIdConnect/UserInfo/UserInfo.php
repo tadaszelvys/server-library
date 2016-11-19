@@ -18,7 +18,7 @@ use OAuth2\OpenIdConnect\ClaimSource\ClaimSourceManagerInterface;
 use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportManagerInterface;
 use OAuth2\UserAccount\UserAccountInterface;
 
-final class UserInfo implements UserInfoInterface
+class UserInfo implements UserInfoInterface
 {
     use HasExceptionManager;
     use HasPairwiseSubjectIdentifierSupport;

@@ -15,7 +15,7 @@ use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
 
-final class FragmentResponseMode implements ResponseModeInterface
+class FragmentResponseMode implements ResponseModeInterface
 {
     /**
      * {@inheritdoc}

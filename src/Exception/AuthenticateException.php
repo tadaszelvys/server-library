@@ -13,7 +13,7 @@ namespace OAuth2\Exception;
 
 use Assert\Assertion;
 
-final class AuthenticateException extends BaseException implements AuthenticateExceptionInterface
+class AuthenticateException extends BaseException implements AuthenticateExceptionInterface
 {
     private $header = [];
 

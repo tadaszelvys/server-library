@@ -13,7 +13,7 @@ namespace OAuth2\Exception\Factory;
 
 use OAuth2\Exception\RedirectException;
 
-final class RedirectExceptionFactory implements ExceptionFactoryInterface
+class RedirectExceptionFactory implements ExceptionFactoryInterface
 {
     /**
      * {@inheritdoc}

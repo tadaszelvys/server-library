@@ -24,7 +24,7 @@ use OAuth2\UserAccount\UserAccountManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
+class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
 {
     use HasIdTokenManager;
     use HasUserAccountManager;

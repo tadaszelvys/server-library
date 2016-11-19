@@ -15,7 +15,7 @@ use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 
-final class PromptParameterChecker implements ParameterCheckerInterface
+class PromptParameterChecker implements ParameterCheckerInterface
 {
     const PROMPT_NONE = 'none';
     const PROMPT_LOGIN = 'login';

@@ -16,7 +16,7 @@ use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 
-final class TokenEndpointAuthMethodEndpointRule implements RuleInterface
+class TokenEndpointAuthMethodEndpointRule implements RuleInterface
 {
     use HasTokenEndpointAuthMethodManager;
 

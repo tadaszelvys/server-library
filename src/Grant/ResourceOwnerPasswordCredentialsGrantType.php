@@ -19,7 +19,7 @@ use OAuth2\UserAccount\UserAccountManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
+class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
 {
     use HasExceptionManager;
     use HasUserAccountManager;

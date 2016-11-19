@@ -20,7 +20,7 @@ use OAuth2\Token\RefreshTokenManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class RefreshTokenGrantType implements GrantTypeInterface
+class RefreshTokenGrantType implements GrantTypeInterface
 {
     use HasExceptionManager;
     use HasRefreshTokenManager;

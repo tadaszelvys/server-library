@@ -13,7 +13,7 @@ namespace OAuth2\Grant;
 
 use Assert\Assertion;
 
-final class GrantTypeManager implements GrantTypeManagerInterface
+class GrantTypeManager implements GrantTypeManagerInterface
 {
     /**
      * @var \OAuth2\Grant\GrantTypeInterface[]

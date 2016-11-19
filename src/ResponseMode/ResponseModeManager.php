@@ -13,7 +13,7 @@ namespace OAuth2\ResponseMode;
 
 use Assert\Assertion;
 
-final class ResponseModeManager implements ResponseModeManagerInterface
+class ResponseModeManager implements ResponseModeManagerInterface
 {
     /**
      * @var \OAuth2\ResponseMode\ResponseModeInterface[]
