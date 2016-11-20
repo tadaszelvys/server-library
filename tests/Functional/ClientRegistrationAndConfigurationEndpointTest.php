@@ -520,4 +520,67 @@ class ClientRegistrationAndConfigurationEndpointTest extends Base
         $this->assertEquals(204, $deletion_response->getStatusCode());
         $this->assertNull($client = $this->getClientManager()->getClient($client_config['client_id']));
     }
+
+    public function testCreationAndModification()
+    {
+        $creation_request = $this->createRequest('/', 'POST',
+            [
+                'token_endpoint_auth_method' => 'client_secret_basic',
+                'client_name'                => 'My Example',
+            ],
+            ['HTTPS' => 'on']
+        );
+        $initial_access_token = $this->getInitialAccessTokenManager()->getInitialAccessToken('INITIAL_ACCESS_TOKEN_VALID');
+
+        $creation_response = new Response();
+        $this->getClientRegistrationEndpoint()->register($creation_request, $creation_response, $initial_access_token);
+        $creation_response->getBody()->rewind();
+        $content = $creation_response->getBody()->getContents();
+
+        $this->assertEquals(200, $creation_response->getStatusCode());
+        $client_config = json_decode($content, true);
+
+        $client = $this->getClientManager()->getClient($client_config['client_id']);
+        $new_client_config = $client_config;
+        $new_client_config['token_endpoint_auth_method'] = 'none';
+        $new_client_config['client_secret'] = null;
+        $software_statement = $this->getJWTCreator()->sign(
+            [
+                'software_id'      => 'This is my software ID',
+                'software_version' => '10.2',
+                'client_name'      => 'My Example v2',
+                'client_name#fr'   => 'Mon Exemple v2',
+            ],
+            ['alg' => 'HS512'],
+            $this->getSignatureKeySet()[0]);
+        $new_client_config['software_statement'] = $software_statement;
+
+        foreach (['registration_access_token', 'registration_client_uri', 'client_secret_expires_at', 'client_id_issued_at'] as $k) {
+            if (array_key_exists($k, $new_client_config)) {
+                unset($new_client_config[$k]);
+            }
+        }
+        $modification_request = $this->createRequest('/', 'PUT',
+            $new_client_config,
+            ['HTTPS' => 'on'],
+            ['Authorization' => sprintf('Bearer %s', $client_config['registration_access_token'])]
+        );
+
+        $modification_response = new Response();
+        $this->getClientConfigurationEndpoint()->handle($modification_request, $modification_response, $client);
+        $modification_response->getBody()->rewind();
+        $content = $modification_response->getBody()->getContents();
+
+        $this->assertEquals(200, $modification_response->getStatusCode());
+        $new_client_config = json_decode($content, true);
+
+        $this->assertEquals($client_config['client_id'], $new_client_config['client_id']);
+        $this->assertEquals($client_config['client_id_issued_at'], $new_client_config['client_id_issued_at']);
+        $this->assertEquals('none', $new_client_config['token_endpoint_auth_method']);
+        $this->assertEquals('My Example v2', $new_client_config['client_name']);
+        $this->assertEquals('Mon Exemple v2', $new_client_config['client_name#fr']);
+        $this->assertEquals($software_statement, $new_client_config['software_statement']);
+        $this->assertArrayNotHasKey('client_secret', $new_client_config);
+        $this->assertArrayNotHasKey('client_secret_expires_at', $new_client_config);
+    }
 }

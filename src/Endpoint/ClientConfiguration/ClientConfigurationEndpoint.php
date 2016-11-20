@@ -172,10 +172,31 @@ class ClientConfigurationEndpoint implements ClientConfigurationEndpointInterfac
         $request_parameters = RequestBody::getParameters($request);
         $this->checkPreservedParameters($request_parameters);
         $this->checkSoftwareStatement($request_parameters);
-        /*$client = $this->getClientManager()->createClient();
+
+        $client_data = $client->all();
+        foreach (['registration_access_token', 'registration_client_uri', 'client_secret_expires_at', 'client_id_issued_at'] as $k) {
+            if (array_key_exists($k, $client_data)) {
+                unset($client_data[$k]);
+            }
+        }
+        $diff_data = array_diff_key($client_data, $request_parameters);
+
+        Assertion::true(empty($diff_data), 'The request must include all client metadata fields.');
+        unset($request_parameters['client_id']);
+        $request_parameters = array_merge(
+            $request_parameters,
+            ['registration_access_token' => null, 'registration_client_uri' => null, 'client_secret_expires_at' => null]
+        );
+
+        foreach ($request_parameters as $k => $v) {
+            if (empty($v)) {
+                $client->remove($k);
+                unset($request_parameters[$k]);
+            }
+        }
         $this->getClientRuleManager()->processParametersForClient($client, $request_parameters);
         $this->getClientManager()->saveClient($client);
-        $this->processResponseWithClient($response, $client);*/
+        $this->processResponseWithClient($response, $client);
     }
 
     /**
