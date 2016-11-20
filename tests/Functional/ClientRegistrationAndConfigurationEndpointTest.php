@@ -544,6 +544,7 @@ class ClientRegistrationAndConfigurationEndpointTest extends Base
         $new_client_config = $client_config;
         $new_client_config['token_endpoint_auth_method'] = 'none';
         $new_client_config['client_secret'] = null;
+        $new_client_config['foo'] = 'bar';
         $software_statement = $this->getJWTCreator()->sign(
             [
                 'software_id'      => 'This is my software ID',
@@ -582,5 +583,6 @@ class ClientRegistrationAndConfigurationEndpointTest extends Base
         $this->assertEquals($software_statement, $new_client_config['software_statement']);
         $this->assertArrayNotHasKey('client_secret', $new_client_config);
         $this->assertArrayNotHasKey('client_secret_expires_at', $new_client_config);
+        $this->assertArrayNotHasKey('foo', $new_client_config);
     }
 }

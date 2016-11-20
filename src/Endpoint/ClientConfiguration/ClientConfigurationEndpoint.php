@@ -182,6 +182,7 @@ class ClientConfigurationEndpoint implements ClientConfigurationEndpointInterfac
         $diff_data = array_diff_key($client_data, $request_parameters);
 
         Assertion::true(empty($diff_data), 'The request must include all client metadata fields.');
+        Assertion::eq($request_parameters['client_id'], $client->getPublicId(), 'Inconsistent "client_id" parameter.');
         unset($request_parameters['client_id']);
         $request_parameters = array_merge(
             $request_parameters,
