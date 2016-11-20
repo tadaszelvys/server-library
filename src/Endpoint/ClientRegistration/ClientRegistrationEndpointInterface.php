@@ -19,11 +19,15 @@ use Psr\Http\Message\ServerRequestInterface;
 interface ClientRegistrationEndpointInterface
 {
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface       $request
-     * @param \Psr\Http\Message\ResponseInterface            $response
-     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface|null $initial_access_token
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface      $response
      */
-    public function register(ServerRequestInterface $request, ResponseInterface &$response, InitialAccessTokenInterface $initial_access_token = null);
+    public function register(ServerRequestInterface $request, ResponseInterface &$response);
+
+    /**
+     * @return bool
+     */
+    public function isInitialAccessTokenSupported();
 
     /**
      * @return bool
@@ -33,6 +37,11 @@ interface ClientRegistrationEndpointInterface
     public function allowRegistrationWithoutInitialAccessToken();
 
     public function disallowRegistrationWithoutInitialAccessToken();
+
+    /**
+     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenManagerInterface $initial_access_token_manage
+     */
+    public function enableInitialAccessTokenSupport(InitialAccessTokenManagerInterface $initial_access_token_manage);
 
     /**
      * @param \Jose\JWTLoaderInterface     $jwt_loader

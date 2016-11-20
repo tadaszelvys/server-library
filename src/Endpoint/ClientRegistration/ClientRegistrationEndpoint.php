@@ -23,6 +23,7 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Client\Rule\RuleManagerInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Token\BearerToken;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,14 +36,19 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
     use HasJWTLoader;
 
     /**
+     * @var \OAuth2\Token\BearerToken
+     */
+    private $bearer_token;
+
+    /**
      * @var bool
      */
     private $is_software_statement_required = false;
 
     /**
-     * @var \Jose\Object\JWKSetInterface
+     * @var null|\Jose\Object\JWKSetInterface
      */
-    private $software_statement_signature_key_set;
+    private $software_statement_signature_key_set = null;
 
     /**
      * @var bool
@@ -50,14 +56,21 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
     private $is_initial_access_token_required = false;
 
     /**
+     * @var null|\OAuth2\Endpoint\ClientRegistration\InitialAccessTokenManagerInterface
+     */
+    private $initial_access_token_manager = null;
+
+    /**
      * ClientRegistrationEndpoint constructor.
      *
+     * @param \OAuth2\Token\BearerToken                   $bearer_token
      * @param \OAuth2\Client\ClientManagerInterface       $client_manager
      * @param \OAuth2\Client\Rule\RuleManagerInterface    $client_rule_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
-    public function __construct(ClientManagerInterface $client_manager, RuleManagerInterface $client_rule_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct(BearerToken $bearer_token, ClientManagerInterface $client_manager, RuleManagerInterface $client_rule_manager, ExceptionManagerInterface $exception_manager)
     {
+        $this->bearer_token = $bearer_token;
         $this->setClientManager($client_manager);
         $this->setClientRuleManager($client_rule_manager);
         $this->setExceptionManager($exception_manager);
@@ -71,14 +84,37 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
         return $this->is_initial_access_token_required;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function allowRegistrationWithoutInitialAccessToken()
     {
         $this->is_initial_access_token_required = false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function disallowRegistrationWithoutInitialAccessToken()
     {
+        Assertion::true($this->isInitialAccessTokenSupported(), 'Initial Access Token not supported.');
         $this->is_initial_access_token_required = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInitialAccessTokenSupported()
+    {
+        return null !== $this->initial_access_token_manager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function enableInitialAccessTokenSupport(InitialAccessTokenManagerInterface $initial_access_token_manage)
+    {
+        $this->initial_access_token_manager = $initial_access_token_manage;
     }
 
     /**
@@ -108,7 +144,6 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
 
     public function allowRegistrationWithoutSoftwareStatement()
     {
-        Assertion::true($this->isSoftwareStatementSupported(), 'Software Statement not supported.');
         $this->is_software_statement_required = false;
     }
 
@@ -121,11 +156,11 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function register(ServerRequestInterface $request, ResponseInterface &$response, InitialAccessTokenInterface $initial_access_token = null)
+    public function register(ServerRequestInterface $request, ResponseInterface &$response)
     {
         try {
-            $this->checkRequest($request, $initial_access_token);
-            $this->handleRequest($request, $response, $initial_access_token);
+            $this->checkRequest($request);
+            $this->handleRequest($request, $response);
         } catch (BaseException $e) {
             $e->getHttpResponse($response);
         } catch (\InvalidArgumentException $e) {
@@ -135,39 +170,59 @@ class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface                             $request
-     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface|null $initial_access_token
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \InvalidArgumentException
+     *
+     * @return \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface|null
      */
-    private function checkRequest(ServerRequestInterface $request, InitialAccessTokenInterface $initial_access_token = null)
+    private function findInitialAccessToken(ServerRequestInterface $request)
     {
-        Assertion::true($this->isRequestSecured($request), 'The request must be secured.');
-        Assertion::eq('POST', $request->getMethod(), 'Method must be POST.');
-        if (null === $initial_access_token) {
-            Assertion::false($this->isInitialAccessTokenRequired(), 'Initial access token required.');
-        } else {
-            Assertion::false($initial_access_token->hasExpired(), 'Expired initial access token.');
+        if (false === $this->isInitialAccessTokenSupported()) {
+            return;
         }
+        $values = [];
+        $token = $this->bearer_token->findToken($request, $values);
+        if (true === $this->isInitialAccessTokenRequired()) {
+            Assertion::notNull($token, 'Initial Access Token is missing or invalid.');
+        }
+        if (null === $token) {
+            return;
+        }
+
+        $initial_access_token = $this->initial_access_token_manager->getInitialAccessToken($token);
+        Assertion::notNull($initial_access_token, 'Initial Access Token is missing or invalid.');
+        Assertion::false($initial_access_token->hasExpired(), 'Initial Access Token expired.');
+
+        return $initial_access_token;
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface                             $request
-     * @param \Psr\Http\Message\ResponseInterface                                  $response
-     * @param \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface|null $initial_access_token
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response, InitialAccessTokenInterface $initial_access_token = null)
+    private function checkRequest(ServerRequestInterface $request)
     {
+        Assertion::true($this->isRequestSecured($request), 'The request must be secured.');
+        Assertion::eq('POST', $request->getMethod(), 'Method must be POST.');
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface      $response
+     *
+     * @throws \OAuth2\Exception\BaseExceptionInterface
+     */
+    private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response)
+    {
+        $initial_access_token = $this->findInitialAccessToken($request);
         $request_parameters = RequestBody::getParameters($request);
         $this->checkSoftwareStatement($request_parameters);
         $client = $this->getClientManager()->createClient();
         $this->getClientRuleManager()->processParametersForClient($client, $request_parameters);
         if (null !== $initial_access_token) {
             $client->setResourceOwnerPublicId($initial_access_token->getUserAccountPublicId());
-        } else {
-            Assertion::false($this->isInitialAccessTokenRequired(), 'Initial Access Token required.');
         }
         $this->getClientManager()->saveClient($client);
         $this->processResponse($response, $client);

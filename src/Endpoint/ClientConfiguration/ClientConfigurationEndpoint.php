@@ -137,8 +137,8 @@ class ClientConfigurationEndpoint implements ClientConfigurationEndpointInterfac
         Assertion::true($client->has('registration_access_token'), 'Invalid client.');
         $values = [];
         $token = $this->bearer_token->findToken($request, $values);
-        Assertion::notNull($token, '');
-        Assertion::eq($token, $client->get('registration_access_token'), 'Invalid access token.');
+        Assertion::notNull($token, 'Initial Access Token is missing or invalid.');
+        Assertion::eq($token, $client->get('registration_access_token'), 'Initial Access Token is missing or invalid.');
     }
 
     /**

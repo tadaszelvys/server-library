@@ -1324,9 +1324,13 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->client_registration_endpoint) {
             $this->client_registration_endpoint = new ClientRegistrationEndpoint(
+                $this->getBearerTokenType(),
                 $this->getClientManager(),
                 $this->getClientRuleManager(),
                 $this->getExceptionManager()
+            );
+            $this->client_registration_endpoint->enableInitialAccessTokenSupport(
+                $this->getInitialAccessTokenManager()
             );
             $this->client_registration_endpoint->enableSoftwareStatementSupport(
                 $this->getJWTLoader(),
@@ -1354,7 +1358,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         if (null === $this->client_configuration_endpoint) {
             $this->client_configuration_endpoint = new ClientConfigurationEndpoint(
-                new BearerToken(),
+                $this->getBearerTokenType(),
                 $this->getClientManager(),
                 $this->getClientRuleManager(),
                 $this->getExceptionManager()
