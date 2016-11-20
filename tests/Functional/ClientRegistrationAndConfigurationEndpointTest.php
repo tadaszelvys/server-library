@@ -16,9 +16,9 @@ use OAuth2\Test\Base;
 use Zend\Diactoros\Response;
 
 /**
- * @group ClientRegistration
+ * @group ClientRegistrationAndConfiguration
  */
-class ClientRegistrationEndpointTest extends Base
+class ClientRegistrationAndConfigurationEndpointTest extends Base
 {
     public function testRequestNotSecured()
     {
@@ -472,5 +472,52 @@ class ClientRegistrationEndpointTest extends Base
         $this->assertTrue(array_key_exists('client_secret_expires_at', $client_config));
         $this->assertEquals('client_secret_basic', $client_config['token_endpoint_auth_method']);
         $this->assertEquals('My Example', $client_config['client_name']);
+    }
+
+    public function testCreationAndDeletion()
+    {
+        $creation_request = $this->createRequest('/', 'POST',
+            [
+                'token_endpoint_auth_method' => 'client_secret_basic',
+                'client_name'                => 'My Example',
+            ],
+            ['HTTPS' => 'on']
+        );
+        $initial_access_token = $this->getInitialAccessTokenManager()->getInitialAccessToken('INITIAL_ACCESS_TOKEN_VALID');
+
+        $creation_response = new Response();
+        $this->getClientRegistrationEndpoint()->register($creation_request, $creation_response, $initial_access_token);
+        $creation_response->getBody()->rewind();
+        $content = $creation_response->getBody()->getContents();
+
+        $this->assertEquals(200, $creation_response->getStatusCode());
+        $client_config = json_decode($content, true);
+
+        $client = $this->getClientManager()->getClient($client_config['client_id']);
+
+        $configuration_request = $this->createRequest('/', 'GET', [],
+            ['HTTPS' => 'on'],
+            ['Authorization' => sprintf('Bearer %s', $client_config['registration_access_token'])]
+        );
+
+        $configuration_response = new Response();
+        $this->getClientConfigurationEndpoint()->handle($configuration_request, $configuration_response, $client);
+        $configuration_response->getBody()->rewind();
+        $content = $configuration_response->getBody()->getContents();
+
+        $this->assertEquals(200, $configuration_response->getStatusCode());
+        $client_config2 = json_decode($content, true);
+        $this->assertEquals($client_config, $client_config2);
+
+        $deletion_request = $this->createRequest('/', 'DELETE', [],
+            ['HTTPS' => 'on'],
+            ['Authorization' => sprintf('Bearer %s', $client_config['registration_access_token'])]
+        );
+
+        $deletion_response = new Response();
+        $this->getClientConfigurationEndpoint()->handle($deletion_request, $deletion_response, $client);
+
+        $this->assertEquals(204, $deletion_response->getStatusCode());
+        $this->assertNull($client = $this->getClientManager()->getClient($client_config['client_id']));
     }
 }

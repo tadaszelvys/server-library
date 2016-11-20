@@ -73,7 +73,7 @@ class ClientManager extends Base
      */
     public function deleteClient(ClientInterface $client)
     {
-        Assertion::keyExists($client->getPublicId(), $this->client_ids);
+        Assertion::keyExists($this->client_ids, $client->getPublicId());
         unset($this->client_ids[$client->getPublicId()]);
     }
 

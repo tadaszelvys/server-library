@@ -135,6 +135,7 @@ class ClientConfigurationEndpoint implements ClientConfigurationEndpointInterfac
     {
         Assertion::true($this->isRequestSecured($request), 'The request must be secured.');
         Assertion::true($client->has('registration_access_token'), 'Invalid client.');
+        $values = [];
         $token = $this->bearer_token->findToken($request, $values);
         Assertion::notNull($token, '');
         Assertion::eq($token, $client->get('registration_access_token'), 'Invalid access token.');

@@ -37,6 +37,7 @@ use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseModeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ResponseTypeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ScopeParameterChecker;
 use OAuth2\Endpoint\Authorization\ParameterChecker\StateParameterChecker;
+use OAuth2\Endpoint\ClientConfiguration\ClientConfigurationEndpoint;
 use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
 use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
@@ -1339,6 +1340,35 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         return $this->client_registration_endpoint;
+    }
+
+    /**
+     * @var null|\OAuth2\Endpoint\ClientConfiguration\ClientConfigurationEndpoint
+     */
+    private $client_configuration_endpoint = null;
+
+    /**
+     * @return \OAuth2\Endpoint\ClientConfiguration\ClientConfigurationEndpoint
+     */
+    protected function getClientConfigurationEndpoint()
+    {
+        if (null === $this->client_configuration_endpoint) {
+            $this->client_configuration_endpoint = new ClientConfigurationEndpoint(
+                new BearerToken(),
+                $this->getClientManager(),
+                $this->getClientRuleManager(),
+                $this->getExceptionManager()
+            );
+            $this->client_configuration_endpoint->enableSoftwareStatementSupport(
+                $this->getJWTLoader(),
+                $this->getSignatureKeySet()
+            );
+
+            $this->client_configuration_endpoint->disallowRegistrationWithoutSoftwareStatement();
+            $this->client_configuration_endpoint->allowRegistrationWithoutSoftwareStatement();
+        }
+
+        return $this->client_configuration_endpoint;
     }
 
     protected function enableSoftwareStatementSupport()
