@@ -221,7 +221,7 @@ class ClientConfigurationEndpoint implements ClientConfigurationEndpointInterfac
      */
     private function checkPreservedParameters(array $request_parameters)
     {
-        $preserved_parameters = ['registration_access_token', 'registration_client_uri', 'client_secret_expires_at', 'client_id_issued_at'];
+        $preserved_parameters = $this->getClientRuleManager()->getPreserverParameters();
         foreach ($preserved_parameters as $preserved_parameter) {
             Assertion::keyNotExists($request_parameters, $preserved_parameter, sprintf('The parameters "%s" is not allowed.', $preserved_parameter));
         }

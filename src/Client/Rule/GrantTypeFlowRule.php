@@ -23,10 +23,24 @@ class GrantTypeFlowRule implements RuleInterface
     use HasResponseTypeManager;
     use HasGrantTypeManager;
 
+    /**
+     * GrantTypeFlowRule constructor.
+     *
+     * @param \OAuth2\Grant\GrantTypeManagerInterface    $grant_type_manager
+     * @param \OAuth2\Grant\ResponseTypeManagerInterface $response_type_manager
+     */
     public function __construct(GrantTypeManagerInterface $grant_type_manager, ResponseTypeManagerInterface $response_type_manager)
     {
         $this->setGrantTypeManager($grant_type_manager);
         $this->setResponseTypeManager($response_type_manager);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return [];
     }
 
     /**

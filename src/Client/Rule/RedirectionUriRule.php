@@ -28,4 +28,12 @@ class RedirectionUriRule implements RuleInterface
         Assertion::allUrl($registration_parameters['redirect_uris'], 'The parameter "redirect_uris" must be a list of URI.');
         $client->set('redirect_uris', $registration_parameters['redirect_uris']);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return [];
+    }
 }

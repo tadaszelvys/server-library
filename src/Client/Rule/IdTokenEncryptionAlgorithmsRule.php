@@ -47,4 +47,12 @@ class IdTokenEncryptionAlgorithmsRule implements RuleInterface
         $client->set('id_token_encrypted_response_alg', $registration_parameters['id_token_encrypted_response_alg']);
         $client->set('id_token_encrypted_response_enc', $registration_parameters['id_token_encrypted_response_enc']);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return [];
+    }
 }

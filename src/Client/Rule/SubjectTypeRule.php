@@ -49,4 +49,12 @@ class SubjectTypeRule implements RuleInterface
 
         $client->set('subject_type', $registration_parameters['subject_type']);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return [];
+    }
 }

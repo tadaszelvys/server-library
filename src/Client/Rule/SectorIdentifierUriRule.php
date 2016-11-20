@@ -74,6 +74,14 @@ class SectorIdentifierUriRule implements RuleInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return [];
+    }
+
+    /**
      * @param string $url
      *
      * @throws \OAuth2\Exception\BadRequestExceptionInterface

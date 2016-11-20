@@ -53,4 +53,12 @@ class ScopeRule implements RuleInterface
             $client->set('default_scope', $registration_parameters['default_scope']);
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return [];
+    }
 }

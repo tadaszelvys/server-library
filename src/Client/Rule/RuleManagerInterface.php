@@ -25,4 +25,9 @@ interface RuleManagerInterface
      * @param array                          $parameters
      */
     public function processParametersForClient(ClientInterface $client, array $parameters);
+
+    /**
+     * @return string[]
+     */
+    public function getPreserverParameters();
 }

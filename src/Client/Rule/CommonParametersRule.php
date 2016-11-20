@@ -33,7 +33,15 @@ class CommonParametersRule extends AbstractInternationalizedRule
         }
     }
 
-    /**a
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return [];
+    }
+
+    /**
      * @return array
      */
     private function getSupportedParameters()

@@ -22,4 +22,9 @@ interface RuleInterface
      * @throws \InvalidArgumentException If an error occurred
      */
     public function check(ClientInterface $client, array $registration_parameters);
+
+    /**
+     * @return string[]
+     */
+    public function getPreserverParameters();
 }

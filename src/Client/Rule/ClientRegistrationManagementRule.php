@@ -25,6 +25,14 @@ abstract class ClientRegistrationManagementRule implements RuleInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return ['registration_client_uri', 'registration_access_token'];
+    }
+
+    /**
      * @param \OAuth2\Client\ClientInterface $client
      *
      * @return string

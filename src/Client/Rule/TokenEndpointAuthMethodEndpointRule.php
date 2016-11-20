@@ -20,6 +20,11 @@ class TokenEndpointAuthMethodEndpointRule implements RuleInterface
 {
     use HasTokenEndpointAuthMethodManager;
 
+    /**
+     * TokenEndpointAuthMethodEndpointRule constructor.
+     *
+     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager
+     */
     public function __construct(TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_method_manager)
     {
         $this->setTokenEndpointAuthMethodManager($token_endpoint_auth_method_manager);
@@ -38,5 +43,13 @@ class TokenEndpointAuthMethodEndpointRule implements RuleInterface
         $token_endpoint_auth_method->checkClientConfiguration($registration_parameters, $client);
 
         $client->set('token_endpoint_auth_method', $registration_parameters['token_endpoint_auth_method']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return ['client_secret_expires_at'];
     }
 }

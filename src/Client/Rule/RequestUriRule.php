@@ -28,4 +28,12 @@ class RequestUriRule implements RuleInterface
         Assertion::allUrl($registration_parameters['request_uris'], 'The parameter "request_uris" must be a list of URI.');
         $client->set('request_uris', $registration_parameters['request_uris']);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return [];
+    }
 }

@@ -21,6 +21,11 @@ class RuleManager implements RuleManagerInterface
     private $rules = [];
 
     /**
+     * @var string[]
+     */
+    private $preserved_parameters = ['client_id_issued_at'];
+
+    /**
      * {@inheritdoc}
      */
     public function processParametersForClient(ClientInterface $client, array $parameters)
@@ -33,8 +38,20 @@ class RuleManager implements RuleManagerInterface
     /**
      * {@inheritdoc}
      */
+    public function getPreserverParameters()
+    {
+        return $this->preserved_parameters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addRule(RuleInterface $rule)
     {
         $this->rules[] = $rule;
+        $this->preserved_parameters = array_unique(array_merge(
+            $rule->getPreserverParameters(),
+            $this->preserved_parameters
+        ));
     }
 }

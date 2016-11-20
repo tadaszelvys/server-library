@@ -26,4 +26,12 @@ class SoftwareRule implements RuleInterface
             }
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreserverParameters()
+    {
+        return [];
+    }
 }
