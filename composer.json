@@ -1,5 +1,5 @@
 {
-    "name": "oauth2-framework/authorization-server-library",
+    "name": "oauth2-framework/server-library",
     "type": "library",
     "description": "OAuth2 Server Library",
     "license": "MIT",
