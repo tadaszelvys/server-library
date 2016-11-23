@@ -46,6 +46,7 @@ use OAuth2\Endpoint\TokenType\AccessToken;
 use OAuth2\Endpoint\TokenType\AuthCode;
 use OAuth2\Endpoint\TokenType\RefreshToken;
 use OAuth2\Exception\ExceptionManager;
+use OAuth2\Exception\Factory\RedirectExceptionFactory;
 use OAuth2\Grant\AuthorizationCodeGrantType;
 use OAuth2\Grant\ClientCredentialsGrantType;
 use OAuth2\Grant\GrantTypeManager;
@@ -101,9 +102,9 @@ use OAuth2\Test\Stub\SessionStateParameterExtension;
 use OAuth2\Test\Stub\TooManyRequestsExceptionFactory;
 use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Test\Stub\UserAccountManager;
-use OAuth2\Token\BearerToken;
-use OAuth2\Token\MacToken;
-use OAuth2\Token\TokenTypeManager;
+use OAuth2\Test\Stub\MacToken;
+use OAuth2\TokenType\BearerToken;
+use OAuth2\TokenType\TokenTypeManager;
 use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
@@ -626,6 +627,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if (null === $this->exception_manager) {
             $this->exception_manager = new ExceptionManager();
             $this->exception_manager->addExtension(new UriExtension());
+            $this->exception_manager->addExceptionFactory(new RedirectExceptionFactory());
             $this->exception_manager->addExceptionFactory(new TooManyRequestsExceptionFactory());
         }
 
@@ -1059,12 +1061,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return null|\OAuth2\Token\BearerToken
+     * @return null|\OAuth2\TokenType\TokenTypeInterface
      */
     private $bearer_token_type = null;
 
     /**
-     * @return \OAuth2\Token\BearerToken
+     * @return \OAuth2\TokenType\TokenTypeInterface
      */
     protected function getBearerTokenType()
     {
@@ -1084,20 +1086,18 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return null|\OAuth2\Token\MacToken
+     * @return null|\OAuth2\TokenType\TokenTypeInterface
      */
     private $mac_token_type = null;
 
     /**
-     * @return \OAuth2\Token\MacToken
+     * @return \OAuth2\TokenType\TokenTypeInterface
      */
     protected function getMacTokenType()
     {
         if (null === $this->mac_token_type) {
             $this->mac_token_type = new MacToken();
 
-            $this->mac_token_type->setMacKeyMinLength(10);
-            $this->mac_token_type->setMacKeyMaxLength(20);
             $this->mac_token_type->setMacAlgorithm('hmac-sha-256');
             $this->mac_token_type->setTimestampLifetime(10);
         }
@@ -1106,12 +1106,12 @@ class Base extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return null|\OAuth2\Token\TokenTypeManagerInterface
+     * @return null|\OAuth2\TokenType\TokenTypeManagerInterface
      */
     private $token_type_manager = null;
 
     /**
-     * @return \OAuth2\Token\TokenTypeManagerInterface
+     * @return \OAuth2\TokenType\TokenTypeManagerInterface
      */
     protected function getTokenTypeManager()
     {

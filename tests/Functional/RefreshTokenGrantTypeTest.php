@@ -60,7 +60,7 @@ class RefreshTokenGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The "grant_type" parameter is missing.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -90,7 +90,7 @@ class RefreshTokenGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The grant type "bar" is not supported by this server.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -105,7 +105,7 @@ class RefreshTokenGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_UNAUTHORIZED_CLIENT, $e->getMessage());
             $this->assertEquals('The grant type "refresh_token" is unauthorized for this client.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -123,7 +123,7 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testRefreshTokenParameterIsMissing()
@@ -183,7 +183,7 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
 
         $this->getTokenEndpoint()->getAccessToken($request, $response);
         $response->getBody()->rewind();
@@ -192,7 +192,7 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"scope":"scope1 scope2 scope3","refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeAuthorizedForClientWithReducedScope()
@@ -207,6 +207,6 @@ class RefreshTokenGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"scope":"scope2","refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 }

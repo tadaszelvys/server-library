@@ -27,7 +27,7 @@ class ExceptionManagerTest extends Base
     public function testRedirectButRedirectUriNotDefined()
     {
         try {
-            $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, 'foo', 'bar');
+            $this->getExceptionManager()->getRedirectException('foo', 'bar');
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('redirect_uri_not_defined', $e->getMessage());
         }
@@ -36,7 +36,7 @@ class ExceptionManagerTest extends Base
     public function testRedirectButTransportModeNotDefined()
     {
         try {
-            $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, 'foo', 'bar', ['redirect_uri' => 'https://foo.bar']);
+            $this->getExceptionManager()->getRedirectException('foo', 'bar', ['redirect_uri' => 'https://foo.bar']);
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('invalid_response_mode', $e->getMessage());
         }
@@ -44,7 +44,7 @@ class ExceptionManagerTest extends Base
 
     public function testRedirectExceptionWithQueryResponseMode()
     {
-        $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, 'foo', 'bar', ['redirect_uri' => 'https://foo.bar', 'response_mode' => new QueryResponseMode()]);
+        $exception = $this->getExceptionManager()->getRedirectException('foo', 'bar', ['redirect_uri' => 'https://foo.bar', 'response_mode' => new QueryResponseMode()]);
         $response = new Response();
         $exception->getHttpResponse($response);
         $response->getBody()->rewind();
@@ -61,7 +61,7 @@ class ExceptionManagerTest extends Base
 
     public function testRedirectExceptionWithFragmentResponseMode()
     {
-        $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, 'foo', 'bar', ['redirect_uri' => 'https://foo.bar', 'response_mode' => new FragmentResponseMode()]);
+        $exception = $this->getExceptionManager()->getRedirectException('foo', 'bar', ['redirect_uri' => 'https://foo.bar', 'response_mode' => new FragmentResponseMode()]);
         $response = new Response();
         $exception->getHttpResponse($response);
         $response->getBody()->rewind();
@@ -78,7 +78,7 @@ class ExceptionManagerTest extends Base
 
     public function testRedirectExceptionWithFormPostResponseMode()
     {
-        $exception = $this->getExceptionManager()->getException(ExceptionManagerInterface::REDIRECT, 'foo', 'bar', ['redirect_uri' => 'https://foo.bar', 'response_mode' => new FormPostResponseMode()]);
+        $exception = $this->getExceptionManager()->getRedirectException('foo', 'bar', ['redirect_uri' => 'https://foo.bar', 'response_mode' => new FormPostResponseMode()]);
         $response = new Response();
         $exception->getHttpResponse($response);
         $response->getBody()->rewind();

@@ -197,7 +197,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     protected function processAuthorization(ServerRequestInterface $request, ResponseInterface &$response, AuthorizationInterface $authorization)
     {
         if ($authorization->isAuthorized() === false) {
-            $this->createRedirectionException($authorization, $response, ExceptionManagerInterface::ACCESS_DENIED, 'The resource owner denied access to your client');
+            $this->createRedirectionException($authorization, $response, ExceptionManagerInterface::ERROR_ACCESS_DENIED, 'The resource owner denied access to your client');
 
             return;
         }

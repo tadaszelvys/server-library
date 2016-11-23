@@ -3,32 +3,28 @@ OAuth2 And OpenID Connect Framework Library for PHP
 
 Help me out for a couple of :beers:!
 
-[![Beerpay](https://beerpay.io/Spomky-Labs/oauth2-server-library/badge.svg?style=beer-square)](https://beerpay.io/Spomky-Labs/oauth2-server-library)  [![Beerpay](https://beerpay.io/Spomky-Labs/oauth2-server-library/make-wish.svg?style=flat-square)](https://beerpay.io/Spomky-Labs/oauth2-server-library?focus=wish)
+[![Beerpay](https://beerpay.io/OAuth2-Framework/authorization-server-library/badge.svg?style=beer-square)](https://beerpay.io/OAuth2-Framework/authorization-server-library)  [![Beerpay](https://beerpay.io/OAuth2-Framework/authorization-server-library/make-wish.svg?style=flat-square)](https://beerpay.io/OAuth2-Framework/authorization-server-library?focus=wish)
 
 ----
 
-[![Join the chat at https://gitter.im/Spomky-Labs/oauth2-server-library](https://badges.gitter.im/Spomky-Labs/oauth2-server-library.svg)](https://gitter.im/Spomky-Labs/oauth2-server-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/OAuth2-Framework/authorization-server-library](https://badges.gitter.im/OAuth2-Framework/authorization-server-library.svg)](https://gitter.im/OAuth2-Framework/authorization-server-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Spomky-Labs/oauth2-server-library/?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/Spomky-Labs/oauth2-server-library/badge.svg?branch=master)](https://coveralls.io/github/Spomky-Labs/oauth2-server-library?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/OAuth2-Framework/authorization-server-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/OAuth2-Framework/authorization-server-library/?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/OAuth2-Framework/authorization-server-library/badge.svg?branch=master)](https://coveralls.io/github/OAuth2-Framework/authorization-server-library?branch=master)
 [![PSR-7 ready](https://img.shields.io/badge/PSR--7-ready-brightgreen.svg)](http://www.php-fig.org/psr/psr-7/)
 
 [![Dependency Status](https://www.versioneye.com/user/projects/57acac64fc2569003af85833/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57acac64fc2569003af85833)
 
-[![Build Status](https://travis-ci.org/Spomky-Labs/oauth2-server-library.svg?branch=master)](https://travis-ci.org/Spomky-Labs/oauth2-server-library)
+[![Build Status](https://travis-ci.org/OAuth2-Framework/authorization-server-library.svg?branch=master)](https://travis-ci.org/OAuth2-Framework/authorization-server-library)
 [![HHVM Status](http://hhvm.h4cc.de/badge/spomky-labs/oauth2-server-library.svg)](http://hhvm.h4cc.de/package/spomky-labs/oauth2-server-library)
-[![PHP 7 ready](http://php7ready.timesplinter.ch/Spomky-Labs/oauth2-server-library/badge.svg)](https://travis-ci.org/Spomky-Labs/oauth2-server-library)
+[![PHP 7 ready](http://php7ready.timesplinter.ch/OAuth2-Framework/authorization-server-library/badge.svg)](https://travis-ci.org/OAuth2-Framework/authorization-server-library)
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/3d678a80-f1b8-48a3-b36e-c7f0c6d45939/big.png)](https://insight.sensiolabs.com/projects/3d678a80-f1b8-48a3-b36e-c7f0c6d45939)
 
-[![Latest Stable Version](https://poser.pugx.org/Spomky-Labs/oauth2-server-library/v/stable.png)](https://packagist.org/packages/Spomky-Labs/oauth2-server-library)
-[![Total Downloads](https://poser.pugx.org/Spomky-Labs/oauth2-server-library/downloads.png)](https://packagist.org/packages/Spomky-Labs/oauth2-server-library)
-[![Latest Unstable Version](https://poser.pugx.org/Spomky-Labs/oauth2-server-library/v/unstable.png)](https://packagist.org/packages/Spomky-Labs/oauth2-server-library)
-[![License](https://poser.pugx.org/Spomky-Labs/oauth2-server-library/license.png)](https://packagist.org/packages/Spomky-Labs/oauth2-server-library)
-
-> *Note 1: this library is still in development. The first stable release will be tagged as `v1.0.x`. All tags `v0.x.y` must be considered as unstable.*
-> 
-> *Note 2: if you use Symfony, [a bundle is in development](https://github.com/Spomky-Labs/OAuth2ServerBundle).*
+[![Latest Stable Version](https://poser.pugx.org/OAuth2-Framework/authorization-server-library/v/stable.png)](https://packagist.org/packages/OAuth2-Framework/authorization-server-library)
+[![Total Downloads](https://poser.pugx.org/OAuth2-Framework/authorization-server-library/downloads.png)](https://packagist.org/packages/OAuth2-Framework/authorization-server-library)
+[![Latest Unstable Version](https://poser.pugx.org/OAuth2-Framework/authorization-server-library/v/unstable.png)](https://packagist.org/packages/OAuth2-Framework/authorization-server-library)
+[![License](https://poser.pugx.org/OAuth2-Framework/authorization-server-library/license.png)](https://packagist.org/packages/OAuth2-Framework/authorization-server-library)
 
 This library provides components to build an authorization server based on the OAuth2 Framework protocol ([RFC6749](https://tools.ietf.org/html/rfc6749)) and associated features.
 
@@ -111,7 +107,7 @@ Have a look at [How to use](doc/Use.md) to use OAuth2 server and handle your fir
 
 # Contributing
 
-Requests for new features, bug fixed and all other ideas to make this library useful are welcome. The best contribution you could provide is by fixing the [opened issues where help is wanted](https://github.com/Spomky-Labs/oauth2-server-library/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
+Requests for new features, bug fixed and all other ideas to make this library useful are welcome. The best contribution you could provide is by fixing the [opened issues where help is wanted](https://github.com/OAuth2-Framework/authorization-server-library/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
 
 Please make sure to [follow these best practices](doc/Contributing.md).
 

@@ -106,7 +106,7 @@ class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
         $server_params = $request->getServerParams();
 
         if (empty($server_params['HTTPS']) || 'on' !== mb_strtolower($server_params['HTTPS'], '8bit')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The request must be secured.');
         }
     }
 
@@ -129,7 +129,7 @@ class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
     {
         $user = $this->getUserAccountManager()->getUserAccountFromResource($resource);
         if (null === $user) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The resource is not supported by this server.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The resource is not supported by this server.');
         }
     }
 
@@ -141,10 +141,10 @@ class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
     private function checkRel(ServerRequestInterface $request)
     {
         if (!array_key_exists('rel', $request->getQueryParams())) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "rel" is mandatory.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The parameter "rel" is mandatory.');
         }
         if ($request->getQueryParams()['rel'] !== 'http://openid.net/specs/connect/1.0/issuer') {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported "rel" parameter value.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unsupported "rel" parameter value.');
         }
     }
 
@@ -158,7 +158,7 @@ class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
     private function getResource(ServerRequestInterface $request)
     {
         if (!array_key_exists('resource', $request->getQueryParams())) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "resource" is mandatory.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The parameter "resource" is mandatory.');
         }
 
         $resource = $request->getQueryParams()['resource'];
@@ -181,7 +181,7 @@ class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
         }
         $at = mb_strpos($resource, '@', null, 'utf-8');
         if (0 === $at) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported Extensible Resource Identifier (XRI) resource value.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unsupported Extensible Resource Identifier (XRI) resource value.');
         } elseif (false !== $at) {
             $this->checkEmailResource($resource);
         } else {
@@ -223,7 +223,7 @@ class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
         $parsed_uri = parse_url($uri);
 
         if (false === array_key_exists('host', $parsed_uri)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported resource value. Must be compliant with RFC3986 (URI) or RFC5322 (e-mail).');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unsupported resource value. Must be compliant with RFC3986 (URI) or RFC5322 (e-mail).');
         }
         $host = $parsed_uri['host'];
         if (array_key_exists('port', $parsed_uri)) {
@@ -241,7 +241,7 @@ class IssuerDiscoveryEndpoint implements IssuerDiscoveryEndpointInterface
     private function checkDomain($domain)
     {
         if ($domain !== $this->computed_server) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported domain.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unsupported domain.');
         }
     }
 }

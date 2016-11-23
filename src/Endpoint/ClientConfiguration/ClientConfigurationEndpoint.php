@@ -23,7 +23,7 @@ use OAuth2\Client\ClientManagerInterface;
 use OAuth2\Client\Rule\RuleManagerInterface;
 use OAuth2\Exception\BaseException;
 use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Token\BearerToken;
+use OAuth2\TokenType\BearerToken;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,7 +36,7 @@ class ClientConfigurationEndpoint implements ClientConfigurationEndpointInterfac
     use HasJWTLoader;
 
     /**
-     * @var \OAuth2\Token\BearerToken
+     * @var \OAuth2\TokenType\BearerToken
      */
     private $bearer_token;
 
@@ -53,7 +53,7 @@ class ClientConfigurationEndpoint implements ClientConfigurationEndpointInterfac
     /**
      * ClientConfigurationEndpoint constructor.
      *
-     * @param \OAuth2\Token\BearerToken                   $bearer_token
+     * @param \OAuth2\TokenType\BearerToken                   $bearer_token
      * @param \OAuth2\Client\ClientManagerInterface       $client_manager
      * @param \OAuth2\Client\Rule\RuleManagerInterface    $client_rule_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
@@ -126,7 +126,7 @@ class ClientConfigurationEndpoint implements ClientConfigurationEndpointInterfac
         } catch (BaseException $e) {
             $e->getHttpResponse($response);
         } catch (\InvalidArgumentException $e) {
-            $e = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $e = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $e->getHttpResponse($response);
         }
     }

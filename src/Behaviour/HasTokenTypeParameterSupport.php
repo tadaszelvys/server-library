@@ -19,14 +19,14 @@ trait HasTokenTypeParameterSupport
     private $token_type_parameter_allowed = false;
 
     /**
-     * @return \OAuth2\Token\TokenTypeManagerInterface
+     * @return \OAuth2\TokenType\TokenTypeManagerInterface
      */
     abstract protected function getTokenTypeManager();
 
     /**
      * @param array $request_parameters
      *
-     * @return \OAuth2\Token\TokenTypeInterface
+     * @return \OAuth2\TokenType\TokenTypeInterface
      */
     protected function getTokenTypeFromRequest(array $request_parameters)
     {

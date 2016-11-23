@@ -42,7 +42,7 @@ class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
     public function processUserAccountIsNotAvailable(ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
     {
         if ($authorization->hasPrompt('none')) {
-            throw new CreateRedirectionException($authorization, ExceptionManagerInterface::LOGIN_REQUIRED);
+            throw new CreateRedirectionException($authorization, ExceptionManagerInterface::ERROR_LOGIN_REQUIRED);
         }
     }
 

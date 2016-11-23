@@ -82,7 +82,7 @@ class JWTBearerGrantTypeTest extends Base
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('Bad audience.', $e->getDescription());
         }
     }
@@ -124,7 +124,7 @@ class JWTBearerGrantTypeTest extends Base
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The assertion must be encrypted.', $e->getDescription());
         }
     }
@@ -191,7 +191,7 @@ class JWTBearerGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","scope":"scope1","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","scope":"scope1","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testEncryptedAndSignedAssertionForPasswordClient()
@@ -248,6 +248,6 @@ class JWTBearerGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 }

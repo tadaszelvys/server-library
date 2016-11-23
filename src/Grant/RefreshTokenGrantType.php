@@ -68,13 +68,13 @@ class RefreshTokenGrantType implements GrantTypeInterface
     {
         $refresh_token = RequestBody::getParameter($request, 'refresh_token');
         if (null === $refresh_token) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'No "refresh_token" parameter found');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'No "refresh_token" parameter found');
         }
 
         $token = $this->getRefreshTokenManager()->getRefreshToken($refresh_token);
 
         if (!$token instanceof RefreshTokenInterface) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Invalid refresh token');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_GRANT, 'Invalid refresh token');
         }
 
         $this->checkRefreshToken($token, $client);
@@ -97,11 +97,11 @@ class RefreshTokenGrantType implements GrantTypeInterface
     public function checkRefreshToken(RefreshTokenInterface $token, ClientInterface $client)
     {
         if ($client->getPublicId() !== $token->getClientPublicId()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Invalid refresh token');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_GRANT, 'Invalid refresh token');
         }
 
         if ($token->hasExpired()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_GRANT, 'Refresh token has expired');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_GRANT, 'Refresh token has expired');
         }
     }
 }

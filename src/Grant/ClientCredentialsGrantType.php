@@ -65,7 +65,7 @@ class ClientCredentialsGrantType implements GrantTypeInterface
     public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         if ($client->isPublic()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a confidential client');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'The client is not a confidential client');
         }
         $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
 

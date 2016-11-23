@@ -45,6 +45,6 @@ class ScopeParameterChecker implements ParameterCheckerInterface
      */
     public function getError()
     {
-        return ExceptionManagerInterface::INVALID_SCOPE;
+        return ExceptionManagerInterface::ERROR_INVALID_SCOPE;
     }
 }

@@ -64,7 +64,6 @@ class ObjectsTest extends Base
         $id_token->setResourceOwnerPublicId('resource_owner');
         $id_token->setUserAccountPublicId('user_account');
         $id_token->setScope([]);
-        $id_token->setTokenType('type');
 
         $this->assertEquals('foo', $id_token->getAccessTokenHash());
         $this->assertEquals('bar', $id_token->getAuthorizationCodeHash());
@@ -74,7 +73,6 @@ class ObjectsTest extends Base
         $this->assertEquals('resource_owner', $id_token->getResourceOwnerPublicId());
         $this->assertEquals('user_account', $id_token->getUserAccountPublicId());
         $this->assertEquals([], $id_token->getScope());
-        $this->assertEquals('type', $id_token->getTokenType());
     }
 
     public function testUserAccount()
@@ -133,7 +131,7 @@ class ObjectsTest extends Base
         $access_token->setScope(['bar', 'baz']);
         $this->assertFalse($access_token->hasScope('foo'));
         $this->assertTrue($access_token->hasScope('bar'));
-        $this->assertEquals('bar', $access_token->getTokenType());
+        $this->assertEquals('bar', $access_token->getTokenTypeParameter('token_type'));
 
         $this->assertEquals([
             'access_token' => 'foo',

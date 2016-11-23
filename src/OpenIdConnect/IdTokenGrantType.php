@@ -16,7 +16,7 @@ use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Grant\ResponseTypeInterface;
-use OAuth2\Token\TokenTypeManagerInterface;
+use OAuth2\TokenType\TokenTypeManagerInterface;
 
 class IdTokenGrantType implements ResponseTypeInterface
 {
@@ -27,7 +27,7 @@ class IdTokenGrantType implements ResponseTypeInterface
     /**
      * IdTokenGrantType constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface       $token_type_manager
+     * @param \OAuth2\TokenType\TokenTypeManagerInterface       $token_type_manager
      * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface $id_token_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface   $exception_manager
      */
@@ -81,7 +81,7 @@ class IdTokenGrantType implements ResponseTypeInterface
             return [];
         }
         if (!array_key_exists('nonce', $authorization->getQueryParams())) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The parameter "nonce" is mandatory using "id_token" response type.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The parameter "nonce" is mandatory using "id_token" response type.');
         }
 
         return [];

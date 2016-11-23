@@ -69,7 +69,7 @@ class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInterface
     public function introspection(ServerRequestInterface $request, ResponseInterface &$response)
     {
         if (!$this->isRequestSecured($request)) {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The request must be secured.');
             $exception->getHttpResponse($response);
 
             return;
@@ -78,7 +78,7 @@ class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInterface
         $this->getParameters($request, $token, $token_type_hint);
 
         if (null === $token) {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Parameter "token" is missing');
             $exception->getHttpResponse($response);
 
             return;
@@ -113,16 +113,16 @@ class TokenIntrospectionEndpoint implements TokenIntrospectionEndpointInterface
                     return;
                 }
             }
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find token or client not authenticated.');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unable to find token or client not authenticated.');
             $exception->getHttpResponse($response);
         } elseif (array_key_exists($token_type_hint, $token_types)) {
             $token_type = $token_types[$token_type_hint];
             if (false === $this->tryIntrospectToken($response, $token_type, $token, $client)) {
-                $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find token or client not authenticated.');
+                $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unable to find token or client not authenticated.');
                 $exception->getHttpResponse($response);
             }
         } else {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unsupported token type hint');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unsupported token type hint');
             $exception->getHttpResponse($response);
         }
     }

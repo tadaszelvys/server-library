@@ -21,10 +21,6 @@ final class UriExtension implements ExceptionExtensionInterface
      */
     public function process($type, $error, $error_description, array &$data)
     {
-        if ($type !== ExceptionManagerInterface::INTERNAL_SERVER_ERROR) {
-            $data['error_uri'] = "https://foo.test/Error/$type/$error";
-        } else {
-            $data['error_uri'] = "https://foo.test/Internal/$type/$error";
-        }
+        $data['error_uri'] = "https://foo.test/Error/$type/$error";
     }
 }

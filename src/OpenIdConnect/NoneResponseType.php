@@ -17,7 +17,7 @@ use OAuth2\Behaviour\HasTokenTypeParameterSupport;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
-use OAuth2\Token\TokenTypeManagerInterface;
+use OAuth2\TokenType\TokenTypeManagerInterface;
 
 /**
  * This response type has been introduced by OpenID Connect
@@ -42,7 +42,7 @@ class NoneResponseType implements ResponseTypeInterface
     /**
      * NoneResponseType constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface   $token_type_manager
+     * @param \OAuth2\TokenType\TokenTypeManagerInterface   $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,

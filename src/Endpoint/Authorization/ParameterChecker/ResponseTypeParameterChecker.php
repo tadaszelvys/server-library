@@ -33,6 +33,6 @@ class ResponseTypeParameterChecker implements ParameterCheckerInterface
      */
     public function getError()
     {
-        return ExceptionManagerInterface::INVALID_REQUEST;
+        return ExceptionManagerInterface::ERROR_INVALID_REQUEST;
     }
 }

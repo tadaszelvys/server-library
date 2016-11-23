@@ -82,13 +82,13 @@ class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
     {
         $this->getParameters($request, $token, $token_type_hint, $callback);
         if (!$this->isRequestSecured($request)) {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The request must be secured.');
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
 
             return;
         }
         if (null === $token) {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "token" is missing');
+            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Parameter "token" is missing');
             $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
 
             return;

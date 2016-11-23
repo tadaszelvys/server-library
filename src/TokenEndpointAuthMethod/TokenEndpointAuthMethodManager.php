@@ -122,7 +122,7 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
             if (null !== $temp) {
                 if (null !== $client_id) {
                     $authentication_method = null;
-                    throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Only one authentication method may be used to authenticate the client.');
+                    throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Only one authentication method may be used to authenticate the client.');
                 } else {
                     $client_id = $temp;
                     $authentication_method = $method;
@@ -164,6 +164,6 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
             $schemes = array_merge($schemes, $scheme);
         }
 
-        return $this->getExceptionManager()->getAuthenticateException(ExceptionManagerInterface::INVALID_CLIENT, $message, ['schemes' => $schemes]);
+        return $this->getExceptionManager()->getAuthenticateException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, $message, ['schemes' => $schemes]);
     }
 }

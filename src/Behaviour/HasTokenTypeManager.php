@@ -12,12 +12,12 @@
 namespace OAuth2\Behaviour;
 
 use Assert\Assertion;
-use OAuth2\Token\TokenTypeManagerInterface;
+use OAuth2\TokenType\TokenTypeManagerInterface;
 
 trait HasTokenTypeManager
 {
     /**
-     * @var \OAuth2\Token\TokenTypeManagerInterface|null
+     * @var \OAuth2\TokenType\TokenTypeManagerInterface|null
      */
     private $token_type_manager = null;
 
@@ -30,7 +30,7 @@ trait HasTokenTypeManager
     }
 
     /**
-     * @return \OAuth2\Token\TokenTypeManagerInterface
+     * @return \OAuth2\TokenType\TokenTypeManagerInterface
      */
     protected function getTokenTypeManager()
     {
@@ -40,7 +40,7 @@ trait HasTokenTypeManager
     }
 
     /**
-     * @param \OAuth2\Token\TokenTypeManagerInterface $token_type_manager
+     * @param \OAuth2\TokenType\TokenTypeManagerInterface $token_type_manager
      */
     protected function setTokenTypeManager(TokenTypeManagerInterface $token_type_manager)
     {

@@ -133,7 +133,7 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
             Assertion::eq(0, count($diff), sprintf('The following claim(s) is/are mandatory: "%s".', json_encode(array_values($diff))));
             Assertion::eq($jwt->getClaim('sub'), $jwt->getClaim('iss'), 'The claims "sub" and "iss" must contain the client public ID.');
         } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
         }
 
         $client_credentials = $jwt;

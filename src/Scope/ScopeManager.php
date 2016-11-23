@@ -172,7 +172,7 @@ class ScopeManager implements ScopeManagerInterface
     private function checkScopeUsedOnce($scope, array $scopes)
     {
         if (1 < count(array_keys($scopes, $scope))) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, sprintf('Scope "%s" appears more than once.', $scope));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_SCOPE, sprintf('Scope "%s" appears more than once.', $scope));
         }
     }
 
@@ -184,7 +184,7 @@ class ScopeManager implements ScopeManagerInterface
     private function checkScopeCharset($scope)
     {
         if (1 !== preg_match('/^[\x20\x23-\x5B\x5D-\x7E]+$/', $scope)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, 'Scope contains illegal characters.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_SCOPE, 'Scope contains illegal characters.');
         }
     }
 }

@@ -97,7 +97,7 @@ class AccessToken implements IntrospectionTokenTypeInterface, RevocationTokenTyp
         $result = [
             'active'     => !$token->hasExpired(),
             'client_id'  => $token->getClientPublicId(),
-            'token_type' => $token->getTokenType(),
+            'token_type' => $token->getTokenTypeParameter('token_type'),
             'exp'        => $token->getExpiresAt(),
         ];
 

@@ -35,7 +35,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The request must be secured.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -50,7 +50,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('Method must be POST.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -65,7 +65,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The "grant_type" parameter is missing.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -80,7 +80,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_CLIENT, $e->getMessage());
             $this->assertEquals('Client authentication failed.', $e->getDescription());
             $this->assertEquals(401, $e->getHttpCode());
         }
@@ -95,7 +95,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The grant type "bar" is not supported by this server.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -110,7 +110,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_UNAUTHORIZED_CLIENT, $e->getMessage());
             $this->assertEquals('The grant type "client_credentials" is unauthorized for this client.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -128,7 +128,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeNotAuthorizedForClientWithExpiredCredentials()
@@ -140,7 +140,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_CLIENT, $e->getMessage());
             $this->assertEquals('Client authentication failed.', $e->getDescription());
             $this->assertEquals(401, $e->getHttpCode());
         }
@@ -159,7 +159,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"MAC","expires_in":[0-9]+,"refresh_token":"[^"]+","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256","foo":"bar"}', $content);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"refresh_token":"[^"]+","token_type":"MAC","mac_key":"[^"]+","mac_algorithm":"hmac-sha-256","foo":"bar"}', $content);
     }
 
     public function testTokenTypeNotAuthorizedForClient()
@@ -171,7 +171,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The token type "Bearer" is not allowed for the client.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -189,7 +189,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeAuthorizedForClientUsingAuthorizationHeaderButMissingPassword()
@@ -200,7 +200,7 @@ class ClientCredentialsGrantTypeTest extends Base
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_CLIENT, $e->getMessage());
             $this->assertEquals('Client authentication failed.', $e->getDescription());
         }
     }
@@ -213,7 +213,7 @@ class ClientCredentialsGrantTypeTest extends Base
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_CLIENT, $e->getMessage());
             $this->assertEquals('Client authentication failed.', $e->getDescription());
         }
     }
@@ -230,7 +230,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testGrantTypeAuthorizedForClientAndJWTAccessToken()
@@ -246,7 +246,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9^"]+,"refresh_token":"[^"]+","foo":"bar"}', $content);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9^"]+,"refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $content);
 
         $response->getBody()->rewind();
         $values = json_decode($content, true);
@@ -269,7 +269,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_CLIENT, $e->getMessage());
             $this->assertEquals('The client is not a confidential client', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }
@@ -314,7 +314,7 @@ class ClientCredentialsGrantTypeTest extends Base
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_CLIENT, $e->getMessage());
             $this->assertEquals('Client authentication failed.', $e->getDescription());
         }
     }
@@ -358,7 +358,7 @@ class ClientCredentialsGrantTypeTest extends Base
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_CLIENT, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_CLIENT, $e->getMessage());
             $this->assertEquals('Client authentication failed.', $e->getDescription());
         }
     }
@@ -407,7 +407,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","scope":"scope1","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","scope":"scope1","refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testMissingClaim()
@@ -449,7 +449,7 @@ class ClientCredentialsGrantTypeTest extends Base
         try {
             $this->getTokenEndpoint()->getAccessToken($request, $response);
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
             $this->assertEquals('The following claim(s) is/are mandatory: "["jti"]".', $e->getDescription());
         }
     }
@@ -497,7 +497,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
     }
 
     public function testEncryptedAndSignedAssertionForJWTClient()
@@ -567,7 +567,7 @@ class ClientCredentialsGrantTypeTest extends Base
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
 
         $content = $response->getBody()->getContents();
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","scope":"scope1","refresh_token":"[^"]+","foo":"bar"}', $content);
+        $this->assertRegExp('{"access_token":"[^"]+","scope":"scope1","refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $content);
     }
 
     public function testNoScopeRequestedForErrorPolicy()
@@ -631,7 +631,7 @@ class ClientCredentialsGrantTypeTest extends Base
             $this->getTokenEndpoint()->getAccessToken($request, $response);
             $this->fail('Should throw an Exception');
         } catch (BaseExceptionInterface $e) {
-            $this->assertEquals(ExceptionManagerInterface::INVALID_SCOPE, $e->getMessage());
+            $this->assertEquals(ExceptionManagerInterface::ERROR_INVALID_SCOPE, $e->getMessage());
             $this->assertEquals('No scope was requested.', $e->getDescription());
             $this->assertEquals(400, $e->getHttpCode());
         }

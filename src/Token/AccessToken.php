@@ -16,22 +16,9 @@ use Assert\Assertion;
 class AccessToken extends OAuth2Token implements AccessTokenInterface
 {
     /**
-     * @var string
-     */
-    protected $token_type;
-
-    /**
      * @var null|string
      */
     protected $refresh_token;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTokenType()
-    {
-        return $this->getParameter('token_type');
-    }
 
     /**
      * {@inheritdoc}
@@ -65,7 +52,6 @@ class AccessToken extends OAuth2Token implements AccessTokenInterface
     {
         $values = [
             'access_token' => $this->getToken(),
-            'token_type'   => $this->getTokenType(),
         ];
 
         if (0 !== $this->getExpiresIn()) {
@@ -84,5 +70,13 @@ class AccessToken extends OAuth2Token implements AccessTokenInterface
         );
 
         return $values;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTokenTypeParameter($name)
+    {
+        return $this->getParameter($name);
     }
 }

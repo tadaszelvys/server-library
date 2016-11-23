@@ -79,7 +79,7 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
             throw new AuthorizeException($authorization);
         } else {
             if ($authorization->hasPrompt('none')) {
-                throw new CreateRedirectionException($authorization, ExceptionManagerInterface::INTERACTION_REQUIRED);
+                throw new CreateRedirectionException($authorization, ExceptionManagerInterface::ERROR_INTERACTION_REQUIRED);
             }
         }
     }

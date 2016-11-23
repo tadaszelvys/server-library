@@ -150,7 +150,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=[\d]+&scope=scope1\+scope2&token_type=Bearer&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
 
         // We get the access token
         $location = parse_url($response->getHeader('Location')[0]);
@@ -218,7 +218,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
         $response->getBody()->rewind();
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&scope=openid\+scope1\+scope2&token_type=Bearer&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
     }
@@ -288,7 +288,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&scope=openid\+scope1\+scope2&token_type=Bearer&foo=bar&state=0123456789&session_state=[^"]+$/', $response->getHeader('Location')[0]);
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
     }
@@ -342,7 +342,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setCurrentUserAccount($user_account);
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&scope=openid\+scope1\+scope2&token_type=Bearer&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
         $this->getAuthorizationRequestLoader()->disableRequestUriRegistrationRequirement();
@@ -415,7 +415,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&scope=openid\+scope1\+scope2&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&scope=openid\+scope1\+scope2&token_type=Bearer&foo=bar&state=012345679&session_state=[^"]+$/', $response->getHeader('Location')[0]);
 
         $this->getImplicitGrantType()->disallowConfidentialClients();
         unlink(__DIR__.'/../signed_and_encrypted_request');
@@ -436,7 +436,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=[^"]+$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=[\d]+&scope=scope1\+scope2&token_type=Bearer&foo=bar&state=[^"]+$/', $response->getHeader('Location')[0]);
     }
 
     public function testAccessTokenSuccessWithStateAndForPostResponseMode()
@@ -499,7 +499,7 @@ class ImplicitGrantTypeTest extends Base
         $this->getAuthorizationEndpoint()->setIsAuthorized(true);
         $this->getAuthorizationEndpoint()->authorize($request, $response);
 
-        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&token_type=Bearer&expires_in=[\d]+&scope=scope1\+scope2&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
+        $this->assertRegExp('/^http:\/\/example.com\/test\?good=false#access_token=[^"]+&expires_in=[\d]+&scope=scope1\+scope2&token_type=Bearer&foo=bar&state=0123456789$/', $response->getHeader('Location')[0]);
         $this->getAuthorizationFactory()->enableResponseModeParameterSupport();
     }
 

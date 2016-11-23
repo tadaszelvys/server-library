@@ -139,7 +139,7 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
             case 'code id_token token':
                 return 'fragment';
             default:
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported response type combination "%s".', $response_type));
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, sprintf('Unsupported response type combination "%s".', $response_type));
         }
     }
 
@@ -153,7 +153,7 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
     private function getResponseModeService($mode)
     {
         if (!$this->getResponseModeManager()->hasResponseMode($mode)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Unsupported response mode "%s".', $mode));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, sprintf('Unsupported response mode "%s".', $mode));
         }
 
         return $this->getResponseModeManager()->getResponseMode($mode);
@@ -168,7 +168,7 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
     private function checkResponseTypeAllowedForTheClient(ClientInterface $client, array $params)
     {
         if (!$client->isResponseTypeAllowed($params['response_type'])) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, 'The response type "'.$params['response_type'].'" is unauthorized for this client.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_UNAUTHORIZED_CLIENT, 'The response type "'.$params['response_type'].'" is unauthorized for this client.');
         }
     }
 
@@ -178,13 +178,13 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
     public function getResponseTypes(array $params)
     {
         if (!$this->getResponseTypeManager()->isResponseTypeSupported($params['response_type'])) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('Response type "%s" is not supported by this server', $params['response_type']));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, sprintf('Response type "%s" is not supported by this server', $params['response_type']));
         }
 
         try {
             $types = $this->getResponseTypeManager()->getResponseTypes($params['response_type']);
         } catch (\InvalidArgumentException $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
         }
 
         return $types;

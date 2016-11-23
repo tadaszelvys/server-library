@@ -187,7 +187,7 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
     {
         $client = $this->getClientManager()->getClient($access_token->getClientPublicId());
         if (null === $client) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find the client.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unable to find the client.');
         }
 
         return $client;
@@ -204,7 +204,7 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
     {
         $user_account = $this->getUserAccountManager()->getUserAccountByPublicId($access_token->getUserAccountPublicId());
         if (null === $user_account) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find the resource owner.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unable to find the resource owner.');
         }
 
         return $user_account;
@@ -255,7 +255,7 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
     private function checkHasRedirectUri(AccessTokenInterface $access_token)
     {
         if (!$access_token->hasMetadata('redirect_uri')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The access token has no "redirect_uri" data and cannot be used.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The access token has no "redirect_uri" data and cannot be used.');
         }
     }
 
@@ -267,7 +267,7 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
     private function checkScope(array $scope)
     {
         if (!in_array('openid', $scope)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The access token does not contain the "openid" scope.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The access token does not contain the "openid" scope.');
         }
     }
 }

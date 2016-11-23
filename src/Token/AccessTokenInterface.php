@@ -11,15 +11,10 @@
 
 namespace OAuth2\Token;
 
-interface AccessTokenInterface extends OAuth2TokenInterface, \JsonSerializable
-{
-    /**
-     * The token type (bearer, mac...).
-     *
-     * @return string
-     */
-    public function getTokenType();
+use OAuth2\AccessToken\AccessTokenInterface as Base;
 
+interface AccessTokenInterface extends Base, OAuth2TokenInterface, \JsonSerializable
+{
     /**
      * The refresh token associated with the access token.
      * Return null if no refresh token is associated.

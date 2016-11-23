@@ -334,7 +334,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"scope":"scope1 scope2","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
 
         $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
@@ -373,7 +373,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"scope":"scope1 scope2","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
 
         $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
@@ -411,7 +411,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"scope":"scope1 scope2","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
 
         $this->getAuthorizationCodeGrantType()->disallowPublicClients();
     }
@@ -651,7 +651,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $body);
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"scope":"scope1 scope2","refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $body);
 
         $json = json_decode($body, true);
 
@@ -673,7 +673,7 @@ class AuthCodeGrantTypeTest extends Base
         $this->assertEquals('no-store, private', $response->getHeader('Cache-Control')[0]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('no-cache', $response->getHeader('Pragma')[0]);
-        $this->assertRegExp('{"access_token":"[^"]+","token_type":"Bearer","expires_in":[0-9]+,"scope":"scope1 scope2","refresh_token":"[^"]+","foo":"bar"}', $response->getBody()->getContents());
+        $this->assertRegExp('{"access_token":"[^"]+","expires_in":[0-9]+,"scope":"scope1 scope2","refresh_token":"[^"]+","token_type":"Bearer","foo":"bar"}', $response->getBody()->getContents());
 
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);

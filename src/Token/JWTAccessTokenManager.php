@@ -171,7 +171,7 @@ class JWTAccessTokenManager extends AccessTokenManager
             'nbf'            => time(),
             'exp'            => $access_token->getExpiresAt(),
             'sub'            => $access_token->getClientPublicId(),
-            'token_type'     => $access_token->getTokenType(),
+            'token_type'     => $access_token->getTokenTypeParameter('token_type'),
             'scp'            => $access_token->getScope(),
             'resource_owner' => $access_token->getResourceOwnerPublicId(),
             'user_account'   => $access_token->getUserAccountPublicId(),

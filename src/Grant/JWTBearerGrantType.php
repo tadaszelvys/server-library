@@ -99,7 +99,7 @@ class JWTBearerGrantType implements GrantTypeInterface
             Assertion::isInstanceOf($jwt, JWSInterface::class, 'Assertion does not contain signed claims.');
             Assertion::true($jwt->hasClaim('sub'), 'Assertion does not contain "sub" claims.');
         } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
         }
 
         //We modify the response:
@@ -115,7 +115,7 @@ class JWTBearerGrantType implements GrantTypeInterface
     public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         if (false === $client->hasPublicKeySet()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client is not a client with signature capabilities.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'The client is not a client with signature capabilities.');
         }
         $jwt = $grant_type_response->getAdditionalData('jwt');
 
@@ -125,7 +125,7 @@ class JWTBearerGrantType implements GrantTypeInterface
                 $client->getPublicKeySet()
             );
         } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
         }
 
         $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();

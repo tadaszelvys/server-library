@@ -311,7 +311,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
                 return;
             }
         }
-        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_URI, 'The request Uri is not allowed.');
+        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST_URI, 'The request Uri is not allowed.');
     }
 
     /**
@@ -322,7 +322,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     private function checkRequestUriPathTraversal($request_uri)
     {
         if (false === Uri::checkUrl($request_uri, false)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The request Uri must not contain path traversal.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'The request Uri must not contain path traversal.');
         }
     }
 
@@ -336,7 +336,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     private function getClientRequestUris(ClientInterface $client)
     {
         if (false === $client->has('request_uris') || empty($request_uris = $client->get('request_uris'))) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'The client must register at least one request Uri.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'The client must register at least one request Uri.');
         }
 
         return $request_uris;
@@ -367,7 +367,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
             $missing_claims = array_keys(array_diff_key(array_flip($this->mandatory_claims), $jwt->getClaims()));
             Assertion::true(0 === count($missing_claims), 'The following mandatory claims are missing: %s.', json_encode($missing_claims));
         } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_OBJECT, $e->getMessage());
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST_OBJECT, $e->getMessage());
         }
 
         return $jwt;
@@ -390,7 +390,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
 
         $content = $response->getBody()->getContents();
         if (!is_string($content)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST_URI, 'Unable to get content.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST_URI, 'Unable to get content.');
         }
 
         return $content;
@@ -407,7 +407,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     {
         $client = array_key_exists('client_id', $params) ? $this->getClientManager()->getClient($params['client_id']) : null;
         if (!$client instanceof ClientInterface) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Parameter "client_id" missing or invalid.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Parameter "client_id" missing or invalid.');
         }
 
         return $client;

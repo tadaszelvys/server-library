@@ -32,7 +32,7 @@ use OAuth2\Scope\ScopeManagerInterface;
 use OAuth2\Token\AccessTokenInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
 use OAuth2\Token\RefreshTokenManagerInterface;
-use OAuth2\Token\TokenTypeManagerInterface;
+use OAuth2\TokenType\TokenTypeManagerInterface;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 use OAuth2\UserAccount\UserAccountManagerInterface;
 use OAuth2\Util\RequestBody;
@@ -61,7 +61,7 @@ class TokenEndpoint implements TokenEndpointInterface
      * TokenEndpoint constructor.
      *
      * @param \OAuth2\Grant\GrantTypeManagerInterface                                 $grant_type_manager
-     * @param \OAuth2\Token\TokenTypeManagerInterface                                 $token_type_manager
+     * @param \OAuth2\TokenType\TokenTypeManagerInterface                                 $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface                               $access_token_manager
      * @param \OAuth2\Client\ClientManagerInterface                                   $client_manager
      * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager
@@ -121,11 +121,11 @@ class TokenEndpoint implements TokenEndpointInterface
     public function getAccessToken(ServerRequestInterface $request, ResponseInterface &$response)
     {
         if (!$this->isRequestSecured($request)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'The request must be secured.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The request must be secured.');
         }
 
         if ('POST' !== $request->getMethod()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Method must be POST.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Method must be POST.');
         }
 
         $this->handleRequest($request, $response);
@@ -165,7 +165,7 @@ class TokenEndpoint implements TokenEndpointInterface
             try {
                 $requested_scope = $this->getScopeManager()->checkScopePolicy($grant_type_response->getRequestedScope(), $client);
             } catch (\InvalidArgumentException $e) {
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, $e->getMessage());
+                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_SCOPE, $e->getMessage());
             }
             $grant_type_response->setRequestedScope($requested_scope);
 
@@ -271,7 +271,7 @@ class TokenEndpoint implements TokenEndpointInterface
     {
         //Check if scope requested are within the available scope
         if (!$this->getScopeManager()->areRequestScopesAvailable($grant_type_response->getRequestedScope(), $grant_type_response->getAvailableScope())) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_SCOPE, sprintf('An unsupported scope was requested. Available scopes are [%s]', implode(',', $grant_type_response->getAvailableScope())));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_SCOPE, sprintf('An unsupported scope was requested. Available scopes are [%s]', implode(',', $grant_type_response->getAvailableScope())));
         }
     }
 
@@ -287,7 +287,7 @@ class TokenEndpoint implements TokenEndpointInterface
     {
         $token_type = $this->getTokenTypeFromRequest($request_parameters);
         if (!$client->isTokenTypeAllowed($token_type->getTokenTypeName())) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, sprintf('The token type "%s" is not allowed for the client.', $token_type->getTokenTypeName()));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, sprintf('The token type "%s" is not allowed for the client.', $token_type->getTokenTypeName()));
         }
 
         return $token_type->getTokenTypeInformation();
@@ -383,7 +383,7 @@ class TokenEndpoint implements TokenEndpointInterface
 
             return $this->getGrantTypeManager()->getGrantType($request_parameters['grant_type']);
         } catch (\InvalidArgumentException $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, $e->getMessage());
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
         }
     }
 
@@ -396,7 +396,7 @@ class TokenEndpoint implements TokenEndpointInterface
     private function checkGrantType(ClientInterface $client, $grant_type)
     {
         if (!$client->isGrantTypeAllowed($grant_type)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::UNAUTHORIZED_CLIENT, sprintf('The grant type "%s" is unauthorized for this client.', $grant_type));
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_UNAUTHORIZED_CLIENT, sprintf('The grant type "%s" is unauthorized for this client.', $grant_type));
         }
     }
 
@@ -416,7 +416,7 @@ class TokenEndpoint implements TokenEndpointInterface
             $resource_owner = $this->getClientManager()->getClient($resource_owner_public_id);
         }
         if (null === $resource_owner) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_REQUEST, 'Unable to find resource owner');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Unable to find resource owner');
         }
 
         return $resource_owner;

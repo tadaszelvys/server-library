@@ -18,7 +18,7 @@ use OAuth2\Behaviour\HasTokenTypeParameterSupport;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Exception\ExceptionManagerInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
-use OAuth2\Token\TokenTypeManagerInterface;
+use OAuth2\TokenType\TokenTypeManagerInterface;
 
 class ImplicitGrantType implements ResponseTypeInterface
 {
@@ -35,7 +35,7 @@ class ImplicitGrantType implements ResponseTypeInterface
     /**
      * ImplicitGrantType constructor.
      *
-     * @param \OAuth2\Token\TokenTypeManagerInterface     $token_type_manager
+     * @param \OAuth2\TokenType\TokenTypeManagerInterface     $token_type_manager
      * @param \OAuth2\Token\AccessTokenManagerInterface   $access_token_manager
      * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
      */
@@ -76,7 +76,7 @@ class ImplicitGrantType implements ResponseTypeInterface
     public function checkAuthorization(AuthorizationInterface $authorization)
     {
         if (false === $this->areConfidentialClientsAllowed() && false === $authorization->getClient()->isPublic()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::INVALID_CLIENT, 'Confidential clients are not allowed to use the implicit grant type.');
+            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'Confidential clients are not allowed to use the implicit grant type.');
         }
     }
 
