@@ -12,7 +12,6 @@
 namespace OAuth2\Test\Stub;
 
 use Base64Url\Base64Url;
-use OAuth2\Client\ClientInterface;
 use OAuth2\Client\Rule\ClientRegistrationManagementRule as Base;
 
 class ClientRegistrationManagementRule extends Base
@@ -20,15 +19,15 @@ class ClientRegistrationManagementRule extends Base
     /**
      * {@inheritdoc}
      */
-    protected function getRegistrationClientUri(ClientInterface $client)
+    protected function getRegistrationClientUri(string $clientId)
     {
-        return sprintf('https://www.config.example.com/client/%s', $client->getPublicId());
+        return sprintf('https://www.config.example.com/client/%s', $clientId);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getRegistrationAccessToken(ClientInterface $client)
+    protected function generateRegistrationAccessToken()
     {
         return Base64Url::encode(random_bytes(64));
     }

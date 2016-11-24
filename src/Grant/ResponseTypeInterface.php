@@ -11,7 +11,7 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization\Authorization;
 
 interface ResponseTypeInterface
 {
@@ -22,17 +22,16 @@ interface ResponseTypeInterface
     /**
      * This function returns the supported response type.
      *
-     * @return string The response type
-     * @return bool   Return true if it can handle the request
+     * @return string
      */
-    public function getResponseType();
+    public function getResponseType(): string;
 
     /**
      * This function returns the list of associated grant types.
      *
      * @return string[]
      */
-    public function getAssociatedGrantTypes();
+    public function getAssociatedGrantTypes(): array;
 
     /**
      * Returns the response mode of the response type or the error returned.
@@ -40,40 +39,40 @@ interface ResponseTypeInterface
      *
      * @return string
      */
-    public function getResponseMode();
+    public function getResponseMode(): string;
 
     /**
      * This function checks the authorization.
      *
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization The authorization object
+     * @param \OAuth2\Endpoint\Authorization\Authorization $authorization The authorization object
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return array
      */
-    public function checkAuthorization(AuthorizationInterface $authorization);
+    public function checkAuthorization(Authorization $authorization);
 
     /**
      * This function checks the request and prepare the authorization response.
      *
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization The authorization object
+     * @param \OAuth2\Endpoint\Authorization\Authorization $authorization The authorization object
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return array
      */
-    public function prepareAuthorization(AuthorizationInterface $authorization);
+    public function prepareAuthorization(Authorization $authorization);
 
     /**
      * This function finish the authorization response.
      *
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization       The authorization object
+     * @param \OAuth2\Endpoint\Authorization\Authorization $authorization       The authorization object
      * @param array                                                 $response_parameters The parameters to send to the client
      * @param string                                                $redirect_uri        The redirect URI
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return array
      */
-    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri);
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri);
 }

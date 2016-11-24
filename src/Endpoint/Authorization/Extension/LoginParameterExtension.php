@@ -14,7 +14,6 @@ namespace OAuth2\Endpoint\Authorization\Extension;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Endpoint\Authorization\Exception\RedirectToLoginPageException;
 use OAuth2\UserAccount\UserAccountInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class LoginParameterExtension implements AuthorizationEndpointExtensionInterface
@@ -22,7 +21,7 @@ class LoginParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccount(ServerRequestInterface $request, ResponseInterface &$response, AuthorizationInterface $authorization, UserAccountInterface &$user_account = null)
+    public function processUserAccount(ServerRequestInterface $request, AuthorizationInterface $authorization, UserAccountInterface &$user_account = null)
     {
         //Nothing to do
     }
@@ -30,7 +29,7 @@ class LoginParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsAvailable(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    public function processUserAccountIsAvailable(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         if ($authorization->hasPrompt('login') && !$is_fully_authenticated) {
             throw new RedirectToLoginPageException($authorization);
@@ -40,7 +39,7 @@ class LoginParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         //Nothing to do
     }
@@ -48,7 +47,7 @@ class LoginParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         //Nothing to do
     }
@@ -56,7 +55,7 @@ class LoginParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function process(array &$response_parameters, ServerRequestInterface $request, ResponseInterface &$response, AuthorizationInterface $authorization)
+    public function process(array &$response_parameters, ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         //Nothing to do
     }

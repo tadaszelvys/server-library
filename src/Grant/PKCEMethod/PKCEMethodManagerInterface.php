@@ -14,42 +14,44 @@ namespace OAuth2\Grant\PKCEMethod;
 interface PKCEMethodManagerInterface
 {
     /**
-     * @param \OAuth2\Grant\PKCEMethod\PKCEMethodInterface $method
+     * @param PKCEMethodInterface $method
+     *
+     * @return self
      */
-    public function addPKCEMethod(PKCEMethodInterface $method);
+    public function addPKCEMethod(PKCEMethodInterface $method): PKCEMethodManagerInterface;
 
     /**
-     * @param string $code_challenge_method
-     * @param string $code_challenge
-     * @param string $code_verifier
+     * @param string $codeChallengeMethod
+     * @param string $codeChallenge
+     * @param string $codeVerifier
      *
      * @throws \InvalidArgumentException
      */
-    public function checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier);
+    public function checkPKCEInput(string $codeChallengeMethod, string $codeChallenge, string $codeVerifier);
 
     /**
-     * @param string $method_name
+     * @param string $methodName
      *
      * @return bool
      */
-    public function hasPKCEMethod($method_name);
+    public function hasPKCEMethod(string $methodName): bool;
 
     /**
-     * @param string $method_name
+     * @param string $methodName
      *
      * @throws \InvalidArgumentException
      *
-     * @return \OAuth2\Grant\PKCEMethod\PKCEMethodInterface
+     * @return PKCEMethodInterface
      */
-    public function getPKCEMethod($method_name);
+    public function getPKCEMethod(string $methodName): PKCEMethodInterface;
 
     /**
-     * @return \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]
+     * @return PKCEMethodInterface[]
      */
-    public function getPKCEMethods();
+    public function getPKCEMethods(): array;
 
     /**
      * @return string[]
      */
-    public function getPKCEMethodNames();
+    public function getPKCEMethodNames(): array;
 }

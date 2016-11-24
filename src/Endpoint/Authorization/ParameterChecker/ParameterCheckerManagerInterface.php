@@ -24,7 +24,7 @@ interface ParameterCheckerManagerInterface
      * @param \OAuth2\Client\ClientInterface $client
      * @param array                          $parameters
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      */
     public function checkParameters(ClientInterface $client, array &$parameters);
 }

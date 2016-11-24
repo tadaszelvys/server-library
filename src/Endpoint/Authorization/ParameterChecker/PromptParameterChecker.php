@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 class PromptParameterChecker implements ParameterCheckerInterface
 {
@@ -30,8 +30,8 @@ class PromptParameterChecker implements ParameterCheckerInterface
         if (!array_key_exists('prompt', $parameters)) {
             return;
         }
-        Assertion::true(empty(array_diff($parameters['prompt'], $this->getAllowedPromptValues())), sprintf('Invalid parameter "prompt". Allowed values are %s', json_encode($this->getAllowedPromptValues())));
-        Assertion::false(in_array('none', $parameters['prompt']) && 1 !== count($parameters['prompt']), 'Invalid parameter "prompt". Prompt value "none" must be used alone.');
+        Assertion::true(empty(array_diff($parameters['prompt'], $this->getAllowedPromptValues())), sprintf('Invalid parameter \'prompt\'. Allowed values are %s', implode(', ', $this->getAllowedPromptValues())));
+        Assertion::false(in_array('none', $parameters['prompt']) && 1 !== count($parameters['prompt']), 'Invalid parameter \'prompt\'. Prompt value \'none\' must be used alone.');
     }
 
     /**
@@ -39,7 +39,7 @@ class PromptParameterChecker implements ParameterCheckerInterface
      */
     public function getError()
     {
-        return ExceptionManagerInterface::ERROR_INVALID_REQUEST;
+        return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }
 
     /**

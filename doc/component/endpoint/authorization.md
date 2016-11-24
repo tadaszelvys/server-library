@@ -20,7 +20,7 @@ This library provide the `OAuth2\Endpoint\Authorization\AuthorizationRequestLoad
 
 use OAuth2\Endpoint\Authorization\AuthorizationRequestLoader;
 
-$request_loader = new AuthorizationRequestLoader($client_manager, $exception_manager);
+$request_loader = new AuthorizationRequestLoader($client_manager, $response_factory_manager);
 ```
 
 ### Authorization Request Object Support

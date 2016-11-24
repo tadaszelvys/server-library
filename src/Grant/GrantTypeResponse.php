@@ -79,7 +79,7 @@ class GrantTypeResponse implements GrantTypeResponseInterface
      */
     public function getAdditionalData($key)
     {
-        Assertion::true($this->hasAdditionalData($key), sprintf('The additional data with key "%s" does not exist.', $key));
+        Assertion::true($this->hasAdditionalData($key), sprintf('The additional data with key \'%s\' does not exist.', $key));
 
         return $this->additional_data[$key];
     }

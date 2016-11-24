@@ -12,26 +12,27 @@
 namespace OAuth2\Endpoint\Authorization;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Grant\ResponseTypeInterface;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\ResponseMode\ResponseModeInterface;
-use OAuth2\UserAccount\UserAccountInterface;
 
-class Authorization implements AuthorizationInterface
+class Authorization
 {
     /**
      * @var bool
      */
-    private $is_authorized;
+    private $authorized;
 
     /**
-     * @var \OAuth2\Client\ClientInterface
+     * @var Client
      */
     private $client;
 
     /**
-     * @var \OAuth2\UserAccount\UserAccountInterface
+     * @var UserAccount
      */
-    private $user_account;
+    private $userAccount;
 
     /**
      * @var array
@@ -44,14 +45,14 @@ class Authorization implements AuthorizationInterface
     private $data = [];
 
     /**
-     * @var \OAuth2\Grant\ResponseTypeInterface[]
+     * @var ResponseTypeInterface[]
      */
-    private $response_types = [];
+    private $responseTypes = [];
 
     /**
-     * @var \OAuth2\ResponseMode\ResponseModeInterface
+     * @var ResponseModeInterface
      */
-    private $response_mode = null;
+    private $responseMode = null;
 
     /**
      * @var array
@@ -67,58 +68,63 @@ class Authorization implements AuthorizationInterface
      * Authorization constructor.
      *
      * @param array                                      $query_params
-     * @param \OAuth2\Client\ClientInterface             $client
-     * @param \OAuth2\Grant\ResponseTypeInterface[]      $response_types
-     * @param \OAuth2\ResponseMode\ResponseModeInterface $response_mode
+     * @param Client             $client
+     * @param ResponseTypeInterface[]      $responseTypes
+     * @param ResponseModeInterface $responseMode
      * @param string                                     $redirect_uri
      * @param string[]                                   $scopes
      */
-    public function __construct(array $query_params, ClientInterface $client, array $response_types, ResponseModeInterface $response_mode, $redirect_uri, array $scopes)
+    public function __construct(array $query_params, Client $client, array $responseTypes, ResponseModeInterface $responseMode, $redirect_uri, array $scopes)
     {
+        Assertion::allIsInstanceOf($responseTypes, ResponseTypeInterface::class);
         $this->scopes = $scopes;
         $this->client = $client;
         $this->query_params = $query_params;
-        $this->response_mode = $response_mode;
-        $this->response_types = $response_types;
+        $this->responseMode = $responseMode;
+        $this->responseTypes = $responseTypes;
         $this->redirect_uri = $redirect_uri;
     }
 
     /**
-     * {@inheritdoc}
+     * @param UserAccount $userAccount
+     * @return self
      */
-    public function setUserAccount(UserAccountInterface $user_account)
+    public function withUserAccount(UserAccount $userAccount): self
     {
-        $this->user_account = $user_account;
+        $clone = clone $this;
+        $clone->userAccount = $userAccount;
+
+        return $clone;
     }
 
     /**
-     * {@inheritdoc}
+     * @return UserAccount
      */
-    public function getUserAccount()
+    public function getUserAccount(): UserAccount
     {
-        return $this->user_account;
+        return $this->userAccount;
     }
 
     /**
-     * {@inheritdoc}
+     * @return Client
      */
-    public function getClient()
+    public function getClient(): Client
     {
         return $this->client;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function getQueryParams()
+    public function getQueryParams(): array
     {
         return $this->query_params;
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getPrompt()
+    public function getPrompt(): array
     {
         if (!$this->hasQueryParam('prompt')) {
             return [];
@@ -128,9 +134,10 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $prompt
+     * @return bool
      */
-    public function hasPrompt($prompt)
+    public function hasPrompt(string $prompt): bool
     {
         Assertion::string($prompt);
 
@@ -138,25 +145,30 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $scope
+     * @return self
      */
-    public function setScopes(array $scope)
+    public function withScopes(array $scope): self
     {
-        $this->scopes = $scope;
+        $clone = clone $this;
+        $clone->scopes += $scope;
+
+        return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function getScopes()
+    public function getScopes(): array
     {
         return $this->scopes;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $scope
+     * @return bool
      */
-    public function hasScope($scope)
+    public function hasScope(string $scope): bool
     {
         Assertion::string($scope);
 
@@ -164,47 +176,70 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $scope
+     * @return self
      */
-    public function removeScope($scope)
+    public function withoutScope(string $scope): self
     {
-        if (true === $this->hasScope($scope)) {
-            unset($this->scopes[array_search($scope, $this->scopes)]);
+        if (!$this->hasScope($scope)) {
+            return $this;
         }
+        $clone = clone $this;
+        unset($clone->scopes[array_search($scope, $clone->scopes)]);
+
+        return $clone;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $scope
+     * @return self
      */
-    public function addScope($scope)
+    public function addScope(string $scope): self
     {
-        if (false === $this->hasScope($scope)) {
-            $this->scopes[] = $scope;
+        if ($this->hasScope($scope)) {
+            return $this;
         }
+        $clone = clone $this;
+        $clone->scopes[] = $scope;
+
+        return $clone;
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
-        return $this->is_authorized;
+        return $this->authorized;
     }
 
     /**
-     * {@inheritdoc}
+     * @return self
      */
-    public function setAuthorized($is_authorized)
+    public function allow(): self
     {
-        Assertion::boolean($is_authorized);
+        $clone = clone $this;
+        $clone->authorized = true;
 
-        $this->is_authorized = $is_authorized;
+        return $clone;
     }
 
     /**
-     * {@inheritdoc}
+     * @return self
      */
-    public function hasQueryParam($param)
+    public function deny(): self
+    {
+        $clone = clone $this;
+        $clone->authorized = false;
+
+        return $clone;
+    }
+
+    /**
+     * @param string $param
+     * @return bool
+     */
+    public function hasQueryParam(string $param): bool
     {
         Assertion::string($param);
 
@@ -212,9 +247,10 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $param
+     * @return mixed
      */
-    public function getQueryParam($param)
+    public function getQueryParam(string $param)
     {
         Assertion::string($param);
         Assertion::true($this->hasQueryParam($param), sprintf('Invalid parameter "%s"', $param));
@@ -223,56 +259,59 @@ class Authorization implements AuthorizationInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $key
+     * @return bool
      */
-    public function hasData($key)
+    public function hasData(string $key): bool
     {
-        Assertion::string($key);
-
         return array_key_exists($key, $this->data);
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $key
+     * @return mixed
      */
-    public function getData($key)
+    public function getData(string $key)
     {
-        Assertion::string($key);
         Assertion::true($this->hasData($key), sprintf('Invalid data "%s"', $key));
 
         return $this->data[$key];
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $key
+     * @param mixed $data
+     * @return self
      */
-    public function setData($key, $data)
+    public function withData(string $key, $data): self
     {
-        Assertion::string($key);
-        $this->data[$key] = $data;
+        $clone = clone $this;
+        $clone->data[$key] = $data;
+
+        return $clone;
     }
 
     /**
-     * {@inheritdoc}
+     * @return ResponseTypeInterface[]
      */
-    public function getResponseTypes()
+    public function getResponseTypes(): array
     {
-        return $this->response_types;
+        return $this->responseTypes;
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function getRedirectUri()
+    public function getRedirectUri(): string
     {
         return $this->redirect_uri;
     }
 
     /**
-     * {@inheritdoc}
+     * @return ResponseModeInterface
      */
-    public function getResponseMode()
+    public function getResponseMode(): ResponseModeInterface
     {
-        return $this->response_mode;
+        return $this->responseMode;
     }
 }

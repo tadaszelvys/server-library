@@ -48,7 +48,7 @@ final class SessionStateParameterExtension extends Base
     /**
      * {@inheritdoc}
      */
-    protected function saveBrowserState(ResponseInterface &$response, $browser_state)
+    protected function saveBrowserState($browser_state)
     {
         $_SESSION[$this->storage_name] = $browser_state;
 

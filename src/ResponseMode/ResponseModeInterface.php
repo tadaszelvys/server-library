@@ -18,12 +18,13 @@ interface ResponseModeInterface
     /**
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
-     * @param string                              $redirect_uri
-     * @param array                               $data
-     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param string $redirect_uri
+     * @param array  $data
+     *
+     * @return ResponseInterface
      */
-    public function prepareResponse($redirect_uri, array $data, ResponseInterface &$response);
+    public function prepareResponse(string $redirect_uri, array $data): ResponseInterface;
 }

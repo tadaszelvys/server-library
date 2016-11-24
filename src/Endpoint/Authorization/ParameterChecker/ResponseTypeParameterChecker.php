@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 class ResponseTypeParameterChecker implements ParameterCheckerInterface
 {
@@ -25,7 +25,7 @@ class ResponseTypeParameterChecker implements ParameterCheckerInterface
         /*
          * @see http://tools.ietf.org/html/rfc6749#section-3.1.1
          */
-        Assertion::keyExists($parameters, 'response_type', 'The parameter "response_type" is mandatory.');
+        Assertion::keyExists($parameters, 'response_type', 'The parameter \'response_type\' is mandatory.');
     }
 
     /**
@@ -33,6 +33,6 @@ class ResponseTypeParameterChecker implements ParameterCheckerInterface
      */
     public function getError()
     {
-        return ExceptionManagerInterface::ERROR_INVALID_REQUEST;
+        return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }
 }

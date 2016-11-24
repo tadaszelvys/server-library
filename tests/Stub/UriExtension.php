@@ -11,16 +11,20 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Exception\Extension\ExceptionExtensionInterface;
+use Assert\Assertion;
+use OAuth2\Response\Extension\ExtensionInterface;
 
-final class UriExtension implements ExceptionExtensionInterface
+final class UriExtension implements ExtensionInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function process($type, $error, $error_description, array &$data)
+    public function process($code, array &$data)
     {
-        $data['error_uri'] = "https://foo.test/Error/$type/$error";
+        if ($code >= 200 && array_key_exists('error', $data)) {
+            $uri = sprintf('https://foo.test/Page/%d/%s', $code, $data['error']);
+            Assertion::regex($uri, '/^[\x21\x23-\x5B\x5D-\x7E]+$/', 'Invalid URI.');
+            $data['error_uri'] = $uri;
+        }
     }
 }

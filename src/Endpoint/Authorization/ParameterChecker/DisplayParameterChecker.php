@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 class DisplayParameterChecker implements ParameterCheckerInterface
 {
@@ -30,7 +30,7 @@ class DisplayParameterChecker implements ParameterCheckerInterface
         if (!array_key_exists('display', $parameters)) {
             return;
         }
-        Assertion::true(in_array($parameters['display'], $this->getAllowedDisplayValues()), sprintf('Invalid parameter "display". Allowed values are %s', json_encode($this->getAllowedDisplayValues())));
+        Assertion::true(in_array($parameters['display'], $this->getAllowedDisplayValues()), sprintf('Invalid parameter \'display\'. Allowed values are %s', implode(', ', $this->getAllowedDisplayValues())));
     }
 
     /**
@@ -38,7 +38,7 @@ class DisplayParameterChecker implements ParameterCheckerInterface
      */
     public function getError()
     {
-        return ExceptionManagerInterface::ERROR_INVALID_REQUEST;
+        return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }
 
     /**

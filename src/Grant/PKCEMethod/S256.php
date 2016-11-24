@@ -18,7 +18,7 @@ class S256 implements PKCEMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function getMethodName()
+    public function getMethodName():string
     {
         return 'S256';
     }
@@ -26,8 +26,8 @@ class S256 implements PKCEMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function isChallengeVerified($code_verifier, $code_challenge)
+    public function isChallengeVerified(string $codeVerifier, string $codeChallenge):bool
     {
-        return hash_equals($code_challenge, Base64Url::encode(hash('sha256', $code_verifier, true)));
+        return hash_equals($codeChallenge, Base64Url::encode(hash('sha256', $codeVerifier, true)));
     }
 }

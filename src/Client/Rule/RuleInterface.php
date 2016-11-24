@@ -11,20 +11,16 @@
 
 namespace OAuth2\Client\Rule;
 
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\UserAccount\UserAccount;
 
 interface RuleInterface
 {
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param array                          $registration_parameters
-     *
-     * @throws \InvalidArgumentException If an error occurred
+     * @param array $command_parameters
+     * @param array $validated_parameters
+     * @param UserAccount $userAccount
+     * @param callable $next
+     * @return array
      */
-    public function check(ClientInterface $client, array $registration_parameters);
-
-    /**
-     * @return string[]
-     */
-    public function getPreserverParameters();
+    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next);
 }

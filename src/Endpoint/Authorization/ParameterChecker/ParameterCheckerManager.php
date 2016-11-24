@@ -11,15 +11,16 @@
 
 namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
-use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasResponseFactoryManager;
 use OAuth2\Behaviour\HasScopeManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 class ParameterCheckerManager implements ParameterCheckerManagerInterface
 {
     use HasScopeManager;
-    use HasExceptionManager;
+    use HasResponseFactoryManager;
 
     /**
      * @var \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface[]
@@ -29,11 +30,11 @@ class ParameterCheckerManager implements ParameterCheckerManagerInterface
     /**
      * ParameterCheckerManager constructor.
      *
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
-    public function __construct(ExceptionManagerInterface $exception_manager)
+    public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory_manager)
     {
-        $this->setExceptionManager($exception_manager);
+        $this->setResponsefactoryManager($response_factory_manager);
     }
 
     /**
@@ -53,7 +54,7 @@ class ParameterCheckerManager implements ParameterCheckerManagerInterface
             try {
                 $parameter_checker->checkerParameter($client, $parameters);
             } catch (\InvalidArgumentException $e) {
-                throw $this->getExceptionManager()->getBadRequestException($parameter_checker->getError(), $e->getMessage());
+                throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => $parameter_checker->getError(), 'error_description' => $e->getMessage()]));
             }
         }
     }

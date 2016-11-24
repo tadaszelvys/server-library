@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint\Authorization;
 
+use Http\Client\HttpClient;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -48,7 +49,10 @@ interface AuthorizationRequestLoaderInterface
      */
     public function enableRequestObjectSupport(JWTLoaderInterface $jwt_loader, array $mandatory_claims = []);
 
-    public function enableRequestObjectReferenceSupport();
+    /**
+     * @param \Http\Client\HttpClient $client
+     */
+    public function enableRequestObjectReferenceSupport(HttpClient $client);
 
     /**
      * @param \Jose\Object\JWKSetInterface $key_encryption_key_set

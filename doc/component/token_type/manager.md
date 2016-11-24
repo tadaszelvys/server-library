@@ -8,10 +8,7 @@ This library provides a fully featured manager. You just have to create an insta
 
 use OAuth2\Token\TokenTypeManager;
 
-$token_type_manager = new TokenTypeManager($exception_manager); // We suppose that $exception_manager is a valid exception manager
-```
-
-## Multiple Token Type Support
+$token_type_manager = new TokenTypeManager($response_factory_manager); response_factory_manresponse_factory_manageriple Token Type Support
 
 This manager is able to support multiple token types.
 You must add at least one token type.

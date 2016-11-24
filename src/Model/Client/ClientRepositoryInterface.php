@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014-2016 Spomky-Labs
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ */
+
+namespace OAuth2\Model\Client;
+
+use OAuth2\Model\UserAccount\UserAccount;
+
+interface ClientRepositoryInterface
+{
+    /**
+     * @param UserAccount $userAccount
+     * @param array $metadatas
+     * @return Client
+     */
+    public function create(UserAccount $userAccount, array $metadatas);
+
+    /**
+     * Get a client using its Id.
+     *
+     * @param ClientId $clientId
+     *
+     * @return null|Client Return the client object or null if no client is found.
+     */
+    public function find(ClientId $clientId);
+
+    /**
+     * @return Client[]
+     */
+    public function findAll();
+
+    /**
+     * Save the client.
+     *
+     * @param Client $client
+     */
+    public function save(Client $client);
+
+    /**
+     * Delete the client.
+     *
+     * @param Client $client
+     */
+    public function delete(Client $client);
+}

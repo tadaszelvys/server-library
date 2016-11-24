@@ -15,70 +15,66 @@ use Assert\Assertion;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
 use Jose\Object\JWSInterface;
-use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasJWTLoader;
-use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Model\Client\Client;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 class JWTBearerGrantType implements GrantTypeInterface
 {
-    use HasExceptionManager;
-    use HasJWTLoader;
+    /**
+     * @var bool
+     */
+    private $encryptionRequired = false;
+
+    /**
+     * @var JWKSetInterface|null
+     */
+    private $keyEncryptionkeySet = null;
 
     /**
      * @var bool
      */
-    private $encryption_required = false;
-
-    /**
-     * @var \Jose\Object\JWKSetInterface|null
-     */
-    private $key_encryption_key_set = null;
-
-    /**
-     * @var bool
-     */
-    private $issue_refresh_token_with_access_token = false;
+    private $issueRefreshToken = false;
 
     /**
      * JWTBearerGrantType constructor.
      *
      * @param \Jose\JWTLoaderInterface                    $loader
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
-    public function __construct(JWTLoaderInterface $loader, ExceptionManagerInterface $exception_manager)
+    public function __construct(JWTLoaderInterface $loader, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
     {
         $this->setJWTLoader($loader);
-        $this->setExceptionManager($exception_manager);
+        $this->setResponsefactoryManager($response_factory_manager);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedResponseTypes()
+    public function getAssociatedResponseTypes(): array
     {
         return [];
     }
 
     /**
-     * @param bool                         $encryption_required
-     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
+     * @param bool                         $encryptionRequired
+     * @param JWKSetInterface $keyEncryptionkeySet
      */
-    public function enableEncryptedAssertions($encryption_required,
-                                              JWKSetInterface $key_encryption_key_set)
+    public function enableEncryptedAssertions($encryptionRequired,
+                                              JWKSetInterface $keyEncryptionkeySet)
     {
-        Assertion::boolean($encryption_required);
+        Assertion::boolean($encryptionRequired);
 
-        $this->encryption_required = $encryption_required;
-        $this->key_encryption_key_set = $key_encryption_key_set;
+        $this->encryptionRequired = $encryptionRequired;
+        $this->keyEncryptionkeySet = $keyEncryptionkeySet;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getGrantType()
+    public function getGrantType(): string
     {
         return 'urn:ietf:params:oauth:grant-type:jwt-bearer';
     }
@@ -86,38 +82,49 @@ class JWTBearerGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
+    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grantTypeResponse)
     {
         $assertion = RequestBody::getParameter($request, 'assertion');
         try {
-            Assertion::notNull($assertion, 'Parameter "assertion" is missing.');
+            Assertion::notNull($assertion, 'Parameter \'assertion\' is missing.');
             $jwt = $this->getJWTLoader()->load(
                 $assertion,
-                $this->key_encryption_key_set,
-                $this->encryption_required
+                $this->keyEncryptionkeySet,
+                $this->encryptionRequired
             );
             Assertion::isInstanceOf($jwt, JWSInterface::class, 'Assertion does not contain signed claims.');
-            Assertion::true($jwt->hasClaim('sub'), 'Assertion does not contain "sub" claims.');
+            Assertion::true($jwt->hasClaim('sub'), 'Assertion does not contain \'sub\' claims.');
         } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => $e->getMessage()
+                ]
+            );
         }
 
         //We modify the response:
         // - We add the subject as the client public id
         // - We transmit the JWT to the response for further needs
-        $grant_type_response->setClientPublicId($jwt->getClaim('sub'));
-        $grant_type_response->setAdditionalData('jwt', $jwt);
+        $grantTypeResponse->setClientPublicId($jwt->getClaim('sub'));
+        $grantTypeResponse->setAdditionalData('jwt', $jwt);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
+    public function grantAccessToken(ServerRequestInterface $request, Client $client, GrantTypeResponseInterface &$grantTypeResponse)
     {
         if (false === $client->hasPublicKeySet()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'The client is not a client with signature capabilities.');
+            throw new OAuth2Exception(400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'The client is not a client with signature capabilities.'
+                ]
+            );
         }
-        $jwt = $grant_type_response->getAdditionalData('jwt');
+        $jwt = $grantTypeResponse->getAdditionalData('jwt');
 
         try {
             $this->getJWTLoader()->verify(
@@ -125,32 +132,38 @@ class JWTBearerGrantType implements GrantTypeInterface
                 $client->getPublicKeySet()
             );
         } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => $e->getMessage()
+                ]
+            );
         }
 
-        $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
+        $issueRefreshToken = $this->isRefreshTokenIssuedWithAccessToken();
 
-        $grant_type_response->setResourceOwnerPublicId($client->getPublicId());
-        $grant_type_response->setUserAccountPublicId(null);
-        $grant_type_response->setRefreshTokenIssued($issue_refresh_token);
-        $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
+        $grantTypeResponse->setResourceOwnerPublicId($client->getId()->getValue());
+        $grantTypeResponse->setUserAccountPublicId(null);
+        $grantTypeResponse->setRefreshTokenIssued($issueRefreshToken);
+        $grantTypeResponse->setRefreshTokenScope($grantTypeResponse->getRequestedScope());
     }
 
     /**
      * @return bool
      */
-    public function isRefreshTokenIssuedWithAccessToken()
+    public function isRefreshTokenIssuedWithAccessToken(): bool
     {
-        return $this->issue_refresh_token_with_access_token;
+        return $this->issueRefreshToken;
     }
 
     public function enableRefreshTokenIssuanceWithAccessToken()
     {
-        $this->issue_refresh_token_with_access_token = true;
+        $this->issueRefreshToken = true;
     }
 
     public function disableRefreshTokenIssuanceWithAccessToken()
     {
-        $this->issue_refresh_token_with_access_token = false;
+        $this->issueRefreshToken = false;
     }
 }

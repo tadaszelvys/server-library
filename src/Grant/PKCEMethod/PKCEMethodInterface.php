@@ -16,13 +16,13 @@ interface PKCEMethodInterface
     /**
      * @return string
      */
-    public function getMethodName();
+    public function getMethodName(): string;
 
     /**
-     * @param string $code_verifier
-     * @param string $code_challenge
+     * @param string $codeVerifier
+     * @param string $codeChallenge
      *
-     * @return mixed
+     * @return bool
      */
-    public function isChallengeVerified($code_verifier, $code_challenge);
+    public function isChallengeVerified(string $codeVerifier, string $codeChallenge): bool;
 }

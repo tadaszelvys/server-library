@@ -12,13 +12,16 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
-use OAuth2\OpenIdConnect\HasIdTokenManager;
+use OAuth2\Model\Client\ClientId;
 use OAuth2\OpenIdConnect\IdTokenManagerInterface;
+use OAuth2\Model\UserAccount\UserAccount;
 
-class IdTokenEncryptionAlgorithmsRule implements RuleInterface
+final class IdTokenEncryptionAlgorithmsRule implements RuleInterface
 {
-    use HasIdTokenManager;
+    /**
+     * @var IdTokenManagerInterface
+     */
+    private $id_token_manager;
 
     /**
      * IdTokenAlgorithmsRule constructor.
@@ -27,32 +30,25 @@ class IdTokenEncryptionAlgorithmsRule implements RuleInterface
      */
     public function __construct(IdTokenManagerInterface $id_token_manager)
     {
-        $this->setIdTokenManager($id_token_manager);
+        $this->id_token_manager = $id_token_manager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
     {
-        if (!array_key_exists('id_token_encrypted_response_alg', $registration_parameters) || !array_key_exists('id_token_encrypted_response_enc', $registration_parameters)) {
-            return;
+        if (array_key_exists('id_token_encrypted_response_alg', $command_parameters) && array_key_exists('id_token_encrypted_response_enc', $command_parameters)) {
+            Assertion::string($command_parameters['id_token_encrypted_response_alg'], 'Invalid parameter \'id_token_encrypted_response_alg\'. The value must be a string.');
+            Assertion::string($command_parameters['id_token_encrypted_response_enc'], 'Invalid parameter \'id_token_encrypted_response_enc\'. The value must be a string.');
+            Assertion::inArray($command_parameters['id_token_encrypted_response_alg'], $this->id_token_manager->getSupportedKeyEncryptionAlgorithms(), sprintf('The ID Token content encryption algorithm \'%s\' is not supported. Please choose one of the following algorithm: %s', $command_parameters['id_token_encrypted_response_alg'], implode(', ', $this->id_token_manager->getSupportedContentEncryptionAlgorithms())));
+            Assertion::inArray($command_parameters['id_token_encrypted_response_enc'], $this->id_token_manager->getSupportedContentEncryptionAlgorithms(), sprintf('The ID Token key encryption algorithm \'%s\' is not supported. Please choose one of the following algorithm: %s', $command_parameters['id_token_encrypted_response_enc'], implode(', ', $this->id_token_manager->getSupportedKeyEncryptionAlgorithms())));
+            $validated_parameters['id_token_encrypted_response_alg'] = $command_parameters['id_token_encrypted_response_alg'];
+            $validated_parameters['id_token_encrypted_response_enc'] = $command_parameters['id_token_encrypted_response_enc'];
+        } elseif (array_key_exists('id_token_encrypted_response_alg', $command_parameters) || array_key_exists('id_token_encrypted_response_enc', $command_parameters)) {
+            throw new \InvalidArgumentException('The parameters \'id_token_encrypted_response_alg\' and \'id_token_encrypted_response_enc\' must be set together');
         }
 
-        Assertion::string($registration_parameters['id_token_encrypted_response_alg'], 'Invalid parameter "id_token_encrypted_response_alg". The value must be a string.');
-        Assertion::string($registration_parameters['id_token_encrypted_response_enc'], 'Invalid parameter "id_token_encrypted_response_enc". The value must be a string.');
-        Assertion::inArray($registration_parameters['id_token_encrypted_response_alg'], $this->getIdTokenManager()->getSupportedKeyEncryptionAlgorithms(), sprintf('The ID Token content encryption algorithm "%s" is not supported. Please choose one of the following algorithm: %s', $registration_parameters['id_token_encrypted_response_alg'], json_encode($this->getIdTokenManager()->getSupportedContentEncryptionAlgorithms())));
-        Assertion::inArray($registration_parameters['id_token_encrypted_response_enc'], $this->getIdTokenManager()->getSupportedContentEncryptionAlgorithms(), sprintf('The ID Token key encryption algorithm "%s" is not supported. Please choose one of the following algorithm: %s', $registration_parameters['id_token_encrypted_response_enc'], json_encode($this->getIdTokenManager()->getSupportedKeyEncryptionAlgorithms())));
-
-        $client->set('id_token_encrypted_response_alg', $registration_parameters['id_token_encrypted_response_alg']);
-        $client->set('id_token_encrypted_response_enc', $registration_parameters['id_token_encrypted_response_enc']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPreserverParameters()
-    {
-        return [];
+        return $next($command_parameters, $validated_parameters, $userAccount);
     }
 }

@@ -11,184 +11,163 @@
 
 namespace OAuth2\Endpoint\TokenRevocation;
 
-use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
-use OAuth2\Client\ClientInterface;
-use OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface;
-use OAuth2\Exception\AuthenticateExceptionInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Token\TokenInterface;
-use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
-use OAuth2\Util\RequestBody;
-use Psr\Http\Message\ResponseInterface;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use OAuth2\Model\Client\Client;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use SimpleBus\Message\Bus\MessageBus;
+use Zend\Diactoros\Response;
 
-class TokenRevocationEndpoint implements TokenRevocationEndpointInterface
+final class TokenRevocationEndpoint implements MiddlewareInterface
 {
-    use HasExceptionManager;
-    use HasTokenEndpointAuthMethodManager;
+    /**
+     * @var RevocationTokenTypeInterface[]
+     */
+    private $tokenTypes = [];
 
     /**
-     * @var \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface[]
+     * @var MessageBus
      */
-    private $token_types = [];
+    private $messageBus;
 
     /**
-     * TokenRevocationEndpoint constructor.
-     *
-     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface                             $exception_manager
+     * ClientConfigurationEndpoint constructor.
+     * @param MessageBus                $messageBus
      */
-    public function __construct(TokenEndpointAuthMethodManagerInterface $token_endpoint_auth_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct(MessageBus $messageBus)
     {
-        $this->setTokenEndpointAuthMethodManager($token_endpoint_auth_manager);
-        $this->setExceptionManager($exception_manager);
+        $this->messageBus = $messageBus;
     }
 
     /**
-     * @param \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface $token_type
+     * @param RevocationTokenTypeInterface $tokenType
      */
-    public function addRevocationTokenType(RevocationTokenTypeInterface $token_type)
+    public function addRevocationTokenType(RevocationTokenTypeInterface $tokenType)
     {
-        if (!array_key_exists($token_type->getTokenTypeHint(), $this->token_types)) {
-            $this->token_types[$token_type->getTokenTypeHint()] = $token_type;
-        }
+        $this->tokenTypes[$tokenType->getTokenTypeHint()] = $tokenType;
     }
 
     /**
-     * @return \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface[]
+     * @return RevocationTokenTypeInterface[]
      */
     private function getTokenTypes()
     {
-        return $this->token_types;
-    }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return bool
-     */
-    private function isRequestSecured(ServerRequestInterface $request)
-    {
-        $server_params = $request->getServerParams();
-
-        return !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
+        return $this->tokenTypes;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function revoke(ServerRequestInterface $request, ResponseInterface &$response)
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        $this->getParameters($request, $token, $token_type_hint, $callback);
-        if (!$this->isRequestSecured($request)) {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The request must be secured.');
-            $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
+        $this->getParameters($request, $token, $tokenType_hint, $callback);
 
-            return;
-        }
-        if (null === $token) {
-            $exception = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Parameter "token" is missing');
-            $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
-
-            return;
-        }
-        $client = null;
         try {
-            $client = $this->getTokenEndpointAuthMethodManager()->findClient($request);
-        } catch (AuthenticateExceptionInterface $e) {
-            $e->getHttpResponse($response);
+            if (null === $token) {
+                $data = ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Parameter \'token\' is missing'];
+                throw new OAuth2Exception(400, $data);
+            }
+            $client = $this->tokenEndpointAuthManager->findClient($request);
 
-            return;
+            if ($client instanceof Client) {
+                throw new OAuth2Exception($this->revokeToken($token, $client, $tokenType_hint, $callback));
+            }
+
+            return $this->getResponse(200, '', $callback);
+        } catch (OAuth2Exception $e) {
+            return $this->getResponse($e->getCode(), json_encode($e->getOAuth2Response()->getData()), $callback);
         } catch (\Exception $e) {
-            $this->getResponseContent($response, json_encode($e->getMessage()), $callback, $e->getCode());
+            $data = ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Parameter \'token\' is missing'];
+            $oauth2_response = $this->getResponseFactoryManager()->getResponse(400, $data);
 
-            return;
+            return $this->getResponse($oauth2_response->getCode(), json_encode($oauth2_response->getCode()), $callback);
         }
-
-        if (!$client instanceof ClientInterface) {
-            $this->getResponseContent($response, '', $callback);
-
-            return;
-        }
-        $this->revokeToken($response, $token, $client, $token_type_hint, $callback);
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param string                              $content
-     * @param string|null                         $callback
-     * @param int                                 $code
+     * @param int         $code
+     * @param string      $data
+     * @param null|string $callback
+     *
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    private function getResponseContent(ResponseInterface &$response, $content, $callback, $code = 200)
+    private function getResponse($code, $data, $callback)
     {
         if (null !== ($callback)) {
-            $data = sprintf('%s(%s)', $callback, $content);
-            $response->getBody()->write($data);
+            $data = sprintf('%s(%s)', $callback, $data);
         }
-        $response = $response->withStatus($code);
+
+        $response = new Response('php://memory', $code, []);
+        $response->getBody()->write($data);
+
+        return $response;
     }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param string                                   $token
-     * @param string|null                              $token_type_hint
+     * @param string|null                              $tokenType_hint
      * @param string|null                              $callback
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
      */
-    private function getParameters(ServerRequestInterface $request, &$token, &$token_type_hint, &$callback)
+    private function getParameters(ServerRequestInterface $request, &$token, &$tokenType_hint, &$callback)
     {
-        $query_params = $request->getQueryParams();
-        $body_params = RequestBody::getParameters($request);
-        foreach (['token', 'token_type_hint', 'callback'] as $key) {
-            $$key = array_key_exists($key, $query_params) ? $query_params[$key] : (array_key_exists($key, $body_params) ? $body_params[$key] : null);
+        if ('GET' === $request->getMethod()) {
+            $params = $request->getQueryParams();
+        } elseif ('POST' === $request->getMethod()) {
+            $params = RequestBody::getParameters($request);
+        } else {
+            return;
+        }
+        foreach (['token', 'tokenType_hint', 'callback'] as $key) {
+            $$key = array_key_exists($key, $params) ? $params[$key] : null;
         }
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response
      * @param string                              $token
-     * @param \OAuth2\Client\ClientInterface      $client
-     * @param string|null                         $token_type_hint
+     * @param Client      $client
+     * @param string|null                         $tokenType_hint
      * @param string|null                         $callback
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
+     *
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    private function revokeToken(ResponseInterface &$response, $token, ClientInterface $client, $token_type_hint = null, $callback = null)
+    private function revokeToken($token, Client $client, $tokenType_hint = null, $callback = null)
     {
-        $token_types = $this->getTokenTypes();
-        if (null === $token_type_hint) {
-            foreach ($token_types as $token_type) {
-                if (true === $this->tryRevokeToken($token_type, $token, $client)) {
+        $tokenTypes = $this->getTokenTypes();
+        if (null === $tokenType_hint) {
+            foreach ($tokenTypes as $tokenType) {
+                if (true === $this->tryRevokeToken($tokenType, $token, $client)) {
                     break;
                 }
             }
-        } elseif (array_key_exists($token_type_hint, $token_types)) {
-            $token_type = $token_types[$token_type_hint];
-            $this->tryRevokeToken($token_type, $token, $client);
+        } elseif (array_key_exists($tokenType_hint, $tokenTypes)) {
+            $tokenType = $tokenTypes[$tokenType_hint];
+            $this->tryRevokeToken($tokenType, $token, $client);
         } else {
-            $exception = $this->getExceptionManager()->getNotImplementedException('unsupported_token_type', sprintf('Token type "%s" not supported', $token_type_hint));
-            $this->getResponseContent($response, $exception->getResponseBody(), $callback, $exception->getHttpCode());
+            $data = ['error' => 'unsupported_tokenType', 'error_description' => sprintf('Token type \'%s\' not supported', $tokenType_hint)];
 
-            return;
+            return $this->getResponse(501, json_encode($data), $callback);
         }
-        $this->getResponseContent($response, '', $callback);
+        return $this->getResponse(200, '', $callback);
     }
 
     /**
-     * @param \OAuth2\Endpoint\TokenType\RevocationTokenTypeInterface $token_type
+     * @param RevocationTokenTypeInterface $tokenType
      * @param string                                                  $token
-     * @param \OAuth2\Client\ClientInterface                          $client
+     * @param Client                          $client
      *
      * @return bool
      */
-    private function tryRevokeToken(RevocationTokenTypeInterface $token_type, $token, ClientInterface $client)
+    private function tryRevokeToken(RevocationTokenTypeInterface $tokenType, $token, Client $client)
     {
-        $result = $token_type->getToken($token);
-        if ($result instanceof TokenInterface) {
+        $result = $tokenType->getToken($token);
+        if ($result instanceof OAuth2TokenInterface) {
             if ($result->getClientPublicId() === $client->getPublicId()) {
-                $token_type->revokeToken($result);
+                $tokenType->revokeToken($result);
 
                 return true;
             }

@@ -41,7 +41,7 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
      */
     public function getResponseTypes($names)
     {
-        Assertion::true($this->isResponseTypeSupported($names), sprintf('The response type "%s" is not supported.', $names));
+        Assertion::true($this->isResponseTypeSupported($names), sprintf('The response type \'%s\' is not supported.', $names));
         $response_types = explode(' ', $names);
 
         $types = [];

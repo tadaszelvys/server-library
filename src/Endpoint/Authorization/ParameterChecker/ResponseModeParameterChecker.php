@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 class ResponseModeParameterChecker implements ParameterCheckerInterface
 {
@@ -41,7 +41,7 @@ class ResponseModeParameterChecker implements ParameterCheckerInterface
         if (false === array_key_exists('response_mode', $parameters)) {
             return;
         }
-        Assertion::true($this->isResponseModeParameterInAuthorizationRequestAllowed(), 'The parameter "response_mode" is not allowed.');
+        Assertion::true($this->isResponseModeParameterInAuthorizationRequestAllowed(), 'The parameter \'response_mode\' is not allowed.');
     }
 
     /**
@@ -49,7 +49,7 @@ class ResponseModeParameterChecker implements ParameterCheckerInterface
      */
     public function getError()
     {
-        return ExceptionManagerInterface::ERROR_INVALID_REQUEST;
+        return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }
 
     /**

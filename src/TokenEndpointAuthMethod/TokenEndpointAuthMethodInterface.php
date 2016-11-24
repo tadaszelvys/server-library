@@ -11,7 +11,8 @@
 
 namespace OAuth2\TokenEndpointAuthMethod;
 
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface TokenEndpointAuthMethodInterface
@@ -19,7 +20,7 @@ interface TokenEndpointAuthMethodInterface
     /**
      * @return string[]
      */
-    public function getSupportedAuthenticationMethods();
+    public function getSupportedAuthenticationMethods(): array;
 
     /**
      * Find a client using the request.
@@ -28,31 +29,31 @@ interface TokenEndpointAuthMethodInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request            The request
      * @param mixed                                    $client_credentials The client credentials found in the request
      *
-     * @return null|string Return the client public ID if found else null. If credentials have are needed to authenticate the client, they are set to the variable $client_credentials
+     * @return null|ClientId Return the client public ID if found else null. If credentials have are needed to authenticate the client, they are set to the variable $client_credentials
      */
-    public function findClient(ServerRequestInterface $request, &$client_credentials = null);
+    public function findClientId(ServerRequestInterface $request, &$client_credentials = null);
 
     /**
-     * @param array                          $client_configuration
-     * @param \OAuth2\Client\ClientInterface $client
+     * @param array                          $command_parameters
+     * @param array                          $validated_parameters
      *
      * @throws \InvalidArgumentException
      */
-    public function checkClientConfiguration(array $client_configuration, ClientInterface $client);
+    public function checkClientConfiguration(array $command_parameters, array &$validated_parameters);
 
     /**
      * This method verifies the client credentials in the request.
      *
-     * @param \OAuth2\Client\ClientInterface           $client
+     * @param Client           $client
      * @param mixed                                    $client_credentials
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return bool Returns true if the client is authenticated, else false
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request);
+    public function isClientAuthenticated(Client $client, $client_credentials, ServerRequestInterface $request): bool;
 
     /**
      * @return array
      */
-    public function getSchemesParameters();
+    public function getSchemesParameters(): array;
 }

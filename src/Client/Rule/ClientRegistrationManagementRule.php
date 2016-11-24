@@ -11,38 +11,33 @@
 
 namespace OAuth2\Client\Rule;
 
-use OAuth2\Client\ClientInterface;
+use Assert\Assertion;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\UserAccount\UserAccount;
 
 abstract class ClientRegistrationManagementRule implements RuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
     {
-        $client->set('registration_client_uri', $this->getRegistrationClientUri($client));
-        $client->set('registration_access_token', $this->getRegistrationAccessToken($client));
+        Assertion::keyExists($validated_parameters, 'client_id', 'The parameter \'client_id\' is not defined.');
+        $validated_parameters['registration_access_token'] = $this->generateRegistrationAccessToken();
+        $validated_parameters['registration_client_uri'] = $this->getRegistrationClientUri($validated_parameters['client_id']);
+
+        return $next($command_parameters, $validated_parameters, $userAccount);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getPreserverParameters()
-    {
-        return ['registration_client_uri', 'registration_access_token'];
-    }
-
-    /**
-     * @param \OAuth2\Client\ClientInterface $client
+     * @param string $clientId
      *
      * @return string
      */
-    abstract protected function getRegistrationClientUri(ClientInterface $client);
+    abstract protected function getRegistrationClientUri(string $clientId);
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     *
      * @return string
      */
-    abstract protected function getRegistrationAccessToken(ClientInterface $client);
+    abstract protected function generateRegistrationAccessToken();
 }

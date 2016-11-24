@@ -13,13 +13,14 @@ namespace OAuth2\ResponseMode;
 
 use OAuth2\Grant\ResponseTypeInterface;
 use Psr\Http\Message\ResponseInterface;
+use Zend\Diactoros\Response;
 
-class FormPostResponseMode implements ResponseModeInterface
+final class FormPostResponseMode implements ResponseModeInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return ResponseTypeInterface::RESPONSE_TYPE_MODE_FORM_POST;
     }
@@ -27,10 +28,13 @@ class FormPostResponseMode implements ResponseModeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareResponse($redirect_uri, array $data, ResponseInterface &$response)
+    public function prepareResponse(string $redirect_uri, array $data): ResponseInterface
     {
         $template = $this->renderTemplate($redirect_uri, $data);
+        $response = new Response();
         $response->getBody()->write($template);
+
+        return $response;
     }
 
     /**
@@ -39,7 +43,7 @@ class FormPostResponseMode implements ResponseModeInterface
      *
      * @return string
      */
-    protected function renderTemplate($redirect_uri, array $data)
+    protected function renderTemplate(string $redirect_uri, array $data): string
     {
         $content = <<<'EOT'
 <!doctype html>

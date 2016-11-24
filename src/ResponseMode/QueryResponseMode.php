@@ -14,13 +14,14 @@ namespace OAuth2\ResponseMode;
 use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
+use Zend\Diactoros\Response;
 
 class QueryResponseMode implements ResponseModeInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return ResponseTypeInterface::RESPONSE_TYPE_MODE_QUERY;
     }
@@ -28,14 +29,16 @@ class QueryResponseMode implements ResponseModeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareResponse($redirect_uri, array $data, ResponseInterface &$response)
+    public function prepareResponse(string $redirect_uri, array $data): ResponseInterface
     {
         $params = empty($data) ? [] : [$this->getName() => $data];
         if (!array_key_exists('fragment', $params)) {
             $params['fragment'] = [];
         }
 
-        $response = $response->withStatus(302)
-            ->withHeader('Location', Uri::buildURI($redirect_uri, $params));
+        $response = new Response('php://memory', 302);
+        $response = $response->withHeader('Location', Uri::buildURI($redirect_uri, $params));
+
+        return $response;
     }
 }

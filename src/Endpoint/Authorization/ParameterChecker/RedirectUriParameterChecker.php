@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\Util\Uri;
 
 class RedirectUriParameterChecker implements ParameterCheckerInterface
@@ -60,7 +60,7 @@ class RedirectUriParameterChecker implements ParameterCheckerInterface
      */
     public function getError()
     {
-        return ExceptionManagerInterface::ERROR_INVALID_REQUEST;
+        return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }
 
     /**
@@ -70,7 +70,7 @@ class RedirectUriParameterChecker implements ParameterCheckerInterface
      */
     private function checkRedirectUriIsSet(array $parameters)
     {
-        Assertion::keyExists($parameters, 'redirect_uri', 'The parameter "redirect_uri" is mandatory.');
+        Assertion::keyExists($parameters, 'redirect_uri', 'The parameter \'redirect_uri\' is mandatory.');
     }
 
     /**
@@ -85,7 +85,7 @@ class RedirectUriParameterChecker implements ParameterCheckerInterface
     private function checkRedirectUriHasNoFragment($redirect_uri)
     {
         $uri = parse_url($redirect_uri);
-        Assertion::false(isset($uri['fragment']), 'The parameter "redirect_uri" must not contain fragment');
+        Assertion::false(isset($uri['fragment']), 'The parameter \'redirect_uri\' must not contain fragment');
     }
 
     /**
@@ -103,7 +103,7 @@ class RedirectUriParameterChecker implements ParameterCheckerInterface
             return;
         }
         if (true === $this->isSecuredRedirectUriEnforced() && 'https' !== mb_substr($redirect_uri, 0, 5, '8bit')) {
-            Assertion::true($this->isALocalUriOrAnUrn($redirect_uri), 'The parameter "redirect_uri" must be a secured URI.');
+            Assertion::true($this->isALocalUriOrAnUrn($redirect_uri), 'The parameter \'redirect_uri\' must be a secured URI.');
         }
     }
 
@@ -176,7 +176,7 @@ class RedirectUriParameterChecker implements ParameterCheckerInterface
      */
     private function checkRedirectUriForConfidentialClient(ClientInterface $client, array $parameters)
     {
-        Assertion::false(!$client->isPublic() && array_key_exists('response_type', $parameters) && $parameters['response_type'] === 'token', 'Confidential clients must register at least one redirect URI when using "token" response type.');
+        Assertion::false(!$client->isPublic() && array_key_exists('response_type', $parameters) && $parameters['response_type'] === 'token', 'Confidential clients must register at least one redirect URI when using \'token\' response type.');
     }
 
     /**

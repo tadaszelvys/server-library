@@ -12,53 +12,46 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Behaviour\HasScopeManager;
-use OAuth2\Client\ClientInterface;
-use OAuth2\Scope\ScopeManagerInterface;
+use OAuth2\Model\Scope\ScopeRepositoryInterface;
+use OAuth2\Model\UserAccount\UserAccount;
 
-class ScopeRule implements RuleInterface
+final class ScopeRule implements RuleInterface
 {
-    use HasScopeManager;
+    /**
+     * @var ScopeRepositoryInterface
+     */
+    private $scopeManager;
 
     /**
-     * @param \OAuth2\Scope\ScopeManagerInterface $scope_manager
+     * @param ScopeRepositoryInterface $scopeManager
      */
-    public function __construct(ScopeManagerInterface $scope_manager)
+    public function __construct(ScopeRepositoryInterface $scopeManager)
     {
-        $this->setScopeManager($scope_manager);
+        $this->scopeManager = $scopeManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
     {
-        if (!$this->hasScopeManager()) {
-            return;
+        if (array_key_exists('scope', $command_parameters)) {
+            Assertion::regex($command_parameters['scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the \'scope\' parameter.');
+            $validated_parameters['scope'] = $command_parameters['scope'];
         }
-        if (array_key_exists('scope', $registration_parameters)) {
-            Assertion::regex($registration_parameters['scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the "scope" parameter.');
-            $client->set('scope', $registration_parameters['scope']);
-        }
-        if (array_key_exists('scope_policy', $registration_parameters)) {
-            Assertion::inArray($registration_parameters['scope_policy'], $this->getScopeManager()->getSupportedScopePolicies(), sprintf('The scope policy "%s" is not supported. Please choose one of the following policy: "%s".', $registration_parameters['scope_policy'], json_encode($this->getScopeManager()->getSupportedScopePolicies())));
-            $client->set('scope_policy', $registration_parameters['scope_policy']);
+        if (array_key_exists('scope_policy', $command_parameters)) {
+            Assertion::inArray($command_parameters['scope_policy'], $this->scopeManager->getSupportedScopePolicies(), sprintf('The scope policy \'%s\' is not supported. Please choose one of the following policy: \'%s\'.', $command_parameters['scope_policy'], implode(', ', $this->scopeManager->getSupportedScopePolicies())));
+            $validated_parameters['scope_policy'] = $command_parameters['scope_policy'];
         }
 
         /*
          * Should be handled by the scope policy itself
          */
-        if (array_key_exists('default_scope', $registration_parameters)) {
-            Assertion::regex($registration_parameters['default_scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the "default_scope" parameter.');
-            $client->set('default_scope', $registration_parameters['default_scope']);
+        if (array_key_exists('default_scope', $command_parameters)) {
+            Assertion::regex($command_parameters['default_scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the \'default_scope\' parameter.');
+            $validated_parameters['default_scope'] = $command_parameters['default_scope'];
         }
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPreserverParameters()
-    {
-        return [];
+        return $next($command_parameters, $validated_parameters, $userAccount);
     }
 }

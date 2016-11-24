@@ -8,10 +8,10 @@ You can create it just by instantiating the class `OAuth2\Exception\ExceptionMan
 ```php
 use OAuth2\Exception\ExceptionManager;
 
-$exception_manager = new ExceptionManager();
+$response_factory_manager = new ExceptionManager();
 ```
 
-Now the variable `$exception_manager` can be injected to all other components that require an exception manager.
+Now the variable `$response_factory_manager` can be injected to all other components that require an exception manager.
 
 ## Advanced
 
@@ -55,7 +55,7 @@ class UriExtension implements ExceptionExtensionInterface
 Then, we add this extension to the exception manager:
 
 ```php
-$exception_manager->addExtension(new UriExtension());
+$response_factory_manager->addExtension(new UriExtension());
 ```
 
 ### Custom Exception Type
@@ -114,13 +114,13 @@ Then, you just have to add this class to the class mapping of the exception mana
 
 ```php
 use  Acme\TooManyRequestsExceptionFactory;
-$exception_manager->addExceptionFactory(new TooManyRequestsExceptionFactory());
+$response_factory_manager->addExceptionFactory(new TooManyRequestsExceptionFactory());
 ```
 
 Now, you are able to throw your new exception type:
 
 ```php
-throw $exception_manager->getException('TooManyRequests', 'unauthorized_client', 'Only 300 requests/day');
+throw $response_factory_manager->getException('TooManyRequests', 'unauthorized_client', 'Only 300 requests/day');
 // Or
-throw $exception_manager->getTooManyRequestsException('unauthorized_client', 'Only 300 requests/day');
+throw $response_factory_manager->getTooManyRequestsException('unauthorized_client', 'Only 300 requests/day');
 ```

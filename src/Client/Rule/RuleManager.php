@@ -11,47 +11,73 @@
 
 namespace OAuth2\Client\Rule;
 
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\UserAccount\UserAccount;
 
-class RuleManager implements RuleManagerInterface
+final class RuleManager implements RuleManagerInterface
 {
     /**
-     * @var \OAuth2\Client\Rule\RuleInterface[]
+     * @var RuleInterface[]
      */
     private $rules = [];
 
     /**
-     * @var string[]
+     * RuleManager constructor.
+     *
+     * @param RuleInterface[] $rules
      */
-    private $preserved_parameters = ['client_id_issued_at'];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function processParametersForClient(ClientInterface $client, array $parameters)
+    public function __construct(array $rules = [])
     {
-        foreach ($this->rules as $rule) {
-            $rule->check($client, $parameters);
+        foreach ($rules as $rule) {
+            $this->appendRule($rule);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * Appends new middleware for this message bus. Should only be used at configuration time.
+     *
+     * @private
+     * @param RuleInterface $rule
+     * @return self
      */
-    public function getPreserverParameters()
+    public function appendRule(RuleInterface $rule)
     {
-        return $this->preserved_parameters;
+        $this->rules[] = $rule;
+
+        return $this;
+    }
+
+    /**
+     * @return RuleInterface[]
+     */
+    public function getRules()
+    {
+        return $this->rules;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addRule(RuleInterface $rule)
+    public function handle(array $command_parameters, UserAccount $userAccount)
     {
-        $this->rules[] = $rule;
-        $this->preserved_parameters = array_unique(array_merge(
-            $rule->getPreserverParameters(),
-            $this->preserved_parameters
-        ));
+        return call_user_func($this->callableForNextRule(0), $command_parameters, [], $userAccount);
+    }
+
+    /**
+     * @param int $index
+     *
+     * @return \Closure
+     */
+    private function callableForNextRule($index)
+    {
+        if (!isset($this->rules[$index])) {
+            return function (array $command_parameters, array $validated_parameters, UserAccount $userAccount) {
+                return $validated_parameters;
+            };
+        }
+        $rule = $this->rules[$index];
+
+        return function ($command_parameters, $validated_parameters, UserAccount $userAccount) use ($rule, $index) {
+            return $rule->handle($command_parameters, $validated_parameters, $userAccount, $this->callableForNextRule($index + 1));
+        };
     }
 }

@@ -11,7 +11,7 @@
 
 namespace OAuth2\TokenEndpointAuthMethod;
 
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
 use Psr\Http\Message\ServerRequestInterface;
 
 class None implements TokenEndpointAuthMethodInterface
@@ -26,7 +26,7 @@ class None implements TokenEndpointAuthMethodInterface
      *
      * @param string $header_name
      */
-    public function __construct($header_name = 'X-OAuth2-Public-Client-ID')
+    public function __construct(string $header_name = 'X-OAuth2-Public-Client-ID')
     {
         $this->header_name = $header_name;
     }
@@ -34,7 +34,7 @@ class None implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function getSchemesParameters()
+    public function getSchemesParameters(): array
     {
         return [];
     }
@@ -42,7 +42,7 @@ class None implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request, &$client_credentials = null)
+    public function findClientId(ServerRequestInterface $request, &$clientCredentials = null)
     {
         $header = $request->getHeader($this->header_name);
 
@@ -54,7 +54,7 @@ class None implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function checkClientConfiguration(array $client_configuration, ClientInterface $client)
+    public function checkClientConfiguration(array $command_parameters, array &$validated_parameters)
     {
         //Nothing to do
     }
@@ -62,7 +62,7 @@ class None implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
+    public function isClientAuthenticated(Client $client, $clientCredentials, ServerRequestInterface $request): bool
     {
         return true;
     }
@@ -70,7 +70,7 @@ class None implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function getSupportedAuthenticationMethods()
+    public function getSupportedAuthenticationMethods(): array
     {
         return ['none'];
     }

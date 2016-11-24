@@ -11,63 +11,68 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasAuthorizationCodeManager;
-use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasPKCEMethodManager;
-use OAuth2\Behaviour\HasScopeManager;
-use OAuth2\Client\ClientInterface;
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Endpoint\Authorization\Authorization;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\Scope\ScopeRepositoryInterface;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface;
-use OAuth2\Scope\ScopeManagerInterface;
-use OAuth2\Token\AuthCodeInterface;
-use OAuth2\Token\AuthCodeManagerInterface;
+use OAuth2\Model\AuthCode\AuthCode;
+use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInterface
 {
-    use HasExceptionManager;
-    use HasAuthorizationCodeManager;
-    use HasScopeManager;
-    use HasPKCEMethodManager;
+    /**
+     * @var bool
+     */
+    private $pkceForPublicClientsEnforced = false;
 
     /**
      * @var bool
      */
-    private $pkce_for_public_clients_enforced = false;
+    private $publicClientsAllowed = false;
 
     /**
-     * @var bool
+     * @var AuthCodeRepositoryInterface
      */
-    private $public_clients_allowed = false;
+    private $authCodeRepository;
+
+    /**
+     * @var PKCEMethodManagerInterface
+     */
+    private $pkceMethodManager;
+
+    /**
+     * @var ScopeRepositoryInterface
+     */
+    private $scopeRepository;
 
     /**
      * AuthorizationCodeGrantType constructor.
      *
-     * @param \OAuth2\Token\AuthCodeManagerInterface              $auth_code_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface         $exception_manager
-     * @param \OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface $pkce_method_manager
+     * @param AuthCodeRepositoryInterface $authCodeRepository
+     * @param PKCEMethodManagerInterface  $pkceMethodManager
      */
-    public function __construct(AuthCodeManagerInterface $auth_code_manager, ExceptionManagerInterface $exception_manager, PKCEMethodManagerInterface $pkce_method_manager)
+    public function __construct(AuthCodeRepositoryInterface $authCodeRepository, PKCEMethodManagerInterface $pkceMethodManager)
     {
-        $this->setAuthorizationCodeManager($auth_code_manager);
-        $this->setExceptionManager($exception_manager);
-        $this->setPKCEMethodManager($pkce_method_manager);
+        $this->authCodeRepository = $authCodeRepository;
+        $this->pkceMethodManager = $pkceMethodManager;
     }
 
     /**
-     * @param \OAuth2\Scope\ScopeManagerInterface $scope_manager
+     * @param ScopeRepositoryInterface $scopeRepository
      */
-    public function enableScopeSupport(ScopeManagerInterface $scope_manager)
+    public function enableScopeSupport(ScopeRepositoryInterface $scopeRepository)
     {
-        $this->setScopeManager($scope_manager);
+        $this->scopeRepository = $scopeRepository;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedResponseTypes()
+    public function getAssociatedResponseTypes(): array
     {
         return ['code'];
     }
@@ -75,7 +80,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedGrantTypes()
+    public function getAssociatedGrantTypes(): array
     {
         return ['authorization_code'];
     }
@@ -83,25 +88,25 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * @return bool
      */
-    public function arePublicClientsAllowed()
+    public function arePublicClientsAllowed(): bool
     {
-        return $this->public_clients_allowed;
+        return $this->publicClientsAllowed;
     }
 
     public function allowPublicClients()
     {
-        $this->public_clients_allowed = true;
+        $this->publicClientsAllowed = true;
     }
 
     public function disallowPublicClients()
     {
-        $this->public_clients_allowed = false;
+        $this->publicClientsAllowed = false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResponseType()
+    public function getResponseType(): string
     {
         return 'code';
     }
@@ -109,7 +114,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function getResponseMode()
+    public function getResponseMode(): string
     {
         return self::RESPONSE_TYPE_MODE_QUERY;
     }
@@ -117,17 +122,23 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function checkAuthorization(AuthorizationInterface $authorization)
+    public function checkAuthorization(Authorization $authorization)
     {
         if (false === $this->arePublicClientsAllowed() && true === $authorization->getClient()->isPublic()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'Public clients are not allowed to use the authorization code grant type.');
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'Public clients are not allowed to use the authorization code grant type.'
+                ]
+            );
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
     {
         //Nothing to do
     }
@@ -135,11 +146,11 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function prepareAuthorization(AuthorizationInterface $authorization)
+    public function prepareAuthorization(Authorization $authorization)
     {
         $offline_access = $this->isOfflineAccess($authorization);
 
-        $code = $this->getAuthorizationCodeManager()->createAuthCode(
+        $code = $this->authCodeRepository->createAuthCode(
             $authorization->getClient(),
             $authorization->getUserAccount(),
             $authorization->getQueryParams(),
@@ -148,7 +159,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
             $offline_access
         );
 
-        $authorization->setData('code', $code);
+        $authorization = $authorization->withData('code', $code);
 
         return $code->toArray();
     }
@@ -156,7 +167,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function getGrantType()
+    public function getGrantType(): string
     {
         return 'authorization_code';
     }
@@ -172,7 +183,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
+    public function grantAccessToken(ServerRequestInterface $request, Client $client, GrantTypeResponseInterface &$grant_type_response)
     {
         $this->checkClient($request, $client);
         $authCode = $this->getAuthCode($request);
@@ -185,7 +196,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
         // Validate the redirect URI.
         $this->checkRedirectUri($authCode, $redirect_uri);
 
-        $this->getAuthorizationCodeManager()->markAuthCodeAsUsed($authCode);
+        $this->authCodeRepository->markAuthCodeAsUsed($authCode);
 
         if ($this->hasScopeManager()) {
             $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
@@ -204,21 +215,33 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
-     * @return null|\OAuth2\Token\AuthCodeInterface
+     * @return null|\OAuth2\Model\AuthCode\AuthCode
      */
     private function getAuthCode(ServerRequestInterface $request)
     {
         $code = RequestBody::getParameter($request, 'code');
         if (null === $code) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Missing parameter. "code" is required.');
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => 'Missing parameter. \'code\' is required.'
+                ]
+            );
         }
 
-        $auth_code = $this->getAuthorizationCodeManager()->getAuthCode($code);
+        $auth_code = $this->authCodeRepository->getAuthCode($code);
 
-        if (!$auth_code instanceof AuthCodeInterface) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
+        if (!$auth_code instanceof AuthCode) {
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error_description' => 'Code doesn\'t exist or is invalid for the client.'
+                ]
+            );
         }
 
         return $auth_code;
@@ -226,32 +249,38 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \OAuth2\Client\ClientInterface           $client
+     * @param Client           $client
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      */
-    private function checkClient(ServerRequestInterface $request, ClientInterface $client)
+    private function checkClient(ServerRequestInterface $request, Client $client)
     {
         if (true === $client->isPublic()) {
             if (null === ($client_id = RequestBody::getParameter($request, 'client_id')) || $client_id !== $client->getPublicId()) {
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The client_id parameter is required for non-confidential clients.');
+                throw new OAuth2Exception(
+                    400,
+                    [
+                        'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                        'error_description' => 'The client_id parameter is required for non-confidential clients.'
+                    ]
+                );
             }
         }
     }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \OAuth2\Token\AuthCodeInterface          $authCode
-     * @param \OAuth2\Client\ClientInterface           $client
+     * @param \OAuth2\Model\AuthCode\AuthCode          $authCode
+     * @param Client           $client
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      */
-    private function checkPKCE(ServerRequestInterface $request, AuthCodeInterface $authCode, ClientInterface $client)
+    private function checkPKCE(ServerRequestInterface $request, AuthCode $authCode, Client $client)
     {
         $params = $authCode->getQueryParams();
         if (!array_key_exists('code_challenge', $params)) {
             if (true === $this->isPKCEForPublicClientsEnforced() && $client->isPublic()) {
-                throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Non-confidential clients must set a proof key (PKCE) for code exchange.');
+                throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Non-confidential clients must set a proof key (PKCE) for code exchange.']));
             }
 
             return;
@@ -264,46 +293,64 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
         try {
             $this->getPKCEMethodManager()->checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier);
         } catch (\InvalidArgumentException $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
+            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]));
         }
     }
 
     /**
-     * @param \OAuth2\Token\AuthCodeInterface $authCode
+     * @param \OAuth2\Model\AuthCode\AuthCode $authCode
      * @param string                          $redirect_uri
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      */
-    private function checkRedirectUri(AuthCodeInterface $authCode, $redirect_uri)
+    private function checkRedirectUri(AuthCode $authCode, $redirect_uri)
     {
         if (true === $authCode->hasMetadata('redirect_uri') && $redirect_uri !== $authCode->getMetadata('redirect_uri')) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'The redirect URI is missing or does not match.');
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'The redirect URI is missing or does not match.'
+                ]
+            );
         }
     }
 
     /**
-     * @param \OAuth2\Token\AuthCodeInterface $authCode
-     * @param \OAuth2\Client\ClientInterface  $client
+     * @param \OAuth2\Model\AuthCode\AuthCode $authCode
+     * @param Client  $client
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      */
-    private function checkAuthCode(AuthCodeInterface $authCode, ClientInterface $client)
+    private function checkAuthCode(AuthCode $authCode, Client $client)
     {
-        if ($client->getPublicId() !== $authCode->getClientPublicId()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_GRANT, "Code doesn't exist or is invalid for the client.");
+        if ($client->getId() !== $authCode->getClientPublicId()) {
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error_description' => "Code doesn't exist or is invalid for the client."
+                ]
+            );
         }
 
         if ($authCode->hasExpired()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_GRANT, 'The authorization code has expired.');
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error_description' => 'The authorization code has expired.'
+                ]
+            );
         }
     }
 
     /**
      * @return bool
      */
-    public function isPKCEForPublicClientsEnforced()
+    public function isPKCEForPublicClientsEnforced(): bool
     {
-        return $this->pkce_for_public_clients_enforced;
+        return $this->pkceForPublicClientsEnforced;
     }
 
     /**
@@ -311,7 +358,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
      */
     public function enablePKCEForPublicClientsEnforcement()
     {
-        $this->pkce_for_public_clients_enforced = true;
+        $this->pkceForPublicClientsEnforced = true;
     }
 
     /**
@@ -319,15 +366,15 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
      */
     public function disablePKCEForPublicClientsEnforcement()
     {
-        $this->pkce_for_public_clients_enforced = false;
+        $this->pkceForPublicClientsEnforced = false;
     }
 
     /**
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     * @param \OAuth2\Endpoint\Authorization\Authorization $authorization
      *
      * @return bool
      */
-    private function isOfflineAccess(AuthorizationInterface $authorization)
+    private function isOfflineAccess(Authorization $authorization)
     {
         // The scope offline_access is not requested
         if (!in_array('offline_access', $authorization->getScopes())) {
@@ -337,7 +384,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
         // The scope offline_access is requested but prompt is not consent
         // The scope offline_access is ignored
         if (!$authorization->hasQueryParam('prompt') || !in_array('consent', $authorization->getQueryParam('prompt'))) {
-            $authorization->removeScope('offline_access');
+            $authorization = $authorization->withoutScope('offline_access');
 
             return false;
         }

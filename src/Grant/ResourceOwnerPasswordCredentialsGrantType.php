@@ -11,81 +11,87 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasUserAccountManager;
-use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\UserAccount\UserAccountManagerInterface;
+use OAuth2\Model\Client\Client;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
 {
-    use HasExceptionManager;
-    use HasUserAccountManager;
+    /**
+     * @var bool
+     */
+    private $refreshTokenIssuanceAllowed = false;
 
     /**
      * @var bool
      */
-    private $refresh_token_issuance_allowed = false;
+    private $refreshTokenIssuanceForPublicClientsAllowed = false;
 
     /**
-     * @var bool
+     * @var UserAccountRepositoryInterface
      */
-    private $refresh_token_issuance_for_public_clients_allowed = false;
+    private $userAccountRepository;
+
+    /**
+     * @var OAuth2ResponseFactoryManagerInterface
+     */
+    private $responseFactoryManager;
 
     /**
      * ResourceOwnerPasswordCredentialsGrantType constructor.
      *
-     * @param \OAuth2\UserAccount\UserAccountManagerInterface $user_account_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface     $exception_manager
+     * @param UserAccountRepositoryInterface $userAccountRepository
+     * @param OAuth2ResponseFactoryManagerInterface     $responseFactoryManager
      */
-    public function __construct(UserAccountManagerInterface $user_account_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct(UserAccountRepositoryInterface $userAccountRepository, OAuth2ResponseFactoryManagerInterface $responseFactoryManager)
     {
-        $this->setUserAccountManager($user_account_manager);
-        $this->setExceptionManager($exception_manager);
+        $this->userAccountRepository = $userAccountRepository;
+        $this->responseFactoryManager = $responseFactoryManager;
     }
 
     public function allowRefreshTokenIssuance()
     {
-        $this->refresh_token_issuance_allowed = true;
+        $this->refreshTokenIssuanceAllowed = true;
     }
 
     public function disallowRefreshTokenIssuance()
     {
-        $this->refresh_token_issuance_allowed = false;
+        $this->refreshTokenIssuanceAllowed = false;
     }
 
     /**
      * @return bool
      */
-    public function isRefreshTokenIssuanceAllowed()
+    public function isRefreshTokenIssuanceAllowed(): bool
     {
-        return $this->refresh_token_issuance_allowed;
+        return $this->refreshTokenIssuanceAllowed;
     }
 
     public function allowRefreshTokenIssuanceForPublicClients()
     {
-        $this->refresh_token_issuance_for_public_clients_allowed = true;
+        $this->refreshTokenIssuanceForPublicClientsAllowed = true;
     }
 
     public function disallowRefreshTokenIssuanceForPublicClients()
     {
-        $this->refresh_token_issuance_for_public_clients_allowed = false;
+        $this->refreshTokenIssuanceForPublicClientsAllowed = false;
     }
 
     /**
      * @return bool
      */
-    public function isRefreshTokenIssuanceForPublicClientsAllowed()
+    public function isRefreshTokenIssuanceForPublicClientsAllowed(): bool
     {
-        return $this->refresh_token_issuance_for_public_clients_allowed;
+        return $this->refreshTokenIssuanceForPublicClientsAllowed;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedResponseTypes()
+    public function getAssociatedResponseTypes(): array
     {
         return [];
     }
@@ -93,7 +99,7 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getGrantType()
+    public function getGrantType(): string
     {
         return 'password';
     }
@@ -101,7 +107,7 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
+    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grantTypeResponse)
     {
         // Nothing to do
     }
@@ -109,28 +115,34 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
+    public function grantAccessToken(ServerRequestInterface $request, Client $client, GrantTypeResponseInterface &$grantTypeResponse)
     {
         $username = RequestBody::getParameter($request, 'username');
         $password = RequestBody::getParameter($request, 'password');
 
-        $user_account = $this->getUserAccountManager()->getUserAccountByUsername($username);
-        if (null === $user_account || !$this->getUserAccountManager()->checkUserAccountPasswordCredentials($user_account, $password)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_GRANT, 'Invalid username and password combination');
+        $userAccount = $this->userAccountRepository->getByUsername($username);
+        if (null === $userAccount || !$this->userAccountRepository->isPasswordCredentialsValid($userAccount, $password)) {
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error_description' => 'Invalid username and password combination'
+                ]
+            );
         }
 
-        $grant_type_response->setResourceOwnerPublicId($user_account->getUserPublicId());
-        $grant_type_response->setUserAccountPublicId($user_account->getPublicId());
-        $grant_type_response->setRefreshTokenIssued($this->issueRefreshToken($client));
-        $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
+        $grantTypeResponse->setResourceOwnerPublicId($userAccount->getUserPublicId());
+        $grantTypeResponse->setUserAccountPublicId($userAccount->getPublicId());
+        $grantTypeResponse->setRefreshTokenIssued($this->issueRefreshToken($client));
+        $grantTypeResponse->setRefreshTokenScope($grantTypeResponse->getRequestedScope());
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
+     * @param Client $client
      *
      * @return bool
      */
-    private function issueRefreshToken(ClientInterface $client)
+    private function issueRefreshToken(Client $client): bool
     {
         if (!$this->isRefreshTokenIssuanceAllowed()) {
             return false;

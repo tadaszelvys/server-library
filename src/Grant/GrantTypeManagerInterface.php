@@ -14,9 +14,10 @@ namespace OAuth2\Grant;
 interface GrantTypeManagerInterface
 {
     /**
-     * @param \OAuth2\Grant\GrantTypeInterface $grant_type
+     * @param GrantTypeInterface $grant_type
+     * @return GrantTypeManagerInterface
      */
-    public function addGrantType(GrantTypeInterface $grant_type);
+    public function addGrantType(GrantTypeInterface $grant_type): GrantTypeManagerInterface;
 
     /**
      * @param string $name

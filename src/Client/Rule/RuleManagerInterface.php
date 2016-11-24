@@ -11,23 +11,15 @@
 
 namespace OAuth2\Client\Rule;
 
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\UserAccount\UserAccount;
 
 interface RuleManagerInterface
 {
     /**
-     * @param \OAuth2\Client\Rule\RuleInterface $rule
+     * @param array $parameters
+     * @param UserAccount $userAccount
+     *
+     * @return array
      */
-    public function addRule(RuleInterface $rule);
-
-    /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param array                          $parameters
-     */
-    public function processParametersForClient(ClientInterface $client, array $parameters);
-
-    /**
-     * @return string[]
-     */
-    public function getPreserverParameters();
+    public function handle(array $parameters, UserAccount $userAccount);
 }

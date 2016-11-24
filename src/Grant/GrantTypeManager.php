@@ -23,9 +23,11 @@ class GrantTypeManager implements GrantTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function addGrantType(GrantTypeInterface $grant_type)
+    public function addGrantType(GrantTypeInterface $grant_type): GrantTypeManagerInterface
     {
         $this->grant_types[$grant_type->getGrantType()] = $grant_type;
+
+        return $this;
     }
 
     /**
@@ -41,7 +43,7 @@ class GrantTypeManager implements GrantTypeManagerInterface
      */
     public function getGrantType($names)
     {
-        Assertion::true($this->hasGrantType($names), sprintf('The grant type "%s" is not supported.', $names));
+        Assertion::true($this->hasGrantType($names), sprintf('The grant type \'%s\' is not supported.', $names));
 
         return $this->grant_types[$names];
     }

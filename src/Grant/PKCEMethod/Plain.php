@@ -16,7 +16,7 @@ class Plain implements PKCEMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function getMethodName()
+    public function getMethodName(): string
     {
         return 'plain';
     }
@@ -24,8 +24,8 @@ class Plain implements PKCEMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function isChallengeVerified($code_verifier, $code_challenge)
+    public function isChallengeVerified(string $codeVerifier, string $codeChallenge): bool
     {
-        return hash_equals($code_challenge, $code_verifier);
+        return hash_equals($codeChallenge, $codeVerifier);
     }
 }

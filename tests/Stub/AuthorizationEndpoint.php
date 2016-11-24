@@ -15,7 +15,6 @@ use Assert\Assertion;
 use OAuth2\Endpoint\Authorization\AuthorizationEndpoint as Base;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\UserAccount\UserAccountInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AuthorizationEndpoint extends Base
@@ -87,27 +86,25 @@ class AuthorizationEndpoint extends Base
     /**
      * {@inheritdoc}
      */
-    protected function redirectToLoginPage(AuthorizationInterface $authorization, ServerRequestInterface $request, ResponseInterface &$response)
+    protected function redirectToLoginPage(AuthorizationInterface $authorization, ServerRequestInterface $request)
     {
-        $response->getBody()->rewind();
-        $response->getBody()->write('You are redirected to the login page');
+        return $this->getResponseFactoryManager()->getResponse(200, 'You are redirected to the login page')->getResponse();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function processConsentScreen(AuthorizationInterface $authorization, ServerRequestInterface $request, ResponseInterface &$response)
+    protected function processConsentScreen(AuthorizationInterface $authorization, ServerRequestInterface $request)
     {
         if (is_bool($this->is_authorized)) {
             $authorization->setAuthorized($this->is_authorized);
-            $this->processAuthorization($request, $response, $authorization);
+            $this->processAuthorization($request, $authorization);
 
             return [
                 'save_authorization' => true,
             ];
         }
 
-        $response->getBody()->rewind();
-        $response->getBody()->write('You are on the consent screen');
+        return $this->getResponseFactoryManager()->getResponse(200, 'You are on the consent screen')->getResponse();
     }
 }

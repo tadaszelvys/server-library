@@ -12,81 +12,50 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use GuzzleHttp\Client;
-use OAuth2\Client\ClientInterface;
+use Http\Client\HttpClient;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\UserAccount\UserAccount;
 
-class SectorIdentifierUriRule implements RuleInterface
+final class SectorIdentifierUriRule implements RuleInterface
 {
     /**
-     * @var bool
+     * @var \Http\Client\HttpClient
      */
-    private $allow_http_connections = false;
+    private $client;
 
     /**
      * @var bool
      */
-    private $allow_unsecured_connections = false;
+    private $allow_http_connections ;
 
     /**
-     * {@inheritdoc}
+     * SectorIdentifierUriRule constructor.
+     * @param HttpClient $client
+     * @param bool $allow_http_connections
      */
-    public function allowHttpConnections()
+    public function __construct(HttpClient $client, bool $allow_http_connections = false)
     {
-        $this->allow_http_connections = true;
+        $this->client = $client;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function disallowHttpConnections()
+    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
     {
-        $this->allow_http_connections = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function allowUnsecuredConnections()
-    {
-        $this->allow_unsecured_connections = true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function disallowUnsecuredConnections()
-    {
-        $this->allow_unsecured_connections = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function check(ClientInterface $client, array $registration_parameters)
-    {
-        if (!array_key_exists('sector_identifier_uri', $registration_parameters)) {
-            return;
+        if (array_key_exists('sector_identifier_uri', $command_parameters)) {
+            Assertion::url($command_parameters['sector_identifier_uri'], sprintf('The sector identifier URI \'%s\' is not valid.', $command_parameters['sector_identifier_uri']));
+            $this->checkSectorIdentifierUri($command_parameters['sector_identifier_uri']);
+            $validated_parameters['sector_identifier_uri'] = $command_parameters['sector_identifier_uri'];
         }
 
-        Assertion::url($registration_parameters['sector_identifier_uri'], sprintf('The sector identifier URI "%s" is not valid.', $registration_parameters['sector_identifier_uri']));
-        $this->checkSectorIdentifierUri($registration_parameters['sector_identifier_uri']);
-        $client->set('sector_identifier_uri', $registration_parameters['sector_identifier_uri']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPreserverParameters()
-    {
-        return [];
+        return $next($command_parameters, $validated_parameters, $userAccount);
     }
 
     /**
      * @param string $url
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
-     *
-     * @return string
+     * @throws \InvalidArgumentException
      */
     private function checkSectorIdentifierUri($url)
     {
@@ -94,12 +63,10 @@ class SectorIdentifierUriRule implements RuleInterface
         if (true === $this->allow_http_connections) {
             $allowed_protocols[] = 'http';
         }
-        Assertion::inArray(mb_substr($url, 0, mb_strpos($url, '://', 0, '8bit'), '8bit'), $allowed_protocols, sprintf('The provided sector identifier URI is not valid: scheme must be one of the following: %s.', json_encode($allowed_protocols)));
-        $client = new Client([
-            'verify' => !$this->allow_unsecured_connections,
-        ]);
-        $response = $client->get($url);
-        Assertion::eq(200, $response->getStatusCode());
+        Assertion::inArray(mb_substr($url, 0, mb_strpos($url, '://', 0, '8bit'), '8bit'), $allowed_protocols, sprintf('The provided sector identifier URI is not valid: scheme must be one of the following: %s.', implode(', ', $allowed_protocols)));
+        $request = new Request($url);
+        $response = $this->client->sendRequest($request);
+        Assertion::eq(200, $response->getStatusCode(), sprintf('Unable to get Uris from the Sector Identifier Uri \'%s\'.', $url));
 
         $body = $response->getBody()->getContents();
         $data = json_decode($body, true);
@@ -107,7 +74,7 @@ class SectorIdentifierUriRule implements RuleInterface
         Assertion::notEmpty($data, 'The provided sector identifier URI is not valid: it must contain at least one URI.');
         foreach ($data as $sector_url) {
             Assertion::url($sector_url, 'The provided sector identifier URI is not valid: it must contain only URIs.');
-            Assertion::inArray(mb_substr($sector_url, 0, mb_strpos($sector_url, '://', 0, '8bit'), '8bit'), $allowed_protocols, sprintf('An URL provided in the sector identifier URI is not valid: scheme must be one of the following: %s.', json_encode($allowed_protocols)));
+            Assertion::inArray(mb_substr($sector_url, 0, mb_strpos($sector_url, '://', 0, '8bit'), '8bit'), $allowed_protocols, sprintf('An URL provided in the sector identifier URI is not valid: scheme must be one of the following: %s.', implode(', ', $allowed_protocols)));
         }
     }
 }

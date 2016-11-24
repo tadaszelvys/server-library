@@ -16,12 +16,12 @@ Let say you want to support the following scopes: `read`, `read_write`, `delete`
 use OAuth2\Scope\ScopeManager;
 
 $scope_manager = new ScopeManager(
-    $exception_manager,
+    $response_factory_manager,
     ['read', 'read_write', 'delete']
 );
 ```
 
-*Please note that the variable `$exception_manager` is an instance of your exception manager. See [this page](exception.md) for more information.*
+*Please note that the variable `$response_factory_manager` is an instance of your exception manager. See [this page](exception.md) for more information.*
 
 You can now inject `$scope_manager` to other components that require the scope manager.
 
@@ -61,7 +61,7 @@ When no scope is set in the client request, an error is thrown.
 use OAuth2\Scope\ErrorScopePolicy;
 
 // We create an instance of our scope policy
-$error_scope_policy = new ErrorScopePolicy($exception_manager);
+$error_scope_policy = new ErrorScopePolicy($response_factory_manager);
 
 // We add it and we specify it is the default policy
 $scope_manager->addScopePolicy($error_scope_policy, true);

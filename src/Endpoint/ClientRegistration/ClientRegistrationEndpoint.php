@@ -12,282 +12,96 @@
 namespace OAuth2\Endpoint\ClientRegistration;
 
 use Assert\Assertion;
-use Jose\JWTLoaderInterface;
-use Jose\Object\JWKSetInterface;
-use OAuth2\Behaviour\HasClientManager;
-use OAuth2\Behaviour\HasClientRuleManager;
-use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasJWTLoader;
-use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ClientManagerInterface;
-use OAuth2\Client\Rule\RuleManagerInterface;
-use OAuth2\Exception\BaseException;
-use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\TokenType\BearerToken;
-use OAuth2\Util\RequestBody;
+use Interop\Http\Factory\ResponseFactoryInterface;
+use Interop\Http\Factory\StreamFactoryInterface;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use OAuth2\Command\Client\CreateClientCommand;
+use OAuth2\DataTransporter;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\InitialAccessToken\InitialAccessToken;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use SimpleBus\Message\Bus\MessageBus;
 
-class ClientRegistrationEndpoint implements ClientRegistrationEndpointInterface
+final class ClientRegistrationEndpoint implements MiddlewareInterface
 {
-    use HasExceptionManager;
-    use HasClientManager;
-    use HasClientRuleManager;
-    use HasJWTLoader;
+    /**
+     * @var MessageBus
+     */
+    private $messageBus;
 
     /**
-     * @var \OAuth2\TokenType\BearerToken
+     * @var ResponseFactoryInterface
      */
-    private $bearer_token;
+    private $responseFactory;
 
     /**
-     * @var bool
+     * @var StreamFactoryInterface
      */
-    private $is_software_statement_required = false;
-
-    /**
-     * @var null|\Jose\Object\JWKSetInterface
-     */
-    private $software_statement_signature_key_set = null;
-
-    /**
-     * @var bool
-     */
-    private $is_initial_access_token_required = false;
-
-    /**
-     * @var null|\OAuth2\Endpoint\ClientRegistration\InitialAccessTokenManagerInterface
-     */
-    private $initial_access_token_manager = null;
+    private $streamFactory;
 
     /**
      * ClientRegistrationEndpoint constructor.
-     *
-     * @param \OAuth2\TokenType\BearerToken                   $bearer_token
-     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
-     * @param \OAuth2\Client\Rule\RuleManagerInterface    $client_rule_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param ResponseFactoryInterface $responseFactory
+     * @param StreamFactoryInterface $streamFactory
+     * @param MessageBus $messageBus
      */
-    public function __construct(BearerToken $bearer_token, ClientManagerInterface $client_manager, RuleManagerInterface $client_rule_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct(ResponseFactoryInterface $responseFactory, StreamFactoryInterface $streamFactory, MessageBus $messageBus)
     {
-        $this->bearer_token = $bearer_token;
-        $this->setClientManager($client_manager);
-        $this->setClientRuleManager($client_rule_manager);
-        $this->setExceptionManager($exception_manager);
+        $this->responseFactory = $responseFactory;
+        $this->streamFactory = $streamFactory;
+        $this->messageBus = $messageBus;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isInitialAccessTokenRequired()
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate = null): ResponseInterface
     {
-        return $this->is_initial_access_token_required;
+        $this->checkRequest($request);
+        $data = new DataTransporter();
+        $initial_access_token = $request->getAttribute('initial_access_token');
+        Assertion::isInstanceOf($initial_access_token, InitialAccessToken::class);
+        $command_parameters = is_array($request->getParsedBody()) ? $request->getParsedBody() : [];
+        $command = CreateClientCommand::create($initial_access_token->getUserAccountPublicId(), $command_parameters, $data);
+        $this->messageBus->handle($command);
+
+        return $this->createResponse($data->getData());
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function allowRegistrationWithoutInitialAccessToken()
-    {
-        $this->is_initial_access_token_required = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function disallowRegistrationWithoutInitialAccessToken()
-    {
-        Assertion::true($this->isInitialAccessTokenSupported(), 'Initial Access Token not supported.');
-        $this->is_initial_access_token_required = true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isInitialAccessTokenSupported()
-    {
-        return null !== $this->initial_access_token_manager;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enableInitialAccessTokenSupport(InitialAccessTokenManagerInterface $initial_access_token_manage)
-    {
-        $this->initial_access_token_manager = $initial_access_token_manage;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSoftwareStatementSupported()
-    {
-        return null !== $this->software_statement_signature_key_set;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSoftwareStatementRequired()
-    {
-        return $this->is_software_statement_required;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enableSoftwareStatementSupport(JWTLoaderInterface $jwt_loader, JWKSetInterface $signature_key_set)
-    {
-        $this->setJWTLoader($jwt_loader);
-        $this->software_statement_signature_key_set = $signature_key_set;
-    }
-
-    public function allowRegistrationWithoutSoftwareStatement()
-    {
-        $this->is_software_statement_required = false;
-    }
-
-    public function disallowRegistrationWithoutSoftwareStatement()
-    {
-        Assertion::true($this->isSoftwareStatementSupported(), 'Software Statement not supported.');
-        $this->is_software_statement_required = true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function register(ServerRequestInterface $request, ResponseInterface &$response)
-    {
-        try {
-            $this->checkRequest($request);
-            $this->handleRequest($request, $response);
-        } catch (BaseException $e) {
-            $e->getHttpResponse($response);
-        } catch (\InvalidArgumentException $e) {
-            $e = $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, $e->getMessage());
-            $e->getHttpResponse($response);
-        }
-    }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return \OAuth2\Endpoint\ClientRegistration\InitialAccessTokenInterface|null
-     */
-    private function findInitialAccessToken(ServerRequestInterface $request)
-    {
-        if (false === $this->isInitialAccessTokenSupported()) {
-            return;
-        }
-        $values = [];
-        $token = $this->bearer_token->findToken($request, $values);
-        if (true === $this->isInitialAccessTokenRequired()) {
-            Assertion::notNull($token, 'Initial Access Token is missing or invalid.');
-        }
-        if (null === $token) {
-            return;
-        }
-
-        $initial_access_token = $this->initial_access_token_manager->getInitialAccessToken($token);
-        Assertion::notNull($initial_access_token, 'Initial Access Token is missing or invalid.');
-        Assertion::false($initial_access_token->hasExpired(), 'Initial Access Token expired.');
-
-        return $initial_access_token;
-    }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @param ServerRequestInterface $request
+     * @throws OAuth2Exception
      */
     private function checkRequest(ServerRequestInterface $request)
     {
-        Assertion::true($this->isRequestSecured($request), 'The request must be secured.');
-        Assertion::eq('POST', $request->getMethod(), 'Method must be POST.');
-    }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Psr\Http\Message\ResponseInterface      $response
-     *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
-     */
-    private function handleRequest(ServerRequestInterface $request, ResponseInterface &$response)
-    {
-        $initial_access_token = $this->findInitialAccessToken($request);
-        $request_parameters = RequestBody::getParameters($request);
-        $this->checkSoftwareStatement($request_parameters);
-        $client = $this->getClientManager()->createClient();
-        $this->getClientRuleManager()->processParametersForClient($client, $request_parameters);
-        if (null !== $initial_access_token) {
-            $client->setResourceOwnerPublicId($initial_access_token->getUserAccountPublicId());
-        }
-        $this->getClientManager()->saveClient($client);
-        $this->processResponse($response, $client);
-    }
-
-    /**
-     * @param array $request_parameters
-     */
-    private function checkSoftwareStatement(array &$request_parameters)
-    {
-        if ($this->isSoftwareStatementSupported()) {
-            Assertion::false(false === array_key_exists('software_statement', $request_parameters) && true === $this->is_software_statement_required, 'Software Statement required.');
-
-            if (array_key_exists('software_statement', $request_parameters)) {
-                $this->updateRequestParametersWithSoftwareStatement($request_parameters);
-            }
-        } elseif (array_key_exists('software_statement', $request_parameters)) {
-            throw new \InvalidArgumentException('Software Statement parameter not supported.');
+        if ('POST' !== $request->getMethod()) {
+            throw new OAuth2Exception(
+                405,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => 'Unsupported method.',
+                ]
+            );
         }
     }
 
     /**
-     * @param array $request_parameters
+     * @param Client $client
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    private function updateRequestParametersWithSoftwareStatement(array &$request_parameters)
+    private function createResponse(Client $client): ResponseInterface
     {
-        try {
-            $jws = $this->getJWTLoader()->load($request_parameters['software_statement']);
-            $this->getJWTLoader()->verify($jws, $this->software_statement_signature_key_set);
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException('Invalid Software Statement', $e->getCode(), $e);
+        $response = $this->responseFactory->createResponse(201);
+        foreach (['Content-Type' => 'application/json', 'Cache-Control' => 'no-store', 'Pragma' => 'no-cache'] as $k => $v) {
+            $response = $response->withHeader($k, $v);
         }
-        $request_parameters = array_merge(
-            $request_parameters,
-            $jws->getClaims()
-        );
-    }
+        $stream = $this->streamFactory->createStream(json_encode($client->all()));
+        $response = $response->withBody($stream);
 
-    /**
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param \OAuth2\Client\ClientInterface      $client
-     */
-    private function processResponse(ResponseInterface &$response, ClientInterface $client)
-    {
-        $response->getBody()->write(json_encode($client));
-        $headers = [
-            'Content-Type'  => 'application/json',
-            'Cache-Control' => 'no-store, private',
-            'Pragma'        => 'no-cache',
-        ];
-        foreach ($headers as $key => $value) {
-            $response = $response->withHeader($key, $value);
-        }
-        $response = $response->withStatus(200);
-    }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return bool
-     */
-    private function isRequestSecured(ServerRequestInterface $request)
-    {
-        $server_params = $request->getServerParams();
-
-        return !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
+        return $response;
     }
 }

@@ -14,89 +14,102 @@ namespace OAuth2\TokenEndpointAuthMethod;
 namespace OAuth2\TokenEndpointAuthMethod;
 
 use Assert\Assertion;
-use OAuth2\Behaviour\HasClientManager;
-use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ClientManagerInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\Client\ClientRepositoryInterface;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerInterface
 {
-    use HasClientManager;
-    use HasExceptionManager;
+    /**
+     * @var ClientRepositoryInterface
+     */
+    private $clientRepository;
 
     /**
-     * @var \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface[]
+     * @var OAuth2ResponseFactoryManagerInterface
      */
-    private $token_endpoint_auth_names = [];
+    private $oauth2ResponseFactoryManager;
 
     /**
-     * @var \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface[]
+     * @var TokenEndpointAuthMethodInterface[]
      */
-    private $token_endpoint_auth_methods = [];
+    private $tokenEndpointAuthMethodNames = [];
 
-    public function __construct(ClientManagerInterface $client_manager, ExceptionManagerInterface $exception_manager)
+    /**
+     * @var TokenEndpointAuthMethodInterface[]
+     */
+    private $tokenEndpointAuthMethods = [];
+
+    /**
+     * TokenEndpointAuthMethodManager constructor.
+     * @param ClientRepositoryInterface $clientRepository
+     * @param OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager
+     */
+    public function __construct(ClientRepositoryInterface $clientRepository, OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager)
     {
-        $this->setClientManager($client_manager);
-        $this->setExceptionManager($exception_manager);
+        $this->clientRepository = $clientRepository;
+        $this->oauth2ResponseFactoryManager = $oauth2ResponseFactoryManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addTokenEndpointAuthMethod(TokenEndpointAuthMethodInterface $token_endpoint_auth_method)
+    public function addTokenEndpointAuthMethod(TokenEndpointAuthMethodInterface $tokenEndpointAuthMethod)
     {
-        $this->token_endpoint_auth_methods[] = $token_endpoint_auth_method;
-        foreach ($token_endpoint_auth_method->getSupportedAuthenticationMethods() as $method_name) {
-            $this->token_endpoint_auth_names[$method_name] = $token_endpoint_auth_method;
+        $this->tokenEndpointAuthMethods[] = $tokenEndpointAuthMethod;
+        foreach ($tokenEndpointAuthMethod->getSupportedAuthenticationMethods() as $method_name) {
+            $this->tokenEndpointAuthMethodNames[$method_name] = $tokenEndpointAuthMethod;
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedTokenEndpointAuthMethods()
+    public function getSupportedTokenEndpointAuthMethods(): array
     {
-        return array_keys($this->token_endpoint_auth_names);
+        return array_keys($this->tokenEndpointAuthMethodNames);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasTokenEndpointAuthMethod($token_endpoint_auth_method)
+    public function hasTokenEndpointAuthMethod($tokenEndpointAuthMethod): bool
     {
-        return array_key_exists($token_endpoint_auth_method, $this->token_endpoint_auth_names);
+        return array_key_exists($tokenEndpointAuthMethod, $this->tokenEndpointAuthMethodNames);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getTokenEndpointAuthMethod($token_endpoint_auth_method)
+    public function getTokenEndpointAuthMethod($tokenEndpointAuthMethod): TokenEndpointAuthMethodInterface
     {
-        Assertion::true($this->hasTokenEndpointAuthMethod($token_endpoint_auth_method), sprintf('The token endpoint authentication method "%s" is not supported. Please use one of the following values: %s', $token_endpoint_auth_method, json_encode($this->getSupportedTokenEndpointAuthMethods())));
+        Assertion::true($this->hasTokenEndpointAuthMethod($tokenEndpointAuthMethod), sprintf('The token endpoint authentication method \'%s\' is not supported. Please use one of the following values: %s', $tokenEndpointAuthMethod, implode(', ', $this->getSupportedTokenEndpointAuthMethods())));
 
-        return $this->token_endpoint_auth_names[$token_endpoint_auth_method];
+        return $this->tokenEndpointAuthMethodNames[$tokenEndpointAuthMethod];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getTokenEndpointAuthMethods()
+    public function getTokenEndpointAuthMethods(): array
     {
-        return array_values($this->token_endpoint_auth_methods);
+        return array_values($this->tokenEndpointAuthMethods);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request)
+    public function findClient(ServerRequestInterface $request): Client
     {
-        $client_id = $this->findClientInTheRequest($request, $authentication_method, $client_credentials);
+        $id = $this->findClientInTheRequest($request, $authentication_method, $client_credentials);
 
-        if (null !== $client_id) {
-            $client = $this->getClientManager()->getClient($client_id);
-            if ($client instanceof ClientInterface && true === $this->isClientAuthenticated($request, $client, $authentication_method, $client_credentials)) {
+        if (null !== $id) {
+            $clientId = ClientId::create($id);
+            $client = $this->clientRepository->find($clientId);
+            if ($client instanceof Client && true === $this->isClientAuthenticated($request, $client, $authentication_method, $client_credentials)) {
                 return $client;
             }
         }
@@ -109,41 +122,46 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
      * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface $authentication_method
      * @param mixed                                                            $client_credentials    The client credentials found in the request
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return null|string
      */
     private function findClientInTheRequest(ServerRequestInterface $request, &$authentication_method, &$client_credentials = null)
     {
-        $client_id = null;
+        $clientId = null;
         $client_credentials = null;
         foreach ($this->getTokenEndpointAuthMethods() as $method) {
-            $temp = $method->findClient($request, $client_credentials);
+            $temp = $method->findClientId($request, $client_credentials);
             if (null !== $temp) {
-                if (null !== $client_id) {
+                if (null !== $clientId) {
                     $authentication_method = null;
-                    throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Only one authentication method may be used to authenticate the client.');
+                    throw new OAuth2Exception(
+                        400,
+                        [
+                            'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                            'error_description' => 'Only one authentication method may be used to authenticate the client.'
+                        ]
+                    );
                 } else {
-                    $client_id = $temp;
+                    $clientId = $temp;
                     $authentication_method = $method;
                 }
             }
         }
 
-        return $client_id;
+        return $clientId;
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface                         $request
-     * @param \OAuth2\Client\ClientInterface                                   $client
-     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface $authentication_method
-     * @param mixed|null                                                       $client_credentials
-     *
-     * @return true
+     * @param ServerRequestInterface $request
+     * @param Client $client
+     * @param TokenEndpointAuthMethodInterface $authentication_method
+     * @param $client_credentials
+     * @return bool
      */
-    public function isClientAuthenticated(ServerRequestInterface $request, ClientInterface $client, TokenEndpointAuthMethodInterface $authentication_method, $client_credentials)
+    public function isClientAuthenticated(ServerRequestInterface $request, Client $client, TokenEndpointAuthMethodInterface $authentication_method, $client_credentials)
     {
-        if (in_array($client->get('token_endpoint_auth_method'), $authentication_method->getSupportedAuthenticationMethods())) {
+        if (in_array($client->get('tokenEndpointAuthMethod'), $authentication_method->getSupportedAuthenticationMethods())) {
             if (false === $client->areClientCredentialsExpired()) {
                 return $authentication_method->isClientAuthenticated($client, $client_credentials, $request);
             }
@@ -155,7 +173,7 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     /**
      * {@inheritdoc}
      */
-    public function buildAuthenticationException(ServerRequestInterface $request)
+    public function buildAuthenticationException(ServerRequestInterface $request): OAuth2Exception
     {
         $schemes = [];
         $message = 'Client authentication failed.';
@@ -164,6 +182,12 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
             $schemes = array_merge($schemes, $scheme);
         }
 
-        return $this->getExceptionManager()->getAuthenticateException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, $message, ['schemes' => $schemes]);
+        return new OAuth2Exception(
+            401,
+            [
+                'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                'error_description' => $message
+            ]
+        );
     }
 }

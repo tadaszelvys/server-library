@@ -13,13 +13,12 @@ namespace OAuth2\Endpoint\Authorization\Extension;
 
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Endpoint\Authorization\Exception\AuthorizeException;
-use OAuth2\Endpoint\Authorization\Exception\CreateRedirectionException;
 use OAuth2\Endpoint\Authorization\Exception\ShowConsentScreenException;
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface;
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\UserAccount\UserAccountInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtensionInterface
@@ -30,19 +29,26 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
     private $pre_configured_authorization_manager;
 
     /**
+     * @var \OAuth2\Response\OAuth2ResponseFactoryManagerInterface
+     */
+    private $response_factory;
+
+    /**
      * PreConfiguredAuthorizationExtension constructor.
      *
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface                                               $response_factory
      * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface $pre_configured_authorization_manager
      */
-    public function __construct(PreConfiguredAuthorizationManagerInterface $pre_configured_authorization_manager)
+    public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory, PreConfiguredAuthorizationManagerInterface $pre_configured_authorization_manager)
     {
+        $this->response_factory = $response_factory;
         $this->pre_configured_authorization_manager = $pre_configured_authorization_manager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function processUserAccount(ServerRequestInterface $request, ResponseInterface &$response, AuthorizationInterface $authorization, UserAccountInterface &$user_account = null)
+    public function processUserAccount(ServerRequestInterface $request, AuthorizationInterface $authorization, UserAccountInterface &$user_account = null)
     {
         //Nothing to do
     }
@@ -50,7 +56,7 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsAvailable(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    public function processUserAccountIsAvailable(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         //Nothing to do
     }
@@ -58,7 +64,7 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         //Nothing to do
     }
@@ -66,7 +72,7 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
     /**
      * {@inheritdoc}
      */
-    public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         $pre_configured_authorization = $this->findPreConfiguredAuthorization($authorization);
 
@@ -79,7 +85,7 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
             throw new AuthorizeException($authorization);
         } else {
             if ($authorization->hasPrompt('none')) {
-                throw new CreateRedirectionException($authorization, ExceptionManagerInterface::ERROR_INTERACTION_REQUIRED);
+                throw new OAuth2Exception($this->response_factory->getResponse(302, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INTERACTION_REQUIRED]));
             }
         }
     }
@@ -87,7 +93,7 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
     /**
      * {@inheritdoc}
      */
-    public function process(array &$response_parameters, ServerRequestInterface $request, ResponseInterface &$response, AuthorizationInterface $authorization)
+    public function process(array &$response_parameters, ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         //Nothing to do
     }

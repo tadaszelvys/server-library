@@ -13,9 +13,8 @@ namespace OAuth2\Endpoint\Authorization\Extension;
 
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Endpoint\Authorization\Exception\CreateRedirectionException;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\UserAccount\UserAccountInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
@@ -23,7 +22,7 @@ class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccount(ServerRequestInterface $request, ResponseInterface &$response, AuthorizationInterface $authorization, UserAccountInterface &$user_account = null)
+    public function processUserAccount(ServerRequestInterface $request, AuthorizationInterface $authorization, UserAccountInterface &$user_account = null)
     {
         //Nothing to do
     }
@@ -31,7 +30,7 @@ class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsAvailable(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    public function processUserAccountIsAvailable(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         //Nothing to do
     }
@@ -39,17 +38,17 @@ class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         if ($authorization->hasPrompt('none')) {
-            throw new CreateRedirectionException($authorization, ExceptionManagerInterface::ERROR_LOGIN_REQUIRED);
+            throw new CreateRedirectionException($authorization, OAuth2ResponseFactoryManagerInterface::ERROR_LOGIN_REQUIRED);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, ResponseInterface $response, AuthorizationInterface $authorization)
+    public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         //Nothing to do
     }
@@ -57,7 +56,7 @@ class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function process(array &$response_parameters, ServerRequestInterface $request, ResponseInterface &$response, AuthorizationInterface $authorization)
+    public function process(array &$response_parameters, ServerRequestInterface $request, AuthorizationInterface $authorization)
     {
         //Nothing to do
     }

@@ -24,7 +24,8 @@ interface AuthorizationEndpointInterface
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Psr\Http\Message\ResponseInterface      $response
+     *
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function authorize(ServerRequestInterface $request, ResponseInterface &$response);
+    public function authorize(ServerRequestInterface $request);
 }

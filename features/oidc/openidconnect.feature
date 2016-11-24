@@ -1,0 +1,34 @@
+Feature: A client sends a request against the OpenID Connect Userinfo Endpoint
+
+  Scenario: No access token in the request
+    When I am on the page "https://oauth2.test/user/info"
+    Then I should receive an authentication error
+    And the status code of the response is 401
+
+  Scenario: I have a valid access token in the request header
+    When I add key "Authorization" with value "Bearer VALID_ACCESS_TOKEN_WITH_OPENID_SCOPE" in the header
+    And I am on the page "https://oauth2.test/user/info"
+    Then the status code of the response is 200
+    And the content type is "application/json"
+
+  Scenario: I have an access token without openid scope in the request header
+    When I add key "Authorization" with value "Bearer ABCD" in the header
+    And I am on the page "https://oauth2.test/user/info"
+    Then the status code of the response is 400
+    And the content type is "application/json"
+    And I should receive an OAuth2 exception with message "invalid_request" and description 'The access token does not contain the "openid" scope.'
+
+  Scenario: The public keys are available through an Url
+    When I am on the page "https://oauth2.test/keys/public.jwkset.json"
+    Then the status code of the response is 200
+    And the content type is "application/jwk-set+json"
+
+  Scenario: The server configuration is available through an Url
+    When I am on the page "https://oauth2.test/.well-known/openid-configuration"
+    Then the status code of the response is 200
+    And the content type is "application/json; charset=UTF-8"
+
+  Scenario: The server has an OP iframe endpoint
+    When I am on the page "https://oauth2.test/session/manager/iframe"
+    Then the status code of the response is 200
+    And the content type is "text/html; charset=UTF-8"

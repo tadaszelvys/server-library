@@ -12,11 +12,12 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\ClientId;
 use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
 use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
+use OAuth2\Model\UserAccount\UserAccount;
 
-class SubjectTypeRule implements RuleInterface
+final class SubjectTypeRule implements RuleInterface
 {
     use HasUserinfo;
 
@@ -33,28 +34,19 @@ class SubjectTypeRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
     {
-        if (!array_key_exists('subject_type', $registration_parameters)) {
-            return;
+        if (array_key_exists('subject_type', $command_parameters)) {
+            Assertion::string($command_parameters['subject_type'], 'Invalid parameter \'subject_type\'. The value must be a string.');
+            $supported_types = ['public'];
+            if ($this->getUserinfo()->isPairwiseSubjectIdentifierSupported()) {
+                $supported_types[] = 'pairwise';
+            }
+
+            Assertion::inArray($command_parameters['subject_type'], $supported_types, sprintf('The subject type \'%s\' is not supported. Please use one of the following value: %s', $command_parameters['subject_type'], implode(', ', $supported_types)));
+            $validated_parameters['subject_type'] = $command_parameters['subject_type'];
         }
 
-        Assertion::string($registration_parameters['subject_type'], 'Invalid parameter "subject_type". The value must be a string.');
-        $supported_types = ['public'];
-        if ($this->getUserinfo()->isPairwiseSubjectIdentifierSupported()) {
-            $supported_types[] = 'pairwise';
-        }
-
-        Assertion::inArray($registration_parameters['subject_type'], $supported_types, sprintf('The subject type "%s" is not supported. Please use one of the following value: %s', $registration_parameters['subject_type'], json_encode($supported_types)));
-
-        $client->set('subject_type', $registration_parameters['subject_type']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPreserverParameters()
-    {
-        return [];
+        return $next($command_parameters, $validated_parameters, $userAccount);
     }
 }

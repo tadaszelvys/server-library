@@ -27,6 +27,8 @@ interface AuthorizationFactoryInterface
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
+     * @throws \OAuth2\Response\OAuth2Exception
+     *
      * @return \OAuth2\Endpoint\Authorization\AuthorizationInterface
      */
     public function createAuthorizationFromRequest(ServerRequestInterface $request);
@@ -35,7 +37,7 @@ interface AuthorizationFactoryInterface
      * @param array                                 $params
      * @param \OAuth2\Grant\ResponseTypeInterface[] $types
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return \OAuth2\ResponseMode\ResponseModeInterface
      */
@@ -44,7 +46,7 @@ interface AuthorizationFactoryInterface
     /**
      * @param array $params
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return \OAuth2\Grant\ResponseTypeInterface[]
      */

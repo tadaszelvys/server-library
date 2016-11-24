@@ -12,33 +12,24 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\UserAccount\UserAccount;
 
-class CommonParametersRule extends AbstractInternationalizedRule
+final class CommonParametersRule extends AbstractInternationalizedRule
 {
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
     {
-        $metadatas = [];
         foreach ($this->getSupportedParameters() as $parameter => $closure) {
-            $metadatas = array_merge(
-                $metadatas,
-                $this->getInternationalizedParameters($registration_parameters, $parameter, $closure)
+            $validated_parameters = array_merge(
+                $validated_parameters,
+                $this->getInternationalizedParameters($command_parameters, $parameter, $closure)
             );
         }
-        foreach ($metadatas as $k => $v) {
-            $client->set($k, $v);
-        }
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPreserverParameters()
-    {
-        return [];
+        return $next($command_parameters, $validated_parameters, $userAccount);
     }
 
     /**
@@ -59,7 +50,7 @@ class CommonParametersRule extends AbstractInternationalizedRule
     private function getUriVerificationClosure()
     {
         return function ($k, $v) {
-            Assertion::url($v, sprintf('The parameter with key "%s" is not a valid URL.', $k));
+            Assertion::url($v, sprintf('The parameter with key \'%s\' is not a valid URL.', $k));
         };
     }
 }

@@ -12,7 +12,8 @@
 namespace OAuth2\TokenEndpointAuthMethod;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
@@ -25,28 +26,28 @@ abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
     /**
      * @var int
      */
-    private $secret_lifetime;
+    private $secretLifetime;
 
     /**
      * ClientSecretBasic constructor.
      *
      * @param string $realm
-     * @param int    $secret_lifetime
+     * @param int    $secretLifetime
      */
-    public function __construct($realm, $secret_lifetime = 0)
+    public function __construct(string $realm, int $secretLifetime = 0)
     {
         Assertion::string($realm);
-        Assertion::integer($secret_lifetime);
-        Assertion::greaterOrEqualThan($secret_lifetime, 0);
+        Assertion::integer($secretLifetime);
+        Assertion::greaterOrEqualThan($secretLifetime, 0);
 
         $this->realm = $realm;
-        $this->secret_lifetime = $secret_lifetime;
+        $this->secretLifetime = $secretLifetime;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSchemesParameters()
+    public function getSchemesParameters(): array
     {
         return [
             sprintf('Basic realm="%s",charset="UTF-8"', $this->getRealm()),
@@ -56,7 +57,7 @@ abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request, &$client_credentials = null)
+    public function findClientId(ServerRequestInterface $request, &$client_credentials = null)
     {
         $server_params = $request->getServerParams();
         if (array_key_exists('PHP_AUTH_USER', $server_params) && array_key_exists('PHP_AUTH_PW', $server_params)) {
@@ -72,7 +73,7 @@ abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
                     if (!empty($client_id) && !empty($client_secret)) {
                         $client_credentials = $client_secret;
 
-                        return $client_id;
+                        return ClientId::create($client_id);
                     }
                 }
             }
@@ -82,16 +83,16 @@ abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function checkClientConfiguration(array $client_configuration, ClientInterface $client)
+    public function checkClientConfiguration(array $command_parameters, array &$validated_parameters)
     {
-        $client->set('client_secret', $this->createClientSecret());
-        $client->set('client_secret_expires_at', (0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime));
+        $validated_parameters['client_secret'] = $this->createClientSecret();
+        $validated_parameters['client_secret_expires_at'] = (0 === $this->secretLifetime ? 0 : time() + $this->secretLifetime);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
+    public function isClientAuthenticated(Client $client, $client_credentials, ServerRequestInterface $request): bool
     {
         return hash_equals($client->get('client_secret'), $client_credentials);
     }
@@ -99,7 +100,7 @@ abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function getSupportedAuthenticationMethods()
+    public function getSupportedAuthenticationMethods(): array
     {
         return ['client_secret_basic'];
     }
@@ -107,7 +108,7 @@ abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
     /**
      * @return string
      */
-    private function getRealm()
+    private function getRealm(): string
     {
         return $this->realm;
     }
@@ -115,5 +116,5 @@ abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
     /**
      * @return string
      */
-    abstract protected function createClientSecret();
+    abstract protected function createClientSecret(): string;
 }

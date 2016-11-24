@@ -11,45 +11,45 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasAccessTokenManager;
-use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasTokenTypeManager;
-use OAuth2\Behaviour\HasTokenTypeParameterSupport;
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
-use OAuth2\Token\AccessTokenManagerInterface;
+use OAuth2\Endpoint\Authorization\Authorization;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use OAuth2\TokenType\TokenTypeManagerInterface;
 
 class ImplicitGrantType implements ResponseTypeInterface
 {
-    use HasExceptionManager;
-    use HasTokenTypeManager;
-    use HasAccessTokenManager;
-    use HasTokenTypeParameterSupport;
-
     /**
      * @var bool
      */
-    private $confidential_clients_allowed = false;
+    private $confidentialClientsAllowed = false;
+
+    /**
+     * @var TokenTypeManagerInterface
+     */
+    private $token_type_manager;
+
+    /**
+     * @var AccessTokenRepositoryInterface
+     */
+    private $access_token_manager;
 
     /**
      * ImplicitGrantType constructor.
      *
-     * @param \OAuth2\TokenType\TokenTypeManagerInterface     $token_type_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface   $access_token_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param TokenTypeManagerInterface     $token_type_manager
+     * @param AccessTokenRepositoryInterface   $access_token_manager
      */
-    public function __construct(TokenTypeManagerInterface $token_type_manager, AccessTokenManagerInterface $access_token_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct(TokenTypeManagerInterface $token_type_manager, AccessTokenRepositoryInterface $access_token_manager)
     {
-        $this->setTokenTypeManager($token_type_manager);
-        $this->setAccessTokenManager($access_token_manager);
-        $this->setExceptionManager($exception_manager);
+        $this->token_type_manager = $token_type_manager;
+        $this->access_token_manager = $access_token_manager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedGrantTypes()
+    public function getAssociatedGrantTypes(): array
     {
         return [];
     }
@@ -57,7 +57,7 @@ class ImplicitGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponseType()
+    public function getResponseType(): string
     {
         return 'token';
     }
@@ -65,7 +65,7 @@ class ImplicitGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponseMode()
+    public function getResponseMode(): string
     {
         return self::RESPONSE_TYPE_MODE_FRAGMENT;
     }
@@ -73,17 +73,23 @@ class ImplicitGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function checkAuthorization(AuthorizationInterface $authorization)
+    public function checkAuthorization(Authorization $authorization)
     {
         if (false === $this->areConfidentialClientsAllowed() && false === $authorization->getClient()->isPublic()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'Confidential clients are not allowed to use the implicit grant type.');
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'Confidential clients are not allowed to use the implicit grant type.'
+                ]
+            );
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
     {
         //Nothing to do
     }
@@ -91,11 +97,11 @@ class ImplicitGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareAuthorization(AuthorizationInterface $authorization)
+    public function prepareAuthorization(Authorization $authorization)
     {
         $token_type = $this->getTokenTypeFromRequest($authorization->getQueryParams());
 
-        $token = $this->getAccessTokenManager()->createAccessToken(
+        $token = $this->access_token_manager->create(
             $authorization->getClient(),
             $authorization->getUserAccount(),
             $token_type->getTokenTypeInformation(),
@@ -106,7 +112,7 @@ class ImplicitGrantType implements ResponseTypeInterface
             ['redirect_uri' => $authorization->getRedirectUri()]
         );
 
-        $authorization->setData('access_token', $token);
+        $authorization = $authorization->withData('access_token', $token);
 
         return $token->toArray();
     }
@@ -114,18 +120,18 @@ class ImplicitGrantType implements ResponseTypeInterface
     /**
      * @return bool
      */
-    public function areConfidentialClientsAllowed()
+    public function areConfidentialClientsAllowed(): bool
     {
-        return $this->confidential_clients_allowed;
+        return $this->confidentialClientsAllowed;
     }
 
     public function allowConfidentialClients()
     {
-        $this->confidential_clients_allowed = true;
+        $this->confidentialClientsAllowed = true;
     }
 
     public function disallowConfidentialClients()
     {
-        $this->confidential_clients_allowed = false;
+        $this->confidentialClientsAllowed = false;
     }
 }

@@ -13,7 +13,7 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 /**
  * Class StateParameterChecker.
@@ -46,7 +46,7 @@ class StateParameterChecker implements ParameterCheckerInterface
         if (false === $this->state_parameter_enforced) {
             return;
         }
-        Assertion::true(array_key_exists('state', $parameters), 'The parameter "state" is mandatory.');
+        Assertion::true(array_key_exists('state', $parameters), 'The parameter \'state\' is mandatory.');
     }
 
     /**
@@ -54,6 +54,6 @@ class StateParameterChecker implements ParameterCheckerInterface
      */
     public function getError()
     {
-        return ExceptionManagerInterface::ERROR_INVALID_REQUEST;
+        return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }
 }

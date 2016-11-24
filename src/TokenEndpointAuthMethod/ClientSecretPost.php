@@ -12,7 +12,8 @@
 namespace OAuth2\TokenEndpointAuthMethod;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -21,20 +22,20 @@ abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
     /**
      * @var int
      */
-    private $secret_lifetime;
+    private $secretLifetime;
 
-    public function __construct($secret_lifetime = 0)
+    public function __construct(int $secretLifetime = 0)
     {
-        Assertion::integer($secret_lifetime);
-        Assertion::greaterOrEqualThan($secret_lifetime, 0);
+        Assertion::integer($secretLifetime);
+        Assertion::greaterOrEqualThan($secretLifetime, 0);
 
-        $this->secret_lifetime = $secret_lifetime;
+        $this->secretLifetime = $secretLifetime;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSchemesParameters()
+    public function getSchemesParameters(): array
     {
         return [];
     }
@@ -42,39 +43,39 @@ abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request, &$client_credentials = null)
+    public function findClientId(ServerRequestInterface $request, &$clientCredentials = null)
     {
-        $client_id = RequestBody::getParameter($request, 'client_id');
-        $client_secret = RequestBody::getParameter($request, 'client_secret');
+        $clientId = RequestBody::getParameter($request, 'clientId');
+        $clientSecret = RequestBody::getParameter($request, 'client_secret');
 
-        if (!empty($client_id) && !empty($client_secret)) {
-            $client_credentials = $client_secret;
+        if (!empty($clientId) && !empty($clientSecret)) {
+            $clientCredentials = $clientSecret;
 
-            return $client_id;
+            return ClientId::create($clientId);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function checkClientConfiguration(array $client_configuration, ClientInterface $client)
+    public function checkClientConfiguration(array $command_parameters, array &$validated_parameters)
     {
-        $client->set('client_secret', $this->createClientSecret());
-        $client->set('client_secret_expires_at', (0 === $this->secret_lifetime ? 0 : time() + $this->secret_lifetime));
+        $validated_parameters['client_secret'] =  $this->createClientSecret();
+        $validated_parameters['client_secret_expires_at'] =  (0 === $this->secretLifetime ? 0 : time() + $this->secretLifetime);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(ClientInterface $client, $client_credentials, ServerRequestInterface $request)
+    public function isClientAuthenticated(Client $client, $clientCredentials, ServerRequestInterface $request): bool
     {
-        return hash_equals($client->get('client_secret'), $client_credentials);
+        return hash_equals($client->get('client_secret'), $clientCredentials);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedAuthenticationMethods()
+    public function getSupportedAuthenticationMethods(): array
     {
         return ['client_secret_post'];
     }
@@ -82,5 +83,5 @@ abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
     /**
      * @return string
      */
-    abstract protected function createClientSecret();
+    abstract protected function createClientSecret(): string;
 }

@@ -14,28 +14,28 @@ namespace OAuth2\ResponseMode;
 interface ResponseModeManagerInterface
 {
     /**
-     * @param \OAuth2\ResponseMode\ResponseModeInterface $response_mode
+     * @param ResponseModeInterface $responseMode
      */
-    public function addResponseMode(ResponseModeInterface $response_mode);
+    public function addResponseMode(ResponseModeInterface $responseMode);
 
     /**
      * @param string $name
      *
      * @return bool
      */
-    public function hasResponseMode($name);
+    public function hasResponseMode(string $name): bool;
 
     /**
      * @param string $name
      *
      * @throws \InvalidArgumentException
      *
-     * @return \OAuth2\ResponseMode\ResponseModeInterface
+     * @return ResponseModeInterface
      */
-    public function getResponseMode($name);
+    public function getResponseMode(string $name): ResponseModeInterface;
 
     /**
      * @return string[]
      */
-    public function getSupportedResponseModes();
+    public function getSupportedResponseModes(): array;
 }

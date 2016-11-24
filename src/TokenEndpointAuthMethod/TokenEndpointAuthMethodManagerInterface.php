@@ -11,6 +11,8 @@
 
 namespace OAuth2\TokenEndpointAuthMethod;
 
+use OAuth2\Model\Client\Client;
+use OAuth2\Response\OAuth2Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface TokenEndpointAuthMethodManagerInterface
@@ -22,21 +24,21 @@ interface TokenEndpointAuthMethodManagerInterface
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request The request
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface Throw an exception if a client tried to authenticate against the server, but failed
+     * @throws OAuth2Exception Throw an exception if a client tried to authenticate against the server, but failed
      *
-     * @return \OAuth2\Client\ClientInterface Return the client object.
+     * @return Client Return the client object.
      */
     public function findClient(ServerRequestInterface $request);
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return \OAuth2\Exception\BaseExceptionInterface
+     * @return OAuth2Exception
      */
     public function buildAuthenticationException(ServerRequestInterface $request);
 
     /**
-     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface $token_endpoint_auth_method
+     * @param TokenEndpointAuthMethodInterface $token_endpoint_auth_method
      */
     public function addTokenEndpointAuthMethod(TokenEndpointAuthMethodInterface $token_endpoint_auth_method);
 
@@ -57,12 +59,12 @@ interface TokenEndpointAuthMethodManagerInterface
      *
      * @throws \InvalidArgumentException
      *
-     * @return \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface
+     * @return TokenEndpointAuthMethodInterface
      */
     public function getTokenEndpointAuthMethod($token_endpoint_auth_method);
 
     /**
-     * @return \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodInterface[]
+     * @return TokenEndpointAuthMethodInterface[]
      */
     public function getTokenEndpointAuthMethods();
 }

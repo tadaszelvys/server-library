@@ -12,28 +12,22 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\UserAccount\UserAccount;
 
-class RequestUriRule implements RuleInterface
+final class RequestUriRule implements RuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
     {
-        if (!array_key_exists('request_uris', $registration_parameters)) {
-            return;
+        if (array_key_exists('request_uris', $command_parameters)) {
+            Assertion::isArray($command_parameters['request_uris'], 'The parameter \'request_uris\' must be a list of URI.');
+            Assertion::allUrl($command_parameters['request_uris'], 'The parameter \'request_uris\' must be a list of URI.');
+            $validated_parameters['request_uris'] = $command_parameters['request_uris'];
         }
-        Assertion::isArray($registration_parameters['request_uris'], 'The parameter "request_uris" must be a list of URI.');
-        Assertion::allUrl($registration_parameters['request_uris'], 'The parameter "request_uris" must be a list of URI.');
-        $client->set('request_uris', $registration_parameters['request_uris']);
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPreserverParameters()
-    {
-        return [];
+        return $next($command_parameters, $validated_parameters, $userAccount);
     }
 }

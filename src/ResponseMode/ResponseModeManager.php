@@ -18,39 +18,39 @@ class ResponseModeManager implements ResponseModeManagerInterface
     /**
      * @var \OAuth2\ResponseMode\ResponseModeInterface[]
      */
-    private $response_modes = [];
+    private $responseModes = [];
 
     /**
      * {@inheritdoc}
      */
-    public function addResponseMode(ResponseModeInterface $response_mode)
+    public function addResponseMode(ResponseModeInterface $responseMode)
     {
-        $this->response_modes[$response_mode->getName()] = $response_mode;
+        $this->responseModes[$responseMode->getName()] = $responseMode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasResponseMode($name)
+    public function hasResponseMode(string $name): bool
     {
-        return array_key_exists($name, $this->response_modes);
+        return array_key_exists($name, $this->responseModes);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResponseMode($name)
+    public function getResponseMode(string $name): ResponseModeInterface
     {
-        Assertion::true($this->hasResponseMode($name), sprintf('The response mode with name "%s" is not supported.', $name));
+        Assertion::true($this->hasResponseMode($name), sprintf('The response mode with name \'%s\' is not supported.', $name));
 
-        return $this->response_modes[$name];
+        return $this->responseModes[$name];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedResponseModes()
+    public function getSupportedResponseModes(): array
     {
-        return array_keys($this->response_modes);
+        return array_keys($this->responseModes);
     }
 }

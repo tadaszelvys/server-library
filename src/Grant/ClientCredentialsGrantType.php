@@ -11,14 +11,15 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasExceptionManager;
+use OAuth2\Behaviour\HasResponseFactoryManager;
 use OAuth2\Client\ClientInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ClientCredentialsGrantType implements GrantTypeInterface
 {
-    use HasExceptionManager;
+    use HasResponseFactoryManager;
 
     /**
      * @var bool
@@ -28,11 +29,11 @@ class ClientCredentialsGrantType implements GrantTypeInterface
     /**
      * ClientCredentialsGrantType constructor.
      *
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
-    public function __construct(ExceptionManagerInterface $exception_manager)
+    public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory_manager)
     {
-        $this->setExceptionManager($exception_manager);
+        $this->setResponsefactoryManager($response_factory_manager);
     }
 
     /**
@@ -65,7 +66,7 @@ class ClientCredentialsGrantType implements GrantTypeInterface
     public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
     {
         if ($client->isPublic()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'The client is not a confidential client');
+            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The client is not a confidential client']));
         }
         $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
 

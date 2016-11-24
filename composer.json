@@ -16,25 +16,28 @@
         }
     ],
     "require": {
-        "php": "^5.6|^7.0",
+        "php": "^7.0",
         "psr/http-message": "^1.0",
         "spomky-labs/jose": "^6.1.1",
-        "oauth2-framework/exception-manager-library": "^1.0.0",
-        "oauth2-framework/token-type-manager-library": "^1.0.0",
+        "oauth2-framework/response-factory-library": "dev-master",
+        "oauth2-framework/token-type-manager-library": "dev-master",
+        "oauth2-framework/security-library": "dev-master",
         "beberlei/assert": "^2.6.4",
-        "php-http/httplug": "^1.1"
+        "php-http/httplug": "^1.1",
+        "simple-bus/message-bus": "^2.2",
+        "http-interop/http-middleware": "^1.0@dev",
+        "http-interop/http-factory": "^1.0@dev",
+        "ramsey/uuid": "^3.5",
+        "jms/serializer": "^1.4",
+        "psr/container": "*@dev"
     },
     "require-dev": {
-        "zendframework/zend-diactoros": "^1.1",
-        "phpunit/phpunit": "^5.0",
-        "symfony/psr-http-message-bridge": "^0.2",
-        "symfony/var-dumper": "^2.8|^3.0",
-        "symfony/http-foundation": "^2.8|^3.0",
-        "symfony/process": "^2.8|^3.0",
-        "satooshi/php-coveralls": "^1.0",
-        "paquettg/php-html-parser": "^1.6",
-        "silex/silex": "^2.0",
-        "guzzlehttp/guzzle": "^6.0"
+        "symfony/var-dumper": "^3.0",
+        "behat/behat": "^3.2",
+        "http-interop/http-factory-diactoros": "*@dev"
+    },
+    "suggests": {
+        "php-http/client-implementation": "For Authorization Request and Sector Identifier Uri support."
     },
     "autoload": {
         "psr-4": {
@@ -43,7 +46,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "OAuth2\\Test\\": "tests/"
+            "OAuth2\\Test\\": "tests"
         }
     },
     "extra": {

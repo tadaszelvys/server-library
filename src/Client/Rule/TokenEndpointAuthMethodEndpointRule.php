@@ -13,10 +13,11 @@ namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\ClientId;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
+use OAuth2\Model\UserAccount\UserAccount;
 
-class TokenEndpointAuthMethodEndpointRule implements RuleInterface
+final class TokenEndpointAuthMethodEndpointRule implements RuleInterface
 {
     use HasTokenEndpointAuthMethodManager;
 
@@ -33,23 +34,17 @@ class TokenEndpointAuthMethodEndpointRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function check(ClientInterface $client, array $registration_parameters)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
     {
-        Assertion::keyExists($registration_parameters, 'token_endpoint_auth_method', 'The parameter "token_endpoint_auth_method" is missing.');
-        Assertion::string($registration_parameters['token_endpoint_auth_method'], 'The parameter "token_endpoint_auth_method" must be a string.');
-        Assertion::true($this->getTokenEndpointAuthMethodManager()->hasTokenEndpointAuthMethod($registration_parameters['token_endpoint_auth_method']), sprintf('The token endpoint authentication method "%s" is not supported. Please use one of the following values: %s', $registration_parameters['token_endpoint_auth_method'], json_encode($this->getTokenEndpointAuthMethodManager()->getSupportedTokenEndpointAuthMethods())));
+        Assertion::keyExists($command_parameters, 'token_endpoint_auth_method', 'The parameter \'token_endpoint_auth_method\' is missing.');
+        Assertion::string($command_parameters['token_endpoint_auth_method'], 'The parameter \'token_endpoint_auth_method\' must be a string.');
+        Assertion::true($this->getTokenEndpointAuthMethodManager()->hasTokenEndpointAuthMethod($command_parameters['token_endpoint_auth_method']), sprintf('The token endpoint authentication method \'%s\' is not supported. Please use one of the following values: %s', $command_parameters['token_endpoint_auth_method'], implode(', ', $this->getTokenEndpointAuthMethodManager()->getSupportedTokenEndpointAuthMethods())));
 
-        $token_endpoint_auth_method = $this->getTokenEndpointAuthMethodManager()->getTokenEndpointAuthMethod($registration_parameters['token_endpoint_auth_method']);
-        $token_endpoint_auth_method->checkClientConfiguration($registration_parameters, $client);
+        $token_endpoint_auth_method = $this->getTokenEndpointAuthMethodManager()->getTokenEndpointAuthMethod($command_parameters['token_endpoint_auth_method']);
+        $token_endpoint_auth_method->checkClientConfiguration($command_parameters, $validated_parameters);
 
-        $client->set('token_endpoint_auth_method', $registration_parameters['token_endpoint_auth_method']);
-    }
+        $validated_parameters['token_endpoint_auth_method'] = $command_parameters['token_endpoint_auth_method'];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPreserverParameters()
-    {
-        return ['client_secret_expires_at'];
+        return $next($command_parameters, $validated_parameters, $userAccount);
     }
 }

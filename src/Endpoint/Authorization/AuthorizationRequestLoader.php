@@ -12,29 +12,17 @@
 namespace OAuth2\Endpoint\Authorization;
 
 use Assert\Assertion;
-use GuzzleHttp\Client;
+use Http\Client\HttpClient;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
-use OAuth2\Behaviour\HasClientManager;
-use OAuth2\Behaviour\HasExceptionManager;
-use OAuth2\Behaviour\HasJWTLoader;
-use OAuth2\Client\ClientInterface;
-use OAuth2\Client\ClientManagerInterface;
-use OAuth2\Exception\ExceptionManagerInterface;
+use OAuth2\Response\OAuth2Exception;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Request;
 
 class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
 {
-    use HasJWTLoader;
-    use HasClientManager;
-    use HasExceptionManager;
-
-    /**
-     * @var bool
-     */
-    private $allow_unsecured_connections = false;
-
     /**
      * @var bool
      */
@@ -66,39 +54,20 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     private $mandatory_claims = [];
 
     /**
+     * @var null|\Http\Client\HttpClient
+     */
+    private $client = null;
+
+    /**
      * AuthorizationRequestLoader constructor.
      *
      * @param \OAuth2\Client\ClientManagerInterface       $client_manager
-     * @param \OAuth2\Exception\ExceptionManagerInterface $exception_manager
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
-    public function __construct(ClientManagerInterface $client_manager, ExceptionManagerInterface $exception_manager)
+    public function __construct(ClientManagerInterface $client_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
     {
         $this->setClientManager($client_manager);
-        $this->setExceptionManager($exception_manager);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function allowUnsecuredConnections()
-    {
-        $this->allow_unsecured_connections = true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function disallowUnsecuredConnections()
-    {
-        $this->allow_unsecured_connections = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function areUnsecuredConnectionsAllowed()
-    {
-        return $this->allow_unsecured_connections;
+        $this->setResponsefactoryManager($response_factory_manager);
     }
 
     /**
@@ -179,10 +148,11 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function enableRequestObjectReferenceSupport()
+    public function enableRequestObjectReferenceSupport(HttpClient $client)
     {
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
         $this->request_object_reference_allowed = true;
+        $this->client = $client;
     }
 
     /**
@@ -227,14 +197,14 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param array $params
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return array
      */
     private function createFromRequestParameter(array $params)
     {
         if (false === $this->isRequestObjectSupportEnabled()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_NOT_SUPPORTED, 'The parameter "request" is not supported.');
+            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_REQUEST_NOT_SUPPORTED, 'error_description' => 'The parameter \'request\' is not supported.']));
         }
         $request = $params['request'];
         Assertion::string($request);
@@ -261,14 +231,14 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param array $params
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return array
      */
     private function createFromRequestUriParameter(array $params)
     {
         if (false === $this->isRequestObjectReferenceSupportEnabled()) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::REQUEST_URI_NOT_SUPPORTED, 'The parameter "request_uri" is not supported.');
+            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_REQUEST_URI_NOT_SUPPORTED, 'error_description' => 'The parameter \'request_uri\' is not supported.']));
         }
         $request_uri = $params['request_uri'];
 
@@ -286,7 +256,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param array $params
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      */
     private function checkIssuerAndClientId(array $params)
     {
@@ -299,7 +269,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
      * @param \OAuth2\Client\ClientInterface $client
      * @param string                         $request_uri
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      */
     private function checkRequestUri(ClientInterface $client, $request_uri)
     {
@@ -311,32 +281,32 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
                 return;
             }
         }
-        throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST_URI, 'The request Uri is not allowed.');
+        throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST_URI, 'error_description' => 'The request Uri is not allowed.']));
     }
 
     /**
      * @param string $request_uri
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      */
     private function checkRequestUriPathTraversal($request_uri)
     {
         if (false === Uri::checkUrl($request_uri, false)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'The request Uri must not contain path traversal.');
+            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The request Uri must not contain path traversal.']));
         }
     }
 
     /**
      * @param \OAuth2\Client\ClientInterface $client
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return string[]
      */
     private function getClientRequestUris(ClientInterface $client)
     {
         if (false === $client->has('request_uris') || empty($request_uris = $client->get('request_uris'))) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_CLIENT, 'The client must register at least one request Uri.');
+            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The client must register at least one request Uri.']));
         }
 
         return $request_uris;
@@ -347,7 +317,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
      * @param string                              $request
      * @param \OAuth2\Client\ClientInterface|null $client
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return \Jose\Object\JWSInterface
      */
@@ -365,9 +335,9 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
 
             $this->getJWTLoader()->verify($jwt, $public_key_set);
             $missing_claims = array_keys(array_diff_key(array_flip($this->mandatory_claims), $jwt->getClaims()));
-            Assertion::true(0 === count($missing_claims), 'The following mandatory claims are missing: %s.', json_encode($missing_claims));
+            Assertion::true(0 === count($missing_claims), 'The following mandatory claims are missing: %s.', implode(', ', $missing_claims));
         } catch (\Exception $e) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST_OBJECT, $e->getMessage());
+            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST_OBJECT, 'error_description' => $e->getMessage()]));
         }
 
         return $jwt;
@@ -376,21 +346,19 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param string $url
      *
-     * @throws \OAuth2\Exception\BadRequestExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return string
      */
     private function downloadContent($url)
     {
-        $client = new Client([
-            'verify' => !$this->areUnsecuredConnectionsAllowed(),
-        ]);
-        $response = $client->get($url);
+        $request = new Request($url, 'GET');
+        $response = $this->client->sendRequest($request);
         Assertion::eq(200, $response->getStatusCode());
 
         $content = $response->getBody()->getContents();
         if (!is_string($content)) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST_URI, 'Unable to get content.');
+            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST_URI, 'error_description' => 'Unable to get content.']));
         }
 
         return $content;
@@ -399,7 +367,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param array $params
      *
-     * @throws \OAuth2\Exception\BaseExceptionInterface
+     * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return \OAuth2\Client\ClientInterface
      */
@@ -407,7 +375,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     {
         $client = array_key_exists('client_id', $params) ? $this->getClientManager()->getClient($params['client_id']) : null;
         if (!$client instanceof ClientInterface) {
-            throw $this->getExceptionManager()->getBadRequestException(ExceptionManagerInterface::ERROR_INVALID_REQUEST, 'Parameter "client_id" missing or invalid.');
+            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Parameter \'client_id\' missing or invalid.']));
         }
 
         return $client;
