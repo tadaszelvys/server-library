@@ -14,8 +14,8 @@ namespace OAuth2\Middleware;
 use Assert\Assertion;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenId;
+use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenType\BearerToken;
@@ -37,7 +37,7 @@ final class InitialAccessTokenMiddleware implements MiddlewareInterface
     /**
      * InitialAccessTokenMiddleware constructor.
      *
-     * @param BearerToken                        $bearerToken
+     * @param BearerToken                           $bearerToken
      * @param InitialAccessTokenRepositoryInterface $initialAccessTokenRepository
      */
     public function __construct(BearerToken $bearerToken, InitialAccessTokenRepositoryInterface $initialAccessTokenRepository)

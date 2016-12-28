@@ -25,6 +25,7 @@ final class ClientAuthenticationMiddleware implements MiddlewareInterface
 
     /**
      * ClientAuthenticationMiddleware constructor.
+     *
      * @param TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthMethodManager
      */
     public function __construct(TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthMethodManager)

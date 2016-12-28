@@ -29,8 +29,9 @@ final class DeleteClientCommandHandler
 
     /**
      * DeleteClientCommandHandler constructor.
+     *
      * @param ClientRepositoryInterface $clientRepository
-     * @param RecordsMessages $messageRecorder
+     * @param RecordsMessages           $messageRecorder
      */
     public function __construct(ClientRepositoryInterface $clientRepository, RecordsMessages $messageRecorder)
     {

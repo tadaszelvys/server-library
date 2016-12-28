@@ -53,9 +53,9 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     /**
      * ClientAssertionJwt constructor.
      *
-     * @param \Jose\JWTLoaderInterface                    $jwtLoader
+     * @param \Jose\JWTLoaderInterface                               $jwtLoader
      * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager
-     * @param int                                         $secretLifetime
+     * @param int                                                    $secretLifetime
      */
     public function __construct(JWTLoaderInterface $jwtLoader, OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager, $secretLifetime = 0)
     {
@@ -143,8 +143,8 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' =>$e->getMessage()
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => $e->getMessage(),
                 ]
             );
         }

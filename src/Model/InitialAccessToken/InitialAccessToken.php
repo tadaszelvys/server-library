@@ -32,9 +32,10 @@ final class InitialAccessToken
 
     /**
      * InitialAccessInitialAccessTokenId constructor.
-     * @param InitialAccessTokenId $initialAccessTokenId
+     *
+     * @param InitialAccessTokenId    $initialAccessTokenId
      * @param null|\DateTimeImmutable $expiresAt
-     * @param UserAccount $userAccount
+     * @param UserAccount             $userAccount
      */
     private function __construct(InitialAccessTokenId $initialAccessTokenId, UserAccount $userAccount, \DateTimeImmutable $expiresAt = null)
     {
@@ -44,9 +45,10 @@ final class InitialAccessToken
     }
 
     /**
-     * @param InitialAccessTokenId $initialAccessTokenId
-     * @param UserAccount $userAccount
+     * @param InitialAccessTokenId    $initialAccessTokenId
+     * @param UserAccount             $userAccount
      * @param \DateTimeImmutable|null $expiresAt
+     *
      * @return InitialAccessToken
      */
     public static function create(InitialAccessTokenId $initialAccessTokenId, UserAccount $userAccount, \DateTimeImmutable $expiresAt = null): self

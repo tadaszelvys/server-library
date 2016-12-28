@@ -20,6 +20,7 @@ abstract class ResourceOwnerId implements \JsonSerializable
 
     /**
      * ResourceOwnerId constructor.
+     *
      * @param $value
      */
     protected function __construct(string $value)

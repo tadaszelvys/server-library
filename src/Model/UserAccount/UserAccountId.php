@@ -17,6 +17,7 @@ final class UserAccountId extends ResourceOwnerId
 {
     /**
      * @param string $value
+     *
      * @return UserAccountId
      */
     public static function create(string $value): self

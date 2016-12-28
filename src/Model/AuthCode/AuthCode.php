@@ -64,14 +64,15 @@ final class AuthCode
 
     /**
      * AuthCode constructor.
-     * @param AuthCodeId $authCodeId
-     * @param ClientId $clientId
-     * @param UserAccountId $userAccountId
-     * @param array $queryParameters
+     *
+     * @param AuthCodeId         $authCodeId
+     * @param ClientId           $clientId
+     * @param UserAccountId      $userAccountId
+     * @param array              $queryParameters
      * @param \DateTimeImmutable $expiresAt
-     * @param array $parameters
-     * @param array $scopes
-     * @param array $metadatas
+     * @param array              $parameters
+     * @param array              $scopes
+     * @param array              $metadatas
      */
     private function __construct(AuthCodeId $authCodeId, ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
@@ -86,14 +87,15 @@ final class AuthCode
     }
 
     /**
-     * @param AuthCodeId $authCodeId
-     * @param ClientId $clientId
-     * @param UserAccountId $userAccountId
-     * @param array $queryParameters
+     * @param AuthCodeId         $authCodeId
+     * @param ClientId           $clientId
+     * @param UserAccountId      $userAccountId
+     * @param array              $queryParameters
      * @param \DateTimeImmutable $expiresAt
-     * @param array $parameters
-     * @param array $scopes
-     * @param array $metadatas
+     * @param array              $parameters
+     * @param array              $scopes
+     * @param array              $metadatas
+     *
      * @return AuthCode
      */
     public static function create(AuthCodeId $authCodeId, ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
@@ -156,6 +158,7 @@ final class AuthCode
 
     /**
      * @param array $parameters
+     *
      * @return self
      */
     public function withParameters(array $parameters): self
@@ -169,6 +172,7 @@ final class AuthCode
     /**
      * @param string $key
      * @param mixed  $parameter
+     *
      * @return self
      */
     public function withParameter(string $key, $parameter): self
@@ -181,6 +185,7 @@ final class AuthCode
 
     /**
      * @param string $key
+     *
      * @return self
      */
     public function withoutParameter(string $key): self
@@ -197,6 +202,7 @@ final class AuthCode
 
     /**
      * @param string $key
+     *
      * @return mixed
      */
     public function getParameter(string $key)
@@ -208,6 +214,7 @@ final class AuthCode
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasParameter(string $key): bool
@@ -225,6 +232,7 @@ final class AuthCode
 
     /**
      * @param string $scope
+     *
      * @return bool
      */
     public function hasScope(string $scope): bool
@@ -234,6 +242,7 @@ final class AuthCode
 
     /**
      * @param string[] $scopes
+     *
      * @return self
      */
     public function withScopes(array $scopes): self
@@ -246,6 +255,7 @@ final class AuthCode
 
     /**
      * @param string $scope
+     *
      * @return self
      */
     public function withScope(string $scope): self
@@ -261,6 +271,7 @@ final class AuthCode
 
     /**
      * @param string $scope
+     *
      * @return self
      */
     public function withoutScope(string $scope): self
@@ -285,6 +296,7 @@ final class AuthCode
 
     /**
      * @param string $key
+     *
      * @return mixed
      */
     public function getMetadatas(string $key): mixed
@@ -296,6 +308,7 @@ final class AuthCode
 
     /**
      * @param array $metadatas
+     *
      * @return self
      */
     public function withMetadatas(array $metadatas): self
@@ -309,6 +322,7 @@ final class AuthCode
     /**
      * @param string $key
      * @param mixed  $metadata
+     *
      * @return self
      */
     public function withMetadata(string $key, $metadata): self
@@ -321,6 +335,7 @@ final class AuthCode
 
     /**
      * @param string $key
+     *
      * @return self
      */
     public function withoutMetadata(string $key): self
@@ -337,6 +352,7 @@ final class AuthCode
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasMetadata(string $key): bool
@@ -390,6 +406,7 @@ final class AuthCode
 
     /**
      * @param string $key
+     *
      * @return mixed
      */
     public function getQueryParam(string $key): mixed
@@ -401,6 +418,7 @@ final class AuthCode
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasQueryParams(string $key): bool

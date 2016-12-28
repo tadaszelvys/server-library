@@ -12,7 +12,6 @@
 namespace OAuth2\Command\AccessToken;
 
 use Assert\Assertion;
-
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\ResourceOwner\ResourceOwner;
 
@@ -50,16 +49,16 @@ final class CreateAccessTokenCommand
 
     /**
      * CreateAccessTokenCommand constructor.
-     * @param ResourceOwner $resourceOwner
-     * @param Client $client
-     * @param array $parameters
-     * @param array $metadatas
-     * @param string[] $scopes
+     *
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param string[]           $scopes
      * @param \DateTimeImmutable $expiresAt
      */
     protected function __construct(ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt)
     {
-
         $this->resourceOwner = $resourceOwner;
         $this->client = $client;
         $this->expiresAt = $expiresAt;
@@ -69,12 +68,13 @@ final class CreateAccessTokenCommand
     }
 
     /**
-     * @param ResourceOwner $resourceOwner
-     * @param Client $client
-     * @param array $parameters
-     * @param array $metadatas
-     * @param string[] $scopes
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param string[]           $scopes
      * @param \DateTimeImmutable $expiresAt
+     *
      * @return CreateAccessTokenCommand
      */
     public static function create(ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt): CreateAccessTokenCommand
@@ -124,6 +124,7 @@ final class CreateAccessTokenCommand
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasParameter(string $key): bool
@@ -133,12 +134,15 @@ final class CreateAccessTokenCommand
 
     /**
      * @param string $key
+     *
      * @throws \InvalidArgumentException
+     *
      * @return mixed
      */
     public function getParameter(string $key): mixed
     {
         Assertion::true($this->hasParameter($key), sprintf('The parameter \'%s\' does not exist.', $key));
+
         return $this->parameters;
     }
 
@@ -152,6 +156,7 @@ final class CreateAccessTokenCommand
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasMetadata(string $key): bool
@@ -161,12 +166,15 @@ final class CreateAccessTokenCommand
 
     /**
      * @param string $key
+     *
      * @throws \InvalidArgumentException
+     *
      * @return mixed
      */
     public function getMetadata(string $key): mixed
     {
         Assertion::true($this->hasParameter($key), sprintf('The metadata \'%s\' does not exist.', $key));
+
         return $this->metadatas;
     }
 }

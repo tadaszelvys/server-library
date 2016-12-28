@@ -26,6 +26,7 @@ final class ClientConfigurationGetEndpoint implements MiddlewareInterface
 
     /**
      * ClientConfigurationGetEndpoint constructor.
+     *
      * @param MessageBus $messageBus
      */
     public function __construct(MessageBus $messageBus)

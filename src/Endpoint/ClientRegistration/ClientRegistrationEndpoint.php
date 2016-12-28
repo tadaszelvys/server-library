@@ -45,9 +45,10 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
 
     /**
      * ClientRegistrationEndpoint constructor.
+     *
      * @param ResponseFactoryInterface $responseFactory
-     * @param StreamFactoryInterface $streamFactory
-     * @param MessageBus $messageBus
+     * @param StreamFactoryInterface   $streamFactory
+     * @param MessageBus               $messageBus
      */
     public function __construct(ResponseFactoryInterface $responseFactory, StreamFactoryInterface $streamFactory, MessageBus $messageBus)
     {
@@ -74,6 +75,7 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
+     *
      * @throws OAuth2Exception
      */
     private function checkRequest(ServerRequestInterface $request)
@@ -82,7 +84,7 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 405,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                     'error_description' => 'Unsupported method.',
                 ]
             );
@@ -91,6 +93,7 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
 
     /**
      * @param Client $client
+     *
      * @return \Psr\Http\Message\ResponseInterface
      */
     private function createResponse(Client $client): ResponseInterface

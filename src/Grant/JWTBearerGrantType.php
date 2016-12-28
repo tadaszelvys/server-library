@@ -41,7 +41,7 @@ class JWTBearerGrantType implements GrantTypeInterface
     /**
      * JWTBearerGrantType constructor.
      *
-     * @param \Jose\JWTLoaderInterface                    $loader
+     * @param \Jose\JWTLoaderInterface                               $loader
      * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
     public function __construct(JWTLoaderInterface $loader, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
@@ -59,7 +59,7 @@ class JWTBearerGrantType implements GrantTypeInterface
     }
 
     /**
-     * @param bool                         $encryptionRequired
+     * @param bool            $encryptionRequired
      * @param JWKSetInterface $keyEncryptionkeySet
      */
     public function enableEncryptedAssertions($encryptionRequired,
@@ -98,8 +98,8 @@ class JWTBearerGrantType implements GrantTypeInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => $e->getMessage()
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => $e->getMessage(),
                 ]
             );
         }
@@ -119,8 +119,8 @@ class JWTBearerGrantType implements GrantTypeInterface
         if (false === $client->hasPublicKeySet()) {
             throw new OAuth2Exception(400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
-                    'error_description' => 'The client is not a client with signature capabilities.'
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'The client is not a client with signature capabilities.',
                 ]
             );
         }
@@ -135,8 +135,8 @@ class JWTBearerGrantType implements GrantTypeInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => $e->getMessage()
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => $e->getMessage(),
                 ]
             );
         }

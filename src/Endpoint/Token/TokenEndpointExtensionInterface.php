@@ -18,19 +18,19 @@ use OAuth2\Token\AccessTokenInterface;
 interface TokenEndpointExtensionInterface
 {
     /**
-     * @param Client           $client
+     * @param Client                     $client
      * @param GrantTypeResponseInterface $grant_type_response
-     * @param array                                    $token_type_information
+     * @param array                      $token_type_information
      *
      * @return array|null
      */
     public function preAccessTokenCreation(Client $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information);
 
     /**
-     * @param Client           $client
+     * @param Client                     $client
      * @param GrantTypeResponseInterface $grant_type_response
-     * @param array                                    $token_type_information
-     * @param AccessToken       $access_token
+     * @param array                      $token_type_information
+     * @param AccessToken                $access_token
      *
      * @return array|null
      */

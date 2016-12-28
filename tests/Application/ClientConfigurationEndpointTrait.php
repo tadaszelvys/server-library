@@ -1,18 +1,29 @@
 <?php
 
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014-2016 Spomky-Labs
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ */
+
 namespace OAuth2\Test\Application;
 
+use OAuth2\Endpoint\ClientConfiguration\ClientConfigurationEndpoint;
 use OAuth2\Middleware\Pipe;
 use OAuth2\Response\OAuth2ExceptionMiddleware;
 use OAuth2\Test\Stub\ClientRepository;
-use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
-use OAuth2\Endpoint\ClientConfiguration\ClientConfigurationEndpoint;
 use OAuth2\TokenType\BearerToken;
+use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
 
 trait ClientConfigurationEndpointTrait
 {
     abstract public function getOAuth2ResponseMiddleware(): OAuth2ExceptionMiddleware;
+
     abstract public function getCommandBus(): MessageBusSupportingMiddleware;
+
     abstract public function getClientRepository(): ClientRepository;
 
     /**

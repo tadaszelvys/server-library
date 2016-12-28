@@ -11,7 +11,6 @@
 
 namespace OAuth2\Command\Client;
 
-
 use OAuth2\DataTransporter;
 use OAuth2\Model\Client\Client;
 
@@ -34,22 +33,23 @@ final class UpdateClientCommand
 
     /**
      * UpdateClientCommand constructor.
-     * @param Client $client
-     * @param array $parameters
+     *
+     * @param Client          $client
+     * @param array           $parameters
      * @param DataTransporter $callback
      */
     protected function __construct(Client $client, array $parameters, DataTransporter $callback)
     {
-
         $this->client = $client;
         $this->parameters = $parameters;
         $this->callback = $callback;
     }
 
     /**
-     * @param Client $client
-     * @param array $parameters
+     * @param Client          $client
+     * @param array           $parameters
      * @param DataTransporter $callback
+     *
      * @return UpdateClientCommand
      */
     public static function create(Client $client, array $parameters, DataTransporter $callback): self

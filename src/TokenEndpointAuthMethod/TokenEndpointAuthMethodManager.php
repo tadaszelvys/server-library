@@ -45,7 +45,8 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
 
     /**
      * TokenEndpointAuthMethodManager constructor.
-     * @param ClientRepositoryInterface $clientRepository
+     *
+     * @param ClientRepositoryInterface             $clientRepository
      * @param OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager
      */
     public function __construct(ClientRepositoryInterface $clientRepository, OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager)
@@ -138,8 +139,8 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
                     throw new OAuth2Exception(
                         400,
                         [
-                            'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                            'error_description' => 'Only one authentication method may be used to authenticate the client.'
+                            'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                            'error_description' => 'Only one authentication method may be used to authenticate the client.',
                         ]
                     );
                 } else {
@@ -153,10 +154,11 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @param Client $client
+     * @param ServerRequestInterface           $request
+     * @param Client                           $client
      * @param TokenEndpointAuthMethodInterface $authentication_method
      * @param $client_credentials
+     *
      * @return bool
      */
     public function isClientAuthenticated(ServerRequestInterface $request, Client $client, TokenEndpointAuthMethodInterface $authentication_method, $client_credentials)
@@ -185,8 +187,8 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
         return new OAuth2Exception(
             401,
             [
-                'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
-                'error_description' => $message
+                'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                'error_description' => $message,
             ]
         );
     }

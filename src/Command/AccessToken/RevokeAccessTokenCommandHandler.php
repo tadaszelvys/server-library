@@ -29,8 +29,9 @@ final class RevokeAccessTokenCommandHandler
 
     /**
      * CreateClientCommandHandler constructor.
+     *
      * @param AccessTokenRepositoryInterface $accessTokenRepository
-     * @param RecordsMessages $messageRecorder
+     * @param RecordsMessages                $messageRecorder
      */
     public function __construct(AccessTokenRepositoryInterface $accessTokenRepository, RecordsMessages $messageRecorder)
     {

@@ -31,6 +31,7 @@ final class HttpMethod implements MiddlewareInterface
 
     /**
      * HttpMethod constructor.
+     *
      * @param ResponseFactoryInterface $responseFactory
      */
     public function __construct(ResponseFactoryInterface $responseFactory)
@@ -39,7 +40,7 @@ final class HttpMethod implements MiddlewareInterface
     }
 
     /**
-     * @param string $method
+     * @param string              $method
      * @param MiddlewareInterface $middleware
      */
     public function addMiddleware(string $method, MiddlewareInterface $middleware)
@@ -49,7 +50,7 @@ final class HttpMethod implements MiddlewareInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {

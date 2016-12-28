@@ -58,14 +58,15 @@ class IdToken implements \JsonSerializable
 
     /**
      * IdToken constructor.
-     * @param IdTokenId $idTokenId
-     * @param ClientId $clientId
-     * @param UserAccountId $userAccountId
+     *
+     * @param IdTokenId          $idTokenId
+     * @param ClientId           $clientId
+     * @param UserAccountId      $userAccountId
      * @param \DateTimeImmutable $expiresAt
-     * @param array $claims
-     * @param string|null $nonce
-     * @param string|null $at_hash
-     * @param string|null $c_hash
+     * @param array              $claims
+     * @param string|null        $nonce
+     * @param string|null        $at_hash
+     * @param string|null        $c_hash
      */
     private function __construct(IdTokenId $idTokenId, ClientId $clientId, UserAccountId $userAccountId, \DateTimeImmutable $expiresAt, array $claims, string $nonce = null, string $at_hash = null, string $c_hash = null)
     {
@@ -80,14 +81,15 @@ class IdToken implements \JsonSerializable
     }
 
     /**
-     * @param IdTokenId $idTokenId
-     * @param ClientId $clientId
-     * @param UserAccountId $userAccountId
+     * @param IdTokenId          $idTokenId
+     * @param ClientId           $clientId
+     * @param UserAccountId      $userAccountId
      * @param \DateTimeImmutable $expiresAt
-     * @param array $claims
-     * @param string|null $nonce
-     * @param string|null $at_hash
-     * @param string|null $c_hash
+     * @param array              $claims
+     * @param string|null        $nonce
+     * @param string|null        $at_hash
+     * @param string|null        $c_hash
+     *
      * @return IdToken
      */
     public static function create(IdTokenId $idTokenId, ClientId $clientId, UserAccountId $userAccountId, \DateTimeImmutable $expiresAt, array $claims, string $nonce = null, string $at_hash = null, string $c_hash = null)
@@ -113,6 +115,7 @@ class IdToken implements \JsonSerializable
 
     /**
      * @param string $nonce
+     *
      * @return self
      */
     public function withNonce(string $nonce): self
@@ -147,6 +150,7 @@ class IdToken implements \JsonSerializable
 
     /**
      * @param string $at_hash
+     *
      * @return self
      */
     public function withAccessTokenHash(string $at_hash): self
@@ -181,6 +185,7 @@ class IdToken implements \JsonSerializable
 
     /**
      * @param string $c_hash
+     *
      * @return IdToken
      */
     public function withAuthorizationCodeHash(string $c_hash)

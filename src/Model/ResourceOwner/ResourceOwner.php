@@ -22,13 +22,13 @@ abstract class ResourceOwner implements \JsonSerializable
 
     /**
      * ResourceOwner constructor.
+     *
      * @param array $metadatas
      */
     protected function __construct(array $metadatas)
     {
         $this->metadatas = $metadatas;
     }
-
 
     /**
      * @param string $name
@@ -62,6 +62,7 @@ abstract class ResourceOwner implements \JsonSerializable
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function has(string $key): bool

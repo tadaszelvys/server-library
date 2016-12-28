@@ -56,6 +56,7 @@ class DefaultScopePolicy implements ScopePolicyInterface
 
     /**
      * @param Client $client
+     *
      * @return \string[]
      */
     private function getDefaultScopesForClient(Client $client): array

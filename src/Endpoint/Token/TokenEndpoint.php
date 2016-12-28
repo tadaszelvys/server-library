@@ -15,6 +15,9 @@ use Assert\Assertion;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Grant\GrantTypeInterface;
+use OAuth2\Grant\GrantTypeManagerInterface;
+use OAuth2\Grant\GrantTypeResponse;
+use OAuth2\Grant\GrantTypeResponseInterface;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientRepositoryInterface;
@@ -23,11 +26,8 @@ use OAuth2\Model\Scope\ScopeRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Grant\GrantTypeManagerInterface;
-use OAuth2\Grant\GrantTypeResponse;
-use OAuth2\Grant\GrantTypeResponseInterface;
-use OAuth2\TokenType\TokenTypeManagerInterface;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
+use OAuth2\TokenType\TokenTypeManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -81,12 +81,12 @@ final class TokenEndpoint implements MiddlewareInterface
     /**
      * TokenEndpoint constructor.
      *
-     * @param GrantTypeManagerInterface                                 $grantTypeManager
-     * @param TokenTypeManagerInterface                                 $tokenTypeManager
-     * @param AccessTokenRepositoryInterface                               $accessTokenRepository
+     * @param GrantTypeManagerInterface               $grantTypeManager
+     * @param TokenTypeManagerInterface               $tokenTypeManager
+     * @param AccessTokenRepositoryInterface          $accessTokenRepository
      * @param TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthManager
-     * @param UserAccountRepositoryInterface                         $userAccountRepository
-     * @param OAuth2ResponseFactoryManagerInterface                             $responseFactoryManager
+     * @param UserAccountRepositoryInterface          $userAccountRepository
+     * @param OAuth2ResponseFactoryManagerInterface   $responseFactoryManager
      */
     public function __construct(GrantTypeManagerInterface $grantTypeManager, TokenTypeManagerInterface $tokenTypeManager, AccessTokenRepositoryInterface $accessTokenRepository, ClientRepositoryInterface $clientRepository, TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthManager, UserAccountRepositoryInterface $userAccountRepository, OAuth2ResponseFactoryManagerInterface $responseFactoryManager)
     {
@@ -175,9 +175,9 @@ final class TokenEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param Client           $client
+     * @param Client                     $client
      * @param GrantTypeResponseInterface $grantTypeResponse
-     * @param array                                    $tokenTypeInformation
+     * @param array                      $tokenTypeInformation
      *
      * @return array
      */
@@ -202,9 +202,9 @@ final class TokenEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param Client           $client
+     * @param Client                     $client
      * @param GrantTypeResponseInterface $grantTypeResponse
-     * @param array                                    $tokenTypeInformation
+     * @param array                      $tokenTypeInformation
      * @param AccessTokenInterface       $accessToken
      *
      * @return array
@@ -244,15 +244,15 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
-                    'error_description' => sprintf('An unsupported scope was requested. Available scopes are [%s]', implode(',', $grantTypeResponse->getAvailableScope()))
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
+                    'error_description' => sprintf('An unsupported scope was requested. Available scopes are [%s]', implode(',', $grantTypeResponse->getAvailableScope())),
                 ]
             );
         }
     }
 
     /**
-     * @param array                          $requestParameters
+     * @param array  $requestParameters
      * @param Client $client
      *
      * @throws OAuth2Exception
@@ -266,8 +266,8 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => sprintf('The token type \'%s\' is not allowed for the client.', $token_type->getTokenTypeName())
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => sprintf('The token type \'%s\' is not allowed for the client.', $token_type->getTokenTypeName()),
                 ]
             );
         }
@@ -276,7 +276,7 @@ final class TokenEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param ServerRequestInterface $request
+     * @param ServerRequestInterface     $request
      * @param GrantTypeResponseInterface $grantTypeResponse
      */
     private function populateScope(ServerRequestInterface $request, GrantTypeResponseInterface &$grantTypeResponse)
@@ -290,11 +290,11 @@ final class TokenEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param Client           $client
+     * @param Client                     $client
      * @param GrantTypeResponseInterface $grantTypeResponse
-     * @param array                                    $requestParameters
-     * @param array                                    $tokenTypeInformation
-     * @param array                                    $metadatas
+     * @param array                      $requestParameters
+     * @param array                      $tokenTypeInformation
+     * @param array                      $metadatas
      *
      * @throws OAuth2Exception
      *
@@ -344,8 +344,8 @@ final class TokenEndpoint implements MiddlewareInterface
         } catch (\InvalidArgumentException $e) {
             throw new OAuth2Exception(400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => $e->getMessage()
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => $e->getMessage(),
                 ]
             );
         }
@@ -353,7 +353,7 @@ final class TokenEndpoint implements MiddlewareInterface
 
     /**
      * @param Client $client
-     * @param string                         $grant_type
+     * @param string $grant_type
      *
      * @throws OAuth2Exception
      */
@@ -363,8 +363,8 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_UNAUTHORIZED_CLIENT,
-                    'error_description' => sprintf('The grant type \'%s\' is unauthorized for this client.', $grant_type)
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_UNAUTHORIZED_CLIENT,
+                    'error_description' => sprintf('The grant type \'%s\' is unauthorized for this client.', $grant_type),
                 ]
             );
         }
@@ -389,8 +389,8 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => 'Unable to find resource owner'
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => 'Unable to find resource owner',
                 ]
             );
         }

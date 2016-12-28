@@ -49,10 +49,11 @@ class RefreshToken
 
     /**
      * RefreshToken constructor.
-     * @param RefreshTokenId $refreshTokenId
-     * @param UserAccount $userAccount
-     * @param Client $client
-     * @param array $parameters
+     *
+     * @param RefreshTokenId     $refreshTokenId
+     * @param UserAccount        $userAccount
+     * @param Client             $client
+     * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
      */
     private function __construct(RefreshTokenId $refreshTokenId, UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt)
@@ -65,11 +66,12 @@ class RefreshToken
     }
 
     /**
-     * @param RefreshTokenId $refreshTokenId
-     * @param UserAccount $userAccount
-     * @param Client $client
-     * @param array $parameters
+     * @param RefreshTokenId     $refreshTokenId
+     * @param UserAccount        $userAccount
+     * @param Client             $client
+     * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
+     *
      * @return RefreshToken
      */
     public static function create(RefreshTokenId $refreshTokenId, UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt)
@@ -79,6 +81,7 @@ class RefreshToken
 
     /**
      * @param AccessToken $accessToken
+     *
      * @return RefreshToken
      */
     public function withAccessToken(AccessToken $accessToken): RefreshToken

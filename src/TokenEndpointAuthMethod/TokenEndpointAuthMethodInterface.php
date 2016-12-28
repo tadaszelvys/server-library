@@ -34,8 +34,8 @@ interface TokenEndpointAuthMethodInterface
     public function findClientId(ServerRequestInterface $request, &$client_credentials = null);
 
     /**
-     * @param array                          $command_parameters
-     * @param array                          $validated_parameters
+     * @param array $command_parameters
+     * @param array $validated_parameters
      *
      * @throws \InvalidArgumentException
      */
@@ -44,7 +44,7 @@ interface TokenEndpointAuthMethodInterface
     /**
      * This method verifies the client credentials in the request.
      *
-     * @param Client           $client
+     * @param Client                                   $client
      * @param mixed                                    $client_credentials
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *

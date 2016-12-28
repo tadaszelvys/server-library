@@ -11,8 +11,6 @@
 
 namespace OAuth2\Command\RefreshToken;
 
-
-
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccount;
 
@@ -40,9 +38,10 @@ final class CreateRefreshTokenCommand
 
     /**
      * CreateRefreshTokenCommand constructor.
-     * @param UserAccount $userAccount
-     * @param Client $client
-     * @param array $parameters
+     *
+     * @param UserAccount        $userAccount
+     * @param Client             $client
+     * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
      */
     protected function __construct(UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt)
@@ -54,10 +53,11 @@ final class CreateRefreshTokenCommand
     }
 
     /**
-     * @param UserAccount $userAccount
-     * @param Client $client
-     * @param array $parameters
+     * @param UserAccount        $userAccount
+     * @param Client             $client
+     * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
+     *
      * @return CreateRefreshTokenCommand
      */
     public static function create(UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt): self

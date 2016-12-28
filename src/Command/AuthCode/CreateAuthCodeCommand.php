@@ -11,7 +11,6 @@
 
 namespace OAuth2\Command\AuthCode;
 
-
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccount;
 
@@ -54,17 +53,17 @@ final class CreateAuthCodeCommand
 
     /**
      * CreateAuthCodeCommand constructor.
-     * @param Client $client
-     * @param UserAccount $userAccount
-     * @param array $queryParameters
+     *
+     * @param Client             $client
+     * @param UserAccount        $userAccount
+     * @param array              $queryParameters
      * @param \DateTimeImmutable $expiresAt
-     * @param array $parameters
-     * @param array $scopes
-     * @param array $metadatas
+     * @param array              $parameters
+     * @param array              $scopes
+     * @param array              $metadatas
      */
     protected function __construct(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
-
         $this->client = $client;
         $this->userAccount = $userAccount;
         $this->queryParameters = $queryParameters;
@@ -75,13 +74,14 @@ final class CreateAuthCodeCommand
     }
 
     /**
-     * @param Client $client
-     * @param UserAccount $userAccount
-     * @param array $queryParameters
+     * @param Client             $client
+     * @param UserAccount        $userAccount
+     * @param array              $queryParameters
      * @param \DateTimeImmutable $expiresAt
-     * @param array $parameters
-     * @param array $scopes
-     * @param array $metadatas
+     * @param array              $parameters
+     * @param array              $scopes
+     * @param array              $metadatas
+     *
      * @return CreateAuthCodeCommand
      */
     public static function create(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas): self

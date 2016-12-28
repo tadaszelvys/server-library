@@ -30,14 +30,14 @@ class JWTAccessTokenRepository implements AccessTokenRepositoryInterface
     /**
      * JWTAccessTokenManager constructor.
      *
-     * @param \Jose\JWTCreatorInterface       $jwt_creator
-     * @param \Jose\JWTLoaderInterface        $jwt_loader
-     * @param string                          $signature_algorithm
-     * @param \Jose\Object\JWKSetInterface    $signature_key_set
-     * @param string                          $key_encryption_algorithm
-     * @param string                          $content_encryption_algorithm
-     * @param \Jose\Object\JWKSetInterface    $key_encryption_key_set
-     * @param string                          $issuer
+     * @param \Jose\JWTCreatorInterface    $jwt_creator
+     * @param \Jose\JWTLoaderInterface     $jwt_loader
+     * @param string                       $signature_algorithm
+     * @param \Jose\Object\JWKSetInterface $signature_key_set
+     * @param string                       $key_encryption_algorithm
+     * @param string                       $content_encryption_algorithm
+     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
+     * @param string                       $issuer
      */
     /*public function __construct(JWTCreatorInterface $jwt_creator,
                                 JWTLoaderInterface $jwt_loader,
@@ -191,6 +191,7 @@ class JWTAccessTokenRepository implements AccessTokenRepositoryInterface
 
     /**
      * @param AccessTokenId $tokenId
+     *
      * @return null|AccessToken
      */
     private function loadAccessToken(AccessTokenId $tokenId)

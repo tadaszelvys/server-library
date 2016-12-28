@@ -40,8 +40,9 @@ final class Client extends ResourceOwner
 
     /**
      * Client constructor.
-     * @param ClientId $id
-     * @param array $metadatas
+     *
+     * @param ClientId    $id
+     * @param array       $metadatas
      * @param UserAccount $userAccount
      */
     protected function __construct(ClientId $id, array $metadatas, UserAccount $userAccount)
@@ -52,15 +53,17 @@ final class Client extends ResourceOwner
     }
 
     /**
-     * @param ClientId $id
-     * @param array $metadatas
+     * @param ClientId    $id
+     * @param array       $metadatas
      * @param UserAccount $userAccount
+     *
      * @return self
      */
     public static function create(ClientId $id, array $metadatas, UserAccount $userAccount): self
     {
         return new self($id, $metadatas, $userAccount);
     }
+
     /**
      * @return ClientId
      */
@@ -79,6 +82,7 @@ final class Client extends ResourceOwner
 
     /**
      * @param string $grant_type
+     *
      * @return bool
      */
     public function isGrantTypeAllowed(string $grant_type): bool
@@ -92,6 +96,7 @@ final class Client extends ResourceOwner
 
     /**
      * @param string $response_type
+     *
      * @return bool
      */
     public function isResponseTypeAllowed(string $response_type): bool
@@ -105,6 +110,7 @@ final class Client extends ResourceOwner
 
     /**
      * @param string $token_type
+     *
      * @return bool
      */
     public function isTokenTypeAllowed(string $token_type): bool

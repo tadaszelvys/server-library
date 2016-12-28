@@ -22,8 +22,9 @@ final class UserAccount extends ResourceOwner
 
     /**
      * UserAccount constructor.
+     *
      * @param UserAccountId $id
-     * @param array $metadatas
+     * @param array         $metadatas
      */
     protected function __construct(UserAccountId $id, array $metadatas)
     {
@@ -33,13 +34,15 @@ final class UserAccount extends ResourceOwner
 
     /**
      * @param UserAccountId $id
-     * @param array $metadatas
+     * @param array         $metadatas
+     *
      * @return self
      */
     public static function create(UserAccountId $id, array $metadatas): self
     {
         return new self($id, $metadatas);
     }
+
     /**
      * @return UserAccountId
      */

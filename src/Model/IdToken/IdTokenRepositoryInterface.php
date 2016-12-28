@@ -20,14 +20,14 @@ interface IdTokenRepositoryInterface
 {
     /**
      * @param Client           $client
-     * @param UserAccount $user_account_account
-     * @param string                                   $redirect_uri
-     * @param array                                    $claims_locales
-     * @param array                                    $request_claims
-     * @param string[]                                 $scope
-     * @param array                                    $id_token_claims
-     * @param AccessToken|null  $access_token
-     * @param AuthCode|null     $auth_code
+     * @param UserAccount      $user_account_account
+     * @param string           $redirect_uri
+     * @param array            $claims_locales
+     * @param array            $request_claims
+     * @param string[]         $scope
+     * @param array            $id_token_claims
+     * @param AccessToken|null $access_token
+     * @param AuthCode|null    $auth_code
      *
      * @return IdToken
      */
@@ -40,6 +40,7 @@ interface IdTokenRepositoryInterface
 
     /**
      * @param IdTokenId $idTokenId
+     *
      * @return null|IdToken
      */
     public function find(IdTokenId $idTokenId);

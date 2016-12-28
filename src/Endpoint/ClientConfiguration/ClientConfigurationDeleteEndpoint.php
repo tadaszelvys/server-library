@@ -27,6 +27,7 @@ final class ClientConfigurationDeleteEndpoint implements MiddlewareInterface
 
     /**
      * ClientConfigurationDeleteEndpoint constructor.
+     *
      * @param MessageBus $messageBus
      */
     public function __construct(MessageBus $messageBus)

@@ -34,7 +34,8 @@ final class TokenRevocationEndpoint implements MiddlewareInterface
 
     /**
      * ClientConfigurationEndpoint constructor.
-     * @param MessageBus                $messageBus
+     *
+     * @param MessageBus $messageBus
      */
     public function __construct(MessageBus $messageBus)
     {
@@ -126,10 +127,10 @@ final class TokenRevocationEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param string                              $token
+     * @param string      $token
      * @param Client      $client
-     * @param string|null                         $tokenType_hint
-     * @param string|null                         $callback
+     * @param string|null $tokenType_hint
+     * @param string|null $callback
      *
      * @throws \OAuth2\Response\OAuth2Exception
      *
@@ -152,13 +153,14 @@ final class TokenRevocationEndpoint implements MiddlewareInterface
 
             return $this->getResponse(501, json_encode($data), $callback);
         }
+
         return $this->getResponse(200, '', $callback);
     }
 
     /**
      * @param RevocationTokenTypeInterface $tokenType
-     * @param string                                                  $token
-     * @param Client                          $client
+     * @param string                       $token
+     * @param Client                       $client
      *
      * @return bool
      */

@@ -33,12 +33,12 @@ interface UserInfoInterface
     public function getPairwiseSubjectIdentifierAlgorithm();
 
     /**
-     * @param Client           $client
+     * @param Client      $client
      * @param UserAccount $user_account
-     * @param string                                   $redirect_uri
-     * @param null|array                               $claims_locales
-     * @param array                                    $request_claims
-     * @param string[]                                 $scope
+     * @param string      $redirect_uri
+     * @param null|array  $claims_locales
+     * @param array       $request_claims
+     * @param string[]    $scope
      *
      * @return array
      */

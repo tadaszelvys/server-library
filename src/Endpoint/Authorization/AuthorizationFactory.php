@@ -11,16 +11,16 @@
 
 namespace OAuth2\Endpoint\Authorization;
 
-use OAuth2\Behaviour\HasResponseFactoryManager;
 use OAuth2\Behaviour\HasJWTLoader;
 use OAuth2\Behaviour\HasParameterCheckerManager;
+use OAuth2\Behaviour\HasResponseFactoryManager;
 use OAuth2\Behaviour\HasResponseModeManager;
 use OAuth2\Behaviour\HasResponseTypeManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface;
+use OAuth2\Grant\ResponseTypeManagerInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Grant\ResponseTypeManagerInterface;
 use OAuth2\ResponseMode\ResponseModeManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -49,7 +49,7 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
      * @param \OAuth2\Grant\ResponseTypeManagerInterface                                       $response_type_manager
      * @param \OAuth2\ResponseMode\ResponseModeManagerInterface                                $response_mode_manager
      * @param \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface $parameter_checker_manager
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface                                      $response_factory_manager
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface                           $response_factory_manager
      */
     public function __construct(AuthorizationRequestLoaderInterface $authorization_request_loader, ResponseTypeManagerInterface $response_type_manager, ResponseModeManagerInterface $response_mode_manager, ParameterCheckerManagerInterface $parameter_checker_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
     {

@@ -1,12 +1,21 @@
 <?php
 
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014-2016 Spomky-Labs
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ */
+
 namespace OAuth2\Test\Application;
 
 use OAuth2\Model\Scope\DefaultScopePolicy;
 use OAuth2\Model\Scope\ErrorScopePolicy;
+use OAuth2\Model\Scope\ScopePolicyInterface;
 use OAuth2\Model\Scope\ScopeRepository;
 use OAuth2\Model\Scope\ScopeRepositoryInterface;
-use OAuth2\Model\Scope\ScopePolicyInterface;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 trait ScopeRepositoryTrait

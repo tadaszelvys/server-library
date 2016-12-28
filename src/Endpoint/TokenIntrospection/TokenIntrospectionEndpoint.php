@@ -96,6 +96,7 @@ abstract class TokenIntrospectionEndpoint implements MiddlewareInterface
         if (null !== $result) {
             if ($result->getClientPublicId() === $client->getPublicId()) {
                 $data = $tokenType->introspectToken($result, $client);
+
                 return $this->getResponseFactoryManager()->getResponse(200, $data)->getResponse();
             }
         }

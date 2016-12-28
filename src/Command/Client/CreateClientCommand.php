@@ -11,7 +11,6 @@
 
 namespace OAuth2\Command\Client;
 
-
 use OAuth2\DataTransporter;
 use OAuth2\Model\UserAccount\UserAccount;
 
@@ -34,22 +33,23 @@ final class CreateClientCommand
 
     /**
      * CreateClientCommand constructor.
-     * @param UserAccount $userAccount
-     * @param array $parameters
+     *
+     * @param UserAccount     $userAccount
+     * @param array           $parameters
      * @param DataTransporter $callback
      */
     protected function __construct(UserAccount $userAccount, array $parameters, DataTransporter $callback)
     {
-
         $this->parameters = $parameters;
         $this->userAccount = $userAccount;
         $this->callback = $callback;
     }
 
     /**
-     * @param UserAccount $userAccount
-     * @param array $parameters
+     * @param UserAccount     $userAccount
+     * @param array           $parameters
      * @param DataTransporter $callback
+     *
      * @return CreateClientCommand
      */
     public static function create(UserAccount $userAccount, array $parameters, DataTransporter $callback): self

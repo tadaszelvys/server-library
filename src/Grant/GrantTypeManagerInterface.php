@@ -15,6 +15,7 @@ interface GrantTypeManagerInterface
 {
     /**
      * @param GrantTypeInterface $grant_type
+     *
      * @return GrantTypeManagerInterface
      */
     public function addGrantType(GrantTypeInterface $grant_type): GrantTypeManagerInterface;

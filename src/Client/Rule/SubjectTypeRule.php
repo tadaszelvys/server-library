@@ -12,10 +12,9 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
 use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
-use OAuth2\Model\UserAccount\UserAccount;
 
 final class SubjectTypeRule implements RuleInterface
 {

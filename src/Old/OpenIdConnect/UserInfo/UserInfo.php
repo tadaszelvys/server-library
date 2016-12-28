@@ -13,9 +13,9 @@ namespace OAuth2\OpenIdConnect\UserInfo;
 
 use OAuth2\Model\ClaimSource\ClaimSourceManagerInterface;
 use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportManagerInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportManagerInterface;
 
 class UserInfo implements UserInfoInterface
 {
@@ -26,9 +26,9 @@ class UserInfo implements UserInfoInterface
     /**
      * UserInfo constructor.
      *
-     * @param UserInfoScopeSupportManagerInterface $userinfo_scope_support_manager
-     * @param ClaimSourceManagerInterface                    $claim_source_manager
-     * @param OAuth2ResponseFactoryManagerInterface                                      $response_factory_manager
+     * @param UserInfoScopeSupportManagerInterface  $userinfo_scope_support_manager
+     * @param ClaimSourceManagerInterface           $claim_source_manager
+     * @param OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
     public function __construct(UserInfoScopeSupportManagerInterface $userinfo_scope_support_manager, ClaimSourceManagerInterface $claim_source_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
     {
@@ -80,8 +80,8 @@ class UserInfo implements UserInfoInterface
 
     /**
      * @param UserAccount $user_account
-     * @param array|null                               $claims_locales
-     * @param array                                    $claims
+     * @param array|null  $claims_locales
+     * @param array       $claims
      *
      * @return array
      */
@@ -125,9 +125,9 @@ class UserInfo implements UserInfoInterface
 
     /**
      * @param UserAccount $user_account
-     * @param string                                   $claim
-     * @param string                                   $claim
-     * @param null|array                               $config
+     * @param string      $claim
+     * @param string      $claim
+     * @param null|array  $config
      *
      * @return null|mixed
      */

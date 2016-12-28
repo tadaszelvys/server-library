@@ -12,13 +12,13 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Endpoint\Authorization\Authorization;
+use OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface;
+use OAuth2\Model\AuthCode\AuthCode;
+use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Scope\ScopeRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface;
-use OAuth2\Model\AuthCode\AuthCode;
-use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -128,8 +128,8 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
-                    'error_description' => 'Public clients are not allowed to use the authorization code grant type.'
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'Public clients are not allowed to use the authorization code grant type.',
                 ]
             );
         }
@@ -226,8 +226,8 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => 'Missing parameter. \'code\' is required.'
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => 'Missing parameter. \'code\' is required.',
                 ]
             );
         }
@@ -238,8 +238,8 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
-                    'error_description' => 'Code doesn\'t exist or is invalid for the client.'
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error_description' => 'Code doesn\'t exist or is invalid for the client.',
                 ]
             );
         }
@@ -249,7 +249,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param Client           $client
+     * @param Client                                   $client
      *
      * @throws \OAuth2\Response\OAuth2Exception
      */
@@ -260,8 +260,8 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
                 throw new OAuth2Exception(
                     400,
                     [
-                        'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                        'error_description' => 'The client_id parameter is required for non-confidential clients.'
+                        'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                        'error_description' => 'The client_id parameter is required for non-confidential clients.',
                     ]
                 );
             }
@@ -271,7 +271,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \OAuth2\Model\AuthCode\AuthCode          $authCode
-     * @param Client           $client
+     * @param Client                                   $client
      *
      * @throws \OAuth2\Response\OAuth2Exception
      */
@@ -310,7 +310,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
                 400,
                 [
                     'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'The redirect URI is missing or does not match.'
+                    'The redirect URI is missing or does not match.',
                 ]
             );
         }
@@ -318,7 +318,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
 
     /**
      * @param \OAuth2\Model\AuthCode\AuthCode $authCode
-     * @param Client  $client
+     * @param Client                          $client
      *
      * @throws \OAuth2\Response\OAuth2Exception
      */
@@ -328,8 +328,8 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
-                    'error_description' => "Code doesn't exist or is invalid for the client."
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error_description' => "Code doesn't exist or is invalid for the client.",
                 ]
             );
         }
@@ -338,8 +338,8 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
-                    'error_description' => 'The authorization code has expired.'
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error_description' => 'The authorization code has expired.',
                 ]
             );
         }

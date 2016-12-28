@@ -14,7 +14,6 @@ namespace OAuth2\Test\Stub;
 use Base64Url\Base64Url;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\OpenIdConnect\SessionManagement\SessionStateParameterExtension as Base;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 

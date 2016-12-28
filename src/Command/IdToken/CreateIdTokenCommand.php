@@ -11,9 +11,6 @@
 
 namespace OAuth2\Command\IdToken;
 
-
-use OAuth2\Model\IdToken\IdToken;
-
 final class CreateIdTokenCommand
 {
     /**
@@ -21,7 +18,6 @@ final class CreateIdTokenCommand
      */
     protected function __construct()
     {
-
     }
 
     /**

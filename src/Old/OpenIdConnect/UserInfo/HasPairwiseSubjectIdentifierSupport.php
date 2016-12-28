@@ -78,9 +78,9 @@ trait HasPairwiseSubjectIdentifierSupport
     }
 
     /**
-     * @param Client           $client
+     * @param Client      $client
      * @param UserAccount $user_account
-     * @param string                                   $redirect_uri
+     * @param string      $redirect_uri
      *
      * @return string
      */
@@ -105,7 +105,7 @@ trait HasPairwiseSubjectIdentifierSupport
 
     /**
      * @param Client $client
-     * @param string                         $redirect_uri
+     * @param string $redirect_uri
      *
      * @return string
      */

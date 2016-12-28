@@ -37,6 +37,7 @@ final class Pipe implements MiddlewareInterface
      * Appends new middleware for this message bus. Should only be used at configuration time.
      *
      * @private
+     *
      * @param MiddlewareInterface $middleware
      */
     public function appendMiddleware(MiddlewareInterface $middleware)
@@ -48,6 +49,7 @@ final class Pipe implements MiddlewareInterface
      * Prepends new middleware for this message bus. Should only be used at configuration time.
      *
      * @private
+     *
      * @param MiddlewareInterface $middleware
      */
     public function prependMiddleware(MiddlewareInterface $middleware)
@@ -56,7 +58,7 @@ final class Pipe implements MiddlewareInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
@@ -76,9 +78,9 @@ final class Pipe implements MiddlewareInterface
      *
      * @param ServerRequestInterface $request
      *
-     * @return ResponseInterface
-     *
      * @throws \LogicException on unexpected result from any middleware on the middlewares
+     *
+     * @return ResponseInterface
      */
     public function dispatch(ServerRequestInterface $request)
     {
@@ -103,7 +105,7 @@ final class Pipe implements MiddlewareInterface
         }
 
         return new Delegate(function () {
-            throw new \LogicException("Unresolved request: middleware middlewares exhausted with no result.");
+            throw new \LogicException('Unresolved request: middleware middlewares exhausted with no result.');
         });
     }
 }

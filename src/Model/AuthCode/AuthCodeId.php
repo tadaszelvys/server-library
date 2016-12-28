@@ -20,6 +20,7 @@ final class AuthCodeId
 
     /**
      * Token constructor.
+     *
      * @param string $value
      */
     private function __construct(string $value)
@@ -29,6 +30,7 @@ final class AuthCodeId
 
     /**
      * @param string $value
+     *
      * @return self
      */
     public static function create(string $value): self

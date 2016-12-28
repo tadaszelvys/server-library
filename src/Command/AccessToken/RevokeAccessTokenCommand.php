@@ -13,7 +13,6 @@ namespace OAuth2\Command\AccessToken;
 
 use OAuth2\Model\AccessToken\AccessToken;
 
-
 final class RevokeAccessTokenCommand
 {
     /**
@@ -23,16 +22,17 @@ final class RevokeAccessTokenCommand
 
     /**
      * RevokeAccessTokenCommand constructor.
+     *
      * @param AccessToken $accessToken
      */
     protected function __construct(AccessToken $accessToken)
     {
-
         $this->accessToken = $accessToken;
     }
 
     /**
      * @param AccessToken $accessToken
+     *
      * @return RevokeAccessTokenCommand
      */
     public static function create(AccessToken $accessToken): self

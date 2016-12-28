@@ -17,7 +17,8 @@ interface ClientRepositoryInterface
 {
     /**
      * @param UserAccount $userAccount
-     * @param array $metadatas
+     * @param array       $metadatas
+     *
      * @return Client
      */
     public function create(UserAccount $userAccount, array $metadatas);

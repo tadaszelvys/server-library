@@ -11,7 +11,6 @@
 
 namespace OAuth2\Command\InitialAccessToken;
 
-
 use OAuth2\Model\InitialAccessToken\InitialAccessToken;
 
 final class RevokeInitialAccessTokenCommand
@@ -23,16 +22,17 @@ final class RevokeInitialAccessTokenCommand
 
     /**
      * RevokeInitialAccessTokenCommand constructor.
+     *
      * @param InitialAccessToken $initialAccessToken
      */
     protected function __construct(InitialAccessToken $initialAccessToken)
     {
-
         $this->initialAccessToken = $initialAccessToken;
     }
 
     /**
      * @param InitialAccessToken $initialAccessToken
+     *
      * @return RevokeInitialAccessTokenCommand
      */
     public static function create(InitialAccessToken $initialAccessToken): self

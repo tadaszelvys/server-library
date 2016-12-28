@@ -16,7 +16,7 @@ use OAuth2\Model\UserAccount\UserAccount;
 interface RuleManagerInterface
 {
     /**
-     * @param array $parameters
+     * @param array       $parameters
      * @param UserAccount $userAccount
      *
      * @return array

@@ -67,12 +67,12 @@ class Authorization
     /**
      * Authorization constructor.
      *
-     * @param array                                      $query_params
-     * @param Client             $client
-     * @param ResponseTypeInterface[]      $responseTypes
-     * @param ResponseModeInterface $responseMode
-     * @param string                                     $redirect_uri
-     * @param string[]                                   $scopes
+     * @param array                   $query_params
+     * @param Client                  $client
+     * @param ResponseTypeInterface[] $responseTypes
+     * @param ResponseModeInterface   $responseMode
+     * @param string                  $redirect_uri
+     * @param string[]                $scopes
      */
     public function __construct(array $query_params, Client $client, array $responseTypes, ResponseModeInterface $responseMode, $redirect_uri, array $scopes)
     {
@@ -87,6 +87,7 @@ class Authorization
 
     /**
      * @param UserAccount $userAccount
+     *
      * @return self
      */
     public function withUserAccount(UserAccount $userAccount): self
@@ -135,6 +136,7 @@ class Authorization
 
     /**
      * @param string $prompt
+     *
      * @return bool
      */
     public function hasPrompt(string $prompt): bool
@@ -146,6 +148,7 @@ class Authorization
 
     /**
      * @param array $scope
+     *
      * @return self
      */
     public function withScopes(array $scope): self
@@ -166,6 +169,7 @@ class Authorization
 
     /**
      * @param string $scope
+     *
      * @return bool
      */
     public function hasScope(string $scope): bool
@@ -177,6 +181,7 @@ class Authorization
 
     /**
      * @param string $scope
+     *
      * @return self
      */
     public function withoutScope(string $scope): self
@@ -192,6 +197,7 @@ class Authorization
 
     /**
      * @param string $scope
+     *
      * @return self
      */
     public function addScope(string $scope): self
@@ -237,6 +243,7 @@ class Authorization
 
     /**
      * @param string $param
+     *
      * @return bool
      */
     public function hasQueryParam(string $param): bool
@@ -248,6 +255,7 @@ class Authorization
 
     /**
      * @param string $param
+     *
      * @return mixed
      */
     public function getQueryParam(string $param)
@@ -260,6 +268,7 @@ class Authorization
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasData(string $key): bool
@@ -269,6 +278,7 @@ class Authorization
 
     /**
      * @param string $key
+     *
      * @return mixed
      */
     public function getData(string $key)
@@ -280,7 +290,8 @@ class Authorization
 
     /**
      * @param string $key
-     * @param mixed $data
+     * @param mixed  $data
+     *
      * @return self
      */
     public function withData(string $key, $data): self

@@ -12,7 +12,6 @@
 namespace OAuth2\Endpoint\Authorization;
 
 use OAuth2\Endpoint\Authorization\Extension\AuthorizationEndpointExtensionInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface AuthorizationEndpointInterface

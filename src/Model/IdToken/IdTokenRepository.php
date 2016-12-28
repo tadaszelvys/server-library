@@ -76,7 +76,7 @@ class IdTokenRepository implements IdTokenRepositoryInterface
         $this->issuer = $issuer;
         $this->signatureAlgorithm = $signatureAlgorithm;
         $this->signatureKeySet = $signatureKeySet;
-        $this->userinfo =$userinfo;
+        $this->userinfo = $userinfo;
         $this->jwtCreator = $jwtCreator;
         $this->jwtLoader = $jwtLoader;
     }
@@ -223,6 +223,7 @@ class IdTokenRepository implements IdTokenRepositoryInterface
 
     /**
      * @param Token $token
+     *
      * @return string
      */
     private function getHash(Token $token): string

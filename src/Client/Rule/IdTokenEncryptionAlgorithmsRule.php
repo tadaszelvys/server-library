@@ -12,9 +12,8 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Model\Client\ClientId;
-use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 
 final class IdTokenEncryptionAlgorithmsRule implements RuleInterface
 {

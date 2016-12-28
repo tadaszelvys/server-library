@@ -16,10 +16,11 @@ use OAuth2\Model\UserAccount\UserAccount;
 interface RuleInterface
 {
     /**
-     * @param array $command_parameters
-     * @param array $validated_parameters
+     * @param array       $command_parameters
+     * @param array       $validated_parameters
      * @param UserAccount $userAccount
-     * @param callable $next
+     * @param callable    $next
+     *
      * @return array
      */
     public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next);

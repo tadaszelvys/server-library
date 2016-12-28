@@ -23,6 +23,7 @@ final class ClientCreatedEventHandler
 
     /**
      * ClientCreatedEventHandler constructor.
+     *
      * @param EventStoreInterface $eventStore
      */
     public function __construct(EventStoreInterface $eventStore)

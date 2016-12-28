@@ -32,7 +32,7 @@ interface ScopeRepositoryInterface
 
     /**
      * @param ScopePolicyInterface $scopePolicy
-     * @param bool                               $isDefault
+     * @param bool                 $isDefault
      *
      * @return ScopeRepositoryInterface
      */
@@ -70,8 +70,8 @@ interface ScopeRepositoryInterface
     /**
      * This function check if the scopes respect the scope policy for the client.
      *
-     * @param string[]                       $scope  The scopes
-     * @param Client $client A client
+     * @param string[] $scope  The scopes
+     * @param Client   $client A client
      *
      * @return string[] An array scopes according to the scope policy
      */

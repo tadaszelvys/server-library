@@ -34,7 +34,7 @@ interface GrantTypeInterface
     /**
      * This function checks the request and returns information to issue an access token.
      *
-     * @param ServerRequestInterface $request             The request
+     * @param ServerRequestInterface                   $request             The request
      * @param \OAuth2\Grant\GrantTypeResponseInterface $grant_type_response
      *
      * @throws OAuth2Exception
@@ -42,8 +42,8 @@ interface GrantTypeInterface
     public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response);
 
     /**
-     * @param ServerRequestInterface $request
-     * @param Client           $client
+     * @param ServerRequestInterface     $request
+     * @param Client                     $client
      * @param GrantTypeResponseInterface $grant_type_response
      *
      * @throws OAuth2Exception

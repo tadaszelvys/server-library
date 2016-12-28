@@ -29,8 +29,9 @@ final class CreateRefreshTokenCommandHandler
 
     /**
      * CreateRefreshTokenCommandHandler constructor.
+     *
      * @param RefreshTokenRepositoryInterface $refreshTokenRepository
-     * @param RecordsMessages $messageRecorder
+     * @param RecordsMessages                 $messageRecorder
      */
     public function __construct(RefreshTokenRepositoryInterface $refreshTokenRepository, RecordsMessages $messageRecorder)
     {

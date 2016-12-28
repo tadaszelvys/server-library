@@ -13,7 +13,6 @@ namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use Http\Client\HttpClient;
-use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\UserAccount\UserAccount;
 
 final class SectorIdentifierUriRule implements RuleInterface
@@ -26,12 +25,13 @@ final class SectorIdentifierUriRule implements RuleInterface
     /**
      * @var bool
      */
-    private $allow_http_connections ;
+    private $allow_http_connections;
 
     /**
      * SectorIdentifierUriRule constructor.
+     *
      * @param HttpClient $client
-     * @param bool $allow_http_connections
+     * @param bool       $allow_http_connections
      */
     public function __construct(HttpClient $client, bool $allow_http_connections = false)
     {

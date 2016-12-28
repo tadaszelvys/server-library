@@ -21,10 +21,11 @@ use OAuth2\Model\UserAccount\UserAccount;
 interface RefreshTokenRepositoryInterface
 {
     /**
-     * @param UserAccount $userAccount
-     * @param Client $client
-     * @param array $parameters
+     * @param UserAccount        $userAccount
+     * @param Client             $client
+     * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
+     *
      * @return RefreshToken
      */
     public function create(UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt);

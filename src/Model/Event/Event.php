@@ -32,6 +32,7 @@ abstract class Event implements \JsonSerializable
 
     /**
      * ClientCreatedEvent constructor.
+     *
      * @param \JsonSerializable $payload
      */
     protected function __construct(\JsonSerializable $payload)
@@ -45,6 +46,7 @@ abstract class Event implements \JsonSerializable
 
     /**
      * @param array $json
+     *
      * @return \JsonSerializable
      */
     abstract protected static function createPayloadFromJson(array $json): \JsonSerializable;

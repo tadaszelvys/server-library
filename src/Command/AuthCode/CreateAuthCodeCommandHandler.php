@@ -29,8 +29,9 @@ final class CreateAuthCodeCommandHandler
 
     /**
      * CreateClientCommandHandler constructor.
+     *
      * @param AuthCodeRepositoryInterface $authCodeRepository
-     * @param RecordsMessages $messageRecorder
+     * @param RecordsMessages             $messageRecorder
      */
     public function __construct(AuthCodeRepositoryInterface $authCodeRepository, RecordsMessages $messageRecorder)
     {
@@ -43,7 +44,6 @@ final class CreateAuthCodeCommandHandler
      */
     public function handle(CreateAuthCodeCommand $command)
     {
-
         $authCode = $this->authCodeRepository->create(
             $command->getClient(),
             $command->getUserAccount(),

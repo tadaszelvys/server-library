@@ -11,11 +11,9 @@
 
 namespace OAuth2\OpenIdConnect;
 
-use OAuth2\Behaviour\HasResponseFactoryManager;
-use OAuth2\Behaviour\HasTokenTypeManager;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\Grant\ResponseTypeInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenType\TokenTypeManagerInterface;
 
 class IdTokenGrantType implements ResponseTypeInterface
@@ -23,9 +21,9 @@ class IdTokenGrantType implements ResponseTypeInterface
     /**
      * IdTokenGrantType constructor.
      *
-     * @param \OAuth2\TokenType\TokenTypeManagerInterface       $token_type_manager
-     * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface $id_token_manager
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface   $response_factory_manager
+     * @param \OAuth2\TokenType\TokenTypeManagerInterface            $token_type_manager
+     * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface          $id_token_manager
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
                                 IdTokenManagerInterface $id_token_manager,

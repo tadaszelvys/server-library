@@ -33,10 +33,10 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param \OAuth2\UserAccount\UserAccountManagerInterface  $user_account_manager
-     * @param \OAuth2\Client\ClientManagerInterface            $client_manager
-     * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface $userinfo
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface      $response_factory_manager
+     * @param \OAuth2\UserAccount\UserAccountManagerInterface        $user_account_manager
+     * @param \OAuth2\Client\ClientManagerInterface                  $client_manager
+     * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface       $userinfo
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
     public function __construct(UserAccountManagerInterface $user_account_manager,
                                 ClientManagerInterface $client_manager,

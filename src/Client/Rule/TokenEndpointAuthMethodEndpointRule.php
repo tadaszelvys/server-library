@@ -13,9 +13,8 @@ namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Behaviour\HasTokenEndpointAuthMethodManager;
-use OAuth2\Model\Client\ClientId;
-use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 
 final class TokenEndpointAuthMethodEndpointRule implements RuleInterface
 {

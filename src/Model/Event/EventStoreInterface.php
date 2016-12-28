@@ -15,6 +15,7 @@ interface EventStoreInterface
 {
     /**
      * @param EventId $eventId
+     *
      * @return null|Event
      */
     public function find(EventId $eventId);

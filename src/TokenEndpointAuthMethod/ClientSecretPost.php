@@ -60,8 +60,8 @@ abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
      */
     public function checkClientConfiguration(array $command_parameters, array &$validated_parameters)
     {
-        $validated_parameters['client_secret'] =  $this->createClientSecret();
-        $validated_parameters['client_secret_expires_at'] =  (0 === $this->secretLifetime ? 0 : time() + $this->secretLifetime);
+        $validated_parameters['client_secret'] = $this->createClientSecret();
+        $validated_parameters['client_secret_expires_at'] = (0 === $this->secretLifetime ? 0 : time() + $this->secretLifetime);
     }
 
     /**

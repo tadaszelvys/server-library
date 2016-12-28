@@ -11,9 +11,9 @@
 
 namespace OAuth2\Command\Client;
 
-use OAuth2\Model\Client\ClientRepositoryInterface;
 use OAuth2\Client\Rule\RuleManagerInterface;
 use OAuth2\Event\Client\ClientCreatedEvent;
+use OAuth2\Model\Client\ClientRepositoryInterface;
 use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class CreateClientCommandHandler
@@ -35,9 +35,10 @@ final class CreateClientCommandHandler
 
     /**
      * CreateClientCommandHandler constructor.
+     *
      * @param ClientRepositoryInterface $clientRepository
-     * @param RuleManagerInterface $ruleManager
-     * @param RecordsMessages $messageRecorder
+     * @param RuleManagerInterface      $ruleManager
+     * @param RecordsMessages           $messageRecorder
      */
     public function __construct(ClientRepositoryInterface $clientRepository, RuleManagerInterface $ruleManager, RecordsMessages $messageRecorder)
     {

@@ -54,12 +54,13 @@ final class AccessToken
 
     /**
      * AccessToken constructor.
-     * @param AccessTokenId $accessTokenId
-     * @param ResourceOwnerId $resourceOwnerId
-     * @param ClientId $clientId
-     * @param array $parameters
-     * @param array $metadatas
-     * @param string[] $scopes
+     *
+     * @param AccessTokenId      $accessTokenId
+     * @param ResourceOwnerId    $resourceOwnerId
+     * @param ClientId           $clientId
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param string[]           $scopes
      * @param \DateTimeImmutable $expiresAt
      */
     private function __construct(AccessTokenId $accessTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt)
@@ -74,13 +75,14 @@ final class AccessToken
     }
 
     /**
-     * @param AccessTokenId $accessTokenId
-     * @param ResourceOwnerId $resourceOwnerId
-     * @param ClientId $clientId
-     * @param array $parameters
-     * @param array $metadatas
-     * @param string[] $scopes
+     * @param AccessTokenId      $accessTokenId
+     * @param ResourceOwnerId    $resourceOwnerId
+     * @param ClientId           $clientId
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param string[]           $scopes
      * @param \DateTimeImmutable $expiresAt
+     *
      * @return AccessToken
      */
     public static function create(AccessTokenId $accessTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt)
@@ -135,6 +137,7 @@ final class AccessToken
 
     /**
      * @param string $scope
+     *
      * @return bool
      */
     public function hasScope(string $scope): bool
@@ -144,6 +147,7 @@ final class AccessToken
 
     /**
      * @param string[] $scopes
+     *
      * @return self
      */
     public function withScopes(array $scopes): self
@@ -156,6 +160,7 @@ final class AccessToken
 
     /**
      * @param string $scope
+     *
      * @return self
      */
     public function withScope(string $scope): self
@@ -171,6 +176,7 @@ final class AccessToken
 
     /**
      * @param string $scope
+     *
      * @return self
      */
     public function withoutScope(string $scope): self
@@ -211,6 +217,7 @@ final class AccessToken
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasParameter(string $key): bool
@@ -220,12 +227,15 @@ final class AccessToken
 
     /**
      * @param string $key
+     *
      * @throws \InvalidArgumentException
+     *
      * @return mixed
      */
     public function getParameter(string $key): mixed
     {
         Assertion::true($this->hasParameter($key), sprintf('The parameter \'%s\' does not exist.', $key));
+
         return $this->parameters;
     }
 
@@ -239,6 +249,7 @@ final class AccessToken
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasMetadata(string $key): bool
@@ -248,12 +259,15 @@ final class AccessToken
 
     /**
      * @param string $key
+     *
      * @throws \InvalidArgumentException
+     *
      * @return mixed
      */
     public function getMetadata(string $key): mixed
     {
         Assertion::true($this->hasMetadata($key), sprintf('The metadata \'%s\' does not exist.', $key));
+
         return $this->metadatas;
     }
 }

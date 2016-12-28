@@ -11,7 +11,6 @@
 
 namespace OAuth2\OpenIdConnect\UserInfo;
 
-
 use OAuth2\Model\AccessToken\AccessToken;
 
 interface UserInfoEndpointInterface

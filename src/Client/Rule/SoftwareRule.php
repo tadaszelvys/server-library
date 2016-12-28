@@ -14,7 +14,6 @@ namespace OAuth2\Client\Rule;
 use Assert\Assertion;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
-use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\UserAccount\UserAccount;
 
 final class SoftwareRule implements RuleInterface

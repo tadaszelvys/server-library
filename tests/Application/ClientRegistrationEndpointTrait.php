@@ -1,22 +1,34 @@
 <?php
 
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014-2016 Spomky-Labs
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ */
+
 namespace OAuth2\Test\Application;
 
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use Interop\Http\Factory\ResponseFactoryInterface;
+use Interop\Http\Factory\StreamFactoryInterface;
 use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
 use OAuth2\Middleware\InitialAccessTokenMiddleware;
 use OAuth2\Middleware\Pipe;
 use OAuth2\Response\OAuth2ExceptionMiddleware;
-use Interop\Http\Factory\ResponseFactoryInterface;
-use Interop\Http\Factory\StreamFactoryInterface;
 use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
 
 trait ClientRegistrationEndpointTrait
 {
     abstract public function getOAuth2ResponseMiddleware(): OAuth2ExceptionMiddleware;
+
     abstract public function getInitialAccessTokenMiddleware(): InitialAccessTokenMiddleware;
+
     abstract public function getResponseFactory(): ResponseFactoryInterface;
+
     abstract public function getStreamFactory(): StreamFactoryInterface;
+
     abstract public function getCommandBus(): MessageBusSupportingMiddleware;
 
     /**

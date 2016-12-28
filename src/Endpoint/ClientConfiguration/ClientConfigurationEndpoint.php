@@ -35,8 +35,9 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
 
     /**
      * ClientConfigurationEndpoint constructor.
-     * @param BearerToken               $bearerToken
-     * @param MessageBus                $messageBus
+     *
+     * @param BearerToken $bearerToken
+     * @param MessageBus  $messageBus
      */
     public function __construct(BearerToken $bearerToken, MessageBus $messageBus)
     {
@@ -53,18 +54,21 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
         switch ($request->getMethod()) {
             case 'GET':
                 $get = new ClientConfigurationGetEndpoint($this->messageBus);
+
                 return $get->process($request, $next);
             case 'PUT':
                 $get = new ClientConfigurationPutEndpoint($this->messageBus);
+
                 return $get->process($request, $next);
             case 'DELETE':
                 $get = new ClientConfigurationDeleteEndpoint($this->messageBus);
+
                 return $get->process($request, $next);
             default:
                 throw new OAuth2Exception(
                     405,
                     [
-                        'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                        'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                         'error_description' => 'Unsupported method.',
                     ]
                 );
@@ -73,6 +77,7 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
+     *
      * @throws OAuth2Exception
      */
     private function checkClient(ServerRequestInterface $request)
@@ -89,7 +94,7 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                     'error_description' => $e->getMessage(),
                 ]
             );

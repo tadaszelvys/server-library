@@ -12,9 +12,9 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Endpoint\Authorization\Authorization;
+use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use OAuth2\TokenType\TokenTypeManagerInterface;
 
 class ImplicitGrantType implements ResponseTypeInterface
@@ -37,8 +37,8 @@ class ImplicitGrantType implements ResponseTypeInterface
     /**
      * ImplicitGrantType constructor.
      *
-     * @param TokenTypeManagerInterface     $token_type_manager
-     * @param AccessTokenRepositoryInterface   $access_token_manager
+     * @param TokenTypeManagerInterface      $token_type_manager
+     * @param AccessTokenRepositoryInterface $access_token_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager, AccessTokenRepositoryInterface $access_token_manager)
     {
@@ -79,8 +79,8 @@ class ImplicitGrantType implements ResponseTypeInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
-                    'error_description' => 'Confidential clients are not allowed to use the implicit grant type.'
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'Confidential clients are not allowed to use the implicit grant type.',
                 ]
             );
         }

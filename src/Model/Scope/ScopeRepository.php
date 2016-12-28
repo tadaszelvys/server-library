@@ -42,7 +42,7 @@ class ScopeRepository implements ScopeRepositoryInterface
      * ScopeManager constructor.
      *
      * @param OAuth2ResponseFactoryManagerInterface $responseFactoryManager
-     * @param array                                       $availableScopes
+     * @param array                                 $availableScopes
      */
     public function __construct(OAuth2ResponseFactoryManagerInterface $responseFactoryManager, array $availableScopes = [])
     {
@@ -168,8 +168,8 @@ class ScopeRepository implements ScopeRepositoryInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
-                    'error_description' => sprintf('Scope \'%s\' appears more than once.', $scope)
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
+                    'error_description' => sprintf('Scope \'%s\' appears more than once.', $scope),
                 ]
             );
         }
@@ -186,8 +186,8 @@ class ScopeRepository implements ScopeRepositoryInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
-                    'error_description' => 'Scope contains illegal characters.'
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
+                    'error_description' => 'Scope contains illegal characters.',
                 ]
             );
         }

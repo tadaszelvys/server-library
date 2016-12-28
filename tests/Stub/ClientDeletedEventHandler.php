@@ -23,6 +23,7 @@ final class ClientDeletedEventHandler
 
     /**
      * ClientDeletedEventHandler constructor.
+     *
      * @param EventStoreInterface $eventStore
      */
     public function __construct(EventStoreInterface $eventStore)

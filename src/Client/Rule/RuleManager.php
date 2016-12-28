@@ -36,7 +36,9 @@ final class RuleManager implements RuleManagerInterface
      * Appends new middleware for this message bus. Should only be used at configuration time.
      *
      * @private
+     *
      * @param RuleInterface $rule
+     *
      * @return self
      */
     public function appendRule(RuleInterface $rule)

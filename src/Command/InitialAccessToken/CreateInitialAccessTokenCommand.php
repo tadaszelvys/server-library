@@ -11,7 +11,6 @@
 
 namespace OAuth2\Command\InitialAccessToken;
 
-
 use OAuth2\Model\UserAccount\UserAccount;
 
 final class CreateInitialAccessTokenCommand
@@ -28,19 +27,20 @@ final class CreateInitialAccessTokenCommand
 
     /**
      * CreateInitialAccessTokenCommand constructor.
-     * @param UserAccount $userAccount
+     *
+     * @param UserAccount             $userAccount
      * @param \DateTimeImmutable|null $expiresAt
      */
     protected function __construct(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null)
     {
-
         $this->userAccount = $userAccount;
         $this->expiresAt = $expiresAt;
     }
 
     /**
-     * @param UserAccount $userAccount
+     * @param UserAccount             $userAccount
      * @param \DateTimeImmutable|null $expiresAt
+     *
      * @return CreateInitialAccessTokenCommand
      */
     public static function create(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null): self

@@ -16,8 +16,9 @@ use OAuth2\Model\UserAccount\UserAccount;
 interface InitialAccessTokenRepositoryInterface
 {
     /**
-     * @param UserAccount $userAccount
+     * @param UserAccount             $userAccount
      * @param \DateTimeImmutable|null $expiresAt
+     *
      * @return InitialAccessToken
      */
     public function create(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null);

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014-2016 Spomky-Labs
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ */
+
 namespace OAuth2\Test\Application;
 
 use Interop\Http\Factory\ResponseFactoryInterface;
@@ -12,12 +21,13 @@ use OAuth2\Response\Factory\NoBodyResponseFactory;
 use OAuth2\Response\Factory\NotImplementedResponseFactory;
 use OAuth2\Response\Factory\SuccessResponseFactory;
 use OAuth2\Response\OAuth2ExceptionMiddleware;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\Response\OAuth2ResponseFactoryManager;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 trait OAuth2ResponseFactoryTrait
 {
     abstract public function getResponseFactory(): ResponseFactoryInterface;
+
     abstract public function getStreamFactory(): StreamFactoryInterface;
 
     /**

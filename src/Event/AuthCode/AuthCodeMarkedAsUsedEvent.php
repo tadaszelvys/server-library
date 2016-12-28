@@ -18,6 +18,7 @@ final class AuthCodeMarkedAsUsedEvent extends Event
 {
     /**
      * @param array $json
+     *
      * @return \JsonSerializable
      */
     protected static function createPayloadFromJson(array $json): \JsonSerializable
@@ -27,6 +28,7 @@ final class AuthCodeMarkedAsUsedEvent extends Event
 
     /**
      * @param AuthCode $authCode
+     *
      * @return self
      */
     public static function create(AuthCode $authCode): self
@@ -42,10 +44,10 @@ final class AuthCodeMarkedAsUsedEvent extends Event
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->getEventId()->getValue(),
-            'type' => self::class,
+            'id'          => $this->getEventId()->getValue(),
+            'type'        => self::class,
             'recorded_on' => (float) $this->getRecordedOn()->format('U.u'),
-            'payload' => $this->getPayload()->jsonSerialize(),
+            'payload'     => $this->getPayload()->jsonSerialize(),
         ];
     }
 }

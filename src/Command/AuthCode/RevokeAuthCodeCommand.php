@@ -11,7 +11,6 @@
 
 namespace OAuth2\Command\AuthCode;
 
-
 use OAuth2\Model\AuthCode\AuthCode;
 
 final class RevokeAuthCodeCommand
@@ -23,16 +22,17 @@ final class RevokeAuthCodeCommand
 
     /**
      * RevokeAuthCodeCommand constructor.
+     *
      * @param AuthCode $authCode
      */
     protected function __construct(AuthCode $authCode)
     {
-
         $this->authCode = $authCode;
     }
 
     /**
      * @param AuthCode $authCode
+     *
      * @return RevokeAuthCodeCommand
      */
     public static function create(AuthCode $authCode): self

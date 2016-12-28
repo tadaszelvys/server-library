@@ -103,9 +103,9 @@ abstract class SessionStateParameterExtension implements AuthorizationEndpointEx
     abstract protected function generateBrowserState();
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface              $request
+     * @param \Psr\Http\Message\ServerRequestInterface     $request
      * @param \OAuth2\Endpoint\Authorization\Authorization $authorization
-     * @param string                                                $browser_state
+     * @param string                                       $browser_state
      *
      * @return string
      */

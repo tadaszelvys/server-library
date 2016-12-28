@@ -1,14 +1,22 @@
 <?php
 
-use Assert\Assertion;
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014-2016 Spomky-Labs
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ */
 
+use Assert\Assertion;
+use OAuth2\Event\Client\ClientCreatedEvent;
+use OAuth2\Event\Client\ClientDeletedEvent;
+use OAuth2\Event\Client\ClientUpdatedEvent;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountId;
-use OAuth2\Event\Client\ClientCreatedEvent;
-use OAuth2\Event\Client\ClientDeletedEvent;
-use OAuth2\Event\Client\ClientUpdatedEvent;
 
 /**
  * Defines application features from the specific context.
@@ -36,7 +44,7 @@ class ClientContext extends BaseContext
     public function aValidClientRegistrationRequestIsReceived()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
@@ -58,7 +66,7 @@ class ClientContext extends BaseContext
     public function aClientRegistrationRequestIsReceivedWithAnExpiredInitialAccessToken()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
@@ -80,7 +88,7 @@ class ClientContext extends BaseContext
     public function aClientRegistrationRequestIsReceivedButNotInitialAccessTokenIsSet()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
@@ -101,7 +109,7 @@ class ClientContext extends BaseContext
     public function aClientRegistrationRequestIsReceivedButAnInvalidInitialAccessTokenIsSet()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
@@ -123,12 +131,12 @@ class ClientContext extends BaseContext
     public function aValidClientRegistrationRequestWithSoftwareStatementIsReceived()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
-            'redirect_uris' => ['https://www.foo.com'],
+            'redirect_uris'      => ['https://www.foo.com'],
             'software_statement' => $this->createSoftwareStatement(),
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -146,7 +154,7 @@ class ClientContext extends BaseContext
     public function aValidClientConfigurationGetRequestIsReceived()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
@@ -155,20 +163,20 @@ class ClientContext extends BaseContext
         $client = Client::create(
             ClientId::create('79b407fb-acc0-4880-ab98-254062c214ce'),
             [
-                "registration_access_token" => "JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA",
-                "grant_types" => [],
-                "response_types" => [],
-                "redirect_uris" => [
-                    "https://www.foo.com"
+                'registration_access_token' => 'JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA',
+                'grant_types'               => [],
+                'response_types'            => [],
+                'redirect_uris'             => [
+                    'https://www.foo.com',
                 ],
-                "software_statement" => "eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ",
-                "software_version" => "1.0",
-                "software_name" => "My application",
-                "software_name#en" => "My application",
-                "software_name#fr" => "Mon application",
-                "registration_client_uri" => "https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id" => "79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id_issued_at" => 1482177703,
+                'software_statement'      => 'eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ',
+                'software_version'        => '1.0',
+                'software_name'           => 'My application',
+                'software_name#en'        => 'My application',
+                'software_name#fr'        => 'Mon application',
+                'registration_client_uri' => 'https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id_issued_at'     => 1482177703,
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
@@ -186,7 +194,7 @@ class ClientContext extends BaseContext
     public function aClientConfigurationGetRequestIsReceivedButNoRegistrationTokenIsSet()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
@@ -194,20 +202,20 @@ class ClientContext extends BaseContext
         $client = Client::create(
             ClientId::create('79b407fb-acc0-4880-ab98-254062c214ce'),
             [
-                "registration_access_token" => "JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA",
-                "grant_types" => [],
-                "response_types" => [],
-                "redirect_uris" => [
-                    "https://www.foo.com"
+                'registration_access_token' => 'JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA',
+                'grant_types'               => [],
+                'response_types'            => [],
+                'redirect_uris'             => [
+                    'https://www.foo.com',
                 ],
-                "software_statement" => "eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ",
-                "software_version" => "1.0",
-                "software_name" => "My application",
-                "software_name#en" => "My application",
-                "software_name#fr" => "Mon application",
-                "registration_client_uri" => "https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id" => "79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id_issued_at" => 1482177703,
+                'software_statement'      => 'eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ',
+                'software_version'        => '1.0',
+                'software_name'           => 'My application',
+                'software_name#en'        => 'My application',
+                'software_name#fr'        => 'Mon application',
+                'registration_client_uri' => 'https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id_issued_at'     => 1482177703,
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
@@ -225,7 +233,7 @@ class ClientContext extends BaseContext
     public function aClientConfigurationGetRequestIsReceivedButTheRegistrationTokenIsInvalid()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
@@ -234,20 +242,20 @@ class ClientContext extends BaseContext
         $client = Client::create(
             ClientId::create('79b407fb-acc0-4880-ab98-254062c214ce'),
             [
-                "registration_access_token" => "JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA",
-                "grant_types" => [],
-                "response_types" => [],
-                "redirect_uris" => [
-                    "https://www.foo.com"
+                'registration_access_token' => 'JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA',
+                'grant_types'               => [],
+                'response_types'            => [],
+                'redirect_uris'             => [
+                    'https://www.foo.com',
                 ],
-                "software_statement" => "eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ",
-                "software_version" => "1.0",
-                "software_name" => "My application",
-                "software_name#en" => "My application",
-                "software_name#fr" => "Mon application",
-                "registration_client_uri" => "https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id" => "79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id_issued_at" => 1482177703,
+                'software_statement'      => 'eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ',
+                'software_version'        => '1.0',
+                'software_name'           => 'My application',
+                'software_name#en'        => 'My application',
+                'software_name#fr'        => 'Mon application',
+                'registration_client_uri' => 'https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id_issued_at'     => 1482177703,
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
@@ -265,7 +273,7 @@ class ClientContext extends BaseContext
     public function aValidClientConfigurationDeleteRequestIsReceived()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('DELETE');
@@ -274,20 +282,20 @@ class ClientContext extends BaseContext
         $client = Client::create(
             ClientId::create('79b407fb-acc0-4880-ab98-254062c214ce'),
             [
-                "registration_access_token" => "JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA",
-                "grant_types" => [],
-                "response_types" => [],
-                "redirect_uris" => [
-                    "https://www.foo.com"
+                'registration_access_token' => 'JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA',
+                'grant_types'               => [],
+                'response_types'            => [],
+                'redirect_uris'             => [
+                    'https://www.foo.com',
                 ],
-                "software_statement" => "eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ",
-                "software_version" => "1.0",
-                "software_name" => "My application",
-                "software_name#en" => "My application",
-                "software_name#fr" => "Mon application",
-                "registration_client_uri" => "https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id" => "79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id_issued_at" => 1482177703,
+                'software_statement'      => 'eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ',
+                'software_version'        => '1.0',
+                'software_name'           => 'My application',
+                'software_name#en'        => 'My application',
+                'software_name#fr'        => 'Mon application',
+                'registration_client_uri' => 'https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id_issued_at'     => 1482177703,
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
@@ -306,7 +314,7 @@ class ClientContext extends BaseContext
     public function aClientConfigurationDeleteRequestIsReceivedButNoRegistrationTokenIsSet()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('DELETE');
@@ -314,20 +322,20 @@ class ClientContext extends BaseContext
         $client = Client::create(
             ClientId::create('79b407fb-acc0-4880-ab98-254062c214ce'),
             [
-                "registration_access_token" => "JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA",
-                "grant_types" => [],
-                "response_types" => [],
-                "redirect_uris" => [
-                    "https://www.foo.com"
+                'registration_access_token' => 'JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA',
+                'grant_types'               => [],
+                'response_types'            => [],
+                'redirect_uris'             => [
+                    'https://www.foo.com',
                 ],
-                "software_statement" => "eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ",
-                "software_version" => "1.0",
-                "software_name" => "My application",
-                "software_name#en" => "My application",
-                "software_name#fr" => "Mon application",
-                "registration_client_uri" => "https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id" => "79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id_issued_at" => 1482177703,
+                'software_statement'      => 'eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ',
+                'software_version'        => '1.0',
+                'software_name'           => 'My application',
+                'software_name#en'        => 'My application',
+                'software_name#fr'        => 'Mon application',
+                'registration_client_uri' => 'https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id_issued_at'     => 1482177703,
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
@@ -346,7 +354,7 @@ class ClientContext extends BaseContext
     public function aClientConfigurationPutRequestIsReceivedButNoRegistrationTokenIsSet()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('PUT');
@@ -357,20 +365,20 @@ class ClientContext extends BaseContext
         $client = Client::create(
             ClientId::create('79b407fb-acc0-4880-ab98-254062c214ce'),
             [
-                "registration_access_token" => "JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA",
-                "grant_types" => [],
-                "response_types" => [],
-                "redirect_uris" => [
-                    "https://www.foo.com"
+                'registration_access_token' => 'JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA',
+                'grant_types'               => [],
+                'response_types'            => [],
+                'redirect_uris'             => [
+                    'https://www.foo.com',
                 ],
-                "software_statement" => "eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ",
-                "software_version" => "1.0",
-                "software_name" => "My application",
-                "software_name#en" => "My application",
-                "software_name#fr" => "Mon application",
-                "registration_client_uri" => "https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id" => "79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id_issued_at" => 1482177703,
+                'software_statement'      => 'eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ',
+                'software_version'        => '1.0',
+                'software_name'           => 'My application',
+                'software_name#en'        => 'My application',
+                'software_name#fr'        => 'Mon application',
+                'registration_client_uri' => 'https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id_issued_at'     => 1482177703,
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
@@ -389,7 +397,7 @@ class ClientContext extends BaseContext
     public function aValidClientConfigurationPutRequestIsReceived()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('PUT');
@@ -401,20 +409,20 @@ class ClientContext extends BaseContext
         $client = Client::create(
             ClientId::create('79b407fb-acc0-4880-ab98-254062c214ce'),
             [
-                "registration_access_token" => "JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA",
-                "grant_types" => [],
-                "response_types" => [],
-                "redirect_uris" => [
-                    "https://www.foo.com"
+                'registration_access_token' => 'JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA',
+                'grant_types'               => [],
+                'response_types'            => [],
+                'redirect_uris'             => [
+                    'https://www.foo.com',
                 ],
-                "software_statement" => "eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ",
-                "software_version" => "1.0",
-                "software_name" => "My application",
-                "software_name#en" => "My application",
-                "software_name#fr" => "Mon application",
-                "registration_client_uri" => "https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id" => "79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id_issued_at" => 1482177703,
+                'software_statement'      => 'eyJhbGciOiJFUzI1NiJ9.eyJzb2Z0d2FyZV92ZXJzaW9uIjoiMS4wIiwic29mdHdhcmVfbmFtZSI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNlbiI6Ik15IGFwcGxpY2F0aW9uIiwic29mdHdhcmVfbmFtZSNmciI6Ik1vbiBhcHBsaWNhdGlvbiJ9.88m8-YyguCCx1QNChwfNnMZ9APKpNC--nnfB1rVBpAYyHLixtsyMuuI09svqxuiRfTxwgXuRUvsg_5RozmtusQ',
+                'software_version'        => '1.0',
+                'software_name'           => 'My application',
+                'software_name#en'        => 'My application',
+                'software_name#fr'        => 'Mon application',
+                'registration_client_uri' => 'https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id_issued_at'     => 1482177703,
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
@@ -445,29 +453,29 @@ class ClientContext extends BaseContext
     public function aValidClientConfigurationPutRequestWithSoftwareStatementIsReceived()
     {
         /**
-         * @var $request \Psr\Http\Message\ServerRequestInterface
+         * @var \Psr\Http\Message\ServerRequestInterface
          */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('PUT');
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withParsedBody([
-            'redirect_uris' => ['https://www.bar.com'],
-            "software_statement" => $this->createSoftwareStatement(),
+            'redirect_uris'      => ['https://www.bar.com'],
+            'software_statement' => $this->createSoftwareStatement(),
 
         ]);
         $request = $request->withHeader('Authorization', 'Bearer JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA');
         $client = Client::create(
             ClientId::create('79b407fb-acc0-4880-ab98-254062c214ce'),
             [
-                "registration_access_token" => "JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA",
-                "grant_types" => [],
-                "response_types" => [],
-                "redirect_uris" => [
-                    "https://www.foo.com"
+                'registration_access_token' => 'JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA',
+                'grant_types'               => [],
+                'response_types'            => [],
+                'redirect_uris'             => [
+                    'https://www.foo.com',
                 ],
-                "registration_client_uri" => "https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id" => "79b407fb-acc0-4880-ab98-254062c214ce",
-                "client_id_issued_at" => 1482177703,
+                'registration_client_uri' => 'https://www.config.example.com/client/79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
+                'client_id_issued_at'     => 1482177703,
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
@@ -506,7 +514,6 @@ class ClientContext extends BaseContext
         $events = $this->getApplication()->getEventStore()->all();
         Assertion::eq(0, count($events));
     }
-
 
     /**
      * @Then no client updated event should be recorded
@@ -563,7 +570,7 @@ class ClientContext extends BaseContext
      */
     public function theResponseContainsAnError($code)
     {
-        Assertion::eq((int)$code, $this->response->getStatusCode());
+        Assertion::eq((int) $code, $this->response->getStatusCode());
         Assertion::greaterOrEqualThan($this->response->getStatusCode(), 400);
         if (401 === $this->response->getStatusCode()) {
         } else {
@@ -622,7 +629,7 @@ class ClientContext extends BaseContext
     {
         $claims = [
             'software_version' => '1.0',
-            'software_name' => 'My application',
+            'software_name'    => 'My application',
             'software_name#en' => 'My application',
             'software_name#fr' => 'Mon application',
         ];

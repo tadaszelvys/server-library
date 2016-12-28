@@ -12,9 +12,9 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Model\Client\Client;
+use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -43,8 +43,8 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
     /**
      * ResourceOwnerPasswordCredentialsGrantType constructor.
      *
-     * @param UserAccountRepositoryInterface $userAccountRepository
-     * @param OAuth2ResponseFactoryManagerInterface     $responseFactoryManager
+     * @param UserAccountRepositoryInterface        $userAccountRepository
+     * @param OAuth2ResponseFactoryManagerInterface $responseFactoryManager
      */
     public function __construct(UserAccountRepositoryInterface $userAccountRepository, OAuth2ResponseFactoryManagerInterface $responseFactoryManager)
     {
@@ -125,8 +125,8 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
-                    'error_description' => 'Invalid username and password combination'
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error_description' => 'Invalid username and password combination',
                 ]
             );
         }

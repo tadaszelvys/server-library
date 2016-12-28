@@ -11,7 +11,6 @@
 
 namespace OAuth2\Command\RefreshToken;
 
-
 use OAuth2\Model\RefreshToken\RefreshToken;
 
 final class RevokeRefreshTokenCommand
@@ -23,16 +22,17 @@ final class RevokeRefreshTokenCommand
 
     /**
      * RevokeRefreshTokenCommand constructor.
+     *
      * @param RefreshToken $refreshToken
      */
     protected function __construct(RefreshToken $refreshToken)
     {
-
         $this->refreshToken = $refreshToken;
     }
 
     /**
      * @param RefreshToken $refreshToken
+     *
      * @return RevokeRefreshTokenCommand
      */
     public static function create(RefreshToken $refreshToken): self

@@ -17,12 +17,13 @@ use OAuth2\Model\ResourceOwner\ResourceOwner;
 interface AccessTokenRepositoryInterface
 {
     /**
-     * @param ResourceOwner $resourceOwner
-     * @param Client $client
-     * @param array $parameters
-     * @param array $metadatas
-     * @param string[] $scopes
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param string[]           $scopes
      * @param \DateTimeImmutable $expiresAt
+     *
      * @return AccessToken
      */
     public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt);

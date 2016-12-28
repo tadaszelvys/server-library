@@ -17,13 +17,14 @@ use OAuth2\Model\UserAccount\UserAccount;
 interface AuthCodeRepositoryInterface
 {
     /**
-     * @param Client $client
-     * @param UserAccount $userAccount
-     * @param array $queryParameters
+     * @param Client             $client
+     * @param UserAccount        $userAccount
+     * @param array              $queryParameters
      * @param \DateTimeImmutable $expiresAt
-     * @param array $parameters
-     * @param array $scopes
-     * @param array $metadatas
+     * @param array              $parameters
+     * @param array              $scopes
+     * @param array              $metadatas
+     *
      * @return mixed
      */
     public function create(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas);

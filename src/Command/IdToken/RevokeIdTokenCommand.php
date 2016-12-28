@@ -11,7 +11,6 @@
 
 namespace OAuth2\Command\IdToken;
 
-
 use OAuth2\Model\IdToken\IdToken;
 
 final class RevokeIdTokenCommand
@@ -23,16 +22,17 @@ final class RevokeIdTokenCommand
 
     /**
      * RevokeIdTokenCommand constructor.
+     *
      * @param IdToken $idToken
      */
     protected function __construct(IdToken $idToken)
     {
-
         $this->idToken = $idToken;
     }
 
     /**
      * @param IdToken $idToken
+     *
      * @return RevokeIdTokenCommand
      */
     public static function create(IdToken $idToken): self

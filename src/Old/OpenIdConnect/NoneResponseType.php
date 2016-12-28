@@ -11,9 +11,6 @@
 
 namespace OAuth2\OpenIdConnect;
 
-use OAuth2\Behaviour\HasAccessTokenManager;
-use OAuth2\Behaviour\HasTokenTypeManager;
-use OAuth2\Behaviour\HasTokenTypeParameterSupport;
 use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Token\AccessTokenManagerInterface;
@@ -38,8 +35,8 @@ class NoneResponseType implements ResponseTypeInterface
     /**
      * NoneResponseType constructor.
      *
-     * @param \OAuth2\TokenType\TokenTypeManagerInterface   $token_type_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface $access_token_manager
+     * @param \OAuth2\TokenType\TokenTypeManagerInterface $token_type_manager
+     * @param \OAuth2\Token\AccessTokenManagerInterface   $access_token_manager
      */
     public function __construct(TokenTypeManagerInterface $token_type_manager,
                                 AccessTokenManagerInterface $access_token_manager

@@ -61,7 +61,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * AuthorizationRequestLoader constructor.
      *
-     * @param \OAuth2\Client\ClientManagerInterface       $client_manager
+     * @param \OAuth2\Client\ClientManagerInterface                  $client_manager
      * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
     public function __construct(ClientManagerInterface $client_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)

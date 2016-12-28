@@ -29,8 +29,9 @@ final class RevokeIdTokenCommandHandler
 
     /**
      * CreateClientCommandHandler constructor.
+     *
      * @param IdTokenRepositoryInterface $idTokenRepository
-     * @param RecordsMessages $messageRecorder
+     * @param RecordsMessages            $messageRecorder
      */
     public function __construct(IdTokenRepositoryInterface $idTokenRepository, RecordsMessages $messageRecorder)
     {

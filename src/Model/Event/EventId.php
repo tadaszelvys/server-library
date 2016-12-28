@@ -20,6 +20,7 @@ final class EventId
 
     /**
      * EventId constructor.
+     *
      * @param $value
      */
     private function __construct(string $value)
@@ -29,6 +30,7 @@ final class EventId
 
     /**
      * @param string $value
+     *
      * @return EventId
      */
     public static function create(string $value): self

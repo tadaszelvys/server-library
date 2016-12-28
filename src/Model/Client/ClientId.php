@@ -14,12 +14,13 @@ namespace OAuth2\Model\Client;
 use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 
 /**
- * Class ClientId
+ * Class ClientId.
  */
 final class ClientId extends ResourceOwnerId
 {
     /**
      * @param string $value
+     *
      * @return ClientId
      */
     public static function create(string $value): self

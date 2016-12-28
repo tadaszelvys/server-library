@@ -11,7 +11,6 @@
 
 namespace OAuth2\Command\Client;
 
-
 use OAuth2\Model\Client\Client;
 
 final class DeleteClientCommand
@@ -23,16 +22,17 @@ final class DeleteClientCommand
 
     /**
      * DeleteClientCommand constructor.
+     *
      * @param Client $client
      */
     protected function __construct(Client $client)
     {
-
         $this->client = $client;
     }
 
     /**
      * @param Client $client
+     *
      * @return DeleteClientCommand
      */
     public static function create(Client $client): DeleteClientCommand

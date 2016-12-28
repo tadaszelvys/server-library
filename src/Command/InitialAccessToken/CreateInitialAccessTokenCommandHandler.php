@@ -29,8 +29,9 @@ final class CreateInitialAccessTokenCommandHandler
 
     /**
      * CreateInitialAccessTokenCommandHandler constructor.
+     *
      * @param InitialAccessTokenRepositoryInterface $initialAccessTokenRepository
-     * @param RecordsMessages $messageRecorder
+     * @param RecordsMessages                       $messageRecorder
      */
     public function __construct(InitialAccessTokenRepositoryInterface $initialAccessTokenRepository, RecordsMessages $messageRecorder)
     {

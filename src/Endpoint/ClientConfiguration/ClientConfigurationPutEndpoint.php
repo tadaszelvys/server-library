@@ -28,6 +28,7 @@ final class ClientConfigurationPutEndpoint implements MiddlewareInterface
 
     /**
      * ClientConfigurationPutEndpoint constructor.
+     *
      * @param MessageBus $messageBus
      */
     public function __construct(MessageBus $messageBus)

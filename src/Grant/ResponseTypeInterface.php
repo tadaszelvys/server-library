@@ -67,8 +67,8 @@ interface ResponseTypeInterface
      * This function finish the authorization response.
      *
      * @param \OAuth2\Endpoint\Authorization\Authorization $authorization       The authorization object
-     * @param array                                                 $response_parameters The parameters to send to the client
-     * @param string                                                $redirect_uri        The redirect URI
+     * @param array                                        $response_parameters The parameters to send to the client
+     * @param string                                       $redirect_uri        The redirect URI
      *
      * @throws \OAuth2\Response\OAuth2Exception
      *

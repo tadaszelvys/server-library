@@ -12,7 +12,6 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Model\Client\ClientId;
 use OAuth2\Grant\GrantTypeManagerInterface;
 use OAuth2\Grant\ResponseTypeManagerInterface;
 use OAuth2\Model\UserAccount\UserAccount;

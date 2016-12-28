@@ -11,8 +11,8 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasResponseFactoryManager;
 use OAuth2\Behaviour\HasRefreshTokenManager;
+use OAuth2\Behaviour\HasResponseFactoryManager;
 use OAuth2\Client\ClientInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
@@ -29,7 +29,7 @@ class RefreshTokenGrantType implements GrantTypeInterface
     /**
      * RefreshTokenGrantType constructor.
      *
-     * @param \OAuth2\Token\RefreshTokenManagerInterface  $refresh_token_manager
+     * @param \OAuth2\Token\RefreshTokenManagerInterface             $refresh_token_manager
      * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
     public function __construct(RefreshTokenManagerInterface $refresh_token_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
