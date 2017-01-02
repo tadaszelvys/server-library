@@ -106,7 +106,7 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
      */
     public function findClientId(ServerRequestInterface $request, &$client_credentials = null)
     {
-        $parameters = $request->getParsedBody();
+        $parameters = $request->getParsedBody() ?? [];
         if (!array_key_exists('client_assertion_type', $parameters)) {
             return;
         }

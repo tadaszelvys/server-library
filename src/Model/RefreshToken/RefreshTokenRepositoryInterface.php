@@ -12,7 +12,7 @@
 namespace OAuth2\Model\RefreshToken;
 
 use OAuth2\Model\Client\Client;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\ResourceOwner\ResourceOwner;
 
 /**
  * @see    http://tools.ietf.org/html/rfc6749#section-6
@@ -21,14 +21,15 @@ use OAuth2\Model\UserAccount\UserAccount;
 interface RefreshTokenRepositoryInterface
 {
     /**
-     * @param UserAccount        $userAccount
+     * @param ResourceOwner      $resourceOwner
      * @param Client             $client
      * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
+     * @param string[]           $scopes
      *
      * @return RefreshToken
      */
-    public function create(UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt);
+    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes);
 
     /**
      * @param RefreshTokenId $refreshTokenId

@@ -11,6 +11,7 @@
 
 use Assert\Assertion;
 use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
+use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 
 class RevocationContext extends BaseContext
 {
@@ -208,7 +209,8 @@ class RevocationContext extends BaseContext
     public function aTokenRevocationEventIsThrown()
     {
         $events = $this->getApplication()->getEventStore()->all();
-        Assertion::eq(1, count($events));
-        Assertion::allIsInstanceOf($events, AccessTokenRevokedEvent::class);
+        Assertion::eq(2, count($events));
+        Assertion::isInstanceOf(array_values($events)[0], AccessTokenRevokedEvent::class);
+        Assertion::isInstanceOf(array_values($events)[1], RefreshTokenRevokedEvent::class);
     }
 }

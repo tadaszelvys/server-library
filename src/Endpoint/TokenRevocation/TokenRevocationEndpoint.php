@@ -173,7 +173,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
      */
     protected function getHints(ServerRequestInterface $request): array
     {
-        $params = $request->getParsedBody();
+        $params = $this->getRequestParameters($request);
         if (array_key_exists('token_type_hint', $params)) {
             return [$this->getTokenTypeHint($params['token_type_hint'])];
         }
@@ -187,7 +187,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
      */
     protected function getCallback(ServerRequestInterface $request)
     {
-        $params = $request->getParsedBody();
+        $params = $this->getRequestParameters($request);
         if (array_key_exists('callback', $params)) {
             return $params['callback'];
         }

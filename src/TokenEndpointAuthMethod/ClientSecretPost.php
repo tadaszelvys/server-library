@@ -44,7 +44,7 @@ abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
      */
     public function findClientId(ServerRequestInterface $request, &$clientCredentials = null)
     {
-        $parameters = $request->getParsedBody();
+        $parameters = $request->getParsedBody() ?? [];
         if (array_key_exists('client_id', $parameters) && array_key_exists('client_secret', $parameters)) {
             $clientCredentials = $parameters['client_secret'];
 
