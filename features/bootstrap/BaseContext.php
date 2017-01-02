@@ -10,8 +10,8 @@
  */
 
 use Behat\Behat\Context\Context;
-use Http\Factory\Diactoros\ServerRequestFactory;
-use Http\Factory\Diactoros\StreamFactory;
+use Interop\Http\Factory\StreamFactoryInterface;
+use Interop\Http\Factory\ServerRequestFactoryInterface;
 use OAuth2\Test\Application\Application;
 
 class BaseContext implements Context
@@ -20,16 +20,6 @@ class BaseContext implements Context
      * @var Application
      */
     private $application;
-
-    /**
-     * @var StreamFactory
-     */
-    private $streamFactory;
-
-    /**
-     * @var ServerRequestFactory
-     */
-    private $serverRequestFactory;
 
     /**
      * Initializes context.
@@ -41,8 +31,7 @@ class BaseContext implements Context
     public function __construct()
     {
         $this->application = new Application();
-        $this->streamFactory = new StreamFactory();
-        $this->serverRequestFactory = new ServerRequestFactory();
+
     }
 
     /**
@@ -54,18 +43,18 @@ class BaseContext implements Context
     }
 
     /**
-     * @return StreamFactory
+     * @return StreamFactoryInterface
      */
-    protected function getStreamFactory(): StreamFactory
+    protected function getStreamFactory(): StreamFactoryInterface
     {
-        return $this->streamFactory;
+        return $this->getApplication()->getStreamFactory();
     }
 
     /**
-     * @return ServerRequestFactory
+     * @return ServerRequestFactoryInterface
      */
-    protected function getServerRequestFactory(): ServerRequestFactory
+    protected function getServerRequestFactory(): ServerRequestFactoryInterface
     {
-        return $this->serverRequestFactory;
+        return $this->getApplication()->getServerRequestFactory();
     }
 }

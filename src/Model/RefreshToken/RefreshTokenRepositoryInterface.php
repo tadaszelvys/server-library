@@ -31,6 +31,13 @@ interface RefreshTokenRepositoryInterface
     public function create(UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt);
 
     /**
+     * @param RefreshTokenId $refreshTokenId
+     * @return bool
+     */
+    public function has(RefreshTokenId $refreshTokenId): bool;
+
+
+    /**
      * @param RefreshToken $refreshToken
      */
     public function save(RefreshToken $refreshToken);

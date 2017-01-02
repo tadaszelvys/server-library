@@ -29,11 +29,6 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     private $clientRepository;
 
     /**
-     * @var OAuth2ResponseFactoryManagerInterface
-     */
-    private $oauth2ResponseFactoryManager;
-
-    /**
      * @var TokenEndpointAuthMethodInterface[]
      */
     private $tokenEndpointAuthMethodNames = [];
@@ -47,12 +42,10 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
      * TokenEndpointAuthMethodManager constructor.
      *
      * @param ClientRepositoryInterface             $clientRepository
-     * @param OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager
      */
-    public function __construct(ClientRepositoryInterface $clientRepository, OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager)
+    public function __construct(ClientRepositoryInterface $clientRepository)
     {
         $this->clientRepository = $clientRepository;
-        $this->oauth2ResponseFactoryManager = $oauth2ResponseFactoryManager;
     }
 
     /**
@@ -163,7 +156,7 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
      */
     public function isClientAuthenticated(ServerRequestInterface $request, Client $client, TokenEndpointAuthMethodInterface $authentication_method, $client_credentials)
     {
-        if (in_array($client->get('tokenEndpointAuthMethod'), $authentication_method->getSupportedAuthenticationMethods())) {
+        if (in_array($client->get('token_endpoint_auth_method'), $authentication_method->getSupportedAuthenticationMethods())) {
             if (false === $client->areClientCredentialsExpired()) {
                 return $authentication_method->isClientAuthenticated($client, $client_credentials, $request);
             }

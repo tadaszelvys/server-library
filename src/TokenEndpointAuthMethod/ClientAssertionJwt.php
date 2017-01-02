@@ -20,7 +20,6 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
@@ -29,11 +28,6 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
      * @var JWTLoaderInterface
      */
     private $jwtLoader;
-
-    /**
-     * @var OAuth2ResponseFactoryManagerInterface
-     */
-    private $oauth2ResponseFactoryManager;
 
     /**
      * @var bool
@@ -53,17 +47,13 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     /**
      * ClientAssertionJwt constructor.
      *
-     * @param \Jose\JWTLoaderInterface                               $jwtLoader
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager
-     * @param int                                                    $secretLifetime
+     * @param \Jose\JWTLoaderInterface $jwtLoader
+     * @param int                      $secretLifetime
      */
-    public function __construct(JWTLoaderInterface $jwtLoader, OAuth2ResponseFactoryManagerInterface $oauth2ResponseFactoryManager, $secretLifetime = 0)
+    public function __construct(JWTLoaderInterface $jwtLoader, int $secretLifetime = 0)
     {
-        Assertion::integer($secretLifetime);
         Assertion::greaterOrEqualThan($secretLifetime, 0);
         $this->jwtLoader = $jwtLoader;
-        $this->oauth2ResponseFactoryManager = $oauth2ResponseFactoryManager;
-
         $this->secretLifetime = $secretLifetime;
     }
 
@@ -116,25 +106,21 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
      */
     public function findClientId(ServerRequestInterface $request, &$client_credentials = null)
     {
-        $client_assertion_type = RequestBody::getParameter($request, 'client_assertion_type');
+        $parameters = $request->getParsedBody();
+        if (!array_key_exists('client_assertion_type', $parameters)) {
+            return;
+        }
+        $client_assertion_type = $parameters['client_assertion_type'];
 
         //We verify the client assertion type in the request
         if ('urn:ietf:params:oauth:client-assertion-type:jwt-bearer' !== $client_assertion_type) {
             return;
         }
 
-        $client_assertion = RequestBody::getParameter($request, 'client_assertion');
-
         try {
-            //We verify the client assertion exists
-            Assertion::notNull($client_assertion, 'Parameter \'client_assertion\' is missing.');
-
-            //We load the assertion
-            $jwt = $this->jwtLoader->load(
-                $client_assertion,
-                $this->key_encryption_key_set,
-                $this->encryption_required
-            );
+            Assertion::keyExists($parameters, 'client_assertion', 'Parameter \'client_assertion\' is missing.');
+            $client_assertion = $parameters['client_assertion'];
+            $jwt = $this->jwtLoader->load($client_assertion, $this->key_encryption_key_set, $this->encryption_required);
 
             $diff = array_diff(['iss', 'sub', 'aud', 'jti', 'exp'], array_keys($jwt->getClaims()));
             Assertion::eq(0, count($diff), sprintf('The following claim(s) is/are mandatory: \'%s\'.', implode(', ', array_values($diff))));

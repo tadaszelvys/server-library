@@ -16,46 +16,51 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\TokenTypeHint\TokenTypeHintInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use SimpleBus\Message\Bus\MessageBus;
 use Zend\Diactoros\Response;
 
-final class TokenRevocationEndpoint implements MiddlewareInterface
+abstract class TokenRevocationEndpoint implements MiddlewareInterface
 {
     /**
-     * @var RevocationTokenTypeInterface[]
+     * @var TokenTypeHintInterface[]
      */
-    private $tokenTypes = [];
+    private $tokenTypeHints = [];
 
     /**
-     * @var MessageBus
+     * @param TokenTypeHintInterface $tokenTypeHint
      */
-    private $messageBus;
-
-    /**
-     * ClientConfigurationEndpoint constructor.
-     *
-     * @param MessageBus $messageBus
-     */
-    public function __construct(MessageBus $messageBus)
+    public function addTokenTypeHint(TokenTypeHintInterface $tokenTypeHint)
     {
-        $this->messageBus = $messageBus;
+        $this->tokenTypeHints[$tokenTypeHint->getTokenTypeHint()] = $tokenTypeHint;
     }
 
     /**
-     * @param RevocationTokenTypeInterface $tokenType
+     * @return TokenTypeHintInterface[]
      */
-    public function addRevocationTokenType(RevocationTokenTypeInterface $tokenType)
+    protected function getTokenTypeHints()
     {
-        $this->tokenTypes[$tokenType->getTokenTypeHint()] = $tokenType;
+        return $this->tokenTypeHints;
     }
 
     /**
-     * @return RevocationTokenTypeInterface[]
+     * @param string $tokenTypeHint
+     * @return TokenTypeHintInterface
+     * @throws OAuth2Exception
      */
-    private function getTokenTypes()
+    protected function getTokenTypeHint(string $tokenTypeHint): TokenTypeHintInterface
     {
-        return $this->tokenTypes;
+        if (!array_key_exists($tokenTypeHint, $this->getTokenTypeHints())) {
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values:  %s', $tokenTypeHint, implode(' ', array_keys($this->getTokenTypeHints()))),
+                ]
+            );
+        }
+
+        return $this->tokenTypeHints[$tokenTypeHint];
     }
 
     /**
@@ -63,27 +68,41 @@ final class TokenRevocationEndpoint implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        $this->getParameters($request, $token, $tokenType_hint, $callback);
+        $callback = $this->getCallback($request);
+        try{
+            $client = $this->getClient($request);
+            $token = $this->getToken($request);
+            $hints = $this->getHints($request);
 
-        try {
-            if (null === $token) {
-                $data = ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Parameter \'token\' is missing'];
-                throw new OAuth2Exception(400, $data);
+            foreach ($hints as $hint) {
+                $token = $hint->find($token);
+                if (null !== $token) {
+                    if ($client->getId()->getValue() === $token->getClient()->getId()->getValue()) {
+                        $hint->revoke($token);
+
+                        return $this->getResponse(200, '', $callback);
+                    } else {
+                        throw new OAuth2Exception(
+                            400,
+                            [
+                                'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                                'error_description' => 'The parameter \'token\' is invalid.',
+                            ]
+                        );
+                    }
+
+                }
             }
-            $client = $this->tokenEndpointAuthManager->findClient($request);
 
-            if ($client instanceof Client) {
-                throw new OAuth2Exception($this->revokeToken($token, $client, $tokenType_hint, $callback));
-            }
-
-            return $this->getResponse(200, '', $callback);
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => 'The parameter \'token\' is invalid.',
+                ]
+            );
         } catch (OAuth2Exception $e) {
-            return $this->getResponse($e->getCode(), json_encode($e->getOAuth2Response()->getData()), $callback);
-        } catch (\Exception $e) {
-            $data = ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Parameter \'token\' is missing'];
-            $oauth2_response = $this->getResponseFactoryManager()->getResponse(400, $data);
-
-            return $this->getResponse($oauth2_response->getCode(), json_encode($oauth2_response->getCode()), $callback);
+            return $this->getResponse($e->getCode(), json_encode($e->getData()), $callback);
         }
     }
 
@@ -96,85 +115,87 @@ final class TokenRevocationEndpoint implements MiddlewareInterface
      */
     private function getResponse($code, $data, $callback)
     {
-        if (null !== ($callback)) {
+        if (null !== $callback) {
             $data = sprintf('%s(%s)', $callback, $data);
         }
 
-        $response = new Response('php://memory', $code, []);
+        $response = new Response('php://memory', $code);
         $response->getBody()->write($data);
 
         return $response;
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param string                                   $token
-     * @param string|null                              $tokenType_hint
-     * @param string|null                              $callback
+     * @param ServerRequestInterface $request
+     * @return Client
+     * @throws OAuth2Exception
      */
-    private function getParameters(ServerRequestInterface $request, &$token, &$tokenType_hint, &$callback)
+    private function getClient(ServerRequestInterface $request): Client
     {
-        if ('GET' === $request->getMethod()) {
-            $params = $request->getQueryParams();
-        } elseif ('POST' === $request->getMethod()) {
-            $params = RequestBody::getParameters($request);
-        } else {
-            return;
+        $client = $request->getAttribute('client');
+        if (null === $client) {
+            throw new OAuth2Exception(
+                401,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'Client not authenticated.',
+                ]
+            );
         }
-        foreach (['token', 'tokenType_hint', 'callback'] as $key) {
-            $$key = array_key_exists($key, $params) ? $params[$key] : null;
+
+        return $client;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return string
+     * @throws OAuth2Exception
+     */
+    protected function getToken(ServerRequestInterface $request): string
+    {
+        $params = $this->getRequestParameters($request);
+        if (!array_key_exists('token', $params)) {
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => 'The parameter \'token\' is missing.',
+                ]
+            );
+        }
+
+        return $params['token'];
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return TokenTypeHintInterface[]
+     */
+    protected function getHints(ServerRequestInterface $request): array
+    {
+        $params = $request->getParsedBody();
+        if (array_key_exists('token_type_hint', $params)) {
+            return [$this->getTokenTypeHint($params['token_type_hint'])];
+        }
+
+        return $this->getTokenTypeHints();
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return null|string
+     */
+    protected function getCallback(ServerRequestInterface $request)
+    {
+        $params = $request->getParsedBody();
+        if (array_key_exists('callback', $params)) {
+            return $params['callback'];
         }
     }
 
     /**
-     * @param string      $token
-     * @param Client      $client
-     * @param string|null $tokenType_hint
-     * @param string|null $callback
-     *
-     * @throws \OAuth2\Response\OAuth2Exception
-     *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @param ServerRequestInterface $request
+     * @return array
      */
-    private function revokeToken($token, Client $client, $tokenType_hint = null, $callback = null)
-    {
-        $tokenTypes = $this->getTokenTypes();
-        if (null === $tokenType_hint) {
-            foreach ($tokenTypes as $tokenType) {
-                if (true === $this->tryRevokeToken($tokenType, $token, $client)) {
-                    break;
-                }
-            }
-        } elseif (array_key_exists($tokenType_hint, $tokenTypes)) {
-            $tokenType = $tokenTypes[$tokenType_hint];
-            $this->tryRevokeToken($tokenType, $token, $client);
-        } else {
-            $data = ['error' => 'unsupported_tokenType', 'error_description' => sprintf('Token type \'%s\' not supported', $tokenType_hint)];
-
-            return $this->getResponse(501, json_encode($data), $callback);
-        }
-
-        return $this->getResponse(200, '', $callback);
-    }
-
-    /**
-     * @param RevocationTokenTypeInterface $tokenType
-     * @param string                       $token
-     * @param Client                       $client
-     *
-     * @return bool
-     */
-    private function tryRevokeToken(RevocationTokenTypeInterface $tokenType, $token, Client $client)
-    {
-        $result = $tokenType->getToken($token);
-        if ($result instanceof OAuth2TokenInterface) {
-            if ($result->getClientPublicId() === $client->getPublicId()) {
-                $tokenType->revokeToken($result);
-
-                return true;
-            }
-        }
-
-        return false;
-    }
+    abstract protected function getRequestParameters(ServerRequestInterface $request): array;
 }

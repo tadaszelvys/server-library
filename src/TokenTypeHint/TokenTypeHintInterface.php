@@ -9,11 +9,11 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Endpoint\TokenIntrospection;
+namespace OAuth2\TokenTypeHint;
 
-use OAuth2\Model\Client\Client;
+use OAuth2\Model\Token\Token;
 
-interface IntrospectionTokenTypeInterface
+interface TokenTypeHintInterface
 {
     /**
      * @return string
@@ -22,9 +22,19 @@ interface IntrospectionTokenTypeInterface
 
     /**
      * @param string $token
-     * @param Client $client
      *
+     * @return null|Token
+     */
+    public function find(string $token);
+
+    /**
+     * @param Token $token
+     */
+    public function revoke(Token $token);
+
+    /**
+     * @param Token $token
      * @return array
      */
-    public function introspectToken(string $token, Client $client);
+    public function introspect(Token $token): array;
 }

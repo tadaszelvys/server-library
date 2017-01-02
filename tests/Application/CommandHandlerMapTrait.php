@@ -11,6 +11,8 @@
 
 namespace OAuth2\Test\Application;
 
+use OAuth2\Command\AccessToken\RevokeAccessTokenCommand;
+use OAuth2\Command\AccessToken\RevokeAccessTokenCommandHandler;
 use OAuth2\Command\Client\CreateClientCommand;
 use OAuth2\Command\Client\CreateClientCommandHandler;
 use OAuth2\Command\Client\DeleteClientCommand;
@@ -40,6 +42,7 @@ trait CommandHandlerMapTrait
                     CreateClientCommand::class => CreateClientCommandHandler::class,
                     DeleteClientCommand::class => DeleteClientCommandHandler::class,
                     UpdateClientCommand::class => UpdateClientCommandHandler::class,
+                    RevokeAccessTokenCommand::class => RevokeAccessTokenCommandHandler::class,
                 ],
                 $this->getServiceLocatorAwareCallableResolver()
             );

@@ -19,7 +19,7 @@ class ClientSecretPost extends Base
     /**
      * {@inheritdoc}
      */
-    protected function createClientSecret()
+    protected function createClientSecret(): string
     {
         return Base64Url::encode(random_bytes(64));
     }

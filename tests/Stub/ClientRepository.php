@@ -16,6 +16,7 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Client\ClientRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 use Ramsey\Uuid\Uuid;
 
 class ClientRepository implements ClientRepositoryInterface
@@ -24,6 +25,21 @@ class ClientRepository implements ClientRepositoryInterface
      * @var Client[]
      */
     private $clients = [];
+
+    public function __construct()
+    {
+        $this->save(Client::create(
+            ClientId::create('client1'),
+            [
+                'token_endpoint_auth_method' => 'client_secret_basic',
+                'client_secret' => 'secret',
+            ],
+            UserAccount::create(
+                UserAccountId::create('User1'),
+                []
+            )
+        ));
+    }
 
     /**
      * {@inheritdoc}

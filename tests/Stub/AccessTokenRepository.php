@@ -17,15 +17,99 @@ use Jose\Object\JWKSetInterface;*/
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\AccessToken\AccessTokenId;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
+use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
-use OAuth2\Model\ResourceOwner\ResourceOwnerId;
+use OAuth2\Model\RefreshToken\RefreshToken;
+use OAuth2\Model\RefreshToken\RefreshTokenId;
+use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
-class JWTAccessTokenRepository implements AccessTokenRepositoryInterface
+class AccessTokenRepository implements AccessTokenRepositoryInterface
 {
     /**
      * @var AccessToken[]
      */
     private $accessTokens = [];
+
+    public function __construct()
+    {
+        $this->save(AccessToken::create(
+            AccessTokenId::create('ACCESS_TOKEN_#1'),
+            UserAccount::create(
+                UserAccountId::create('User #1'),
+                []
+            ),
+            Client::create(
+                ClientId::create('client1'),
+                [],
+                UserAccount::create(
+                    UserAccountId::create('User #1'),
+                    []
+                )
+            ),
+            [],
+            [],
+            [],
+            new \DateTimeImmutable('now +3600 seconds'),
+            RefreshToken::create(
+                RefreshTokenId::create('REFRESH_TOKEN_#1'),
+                UserAccount::create(
+                    UserAccountId::create('User #1'),
+                    []
+                ),
+                Client::create(
+                    ClientId::create('client1'),
+                    [],
+                    UserAccount::create(
+                        UserAccountId::create('User #1'),
+                        []
+                    )
+                ),
+                [],
+                new \DateTimeImmutable('now +2 days'),
+                []
+            )
+        ));
+
+        $this->save(AccessToken::create(
+            AccessTokenId::create('ACCESS_TOKEN_#2'),
+            UserAccount::create(
+                UserAccountId::create('User #1'),
+                []
+            ),
+            Client::create(
+                ClientId::create('client2'),
+                [],
+                UserAccount::create(
+                    UserAccountId::create('User #1'),
+                    []
+                )
+            ),
+            [],
+            [],
+            [],
+            new \DateTimeImmutable('now +3600 seconds'),
+            RefreshToken::create(
+                RefreshTokenId::create('REFRESH_TOKEN_#1'),
+                UserAccount::create(
+                    UserAccountId::create('User #1'),
+                    []
+                ),
+                Client::create(
+                    ClientId::create('client2'),
+                    [],
+                    UserAccount::create(
+                        UserAccountId::create('User #1'),
+                        []
+                    )
+                ),
+                [],
+                new \DateTimeImmutable('now +2 days'),
+                []
+            )
+        ));
+    }
 
     /**
      * JWTAccessTokenManager constructor.
@@ -156,11 +240,19 @@ class JWTAccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function revoke(AccessToken $accessToken)
     {
-        if (isset($this->accessTokens[$accessToken->getId()->getValue()])) {
+        if ($this->has($accessToken->getId())) {
             unset($this->accessTokens[$accessToken->getId()->getValue()]);
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function has(AccessTokenId $accessTokenId): bool
+    {
+        return array_key_exists($accessTokenId->getValue(), $this->accessTokens);
     }
 
     /**
@@ -171,16 +263,17 @@ class JWTAccessTokenRepository implements AccessTokenRepositoryInterface
         return array_key_exists($tokenId->getValue(), $this->accessTokens) ? $this->accessTokens[$tokenId->getValue()] : $this->loadAccessToken($tokenId);
     }
 
-    public function create(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt)
+    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
     {
         return AccessToken::create(
             AccessTokenId::create(base64_encode(random_bytes(50))),
-            $resourceOwnerId,
-            $clientId,
+            $resourceOwner,
+            $client,
             $parameters,
             $metadatas,
             $scopes,
-            $expiresAt
+            $expiresAt,
+            $refreshToken
         );
     }
 

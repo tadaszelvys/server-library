@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Test\Stub;
+namespace OAuth2\Test\Stub\Event;
 
 use OAuth2\Event\Client\ClientCreatedEvent;
 use OAuth2\Model\Event\EventStoreInterface;

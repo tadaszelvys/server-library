@@ -23,6 +23,7 @@ use OAuth2\Response\Factory\SuccessResponseFactory;
 use OAuth2\Response\OAuth2ExceptionMiddleware;
 use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Test\Stub\AuthenticateResponseFactory;
 
 trait OAuth2ResponseFactoryTrait
 {
@@ -47,6 +48,7 @@ trait OAuth2ResponseFactoryTrait
                 $this->getStreamFactory()
             );
 
+            $this->oauth2ResponseFactory->addResponseFactory(new AuthenticateResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new AccessDeniedResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new BadRequestResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new CreatedResponseFactory());

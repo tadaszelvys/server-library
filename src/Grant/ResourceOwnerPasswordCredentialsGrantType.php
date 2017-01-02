@@ -15,7 +15,6 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
@@ -117,8 +116,9 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
      */
     public function grantAccessToken(ServerRequestInterface $request, Client $client, GrantTypeResponseInterface &$grantTypeResponse)
     {
-        $username = RequestBody::getParameter($request, 'username');
-        $password = RequestBody::getParameter($request, 'password');
+        $parsedBody = $request->getParsedBody();
+        $username = $parsedBody['username'];
+        $password = $parsedBody['password'];
 
         $userAccount = $this->userAccountRepository->getByUsername($username);
         if (null === $userAccount || !$this->userAccountRepository->isPasswordCredentialsValid($userAccount, $password)) {
@@ -132,7 +132,7 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
         }
 
         $grantTypeResponse->setResourceOwnerPublicId($userAccount->getUserPublicId());
-        $grantTypeResponse->setUserAccountPublicId($userAccount->getPublicId());
+        $grantTypeResponse->setUserAccountPublicId($userAccount->getId());
         $grantTypeResponse->setRefreshTokenIssued($this->issueRefreshToken($client));
         $grantTypeResponse->setRefreshTokenScope($grantTypeResponse->getRequestedScope());
     }

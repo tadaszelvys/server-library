@@ -11,12 +11,14 @@
 
 namespace OAuth2\Test\Application;
 
+use OAuth2\Command\AccessToken\RevokeAccessTokenCommandHandler;
 use OAuth2\Command\Client\CreateClientCommandHandler;
 use OAuth2\Command\Client\DeleteClientCommandHandler;
 use OAuth2\Command\Client\UpdateClientCommandHandler;
-use OAuth2\Test\Stub\ClientCreatedEventHandler;
-use OAuth2\Test\Stub\ClientDeletedEventHandler;
-use OAuth2\Test\Stub\ClientUpdatedEventHandler;
+use OAuth2\Test\Stub\Event\AccessTokenRevokedEventHandler;
+use OAuth2\Test\Stub\Event\ClientCreatedEventHandler;
+use OAuth2\Test\Stub\Event\ClientDeletedEventHandler;
+use OAuth2\Test\Stub\Event\ClientUpdatedEventHandler;
 use OAuth2\Test\Stub\Container;
 
 trait ContainerTrait
@@ -32,6 +34,10 @@ trait ContainerTrait
     abstract public function getUpdateClientCommandHandler(): UpdateClientCommandHandler;
 
     abstract public function getClientUpdatedEventHandler(): ClientUpdatedEventHandler;
+
+    abstract public function getRevokeAccessTokenCommandHandler(): RevokeAccessTokenCommandHandler;
+
+    abstract public function getAccessTokenRevokedEventHandler(): AccessTokenRevokedEventHandler;
 
     /**
      * @var null|Container
@@ -49,9 +55,13 @@ trait ContainerTrait
             $this->container->add($this->getCreateClientCommandHandler());
             $this->container->add($this->getDeleteClientCommandHandler());
             $this->container->add($this->getUpdateClientCommandHandler());
+
             $this->container->add($this->getClientCreatedEventHandler());
             $this->container->add($this->getClientDeletedEventHandler());
             $this->container->add($this->getClientUpdatedEventHandler());
+
+            $this->container->add($this->getRevokeAccessTokenCommandHandler());
+            $this->container->add($this->getAccessTokenRevokedEventHandler());
         }
 
         return $this->container;

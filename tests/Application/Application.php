@@ -16,6 +16,7 @@ final class Application
     use OAuth2ResponseFactoryTrait;
     use ClientRepositoryTrait;
     use ClientRegistrationEndpointTrait;
+    use ClientAuthenticationMiddlewareTrait;
     use ClientEventHandlerTrait;
     use CommandBusTrait;
     use CommandHandlerMapTrait;
@@ -41,4 +42,8 @@ final class Application
     use InitialAccessTokenTrait;
     use JwtTrait;
     use ClientConfigurationEndpointTrait;
+    use TokenRevocationEndpointTrait;
+    use AccessTokenRepositoryTrait;
+    use AccessTokenCommandHandlerTrait;
+    use AccessTokenEventHandlerTrait;
 }

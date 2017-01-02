@@ -12,30 +12,17 @@
 namespace OAuth2\Model\AccessToken;
 
 use Assert\Assertion;
-use OAuth2\Model\Client\ClientId;
-use OAuth2\Model\ResourceOwner\ResourceOwnerId;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\RefreshToken\RefreshToken;
+use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\Token\Token;
 
-final class AccessToken
+final class AccessToken extends Token
 {
     /**
      * @var AccessTokenId
      */
     private $accessTokenId;
-
-    /**
-     * @var \DateTimeImmutable
-     */
-    private $expiresAt;
-
-    /**
-     * @var ResourceOwnerId
-     */
-    private $resourceOwnerId;
-
-    /**
-     * @var ClientId
-     */
-    private $clientId;
 
     /**
      * @var array
@@ -53,41 +40,45 @@ final class AccessToken
     private $scopes;
 
     /**
-     * AccessToken constructor.
-     *
-     * @param AccessTokenId      $accessTokenId
-     * @param ResourceOwnerId    $resourceOwnerId
-     * @param ClientId           $clientId
-     * @param array              $parameters
-     * @param array              $metadatas
-     * @param string[]           $scopes
-     * @param \DateTimeImmutable $expiresAt
+     * @var null|RefreshToken
      */
-    private function __construct(AccessTokenId $accessTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt)
+    private $refreshToken;
+
+    /**
+     * AccessToken constructor.
+     * @param AccessTokenId $accessTokenId
+     * @param ResourceOwner $resourceOwner
+     * @param Client $client
+     * @param array $parameters
+     * @param array $metadatas
+     * @param array $scopes
+     * @param \DateTimeImmutable $expiresAt
+     * @param RefreshToken|null $refreshToken
+     */
+    protected function __construct(AccessTokenId $accessTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
     {
+        parent::__construct($resourceOwner, $client, $expiresAt);
         $this->accessTokenId = $accessTokenId;
-        $this->resourceOwnerId = $resourceOwnerId;
-        $this->clientId = $clientId;
-        $this->expiresAt = $expiresAt;
         $this->parameters = $parameters;
         $this->metadatas = $metadatas;
         $this->scopes = $scopes;
+        $this->refreshToken = $refreshToken;
     }
 
     /**
-     * @param AccessTokenId      $accessTokenId
-     * @param ResourceOwnerId    $resourceOwnerId
-     * @param ClientId           $clientId
-     * @param array              $parameters
-     * @param array              $metadatas
-     * @param string[]           $scopes
+     * @param AccessTokenId $accessTokenId
+     * @param ResourceOwner $resourceOwner
+     * @param Client $client
+     * @param array $parameters
+     * @param array $metadatas
+     * @param array $scopes
      * @param \DateTimeImmutable $expiresAt
-     *
+     * @param RefreshToken|null $refreshToken
      * @return AccessToken
      */
-    public static function create(AccessTokenId $accessTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt)
+    public static function create(AccessTokenId $accessTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
     {
-        return new self($accessTokenId, $resourceOwnerId, $clientId, $parameters, $metadatas, $scopes, $expiresAt);
+        return new self($accessTokenId, $resourceOwner, $client, $parameters, $metadatas, $scopes, $expiresAt, $refreshToken);
     }
 
     /**
@@ -96,43 +87,6 @@ final class AccessToken
     public function getId(): AccessTokenId
     {
         return $this->accessTokenId;
-    }
-
-    /**
-     * @return ResourceOwnerId
-     */
-    public function getResourceOwnerId(): ResourceOwnerId
-    {
-        return $this->resourceOwnerId;
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function getExpiresAt(): \DateTimeImmutable
-    {
-        return $this->expiresAt;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasExpired(): bool
-    {
-        return $this->expiresAt->getTimestamp() < time();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExpiresIn(): int
-    {
-        $expiresAt = $this->expiresAt;
-        if (null === $expiresAt) {
-            return 0;
-        }
-
-        return $this->expiresAt->getTimestamp() - time() < 0 ? 0 : $this->expiresAt->getTimestamp() - time();
     }
 
     /**
@@ -200,14 +154,6 @@ final class AccessToken
     }
 
     /**
-     * @return ClientId
-     */
-    public function getClientId(): ClientId
-    {
-        return $this->clientId;
-    }
-
-    /**
      * @return array
      */
     public function getParameters(): array
@@ -269,5 +215,31 @@ final class AccessToken
         Assertion::true($this->hasMetadata($key), sprintf('The metadata \'%s\' does not exist.', $key));
 
         return $this->metadatas;
+    }
+
+    /**
+     * @return null|RefreshToken
+     */
+    public function getRefreshToken()
+    {
+        return $this->refreshToken;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        $values = [
+            'access_token' => $this->getId()->getValue(),
+            'expires_in' => $this->getExpiresIn(),
+        ];
+        if (!empty($this->getScopes())) {
+            $values['scope'] = implode(' ', $this->getScopes());
+        }
+        if (!empty($this->getRefreshToken())) {
+            $values['refresh_token'] = $this->getRefreshToken()->getId()->getValue();
+        }
+        return $values + $this->getParameters();
     }
 }

@@ -43,6 +43,13 @@ interface AccessTokenRepositoryInterface
     /**
      * @param AccessTokenId $accessTokenId The access token ID
      *
+     * @return bool
+     */
+    public function has(AccessTokenId $accessTokenId): bool;
+
+    /**
+     * @param AccessTokenId $accessTokenId The access token ID
+     *
      * @return AccessToken|null Return the access token or null if the argument is not a valid access token
      */
     public function find(AccessTokenId $accessTokenId);

@@ -12,9 +12,9 @@
 namespace OAuth2\Test\Application;
 
 use OAuth2\Model\Event\EventStoreInterface;
-use OAuth2\Test\Stub\ClientCreatedEventHandler;
-use OAuth2\Test\Stub\ClientDeletedEventHandler;
-use OAuth2\Test\Stub\ClientUpdatedEventHandler;
+use OAuth2\Test\Stub\Event\ClientCreatedEventHandler;
+use OAuth2\Test\Stub\Event\ClientDeletedEventHandler;
+use OAuth2\Test\Stub\Event\ClientUpdatedEventHandler;
 
 trait ClientEventHandlerTrait
 {

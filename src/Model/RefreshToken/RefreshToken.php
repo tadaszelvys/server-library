@@ -13,9 +13,10 @@ namespace OAuth2\Model\RefreshToken;
 
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\Client\Client;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\Token\Token;
 
-class RefreshToken
+class RefreshToken extends Token
 {
     /**
      * @var RefreshTokenId
@@ -28,55 +29,44 @@ class RefreshToken
     private $accessTokens;
 
     /**
-     * @var \DateTimeImmutable
-     */
-    private $expiresAt;
-
-    /**
-     * @var UserAccount
-     */
-    private $userAccount;
-
-    /**
-     * @var Client
-     */
-    private $client;
-
-    /**
      * @var array
      */
     private $parameters;
 
     /**
-     * RefreshToken constructor.
-     *
-     * @param RefreshTokenId     $refreshTokenId
-     * @param UserAccount        $userAccount
-     * @param Client             $client
-     * @param array              $parameters
-     * @param \DateTimeImmutable $expiresAt
+     * @var string[]
      */
-    private function __construct(RefreshTokenId $refreshTokenId, UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt)
+    private $scopes;
+
+    /**
+     * RefreshToken constructor.
+     * @param RefreshTokenId $refreshTokenId
+     * @param ResourceOwner $resourceOwner
+     * @param Client $client
+     * @param array $parameters
+     * @param \DateTimeImmutable $expiresAt
+     * @param array $scopes
+     */
+    protected function __construct(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes)
     {
+        parent::__construct($resourceOwner, $client, $expiresAt);
         $this->refreshTokenId = $refreshTokenId;
-        $this->userAccount = $userAccount;
-        $this->client = $client;
-        $this->expiresAt = $expiresAt;
         $this->parameters = $parameters;
+        $this->scopes = $scopes;
     }
 
     /**
-     * @param RefreshTokenId     $refreshTokenId
-     * @param UserAccount        $userAccount
-     * @param Client             $client
-     * @param array              $parameters
+     * @param RefreshTokenId $refreshTokenId
+     * @param ResourceOwner $resourceOwner
+     * @param Client $client
+     * @param array $parameters
      * @param \DateTimeImmutable $expiresAt
-     *
+     * @param string[] $scopes
      * @return RefreshToken
      */
-    public static function create(RefreshTokenId $refreshTokenId, UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt)
+    public static function create(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes)
     {
-        return new self($refreshTokenId, $userAccount, $client, $parameters, $expiresAt);
+        return new self($refreshTokenId, $resourceOwner, $client, $parameters, $expiresAt, $scopes);
     }
 
     /**
@@ -100,7 +90,7 @@ class RefreshToken
     /**
      * @return RefreshTokenId
      */
-    public function getRefreshTokenId(): RefreshTokenId
+    public function getId(): RefreshTokenId
     {
         return $this->refreshTokenId;
     }
@@ -114,34 +104,26 @@ class RefreshToken
     }
 
     /**
-     * @return \DateTimeImmutable
-     */
-    public function getExpiresAt(): \DateTimeImmutable
-    {
-        return $this->expiresAt;
-    }
-
-    /**
-     * @return UserAccount
-     */
-    public function getUserAccount(): UserAccount
-    {
-        return $this->userAccount;
-    }
-
-    /**
-     * @return Client
-     */
-    public function getClient(): Client
-    {
-        return $this->client;
-    }
-
-    /**
      * @return array
      */
     public function getParameters(): array
     {
         return $this->parameters;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getScopes(): array
+    {
+        return $this->scopes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return $this->getId()->getValue();
     }
 }

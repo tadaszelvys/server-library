@@ -12,10 +12,11 @@
 namespace OAuth2\Model\AuthCode;
 
 use Assert\Assertion;
-use OAuth2\Model\Client\ClientId;
-use OAuth2\Model\UserAccount\UserAccountId;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\Token\Token;
+use OAuth2\Model\UserAccount\UserAccount;
 
-final class AuthCode
+final class AuthCode extends Token
 {
     /**
      * @var bool
@@ -38,16 +39,6 @@ final class AuthCode
     private $scopes;
 
     /**
-     * @var ClientId
-     */
-    private $clientId;
-
-    /**
-     * @var UserAccountId
-     */
-    private $userAccountId;
-
-    /**
      * @var array
      */
     private $parameters;
@@ -58,29 +49,22 @@ final class AuthCode
     private $authCodeId;
 
     /**
-     * @var \DateTimeImmutable
-     */
-    private $expiresAt;
-
-    /**
      * AuthCode constructor.
      *
      * @param AuthCodeId         $authCodeId
-     * @param ClientId           $clientId
-     * @param UserAccountId      $userAccountId
+     * @param Client           $client
+     * @param UserAccount      $userAccount
      * @param array              $queryParameters
      * @param \DateTimeImmutable $expiresAt
      * @param array              $parameters
      * @param array              $scopes
      * @param array              $metadatas
      */
-    private function __construct(AuthCodeId $authCodeId, ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
+    protected function __construct(AuthCodeId $authCodeId, Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
+        parent::__construct($userAccount, $client, $expiresAt);
         $this->authCodeId = $authCodeId;
-        $this->clientId = $clientId;
-        $this->userAccountId = $userAccountId;
         $this->queryParameters = $queryParameters;
-        $this->expiresAt = $expiresAt;
         $this->parameters = $parameters;
         $this->scopes = $scopes;
         $this->metadatas = $metadatas;
@@ -88,8 +72,8 @@ final class AuthCode
 
     /**
      * @param AuthCodeId         $authCodeId
-     * @param ClientId           $clientId
-     * @param UserAccountId      $userAccountId
+     * @param Client           $client
+     * @param UserAccount      $userAccount
      * @param array              $queryParameters
      * @param \DateTimeImmutable $expiresAt
      * @param array              $parameters
@@ -98,54 +82,17 @@ final class AuthCode
      *
      * @return AuthCode
      */
-    public static function create(AuthCodeId $authCodeId, ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
+    public static function create(AuthCodeId $authCodeId, Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
-        return new self($authCodeId, $clientId, $userAccountId, $queryParameters, $expiresAt, $parameters, $scopes, $metadatas);
+        return new self($authCodeId, $client, $userAccount, $queryParameters, $expiresAt, $parameters, $scopes, $metadatas);
     }
 
     /**
      * @return AuthCodeId
      */
-    public function getAuthCodeId(): AuthCodeId
+    public function getId(): AuthCodeId
     {
         return $this->authCodeId;
-    }
-
-    /**
-     * @return UserAccountId
-     */
-    public function getUserAccountId(): UserAccountId
-    {
-        return $this->userAccountId;
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function getExpiresAt()
-    {
-        return $this->expiresAt;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasExpired(): bool
-    {
-        return $this->expiresAt->getTimestamp() < time();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExpiresIn(): int
-    {
-        $expiresAt = $this->expiresAt;
-        if (null === $expiresAt) {
-            return 0;
-        }
-
-        return $this->expiresAt->getTimestamp() - time() < 0 ? 0 : $this->expiresAt->getTimestamp() - time();
     }
 
     /**
@@ -220,14 +167,6 @@ final class AuthCode
     public function hasParameter(string $key): bool
     {
         return array_key_exists($key, $this->parameters);
-    }
-
-    /**
-     * @return ClientId
-     */
-    public function getClientId(): ClientId
-    {
-        return $this->clientId;
     }
 
     /**
@@ -424,5 +363,13 @@ final class AuthCode
     public function hasQueryParams(string $key): bool
     {
         return array_key_exists($key, $this->getQueryParams());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return $this->getId()->getValue();
     }
 }

@@ -9,12 +9,12 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Test\Stub;
+namespace OAuth2\Test\Stub\Event;
 
-use OAuth2\Event\Client\ClientDeletedEvent;
+use OAuth2\Event\Client\ClientUpdatedEvent;
 use OAuth2\Model\Event\EventStoreInterface;
 
-final class ClientDeletedEventHandler
+final class ClientUpdatedEventHandler
 {
     /**
      * @var EventStoreInterface
@@ -22,7 +22,7 @@ final class ClientDeletedEventHandler
     private $eventStore;
 
     /**
-     * ClientDeletedEventHandler constructor.
+     * ClientUpdatedEventHandler constructor.
      *
      * @param EventStoreInterface $eventStore
      */
@@ -32,9 +32,9 @@ final class ClientDeletedEventHandler
     }
 
     /**
-     * @param ClientDeletedEvent $event
+     * @param ClientUpdatedEvent $event
      */
-    public function handle(ClientDeletedEvent $event)
+    public function handle(ClientUpdatedEvent $event)
     {
         $this->eventStore->save($event);
     }

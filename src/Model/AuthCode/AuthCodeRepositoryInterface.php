@@ -30,6 +30,12 @@ interface AuthCodeRepositoryInterface
     public function create(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas);
 
     /**
+     * @param AuthCodeId $authCodeId
+     * @return bool
+     */
+    public function has(AuthCodeId $authCodeId): bool;
+
+    /**
      * @param AuthCode $authCode
      */
     public function save(AuthCode $authCode);

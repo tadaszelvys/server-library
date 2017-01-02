@@ -14,7 +14,6 @@ namespace OAuth2\TokenEndpointAuthMethod;
 use Assert\Assertion;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
-use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
@@ -45,13 +44,11 @@ abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
      */
     public function findClientId(ServerRequestInterface $request, &$clientCredentials = null)
     {
-        $clientId = RequestBody::getParameter($request, 'clientId');
-        $clientSecret = RequestBody::getParameter($request, 'client_secret');
+        $parameters = $request->getParsedBody();
+        if (array_key_exists('client_id', $parameters) && array_key_exists('client_secret', $parameters)) {
+            $clientCredentials = $parameters['client_secret'];
 
-        if (!empty($clientId) && !empty($clientSecret)) {
-            $clientCredentials = $clientSecret;
-
-            return ClientId::create($clientId);
+            return ClientId::create($parameters['client_id']);
         }
     }
 
