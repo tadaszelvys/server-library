@@ -9,27 +9,17 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-use Behat\Gherkin\Node\PyStringNode;
-use Behat\Behat\Tester\Exception\PendingException;
 use Assert\Assertion;
 use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
 
 class RevocationContext extends BaseContext
 {
-    /**
-     * @var null|\Psr\Http\Message\ResponseInterface
-     */
-    private $response = null;
-
-    /**
-     * @var null|array
-     */
-    private $error = null;
+    use ResponseTrait;
 
     /**
      * @Given a client sends a POST revocation request but it is not authenticated
      */
-    public function aClientSendsARevocationRequestButItIsNotAuthenticated()
+    public function aClientSendsAPostRevocationRequestButItIsNotAuthenticated()
     {
         /**
          * @var \Psr\Http\Message\ServerRequestInterface
@@ -39,16 +29,28 @@ class RevocationContext extends BaseContext
         $request = $request->withParsedBody([]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->response = $this->getApplication()->getTokenRevocationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+    }
+
+    /**
+     * @Given a client sends a GET revocation request but it is not authenticated
+     */
+    public function aClientSendsAGetRevocationRequestButItIsNotAuthenticated()
+    {
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withQueryParams([]);
+
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
      * @Given a client sends a POST revocation request without token parameter
      */
-    public function aClientSendsARevocationRequestWithoutTokenParameter()
+    public function aClientSendsAPostRevocationRequestWithoutTokenParameter()
     {
         /**
          * @var \Psr\Http\Message\ServerRequestInterface
@@ -60,16 +62,30 @@ class RevocationContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->response = $this->getApplication()->getTokenRevocationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+    }
+
+    /**
+     * @Given a client sends a GET revocation request without token parameter
+     */
+    public function aClientSendsAGetRevocationRequestWithoutTokenParameter()
+    {
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withQueryParams([
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
      * @Given a client sends a POST revocation request without token parameter with a callback parameter
      */
-    public function aClientSendsARevocationRequestWithoutTokenParameterWithACallbackParameter()
+    public function aClientSendsAPostRevocationRequestWithoutTokenParameterWithACallbackParameter()
     {
         /**
          * @var \Psr\Http\Message\ServerRequestInterface
@@ -82,10 +98,25 @@ class RevocationContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->response = $this->getApplication()->getTokenRevocationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+    }
+
+    /**
+     * @Given a client sends a GET revocation request without token parameter with a callback parameter
+     */
+    public function aClientSendsAGetRevocationRequestWithoutTokenParameterWithACallbackParameter()
+    {
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withQueryParams([
+            'callback' => 'foo'
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -104,10 +135,25 @@ class RevocationContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->response = $this->getApplication()->getTokenRevocationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+    }
+
+    /**
+     * @Given a client sends a valid GET revocation request
+     */
+    public function aClientSendsAValidGetRevocationRequest()
+    {
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withQueryParams([
+            'token' => 'ACCESS_TOKEN_#1'
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -126,77 +172,25 @@ class RevocationContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->response = $this->getApplication()->getTokenRevocationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
-     * @Then the response code is :code
+     * @Given a client sends a valid GET revocation request but the token owns to another client
      */
-    public function theResponseCodeIs($code)
+    public function aClientSendsAValidGetRevocationRequestButTheTokenOwnsToAnotherClient()
     {
-        Assertion::eq((int) $code, $this->response->getStatusCode());
-    }
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withQueryParams([
+            'token' => 'ACCESS_TOKEN_#2'
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-    /**
-     * @Then the response contains
-     */
-    public function theResponseContains(PyStringNode $response)
-    {
-        Assertion::eq($response->getRaw(), (string) $this->response->getBody()->getContents());
-    }
-
-    /**
-     * @Then the response contains an error with code :code
-     */
-    public function theResponseContainsAnError($code)
-    {
-        Assertion::eq((int) $code, $this->response->getStatusCode());
-        Assertion::greaterOrEqualThan($this->response->getStatusCode(), 400);
-        if (401 === $this->response->getStatusCode()) {
-            $headers = $this->response->getHeader('WWW-Authenticate');
-            Assertion::greaterOrEqualThan(count($headers), 0);
-            $header = $headers[0];
-            preg_match_all('/(\w+\*?)="((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+)/', substr($header, strpos($header, ' ')), $matches, PREG_SET_ORDER);
-            if (!is_array($matches)) {
-                throw new \InvalidArgumentException('Unable to parse header');
-            }
-            foreach ($matches as $match) {
-                $this->error[$match[1]] = $match[2];
-            }
-        } else {
-            $response = $this->response->getBody()->getContents();
-            $json = json_decode($response, true);
-            Assertion::isArray($json);
-            Assertion::keyExists($json, 'error');
-            $this->error = $json;
-        }
-    }
-
-    /**
-     * @Then the error is :error
-     *
-     * @param string $error
-     */
-    public function theErrorIs($error)
-    {
-        Assertion::notNull($this->error);
-        Assertion::keyExists($this->error, 'error');
-        Assertion::eq($error, $this->error['error']);
-    }
-
-    /**
-     * @Then the error description is :errorDescription
-     *
-     * @param string $errorDescription
-     */
-    public function theErrorDescriptionIs($errorDescription)
-    {
-        Assertion::notNull($this->error);
-        Assertion::keyExists($this->error, 'error_description');
-        Assertion::eq($errorDescription, $this->error['error_description']);
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**

@@ -23,20 +23,12 @@ use OAuth2\Model\UserAccount\UserAccountId;
  */
 class ClientContext extends BaseContext
 {
-    /**
-     * @var null|\Psr\Http\Message\ResponseInterface
-     */
-    private $response = null;
+    use ResponseTrait;
 
     /**
      * @var null|array
      */
     private $client = null;
-
-    /**
-     * @var null|array
-     */
-    private $error = null;
 
     /**
      * @Given a valid client registration request is received
@@ -54,10 +46,7 @@ class ClientContext extends BaseContext
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer INITIAL_ACCESS_TOKEN_VALID');
 
-        $this->response = $this->getApplication()->getClientRegistrationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -76,10 +65,7 @@ class ClientContext extends BaseContext
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer INITIAL_ACCESS_TOKEN_EXPIRED');
 
-        $this->response = $this->getApplication()->getClientRegistrationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -97,10 +83,7 @@ class ClientContext extends BaseContext
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->response = $this->getApplication()->getClientRegistrationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -119,10 +102,7 @@ class ClientContext extends BaseContext
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer ***INVALID_INITIAL_ACCESS_TOKEN***');
 
-        $this->response = $this->getApplication()->getClientRegistrationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -142,10 +122,7 @@ class ClientContext extends BaseContext
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer INITIAL_ACCESS_TOKEN_VALID');
 
-        $this->response = $this->getApplication()->getClientRegistrationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -182,10 +159,7 @@ class ClientContext extends BaseContext
         );
         $request = $request->withAttribute('client', $client);
 
-        $this->response = $this->getApplication()->getClientConfigurationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -221,10 +195,7 @@ class ClientContext extends BaseContext
         );
         $request = $request->withAttribute('client', $client);
 
-        $this->response = $this->getApplication()->getClientConfigurationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -261,10 +232,7 @@ class ClientContext extends BaseContext
         );
         $request = $request->withAttribute('client', $client);
 
-        $this->response = $this->getApplication()->getClientConfigurationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -302,10 +270,7 @@ class ClientContext extends BaseContext
         $this->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->response = $this->getApplication()->getClientConfigurationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -342,10 +307,7 @@ class ClientContext extends BaseContext
         $this->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->response = $this->getApplication()->getClientConfigurationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -385,10 +347,7 @@ class ClientContext extends BaseContext
         $this->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->response = $this->getApplication()->getClientConfigurationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -429,10 +388,7 @@ class ClientContext extends BaseContext
         $this->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->response = $this->getApplication()->getClientConfigurationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
+        $this->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -440,7 +396,7 @@ class ClientContext extends BaseContext
      */
     public function theResponseContainsTheUpdatedClient()
     {
-        $response = (string) $this->response->getBody()->getContents();
+        $response = (string) $this->getResponse()->getBody()->getContents();
         $json = json_decode($response, true);
         Assertion::isArray($json);
         Assertion::keyExists($json, 'client_id');
@@ -482,18 +438,7 @@ class ClientContext extends BaseContext
         $this->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->response = $this->getApplication()->getClientConfigurationPipe()->dispatch($request);
-        if ($this->response->getBody()->isSeekable()) {
-            $this->response->getBody()->rewind();
-        }
-    }
-
-    /**
-     * @Then the response code is :code
-     */
-    public function theResponseCodeIs($code)
-    {
-        Assertion::eq((int) $code, $this->response->getStatusCode());
+        $this->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -549,7 +494,7 @@ class ClientContext extends BaseContext
      */
     public function theResponseContainsAClient()
     {
-        $response = $this->response->getBody()->getContents();
+        $response = $this->getResponse()->getBody()->getContents();
         $json = json_decode($response, true);
         Assertion::isArray($json);
         Assertion::keyExists($json, 'client_id');
@@ -563,47 +508,6 @@ class ClientContext extends BaseContext
     {
         $events = $this->getApplication()->getEventStore()->all();
         Assertion::eq(0, count($events));
-    }
-
-    /**
-     * @Then the response contains an error with code :code
-     */
-    public function theResponseContainsAnError($code)
-    {
-        Assertion::eq((int) $code, $this->response->getStatusCode());
-        Assertion::greaterOrEqualThan($this->response->getStatusCode(), 400);
-        if (401 === $this->response->getStatusCode()) {
-        } else {
-            $response = $this->response->getBody()->getContents();
-            $json = json_decode($response, true);
-            Assertion::isArray($json);
-            Assertion::keyExists($json, 'error');
-            $this->error = $json;
-        }
-    }
-
-    /**
-     * @Then the error is :error
-     *
-     * @param string $error
-     */
-    public function theErrorIs($error)
-    {
-        Assertion::notNull($this->error);
-        Assertion::keyExists($this->error, 'error');
-        Assertion::eq($error, $this->error['error']);
-    }
-
-    /**
-     * @Then the error description is :errorDescription
-     *
-     * @param string $errorDescription
-     */
-    public function theErrorDescriptionIs($errorDescription)
-    {
-        Assertion::notNull($this->error);
-        Assertion::keyExists($this->error, 'error_description');
-        Assertion::eq($errorDescription, $this->error['error_description']);
     }
 
     /**
