@@ -20,6 +20,8 @@ final class TokenRevocationPostEndpoint extends TokenRevocationEndpoint
      */
     protected function getRequestParameters(ServerRequestInterface $request): array
     {
-        return $request->getParsedBody() ?? [];
+        $parameters = $request->getParsedBody() ?? [];
+
+        return array_intersect_key($parameters, array_flip(['token', 'token_type_hint']));
     }
 }

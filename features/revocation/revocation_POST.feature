@@ -18,11 +18,9 @@ Feature: A client request an access token
 
   Scenario: The token parameter is missing and a callback is set
     Given a client sends a POST revocation request without token parameter with a callback parameter
-    Then the response code is 400
-    And the response contains
-    """
-    foo({"error":"invalid_request","error_description":"The parameter 'token' is missing."})
-    """
+    Then the response contains an error with code 400
+    And the error is "invalid_request"
+    And the error description is "The parameter 'token' is missing."
     And no token revocation event is thrown
 
   Scenario: The request is valid and the access token is revoked
@@ -35,4 +33,16 @@ Feature: A client request an access token
     Then the response contains an error with code 400
     And the error is "invalid_request"
     And the error description is "The parameter 'token' is invalid."
+    And no token revocation event is thrown
+
+  Scenario: The token type hint is not supported
+    Given a client sends a POST revocation request but the token type hint is not supported
+    Then the response contains an error with code 400
+    And the error is "unsupported_token_type"
+    And the error description is "The token type hint 'bad_hint' is not supported. Please use one of the following values: access_token, refresh_token."
+    And no token revocation event is thrown
+
+  Scenario: The token type hint is supported but the token does not exist or expired
+    Given a client sends a POST revocation request but the token does not exist or expired
+    Then the response code is 200
     And no token revocation event is thrown

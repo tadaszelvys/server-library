@@ -36,3 +36,24 @@ Feature: A client request an access token
     And the error is "invalid_request"
     And the error description is "The parameter 'token' is invalid."
     And no token revocation event is thrown
+
+  Scenario: The token type hint is not supported
+    Given a client sends a GET revocation request but the token type hint is not supported
+    Then the response contains an error with code 400
+    And the error is "unsupported_token_type"
+    And the error description is "The token type hint 'bad_hint' is not supported. Please use one of the following values: access_token, refresh_token."
+    And no token revocation event is thrown
+
+  Scenario: The token type hint is supported but the token does not exist or expired
+    Given a client sends a GET revocation request but the token does not exist or expired
+    Then the response code is 200
+    And no token revocation event is thrown
+
+  Scenario: The token type hint is supported but the token does not exist or expired (with callback)
+    Given a client sends a GET revocation request with callback but the token does not exist or expired
+    Then the response code is 200
+    And the response contains
+    """
+    callback()
+    """
+    And no token revocation event is thrown

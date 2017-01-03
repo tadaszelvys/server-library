@@ -17,50 +17,57 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintInterface;
+use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response;
 
 abstract class TokenRevocationEndpoint implements MiddlewareInterface
 {
     /**
-     * @var TokenTypeHintInterface[]
+     * @var TokenTypeHintManagerInterface
      */
-    private $tokenTypeHints = [];
+    private $tokenTypeHintManager;
 
     /**
-     * @param TokenTypeHintInterface $tokenTypeHint
+     * TokenRevocationEndpoint constructor.
+     * @param TokenTypeHintManagerInterface $tokenTypeHintManager
      */
-    public function addTokenTypeHint(TokenTypeHintInterface $tokenTypeHint)
+    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager)
     {
-        $this->tokenTypeHints[$tokenTypeHint->getTokenTypeHint()] = $tokenTypeHint;
+        $this->tokenTypeHintManager = $tokenTypeHintManager;
     }
 
     /**
-     * @return TokenTypeHintInterface[]
+     * @return TokenTypeHintManagerInterface
      */
-    protected function getTokenTypeHints()
+    protected function getTokenTypeHintManager(): TokenTypeHintManagerInterface
     {
-        return $this->tokenTypeHints;
+        return $this->tokenTypeHintManager;
     }
 
     /**
      * @param string $tokenTypeHint
-     * @return TokenTypeHintInterface
+     * @return TokenTypeHintInterface[]
      * @throws OAuth2Exception
      */
-    protected function getTokenTypeHint(string $tokenTypeHint): TokenTypeHintInterface
+    protected function getTokenTypeHint(string $tokenTypeHint): array
     {
-        if (!array_key_exists($tokenTypeHint, $this->getTokenTypeHints())) {
+        $tokenTypeHints = $this->getTokenTypeHintManager()->getTokenTypeHints();
+        if (!array_key_exists($tokenTypeHint, $tokenTypeHints)) {
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values:  %s', $tokenTypeHint, implode(' ', array_keys($this->getTokenTypeHints()))),
+                    'error' => 'unsupported_token_type',
+                    'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values: %s.', $tokenTypeHint, implode(', ', array_keys($tokenTypeHints))),
                 ]
             );
         }
 
-        return $this->tokenTypeHints[$tokenTypeHint];
+        $key = array_search($tokenTypeHint, $tokenTypeHints);
+        unset($tokenTypeHints[$key]);
+        array_unshift($tokenTypeHints, $tokenTypeHint);
+
+        return $tokenTypeHints;
     }
 
     /**
@@ -72,13 +79,13 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
         try{
             $client = $this->getClient($request);
             $token = $this->getToken($request);
-            $hints = $this->getHints($request);
+            $hints = $this->getTokenTypeHints($request);
 
             foreach ($hints as $hint) {
-                $token = $hint->find($token);
-                if (null !== $token) {
-                    if ($client->getId()->getValue() === $token->getClient()->getId()->getValue()) {
-                        $hint->revoke($token);
+                $result = $hint->find($token);
+                if (null !== $result) {
+                    if ($client->getId()->getValue() === $result->getClient()->getId()->getValue()) {
+                        $hint->revoke($result);
 
                         return $this->getResponse(200, '', $callback);
                     } else {
@@ -93,14 +100,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
                 }
             }
-
-            throw new OAuth2Exception(
-                400,
-                [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => 'The parameter \'token\' is invalid.',
-                ]
-            );
+            return $this->getResponse(200, '', $callback);
         } catch (OAuth2Exception $e) {
             return $this->getResponse($e->getCode(), json_encode($e->getData()), $callback);
         }
@@ -170,15 +170,31 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
     /**
      * @param ServerRequestInterface $request
      * @return TokenTypeHintInterface[]
+     * @throws OAuth2Exception
      */
-    protected function getHints(ServerRequestInterface $request): array
+    protected function getTokenTypeHints(ServerRequestInterface $request): array
     {
         $params = $this->getRequestParameters($request);
+        $tokenTypeHints = $this->getTokenTypeHintManager()->getTokenTypeHints();
+
         if (array_key_exists('token_type_hint', $params)) {
-            return [$this->getTokenTypeHint($params['token_type_hint'])];
+            $tokenTypeHint = $params['token_type_hint'];
+            if (!array_key_exists($params['token_type_hint'], $tokenTypeHints)) {
+                throw new OAuth2Exception(
+                    400,
+                    [
+                        'error' => 'unsupported_token_type',
+                        'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values: %s.', $params['token_type_hint'], implode(', ', array_keys($tokenTypeHints))),
+                    ]
+                );
+            }
+
+            $hint = $tokenTypeHints[$tokenTypeHint];
+            unset($tokenTypeHints[$tokenTypeHint]);
+            $tokenTypeHints = [$tokenTypeHint => $hint]+$tokenTypeHints;
         }
 
-        return $this->getTokenTypeHints();
+        return $tokenTypeHints;
     }
 
     /**

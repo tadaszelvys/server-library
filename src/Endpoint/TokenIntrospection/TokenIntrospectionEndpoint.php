@@ -11,36 +11,62 @@
 
 namespace OAuth2\Endpoint\TokenIntrospection;
 
-use Assert\Assertion;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use OAuth2\Endpoint\TokenType\IntrospectionTokenTypeInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\TokenTypeHint\TokenTypeHintInterface;
+use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class TokenIntrospectionEndpoint implements MiddlewareInterface
+final class TokenIntrospectionEndpoint implements MiddlewareInterface
 {
     /**
-     * @var IntrospectionTokenTypeInterface[]
+     * @var TokenTypeHintManagerInterface
      */
-    private $tokenTypes = [];
+    private $tokenTypeHintManager;
 
     /**
-     * @param IntrospectionTokenTypeInterface $tokenType
+     * TokenIntrospectionEndpoint constructor.
+     * @param TokenTypeHintManagerInterface $tokenTypeHintManager
      */
-    public function addIntrospectionTokenType(IntrospectionTokenTypeInterface $tokenType)
+    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager)
     {
-        $this->tokenTypes[$tokenType->getTokenTypeHint()] = $tokenType;
+        $this->tokenTypeHintManager = $tokenTypeHintManager;
     }
 
     /**
-     * @return IntrospectionTokenTypeInterface[]
+     * @return TokenTypeHintManagerInterface
      */
-    private function getTokenTypes()
+    protected function getTokenTypeHintManager(): TokenTypeHintManagerInterface
     {
-        return $this->tokenTypes;
+        return $this->tokenTypeHintManager;
+    }
+
+    /**
+     * @param string $tokenTypeHint
+     * @return TokenTypeHintInterface[]
+     * @throws OAuth2Exception
+     */
+    protected function getTokenTypeHint(string $tokenTypeHint): array
+    {
+        $tokenTypeHints = $this->getTokenTypeHintManager()->getTokenTypeHints();
+        if (!array_key_exists($tokenTypeHint, $tokenTypeHints)) {
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => 'unsupported_token_type',
+                    'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values: %s.', $tokenTypeHint, implode(', ', array_keys($tokenTypeHints))),
+                ]
+            );
+        }
+
+        $key = array_search($tokenTypeHint, $tokenTypeHints);
+        unset($tokenTypeHints[$key]);
+        array_unshift($tokenTypeHints, $tokenTypeHint);
+
+        return $tokenTypeHints;
     }
 
     /**
@@ -48,64 +74,112 @@ abstract class TokenIntrospectionEndpoint implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        $this->getParameters($request, $token, $tokenTypeHint);
-        try {
-            Assertion::notNull($token, 'Parameter \'token\' is missing.');
-            $client = $request->getAttribute('client');
-            Assertion::notNull($client, 'Unable to find token or client not authenticated.');
+        $client = $this->getClient($request);
+        $token = $this->getToken($request);
+        $hints = $this->getTokenTypeHints($request);
 
-            $this->getTokenInformation($token, $client, $tokenTypeHint);
-        } catch (\InvalidArgumentException $e) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]);
-        }
-    }
+        foreach ($hints as $hint) {
+            $result = $hint->find($token);
+            if (null !== $result) {
+                if ($client->getId()->getValue() === $result->getClient()->getId()->getValue()) {
+                    $data = $hint->introspect($result);
 
-    /**
-     * @param string      $token
-     * @param Client      $client
-     * @param string|null $tokenTypeHint
-     *
-     * @throws OAuth2Exception
-     */
-    private function getTokenInformation(string $token, Client $client, string $tokenTypeHint = null)
-    {
-        $tokenTypes = $this->getTokenTypes();
-        if (null === $tokenTypeHint) {
-            foreach ($tokenTypes as $tokenType) {
-                $this->tryIntrospectToken($tokenType, $token, $client);
-            }
-            throw new \InvalidArgumentException('Unable to find token or client not authenticated.');
-        } elseif (array_key_exists($tokenTypeHint, $tokenTypes)) {
-            $tokenType = $tokenTypes[$tokenTypeHint];
-            $this->tryIntrospectToken($tokenType, $token, $client);
-            throw new \InvalidArgumentException('Unable to find token or client not authenticated.');
-        }
-        throw new OAuth2Exception(501, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unsupported token type hint.']);
-    }
+                    throw new OAuth2Exception(200, json_encode($data));
+                } else {
+                    throw new OAuth2Exception(
+                        400,
+                        [
+                            'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                            'error_description' => 'The parameter \'token\' is invalid.',
+                        ]
+                    );
+                }
 
-    /**
-     * @param IntrospectionTokenTypeInterface $tokenType
-     * @param string                          $token
-     * @param Client                          $client
-     *
-     * @throws OAuth2Exception
-     */
-    private function tryIntrospectToken(IntrospectionTokenTypeInterface $tokenType, string $token, Client $client)
-    {
-        $result = $tokenType->getToken($token);
-        if (null !== $result) {
-            if ($result->getClientPublicId() === $client->getPublicId()) {
-                $data = $tokenType->introspectToken($result, $client);
-
-                return $this->getResponseFactoryManager()->getResponse(200, $data)->getResponse();
             }
         }
+        throw new OAuth2Exception(200, json_encode(['active' => false]));
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param string|null                              $token
-     * @param string|null                              $tokenTypeHint
+     * @param ServerRequestInterface $request
+     * @return Client
+     * @throws OAuth2Exception
      */
-    abstract protected function getParameters(ServerRequestInterface $request, &$token, &$tokenTypeHint);
+    private function getClient(ServerRequestInterface $request): Client
+    {
+        $client = $request->getAttribute('client');
+        if (null === $client) {
+            throw new OAuth2Exception(
+                401,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'Client not authenticated.',
+                ]
+            );
+        }
+
+        return $client;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return string
+     * @throws OAuth2Exception
+     */
+    protected function getToken(ServerRequestInterface $request): string
+    {
+        $params = $this->getRequestParameters($request);
+        if (!array_key_exists('token', $params)) {
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => 'The parameter \'token\' is missing.',
+                ]
+            );
+        }
+
+        return $params['token'];
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return TokenTypeHintInterface[]
+     * @throws OAuth2Exception
+     */
+    protected function getTokenTypeHints(ServerRequestInterface $request): array
+    {
+        $params = $this->getRequestParameters($request);
+        $tokenTypeHints = $this->getTokenTypeHintManager()->getTokenTypeHints();
+
+        if (array_key_exists('token_type_hint', $params)) {
+            $tokenTypeHint = $params['token_type_hint'];
+            if (!array_key_exists($params['token_type_hint'], $tokenTypeHints)) {
+                throw new OAuth2Exception(
+                    400,
+                    [
+                        'error' => 'unsupported_token_type',
+                        'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values: %s.', $params['token_type_hint'], implode(', ', array_keys($tokenTypeHints))),
+                    ]
+                );
+            }
+
+            $hint = $tokenTypeHints[$tokenTypeHint];
+            unset($tokenTypeHints[$tokenTypeHint]);
+            $tokenTypeHints = [$tokenTypeHint => $hint]+$tokenTypeHints;
+        }
+
+        return $tokenTypeHints;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return array
+     */
+    protected function getRequestParameters(ServerRequestInterface $request): array
+    {
+        $parameters = $request->getParsedBody() ?? [];
+
+        return array_intersect_key($parameters, array_flip(['token', 'token_type_hint']));
+    }
 }

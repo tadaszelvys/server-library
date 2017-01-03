@@ -15,6 +15,7 @@ use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\Factory\StreamFactoryInterface;
 use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommand;
 use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommandHandler;
+use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
 use OAuth2\Response\Factory\AccessDeniedResponseFactory;
@@ -35,6 +36,9 @@ use OAuth2\Middleware\Pipe;
 use OAuth2\Test\Stub\Event\RefreshTokenRevokedEventHandler;
 use OAuth2\Test\Stub\EventStore;
 use OAuth2\Test\Stub\RefreshTokenRepository;
+use OAuth2\TokenTypeHint\RefreshTokenTypeHint;
+use OAuth2\TokenTypeHint\TokenTypeHintManager;
+use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
 use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
 use OAuth2\Middleware\ClientAuthenticationMiddleware;
 use OAuth2\Test\Stub\ClientAssertionJwt;
@@ -1132,6 +1136,26 @@ final class Application
     }
 
     /**
+     * @var null|TokenTypeHintManagerInterface
+     */
+    private $tokenTypeHintManager = null;
+
+    /**
+     * @return TokenTypeHintManagerInterface
+     */
+    public function getTokenTypeHintManager(): TokenTypeHintManagerInterface
+    {
+        if (null === $this->tokenTypeHintManager) {
+            $this->tokenTypeHintManager = new TokenTypeHintManager();
+            $this->tokenTypeHintManager->addTokenTypeHint($this->getAccessTokenTypeHint()); // Access Token
+            $this->tokenTypeHintManager->addTokenTypeHint($this->getRefreshTokenTypeHint()); // Refresh Token
+            //$this->tokenTypeHintManager->addTokenTypeHint(); // Auth Code
+        }
+
+        return $this->tokenTypeHintManager;
+    }
+
+    /**
      * @var null|TokenRevocationGetEndpoint
      */
     private $tokenRevocationGetEndpoint = null;
@@ -1142,10 +1166,10 @@ final class Application
     public function getTokenRevocationGetEndpoint(): TokenRevocationGetEndpoint
     {
         if (null === $this->tokenRevocationGetEndpoint) {
-            $this->tokenRevocationGetEndpoint = new TokenRevocationGetEndpoint();
-            $this->tokenRevocationGetEndpoint->addTokenTypeHint($this->getAccessTokenTypeHint()); // Access Token
-            //$this->tokenRevocationGetEndpoint->addTokenTypeHint(); // Refresh Token
-            //$this->tokenRevocationGetEndpoint->addTokenTypeHint(); // Auth Code
+            $this->tokenRevocationGetEndpoint = new TokenRevocationGetEndpoint(
+                $this->getTokenTypeHintManager(),
+                true
+            );
         }
 
         return $this->tokenRevocationGetEndpoint;
@@ -1162,10 +1186,9 @@ final class Application
     public function getTokenRevocationPostEndpoint(): TokenRevocationPostEndpoint
     {
         if (null === $this->tokenRevocationPostEndpoint) {
-            $this->tokenRevocationPostEndpoint = new TokenRevocationPostEndpoint();
-            $this->tokenRevocationPostEndpoint->addTokenTypeHint($this->getAccessTokenTypeHint()); // Access Token
-            //$this->tokenRevocationPostEndpoint->addTokenTypeHint(); // Refresh Token
-            //$this->tokenRevocationPostEndpoint->addTokenTypeHint(); // Auth Code
+            $this->tokenRevocationPostEndpoint = new TokenRevocationPostEndpoint(
+                $this->getTokenTypeHintManager()
+            );
         }
 
         return $this->tokenRevocationPostEndpoint;
@@ -1214,6 +1237,66 @@ final class Application
     }
 
     /**
+     * @var null|TokenIntrospectionEndpoint
+     */
+    private $tokenIntrospectionEndpoint = null;
+
+    /**
+     * @return TokenIntrospectionEndpoint
+     */
+    public function getTokenIntrospectionEndpoint(): TokenIntrospectionEndpoint
+    {
+        if (null === $this->tokenIntrospectionEndpoint) {
+            $this->tokenIntrospectionEndpoint = new TokenIntrospectionEndpoint(
+                $this->getTokenTypeHintManager()
+            );
+        }
+
+        return $this->tokenIntrospectionEndpoint;
+    }
+
+    /**
+     * @var null|Pipe
+     */
+    private $tokenIntrospectionPipe = null;
+
+    /**
+     * @return Pipe
+     */
+    public function getTokenIntrospectionPipe(): Pipe
+    {
+        if (null === $this->tokenIntrospectionPipe) {
+            $this->tokenIntrospectionPipe = new Pipe();
+
+            $this->tokenIntrospectionPipe->appendMiddleware($this->getOAuth2ResponseMiddleware());
+            $this->tokenIntrospectionPipe->appendMiddleware($this->getClientAuthenticationMiddleware());
+            $this->tokenIntrospectionPipe->appendMiddleware($this->getTokenIntrospectionHttpMethod());
+        }
+
+        return $this->tokenIntrospectionPipe;
+    }
+
+    /**
+     * @var null|HttpMethod
+     */
+    private $tokenIntrospectionHttpMethod = null;
+
+    /**
+     * @return HttpMethod
+     */
+    public function getTokenIntrospectionHttpMethod(): HttpMethod
+    {
+        if (null === $this->tokenIntrospectionHttpMethod) {
+            $this->tokenIntrospectionHttpMethod = new HttpMethod(
+                $this->getResponseFactory()
+            );
+            $this->tokenIntrospectionHttpMethod->addMiddleware('POST', $this->getTokenIntrospectionEndpoint());
+        }
+
+        return $this->tokenIntrospectionHttpMethod;
+    }
+
+    /**
      * @var null|AccessTokenTypeHint
      */
     private $accessTokenTypeHint = null;
@@ -1232,6 +1315,27 @@ final class Application
         }
 
         return $this->accessTokenTypeHint;
+    }
+
+    /**
+     * @var null|RefreshTokenTypeHint
+     */
+    private $refreshTokenTypeHint = null;
+
+    /**
+     * @return RefreshTokenTypeHint
+     */
+    public function getRefreshTokenTypeHint(): RefreshTokenTypeHint
+    {
+        if (null === $this->refreshTokenTypeHint) {
+            $this->refreshTokenTypeHint = new RefreshTokenTypeHint(
+                $this->getRefreshTokenRepository(),
+                $this->getCommandBus(),
+                true
+            );
+        }
+
+        return $this->refreshTokenTypeHint;
     }
 
     /**

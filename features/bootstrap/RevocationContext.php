@@ -195,6 +195,104 @@ class RevocationContext extends BaseContext
     }
 
     /**
+     * @Given a client sends a POST revocation request but the token type hint is not supported
+     */
+    public function aClientSendsAPostRevocationRequestButTheTokenTypeHintIsNotSupported()
+    {
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'token' => 'ACCESS_TOKEN_#2',
+            'token_type_hint' => 'bad_hint',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+    }
+
+    /**
+     * @Given a client sends a GET revocation request but the token type hint is not supported
+     */
+    public function aClientSendsAGetRevocationRequestButTheTokenTypeHintIsNotSupported()
+    {
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withQueryParams([
+            'token' => 'ACCESS_TOKEN_#2',
+            'token_type_hint' => 'bad_hint',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+    }
+
+    /**
+     * @Given a client sends a POST revocation request but the token does not exist or expired
+     */
+    public function aClientSendsAPostRevocationRequestButTheTokenDoesNotExistOrExpired()
+    {
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'token' => 'UNKNOWN_REFRESH_TOKEN_#2',
+            'token_type_hint' => 'refresh_token',
+        ]);
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+    }
+
+    /**
+     * @Given a client sends a GET revocation request but the token does not exist or expired
+     */
+    public function aClientSendsAGetRevocationRequestButTheTokenDoesNotExistOrExpired()
+    {
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withQueryParams([
+            'token' => 'UNKNOWN_REFRESH_TOKEN_#2',
+            'token_type_hint' => 'refresh_token',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+    }
+
+    /**
+     * @Given a client sends a GET revocation request with callback but the token does not exist or expired
+     */
+    public function aClientSendsAGetRevocationRequestWithCallbackButTheTokenDoesNotExistOrExpired()
+    {
+        /**
+         * @var \Psr\Http\Message\ServerRequestInterface
+         */
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withQueryParams([
+            'token' => 'UNKNOWN_REFRESH_TOKEN_#2',
+            'token_type_hint' => 'refresh_token',
+            'callback' => 'callback',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+
+        $this->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+    }
+
+    /**
      * @Then no token revocation event is thrown
      */
     public function noTokenRevocationEventIsThrown()
