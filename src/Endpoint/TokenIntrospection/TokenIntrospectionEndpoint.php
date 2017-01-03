@@ -94,7 +94,6 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
                         ]
                     );
                 }
-
             }
         }
         throw new OAuth2Exception(200, json_encode(['active' => false]));

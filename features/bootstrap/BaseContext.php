@@ -31,7 +31,6 @@ class BaseContext implements Context
     public function __construct()
     {
         $this->application = new Application();
-
     }
 
     /**

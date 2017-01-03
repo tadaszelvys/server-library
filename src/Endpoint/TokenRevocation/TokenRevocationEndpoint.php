@@ -76,7 +76,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         $callback = $this->getCallback($request);
-        try{
+        try {
             $client = $this->getClient($request);
             $token = $this->getToken($request);
             $hints = $this->getTokenTypeHints($request);
@@ -97,7 +97,6 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
                             ]
                         );
                     }
-
                 }
             }
             return $this->getResponse(200, '', $callback);
