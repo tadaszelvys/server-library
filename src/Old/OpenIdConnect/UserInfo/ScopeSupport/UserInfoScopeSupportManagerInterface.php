@@ -14,23 +14,24 @@ namespace OAuth2\OpenIdConnect\UserInfo\ScopeSupport;
 interface UserInfoScopeSupportManagerInterface
 {
     /**
-     * @param \OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserinfoScopeSupportInterface $userinfo_scope_support
+     * @param UserInfoScopeSupportInterface $userinfo_scope_support
+     * @return UserInfoScopeSupportManagerInterface
      */
-    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfo_scope_support);
+    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfo_scope_support): self;
 
     /**
      * @param string $scope
      *
      * @return bool
      */
-    public function hasUserInfoScopeSupport($scope);
+    public function hasUserInfoScopeSupport($scope): bool;
 
     /**
      * @param string $scope
      *
      * @throws \InvalidArgumentException
      *
-     * @return \OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserinfoScopeSupportInterface
+     * @return UserinfoScopeSupportInterface
      */
-    public function getUserInfoScopeSupport($scope);
+    public function getUserInfoScopeSupport($scope): UserinfoScopeSupportInterface;
 }

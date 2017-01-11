@@ -13,4 +13,34 @@ namespace OAuth2\Model\ResourceServer;
 
 final class ResourceServer
 {
+    /**
+     * @var ResourceServerId
+     */
+    private $resourceServerId;
+
+    /**
+     * ResourceServer constructor.
+     * @param ResourceServerId $resourceServerId
+     */
+    private function __construct(ResourceServerId $resourceServerId)
+    {
+        $this->resourceServerId = $resourceServerId;
+    }
+
+    /**
+     * @param ResourceServerId $resourceServerId
+     * @return ResourceServer
+     */
+    public static function create(ResourceServerId $resourceServerId): self
+    {
+        return new self($resourceServerId);
+    }
+
+    /**
+     * @return ResourceServerId
+     */
+    public function getId(): ResourceServerId
+    {
+        return $this->resourceServerId;
+    }
 }

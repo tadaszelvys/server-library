@@ -14,13 +14,14 @@ namespace OAuth2\OpenIdConnect\Pairwise;
 use Assert\Assertion;
 use Base64Url\Base64Url;
 use OAuth2\Model\UserAccount\UserAccount;
+use Psr\Http\Message\UriInterface;
 
 class EncryptedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInterface
 {
     /**
      * @var string
      */
-    private $pairwise_encryption_key;
+    private $pairwiseEncryptionKey;
 
     /**
      * @var string
@@ -40,19 +41,15 @@ class EncryptedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmIn
     /**
      * EncryptedSubjectIdentifier constructor.
      *
-     * @param string      $pairwise_encryption_key
+     * @param string      $pairwiseEncryptionKey
      * @param string      $algorithm
      * @param null|string $iv
      * @param string      $salt
      */
-    public function __construct($pairwise_encryption_key, $algorithm, $iv, $salt)
+    public function __construct(string $pairwiseEncryptionKey, string $algorithm, string $salt, string $iv = null)
     {
-        Assertion::nullOrString($iv);
-        Assertion::string($salt);
-        Assertion::string($pairwise_encryption_key);
-        Assertion::string($algorithm);
         Assertion::inArray($algorithm, openssl_get_cipher_methods(), sprintf('The algorithm \'%s\' is not supported.', $algorithm));
-        $this->pairwise_encryption_key = $pairwise_encryption_key;
+        $this->pairwiseEncryptionKey = $pairwiseEncryptionKey;
         $this->algorithm = $algorithm;
         $this->salt = $salt;
         $this->iv = $iv;
@@ -61,24 +58,24 @@ class EncryptedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmIn
     /**
      * {@inheritdoc}
      */
-    public function calculateSubjectIdentifier(UserAccount $userAccount, $sector_identifier_host)
+    public function calculateSubjectIdentifier(UserAccount $userAccount, UriInterface $sectorIdentifierHost): string
     {
         $prepared = sprintf(
             '%s:%s:%s',
-            $sector_identifier_host,
+            $sectorIdentifierHost,
             $userAccount->getId()->getValue(),
             $this->salt
         );
 
-        return Base64Url::encode(openssl_encrypt($prepared, $this->algorithm, $this->pairwise_encryption_key, OPENSSL_RAW_DATA, $this->iv));
+        return Base64Url::encode(openssl_encrypt($prepared, $this->algorithm, $this->pairwiseEncryptionKey, OPENSSL_RAW_DATA, $this->iv));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPublicIdFromSubjectIdentifier($subject_identifier)
+    public function getPublicIdFromSubjectIdentifier(string $subjectIdentifier)
     {
-        $decoded = openssl_decrypt(Base64Url::decode($subject_identifier), $this->algorithm, $this->pairwise_encryption_key, OPENSSL_RAW_DATA, $this->iv);
+        $decoded = openssl_decrypt(Base64Url::decode($subjectIdentifier), $this->algorithm, $this->pairwiseEncryptionKey, OPENSSL_RAW_DATA, $this->iv);
         $parts = explode(':', $decoded);
         if (3 !== count($parts)) {
             return;

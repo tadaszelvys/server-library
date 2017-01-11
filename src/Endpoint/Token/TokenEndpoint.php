@@ -11,28 +11,28 @@
 
 namespace OAuth2\Endpoint\Token;
 
-use Assert\Assertion;
+use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use OAuth2\Command\AccessToken\CreateAccessTokenCommand;
+use OAuth2\DataTransporter;
 use OAuth2\Grant\GrantTypeInterface;
-use OAuth2\Grant\GrantTypeManagerInterface;
-use OAuth2\Grant\GrantTypeResponse;
-use OAuth2\Grant\GrantTypeResponseInterface;
-use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
+use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\Client\Client;
-use OAuth2\Model\Client\ClientRepositoryInterface;
-use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
-use OAuth2\Model\Scope\ScopeRepositoryInterface;
-use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
+use OAuth2\TokenType\TokenTypeInterface;
 use OAuth2\TokenType\TokenTypeManagerInterface;
-use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
+use SimpleBus\Message\Bus\MessageBus;
 
 final class TokenEndpoint implements MiddlewareInterface
 {
+    /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
     /**
      * @var TokenEndpointExtensionInterface[]
      */
@@ -44,78 +44,25 @@ final class TokenEndpoint implements MiddlewareInterface
     private $tokenTypeManager;
 
     /**
-     * @var AccessTokenRepositoryInterface
+     * @var MessageBus
      */
-    private $accessTokenRepository;
-
-    /**
-     * @var TokenEndpointAuthMethodManagerInterface
-     */
-    private $tokenEndpointAuthManager;
-
-    /**
-     * @var UserAccountRepositoryInterface
-     */
-    private $userAccountRepository;
-
-    /**
-     * @var OAuth2ResponseFactoryManagerInterface
-     */
-    private $responseFactoryManager;
-
-    /**
-     * @var GrantTypeManagerInterface
-     */
-    private $grantTypeManager;
-
-    /**
-     * @var ScopeRepositoryInterface
-     */
-    private $scopeManager;
-
-    /**
-     * @var RefreshTokenRepositoryInterface
-     */
-    private $refreshTokenManager;
+    private $commandBus;
 
     /**
      * TokenEndpoint constructor.
-     *
-     * @param GrantTypeManagerInterface               $grantTypeManager
-     * @param TokenTypeManagerInterface               $tokenTypeManager
-     * @param AccessTokenRepositoryInterface          $accessTokenRepository
-     * @param TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthManager
-     * @param UserAccountRepositoryInterface          $userAccountRepository
-     * @param OAuth2ResponseFactoryManagerInterface   $responseFactoryManager
+     * @param ResponseFactoryInterface $responseFactory
+     * @param MessageBus $commandBus
+     * @param TokenTypeManagerInterface $tokenTypeManager
      */
-    public function __construct(GrantTypeManagerInterface $grantTypeManager, TokenTypeManagerInterface $tokenTypeManager, AccessTokenRepositoryInterface $accessTokenRepository, ClientRepositoryInterface $clientRepository, TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthManager, UserAccountRepositoryInterface $userAccountRepository, OAuth2ResponseFactoryManagerInterface $responseFactoryManager)
+    public function __construct(ResponseFactoryInterface $responseFactory, MessageBus $commandBus, TokenTypeManagerInterface $tokenTypeManager)
     {
+        $this->responseFactory = $responseFactory;
+        $this->commandBus = $commandBus;
         $this->tokenTypeManager = $tokenTypeManager;
-        $this->accessTokenRepository = $accessTokenRepository;
-        $this->tokenEndpointAuthManager = $tokenEndpointAuthManager;
-        $this->userAccountRepository = $userAccountRepository;
-        $this->responseFactoryManager = $responseFactoryManager;
-        $this->grantTypeManager = $grantTypeManager;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function enableRefreshTokenSupport(RefreshTokenRepositoryInterface $refreshTokenManager)
-    {
-        $this->refreshTokenManager = $refreshTokenManager;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enableScopeSupport(ScopeRepositoryInterface $scopeManager)
-    {
-        $this->scopeManager = $scopeManager;
-    }
-
-    /**
-     * {@inheritdoc}
+     * @param TokenEndpointExtensionInterface $tokenEndpointExtension
      */
     public function addTokenEndpointExtension(TokenEndpointExtensionInterface $tokenEndpointExtension)
     {
@@ -127,31 +74,33 @@ final class TokenEndpoint implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        $requestParameters = RequestBody::getParameters($request);
-        $type = $this->getGrantType($requestParameters);
+        /**
+         * @var $type GrantTypeInterface
+         */
+        $type = $request->getAttribute('grant_type');
 
         $grantTypeResponse = new GrantTypeResponse();
-        $type->prepareGrantTypeResponse($request, $grantTypeResponse);
-
-        $client = $this->findClient($request, $grantTypeResponse);
-        $this->checkGrantType($client, $type->getGrantType());
-
-        $grantTypeResponse->setClientPublicId($client->getPublicId());
-
-        if (null !== $this->scopeManager) {
-            $this->populateScope($request, $grantTypeResponse);
+        if (null !== $request->getAttribute('client')) {
+            $grantTypeResponse = $grantTypeResponse->withClient($request->getAttribute('client'));
         }
+        $type->prepareGrantTypeResponse($request, $grantTypeResponse);
+        $this->checkGrantType($grantTypeResponse->getClient(), $type->getGrantType());
 
-        $tokenTypeInformation = $this->getTokenTypeInformation($requestParameters, $client);
+        //$grantTypeResponse->setClientPublicId($client->getPublicId());
 
-        $type->grantAccessToken($request, $client, $grantTypeResponse);
+        /*if (null !== $this->scopeManager) {
+            $this->populateScope($request, $grantTypeResponse);
+        }*/
 
-        if (null !== $this->scopeManager) {
-            $grantTypeResponse->setAvailableScope($grantTypeResponse->getAvailableScope() ?: $this->scopeManager->getAvailableScopesForClient($client));
+        $this->populateTokenTypeInformation($request, $grantTypeResponse);
+        $type->grantAccessToken($request, $grantTypeResponse->getClient(), $grantTypeResponse);
+
+        /*if (null !== $this->scopeManager) {
+            $grantTypeResponse->setAvailableScope($grantTypeResponse->getAvailableScope() ?: $this->scopeManager->getAvailableScopesForClient($grantTypeResponse->getClient()));
 
             //Modify the scope according to the scope policy
             try {
-                $requested_scope = $this->scopeManager->checkScopePolicy($grantTypeResponse->getRequestedScope(), $client);
+                $requested_scope = $this->scopeManager->checkScopePolicy($grantTypeResponse->getRequestedScope(), $grantTypeResponse->getClient());
             } catch (\InvalidArgumentException $e) {
                 return $this->responseFactoryManager->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE, 'error_description' => $e->getMessage()])->getResponse();
             }
@@ -159,33 +108,47 @@ final class TokenEndpoint implements MiddlewareInterface
 
             //Check if scope requested are within the available scope
             $this->checkRequestedScope($grantTypeResponse);
-        }
+        }*/
 
         //Call extensions to add metadatas to the Access Token
-        $metadatas = $this->preAccessTokenCreation($client, $grantTypeResponse, $tokenTypeInformation);
+        //$metadatas = $this->preAccessTokenCreation($grantTypeResponse->getClient(), $grantTypeResponse, $tokenTypeInformation);
 
         //The access token can be created
-        $accessToken = $this->createAccessToken($client, $grantTypeResponse, $requestParameters, $tokenTypeInformation, $metadatas);
+        $dataTransporter = new DataTransporter();
+        $command = CreateAccessTokenCommand::create(
+            $grantTypeResponse->getClient(),
+            $grantTypeResponse->getResourceOwner(),
+            $grantTypeResponse->getParameters(),
+            $grantTypeResponse->getMetadatas(),
+            $grantTypeResponse->getScopes(),
+            $dataTransporter
+        );
+
+        $this->commandBus->handle($command);
+        $data = $dataTransporter->getData();
+        //$accessToken = $this->createAccessToken($grantTypeResponse->getClient(), $grantTypeResponse, $requestParameters, $tokenTypeInformation, $metadatas);
 
         //The result is processed using the access token and the other information
-        $data = $this->postAccessTokenCreation($client, $grantTypeResponse, $tokenTypeInformation, $accessToken);
+        //$data = $this->postAccessTokenCreation($grantTypeResponse, $tokenTypeInformation, $dataTransporter->getData());
 
+        $response = $this->responseFactory->createResponse();
+        $response->getBody()->write(json_encode($data));
+dump(json_encode($data));
+        return $response;
         //The response is updated
-        return $this->responseFactoryManager->getResponse(200, $data)->getResponse();
+        //return $this->responseFactoryManager->getResponse(200, $data)->getResponse();
     }
 
     /**
      * @param Client                     $client
-     * @param GrantTypeResponseInterface $grantTypeResponse
+     * @param GrantTypeResponse $grantTypeResponse
      * @param array                      $tokenTypeInformation
      *
      * @return array
      */
-    private function preAccessTokenCreation(Client $client,
-                                   GrantTypeResponseInterface $grantTypeResponse,
-                                   array $tokenTypeInformation
-    ) {
-        $metadatas = $grantTypeResponse->hasAdditionalData('metadatas') ? $grantTypeResponse->getAdditionalData('metadatas') : [];
+    private function preAccessTokenCreation(Client $client, GrantTypeResponse $grantTypeResponse, array $tokenTypeInformation)
+    {
+        /*$metadatas = $grantTypeResponse->hasData('metadatas') ? $grantTypeResponse->getData('metadatas') : [];
         foreach ($this->tokenEndpointExtensions as $tokenEndpointExtension) {
             $result = $tokenEndpointExtension->preAccessTokenCreation(
                 $client,
@@ -198,22 +161,18 @@ final class TokenEndpoint implements MiddlewareInterface
             }
         }
 
-        return $metadatas;
+        return $metadatas;*/
     }
 
     /**
-     * @param Client                     $client
-     * @param GrantTypeResponseInterface $grantTypeResponse
-     * @param array                      $tokenTypeInformation
-     * @param AccessTokenInterface       $accessToken
+     * @param GrantTypeResponse $grantTypeResponse
+     * @param array             $tokenTypeInformation
+     * @param AccessToken       $accessToken
      *
      * @return array
      */
-    private function postAccessTokenCreation(Client $client,
-                                   GrantTypeResponseInterface $grantTypeResponse,
-                                   array $tokenTypeInformation,
-                                   AccessTokenInterface $accessToken
-    ) {
+    private function postAccessTokenCreation(GrantTypeResponse $grantTypeResponse, array $tokenTypeInformation, AccessToken $accessToken)
+    {
         $data = $accessToken->toArray();
 
         foreach ($this->tokenEndpointExtensions as $tokenEndpointExtension) {
@@ -233,11 +192,11 @@ final class TokenEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param GrantTypeResponseInterface $grantTypeResponse
+     * @param GrantTypeResponse $grantTypeResponse
      *
      * @throws OAuth2Exception
      */
-    private function checkRequestedScope(GrantTypeResponseInterface $grantTypeResponse)
+    private function checkRequestedScope(GrantTypeResponse $grantTypeResponse)
     {
         //Check if scope requested are within the available scope
         if (!$this->scopeManager->areRequestScopesAvailable($grantTypeResponse->getRequestedScope(), $grantTypeResponse->getAvailableScope())) {
@@ -252,34 +211,38 @@ final class TokenEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param array  $requestParameters
-     * @param Client $client
-     *
-     * @throws OAuth2Exception
-     *
+     * @param ServerRequestInterface $request
+     * @param GrantTypeResponse $grantTypeResponse
      * @return array
+     * @throws OAuth2Exception
      */
-    private function getTokenTypeInformation(array $requestParameters, Client $client)
+    private function populateTokenTypeInformation(ServerRequestInterface $request, GrantTypeResponse &$grantTypeResponse)
     {
-        $token_type = $this->getTokenTypeFromRequest($requestParameters);
-        if (!$client->isTokenTypeAllowed($token_type->getTokenTypeName())) {
+        /**
+         * @var $tokenType TokenTypeInterface
+         */
+        $tokenType = $request->getAttribute('token_type');
+        if (!$grantTypeResponse->getClient()->isTokenTypeAllowed($tokenType->getTokenTypeName())) {
             throw new OAuth2Exception(
                 400,
                 [
                     'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => sprintf('The token type \'%s\' is not allowed for the client.', $token_type->getTokenTypeName()),
+                    'error_description' => sprintf('The token type \'%s\' is not allowed for the client.', $tokenType->getTokenTypeName()),
                 ]
             );
         }
 
-        return $token_type->getTokenTypeInformation();
+        $info = $tokenType->getTokenTypeInformation();
+        foreach ($info as $k => $v) {
+            $grantTypeResponse = $grantTypeResponse->withParameter($k, $v);
+        }
     }
 
     /**
      * @param ServerRequestInterface     $request
-     * @param GrantTypeResponseInterface $grantTypeResponse
+     * @param GrantTypeResponse $grantTypeResponse
      */
-    private function populateScope(ServerRequestInterface $request, GrantTypeResponseInterface &$grantTypeResponse)
+    private function populateScope(ServerRequestInterface $request, GrantTypeResponse &$grantTypeResponse)
     {
         $scope = RequestBody::getParameter($request, 'scope');
 
@@ -291,16 +254,16 @@ final class TokenEndpoint implements MiddlewareInterface
 
     /**
      * @param Client                     $client
-     * @param GrantTypeResponseInterface $grantTypeResponse
+     * @param GrantTypeResponse $grantTypeResponse
      * @param array                      $requestParameters
      * @param array                      $tokenTypeInformation
      * @param array                      $metadatas
      *
      * @throws OAuth2Exception
      *
-     * @return AccessTokenInterface
+     * @return AccessToken
      */
-    private function createAccessToken(Client $client, GrantTypeResponseInterface $grantTypeResponse, array $requestParameters, array $tokenTypeInformation, array $metadatas)
+    private function createAccessToken(Client $client, GrantTypeResponse $grantTypeResponse, array $requestParameters, array $tokenTypeInformation, array $metadatas)
     {
         $refresh_token = null;
         $resourceOwner = $this->getResourceOwner(
@@ -327,44 +290,50 @@ final class TokenEndpoint implements MiddlewareInterface
         return $accessToken;
     }
 
-    /**
-     * @param array $requestParameters
-     *
-     * @throws OAuth2Exception
-     *
-     * @return GrantTypeInterface
-     */
-    private function getGrantType(array $requestParameters)
-    {
-        try {
-            Assertion::keyExists($requestParameters, 'grant_type', 'The \'grant_type\' parameter is missing.');
-            Assertion::true($this->grantTypeManager->hasGrantType($requestParameters['grant_type']), sprintf('The grant type \'%s\' is not supported by this server.', $requestParameters['grant_type']));
 
-            return $this->grantTypeManager->getGrantType($requestParameters['grant_type']);
-        } catch (\InvalidArgumentException $e) {
-            throw new OAuth2Exception(400,
-                [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => $e->getMessage(),
-                ]
-            );
-        }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * @param Client $client
-     * @param string $grant_type
+     * @param string $grantType
      *
      * @throws OAuth2Exception
      */
-    private function checkGrantType(Client $client, $grant_type)
+    private function checkGrantType(Client $client, string $grantType)
     {
-        if (!$client->isGrantTypeAllowed($grant_type)) {
+        if (!$client->isGrantTypeAllowed($grantType)) {
             throw new OAuth2Exception(
                 400,
                 [
                     'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_UNAUTHORIZED_CLIENT,
-                    'error_description' => sprintf('The grant type \'%s\' is unauthorized for this client.', $grant_type),
+                    'error_description' => sprintf('The grant type \'%s\' is unauthorized for this client.', $grantType),
                 ]
             );
         }
@@ -396,5 +365,56 @@ final class TokenEndpoint implements MiddlewareInterface
         }
 
         return $resourceOwner;
+    }
+
+    /**
+     * Appends new middleware for this message bus. Should only be used at configuration time.
+     *
+     * @private
+     *
+     * @param TokenEndpointExtensionInterface $tokenEndpointExtension
+     *
+     * @return self
+     */
+    public function appendTokenEndpointExtension(TokenEndpointExtensionInterface $tokenEndpointExtension)
+    {
+        $this->tokenEndpointExtensions[] = $tokenEndpointExtension;
+
+        return $this;
+    }
+
+    /**
+     * @return TokenEndpointExtensionInterface[]
+     */
+    public function getTokenEndpointExtensions()
+    {
+        return $this->tokenEndpointExtensions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handle(ServerRequestInterface $serverRequest)
+    {
+        return call_user_func($this->callableForNextTokenEndpointExtension(0), $serverRequest, []);
+    }
+
+    /**
+     * @param int $index
+     *
+     * @return \Closure
+     */
+    private function callableForNextTokenEndpointExtension($index)
+    {
+        if (!isset($this->tokenEndpointExtensions[$index])) {
+            return function (ServerRequestInterface $serverRequest, array $data) {
+                return $data;
+            };
+        }
+        $tokenEndpointExtension = $this->tokenEndpointExtensions[$index];
+
+        return function (ServerRequestInterface $serverRequest, array $data) use ($tokenEndpointExtension, $index) {
+            return $tokenEndpointExtension->handle($serverRequest, $data, $this->callableForNextTokenEndpointExtension($index + 1));
+        };
     }
 }

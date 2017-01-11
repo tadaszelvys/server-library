@@ -23,15 +23,17 @@ class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterfac
     /**
      * {@inheritdoc}
      */
-    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfo_scope_support)
+    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfo_scope_support): UserInfoScopeSupportManagerInterface
     {
         $this->userinfo_scope_supports[$userinfo_scope_support->getScope()] = $userinfo_scope_support;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasUserInfoScopeSupport($scope)
+    public function hasUserInfoScopeSupport($scope): bool
     {
         return array_key_exists($scope, $this->userinfo_scope_supports);
     }
@@ -39,7 +41,7 @@ class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterfac
     /**
      * {@inheritdoc}
      */
-    public function getUserInfoScopeSupport($scope)
+    public function getUserInfoScopeSupport($scope): UserInfoScopeSupportInterface
     {
         Assertion::true($this->hasUserInfoScopeSupport($scope), sprintf('The userinfo scope \'%s\' is not supported.', $scope));
 

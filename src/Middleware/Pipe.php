@@ -90,11 +90,11 @@ final class Pipe implements MiddlewareInterface
     }
 
     /**
-     * @param int $index middleware middlewares index
+     * @param int $index Middleware index
      *
      * @return DelegateInterface
      */
-    private function resolve($index)
+    private function resolve(int $index): DelegateInterface
     {
         if (isset($this->middlewares[$index])) {
             $middleware = $this->middlewares[$index];
@@ -105,7 +105,7 @@ final class Pipe implements MiddlewareInterface
         }
 
         return new Delegate(function () {
-            throw new \LogicException('Unresolved request: middleware middlewares exhausted with no result.');
+            throw new \LogicException('Unresolved request: middleware exhausted with no result.');
         });
     }
 }

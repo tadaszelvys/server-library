@@ -11,28 +11,15 @@
 
 namespace OAuth2\Endpoint\Token;
 
-use OAuth2\Grant\GrantTypeResponseInterface;
-use OAuth2\Model\Client\Client;
-use OAuth2\Token\AccessTokenInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 interface TokenEndpointExtensionInterface
 {
     /**
-     * @param Client                     $client
-     * @param GrantTypeResponseInterface $grant_type_response
-     * @param array                      $token_type_information
-     *
-     * @return array|null
+     * @param ServerRequestInterface $serverRequest
+     * @param array $data
+     * @param \Closure $next
+     * @return array
      */
-    public function preAccessTokenCreation(Client $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information);
-
-    /**
-     * @param Client                     $client
-     * @param GrantTypeResponseInterface $grant_type_response
-     * @param array                      $token_type_information
-     * @param AccessToken                $access_token
-     *
-     * @return array|null
-     */
-    public function postAccessTokenCreation(Client $client, GrantTypeResponseInterface $grant_type_response, array $token_type_information, AccessTokenInterface $access_token);
+    public function process(ServerRequestInterface $serverRequest, array $data, \Closure $next): array;
 }

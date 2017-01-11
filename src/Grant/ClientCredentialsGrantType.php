@@ -11,35 +11,23 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasResponseFactoryManager;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Endpoint\Token\GrantTypeResponse;
+use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ClientCredentialsGrantType implements GrantTypeInterface
 {
-    use HasResponseFactoryManager;
-
     /**
      * @var bool
      */
-    private $issue_refresh_token_with_access_token = false;
-
-    /**
-     * ClientCredentialsGrantType constructor.
-     *
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
-     */
-    public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory_manager)
-    {
-        $this->setResponsefactoryManager($response_factory_manager);
-    }
+    private $issueRefreshTokenWithAccessToken = false;
 
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedResponseTypes()
+    public function getAssociatedResponseTypes(): array
     {
         return [];
     }
@@ -47,7 +35,7 @@ class ClientCredentialsGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getGrantType()
+    public function getGrantType(): string
     {
         return 'client_credentials';
     }
@@ -55,25 +43,24 @@ class ClientCredentialsGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
+    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponse &$grantTypeResponse)
     {
-        // Nothing to do
+        $client = $request->getAttribute('client');
+        if ($client->isPublic()) {
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The client is not a confidential client.']);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
+    public function grantAccessToken(ServerRequestInterface $request, Client $client, GrantTypeResponse &$grantTypeResponse)
     {
-        if ($client->isPublic()) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The client is not a confidential client']));
+        if (true === $this->isRefreshTokenIssuedWithAccessToken() ) {
+            $grantTypeResponse = $grantTypeResponse->withMetadata('refresh_token', true);
         }
-        $issue_refresh_token = $this->isRefreshTokenIssuedWithAccessToken();
 
-        $grant_type_response->setResourceOwnerPublicId($client->getPublicId());
-        $grant_type_response->setUserAccountPublicId(null);
-        $grant_type_response->setRefreshTokenIssued($issue_refresh_token);
-        $grant_type_response->setRefreshTokenScope($grant_type_response->getRequestedScope());
+        $grantTypeResponse = $grantTypeResponse->withResourceOwner($client);
     }
 
     /**
@@ -81,16 +68,16 @@ class ClientCredentialsGrantType implements GrantTypeInterface
      */
     public function isRefreshTokenIssuedWithAccessToken()
     {
-        return $this->issue_refresh_token_with_access_token;
+        return $this->issueRefreshTokenWithAccessToken;
     }
 
     public function enableRefreshTokenIssuanceWithAccessToken()
     {
-        $this->issue_refresh_token_with_access_token = true;
+        $this->issueRefreshTokenWithAccessToken = true;
     }
 
     public function disableRefreshTokenIssuanceWithAccessToken()
     {
-        $this->issue_refresh_token_with_access_token = false;
+        $this->issueRefreshTokenWithAccessToken = false;
     }
 }

@@ -148,7 +148,7 @@ class UserInfo implements UserInfoInterface
     private function checkScope($scope)
     {
         if (!in_array('openid', $scope)) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Access token does not contain the \'openid\' scope.']));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Access token does not contain the \'openid\' scope.']);
         }
     }
 }

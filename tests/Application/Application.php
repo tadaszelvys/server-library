@@ -13,10 +13,16 @@ namespace OAuth2\Test\Application;
 
 use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\Factory\StreamFactoryInterface;
+use OAuth2\Command\AccessToken\CreateAccessTokenCommand;
+use OAuth2\Command\AccessToken\CreateAccessTokenCommandHandler;
 use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommand;
 use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommandHandler;
+use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
+use OAuth2\Grant\ClientCredentialsGrantType;
+use OAuth2\Middleware\GrantTypeMiddleware;
+use OAuth2\Middleware\TokenTypeMiddleware;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
 use OAuth2\Response\Factory\AccessDeniedResponseFactory;
 use OAuth2\Response\Factory\BadRequestResponseFactory;
@@ -35,7 +41,11 @@ use OAuth2\Middleware\InitialAccessTokenMiddleware;
 use OAuth2\Middleware\Pipe;
 use OAuth2\Test\Stub\Event\RefreshTokenRevokedEventHandler;
 use OAuth2\Test\Stub\EventStore;
+use OAuth2\Test\Stub\MacToken;
 use OAuth2\Test\Stub\RefreshTokenRepository;
+use OAuth2\TokenEndpointAuthMethod\None;
+use OAuth2\TokenType\TokenTypeManager;
+use OAuth2\TokenType\TokenTypeManagerInterface;
 use OAuth2\TokenTypeHint\RefreshTokenTypeHint;
 use OAuth2\TokenTypeHint\TokenTypeHintManager;
 use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
@@ -129,6 +139,10 @@ final class Application
      * @var null|OAuth2ResponseFactoryManagerInterface
      */
     private $oauth2ResponseFactory = null;
+
+    /**
+     * @var null|OAuth2ExceptionMiddleware
+     */
     private $oauth2ResponseMiddleware = null;
 
     /**
@@ -199,7 +213,6 @@ final class Application
         if (null === $this->clientRegistrationEndpoint) {
             $this->clientRegistrationEndpoint = new ClientRegistrationEndpoint(
                 $this->getResponseFactory(),
-                $this->getStreamFactory(),
                 $this->getCommandBus()
             );
         }
@@ -261,6 +274,7 @@ final class Application
             $this->tokenEndpointAuthMethodManager = new TokenEndpointAuthMethodManager(
                 $this->getClientRepository()
             );
+            $this->tokenEndpointAuthMethodManager->addTokenEndpointAuthMethod(new None());
             $this->tokenEndpointAuthMethodManager->addTokenEndpointAuthMethod(new ClientSecretBasic('My service'));
             $this->tokenEndpointAuthMethodManager->addTokenEndpointAuthMethod(new ClientSecretPost());
             $this->tokenEndpointAuthMethodManager->addTokenEndpointAuthMethod(new ClientAssertionJwt(
@@ -369,6 +383,7 @@ final class Application
                     CreateClientCommand::class => CreateClientCommandHandler::class,
                     DeleteClientCommand::class => DeleteClientCommandHandler::class,
                     UpdateClientCommand::class => UpdateClientCommandHandler::class,
+                    CreateAccessTokenCommand::class => CreateAccessTokenCommandHandler::class,
                     RevokeAccessTokenCommand::class => RevokeAccessTokenCommandHandler::class,
                     RevokeRefreshTokenCommand::class => RevokeRefreshTokenCommandHandler::class,
                 ],
@@ -422,6 +437,8 @@ final class Application
 
             $this->container->add($this->getRevokeAccessTokenCommandHandler());
             $this->container->add($this->getAccessTokenRevokedEventHandler());
+
+            $this->container->add($this->getCreateAccessTokenCommandHandler());
 
             $this->container->add($this->getRevokeRefreshTokenCommandHandler());
             $this->container->add($this->getRefreshTokenRevokedEventHandler());
@@ -793,6 +810,7 @@ final class Application
     {
         if (null === $this->grantTypeManager) {
             $this->grantTypeManager = new GrantTypeManager();
+            $this->grantTypeManager->addGrantType(new ClientCredentialsGrantType());
         }
 
         return $this->grantTypeManager;
@@ -943,12 +961,46 @@ final class Application
     {
         if (null === $this->initialAccessTokenMiddleware) {
             $this->initialAccessTokenMiddleware = new InitialAccessTokenMiddleware(
-                new BearerToken(),
+                $this->getBearerTokenType(),
                 $this->getInitialAccessTokenRepository()
             );
         }
 
         return $this->initialAccessTokenMiddleware;
+    }
+
+    /**
+     * @var null|BearerToken
+     */
+    private $bearerTokenType = null;
+
+    /**
+     * @return BearerToken
+     */
+    public function getBearerTokenType(): BearerToken
+    {
+        if (null === $this->bearerTokenType) {
+            $this->bearerTokenType = new BearerToken('**My Service**');
+        }
+
+        return $this->bearerTokenType;
+    }
+
+    /**
+     * @var null|MacToken
+     */
+    private $macTokenType = null;
+
+    /**
+     * @return MacToken
+     */
+    public function getMacTokenType(): MacToken
+    {
+        if (null === $this->macTokenType) {
+            $this->macTokenType = new MacToken();
+        }
+
+        return $this->macTokenType;
     }
 
     /**
@@ -1106,7 +1158,7 @@ final class Application
     {
         if (null === $this->clientConfigurationEndpoint) {
             $this->clientConfigurationEndpoint = new ClientConfigurationEndpoint(
-                new BearerToken(),
+                $this->getBearerTokenType(),
                 $this->getCommandBus(),
                 $this->getClientRepository()
             );
@@ -1226,9 +1278,7 @@ final class Application
     public function getTokenRevocationHttpMethod(): HttpMethod
     {
         if (null === $this->tokenRevocationHttpMethod) {
-            $this->tokenRevocationHttpMethod = new HttpMethod(
-                $this->getResponseFactory()
-            );
+            $this->tokenRevocationHttpMethod = new HttpMethod();
             $this->tokenRevocationHttpMethod->addMiddleware('POST', $this->getTokenRevocationPostEndpoint());
             $this->tokenRevocationHttpMethod->addMiddleware('GET', $this->getTokenRevocationGetEndpoint());
         }
@@ -1287,9 +1337,7 @@ final class Application
     public function getTokenIntrospectionHttpMethod(): HttpMethod
     {
         if (null === $this->tokenIntrospectionHttpMethod) {
-            $this->tokenIntrospectionHttpMethod = new HttpMethod(
-                $this->getResponseFactory()
-            );
+            $this->tokenIntrospectionHttpMethod = new HttpMethod();
             $this->tokenIntrospectionHttpMethod->addMiddleware('POST', $this->getTokenIntrospectionEndpoint());
         }
 
@@ -1487,5 +1535,126 @@ final class Application
         }
 
         return $this->grantImplicitGrantType;
+    }
+
+    /**
+     * @var null|TokenEndpoint
+     */
+    private $tokenEndpoint = null;
+
+    /**
+     * @return TokenEndpoint
+     */
+    public function getTokenEndpoint(): TokenEndpoint
+    {
+        if (null === $this->tokenEndpoint) {
+            $this->tokenEndpoint = new TokenEndpoint(
+                $this->getResponseFactory(),
+                $this->getCommandBus(),
+                $this->getTokenTypeManager()
+            );
+        }
+
+        return $this->tokenEndpoint;
+    }
+
+    /**
+     * @var null|TokenTypeManagerInterface
+     */
+    private $tokenTypeManager = null;
+
+    /**
+     * @return TokenTypeManagerInterface
+     */
+    public function getTokenTypeManager(): TokenTypeManagerInterface
+    {
+        if (null === $this->tokenTypeManager) {
+            $this->tokenTypeManager = new TokenTypeManager();
+            $this->tokenTypeManager->addTokenType($this->getBearerTokenType());
+            $this->tokenTypeManager->addTokenType($this->getMacTokenType());
+        }
+
+        return $this->tokenTypeManager;
+    }
+
+    /**
+     * @var null|GrantTypeMiddleware
+     */
+    private $grantTypeMiddleware = null;
+
+    /**
+     * @return GrantTypeMiddleware
+     */
+    public function getGrantTypeMiddleware(): GrantTypeMiddleware
+    {
+        if (null === $this->grantTypeMiddleware) {
+            $this->grantTypeMiddleware = new GrantTypeMiddleware(
+                $this->getGrantTypeManager()
+            );
+        }
+
+        return $this->grantTypeMiddleware;
+    }
+
+    /**
+     * @var null|Pipe
+     */
+    private $tokenEndpointPipe = null;
+
+    /**
+     * @return Pipe
+     */
+    public function getTokenEndpointPipe(): Pipe
+    {
+        if (null === $this->tokenEndpointPipe) {
+            $this->tokenEndpointPipe = new Pipe();
+            $this->tokenEndpointPipe->appendMiddleware($this->getOAuth2ResponseMiddleware());
+            $this->tokenEndpointPipe->appendMiddleware($this->getClientAuthenticationMiddleware());
+            $this->tokenEndpointPipe->appendMiddleware($this->getGrantTypeMiddleware());
+            $this->tokenEndpointPipe->appendMiddleware($this->getTokenTypeMiddleware());
+            $this->tokenEndpointPipe->appendMiddleware($this->getTokenEndpoint());
+        }
+
+        return $this->tokenEndpointPipe;
+    }
+
+    /**
+     * @var null|TokenTypeMiddleware
+     */
+    private $tokenTypeMiddleware = null;
+
+    /**
+     * @return TokenTypeMiddleware
+     */
+    public function getTokenTypeMiddleware(): TokenTypeMiddleware
+    {
+        if (null === $this->tokenTypeMiddleware) {
+            $this->tokenTypeMiddleware = new TokenTypeMiddleware(
+                $this->getTokenTypeManager(),
+                true
+            );
+        }
+
+        return $this->tokenTypeMiddleware;
+    }
+
+    /**
+     * @var null|CreateAccessTokenCommandHandler
+     */
+    private $createAccessTokenCommandHandler = null;
+
+    /**
+     * @return CreateAccessTokenCommandHandler
+     */
+    public function getCreateAccessTokenCommandHandler(): CreateAccessTokenCommandHandler
+    {
+        if (null === $this->createAccessTokenCommandHandler) {
+            $this->createAccessTokenCommandHandler = new CreateAccessTokenCommandHandler(
+                $this->getAccessTokenRepository(),
+                $this->getPublicMessageRecorder()
+            );
+        }
+
+        return $this->createAccessTokenCommandHandler;
     }
 }

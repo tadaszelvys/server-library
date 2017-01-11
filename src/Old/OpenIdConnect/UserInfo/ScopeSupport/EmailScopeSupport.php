@@ -16,7 +16,7 @@ class EmailScopeSupport implements UserInfoScopeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function getScope()
+    public function getScope(): string
     {
         return 'email';
     }
@@ -24,7 +24,7 @@ class EmailScopeSupport implements UserInfoScopeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function getClaims()
+    public function getClaims(): array
     {
         return [
             'email',

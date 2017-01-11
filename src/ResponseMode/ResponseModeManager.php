@@ -23,7 +23,7 @@ class ResponseModeManager implements ResponseModeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function addResponseMode(ResponseModeInterface $responseMode)
+    public function add(ResponseModeInterface $responseMode)
     {
         $this->responseModes[$responseMode->getName()] = $responseMode;
     }
@@ -31,7 +31,7 @@ class ResponseModeManager implements ResponseModeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function hasResponseMode(string $name): bool
+    public function has(string $name): bool
     {
         return array_key_exists($name, $this->responseModes);
     }
@@ -39,7 +39,7 @@ class ResponseModeManager implements ResponseModeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponseMode(string $name): ResponseModeInterface
+    public function get(string $name): ResponseModeInterface
     {
         Assertion::true($this->hasResponseMode($name), sprintf('The response mode with name \'%s\' is not supported.', $name));
 
@@ -49,7 +49,7 @@ class ResponseModeManager implements ResponseModeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getSupportedResponseModes(): array
+    public function list(): array
     {
         return array_keys($this->responseModes);
     }

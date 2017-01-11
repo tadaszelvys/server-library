@@ -62,7 +62,7 @@ final class CreateClientCommandHandler
         $this->clientRepository->save($client);
         $event = ClientCreatedEvent::create($client);
         $this->messageRecorder->record($event);
-        $callback = $command->getCallback();
+        $callback = $command->getDataTransporter();
         $callback($client);
     }
 }

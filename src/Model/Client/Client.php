@@ -90,7 +90,6 @@ final class Client extends ResourceOwner
         Assertion::string($grant_type, 'Argument must be a string.');
         $grant_types = $this->has('grant_types') ? $this->get('grant_types') : [];
         Assertion::isArray($grant_types, 'The metadata \'grant_types\' must be an array.');
-
         return in_array($grant_type, $grant_types);
     }
 

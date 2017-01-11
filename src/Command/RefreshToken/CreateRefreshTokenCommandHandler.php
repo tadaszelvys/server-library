@@ -48,7 +48,8 @@ final class CreateRefreshTokenCommandHandler
             $command->getUserAccount(),
             $command->getClient(),
             $command->getParameters(),
-            $command->getExpiresAt()
+            $command->getExpiresAt(),
+            $command->getMetadatas()
         );
         $this->refreshTokenRepository->save($refreshToken);
         $event = RefreshTokenCreatedEvent::create($refreshToken);

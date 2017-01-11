@@ -13,85 +13,93 @@ namespace OAuth2\OpenIdConnect\UserInfo;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Jose\JWTCreatorInterface;
 use Jose\Object\JWKSetInterface;
+use OAuth2\Model\AccessToken\AccessToken;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-class UserInfoEndpoint implements UserInfoEndpointInterface
+class UserInfoEndpoint implements MiddlewareInterface
 {
     /**
      * @var string|null
      */
-    private $signature_algorithm = null;
+    private $signatureAlgorithm = null;
 
     /**
-     * @var \Jose\Object\JWKSetInterface|null
+     * @var JWKSetInterface|null
      */
-    private $signature_key_set = null;
+    private $signatureKeySet = null;
+
+    /**
+     * @var UserInfoInterface
+     */
+    private $userinfo;
+
+    /**
+     * @var null|JWTCreatorInterface
+     */
+    private $jwtCreator = null;
+
+    /**
+     * @var null|string
+     */
+    private $issuer;
 
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param \OAuth2\UserAccount\UserAccountManagerInterface        $user_account_manager
-     * @param \OAuth2\Client\ClientManagerInterface                  $client_manager
-     * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface       $userinfo
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
+     * @param UserInfoInterface $userinfo
      */
-    public function __construct(UserAccountManagerInterface $user_account_manager,
-                                ClientManagerInterface $client_manager,
-                                UserInfoInterface $userinfo,
-                                OAuth2ResponseFactoryManagerInterface $response_factory_manager
-    ) {
-        $this->setUserAccountManager($user_account_manager);
-        $this->setClientManager($client_manager);
-        $this->setUserinfo($userinfo);
-        $this->setResponsefactoryManager($response_factory_manager);
+    public function __construct(UserInfoInterface $userinfo)
+    {
+        $this->userinfo = $userinfo;
     }
 
     /**
-     * @param \Jose\JWTCreatorInterface    $jwt_creator
-     * @param string                       $issuer
-     * @param string                       $signature_algorithm
-     * @param \Jose\Object\JWKSetInterface $signature_key_set
+     * @param JWTCreatorInterface $jwtCreator
+     * @param string              $issuer
+     * @param string              $signatureAlgorithm
+     * @param JWKSetInterface     $signatureKeySet
      */
-    public function enableSignedResponsesSupport(JWTCreatorInterface $jwt_creator,
-                                                 $issuer,
-                                                 $signature_algorithm,
-                                                 JWKSetInterface $signature_key_set
-    ) {
+    public function enableSignedResponsesSupport(JWTCreatorInterface $jwtCreator, $issuer, $signatureAlgorithm, JWKSetInterface $signatureKeySet)
+    {
         Assertion::string($issuer);
-        Assertion::inArray($signature_algorithm, $jwt_creator->getSupportedSignatureAlgorithms());
-        Assertion::greaterThan($signature_key_set->countKeys(), 0, 'The signature key set must have at least one key.');
-        $this->setJWTCreator($jwt_creator);
-
-        $this->setIssuer($issuer);
-        $this->signature_key_set = $signature_key_set;
-        $this->signature_algorithm = $signature_algorithm;
+        Assertion::inArray($signatureAlgorithm, $jwtCreator->getSupportedSignatureAlgorithms());
+        Assertion::greaterThan($signatureKeySet->countKeys(), 0, 'The signature key set must have at least one key.');
+        $this->jwtCreator = $jwtCreator;
+        $this->issuer = $issuer;
+        $this->signatureKeySet = $signatureKeySet;
+        $this->signatureAlgorithm = $signatureAlgorithm;
     }
 
     /**
      * @return bool
      */
-    public function isSignedResponsesSupportEnabled()
+    public function isSignedResponsesSupportEnabled(): bool
     {
-        return $this->hasJWTCreator();
+        return null !== $this->jwtCreator;
     }
 
     /**
-     * {@inheritdoc}
+     * @return \string[]
      */
-    public function getSupportedSignatureAlgorithms()
+    public function getSupportedSignatureAlgorithms(): array
     {
-        return false === $this->hasJWTCreator() ? [] : $this->getJWTCreator()->getSupportedSignatureAlgorithms();
+        return false === $this->isSignedResponsesSupportEnabled() ? [] : $this->jwtCreator->getSupportedSignatureAlgorithms();
     }
 
     /**
-     * {@inheritdoc}
+     * @return \string[]
      */
-    public function getSupportedKeyEncryptionAlgorithms()
+    public function getSupportedKeyEncryptionAlgorithms(): array
     {
-        return false === $this->hasJWTCreator() ? [] : $this->getJWTCreator()->getSupportedKeyEncryptionAlgorithms();
+        return false === $this->isSignedResponsesSupportEnabled() ? [] : $this->jwtCreator->getSupportedKeyEncryptionAlgorithms();
     }
 
     /**
@@ -99,14 +107,13 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
      */
     public function getSupportedContentEncryptionAlgorithms()
     {
-        return false === $this->hasJWTCreator() ? [] : $this->getJWTCreator()->getSupportedContentEncryptionAlgorithms();
+        return false === $this->isSignedResponsesSupportEnabled() ? [] : $this->jwtCreator->getSupportedContentEncryptionAlgorithms();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(AccessTokenInterface $access_token)
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
+        $access_token = $request->getAttribute('access_token');
+
         $this->checkScope($access_token->getScope());
         $this->checkHasRedirectUri($access_token);
 
@@ -114,7 +121,7 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
         $user = $this->getUserAccount($access_token);
         $endpoint_claims = $this->getEndpointClaims($access_token);
 
-        $claims = $this->getUserinfo()->getUserinfo(
+        $claims = $this->userinfo->getUserinfo(
             $client,
             $user,
             $access_token->getMetadata('redirect_uri'),
@@ -128,8 +135,8 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
                 $claims,
                 [
                     'jti'       => Base64Url::encode(random_bytes(25)),
-                    'iss'       => $this->getIssuer(),
-                    'aud'       => [$this->getIssuer(), $client->getPublicId()],
+                    'iss'       => $this->issuer,
+                    'aud'       => [$this->issuer, $client->getId()],
                     'iat'       => time(),
                     'nbf'       => time(),
                     'exp'       => $access_token->getExpiresAt(),
@@ -143,11 +150,11 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     * @param AccessToken $access_token
      *
      * @return array
      */
-    private function getEndpointClaims(AccessTokenInterface $access_token)
+    private function getEndpointClaims(AccessToken $access_token): array
     {
         if (!$access_token->hasMetadata('requested_claims')) {
             return [];
@@ -162,54 +169,54 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     * @param AccessToken $access_token
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      *
-     * @return null|\OAuth2\Client\ClientInterface
+     * @return null|Client
      */
-    private function getClient(AccessTokenInterface $access_token)
+    private function getClient(AccessToken $access_token): Client
     {
-        $client = $this->getClientManager()->getClient($access_token->getClientPublicId());
+        $client = $access_token->getClient();
         if (null === $client) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the client.']));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the client.']);
         }
 
         return $client;
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     * @param AccessToken $access_token
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      *
-     * @return null|\OAuth2\UserAccount\UserAccountInterface
+     * @return UserAccount
      */
-    private function getUserAccount(AccessTokenInterface $access_token)
+    private function getUserAccount(AccessToken $access_token): UserAccount
     {
-        $user_account = $this->getUserAccountManager()->getUserAccountByPublicId($access_token->getUserAccountPublicId());
-        if (null === $user_account) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the resource owner.']));
+        $userAccount = $access_token->getResourceOwner();
+        if (!$userAccount instanceof UserAccount) {
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the resource owner.']);
         }
 
-        return $user_account;
+        return $userAccount;
     }
 
     /**
      * @param array                          $claims
-     * @param \OAuth2\Client\ClientInterface $client
+     * @param Client $client
      *
      * @return string
      */
-    private function signAndEncrypt($claims, ClientInterface $client)
+    private function signAndEncrypt(array $claims, Client $client): string
     {
-        $signature_key = $this->signature_key_set->getKey(0);
+        $signature_key = $this->signatureKeySet->getKey(0);
         Assertion::notNull($signature_key, 'Unable to find a key to sign the userinfo response. Please verify the selected key set contains suitable keys.');
-        $jwt = $this->getJWTCreator()->sign(
+        $jwt = $this->jwtCreator->sign(
             $claims,
             [
                 'typ' => 'JWT',
-                'alg' => $this->signature_algorithm,
+                'alg' => $this->signatureAlgorithm,
             ],
             $signature_key
         );
@@ -218,7 +225,7 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
             $key_set = $client->getPublicKeySet();
             $key = $key_set->selectKey('enc');
             if (null !== $key) {
-                $jwt = $this->getJWTCreator()->encrypt(
+                $jwt = $this->jwtCreator->encrypt(
                     $jwt,
                     [
                         'alg' => $client->get('id_token_encrypted_response_alg'),
@@ -233,26 +240,26 @@ class UserInfoEndpoint implements UserInfoEndpointInterface
     }
 
     /**
-     * @param \OAuth2\Token\AccessTokenInterface $access_token
+     * @param AccessToken $access_token
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      */
-    private function checkHasRedirectUri(AccessTokenInterface $access_token)
+    private function checkHasRedirectUri(AccessToken $access_token)
     {
         if (!$access_token->hasMetadata('redirect_uri')) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token has no \'redirect_uri\' data and cannot be used.']));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token has no \'redirect_uri\' data and cannot be used.']);
         }
     }
 
     /**
      * @param string[] $scope
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      */
     private function checkScope(array $scope)
     {
         if (!in_array('openid', $scope)) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token does not contain the \'openid\' scope.']));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token does not contain the \'openid\' scope.']);
         }
     }
 }

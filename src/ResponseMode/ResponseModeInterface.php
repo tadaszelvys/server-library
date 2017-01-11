@@ -12,19 +12,20 @@
 namespace OAuth2\ResponseMode;
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 
 interface ResponseModeInterface
 {
     /**
      * @return string
      */
-    public function getName(): string;
+    public function name(): string;
 
     /**
-     * @param string $redirect_uri
+     * @param UriInterface $redirectUri
      * @param array  $data
      *
      * @return ResponseInterface
      */
-    public function prepareResponse(string $redirect_uri, array $data): ResponseInterface;
+    public function buildResponse(UriInterface $redirectUri, array $data): ResponseInterface;
 }

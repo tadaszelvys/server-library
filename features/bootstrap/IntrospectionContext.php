@@ -10,25 +10,38 @@
  */
 
 use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 class IntrospectionContext extends BaseContext
 {
-    use ResponseTrait;
+    /**
+     * @var ResponseContext
+     */
+    private $responseContext;
+
+    /**
+     * @BeforeScenario
+     *
+     * @param BeforeScenarioScope $scope
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+
+        $this->responseContext = $environment->getContext('ResponseContext');
+    }
 
     /**
      * @Given An unauthenticated protected resource tries to get information about a token
      */
     public function anUnauthenticatedProtectedResourceTriesToGetInformationAboutAToken()
     {
-        /**
-         * @var \Psr\Http\Message\ServerRequestInterface
-         */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->setResponse($this->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
     }
 
     /**
@@ -36,16 +49,13 @@ class IntrospectionContext extends BaseContext
      */
     public function aProtectedResourceSendsAnInvalidIntrospectionRequest()
     {
-        /**
-         * @var \Psr\Http\Message\ServerRequestInterface
-         */
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->setResponse($this->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
     }
 
     /**

@@ -11,10 +11,11 @@
 
 namespace OAuth2\Command\Client;
 
+use OAuth2\Command\CommandWithDataTransporter;
 use OAuth2\DataTransporter;
 use OAuth2\Model\UserAccount\UserAccount;
 
-final class CreateClientCommand
+final class CreateClientCommand extends CommandWithDataTransporter
 {
     /**
      * @var array
@@ -27,22 +28,16 @@ final class CreateClientCommand
     private $userAccount;
 
     /**
-     * @var DataTransporter
-     */
-    private $callback;
-
-    /**
      * CreateClientCommand constructor.
-     *
-     * @param UserAccount     $userAccount
-     * @param array           $parameters
-     * @param DataTransporter $callback
+     * @param UserAccount $userAccount
+     * @param array $parameters
+     * @param DataTransporter|null $dataTransporter
      */
-    protected function __construct(UserAccount $userAccount, array $parameters, DataTransporter $callback)
+    protected function __construct(UserAccount $userAccount, array $parameters, DataTransporter $dataTransporter = null)
     {
         $this->parameters = $parameters;
         $this->userAccount = $userAccount;
-        $this->callback = $callback;
+        parent::__construct($dataTransporter);
     }
 
     /**
@@ -71,13 +66,5 @@ final class CreateClientCommand
     public function getUserAccount(): UserAccount
     {
         return $this->userAccount;
-    }
-
-    /**
-     * @return DataTransporter
-     */
-    public function getCallback(): DataTransporter
-    {
-        return $this->callback;
     }
 }

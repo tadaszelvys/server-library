@@ -12,8 +12,9 @@
 use Psr\Http\Message\ResponseInterface;
 use Behat\Gherkin\Node\PyStringNode;
 use Assert\Assertion;
+use Behat\Behat\Tester\Exception\PendingException;
 
-trait ResponseTrait
+class ResponseContext  extends BaseContext
 {
     /**
      * @var null|ResponseInterface
@@ -28,7 +29,7 @@ trait ResponseTrait
     /**
      * @param ResponseInterface $response
      */
-    protected function setResponse(ResponseInterface $response)
+    public function setResponse(ResponseInterface $response)
     {
         $this->response = $response;
         if ($this->response->getBody()->isSeekable()) {
@@ -39,7 +40,7 @@ trait ResponseTrait
     /**
      * @return ResponseInterface
      */
-    protected function getResponse(): ResponseInterface
+    public function getResponse(): ResponseInterface
     {
         return $this->response;
     }
@@ -109,5 +110,49 @@ trait ResponseTrait
         Assertion::notNull($this->error);
         Assertion::keyExists($this->error, 'error_description');
         Assertion::eq($errorDescription, $this->error['error_description']);
+    }
+
+    /**
+     * @Then the client should be redirected
+     */
+    public function theClientShouldBeRedirected()
+    {
+        Assertion::eq(302, $this->getResponse()->getStatusCode());
+        $header = $this->getResponse()->getHeaders();
+        Assertion::keyExists($header, 'Location');
+        $location = $header['Location'];
+        Assertion::true(!empty($location));
+    }
+
+    /**
+     * @Then the redirect Uri contains an error
+     */
+    public function theRedirectUriContainsAnError()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then no access token creation event is thrown
+     */
+    public function noAccessTokenCreationEventIsThrown()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then the response contains an access token
+     */
+    public function theResponseContainsAnAccessToken()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @Then an access token creation event is thrown
+     */
+    public function anAccessTokenCreationEventIsThrown()
+    {
+        throw new PendingException();
     }
 }

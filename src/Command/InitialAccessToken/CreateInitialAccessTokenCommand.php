@@ -11,9 +11,11 @@
 
 namespace OAuth2\Command\InitialAccessToken;
 
+use OAuth2\Command\CommandWithDataTransporter;
+use OAuth2\DataTransporter;
 use OAuth2\Model\UserAccount\UserAccount;
 
-final class CreateInitialAccessTokenCommand
+final class CreateInitialAccessTokenCommand extends CommandWithDataTransporter
 {
     /**
      * @var UserAccount
@@ -27,14 +29,15 @@ final class CreateInitialAccessTokenCommand
 
     /**
      * CreateInitialAccessTokenCommand constructor.
-     *
-     * @param UserAccount             $userAccount
+     * @param UserAccount $userAccount
      * @param \DateTimeImmutable|null $expiresAt
+     * @param DataTransporter|null $dataTransporter
      */
-    protected function __construct(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null)
+    protected function __construct(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null, DataTransporter $dataTransporter = null)
     {
         $this->userAccount = $userAccount;
         $this->expiresAt = $expiresAt;
+        parent::__construct($dataTransporter);
     }
 
     /**

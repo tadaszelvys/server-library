@@ -11,17 +11,31 @@
 
 namespace OAuth2\ResponseMode;
 
+use Interop\Http\Factory\ResponseFactoryInterface;
 use OAuth2\Grant\ResponseTypeInterface;
-use OAuth2\Util\Uri;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\Response;
+use Psr\Http\Message\UriInterface;
 
 class QueryResponseMode implements ResponseModeInterface
 {
     /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
+     * QueryResponseMode constructor.
+     * @param ResponseFactoryInterface $responseFactory
+     */
+    public function __construct(ResponseFactoryInterface $responseFactory)
+    {
+        $this->responseFactory = $responseFactory;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function name(): string
     {
         return ResponseTypeInterface::RESPONSE_TYPE_MODE_QUERY;
     }
@@ -29,15 +43,15 @@ class QueryResponseMode implements ResponseModeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareResponse(string $redirect_uri, array $data): ResponseInterface
+    public function buildResponse(UriInterface $redirectUri, array $data): ResponseInterface
     {
-        $params = empty($data) ? [] : [$this->getName() => $data];
-        if (!array_key_exists('fragment', $params)) {
-            $params['fragment'] = [];
-        }
+        $redirectUri = $redirectUri->withFragment('_=_');
+        parse_str($redirectUri->getQuery(), $queryParams);
+        $queryParams += $data;
+        $redirectUri = $redirectUri->withQuery(http_build_query($queryParams));
 
-        $response = new Response('php://memory', 302);
-        $response = $response->withHeader('Location', Uri::buildURI($redirect_uri, $params));
+        $response = $this->responseFactory->createResponse(302);
+        $response = $response->withHeader('Location', $redirectUri->__toString());
 
         return $response;
     }

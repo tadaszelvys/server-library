@@ -21,6 +21,7 @@ use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 
 class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInterface
 {
@@ -122,23 +123,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function checkAuthorization(Authorization $authorization)
-    {
-        if (false === $this->arePublicClientsAllowed() && true === $authorization->getClient()->isPublic()) {
-            throw new OAuth2Exception(
-                400,
-                [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
-                    'error_description' => 'Public clients are not allowed to use the authorization code grant type.',
-                ]
-            );
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, UriInterface $redirect_uri)
     {
         //Nothing to do
     }

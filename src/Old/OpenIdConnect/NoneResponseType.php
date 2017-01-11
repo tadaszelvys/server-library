@@ -80,14 +80,6 @@ class NoneResponseType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function checkAuthorization(AuthorizationInterface $authorization)
-    {
-        //Nothing to do
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
     {
         //Nothing to do

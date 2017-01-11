@@ -12,9 +12,9 @@
 namespace OAuth2\Middleware;
 
 use Assert\Assertion;
-use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use OAuth2\Response\OAuth2Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class HttpMethod implements MiddlewareInterface
@@ -23,21 +23,6 @@ final class HttpMethod implements MiddlewareInterface
      * @var MiddlewareInterface[]
      */
     private $methodMap = [];
-
-    /**
-     * @var array|ResponseFactoryInterface
-     */
-    private $responseFactory = [];
-
-    /**
-     * HttpMethod constructor.
-     *
-     * @param ResponseFactoryInterface $responseFactory
-     */
-    public function __construct(ResponseFactoryInterface $responseFactory)
-    {
-        $this->responseFactory = $responseFactory;
-    }
 
     /**
      * @param string              $method
@@ -57,7 +42,13 @@ final class HttpMethod implements MiddlewareInterface
         $method = $request->getMethod();
 
         if (!array_key_exists($method, $this->methodMap)) {
-            return $this->responseFactory->createResponse(405);
+            throw new OAuth2Exception(
+                405,
+                [
+                    'error' => 'not_implemented',
+                    'error_description' => sprintf('The method \'%s\' is not supported.', $method),
+                ]
+            );
         }
 
         $middleware = $this->methodMap[$method];

@@ -12,21 +12,22 @@
 namespace OAuth2\OpenIdConnect\Pairwise;
 
 use OAuth2\Model\UserAccount\UserAccount;
+use Psr\Http\Message\UriInterface;
 
 interface PairwiseSubjectIdentifierAlgorithmInterface
 {
     /**
-     * @param UserAccount $user
-     * @param string      $sector_identifier_uri
+     * @param UserAccount  $user
+     * @param UriInterface $sectorIdentifierUri
      *
      * @return string
      */
-    public function calculateSubjectIdentifier(UserAccount $user, $sector_identifier_uri);
+    public function calculateSubjectIdentifier(UserAccount $user, UriInterface $sectorIdentifierUri): string;
 
     /**
-     * @param string $subject_identifier
+     * @param string $subjectIdentifier
      *
      * @return string|null
      */
-    public function getPublicIdFromSubjectIdentifier($subject_identifier);
+    public function getPublicIdFromSubjectIdentifier(string $subjectIdentifier);
 }

@@ -45,14 +45,19 @@ final class CreateIdTokenCommandHandler
     public function handle(CreateIdTokenCommand $command)
     {
         $idToken = $this->idTokenRepository->create(
-            $command->getResourceOwnerId(),
-            $command->getClientId(),
+            $command->getClient(),
+            $command->getUserAccount(),
+            $command->getRedirectUri(),
             $command->getParameters(),
             $command->getMetadatas(),
             $command->getScopes(),
-            $command->getExpiresAt()
+            $command->getExpiresAt(),
+            []
         );
-        $this->idTokenRepository->save($idToken);
+        if (null !== $command->getDataTransporter()) {
+            $data = $command->getDataTransporter();
+            $data($idToken);
+        }
         $event = IdTokenCreatedEvent::create($idToken);
         $this->messageRecorder->record($event);
     }

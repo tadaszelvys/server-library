@@ -11,10 +11,11 @@
 
 namespace OAuth2\Command\Client;
 
+use OAuth2\Command\CommandWithDataTransporter;
 use OAuth2\DataTransporter;
 use OAuth2\Model\Client\Client;
 
-final class UpdateClientCommand
+final class UpdateClientCommand extends CommandWithDataTransporter
 {
     /**
      * @var Client
@@ -27,34 +28,29 @@ final class UpdateClientCommand
     private $parameters;
 
     /**
-     * @var DataTransporter
-     */
-    private $callback;
-
-    /**
      * UpdateClientCommand constructor.
      *
      * @param Client          $client
      * @param array           $parameters
-     * @param DataTransporter $callback
+     * @param DataTransporter $dataTransporter
      */
-    protected function __construct(Client $client, array $parameters, DataTransporter $callback)
+    protected function __construct(Client $client, array $parameters, DataTransporter $dataTransporter)
     {
         $this->client = $client;
         $this->parameters = $parameters;
-        $this->callback = $callback;
+        parent::__construct($dataTransporter);
     }
 
     /**
      * @param Client          $client
      * @param array           $parameters
-     * @param DataTransporter $callback
+     * @param DataTransporter $dataTransporter
      *
      * @return UpdateClientCommand
      */
-    public static function create(Client $client, array $parameters, DataTransporter $callback): self
+    public static function create(Client $client, array $parameters, DataTransporter $dataTransporter): self
     {
-        return new self($client, $parameters, $callback);
+        return new self($client, $parameters, $dataTransporter);
     }
 
     /**
@@ -71,13 +67,5 @@ final class UpdateClientCommand
     public function getParameters(): array
     {
         return $this->parameters;
-    }
-
-    /**
-     * @return DataTransporter
-     */
-    public function getCallback(): DataTransporter
-    {
-        return $this->callback;
     }
 }

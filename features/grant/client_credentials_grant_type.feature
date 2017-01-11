@@ -1,40 +1,34 @@
 Feature: A client request an access token using the Client Credentials Grant Type
-  In order get a protected resource
-  A client must get an Access Token
-  Using a valid request to the Token Endpoint
 
-  Scenario: The request is valid and an access token is issued
-    Given I have a valid client assertion for client 'jwt1' in the body request
-    And I add key "scope" with value "scope1" in the body request
-    And I add key "grant_type" with value "client_credentials" in the body request
-    When I post the request to "https://oauth2.test/token/get"
-    Then I should receive an OAuth2 response
-    And the response is not an OAuth2 Exception
+  Scenario: A client sends a Client Credentials Grant Type request but client is not authenticated
+    Given An unauthenticated client sends a Client Credentials Grant Type request
+    Then the response contains an error with code 401
+    And the error is "invalid_client"
+    And the error description is "Client authentication failed."
+    And no access token creation event is thrown
+
+  Scenario: A client sends a Client Credentials Grant Type request but it is a public client
+    Given An public client sends a Client Credentials Grant Type request
+    Then the response contains an error with code 400
+    And the error is "invalid_client"
+    And the error description is "The client is not a confidential client."
+    And no access token creation event is thrown
+
+  Scenario: A client sends a valid Client Credentials Grant Type request
+    Given A client sends a valid Client Credentials Grant Type request
+    Then the response code is 200
     And the response contains an access token
-    And the status code of the response is 200
+    And an access token creation event is thrown
 
-  Scenario: The request is valid and an access token is issued
-    Given I add key "X-OAuth2-Public-Client-ID" with value "foo" in the header
-    And I add key "scope" with value "scope1 scope2" in the body request
-    And I add key "grant_type" with value "client_credentials" in the body request
-    When I post the request to "https://oauth2.test/token/get"
-    Then I should receive an OAuth2 exception with message 'invalid_client' and description 'The client is not a confidential client'
-    And the status code of the response is 400
-
-  Scenario: The request is valid and an access token is issued
-    Given I add user 'bar' and password 'secret' in the authorization header
-    And I add key "scope" with value "scope1 scope2" in the body request
-    And I add key "grant_type" with value "client_credentials" in the body request
-    When I post the request to "https://oauth2.test/token/get"
-    Then I should receive an OAuth2 response
-    And the response is not an OAuth2 Exception
+  Scenario: A client sends a valid Client Credentials Grant Type request
+    Given A client authenticated with a JWT assertion sends a valid Client Credentials Grant Type request
+    Then the response code is 200
     And the response contains an access token
-    And the status code of the response is 200
+    And an access token creation event is thrown
 
-  Scenario: The request is valid but the client is not authorized
-    Given I add user 'baz' and password 'secret' in the authorization header
-    And I add key "scope" with value "scope1 scope2" in the body request
-    And I add key "grant_type" with value "client_credentials" in the body request
-    When I post the request to "https://oauth2.test/token/get"
-    Then I should receive an OAuth2 exception with message 'unauthorized_client' and description 'The grant type "client_credentials" is unauthorized for this client.'
-    And the status code of the response is 400
+  Scenario: A client sends a valid Client Credentials Grant Type request but this grant type is not allowed to the client
+    Given A client sends a valid Client Credentials Grant Type request but the grant type is not allowed
+    Then the response contains an error with code 400
+    And the error is "invalid_request"
+    And the error description is "The grant type 'client_credentials' is unauthorized for this client."
+    And no access token creation event is thrown

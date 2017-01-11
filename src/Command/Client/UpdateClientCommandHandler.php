@@ -68,7 +68,7 @@ final class UpdateClientCommandHandler
         $this->clientRepository->save($client);
         $event = ClientUpdatedEvent::create($client);
         $this->messageRecorder->record($event);
-        $callback = $command->getCallback();
+        $callback = $command->getDataTransporter();
         $callback($client);
     }
 }

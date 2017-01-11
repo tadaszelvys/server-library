@@ -12,16 +12,13 @@
 namespace OAuth2\Command\AccessToken;
 
 use Assert\Assertion;
+use OAuth2\Command\CommandWithDataTransporter;
+use OAuth2\DataTransporter;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\ResourceOwner\ResourceOwner;
 
-final class CreateAccessTokenCommand
+final class CreateAccessTokenCommand extends CommandWithDataTransporter
 {
-    /**
-     * @var \DateTimeImmutable
-     */
-    private $expiresAt;
-
     /**
      * @var ResourceOwner
      */
@@ -43,7 +40,7 @@ final class CreateAccessTokenCommand
     private $metadatas;
 
     /**
-     * @var string[]
+     * @var \string[]
      */
     private $scopes;
 
@@ -54,17 +51,17 @@ final class CreateAccessTokenCommand
      * @param Client             $client
      * @param array              $parameters
      * @param array              $metadatas
-     * @param string[]           $scopes
-     * @param \DateTimeImmutable $expiresAt
+     * @param array              $scopes
+     * @param DataTransporter $dataTransporter
      */
-    protected function __construct(ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt)
+    protected function __construct(Client $client, ResourceOwner $resourceOwner, array $parameters, array $metadatas, array $scopes, DataTransporter $dataTransporter = null)
     {
         $this->resourceOwner = $resourceOwner;
         $this->client = $client;
-        $this->expiresAt = $expiresAt;
         $this->parameters = $parameters;
-        $this->scopes = $scopes;
         $this->metadatas = $metadatas;
+        $this->scopes = $scopes;
+        parent::__construct($dataTransporter);
     }
 
     /**
@@ -72,22 +69,14 @@ final class CreateAccessTokenCommand
      * @param Client             $client
      * @param array              $parameters
      * @param array              $metadatas
-     * @param string[]           $scopes
-     * @param \DateTimeImmutable $expiresAt
+     * @param array              $scopes
+     * @param DataTransporter $dataTransporter
      *
      * @return CreateAccessTokenCommand
      */
-    public static function create(ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt): CreateAccessTokenCommand
+    public static function create(Client $client, ResourceOwner $resourceOwner, array $parameters, array $metadatas, array $scopes, DataTransporter $dataTransporter = null): CreateAccessTokenCommand
     {
-        return new self($resourceOwner, $client, $parameters, $metadatas, $scopes, $expiresAt);
-    }
-
-    /**
-     * @return \string[]
-     */
-    public function getScopes(): array
-    {
-        return $this->scopes;
+        return new self($client, $resourceOwner, $parameters, $metadatas, $scopes, $dataTransporter);
     }
 
     /**
@@ -96,14 +85,6 @@ final class CreateAccessTokenCommand
     public function getResourceOwner(): ResourceOwner
     {
         return $this->resourceOwner;
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function getExpiresAt(): \DateTimeImmutable
-    {
-        return $this->expiresAt;
     }
 
     /**
@@ -176,5 +157,13 @@ final class CreateAccessTokenCommand
         Assertion::true($this->hasParameter($key), sprintf('The metadata \'%s\' does not exist.', $key));
 
         return $this->metadatas;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getScopes(): array
+    {
+        return $this->scopes;
     }
 }

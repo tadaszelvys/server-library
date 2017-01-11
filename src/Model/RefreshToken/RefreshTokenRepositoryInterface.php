@@ -26,10 +26,11 @@ interface RefreshTokenRepositoryInterface
      * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
      * @param string[]           $scopes
+     * @param array              $metadatas
      *
      * @return RefreshToken
      */
-    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes);
+    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas);
 
     /**
      * @param RefreshTokenId $refreshTokenId

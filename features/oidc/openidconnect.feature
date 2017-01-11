@@ -22,13 +22,3 @@ Feature: A client sends a request against the OpenID Connect Userinfo Endpoint
     When I am on the page "https://oauth2.test/keys/public.jwkset.json"
     Then the status code of the response is 200
     And the content type is "application/jwk-set+json"
-
-  Scenario: The server configuration is available through an Url
-    When I am on the page "https://oauth2.test/.well-known/openid-configuration"
-    Then the status code of the response is 200
-    And the content type is "application/json; charset=UTF-8"
-
-  Scenario: The server has an OP iframe endpoint
-    When I am on the page "https://oauth2.test/session/manager/iframe"
-    Then the status code of the response is 200
-    And the content type is "text/html; charset=UTF-8"

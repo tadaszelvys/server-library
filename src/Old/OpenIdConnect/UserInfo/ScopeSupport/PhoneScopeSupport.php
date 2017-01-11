@@ -16,7 +16,7 @@ class PhoneScopeSupport implements UserInfoScopeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function getScope()
+    public function getScope(): string
     {
         return 'phone';
     }
@@ -24,7 +24,7 @@ class PhoneScopeSupport implements UserInfoScopeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function getClaims()
+    public function getClaims(): array
     {
         return [
             'phone_number',

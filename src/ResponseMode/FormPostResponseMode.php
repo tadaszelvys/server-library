@@ -11,16 +11,39 @@
 
 namespace OAuth2\ResponseMode;
 
+use Interop\Http\Factory\ResponseFactoryInterface;
+use Interop\Http\Factory\StreamFactoryInterface;
 use OAuth2\Grant\ResponseTypeInterface;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\Response;
+use Psr\Http\Message\UriInterface;
 
 final class FormPostResponseMode implements ResponseModeInterface
 {
     /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
+     * @var StreamFactoryInterface
+     */
+    private $streamFactory;
+
+    /**
+     * FormPostResponseMode constructor.
+     * @param ResponseFactoryInterface $responseFactory
+     * @param StreamFactoryInterface $streamFactory
+     */
+    public function __construct(ResponseFactoryInterface $responseFactory, StreamFactoryInterface $streamFactory)
+    {
+        $this->responseFactory = $responseFactory;
+        $this->streamFactory = $streamFactory;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function name(): string
     {
         return ResponseTypeInterface::RESPONSE_TYPE_MODE_FORM_POST;
     }
@@ -28,22 +51,24 @@ final class FormPostResponseMode implements ResponseModeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareResponse(string $redirect_uri, array $data): ResponseInterface
+    public function buildResponse(UriInterface $redirectUri, array $data): ResponseInterface
     {
-        $template = $this->renderTemplate($redirect_uri, $data);
-        $response = new Response();
-        $response->getBody()->write($template);
+        $template = $this->renderTemplate($redirectUri, $data);
+        $response = $this->responseFactory->createResponse();
+        $body = $this->streamFactory->createStream($template);
+        $response = $response->withBody($body);
+        $response = $response->withHeader('Content-Type', 'text/html');
 
         return $response;
     }
 
     /**
-     * @param string $redirect_uri
+     * @param UriInterface $redirectUri
      * @param array  $data
      *
      * @return string
      */
-    protected function renderTemplate(string $redirect_uri, array $data): string
+    protected function renderTemplate(UriInterface $redirectUri, array $data): string
     {
         $content = <<<'EOT'
 <!doctype html>
@@ -70,7 +95,7 @@ EOT;
             $input[] = sprintf('<input type="hidden" name="%s" value="%s"/>', $key, $value);
         }
         $replacements = [
-            '{{redirect_uri}}' => $redirect_uri,
+            '{{redirect_uri}}' => $redirectUri->__toString(),
             '{{input}}'        => implode(PHP_EOL, $input),
         ];
 

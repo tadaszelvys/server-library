@@ -11,12 +11,6 @@
 
 namespace OAuth2\Endpoint\Authorization;
 
-use OAuth2\Behaviour\HasJWTLoader;
-use OAuth2\Behaviour\HasParameterCheckerManager;
-use OAuth2\Behaviour\HasResponseFactoryManager;
-use OAuth2\Behaviour\HasResponseModeManager;
-use OAuth2\Behaviour\HasResponseTypeManager;
-use OAuth2\Client\ClientInterface;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface;
 use OAuth2\Grant\ResponseTypeManagerInterface;
 use OAuth2\Response\OAuth2Exception;
@@ -26,34 +20,28 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class AuthorizationFactory implements AuthorizationFactoryInterface
 {
-    use HasJWTLoader;
-    use HasResponseFactoryManager;
-    use HasResponseModeManager;
-    use HasResponseTypeManager;
-    use HasParameterCheckerManager;
-
     /**
      * @var \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface
      */
-    private $authorization_request_loader;
+    private $authorizationRequestLoader;
 
     /**
      * @var bool
      */
-    private $response_mode_parameter_in_authorization_request_enabled = true;
+    private $responseModeParameterInAuthorizationRequestEnabled = true;
 
     /**
      * AuthorizationFactory constructor.
      *
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface               $authorization_request_loader
+     * @param \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface               $authorizationRequestLoader
      * @param \OAuth2\Grant\ResponseTypeManagerInterface                                       $response_type_manager
      * @param \OAuth2\ResponseMode\ResponseModeManagerInterface                                $response_mode_manager
      * @param \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface $parameter_checker_manager
      * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface                           $response_factory_manager
      */
-    public function __construct(AuthorizationRequestLoaderInterface $authorization_request_loader, ResponseTypeManagerInterface $response_type_manager, ResponseModeManagerInterface $response_mode_manager, ParameterCheckerManagerInterface $parameter_checker_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
+    public function __construct(AuthorizationRequestLoaderInterface $authorizationRequestLoader, ResponseTypeManagerInterface $response_type_manager, ResponseModeManagerInterface $response_mode_manager, ParameterCheckerManagerInterface $parameter_checker_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
     {
-        $this->authorization_request_loader = $authorization_request_loader;
+        $this->authorizationRequestLoader = $authorizationRequestLoader;
         $this->setResponseTypeManager($response_type_manager);
         $this->setResponseModeManager($response_mode_manager);
         $this->setParameterCheckerManager($parameter_checker_manager);
@@ -65,7 +53,7 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     public function isResponseModeParameterSupported()
     {
-        return $this->response_mode_parameter_in_authorization_request_enabled;
+        return $this->responseModeParameterInAuthorizationRequestEnabled;
     }
 
     /**
@@ -73,7 +61,7 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     public function enableResponseModeParameterSupport()
     {
-        $this->response_mode_parameter_in_authorization_request_enabled = true;
+        $this->responseModeParameterInAuthorizationRequestEnabled = true;
     }
 
     /**
@@ -81,7 +69,7 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     public function disableResponseModeParameterSupport()
     {
-        $this->response_mode_parameter_in_authorization_request_enabled = false;
+        $this->responseModeParameterInAuthorizationRequestEnabled = false;
     }
 
     /**
@@ -89,7 +77,7 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     public function createAuthorizationFromRequest(ServerRequestInterface $request)
     {
-        $parameters = $this->authorization_request_loader->loadParametersFromRequest($request);
+        $parameters = $this->authorizationRequestLoader->loadParametersFromRequest($request);
         $client = $parameters['client'];
 
         $this->getParameterCheckerManager()->checkParameters($client, $parameters);

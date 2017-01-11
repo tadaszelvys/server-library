@@ -14,6 +14,11 @@ namespace OAuth2\Model\ResourceServer;
 interface ResourceServerRepositoryInterface
 {
     /**
+     * @return ResourceServer
+     */
+    public function create(): ResourceServer;
+
+    /**
      * @param ResourceServer $resourceServer
      */
     public function save(ResourceServer $resourceServer);

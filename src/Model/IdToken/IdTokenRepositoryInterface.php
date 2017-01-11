@@ -19,19 +19,18 @@ use OAuth2\Model\UserAccount\UserAccount;
 interface IdTokenRepositoryInterface
 {
     /**
-     * @param Client           $client
-     * @param UserAccount      $user_account_account
-     * @param string           $redirect_uri
-     * @param array            $claims_locales
-     * @param array            $request_claims
-     * @param string[]         $scope
-     * @param array            $id_token_claims
-     * @param AccessToken|null $access_token
-     * @param AuthCode|null    $auth_code
-     *
-     * @return IdToken
+     * @param Client $client
+     * @param UserAccount $userAccount
+     * @param string $redirectUri
+     * @param array $claimsLocales
+     * @param array $requestClaims
+     * @param array $scopes
+     * @param array $idTokenClaims
+     * @param AccessToken|null $accessToken
+     * @param AuthCode|null $authCode
+     * @return mixed
      */
-    public function create(Client $client, UserAccount $userAccount, string $redirectUri, array $claimsLocales, array $requestClaims, array $scopes, array $idTokenClaims = [], AccessToken $accessToken = null, AuthCode $authCode = null);
+    public function create(Client $client, UserAccount $userAccount, string $redirectUri, array $claimsLocales, array $requestClaims, array $scopes, array $idTokenClaims, AccessToken $accessToken = null, AuthCode $authCode = null);
 
     /**
      * @param IdToken $token The ID token to revoke

@@ -11,39 +11,26 @@
 
 namespace OAuth2\Grant;
 
+use OAuth2\Command\AccessToken\CreateAccessTokenCommand;
+use OAuth2\DataTransporter;
 use OAuth2\Endpoint\Authorization\Authorization;
-use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
-use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\TokenType\TokenTypeManagerInterface;
+use Psr\Http\Message\UriInterface;
+use SimpleBus\Message\Bus\MessageBus;
 
 class ImplicitGrantType implements ResponseTypeInterface
 {
     /**
-     * @var bool
+     * @var MessageBus
      */
-    private $confidentialClientsAllowed = false;
-
-    /**
-     * @var TokenTypeManagerInterface
-     */
-    private $token_type_manager;
-
-    /**
-     * @var AccessTokenRepositoryInterface
-     */
-    private $access_token_manager;
+    private $commandBus;
 
     /**
      * ImplicitGrantType constructor.
-     *
-     * @param TokenTypeManagerInterface      $token_type_manager
-     * @param AccessTokenRepositoryInterface $access_token_manager
+     * @param MessageBus $messageBus
      */
-    public function __construct(TokenTypeManagerInterface $token_type_manager, AccessTokenRepositoryInterface $access_token_manager)
+    public function __construct(MessageBus $messageBus)
     {
-        $this->token_type_manager = $token_type_manager;
-        $this->access_token_manager = $access_token_manager;
+        $this->messageBus = $messageBus;
     }
 
     /**
@@ -73,23 +60,7 @@ class ImplicitGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function checkAuthorization(Authorization $authorization)
-    {
-        if (false === $this->areConfidentialClientsAllowed() && false === $authorization->getClient()->isPublic()) {
-            throw new OAuth2Exception(
-                400,
-                [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
-                    'error_description' => 'Confidential clients are not allowed to use the implicit grant type.',
-                ]
-            );
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, UriInterface $redirect_uri)
     {
         //Nothing to do
     }
@@ -99,39 +70,24 @@ class ImplicitGrantType implements ResponseTypeInterface
      */
     public function prepareAuthorization(Authorization $authorization)
     {
-        $token_type = $this->getTokenTypeFromRequest($authorization->getQueryParams());
+        $tokenType = $authorization->getTokenType();
 
-        $token = $this->access_token_manager->create(
+        $dataTransporter = new DataTransporter();
+        $command = CreateAccessTokenCommand::create(
             $authorization->getClient(),
             $authorization->getUserAccount(),
-            $token_type->getTokenTypeInformation(),
+            $tokenType->getTokenTypeInformation(),
             $authorization->getQueryParams(),
             $authorization->getScopes(),
             null, // Refresh token
             null, // Resource Server
-            ['redirect_uri' => $authorization->getRedirectUri()]
+            ['redirect_uri' => $authorization->getRedirectUri()],
+            $dataTransporter
         );
 
-        $authorization = $authorization->withData('access_token', $token);
+        $this->commandBus->handle($command);
+        $authorization = $authorization->withData('access_token', $dataTransporter->getData());
 
-        return $token->toArray();
-    }
-
-    /**
-     * @return bool
-     */
-    public function areConfidentialClientsAllowed(): bool
-    {
-        return $this->confidentialClientsAllowed;
-    }
-
-    public function allowConfidentialClients()
-    {
-        $this->confidentialClientsAllowed = true;
-    }
-
-    public function disallowConfidentialClients()
-    {
-        $this->confidentialClientsAllowed = false;
+        return $dataTransporter->getData()->toArray();
     }
 }

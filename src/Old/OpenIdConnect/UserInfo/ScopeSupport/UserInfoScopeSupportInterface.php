@@ -16,10 +16,10 @@ interface UserInfoScopeSupportInterface
     /**
      * @return string
      */
-    public function getScope();
+    public function getScope(): string;
 
     /**
      * @return string[]
      */
-    public function getClaims();
+    public function getClaims(): array;
 }

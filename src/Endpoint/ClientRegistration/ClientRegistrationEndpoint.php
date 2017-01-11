@@ -13,7 +13,6 @@ namespace OAuth2\Endpoint\ClientRegistration;
 
 use Assert\Assertion;
 use Interop\Http\Factory\ResponseFactoryInterface;
-use Interop\Http\Factory\StreamFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Command\Client\CreateClientCommand;
@@ -39,21 +38,14 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
     private $responseFactory;
 
     /**
-     * @var StreamFactoryInterface
-     */
-    private $streamFactory;
-
-    /**
      * ClientRegistrationEndpoint constructor.
      *
      * @param ResponseFactoryInterface $responseFactory
-     * @param StreamFactoryInterface   $streamFactory
      * @param MessageBus               $messageBus
      */
-    public function __construct(ResponseFactoryInterface $responseFactory, StreamFactoryInterface $streamFactory, MessageBus $messageBus)
+    public function __construct(ResponseFactoryInterface $responseFactory, MessageBus $messageBus)
     {
         $this->responseFactory = $responseFactory;
-        $this->streamFactory = $streamFactory;
         $this->messageBus = $messageBus;
     }
 
@@ -102,8 +94,7 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
         foreach (['Content-Type' => 'application/json', 'Cache-Control' => 'no-store', 'Pragma' => 'no-cache'] as $k => $v) {
             $response = $response->withHeader($k, $v);
         }
-        $stream = $this->streamFactory->createStream(json_encode($client->all()));
-        $response = $response->withBody($stream);
+        $response->getBody()->write(json_encode($client->all()));
 
         return $response;
     }

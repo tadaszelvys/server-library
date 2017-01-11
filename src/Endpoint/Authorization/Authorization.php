@@ -16,8 +16,10 @@ use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\ResponseMode\ResponseModeInterface;
+use OAuth2\TokenType\TokenTypeInterface;
+use Psr\Http\Message\UriInterface;
 
-class Authorization
+final class Authorization
 {
     /**
      * @var bool
@@ -45,6 +47,11 @@ class Authorization
     private $data = [];
 
     /**
+     * @var TokenTypeInterface
+     */
+    private $tokenType;
+
+    /**
      * @var ResponseTypeInterface[]
      */
     private $responseTypes = [];
@@ -57,32 +64,33 @@ class Authorization
     /**
      * @var array
      */
-    private $query_params = [];
+    private $queryParameters = [];
 
     /**
      * @var string
      */
-    private $redirect_uri;
+    private $redirectUri;
 
     /**
      * Authorization constructor.
-     *
-     * @param array                   $query_params
-     * @param Client                  $client
-     * @param ResponseTypeInterface[] $responseTypes
-     * @param ResponseModeInterface   $responseMode
-     * @param string                  $redirect_uri
-     * @param string[]                $scopes
+     * @param array $queryParameters
+     * @param Client $client
+     * @param TokenTypeInterface $tokenType
+     * @param array $responseTypes
+     * @param ResponseModeInterface $responseMode
+     * @param UriInterface $redirectUri
+     * @param string[] $scopes
      */
-    public function __construct(array $query_params, Client $client, array $responseTypes, ResponseModeInterface $responseMode, $redirect_uri, array $scopes)
+    public function __construct(array $queryParameters, Client $client, TokenTypeInterface $tokenType, array $responseTypes, ResponseModeInterface $responseMode, UriInterface $redirectUri, array $scopes)
     {
         Assertion::allIsInstanceOf($responseTypes, ResponseTypeInterface::class);
         $this->scopes = $scopes;
         $this->client = $client;
-        $this->query_params = $query_params;
+        $this->queryParameters = $queryParameters;
+        $this->tokenType = $tokenType;
         $this->responseMode = $responseMode;
         $this->responseTypes = $responseTypes;
-        $this->redirect_uri = $redirect_uri;
+        $this->redirectUri = $redirectUri;
     }
 
     /**
@@ -119,7 +127,15 @@ class Authorization
      */
     public function getQueryParams(): array
     {
-        return $this->query_params;
+        return $this->queryParameters;
+    }
+
+    /**
+     * @return TokenTypeInterface
+     */
+    public function getTokenType(): TokenTypeInterface
+    {
+        return $this->tokenType;
     }
 
     /**
@@ -141,8 +157,6 @@ class Authorization
      */
     public function hasPrompt(string $prompt): bool
     {
-        Assertion::string($prompt);
-
         return in_array($prompt, $this->getPrompt());
     }
 
@@ -174,7 +188,6 @@ class Authorization
      */
     public function hasScope(string $scope): bool
     {
-        Assertion::string($scope);
 
         return null !== $this->scopes && in_array($scope, $this->scopes);
     }
@@ -248,9 +261,7 @@ class Authorization
      */
     public function hasQueryParam(string $param): bool
     {
-        Assertion::string($param);
-
-        return array_key_exists($param, $this->query_params);
+        return array_key_exists($param, $this->queryParameters);
     }
 
     /**
@@ -260,10 +271,9 @@ class Authorization
      */
     public function getQueryParam(string $param)
     {
-        Assertion::string($param);
         Assertion::true($this->hasQueryParam($param), sprintf('Invalid parameter "%s"', $param));
 
-        return $this->query_params[$param];
+        return $this->queryParameters[$param];
     }
 
     /**
@@ -315,7 +325,7 @@ class Authorization
      */
     public function getRedirectUri(): string
     {
-        return $this->redirect_uri;
+        return $this->redirectUri;
     }
 
     /**

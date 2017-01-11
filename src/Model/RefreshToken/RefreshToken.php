@@ -29,16 +29,6 @@ class RefreshToken extends Token
     private $accessTokens;
 
     /**
-     * @var array
-     */
-    private $parameters;
-
-    /**
-     * @var string[]
-     */
-    private $scopes;
-
-    /**
      * RefreshToken constructor.
      * @param RefreshTokenId $refreshTokenId
      * @param ResourceOwner $resourceOwner
@@ -46,13 +36,12 @@ class RefreshToken extends Token
      * @param array $parameters
      * @param \DateTimeImmutable $expiresAt
      * @param array $scopes
+     * @param array $metadatas
      */
-    protected function __construct(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes)
+    protected function __construct(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
     {
-        parent::__construct($resourceOwner, $client, $expiresAt);
+        parent::__construct($resourceOwner, $client, $expiresAt, $parameters, $metadatas, $scopes);
         $this->refreshTokenId = $refreshTokenId;
-        $this->parameters = $parameters;
-        $this->scopes = $scopes;
     }
 
     /**
@@ -62,11 +51,12 @@ class RefreshToken extends Token
      * @param array $parameters
      * @param \DateTimeImmutable $expiresAt
      * @param string[] $scopes
+     * @param array $metadatas
      * @return RefreshToken
      */
-    public static function create(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes)
+    public static function create(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
     {
-        return new self($refreshTokenId, $resourceOwner, $client, $parameters, $expiresAt, $scopes);
+        return new self($refreshTokenId, $resourceOwner, $client, $parameters, $expiresAt, $scopes, $metadatas);
     }
 
     /**
@@ -101,22 +91,6 @@ class RefreshToken extends Token
     public function getAccessTokens(): array
     {
         return $this->accessTokens;
-    }
-
-    /**
-     * @return array
-     */
-    public function getParameters(): array
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * @return \string[]
-     */
-    public function getScopes(): array
-    {
-        return $this->scopes;
     }
 
     /**

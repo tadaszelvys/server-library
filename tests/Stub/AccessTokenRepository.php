@@ -68,6 +68,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
                 ),
                 [],
                 new \DateTimeImmutable('now +2 days'),
+                [],
                 []
             )
         ));
@@ -106,6 +107,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
                 ),
                 [],
                 new \DateTimeImmutable('now +2 days'),
+                [],
                 []
             )
         ));
@@ -266,7 +268,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
     {
         return AccessToken::create(
-            AccessTokenId::create(base64_encode(random_bytes(50))),
+            AccessTokenId::create(bin2hex(random_bytes(50))),
             $resourceOwner,
             $client,
             $parameters,

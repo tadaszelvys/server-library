@@ -14,6 +14,7 @@ namespace OAuth2\OpenIdConnect\Pairwise;
 use Assert\Assertion;
 use Base64Url\Base64Url;
 use OAuth2\Model\UserAccount\UserAccount;
+use Psr\Http\Message\UriInterface;
 
 class HashedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInterface
 {
@@ -25,7 +26,7 @@ class HashedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInter
     /**
      * @var string
      */
-    private $pairwise_hash_key;
+    private $pairwiseHashKey;
 
     /**
      * @var string
@@ -35,17 +36,17 @@ class HashedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInter
     /**
      * EncryptedSubjectIdentifier constructor.
      *
-     * @param string $pairwise_hash_key
+     * @param string $pairwiseHashKey
      * @param string $algorithm
      * @param string $salt
      */
-    public function __construct($pairwise_hash_key, $algorithm, $salt)
+    public function __construct($pairwiseHashKey, $algorithm, $salt)
     {
-        Assertion::string($pairwise_hash_key);
+        Assertion::string($pairwiseHashKey);
         Assertion::string($algorithm);
         Assertion::string($salt);
         Assertion::inArray($algorithm, hash_algos(), sprintf('The algorithm \'%s\' is not supported.', $algorithm));
-        $this->pairwise_hash_key = $pairwise_hash_key;
+        $this->pairwiseHashKey = $pairwiseHashKey;
         $this->algorithm = $algorithm;
         $this->salt = $salt;
     }
@@ -53,22 +54,22 @@ class HashedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInter
     /**
      * {@inheritdoc}
      */
-    public function calculateSubjectIdentifier(UserAccount $userAccount, $sector_identifier_host)
+    public function calculateSubjectIdentifier(UserAccount $userAccount, UriInterface $sectorIdentifierHost): string
     {
         $prepared = sprintf(
             '%s%s%s',
-            $sector_identifier_host,
+            $sectorIdentifierHost,
             $userAccount->getId()->getValue(),
             $this->salt
         );
 
-        return Base64Url::encode(hash_hmac($this->algorithm, $prepared, $this->pairwise_hash_key, true));
+        return Base64Url::encode(hash_hmac($this->algorithm, $prepared, $this->pairwiseHashKey, true));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPublicIdFromSubjectIdentifier($subject_identifier)
+    public function getPublicIdFromSubjectIdentifier(string $subjectIdentifier)
     {
     }
 }

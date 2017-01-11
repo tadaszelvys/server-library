@@ -50,10 +50,13 @@ final class CreateAccessTokenCommandHandler
             $command->getParameters(),
             $command->getMetadatas(),
             $command->getScopes(),
-            $command->getExpiresAt()
+            new \DateTimeImmutable('now + 1 day')
         );
         $this->accessTokenRepository->save($accessToken);
         $event = AccessTokenCreatedEvent::create($accessToken);
+        if (null !== $data = $command->getDataTransporter()) {
+            $data($accessToken);
+        }
         $this->messageRecorder->record($event);
     }
 }

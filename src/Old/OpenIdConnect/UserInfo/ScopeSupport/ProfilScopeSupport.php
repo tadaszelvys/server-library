@@ -16,7 +16,7 @@ class ProfilScopeSupport implements UserInfoScopeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function getScope()
+    public function getScope(): string
     {
         return 'profile';
     }
@@ -24,7 +24,7 @@ class ProfilScopeSupport implements UserInfoScopeSupportInterface
     /**
      * {@inheritdoc}
      */
-    public function getClaims()
+    public function getClaims(): array
     {
         return [
             'sub',

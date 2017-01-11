@@ -16,14 +16,14 @@ interface ResponseModeManagerInterface
     /**
      * @param ResponseModeInterface $responseMode
      */
-    public function addResponseMode(ResponseModeInterface $responseMode);
+    public function add(ResponseModeInterface $responseMode);
 
     /**
      * @param string $name
      *
      * @return bool
      */
-    public function hasResponseMode(string $name): bool;
+    public function has(string $name): bool;
 
     /**
      * @param string $name
@@ -32,10 +32,10 @@ interface ResponseModeManagerInterface
      *
      * @return ResponseModeInterface
      */
-    public function getResponseMode(string $name): ResponseModeInterface;
+    public function get(string $name): ResponseModeInterface;
 
     /**
      * @return string[]
      */
-    public function getSupportedResponseModes(): array;
+    public function list(): array;
 }

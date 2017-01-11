@@ -11,19 +11,35 @@
 
 namespace OAuth2\OpenIdConnect\SessionManagement;
 
+use Interop\Http\Factory\ResponseFactoryInterface;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response;
 
-class IFrameEndpoint implements IFrameEndpointInterface
+class IFrameEndpoint implements MiddlewareInterface
 {
+    /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
+     * IFrameEndpoint constructor.
+     * @param ResponseFactoryInterface $responseFactory
+     */
+    public function __construct(ResponseFactoryInterface $responseFactory)
+    {
+        $this->responseFactory = $responseFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function handle(ServerRequestInterface $server)
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         $content = $this->renderTemplate();
 
-        $response = new Response('php://memory');
+        $response = $this->responseFactory->createResponse();
         $response = $response->withHeader('Cache-Control', 'no-store');
         $response = $response->withHeader('Pragma', 'no-cache');
         $response->getBody()->write($content);

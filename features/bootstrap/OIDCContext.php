@@ -9,6 +9,24 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+
 class OIDCContext extends BaseContext
 {
+    /**
+     * @var ResponseContext
+     */
+    private $responseContext;
+
+    /**
+     * @BeforeScenario
+     *
+     * @param BeforeScenarioScope $scope
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+
+        $this->responseContext = $environment->getContext('ResponseContext');
+    }
 }

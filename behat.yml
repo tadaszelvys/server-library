@@ -2,16 +2,16 @@ default:
     suites:
         client:
             paths: [ '%paths.base%/features/client' ]
-            contexts: ['ClientContext']
+            contexts: ['ResponseContext', 'ClientContext']
         grant_type:
             paths: [ '%paths.base%/features/grant' ]
-            contexts: ['GrantContext']
+            contexts: ['ResponseContext', 'ClientCredentialsGrantTypeContext', 'AuthorizationCodeGrantTypeContext']
         oidc:
             paths: [ '%paths.base%/features/oidc' ]
-            contexts: ['OIDCContext']
+            contexts: ['ResponseContext', 'OIDCContext']
         introspection:
             paths: [ '%paths.base%/features/introspection' ]
-            contexts: ['IntrospectionContext']
+            contexts: ['ResponseContext', 'IntrospectionContext']
         revocation:
             paths: [ '%paths.base%/features/revocation' ]
-            contexts: ['RevocationContext']
+            contexts: ['ResponseContext', 'RevocationContext']

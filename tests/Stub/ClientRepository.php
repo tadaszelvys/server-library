@@ -33,6 +33,17 @@ class ClientRepository implements ClientRepositoryInterface
             [
                 'token_endpoint_auth_method' => 'client_secret_basic',
                 'client_secret' => 'secret',
+                'grant_types' => ['client_credentials']
+            ],
+            UserAccount::create(
+                UserAccountId::create('User1'),
+                []
+            )
+        ));
+        $this->save(Client::create(
+            ClientId::create('client2'),
+            [
+                'token_endpoint_auth_method' => 'none',
             ],
             UserAccount::create(
                 UserAccountId::create('User1'),

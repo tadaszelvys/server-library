@@ -11,33 +11,34 @@
 
 namespace OAuth2\OpenIdConnect;
 
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\Command\IdToken\CreateIdTokenCommand;
+use OAuth2\DataTransporter;
+use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\Grant\ResponseTypeInterface;
+use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\TokenType\TokenTypeManagerInterface;
+use SimpleBus\Message\Bus\MessageBus;
 
 class IdTokenGrantType implements ResponseTypeInterface
 {
     /**
-     * IdTokenGrantType constructor.
-     *
-     * @param \OAuth2\TokenType\TokenTypeManagerInterface            $token_type_manager
-     * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface          $id_token_manager
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
+     * @var MessageBus
      */
-    public function __construct(TokenTypeManagerInterface $token_type_manager,
-                                IdTokenManagerInterface $id_token_manager,
-                                OAuth2ResponseFactoryManagerInterface $response_factory_manager
-    ) {
-        $this->setTokenTypeManager($token_type_manager);
-        $this->setIdTokenManager($id_token_manager);
-        $this->setResponsefactoryManager($response_factory_manager);
+    private $commandBus;
+
+    /**
+     * IdTokenGrantType constructor.
+     * @param MessageBus $commandBus
+     */
+    public function __construct(MessageBus $commandBus)
+    {
+        $this->commandBus = $commandBus;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedGrantTypes()
+    public function getAssociatedGrantTypes(): array
     {
         return [];
     }
@@ -45,7 +46,7 @@ class IdTokenGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponseType()
+    public function getResponseType(): string
     {
         return 'id_token';
     }
@@ -53,7 +54,7 @@ class IdTokenGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponseMode()
+    public function getResponseMode(): string
     {
         return self::RESPONSE_TYPE_MODE_FRAGMENT;
     }
@@ -61,21 +62,19 @@ class IdTokenGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function checkAuthorization(AuthorizationInterface $authorization)
-    {
-        //Nothing to do
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function prepareAuthorization(AuthorizationInterface $authorization)
+    public function prepareAuthorization(Authorization $authorization)
     {
         if (!in_array('openid', $authorization->getScopes())) {
             return [];
         }
         if (!array_key_exists('nonce', $authorization->getQueryParams())) {
-            throw $this->getResponseFactoryManager()->getBadRequestException(OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'The parameter \'nonce\' is mandatory using \'id_token\' response type.');
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error_description' => 'The parameter \'nonce\' is mandatory using \'id_token\' response type.',
+                ]
+            );
         }
 
         return [];
@@ -84,11 +83,12 @@ class IdTokenGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
     {
         $params = $authorization->getQueryParams();
         $requested_claims = $this->getIdTokenClaims($authorization);
-        $id_token = $this->getIdTokenManager()->createIdToken(
+        $dataTransporter = new DataTransporter();
+        $command = CreateIdTokenCommand::create(
             $authorization->getClient(),
             $authorization->getUserAccount(),
             $redirect_uri,
@@ -97,23 +97,20 @@ class IdTokenGrantType implements ResponseTypeInterface
             $authorization->getScopes(),
             ['nonce' => $params['nonce']],
             $authorization->hasData('access_token') ? $authorization->getData('access_token') : null,
-            $authorization->hasData('code') ? $authorization->getData('code') : null
+            $authorization->hasData('code') ? $authorization->getData('code') : null,
+            $dataTransporter
         );
-
-        $authorization->setData('id_token', $id_token);
-
-        $response_parameters = array_merge(
-            $response_parameters,
-            $id_token->toArray()
-        );
+        $this->commandBus->handle($command);
+        $authorization = $authorization->withData('id_token', $dataTransporter->getData());
+        $response_parameters = $response_parameters + $dataTransporter->getData()->toArray();
     }
 
     /**
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     * @param \OAuth2\Endpoint\Authorization\Authorization $authorization
      *
      * @return array
      */
-    private function getIdTokenClaims(AuthorizationInterface $authorization)
+    private function getIdTokenClaims(Authorization $authorization)
     {
         if (!$authorization->hasQueryParam('claims')) {
             return [];

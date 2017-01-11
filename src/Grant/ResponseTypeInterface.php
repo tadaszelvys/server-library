@@ -12,6 +12,7 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Endpoint\Authorization\Authorization;
+use Psr\Http\Message\UriInterface;
 
 interface ResponseTypeInterface
 {
@@ -42,17 +43,6 @@ interface ResponseTypeInterface
     public function getResponseMode(): string;
 
     /**
-     * This function checks the authorization.
-     *
-     * @param \OAuth2\Endpoint\Authorization\Authorization $authorization The authorization object
-     *
-     * @throws \OAuth2\Response\OAuth2Exception
-     *
-     * @return array
-     */
-    public function checkAuthorization(Authorization $authorization);
-
-    /**
      * This function checks the request and prepare the authorization response.
      *
      * @param \OAuth2\Endpoint\Authorization\Authorization $authorization The authorization object
@@ -68,11 +58,11 @@ interface ResponseTypeInterface
      *
      * @param \OAuth2\Endpoint\Authorization\Authorization $authorization       The authorization object
      * @param array                                        $response_parameters The parameters to send to the client
-     * @param string                                       $redirect_uri        The redirect URI
+     * @param UriInterface                                 $redirect_uri        The redirect URI
      *
      * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return array
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri);
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, UriInterface $redirect_uri);
 }

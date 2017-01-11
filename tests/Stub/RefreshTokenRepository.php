@@ -11,9 +11,6 @@
 
 namespace OAuth2\Test\Stub;
 
-/*use Jose\JWTCreatorInterface;
-use Jose\JWTLoaderInterface;
-use Jose\Object\JWKSetInterface;*/
 use OAuth2\Model\RefreshToken\RefreshToken;
 use OAuth2\Model\RefreshToken\RefreshTokenId;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
@@ -33,22 +30,23 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     public function __construct()
     {
         $this->save(RefreshToken::create(
-                RefreshTokenId::create('REFRESH_TOKEN_#1'),
+            RefreshTokenId::create('REFRESH_TOKEN_#1'),
+            UserAccount::create(
+                UserAccountId::create('User #1'),
+                []
+            ),
+            Client::create(
+                ClientId::create('client1'),
+                [],
                 UserAccount::create(
                     UserAccountId::create('User #1'),
                     []
-                ),
-                Client::create(
-                    ClientId::create('client1'),
-                    [],
-                    UserAccount::create(
-                        UserAccountId::create('User #1'),
-                        []
-                    )
-                ),
-                [],
-                new \DateTimeImmutable('now +2 days'),
-                []
+                )
+            ),
+            [],
+            new \DateTimeImmutable('now +2 days'),
+            [],
+            []
         ));
     }
 
@@ -80,7 +78,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
         return array_key_exists($tokenId->getValue(), $this->refreshTokens) ? $this->refreshTokens[$tokenId->getValue()] : null;
     }
 
-    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes)
+    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
     {
         return RefreshToken::create(
             RefreshTokenId::create(base64_encode(random_bytes(50))),
@@ -88,7 +86,8 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
             $client,
             $parameters,
             $expiresAt,
-            $scopes
+            $scopes,
+            $metadatas
         );
     }
 
