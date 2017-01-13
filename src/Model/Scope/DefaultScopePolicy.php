@@ -33,7 +33,7 @@ class DefaultScopePolicy implements ScopePolicyInterface
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function name(): string
     {
         return 'default';
     }

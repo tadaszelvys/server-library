@@ -19,7 +19,7 @@ class NoScopePolicy implements ScopePolicyInterface
     /**
      * {@inheritdoc}
      */
-    public function getName():string
+    public function name():string
     {
         return 'none';
     }

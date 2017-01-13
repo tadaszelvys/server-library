@@ -1553,6 +1553,7 @@ final class Application
                 $this->getCommandBus(),
                 $this->getTokenTypeManager()
             );
+            $this->tokenEndpoint->enableScopeSupport($this->getScopeRepository());
         }
 
         return $this->tokenEndpoint;

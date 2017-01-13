@@ -29,6 +29,6 @@ Feature: A client request an access token using the Client Credentials Grant Typ
   Scenario: A client sends a valid Client Credentials Grant Type request but this grant type is not allowed to the client
     Given A client sends a valid Client Credentials Grant Type request but the grant type is not allowed
     Then the response contains an error with code 400
-    And the error is "invalid_request"
+    And the error is "unauthorized_client"
     And the error description is "The grant type 'client_credentials' is unauthorized for this client."
     And no access token creation event is thrown

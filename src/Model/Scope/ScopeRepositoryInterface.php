@@ -92,5 +92,5 @@ interface ScopeRepositoryInterface
      *
      * @return string[] An array of scopes
      */
-    public function convertToArray($scope): array;
+    public function convertToArray(string $scope): array;
 }

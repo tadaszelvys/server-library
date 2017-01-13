@@ -19,7 +19,7 @@ class ErrorScopePolicy implements ScopePolicyInterface
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function name(): string
     {
         return 'error';
     }

@@ -12,7 +12,6 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Endpoint\Token\GrantTypeResponse;
-use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -33,21 +32,31 @@ interface GrantTypeInterface
     public function getGrantType(): string;
 
     /**
+     * This function checks the request.
+     *
+     * @param ServerRequestInterface $request The request
+     *
+     * @throws OAuth2Exception
+     */
+    public function checkTokenRequest(ServerRequestInterface $request);
+
+    /**
      * This function checks the request and returns information to issue an access token.
      *
      * @param ServerRequestInterface                   $request             The request
      * @param GrantTypeResponse $grantTypeResponse
+     * @return GrantTypeResponse
      *
      * @throws OAuth2Exception
      */
-    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponse &$grantTypeResponse);
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse $grantTypeResponse): GrantTypeResponse;
 
     /**
      * @param ServerRequestInterface     $request
-     * @param Client                     $client
      * @param GrantTypeResponse $grantTypeResponse
+     * @return GrantTypeResponse
      *
      * @throws OAuth2Exception
      */
-    public function grantAccessToken(ServerRequestInterface $request, Client $client, GrantTypeResponse &$grantTypeResponse);
+    public function grant(ServerRequestInterface $request, GrantTypeResponse $grantTypeResponse): GrantTypeResponse;
 }

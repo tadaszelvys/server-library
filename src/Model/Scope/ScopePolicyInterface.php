@@ -18,7 +18,7 @@ interface ScopePolicyInterface
     /**
      * @return string
      */
-    public function getName(): string;
+    public function name(): string;
 
     /**
      * This function check if the scopes respect the scope policy for the client.

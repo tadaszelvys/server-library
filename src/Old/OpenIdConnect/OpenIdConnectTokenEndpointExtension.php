@@ -17,9 +17,9 @@ use OAuth2\Endpoint\Token\TokenEndpointExtensionInterface;
 use OAuth2\Endpoint\Token\GrantTypeResponse;
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\AuthCode\AuthCode;
-use OAuth2\Model\Client\Client;
 use OAuth2\Model\IdToken\IdToken;
 use OAuth2\Model\UserAccount\UserAccount;
+use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
 /**
@@ -41,56 +41,69 @@ class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensionInter
         $this->commandBus = $commandBus;
     }
 
-    /**
-     * {@inheritdoc].
-     */
-    public function postAccessTokenCreation(Client $client, GrantTypeResponse &$grantTypeResponse, AccessToken $accessToken)
+    public function process(ServerRequestInterface $request, GrantTypeResponse $tokenResponse, callable $next): AccessToken
     {
-        if (false === $this->issueIdToken($grantTypeResponse) || !$grantTypeResponse->hasMetadata('redirect_uri')) {
-            return;
-        }
-        $user = $grantTypeResponse->getResourceOwner();
-        if (!$grantTypeResponse->getResourceOwner() instanceof UserAccount) {
-            return;
-        }
+        //pre
 
-        $claims = [];
-        $authCode = $grantTypeResponse->getMetadata('auth_code');
-
-        if (!$authCode instanceof AuthCode) {
-            return;
+        $data = [
+            'redirect_uri' => $tokenResponse->getMetadata('redirect_uri'),
+        ];
+        if ($tokenResponse->hasMetadata('auth_code') && null !== $tokenResponse->getMetadata('auth_code')) {
+            $data['claims_locales'] = array_key_exists('claims_locales', $tokenResponse->getMetadata('auth_code')->getQueryParams()) ? $tokenResponse->getMetadata('auth_code')->getQueryParams()['claims_locales'] : null;
+            $data['requested_claims'] = array_key_exists('claims', $tokenResponse->getMetadata('auth_code')->getQueryParams()) ? $tokenResponse->getMetadata('auth_code')->getQueryParams()['claims'] : [];
+        } else {
+            $data['claims_locales'] = null;
+            $data['requested_claims'] = [];
         }
 
-        if (array_key_exists('nonce', $params = $authCode->getQueryParams())) {
-            $claims = array_merge(
+        return $data;
+
+        //post
+        if (true === $this->issueIdToken($tokenResponse) && $tokenResponse->hasMetadata('redirect_uri')) {
+
+            $user = $tokenResponse->getResourceOwner();
+            if (!$tokenResponse->getResourceOwner() instanceof UserAccount) {
+                return;
+            }
+
+            $claims = [];
+            $authCode = $tokenResponse->getMetadata('auth_code');
+
+            if (!$authCode instanceof AuthCode) {
+                return;
+            }
+
+            if (array_key_exists('nonce', $params = $authCode->getQueryParams())) {
+                $claims = array_merge(
+                    $claims,
+                    ['nonce' => $params['nonce']]
+                );
+            }
+
+            $requestedClaims = $this->getIdTokenClaims($accessToken);
+
+            $dataTransporter = new DataTransporter();
+            $command = CreateIdTokenCommand::create(
+                $client,
+                $user,
+                $accessToken->getMetadata('redirect_uri'),
+                $requestedClaims,
+                $accessToken->getMetadata('claims_locales'),
+                $accessToken->getScopes(),
                 $claims,
-                ['nonce' => $params['nonce']]
+                $accessToken,
+                $authCode,
+                $dataTransporter
             );
-        }
+            $this->commandBus->handle($command);
 
-        $requested_claims = $this->getIdTokenClaims($accessToken);
-
-        $dataTransporter = new DataTransporter();
-        $command = CreateIdTokenCommand::create(
-            $client,
-            $user,
-            $accessToken->getMetadata('redirect_uri'),
-            $requested_claims,
-            $accessToken->getMetadata('claims_locales'),
-            $accessToken->getScopes(),
-            $claims,
-            $accessToken,
-            $authCode,
-            $dataTransporter
-        );
-        $this->commandBus->handle($command);
-
-        /**
-         * @var $data IdToken
-         */
-        $data = $dataTransporter->getData();
-        foreach ($data->jsonSerialize() as $k => $v) {
-            $grantTypeResponse = $grantTypeResponse->withParameter($k, $v);
+            /**
+             * @var $data IdToken
+             */
+            $data = $dataTransporter->getData();
+            foreach ($data->jsonSerialize() as $k => $v) {
+                $tokenResponse = $tokenResponse->withParameter($k, $v);
+            }
         }
     }
 
@@ -105,40 +118,21 @@ class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensionInter
             return [];
         }
 
-        $requested_claims = $accessToken->getMetadata('requested_claims');
-        if (true === array_key_exists('id_token', $requested_claims)) {
-            return $requested_claims['id_token'];
+        $requestedClaims = $accessToken->getMetadata('requested_claims');
+        if (true === array_key_exists('id_token', $requestedClaims)) {
+            return $requestedClaims['id_token'];
         }
 
         return [];
     }
 
     /**
-     * @param GrantTypeResponse $grantTypeResponse
+     * @param GrantTypeResponse $tokenResponse
      *
      * @return bool
      */
-    private function issueIdToken(GrantTypeResponse $grantTypeResponse)
+    private function issueIdToken(GrantTypeResponse $tokenResponse)
     {
-        return $grantTypeResponse->hasScope('openid');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function preAccessTokenCreation(Client $client, GrantTypeResponse $grantTypeResponse, array $tokenTypeInformation)
-    {
-        $data = [
-            'redirect_uri' => $grantTypeResponse->getMetadata('redirect_uri'),
-        ];
-        if ($grantTypeResponse->hasMetadata('auth_code') && null !== $grantTypeResponse->getMetadata('auth_code')) {
-            $data['claims_locales'] = array_key_exists('claims_locales', $grantTypeResponse->getMetadata('auth_code')->getQueryParams()) ? $grantTypeResponse->getMetadata('auth_code')->getQueryParams()['claims_locales'] : null;
-            $data['requested_claims'] = array_key_exists('claims', $grantTypeResponse->getMetadata('auth_code')->getQueryParams()) ? $grantTypeResponse->getMetadata('auth_code')->getQueryParams()['claims'] : [];
-        } else {
-            $data['claims_locales'] = null;
-            $data['requested_claims'] = [];
-        }
-
-        return $data;
+        return $tokenResponse->hasScope('openid');
     }
 }

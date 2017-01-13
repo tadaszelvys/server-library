@@ -15,10 +15,10 @@ use Assert\Assertion;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
 use Jose\Object\JWSInterface;
+use OAuth2\Endpoint\Token\GrantTypeResponse;
 use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 class JWTBearerGrantType implements GrantTypeInterface
@@ -82,7 +82,7 @@ class JWTBearerGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grantTypeResponse)
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse &$grantTypeResponse)
     {
         $assertion = RequestBody::getParameter($request, 'assertion');
         try {
@@ -114,7 +114,7 @@ class JWTBearerGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, Client $client, GrantTypeResponseInterface &$grantTypeResponse)
+    public function grant(ServerRequestInterface $request, Client $client, GrantTypeResponse &$grantTypeResponse)
     {
         if (false === $client->hasPublicKeySet()) {
             throw new OAuth2Exception(400,

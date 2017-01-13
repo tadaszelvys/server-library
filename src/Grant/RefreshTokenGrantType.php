@@ -11,28 +11,23 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Behaviour\HasRefreshTokenManager;
-use OAuth2\Behaviour\HasResponseFactoryManager;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Endpoint\Token\GrantTypeResponse;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\RefreshToken\RefreshToken;
+use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Token\RefreshTokenInterface;
-use OAuth2\Token\RefreshTokenManagerInterface;
-use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 class RefreshTokenGrantType implements GrantTypeInterface
 {
-    use HasResponseFactoryManager;
-    use HasRefreshTokenManager;
-
     /**
      * RefreshTokenGrantType constructor.
      *
-     * @param \OAuth2\Token\RefreshTokenManagerInterface             $refresh_token_manager
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
+     * @param RefreshTokenRepositoryInterface             $refresh_token_manager
+     * @param OAuth2ResponseFactoryManagerInterface $response_factory_manager
      */
-    public function __construct(RefreshTokenManagerInterface $refresh_token_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
+    public function __construct(RefreshTokenRepositoryInterface $refresh_token_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
     {
         $this->setRefreshTokenManager($refresh_token_manager);
         $this->setResponsefactoryManager($response_factory_manager);
@@ -41,7 +36,7 @@ class RefreshTokenGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedResponseTypes()
+    public function getAssociatedResponseTypes(): array
     {
         return [];
     }
@@ -49,7 +44,7 @@ class RefreshTokenGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getGrantType()
+    public function getGrantType(): string
     {
         return 'refresh_token';
     }
@@ -57,7 +52,7 @@ class RefreshTokenGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse &$grant_type_response)
     {
         // Nothing to do
     }
@@ -65,17 +60,17 @@ class RefreshTokenGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, ClientInterface $client, GrantTypeResponseInterface &$grant_type_response)
+    public function grant(ServerRequestInterface $request, Client $client, GrantTypeResponse &$grant_type_response)
     {
         $refresh_token = RequestBody::getParameter($request, 'refresh_token');
         if (null === $refresh_token) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'No \'refresh_token\' parameter found']));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'No \'refresh_token\' parameter found']);
         }
 
         $token = $this->getRefreshTokenManager()->getRefreshToken($refresh_token);
 
-        if (!$token instanceof RefreshTokenInterface) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token']));
+        if (!$token instanceof RefreshToken) {
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token']);
         }
 
         $this->checkRefreshToken($token, $client);
@@ -95,14 +90,14 @@ class RefreshTokenGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function checkRefreshToken(RefreshTokenInterface $token, ClientInterface $client)
+    public function checkRefreshToken(RefreshToken $token, Client $client)
     {
         if ($client->getPublicId() !== $token->getClientPublicId()) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token']));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token']);
         }
 
         if ($token->hasExpired()) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Refresh token has expired']));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Refresh token has expired']);
         }
     }
 }

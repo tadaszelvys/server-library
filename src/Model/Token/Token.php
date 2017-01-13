@@ -208,6 +208,36 @@ abstract class Token implements \JsonSerializable
     }
 
     /**
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function withParameter(string $key, $value): self
+    {
+        $clone = clone $this;
+        $clone->parameters[$key] = $value;
+
+        return $clone;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return self
+     */
+    public function withoutParameter(string $key): self
+    {
+        if (!$this->hasParameter($key)) {
+            return $this;
+        }
+        $clone = clone $this;
+        unset($clone->parameters[$key]);
+
+        return $clone;
+    }
+
+    /**
      * @return array
      */
     public function getMetadatas(): array
@@ -237,5 +267,35 @@ abstract class Token implements \JsonSerializable
         Assertion::true($this->hasMetadata($key), sprintf('The metadata \'%s\' does not exist.', $key));
 
         return $this->metadatas;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function withMetadata(string $key, $value): self
+    {
+        $clone = clone $this;
+        $clone->metadatas[$key] = $value;
+
+        return $clone;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return self
+     */
+    public function withoutMetadata(string $key): self
+    {
+        if (!$this->hasMetadata($key)) {
+            return $this;
+        }
+        $clone = clone $this;
+        unset($clone->metadatas[$key]);
+
+        return $clone;
     }
 }

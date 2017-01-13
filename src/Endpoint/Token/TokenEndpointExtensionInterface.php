@@ -11,15 +11,16 @@
 
 namespace OAuth2\Endpoint\Token;
 
+use OAuth2\Model\AccessToken\AccessToken;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface TokenEndpointExtensionInterface
 {
     /**
-     * @param ServerRequestInterface $serverRequest
-     * @param array $data
-     * @param \Closure $next
-     * @return array
+     * @param ServerRequestInterface $request
+     * @param GrantTypeResponse $tokenResponse
+     * @param callable $next
+     * @return AccessToken
      */
-    public function process(ServerRequestInterface $serverRequest, array $data, \Closure $next): array;
+    public function process(ServerRequestInterface $request, GrantTypeResponse $tokenResponse, callable $next): AccessToken;
 }

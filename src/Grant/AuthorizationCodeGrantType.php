@@ -12,6 +12,7 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Endpoint\Authorization\Authorization;
+use OAuth2\Endpoint\Token\GrantTypeResponse;
 use OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface;
 use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
@@ -19,7 +20,6 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Model\Scope\ScopeRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Util\RequestBody;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -160,7 +160,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grant_type_response)
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse &$grantTypeResponse)
     {
         //Nothing to do
     }
@@ -168,7 +168,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, Client $client, GrantTypeResponseInterface &$grant_type_response)
+    public function grant(ServerRequestInterface $request, Client $client, GrantTypeResponse &$grantTypeResponse)
     {
         $this->checkClient($request, $client);
         $authCode = $this->getAuthCode($request);
@@ -183,18 +183,18 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
 
         $this->authCodeRepository->markAuthCodeAsUsed($authCode);
 
-        if ($this->hasScopeManager()) {
-            $grant_type_response->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
-            $grant_type_response->setAvailableScope($authCode->getScope());
-            $grant_type_response->setRefreshTokenScope($authCode->getScope());
+        if (null !== $this->scopeRepository) {
+            $grantTypeResponse->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
+            $grantTypeResponse->setAvailableScope($authCode->getScope());
+            $grantTypeResponse->setRefreshTokenScope($authCode->getScope());
         }
-        $grant_type_response->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
-        $grant_type_response->setUserAccountPublicId($authCode->getUserAccountPublicId());
-        $grant_type_response->setRedirectUri($authCode->getMetadata('redirect_uri'));
+        $grantTypeResponse->setResourceOwnerPublicId($authCode->getResourceOwnerPublicId());
+        $grantTypeResponse->setUserAccountPublicId($authCode->getUserAccountPublicId());
+        $grantTypeResponse->setRedirectUri($authCode->getMetadata('redirect_uri'));
 
         // Refresh Token
-        $grant_type_response->setRefreshTokenIssued($authCode->getIssueRefreshToken());
-        $grant_type_response->setAdditionalData('auth_code', $authCode);
+        $grantTypeResponse->setRefreshTokenIssued($authCode->getIssueRefreshToken());
+        $grantTypeResponse->setAdditionalData('auth_code', $authCode);
     }
 
     /**
@@ -241,7 +241,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     private function checkClient(ServerRequestInterface $request, Client $client)
     {
         if (true === $client->isPublic()) {
-            if (null === ($client_id = RequestBody::getParameter($request, 'client_id')) || $client_id !== $client->getPublicId()) {
+            if (null === ($clientId = RequestBody::getParameter($request, 'client_id')) || $clientId !== $client->getId()->getValue()) {
                 throw new OAuth2Exception(
                     400,
                     [
@@ -265,7 +265,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
         $params = $authCode->getQueryParams();
         if (!array_key_exists('code_challenge', $params)) {
             if (true === $this->isPKCEForPublicClientsEnforced() && $client->isPublic()) {
-                throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Non-confidential clients must set a proof key (PKCE) for code exchange.']));
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Non-confidential clients must set a proof key (PKCE) for code exchange.']);
             }
 
             return;
@@ -276,9 +276,9 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
         $code_verifier = RequestBody::getParameter($request, 'code_verifier');
 
         try {
-            $this->getPKCEMethodManager()->checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier);
+            $this->pkceMethodManager->checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier);
         } catch (\InvalidArgumentException $e) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]);
         }
     }
 
@@ -309,7 +309,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
      */
     private function checkAuthCode(AuthCode $authCode, Client $client)
     {
-        if ($client->getId() !== $authCode->getClientPublicId()) {
+        if ($client->getId()->getValue() !== $authCode->getClient()->getId()->getValue()) {
             throw new OAuth2Exception(
                 400,
                 [

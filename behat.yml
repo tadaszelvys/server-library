@@ -5,7 +5,7 @@ default:
             contexts: ['ResponseContext', 'ClientContext']
         grant_type:
             paths: [ '%paths.base%/features/grant' ]
-            contexts: ['ResponseContext', 'ClientCredentialsGrantTypeContext', 'AuthorizationCodeGrantTypeContext']
+            contexts: ['ResponseContext', 'RefreshTokenGrantTypeContext', 'ClientCredentialsGrantTypeContext', 'JwtBearerGrantTypeContext', 'ResourceOwnerPasswordCredentialsGrantTypeContext', 'AuthorizationCodeGrantTypeContext']
         oidc:
             paths: [ '%paths.base%/features/oidc' ]
             contexts: ['ResponseContext', 'OIDCContext']

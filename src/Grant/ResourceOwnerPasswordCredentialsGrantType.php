@@ -11,6 +11,7 @@
 
 namespace OAuth2\Grant;
 
+use OAuth2\Endpoint\Token\GrantTypeResponse;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
@@ -103,10 +104,16 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
         return 'password';
     }
 
+    public function checkTokenRequest(ServerRequestInterface $request)
+    {
+        // TODO: Implement checkTokenRequest() method.
+    }
+
+
     /**
      * {@inheritdoc}
      */
-    public function prepareGrantTypeResponse(ServerRequestInterface $request, GrantTypeResponseInterface &$grantTypeResponse)
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse $grantTypeResponse): GrantTypeResponse
     {
         // Nothing to do
     }
@@ -114,7 +121,7 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function grantAccessToken(ServerRequestInterface $request, Client $client, GrantTypeResponseInterface &$grantTypeResponse)
+    public function grant(ServerRequestInterface $request, GrantTypeResponse $grantTypeResponse): GrantTypeResponse
     {
         $parsedBody = $request->getParsedBody();
         $username = $parsedBody['username'];
@@ -131,10 +138,10 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
             );
         }
 
-        $grantTypeResponse->setResourceOwnerPublicId($userAccount->getUserPublicId());
+        /*$grantTypeResponse->setResourceOwnerPublicId($userAccount->getUserPublicId());
         $grantTypeResponse->setUserAccountPublicId($userAccount->getId());
         $grantTypeResponse->setRefreshTokenIssued($this->issueRefreshToken($client));
-        $grantTypeResponse->setRefreshTokenScope($grantTypeResponse->getRequestedScope());
+        $grantTypeResponse->setRefreshTokenScope($grantTypeResponse->getRequestedScope());*/
     }
 
     /**

@@ -33,7 +33,7 @@ class ClientRepository implements ClientRepositoryInterface
             [
                 'token_endpoint_auth_method' => 'client_secret_basic',
                 'client_secret' => 'secret',
-                'grant_types' => ['client_credentials']
+                'grant_types' => ['client_credentials'],
             ],
             UserAccount::create(
                 UserAccountId::create('User1'),
@@ -44,6 +44,31 @@ class ClientRepository implements ClientRepositoryInterface
             ClientId::create('client2'),
             [
                 'token_endpoint_auth_method' => 'none',
+            ],
+            UserAccount::create(
+                UserAccountId::create('User1'),
+                []
+            )
+        ));
+        $this->save(Client::create(
+            ClientId::create('client3'),
+            [
+                'token_endpoint_auth_method' => 'client_secret_jwt',
+                'client_secret' => 'secret',
+                'client_secret_expires_at' => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
+                'grant_types' => ['client_credentials'],
+            ],
+            UserAccount::create(
+                UserAccountId::create('User1'),
+                []
+            )
+        ));
+        $this->save(Client::create(
+            ClientId::create('client4'),
+            [
+                'token_endpoint_auth_method' => 'client_secret_post',
+                'client_secret' => 'secret',
+                'client_secret_expires_at' => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
             ],
             UserAccount::create(
                 UserAccountId::create('User1'),

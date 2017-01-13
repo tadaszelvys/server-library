@@ -11,16 +11,17 @@
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Token\TokenInterface;
-use OAuth2\Token\TokenUpdaterInterface;
 
-class FooBarAccessTokenUpdater implements TokenUpdaterInterface
+use OAuth2\Model\AccessToken\AccessToken;
+use OAuth2\Model\AccessToken\AccessTokenUpdaterInterface;
+
+class FooBarAccessTokenUpdater implements AccessTokenUpdaterInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function updateToken(TokenInterface &$token)
+    public function update(AccessToken $token): AccessToken
     {
-        $token->setParameter('foo', 'bar');
+        return $token->withParameter('foo', 'bar');
     }
 }

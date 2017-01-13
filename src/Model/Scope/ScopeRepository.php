@@ -56,7 +56,7 @@ class ScopeRepository implements ScopeRepositoryInterface
      */
     public function addScopePolicy(ScopePolicyInterface $scopePolicy, bool $is_default = false): ScopeRepositoryInterface
     {
-        $name = $scopePolicy->getName();
+        $name = $scopePolicy->name();
         $this->scopePolicies[$name] = $scopePolicy;
 
         if (true === $is_default) {
@@ -144,7 +144,7 @@ class ScopeRepository implements ScopeRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function convertToArray($scopes): array
+    public function convertToArray(string $scopes): array
     {
         $this->checkScopeCharset($scopes);
         $scopes = explode(' ', $scopes);
@@ -162,7 +162,7 @@ class ScopeRepository implements ScopeRepositoryInterface
      *
      * @throws \OAuth2\Response\OAuth2Exception
      */
-    private function checkScopeUsedOnce($scope, array $scopes)
+    private function checkScopeUsedOnce(string $scope, array $scopes)
     {
         if (1 < count(array_keys($scopes, $scope))) {
             throw new OAuth2Exception(
@@ -180,7 +180,7 @@ class ScopeRepository implements ScopeRepositoryInterface
      *
      * @throws \OAuth2\Response\OAuth2Exception
      */
-    private function checkScopeCharset($scope)
+    private function checkScopeCharset(string $scope)
     {
         if (1 !== preg_match('/^[\x20\x23-\x5B\x5D-\x7E]+$/', $scope)) {
             throw new OAuth2Exception(

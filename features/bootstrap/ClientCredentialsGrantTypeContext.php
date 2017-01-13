@@ -9,8 +9,10 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Base64Url\Base64Url;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use OAuth2\Model\Client\ClientId;
 
 class ClientCredentialsGrantTypeContext extends BaseContext
 {
@@ -83,7 +85,16 @@ class ClientCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientAuthenticatedWithAJwtAssertionSendsAValidClientCredentialsGrantTypeRequest()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'client_credentials',
+            'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+            'client_assertion' => $this->generateValidClientAssertion(),
+        ]);
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -91,6 +102,32 @@ class ClientCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidClientCredentialsGrantTypeRequestButTheGrantTypeIsNotAllowed()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'client_credentials',
+            'client_id' => 'client4',
+            'client_secret' => 'secret',
+        ]);
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+    }
+
+    private function generateValidClientAssertion()
+    {
+        $claims = [
+            'iss' => 'client3',
+            'sub' => 'client3',
+            'aud' => 'My Server',
+            'jti' => Base64Url::encode(random_bytes(64)),
+            'exp' => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
+        ];
+        $headers = [
+            'alg' => 'HS256',
+        ];
+        $client = $this->getApplication()->getClientRepository()->find(ClientId::create('client3'));
+
+        return $this->getApplication()->getJwTCreator()->sign($claims, $headers, $client->getPublicKeySet()->getKey(0));
     }
 }

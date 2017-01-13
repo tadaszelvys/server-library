@@ -32,12 +32,12 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     /**
      * @var bool
      */
-    private $encryption_required = false;
+    private $encryptionRequired = false;
 
     /**
      * @var \Jose\Object\JWKSetInterface|null
      */
-    private $key_encryption_key_set = null;
+    private $keyEncryptionKeySet = null;
 
     /**
      * @var int
@@ -58,15 +58,13 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     }
 
     /**
-     * @param bool                         $encryption_required
-     * @param \Jose\Object\JWKSetInterface $key_encryption_key_set
+     * @param bool                         $encryptionRequired
+     * @param \Jose\Object\JWKSetInterface $keyEncryptionKeySet
      */
-    public function enableEncryptedAssertions(bool $encryption_required, JWKSetInterface $key_encryption_key_set)
+    public function enableEncryptedAssertions(bool $encryptionRequired, JWKSetInterface $keyEncryptionKeySet)
     {
-        Assertion::boolean($encryption_required);
-
-        $this->encryption_required = $encryption_required;
-        $this->key_encryption_key_set = $key_encryption_key_set;
+        $this->encryptionRequired = $encryptionRequired;
+        $this->keyEncryptionKeySet = $keyEncryptionKeySet;
     }
 
     /**
@@ -104,23 +102,23 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function findClientId(ServerRequestInterface $request, &$client_credentials = null)
+    public function findClientId(ServerRequestInterface $request, &$clientCredentials = null)
     {
         $parameters = $request->getParsedBody() ?? [];
         if (!array_key_exists('client_assertion_type', $parameters)) {
             return;
         }
-        $client_assertion_type = $parameters['client_assertion_type'];
+        $clientAssertionType = $parameters['client_assertion_type'];
 
         //We verify the client assertion type in the request
-        if ('urn:ietf:params:oauth:client-assertion-type:jwt-bearer' !== $client_assertion_type) {
+        if ('urn:ietf:params:oauth:client-assertion-type:jwt-bearer' !== $clientAssertionType) {
             return;
         }
 
         try {
             Assertion::keyExists($parameters, 'client_assertion', 'Parameter \'client_assertion\' is missing.');
             $client_assertion = $parameters['client_assertion'];
-            $jwt = $this->jwtLoader->load($client_assertion, $this->key_encryption_key_set, $this->encryption_required);
+            $jwt = $this->jwtLoader->load($client_assertion, $this->keyEncryptionKeySet, $this->encryptionRequired);
 
             $diff = array_diff(['iss', 'sub', 'aud', 'jti', 'exp'], array_keys($jwt->getClaims()));
             Assertion::eq(0, count($diff), sprintf('The following claim(s) is/are mandatory: \'%s\'.', implode(', ', array_values($diff))));
@@ -135,7 +133,7 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
             );
         }
 
-        $client_credentials = $jwt;
+        $clientCredentials = $jwt;
 
         return ClientId::create($jwt->getClaim('sub'));
     }
@@ -143,7 +141,7 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function isClientAuthenticated(Client $client, $client_credentials, ServerRequestInterface $request): bool
+    public function isClientAuthenticated(Client $client, $clientCredentials, ServerRequestInterface $request): bool
     {
         $jwk_set = $client->getPublicKeySet();
         if (!$jwk_set instanceof JWKSetInterface) {
@@ -152,7 +150,7 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
 
         try {
             $this->jwtLoader->verify(
-                $client_credentials,
+                $clientCredentials,
                 $jwk_set
             );
         } catch (\Exception $e) {
@@ -173,21 +171,21 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function checkClientConfiguration(array $command_parameters, array &$validated_parameters)
+    public function checkClientConfiguration(array $commandParameters, array &$validatedParameters)
     {
-        if ('client_secret_jwt' === $command_parameters['token_endpoint_auth_method']) {
-            $validated_parameters['client_secret'] = $this->createClientSecret();
-            $validated_parameters['client_secret_expires_at'] = (0 === $this->secretLifetime ? 0 : time() + $this->secretLifetime);
-        } elseif ('private_key_jwt' === $command_parameters['token_endpoint_auth_method']) {
-            Assertion::true(array_key_exists('jwks', $command_parameters) xor array_key_exists('jwks_uri', $command_parameters), 'The parameter \'jwks\' or \'jwks_uri\' must be set.');
-            if (array_key_exists('jwks', $command_parameters)) {
-                $jwks = new JWKSet($command_parameters['jwks']);
+        if ('client_secret_jwt' === $commandParameters['token_endpoint_auth_method']) {
+            $validatedParameters['client_secret'] = $this->createClientSecret();
+            $validatedParameters['client_secret_expires_at'] = (0 === $this->secretLifetime ? 0 : time() + $this->secretLifetime);
+        } elseif ('private_key_jwt' === $commandParameters['token_endpoint_auth_method']) {
+            Assertion::true(array_key_exists('jwks', $commandParameters) xor array_key_exists('jwks_uri', $commandParameters), 'The parameter \'jwks\' or \'jwks_uri\' must be set.');
+            if (array_key_exists('jwks', $commandParameters)) {
+                $jwks = new JWKSet($commandParameters['jwks']);
                 Assertion::isInstanceOf($jwks, JWKSetInterface::class, 'The parameter \'jwks\' must be a valid JWKSet object.');
-                $validated_parameters['jwks'] = $command_parameters['jwks'];
+                $validatedParameters['jwks'] = $commandParameters['jwks'];
             } else {
-                $jwks = JWKFactory::createFromJKU($command_parameters['jwks_uri']);
+                $jwks = JWKFactory::createFromJKU($commandParameters['jwks_uri']);
                 Assertion::isInstanceOf($jwks, JWKSetInterface::class, 'The parameter \'jwks_uri\' must be a valid uri that provide a valid JWKSet.');
-                $validated_parameters['jwks_uri'] = $command_parameters['jwks_uri'];
+                $validatedParameters['jwks_uri'] = $commandParameters['jwks_uri'];
             }
         } else {
             throw new \InvalidArgumentException('Unsupported token endpoint authentication method.');
