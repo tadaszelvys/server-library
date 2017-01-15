@@ -12,42 +12,43 @@
 namespace OAuth2\Test\Stub;
 
 use Assert\Assertion;
+use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\Endpoint\Authorization\AuthorizationEndpoint as Base;
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
-use OAuth2\UserAccount\UserAccountInterface;
+use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Response\OAuth2Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AuthorizationEndpoint extends Base
 {
     /**
-     * @var null|\OAuth2\UserAccount\UserAccountInterface
+     * @var null|UserAccount
      */
-    private $current_user_account = null;
+    private $currentUserAccount = null;
 
     /**
      * @var bool
      */
-    private $current_user_fully_authenticated = true;
+    private $currentUserFullyAuthenticated = true;
 
     /**
      * @var null|bool
      */
-    private $is_authorized = null;
+    private $isAuthorized = null;
 
     /**
      * {@inheritdoc}
      */
     protected function getCurrentUserAccount()
     {
-        return $this->current_user_account;
+        return $this->currentUserAccount;
     }
 
     /**
-     * @param \OAuth2\UserAccount\UserAccountInterface|null $current_user_account
+     * @param UserAccount|null $currentUserAccount
      */
-    public function setCurrentUserAccount(UserAccountInterface $current_user_account = null)
+    public function setCurrentUserAccount(UserAccount $currentUserAccount = null)
     {
-        $this->current_user_account = $current_user_account;
+        $this->currentUserAccount = $currentUserAccount;
     }
 
     /**
@@ -55,7 +56,7 @@ class AuthorizationEndpoint extends Base
      */
     public function setUserFullyAuthenticated($current_user_fully_authenticate)
     {
-        $this->current_user_fully_authenticated = $current_user_fully_authenticate;
+        $this->currentUserFullyAuthenticated = $current_user_fully_authenticate;
     }
 
     /**
@@ -63,16 +64,16 @@ class AuthorizationEndpoint extends Base
      */
     public function getIsAuthorized()
     {
-        return $this->is_authorized;
+        return $this->isAuthorized;
     }
 
     /**
-     * @param bool|null $is_authorized
+     * @param bool|null $isAuthorized
      */
-    public function setIsAuthorized($is_authorized)
+    public function setIsAuthorized($isAuthorized)
     {
-        Assertion::nullOrBoolean($is_authorized);
-        $this->is_authorized = $is_authorized;
+        Assertion::nullOrBoolean($isAuthorized);
+        $this->isAuthorized = $isAuthorized;
     }
 
     /**
@@ -80,24 +81,27 @@ class AuthorizationEndpoint extends Base
      */
     protected function isCurrentUserFullyAuthenticated()
     {
-        return $this->current_user_fully_authenticated;
+        return $this->currentUserFullyAuthenticated;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function redirectToLoginPage(AuthorizationInterface $authorization, ServerRequestInterface $request)
+    protected function redirectToLoginPage(Authorization $authorization, ServerRequestInterface $request)
     {
-        return $this->getResponseFactoryManager()->getResponse(200, 'You are redirected to the login page')->getResponse();
+        throw new OAuth2Exception(
+            200,
+            'You are redirected to the login page'
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function processConsentScreen(AuthorizationInterface $authorization, ServerRequestInterface $request)
+    protected function processConsentScreen(Authorization $authorization, ServerRequestInterface $request)
     {
-        if (is_bool($this->is_authorized)) {
-            $authorization->setAuthorized($this->is_authorized);
+        if (is_bool($this->isAuthorized)) {
+            $authorization = $authorization->setAuthorized($this->isAuthorized);
             $this->processAuthorization($request, $authorization);
 
             return [
@@ -105,6 +109,9 @@ class AuthorizationEndpoint extends Base
             ];
         }
 
-        return $this->getResponseFactoryManager()->getResponse(200, 'You are on the consent screen')->getResponse();
+        throw new OAuth2Exception(
+            200,
+            'You are on the consent screen'
+        );
     }
 }

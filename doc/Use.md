@@ -3,31 +3,6 @@
 This library provides all components to build an authorization server base on the OAuth2 Framework protocol.
 
 Not all components are needed; it mainly depends on the features your authorization server has to provide.
-However, you must at least the following ones:
-
-* [An exception manager](#exceptions-and-exception-manager)
-* [A Scope manager](#scope-and-scope-manager)
-* [A Token Endpoint Authorization ]
-* [A Client manager](#clients-and-client-manager)
-* [An User Account manager](#users-and-accounts)
-* [An Access Token manager](#access-token-manager)
-* [A Token Type manager with at least one token type](#token-types)
-* [At least one grant type](#grant-types)
-* [At least one endpoint (endpoints depend on the grant types)](#endpoints)
-
-## Exceptions and Exception Manager
-
-The exception manager manages all exception types thrown during the authorization process.
-It is used by almost all other components.
-
-Please read [this page](component/exception.md) to know how to create and use this component.
-
-## Scope And Scope manager
-
-Tokens issued by this library may have a limited scope.
-The scope is used by the resource servers for example for operation limitations.
-
-Please read [this page](component/scope.md) to know how to create and use this component.
 
 ## Access Token Manager
 
@@ -82,6 +57,14 @@ In general, you do not need to use them as they are directly used by components.
 and claims you want to check.
 
 Please read [this page](component/jwt_loader_and_creator.md) to know how to create and use these components.
+
+## Scope And Scope manager
+
+Tokens issued by this library may have a limited scope.
+The scope is used by the resource servers for example for operation limitations.
+
+Please read [this page](component/scope.md) to know how to create and use this component.
+
 
 ## OpenID Connect
 

@@ -1,4 +1,4 @@
-Feature: A client request an access token using the JWT Bearer Grant Type
+Feature: A client requests an access token using the JWT Bearer Grant Type
 
   Scenario: A client sends a JWT Bearer Grant Type request but client is not authenticated
     Given An unauthenticated client sends a JWT Bearer Grant Type request

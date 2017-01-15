@@ -12,7 +12,7 @@
 namespace OAuth2\Test\Stub;
 
 use Base64Url\Base64Url;
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\OpenIdConnect\SessionManagement\SessionStateParameterExtension as Base;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -66,7 +66,7 @@ final class SessionStateParameterExtension extends Base
     /**
      * {@inheritdoc}
      */
-    protected function calculateSessionState(ServerRequestInterface $request, AuthorizationInterface $authorization, $browser_state)
+    protected function calculateSessionState(ServerRequestInterface $request, Authorization $authorization, $browser_state)
     {
         $origin = $this->getOriginUri($authorization->getRedirectUri());
         $salt = Base64Url::encode(random_bytes(16));

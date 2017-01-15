@@ -18,7 +18,7 @@ class MacToken extends Base
     /**
      * {@inheritdoc}
      */
-    protected function generateMacKey()
+    protected function generateMacKey(): string
     {
         return bin2hex(random_bytes(50));
     }

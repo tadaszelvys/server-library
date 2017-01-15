@@ -98,10 +98,9 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
      */
     public function findClient(ServerRequestInterface $request): Client
     {
-        $id = $this->findClientInTheRequest($request, $authentication_method, $client_credentials);
+        $clientId = $this->findClientInTheRequest($request, $authentication_method, $client_credentials);
 
-        if (null !== $id) {
-            $clientId = ClientId::create($id);
+        if (null !== $clientId) {
             $client = $this->clientRepository->find($clientId);
             if ($client instanceof Client && true === $this->isClientAuthenticated($request, $client, $authentication_method, $client_credentials)) {
                 return $client;
@@ -118,7 +117,7 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
      *
      * @throws \OAuth2\Response\OAuth2Exception
      *
-     * @return null|string
+     * @return null|ClientId
      */
     private function findClientInTheRequest(ServerRequestInterface $request, &$authentication_method, &$client_credentials = null)
     {

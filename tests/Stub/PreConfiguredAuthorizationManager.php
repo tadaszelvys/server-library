@@ -14,6 +14,8 @@ namespace OAuth2\Test\Stub;
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorization;
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface;
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\Client\ClientRepositoryInterface;
 
 class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationManagerInterface
 {
@@ -25,11 +27,11 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     /**
      * PreConfiguredAuthorizationManager constructor.
      *
-     * @param \OAuth2\Test\Stub\ClientManager $client_manager
+     * @param ClientRepositoryInterface $clientRepository
      */
-    public function __construct(ClientManager $client_manager)
+    public function __construct(ClientRepositoryInterface $clientRepository)
     {
-        foreach ($this->getPreConfiguredAuthorizations($client_manager) as $preConfiguredAuthorization) {
+        foreach ($this->getPreConfiguredAuthorizations($clientRepository) as $preConfiguredAuthorization) {
             $auth = $this->createPreConfiguredAuthorization();
             $auth->setClientPublicId($preConfiguredAuthorization['client_public_id']);
             $auth->setResourceOwnerPublicId($preConfiguredAuthorization['resource_owner_public_id']);
@@ -40,22 +42,22 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     }
 
     /**
-     * @param \OAuth2\Test\Stub\ClientManager $client_manager
+     * @param ClientRepositoryInterface $clientRepository
      *
      * @return array
      */
-    protected function getPreConfiguredAuthorizations(ClientManager $client_manager)
+    protected function getPreConfiguredAuthorizations(ClientRepositoryInterface $clientRepository)
     {
         return [
             [
-                'client_public_id'         => $client_manager->getClientByName('foo')->getPublicId(),
+                'client_public_id'         => $clientRepository->find(ClientId::create('foo'))->getId()->getValue(),
                 'resource_owner_public_id' => 'real_user1_public_id',
                 'user_account_public_id'   => 'user1',
                 'scopes'                   => ['openid', 'email', 'profile'],
                 'validated_scopes'         => ['openid', 'email', 'profile'],
             ],
             [
-                'client_public_id'         => $client_manager->getClientByName('Mufasa')->getPublicId(),
+                'client_public_id'         => $clientRepository->find(ClientId::create('Mufasa'))->getId()->getValue(),
                 'resource_owner_public_id' => 'real_user1_public_id',
                 'user_account_public_id'   => 'user1',
                 'scopes'                   => ['openid', 'email', 'profile'],

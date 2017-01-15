@@ -38,7 +38,6 @@ The following components are implemented:
     * [x] Bearer access token ([RFC6750](https://tools.ietf.org/html/rfc6750))
     * [x] MAC access token ([IETF draft 02 only](https://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-02)) - *The implementation is stopped until the specification has not reach maturity*
     * [x] Ability to use other Access Token Types
-* [x] Exception manager
 * [x] Scope manager ([RFC6749, section 3.3](https://tools.ietf.org/html/rfc6749#section-3.3))
 * Clients Managers:
     * [x] Public clients ([RFC6749, section 2.1](https://tools.ietf.org/html/rfc6749#section-2.1)) - See `none` authentication method
@@ -48,7 +47,6 @@ The following components are implemented:
         * [x] Credentials from request body - See `client_secret_post` authentication method
     * [ ] SAML clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7522](https://tools.ietf.org/html/rfc7522)) - *Help requested!*
     * [x] JWT clients ([RFC7521](https://tools.ietf.org/html/rfc7521) and [RFC7523](https://tools.ietf.org/html/rfc7523)) - See `private_key_jwt` authentication method
-    * [x] Unregistered clients ([RFC6749, section 2.4](https://tools.ietf.org/html/rfc6749#section-2.4)) - See `none` authentication method
     * [x] Ability to use other Client Managers
 * Endpoints:
     * [x] Authorization ([RFC6749, section 3.1](https://tools.ietf.org/html/rfc6749#section-3.1))
@@ -56,7 +54,7 @@ The following components are implemented:
     * [x] Token Revocation ([RFC7009](https://tools.ietf.org/html/rfc7009))
     * [x] Token Introspection ([RFC7662](https://tools.ietf.org/html/rfc7662))
     * [x] Dynamic Client Registration Protocol ([RFC7591](https://tools.ietf.org/html/rfc7591))
-    * [ ] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
+    * [x] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
     * [x] Ability to use other Endpoints
 * Grant types:
     * [x] Authorization code grant type ([RFC6749, section 4.1](https://tools.ietf.org/html/rfc6749#section-4.1))
@@ -89,9 +87,9 @@ The release process [is described here](doc/Release.md).
 
 # Prerequisites
 
-This library needs at least ![PHP 5.6+](https://img.shields.io/badge/PHP-5.6%2B-ff69b4.svg).
+This library needs at least ![PHP 7.0+](https://img.shields.io/badge/PHP-7.0%2B-ff69b4.svg).
 
-It has been successfully tested using `PHP 7.0`, `PHP 7.1` and `HHVM`.
+It has been successfully tested using `PHP 7.0`, `PHP 7.1` and `nightly`.
 
 # Installation
 
@@ -107,7 +105,8 @@ Have a look at [How to use](doc/Use.md) to use OAuth2 server and handle your fir
 
 # Contributing
 
-Requests for new features, bug fixed and all other ideas to make this library useful are welcome. The best contribution you could provide is by fixing the [opened issues where help is wanted](https://github.com/OAuth2-Framework/server-library/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
+Requests for new features, bug fixed and all other ideas to make this library useful are welcome.
+The best contribution you could provide is by fixing the [opened issues where help is wanted](https://github.com/OAuth2-Framework/server-library/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
 
 Please make sure to [follow these best practices](doc/Contributing.md).
 

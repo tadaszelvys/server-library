@@ -1,17 +1,36 @@
 default:
     suites:
         client:
-            paths: [ '%paths.base%/features/client' ]
-            contexts: ['ResponseContext', 'ClientContext']
+            paths:
+                - '%paths.base%/features/client'
+            contexts:
+                - 'ResponseContext'
+                - 'ClientContext'
         grant_type:
-            paths: [ '%paths.base%/features/grant' ]
-            contexts: ['ResponseContext', 'RefreshTokenGrantTypeContext', 'ClientCredentialsGrantTypeContext', 'JwtBearerGrantTypeContext', 'ResourceOwnerPasswordCredentialsGrantTypeContext', 'AuthorizationCodeGrantTypeContext']
+            paths:
+                - '%paths.base%/features/grant'
+            contexts:
+                - 'ResponseContext'
+                - 'RefreshTokenGrantTypeContext'
+                - 'ClientCredentialsGrantTypeContext'
+                - 'JwtBearerGrantTypeContext'
+                - 'ResourceOwnerPasswordCredentialsGrantTypeContext'
+                - 'AuthorizationCodeGrantTypeContext'
         oidc:
-            paths: [ '%paths.base%/features/oidc' ]
-            contexts: ['ResponseContext', 'OIDCContext']
+            paths:
+                - '%paths.base%/features/oidc'
+            contexts:
+                - 'ResponseContext'
+                - 'OIDCContext'
         introspection:
-            paths: [ '%paths.base%/features/introspection' ]
-            contexts: ['ResponseContext', 'IntrospectionContext']
+            paths:
+                - '%paths.base%/features/introspection'
+            contexts:
+                - 'ResponseContext'
+                - 'IntrospectionContext'
         revocation:
-            paths: [ '%paths.base%/features/revocation' ]
-            contexts: ['ResponseContext', 'RevocationContext']
+            paths:
+                - '%paths.base%/features/revocation'
+            contexts:
+                - 'ResponseContext'
+                - 'RevocationContext'

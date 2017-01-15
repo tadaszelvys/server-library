@@ -6,10 +6,10 @@ matrix:
   fast_finish: true
   allow_failures:
     - php: nightly
-    - php: hhvm-stable
+    - php: hhvm
   include:
-    - php: hhvm-stable
-    - php: hhvm-stable
+    - php: hhvm
+    - php: hhvm
       env: deps=low
     - php: 7.0
     - php: 7.0

@@ -12,7 +12,7 @@
         },
         {
             "name": "All contributors",
-            "homepage": "https://github.com/OAuth2-Framework/authorization-server-library/contributors"
+            "homepage": "https://github.com/OAuth2-Framework/server-library/contributors"
         }
     ],
     "require": {
@@ -25,10 +25,9 @@
         "beberlei/assert": "^2.6.4",
         "php-http/httplug": "^1.1",
         "simple-bus/message-bus": "^2.2",
-        "http-interop/http-middleware": "^1.0@dev",
-        "http-interop/http-factory": "^1.0@dev",
+        "http-interop/http-middleware": "*@dev",
+        "http-interop/http-factory": "*@dev",
         "ramsey/uuid": "^3.5",
-        "jms/serializer": "^1.4",
         "psr/container": "*@dev"
     },
     "require-dev": {

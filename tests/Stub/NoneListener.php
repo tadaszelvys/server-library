@@ -11,29 +11,29 @@
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\OpenIdConnect\NoneResponseTypeListenerInterface;
-use OAuth2\Token\AccessTokenInterface;
 
 class NoneListener implements NoneResponseTypeListenerInterface
 {
     /**
-     * @var \OAuth2\Token\AccessTokenInterface[]
+     * @var AccessToken[]
      */
-    private $access_tokens = [];
+    private $accessTokens = [];
 
     /**
-     * [@inheritdoc}.
+     * [@inheritdoc}
      */
-    public function call(AccessTokenInterface $access_token)
+    public function call(AccessToken $accessToken)
     {
-        $this->access_tokens[] = $access_token;
+        $this->accessTokens[] = $accessToken;
     }
 
     /**
-     * @return \OAuth2\Token\AccessTokenInterface[]
+     * @return AccessToken[]
      */
     public function getAccessTokens()
     {
-        return $this->access_tokens;
+        return $this->accessTokens;
     }
 }

@@ -15,7 +15,7 @@ use OAuth2\Response\Factory\AuthenticateResponseFactory as Base;
 
 class AuthenticateResponseFactory extends Base
 {
-    protected function getSchemes()
+    protected function getSchemes(): array
     {
         return ['Bearer realm="My service"', 'MAC'];
     }

@@ -35,10 +35,10 @@
     * [x]  [Client Authentication](http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
         * [x] Authentication Methods:
             * [x] `client_secret_basic`
-            * [x] `client_secret_post` (disabled by default)
+            * [x] `client_secret_post`
             * [x] `client_secret_jwt`
             * [x] `private_key_jwt`
-            * [x] `none` (public and unregistered clients supported)
+            * [x] `none`
             * [x] Ability to support custom authentication methods
     * [x]  [Signature and encryption](http://openid.net/specs/openid-connect-core-1_0.html#SigEnc)
         * [x]  Signing
@@ -50,7 +50,7 @@
     * [x] [OpenID Provider Metadata](http://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata)
     * [x] [Obtaining OpenID Provider Configuration Information](http://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig)
 * [x] [Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html) and Dynamic Client Registration Protocol ([RFC7591](https://tools.ietf.org/html/rfc7591))
-* [ ] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
+* [x] Dynamic Client Registration Management Protocol ([RFC7592](https://tools.ietf.org/html/rfc7592))
 * [x] [Multiple response types](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
 * [x] [Form post response mode](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
 * [ ] [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)

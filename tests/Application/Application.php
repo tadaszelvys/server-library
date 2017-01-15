@@ -45,6 +45,7 @@ use OAuth2\Test\Stub\Event\RefreshTokenRevokedEventHandler;
 use OAuth2\Test\Stub\EventStore;
 use OAuth2\Test\Stub\MacToken;
 use OAuth2\Test\Stub\RefreshTokenRepository;
+use OAuth2\Test\Stub\UriExtension;
 use OAuth2\Test\Stub\UserAccountRepository;
 use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\TokenType\TokenTypeManager;
@@ -158,6 +159,7 @@ final class Application
                 $this->getResponseFactory(),
                 $this->getStreamFactory()
             );
+            $this->oauth2ResponseFactory->addExtension(new UriExtension());
 
             $this->oauth2ResponseFactory->addResponseFactory(new AuthenticateResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new AccessDeniedResponseFactory());

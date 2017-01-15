@@ -1,4 +1,4 @@
-Feature: A client request an access token using the Client Credentials Grant Type
+Feature: A client requests an access token using the Client Credentials Grant Type
 
   Scenario: A client sends a Client Credentials Grant Type request but client is not authenticated
     Given An unauthenticated client sends a Client Credentials Grant Type request

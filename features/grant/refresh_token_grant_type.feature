@@ -1,4 +1,4 @@
-Feature: A client request an access token using the Refresh Token Grant Type
+Feature: A client requests an access token using the Refresh Token Grant Type
 
   Scenario: A client sends a Refresh Token Grant Type request but the refresh_token parameter is missing
     Given A client sends a Refresh Token Grant Type request without refresh_token parameter

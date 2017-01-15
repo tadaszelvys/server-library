@@ -11,9 +11,7 @@
 
 namespace OAuth2\Test\Stub;
 
-
 use OAuth2\Model\AccessToken\AccessToken;
-use OAuth2\Model\AccessToken\AccessTokenUpdaterInterface;
 
 class FooBarAccessTokenUpdater implements AccessTokenUpdaterInterface
 {

@@ -1,4 +1,4 @@
-Feature: A client request an access token using the Resource Owner Password Credentials Grant Type
+Feature: A client requests an access token using the Resource Owner Password Credentials Grant Type
 
   Scenario: A client sends a ROPC Grant Type request but the username parameter is missing
     Given A client sends a Resource Owner Password Credentials Grant Type request without username parameter
