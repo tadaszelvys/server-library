@@ -12,7 +12,7 @@
 namespace OAuth2\Grant;
 
 use OAuth2\Endpoint\Authorization\Authorization;
-use OAuth2\Endpoint\Token\GrantTypeResponse;
+use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface;
 use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
@@ -160,7 +160,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse &$grantTypeResponse)
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData &$grantTypeResponse)
     {
         //Nothing to do
     }
@@ -168,7 +168,7 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function grant(ServerRequestInterface $request, Client $client, GrantTypeResponse &$grantTypeResponse)
+    public function grant(ServerRequestInterface $request, Client $client, GrantTypeData &$grantTypeResponse)
     {
         $this->checkClient($request, $client);
         $authCode = $this->getAuthCode($request);

@@ -9,15 +9,15 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect\UserInfo\ScopeSupport;
+namespace OAuth2\Endpoint\UserInfo\ScopeSupport;
 
 interface UserInfoScopeSupportManagerInterface
 {
     /**
-     * @param UserInfoScopeSupportInterface $userinfo_scope_support
+     * @param UserInfoScopeSupportInterface $userinfoScopeSupport
      * @return UserInfoScopeSupportManagerInterface
      */
-    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfo_scope_support): self;
+    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfoScopeSupport): self;
 
     /**
      * @param string $scope

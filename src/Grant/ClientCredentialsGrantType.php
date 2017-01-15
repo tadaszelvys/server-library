@@ -11,7 +11,7 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Endpoint\Token\GrantTypeResponse;
+use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -53,7 +53,7 @@ class ClientCredentialsGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse $grantTypeResponse): GrantTypeResponse
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
         // Nothing to do
         return $grantTypeResponse;
@@ -62,7 +62,7 @@ class ClientCredentialsGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function grant(ServerRequestInterface $request, GrantTypeResponse $grantTypeResponse): GrantTypeResponse
+    public function grant(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
         if (true === $this->isRefreshTokenIssuedWithAccessToken() ) {
             $grantTypeResponse = $grantTypeResponse->withMetadata('refresh_token', true);

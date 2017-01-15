@@ -15,7 +15,7 @@ use Assert\Assertion;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\ResourceOwner\ResourceOwner;
 
-class GrantTypeResponse
+class GrantTypeData
 {
     /**
      * @var array
@@ -45,7 +45,7 @@ class GrantTypeResponse
     /**
      * @param string $key
      * @param $metadata
-     * @return GrantTypeResponse
+     * @return GrantTypeData
      */
     public function withMetadata(string $key, $metadata): self
     {
@@ -86,7 +86,7 @@ class GrantTypeResponse
     /**
      * @param string $key
      * @param $parameter
-     * @return GrantTypeResponse
+     * @return GrantTypeData
      */
     public function withParameter(string $key, $parameter): self
     {
@@ -126,7 +126,7 @@ class GrantTypeResponse
 
     /**
      * @param Client $client
-     * @return GrantTypeResponse
+     * @return GrantTypeData
      */
     public function withClient(Client $client): self
     {
@@ -146,7 +146,7 @@ class GrantTypeResponse
 
     /**
      * @param ResourceOwner $resourceOwner
-     * @return GrantTypeResponse
+     * @return GrantTypeData
      */
     public function withResourceOwner(ResourceOwner $resourceOwner): self
     {
@@ -166,7 +166,7 @@ class GrantTypeResponse
 
     /**
      * @param \string[] $scopes
-     * @return GrantTypeResponse
+     * @return GrantTypeData
      */
     public function withScopes(array $scopes): self
     {
@@ -178,7 +178,7 @@ class GrantTypeResponse
 
     /**
      * @param string $scope
-     * @return GrantTypeResponse
+     * @return GrantTypeData
      */
     public function withScope(string $scope): self
     {
@@ -193,7 +193,7 @@ class GrantTypeResponse
 
     /**
      * @param string $scope
-     * @return GrantTypeResponse
+     * @return GrantTypeData
      */
     public function withoutScope(string $scope): self
     {

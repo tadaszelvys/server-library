@@ -13,7 +13,13 @@ namespace OAuth2\OpenIdConnect;
 
 use OAuth2\Model\AccessToken\AccessToken;
 
+/**
+ * Should be remplaced by a Command/Event
+ */
 interface NoneResponseTypeListenerInterface
 {
+    /**
+     * @param AccessToken $access_token
+     */
     public function call(AccessToken $access_token);
 }

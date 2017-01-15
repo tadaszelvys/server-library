@@ -9,10 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-use Base64Url\Base64Url;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use OAuth2\Model\Client\ClientId;
 
 class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
 {
@@ -38,7 +35,15 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAResourceOwnerPasswordCredentialsGrantTypeRequestWithoutUsernameParameter()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'password',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -46,7 +51,16 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAResourceOwnerPasswordCredentialsGrantTypeRequestWithoutPasswordParameter()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'password',
+            'username' => 'john.1',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -54,7 +68,17 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAResourceOwnerPasswordCredentialsGrantTypeRequestWithInvalidUserCredentials()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'password',
+            'username' => 'john.1',
+            'password' => 'BAD PASSWORD',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -62,7 +86,17 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidResourceOwnerPasswordCredentialsGrantTypeRequest()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'password',
+            'username' => 'john.1',
+            'password' => 'doe',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -70,6 +104,16 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidResourceOwnerPasswordCredentialsGrantTypeRequestButTheGrantTypeIsNotAllowed()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'password',
+            'username' => 'john.1',
+            'password' => 'doe',
+            'client_id' => 'client2',
+        ]);
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 }

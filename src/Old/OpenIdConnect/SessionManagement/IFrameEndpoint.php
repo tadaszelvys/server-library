@@ -50,7 +50,7 @@ class IFrameEndpoint implements MiddlewareInterface
     /**
      * @return string
      */
-    protected function renderTemplate()
+    protected function renderTemplate(): string
     {
         $content = <<<'EOT'
 <html>

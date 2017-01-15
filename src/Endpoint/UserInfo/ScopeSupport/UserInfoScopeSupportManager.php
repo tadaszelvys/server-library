@@ -9,23 +9,23 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect\UserInfo\ScopeSupport;
+namespace OAuth2\Endpoint\UserInfo\ScopeSupport;
 
 use Assert\Assertion;
 
 class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterface
 {
     /**
-     * @var \OAuth2\OpenIdConnect\UserInfo\ScopeSupport\UserInfoScopeSupportInterface[]
+     * @var UserInfoScopeSupportInterface[]
      */
-    private $userinfo_scope_supports = [];
+    private $userinfoScopeSupports = [];
 
     /**
      * {@inheritdoc}
      */
-    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfo_scope_support): UserInfoScopeSupportManagerInterface
+    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfoScopeSupport): UserInfoScopeSupportManagerInterface
     {
-        $this->userinfo_scope_supports[$userinfo_scope_support->getScope()] = $userinfo_scope_support;
+        $this->userinfoScopeSupports[$userinfoScopeSupport->getScope()] = $userinfoScopeSupport;
 
         return $this;
     }
@@ -35,7 +35,7 @@ class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterfac
      */
     public function hasUserInfoScopeSupport($scope): bool
     {
-        return array_key_exists($scope, $this->userinfo_scope_supports);
+        return array_key_exists($scope, $this->userinfoScopeSupports);
     }
 
     /**
@@ -45,6 +45,6 @@ class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterfac
     {
         Assertion::true($this->hasUserInfoScopeSupport($scope), sprintf('The userinfo scope \'%s\' is not supported.', $scope));
 
-        return $this->userinfo_scope_supports[$scope];
+        return $this->userinfoScopeSupports[$scope];
     }
 }

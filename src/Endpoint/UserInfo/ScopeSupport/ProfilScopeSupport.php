@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect\UserInfo\ScopeSupport;
+namespace OAuth2\Endpoint\UserInfo\ScopeSupport;
 
 class ProfilScopeSupport implements UserInfoScopeSupportInterface
 {

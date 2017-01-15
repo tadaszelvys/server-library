@@ -14,7 +14,6 @@ namespace OAuth2\OpenIdConnect\Pairwise;
 use Assert\Assertion;
 use Base64Url\Base64Url;
 use OAuth2\Model\UserAccount\UserAccount;
-use Psr\Http\Message\UriInterface;
 
 class EncryptedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInterface
 {
@@ -58,7 +57,7 @@ class EncryptedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmIn
     /**
      * {@inheritdoc}
      */
-    public function calculateSubjectIdentifier(UserAccount $userAccount, UriInterface $sectorIdentifierHost): string
+    public function calculateSubjectIdentifier(UserAccount $userAccount, string $sectorIdentifierHost): string
     {
         $prepared = sprintf(
             '%s:%s:%s',

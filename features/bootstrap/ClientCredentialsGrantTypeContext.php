@@ -10,7 +10,6 @@
  */
 
 use Base64Url\Base64Url;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use OAuth2\Model\Client\ClientId;
 
@@ -57,9 +56,9 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'client_credentials',
+            'client_id' => 'client2',
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
-        $request = $request->withHeader('X-OAuth2-Public-Client-ID', 'client2');
 
         $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }

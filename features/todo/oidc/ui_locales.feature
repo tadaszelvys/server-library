@@ -5,10 +5,10 @@ Feature: A client requests an authorization
 
   Scenario: A client send an authorization request with a ui_locales parameter.
     Given A client sends an authorization request with ui_locales parameter and at least one locale is supported
-    Then print last response
+    Then I print last response
     And I should see "a besoin de votre autorisation pour accéder à vos resources."
 
   Scenario: A client send an authorization request with a ui_locales parameter but none of them is supported.
     Given A client sends an authorization request with ui_locales parameter and none of them is supported
-    Then print last response
+    Then I print last response
     And I should see "needs your authorization to get access on your resources."

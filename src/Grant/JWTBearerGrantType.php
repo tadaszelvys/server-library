@@ -15,7 +15,7 @@ use Assert\Assertion;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
 use Jose\Object\JWSInterface;
-use OAuth2\Endpoint\Token\GrantTypeResponse;
+use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
@@ -82,7 +82,7 @@ class JWTBearerGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse &$grantTypeResponse)
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData &$grantTypeResponse)
     {
         $assertion = RequestBody::getParameter($request, 'assertion');
         try {
@@ -114,7 +114,7 @@ class JWTBearerGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function grant(ServerRequestInterface $request, Client $client, GrantTypeResponse &$grantTypeResponse)
+    public function grant(ServerRequestInterface $request, Client $client, GrantTypeData &$grantTypeResponse)
     {
         if (false === $client->hasPublicKeySet()) {
             throw new OAuth2Exception(400,

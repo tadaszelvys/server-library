@@ -67,7 +67,7 @@ final class Authorization
     private $queryParameters = [];
 
     /**
-     * @var string
+     * @var UriInterface
      */
     private $redirectUri;
 
@@ -321,9 +321,9 @@ final class Authorization
     }
 
     /**
-     * @return string
+     * @return UriInterface
      */
-    public function getRedirectUri(): string
+    public function getRedirectUri(): UriInterface
     {
         return $this->redirectUri;
     }

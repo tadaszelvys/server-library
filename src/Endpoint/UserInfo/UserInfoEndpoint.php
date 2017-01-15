@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect\UserInfo;
+namespace OAuth2\Endpoint\UserInfo;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
@@ -67,9 +67,8 @@ class UserInfoEndpoint implements MiddlewareInterface
      * @param string              $signatureAlgorithm
      * @param JWKSetInterface     $signatureKeySet
      */
-    public function enableSignedResponsesSupport(JWTCreatorInterface $jwtCreator, $issuer, $signatureAlgorithm, JWKSetInterface $signatureKeySet)
+    public function enableSignedResponsesSupport(JWTCreatorInterface $jwtCreator, string $issuer, string $signatureAlgorithm, JWKSetInterface $signatureKeySet)
     {
-        Assertion::string($issuer);
         Assertion::inArray($signatureAlgorithm, $jwtCreator->getSupportedSignatureAlgorithms());
         Assertion::greaterThan($signatureKeySet->countKeys(), 0, 'The signature key set must have at least one key.');
         $this->jwtCreator = $jwtCreator;
@@ -247,7 +246,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     private function checkHasRedirectUri(AccessToken $access_token)
     {
         if (!$access_token->hasMetadata('redirect_uri')) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token has no \'redirect_uri\' data and cannot be used.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token has been issued through the authorization endpoint and cannot be used.']);
         }
     }
 

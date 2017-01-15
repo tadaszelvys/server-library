@@ -30,14 +30,14 @@ interface UserAccountRepositoryInterface
      *
      * @return UserAccount|null
      */
-    public function getByUsername($username);
+    public function getByUsername(string $username);
 
     /**
      * Get the user account with the specified public ID.
      *
-     * @param string $public_id Public ID
+     * @param UserAccountId $publicId Public ID
      *
      * @return UserAccount|null
      */
-    public function getByPublicId($public_id);
+    public function getByPublicId(UserAccountId $publicId);
 }

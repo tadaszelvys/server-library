@@ -17,6 +17,7 @@ use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use Psr\Http\Message\UriInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
 class IdTokenGrantType implements ResponseTypeInterface
@@ -83,7 +84,7 @@ class IdTokenGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, UriInterface $redirectUri)
     {
         $params = $authorization->getQueryParams();
         $requested_claims = $this->getIdTokenClaims($authorization);
@@ -91,7 +92,7 @@ class IdTokenGrantType implements ResponseTypeInterface
         $command = CreateIdTokenCommand::create(
             $authorization->getClient(),
             $authorization->getUserAccount(),
-            $redirect_uri,
+            $redirectUri,
             $authorization->hasQueryParam('claims_locales') ? $authorization->getQueryParam('claims_locales') : null,
             $requested_claims,
             $authorization->getScopes(),
@@ -110,7 +111,7 @@ class IdTokenGrantType implements ResponseTypeInterface
      *
      * @return array
      */
-    private function getIdTokenClaims(Authorization $authorization)
+    private function getIdTokenClaims(Authorization $authorization): array
     {
         if (!$authorization->hasQueryParam('claims')) {
             return [];

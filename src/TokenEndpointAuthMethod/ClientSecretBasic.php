@@ -36,8 +36,6 @@ abstract class ClientSecretBasic implements TokenEndpointAuthMethodInterface
      */
     public function __construct(string $realm, int $secretLifetime = 0)
     {
-        Assertion::string($realm);
-        Assertion::integer($secretLifetime);
         Assertion::greaterOrEqualThan($secretLifetime, 0);
 
         $this->realm = $realm;

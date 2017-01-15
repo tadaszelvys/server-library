@@ -21,9 +21,11 @@ use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 use OAuth2\Grant\ClientCredentialsGrantType;
+use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Middleware\GrantTypeMiddleware;
 use OAuth2\Middleware\TokenTypeMiddleware;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
+use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\Factory\AccessDeniedResponseFactory;
 use OAuth2\Response\Factory\BadRequestResponseFactory;
 use OAuth2\Response\Factory\CreatedResponseFactory;
@@ -43,6 +45,7 @@ use OAuth2\Test\Stub\Event\RefreshTokenRevokedEventHandler;
 use OAuth2\Test\Stub\EventStore;
 use OAuth2\Test\Stub\MacToken;
 use OAuth2\Test\Stub\RefreshTokenRepository;
+use OAuth2\Test\Stub\UserAccountRepository;
 use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\TokenType\TokenTypeManager;
 use OAuth2\TokenType\TokenTypeManagerInterface;
@@ -811,6 +814,9 @@ final class Application
         if (null === $this->grantTypeManager) {
             $this->grantTypeManager = new GrantTypeManager();
             $this->grantTypeManager->addGrantType(new ClientCredentialsGrantType());
+            $this->grantTypeManager->addGrantType(new ResourceOwnerPasswordCredentialsGrantType(
+                $this->getUserAccountRepository()
+            ));
         }
 
         return $this->grantTypeManager;
@@ -832,6 +838,24 @@ final class Application
 
         return $this->responseTypeManager;
     }
+
+    /**
+     * @var null|UserAccountRepositoryInterface
+     */
+    private $userAccountRepository = null;
+
+    /**
+     * @return UserAccountRepositoryInterface
+     */
+    public function getUserAccountRepository(): UserAccountRepositoryInterface
+    {
+        if (null === $this->userAccountRepository) {
+            $this->userAccountRepository = new UserAccountRepository();
+        }
+
+        return $this->userAccountRepository;
+    }
+
     /**
      * @var null|PKCEMethodManagerInterface
      */

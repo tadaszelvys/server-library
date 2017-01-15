@@ -18,9 +18,9 @@ interface TokenEndpointExtensionInterface
 {
     /**
      * @param ServerRequestInterface $request
-     * @param GrantTypeResponse $tokenResponse
+     * @param GrantTypeData $tokenResponse
      * @param callable $next
      * @return AccessToken
      */
-    public function process(ServerRequestInterface $request, GrantTypeResponse $tokenResponse, callable $next): AccessToken;
+    public function process(ServerRequestInterface $request, GrantTypeData $tokenResponse, callable $next): AccessToken;
 }

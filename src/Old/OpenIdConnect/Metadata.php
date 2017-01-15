@@ -25,7 +25,7 @@ class Metadata implements \JsonSerializable
      *
      * @return bool
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         Assertion::string($key);
 
@@ -37,7 +37,7 @@ class Metadata implements \JsonSerializable
      *
      * @return mixed
      */
-    public function get($key)
+    public function get(string $key)
     {
         Assertion::true($this->has($key), sprintf('Configuration value with key \'%s\' does not exist.', $key));
 
@@ -48,7 +48,7 @@ class Metadata implements \JsonSerializable
      * @param string $key
      * @param mixed  $value
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         Assertion::string($key);
         $this->values[$key] = $value;
@@ -57,7 +57,7 @@ class Metadata implements \JsonSerializable
     /**
      * @param $key
      */
-    public function remove($key)
+    public function remove(string $key)
     {
         if (true === $this->has($key)) {
             unset($this->values[$key]);

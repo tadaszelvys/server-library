@@ -30,6 +30,6 @@ Feature: A client request an access token using the Resource Owner Password Cred
   Scenario: A client sends a valid ROPC Grant Type request but this grant type is not allowed to the client
     Given A client sends a valid Resource Owner Password Credentials Grant Type request but the grant type is not allowed
     Then the response contains an error with code 400
-    And the error is "invalid_request"
+    And the error is "unauthorized_client"
     And the error description is "The grant type 'password' is unauthorized for this client."
     And no access token creation event is thrown

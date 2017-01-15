@@ -9,16 +9,16 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect\UserInfo\ScopeSupport;
+namespace OAuth2\Endpoint\UserInfo\ScopeSupport;
 
-class EmailScopeSupport implements UserInfoScopeSupportInterface
+class AddressScopeSupport implements UserInfoScopeSupportInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getScope(): string
     {
-        return 'email';
+        return 'address';
     }
 
     /**
@@ -27,8 +27,7 @@ class EmailScopeSupport implements UserInfoScopeSupportInterface
     public function getClaims(): array
     {
         return [
-            'email',
-            'email_verified',
+            'address',
         ];
     }
 }

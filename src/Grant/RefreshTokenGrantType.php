@@ -11,7 +11,7 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Endpoint\Token\GrantTypeResponse;
+use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\RefreshToken\RefreshToken;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
@@ -52,7 +52,7 @@ class RefreshTokenGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse &$grant_type_response)
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData &$grant_type_response)
     {
         // Nothing to do
     }
@@ -60,7 +60,7 @@ class RefreshTokenGrantType implements GrantTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function grant(ServerRequestInterface $request, Client $client, GrantTypeResponse &$grant_type_response)
+    public function grant(ServerRequestInterface $request, Client $client, GrantTypeData &$grant_type_response)
     {
         $refresh_token = RequestBody::getParameter($request, 'refresh_token');
         if (null === $refresh_token) {

@@ -11,7 +11,7 @@
 
 namespace OAuth2\Grant;
 
-use OAuth2\Endpoint\Token\GrantTypeResponse;
+use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
@@ -36,20 +36,13 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
     private $userAccountRepository;
 
     /**
-     * @var OAuth2ResponseFactoryManagerInterface
-     */
-    private $responseFactoryManager;
-
-    /**
      * ResourceOwnerPasswordCredentialsGrantType constructor.
      *
      * @param UserAccountRepositoryInterface        $userAccountRepository
-     * @param OAuth2ResponseFactoryManagerInterface $responseFactoryManager
      */
-    public function __construct(UserAccountRepositoryInterface $userAccountRepository, OAuth2ResponseFactoryManagerInterface $responseFactoryManager)
+    public function __construct(UserAccountRepositoryInterface $userAccountRepository)
     {
         $this->userAccountRepository = $userAccountRepository;
-        $this->responseFactoryManager = $responseFactoryManager;
     }
 
     public function allowRefreshTokenIssuance()
@@ -106,22 +99,30 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
 
     public function checkTokenRequest(ServerRequestInterface $request)
     {
-        // TODO: Implement checkTokenRequest() method.
+        $parameters = $request->getParsedBody() ?? [];
+        $requiredParameters = ['username', 'password'];
+
+        foreach ($requiredParameters as $requiredParameter) {
+            if (!array_key_exists($requiredParameter, $parameters)) {
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
+            }
+        }
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeResponse $grantTypeResponse): GrantTypeResponse
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
         // Nothing to do
+        return $grantTypeResponse;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function grant(ServerRequestInterface $request, GrantTypeResponse $grantTypeResponse): GrantTypeResponse
+    public function grant(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
         $parsedBody = $request->getParsedBody();
         $username = $parsedBody['username'];
@@ -133,15 +134,16 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
                 400,
                 [
                     'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
-                    'error_description' => 'Invalid username and password combination',
+                    'error_description' => 'Invalid username and password combination.',
                 ]
             );
         }
 
-        /*$grantTypeResponse->setResourceOwnerPublicId($userAccount->getUserPublicId());
-        $grantTypeResponse->setUserAccountPublicId($userAccount->getId());
-        $grantTypeResponse->setRefreshTokenIssued($this->issueRefreshToken($client));
-        $grantTypeResponse->setRefreshTokenScope($grantTypeResponse->getRequestedScope());*/
+        $grantTypeResponse = $grantTypeResponse->withResourceOwner($userAccount);
+        //$grantTypeResponse->withRefreshTokenIssued($this->issueRefreshToken($client));
+        //$grantTypeResponse->setRefreshTokenScope($grantTypeResponse->getRequestedScope());
+
+        return $grantTypeResponse;
     }
 
     /**

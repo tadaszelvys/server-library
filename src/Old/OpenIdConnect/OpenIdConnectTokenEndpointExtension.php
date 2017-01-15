@@ -14,7 +14,7 @@ namespace OAuth2\OpenIdConnect;
 use OAuth2\Command\IdToken\CreateIdTokenCommand;
 use OAuth2\DataTransporter;
 use OAuth2\Endpoint\Token\TokenEndpointExtensionInterface;
-use OAuth2\Endpoint\Token\GrantTypeResponse;
+use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\IdToken\IdToken;
@@ -41,7 +41,7 @@ class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensionInter
         $this->commandBus = $commandBus;
     }
 
-    public function process(ServerRequestInterface $request, GrantTypeResponse $tokenResponse, callable $next): AccessToken
+    public function process(ServerRequestInterface $request, GrantTypeData $tokenResponse, callable $next): AccessToken
     {
         //pre
 
@@ -127,11 +127,11 @@ class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensionInter
     }
 
     /**
-     * @param GrantTypeResponse $tokenResponse
+     * @param GrantTypeData $tokenResponse
      *
      * @return bool
      */
-    private function issueIdToken(GrantTypeResponse $tokenResponse)
+    private function issueIdToken(GrantTypeData $tokenResponse)
     {
         return $tokenResponse->hasScope('openid');
     }

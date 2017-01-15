@@ -11,10 +11,11 @@
 
 namespace OAuth2\OpenIdConnect;
 
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\Grant\ResponseTypeInterface;
-use OAuth2\Token\AccessTokenManagerInterface;
+use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use OAuth2\TokenType\TokenTypeManagerInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * This response type has been introduced by OpenID Connect
@@ -28,43 +29,55 @@ use OAuth2\TokenType\TokenTypeManagerInterface;
 class NoneResponseType implements ResponseTypeInterface
 {
     /**
-     * @var \OAuth2\OpenIdConnect\NoneResponseTypeListenerInterface[]
+     * @var NoneResponseTypeListenerInterface[]
      */
     private $listeners = [];
 
     /**
+     * @var TokenTypeManagerInterface
+     */
+    private $tokenTypeManager;
+
+    /**
+     * @var AccessTokenRepositoryInterface
+     */
+    private $accessTokenManager;
+
+    /**
      * NoneResponseType constructor.
      *
-     * @param \OAuth2\TokenType\TokenTypeManagerInterface $token_type_manager
-     * @param \OAuth2\Token\AccessTokenManagerInterface   $access_token_manager
+     * @param TokenTypeManagerInterface      $tokenTypeManager
+     * @param AccessTokenRepositoryInterface $accessTokenManager
      */
-    public function __construct(TokenTypeManagerInterface $token_type_manager,
-                                AccessTokenManagerInterface $access_token_manager
-    ) {
-        $this->setTokenTypeManager($token_type_manager);
-        $this->setAccessTokenManager($access_token_manager);
+    public function __construct(TokenTypeManagerInterface $tokenTypeManager, AccessTokenRepositoryInterface $accessTokenManager)
+    {
+        $this->tokenTypeManager = $tokenTypeManager;
+        $this->accessTokenManager = $accessTokenManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedGrantTypes()
+    public function getAssociatedGrantTypes(): array
     {
         return [];
     }
 
     /**
      * @param \OAuth2\OpenIdConnect\NoneResponseTypeListenerInterface $listener
+     * @return self
      */
-    public function addListener(NoneResponseTypeListenerInterface $listener)
+    public function addListener(NoneResponseTypeListenerInterface $listener): self
     {
         $this->listeners[] = $listener;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResponseType()
+    public function getResponseType(): string
     {
         return 'none';
     }
@@ -72,7 +85,7 @@ class NoneResponseType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponseMode()
+    public function getResponseMode(): string
     {
         return self::RESPONSE_TYPE_MODE_QUERY;
     }
@@ -80,7 +93,7 @@ class NoneResponseType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function finalizeAuthorization(array &$response_parameters, AuthorizationInterface $authorization, $redirect_uri)
+    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, UriInterface $redirectUri)
     {
         //Nothing to do
     }
@@ -88,7 +101,7 @@ class NoneResponseType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareAuthorization(AuthorizationInterface $authorization)
+    public function prepareAuthorization(Authorization $authorization)
     {
         $token_type = $this->getTokenTypeFromRequest($authorization->getQueryParams());
 

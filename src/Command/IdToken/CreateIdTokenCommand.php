@@ -17,6 +17,7 @@ use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccount;
+use Psr\Http\Message\UriInterface;
 
 final class CreateIdTokenCommand extends CommandWithDataTransporter
 {
@@ -31,7 +32,7 @@ final class CreateIdTokenCommand extends CommandWithDataTransporter
     private $userAccount;
 
     /**
-     * @var string
+     * @var UriInterface
      */
     private $redirectUri;
 
@@ -69,7 +70,7 @@ final class CreateIdTokenCommand extends CommandWithDataTransporter
      * CreateIdTokenCommand constructor.
      * @param Client $client
      * @param UserAccount $userAccount
-     * @param string $redirectUri
+     * @param UriInterface $redirectUri
      * @param array $requestClaims
      * @param array $claimsLocales
      * @param array $scopes
@@ -78,7 +79,7 @@ final class CreateIdTokenCommand extends CommandWithDataTransporter
      * @param AuthCode|null $authCode
      * @param DataTransporter|null $dataTransporter
      */
-    protected function __construct(Client $client, UserAccount $userAccount, string $redirectUri, array $requestClaims, array $claimsLocales, array $scopes, array $idTokenClaims, AccessToken $accessToken = null, AuthCode $authCode = null, DataTransporter $dataTransporter = null)
+    protected function __construct(Client $client, UserAccount $userAccount, UriInterface $redirectUri, array $requestClaims, array $claimsLocales, array $scopes, array $idTokenClaims, AccessToken $accessToken = null, AuthCode $authCode = null, DataTransporter $dataTransporter = null)
     {
         $this->client = $client;
         $this->userAccount = $userAccount;
@@ -95,7 +96,7 @@ final class CreateIdTokenCommand extends CommandWithDataTransporter
     /**
      * @param Client $client
      * @param UserAccount $userAccount
-     * @param string $redirectUri
+     * @param UriInterface $redirectUri
      * @param array $requestClaims
      * @param array $claimsLocales
      * @param array $scopes
@@ -105,7 +106,7 @@ final class CreateIdTokenCommand extends CommandWithDataTransporter
      * @param DataTransporter|null $dataTransporter
      * @return CreateIdTokenCommand
      */
-    public static function create(Client $client, UserAccount $userAccount, string $redirectUri, array $requestClaims, array $claimsLocales, array $scopes, array $idTokenClaims, AccessToken $accessToken = null, AuthCode $authCode = null, DataTransporter $dataTransporter = null): self
+    public static function create(Client $client, UserAccount $userAccount, UriInterface $redirectUri, array $requestClaims, array $claimsLocales, array $scopes, array $idTokenClaims, AccessToken $accessToken = null, AuthCode $authCode = null, DataTransporter $dataTransporter = null): self
     {
         return new self($client, $userAccount, $redirectUri, $requestClaims, $claimsLocales, $scopes, $idTokenClaims, $accessToken, $authCode, $dataTransporter);
     }
@@ -127,9 +128,9 @@ final class CreateIdTokenCommand extends CommandWithDataTransporter
     }
 
     /**
-     * @return string
+     * @return UriInterface
      */
-    public function getRedirectUri(): string
+    public function getRedirectUri(): UriInterface
     {
         return $this->redirectUri;
     }

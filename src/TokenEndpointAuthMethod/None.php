@@ -12,25 +12,11 @@
 namespace OAuth2\TokenEndpointAuthMethod;
 
 use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 use Psr\Http\Message\ServerRequestInterface;
 
 class None implements TokenEndpointAuthMethodInterface
 {
-    /**
-     * @var string
-     */
-    private $header_name;
-
-    /**
-     * None constructor.
-     *
-     * @param string $header_name
-     */
-    public function __construct(string $header_name = 'X-OAuth2-Public-Client-ID')
-    {
-        $this->header_name = $header_name;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -44,10 +30,10 @@ class None implements TokenEndpointAuthMethodInterface
      */
     public function findClientId(ServerRequestInterface $request, &$clientCredentials = null)
     {
-        $header = $request->getHeader($this->header_name);
+        $parameters = $request->getParsedBody() ?? [];
+        if (array_key_exists('client_id', $parameters) && !array_key_exists('client_secret', $parameters)) {
 
-        if (is_array($header) && 1 === count($header)) {
-            return $header[0];
+            return ClientId::create($parameters['client_id']);
         }
     }
 

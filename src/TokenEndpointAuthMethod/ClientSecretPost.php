@@ -25,7 +25,6 @@ abstract class ClientSecretPost implements TokenEndpointAuthMethodInterface
 
     public function __construct(int $secretLifetime = 0)
     {
-        Assertion::integer($secretLifetime);
         Assertion::greaterOrEqualThan($secretLifetime, 0);
 
         $this->secretLifetime = $secretLifetime;
