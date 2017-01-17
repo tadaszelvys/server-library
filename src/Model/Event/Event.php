@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -37,7 +37,7 @@ abstract class Event implements \JsonSerializable
      */
     protected function __construct(\JsonSerializable $payload)
     {
-        $recorded_on = \DateTimeImmutable::createFromFormat('U.u', microtime(true));
+        $recorded_on = \DateTimeImmutable::createFromFormat('U.u', (string)microtime(true));
         $eventId = EventId::create(Uuid::uuid4()->toString());
         $this->eventId = $eventId;
         $this->payload = $payload;

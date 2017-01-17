@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -63,14 +63,6 @@ class AuthorizationCodeResponseType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getAssociatedResponseTypes(): array
-    {
-        return ['code'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAssociatedGrantTypes(): array
     {
         return ['authorization_code'];
@@ -124,6 +116,14 @@ class AuthorizationCodeResponseType implements ResponseTypeInterface
     public function prepareAuthorization(Authorization $authorization)
     {
         $offline_access = $this->isOfflineAccess($authorization);
+
+        if (!array_key_exists('code_challenge', $params)) {
+            if (true === $this->isPKCEForPublicClientsEnforced() && $client->isPublic()) {
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Non-confidential clients must set a proof key (PKCE) for code exchange.']);
+            }
+
+            return;
+        }
 
         $code = $this->authCodeRepository->createAuthCode(
             $authorization->getClient(),
