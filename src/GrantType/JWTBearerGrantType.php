@@ -9,20 +9,31 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\GrantType;
 
 use Assert\Assertion;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
 use Jose\Object\JWSInterface;
 use OAuth2\Endpoint\Token\GrantTypeData;
-use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\Client\ClientRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class JWTBearerGrantType implements GrantTypeInterface
 {
+    /**
+     * @var JWTLoaderInterface
+     */
+    private $jwtLoader;
+
+    /**
+     * @var ClientRepositoryInterface
+     */
+    private $clientRepository;
+
     /**
      * @var bool
      */
@@ -41,13 +52,13 @@ class JWTBearerGrantType implements GrantTypeInterface
     /**
      * JWTBearerGrantType constructor.
      *
-     * @param \Jose\JWTLoaderInterface                               $loader
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
+     * @param JWTLoaderInterface $jwtLoader
+     * @param ClientRepositoryInterface $clientRepository
      */
-    public function __construct(JWTLoaderInterface $loader, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
+    public function __construct(JWTLoaderInterface $jwtLoader, ClientRepositoryInterface $clientRepository)
     {
-        $this->setJWTLoader($loader);
-        $this->setResponsefactoryManager($response_factory_manager);
+        $this->jwtLoader = $jwtLoader;
+        $this->clientRepository = $clientRepository;
     }
 
     /**
@@ -79,15 +90,27 @@ class JWTBearerGrantType implements GrantTypeInterface
         return 'urn:ietf:params:oauth:grant-type:jwt-bearer';
     }
 
+    public function checkTokenRequest(ServerRequestInterface $request)
+    {
+        $parameters = $request->getParsedBody() ?? [];
+        $requiredParameters = ['assertion'];
+
+        foreach ($requiredParameters as $requiredParameter) {
+            if (!array_key_exists($requiredParameter, $parameters)) {
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
+            }
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData &$grantTypeResponse)
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
-        $assertion = RequestBody::getParameter($request, 'assertion');
+        $parameters = $request->getParsedBody() ?? [];
+        $assertion = $parameters['assertion'];
         try {
-            Assertion::notNull($assertion, 'Parameter \'assertion\' is missing.');
-            $jwt = $this->getJWTLoader()->load(
+            $jwt = $this->jwtLoader->load(
                 $assertion,
                 $this->keyEncryptionkeySet,
                 $this->encryptionRequired
@@ -104,19 +127,42 @@ class JWTBearerGrantType implements GrantTypeInterface
             );
         }
 
-        //We modify the response:
+        $client = $this->clientRepository->find(ClientId::create($jwt->getClaim('sub')));
+        if (null === $client) {
+            throw new  OAuth2Exception(
+                401,
+                [
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'Client authentication failed.',
+                ]
+            );
+        }
+
+        if (null !== $grantTypeResponse->getClient() && $grantTypeResponse->getClient()->getId()->getValue() !== $client->getId()->getValue()) {
+            throw new  OAuth2Exception(
+                401,
+                [
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'Client authentication failed.',
+                ]
+            );
+        }
+
         // - We add the subject as the client public id
+        $grantTypeResponse = $grantTypeResponse->withClient($client);
+
         // - We transmit the JWT to the response for further needs
-        $grantTypeResponse->setClientPublicId($jwt->getClaim('sub'));
-        $grantTypeResponse->setAdditionalData('jwt', $jwt);
+        $grantTypeResponse = $grantTypeResponse->withMetadata('jwt', $jwt);
+
+        return $grantTypeResponse;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function grant(ServerRequestInterface $request, Client $client, GrantTypeData &$grantTypeResponse)
+    public function grant(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
-        if (false === $client->hasPublicKeySet()) {
+        if (false === $grantTypeResponse->getClient()->hasPublicKeySet()) {
             throw new OAuth2Exception(400,
                 [
                     'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
@@ -124,12 +170,12 @@ class JWTBearerGrantType implements GrantTypeInterface
                 ]
             );
         }
-        $jwt = $grantTypeResponse->getAdditionalData('jwt');
+        $jwt = $grantTypeResponse->getMetadata('jwt');
 
         try {
-            $this->getJWTLoader()->verify(
+            $this->jwtLoader->verify(
                 $jwt,
-                $client->getPublicKeySet()
+                $grantTypeResponse->getClient()->getPublicKeySet()
             );
         } catch (\Exception $e) {
             throw new OAuth2Exception(
@@ -141,12 +187,16 @@ class JWTBearerGrantType implements GrantTypeInterface
             );
         }
 
-        $issueRefreshToken = $this->isRefreshTokenIssuedWithAccessToken();
+        $grantTypeResponse = $grantTypeResponse->withResourceOwner($grantTypeResponse->getClient());
+        if ($issueRefreshToken = $this->isRefreshTokenIssuedWithAccessToken()) {
+            $grantTypeResponse = $grantTypeResponse->withRefreshToken();
+        } else {
+            $grantTypeResponse = $grantTypeResponse->withRefreshToken();
+            $grantTypeResponse->withRefreshTokenScopes($grantTypeResponse->getScopes());
+        }
 
-        $grantTypeResponse->setResourceOwnerPublicId($client->getId()->getValue());
-        $grantTypeResponse->setUserAccountPublicId(null);
-        $grantTypeResponse->setRefreshTokenIssued($issueRefreshToken);
-        $grantTypeResponse->setRefreshTokenScope($grantTypeResponse->getRequestedScope());
+        //$grantTypeResponse->setUserAccountPublicId(null);
+        return $grantTypeResponse;
     }
 
     /**

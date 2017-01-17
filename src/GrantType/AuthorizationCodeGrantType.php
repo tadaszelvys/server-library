@@ -9,11 +9,11 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\GrantType;
 
 use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\Endpoint\Token\GrantTypeData;
-use OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface;
+use OAuth2\GrantType\PKCEMethod\PKCEMethodManagerInterface;
 use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
 use OAuth2\Model\Client\Client;
@@ -23,7 +23,7 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
-class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInterface
+class AuthorizationCodeGrantType implements GrantTypeInterface
 {
     /**
      * @var bool
@@ -107,51 +107,6 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function getResponseType(): string
-    {
-        return 'code';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getResponseMode(): string
-    {
-        return self::RESPONSE_TYPE_MODE_QUERY;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finalizeAuthorization(array &$response_parameters, Authorization $authorization, UriInterface $redirect_uri)
-    {
-        //Nothing to do
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function prepareAuthorization(Authorization $authorization)
-    {
-        $offline_access = $this->isOfflineAccess($authorization);
-
-        $code = $this->authCodeRepository->createAuthCode(
-            $authorization->getClient(),
-            $authorization->getUserAccount(),
-            $authorization->getQueryParams(),
-            $authorization->getQueryParam('redirect_uri') ? $authorization->getQueryParam('redirect_uri') : null,
-            $authorization->getScopes(),
-            $offline_access
-        );
-
-        $authorization = $authorization->withData('code', $code);
-
-        return $code->toArray();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getGrantType(): string
     {
         return 'authorization_code';
@@ -160,21 +115,37 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
     /**
      * {@inheritdoc}
      */
-    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData &$grantTypeResponse)
+    public function checkTokenRequest(ServerRequestInterface $request)
     {
-        //Nothing to do
+        $parameters = $request->getParsedBody() ?? [];
+        $requiredParameters = ['code'];
+
+        foreach ($requiredParameters as $requiredParameter) {
+            if (!array_key_exists($requiredParameter, $parameters)) {
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
+            }
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function grant(ServerRequestInterface $request, Client $client, GrantTypeData &$grantTypeResponse)
+    public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
-        $this->checkClient($request, $client);
+        //Nothing to do
+        return $grantTypeResponse;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function grant(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
+    {
+        $this->checkClient($request, $grantTypeResponse->getClient());
         $authCode = $this->getAuthCode($request);
 
-        $this->checkPKCE($request, $authCode, $client);
-        $this->checkAuthCode($authCode, $client);
+        $this->checkPKCE($request, $authCode, $grantTypeResponse->getClient());
+        $this->checkAuthCode($authCode, $grantTypeResponse->getClient());
 
         $redirect_uri = RequestBody::getParameter($request, 'redirect_uri');
 
@@ -284,11 +255,11 @@ class AuthorizationCodeGrantType implements ResponseTypeInterface, GrantTypeInte
 
     /**
      * @param \OAuth2\Model\AuthCode\AuthCode $authCode
-     * @param string                          $redirect_uri
+     * @param UriInterface                    $redirect_uri
      *
      * @throws \OAuth2\Response\OAuth2Exception
      */
-    private function checkRedirectUri(AuthCode $authCode, $redirect_uri)
+    private function checkRedirectUri(AuthCode $authCode, UriInterface $redirect_uri)
     {
         if (true === $authCode->hasMetadata('redirect_uri') && $redirect_uri !== $authCode->getMetadata('redirect_uri')) {
             throw new OAuth2Exception(

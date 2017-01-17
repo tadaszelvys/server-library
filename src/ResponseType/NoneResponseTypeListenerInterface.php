@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect;
+namespace OAuth2\ResponseType;
 
 use OAuth2\Model\AccessToken\AccessToken;
 

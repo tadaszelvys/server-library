@@ -33,7 +33,7 @@ class ClientRepository implements ClientRepositoryInterface
             [
                 'token_endpoint_auth_method' => 'client_secret_basic',
                 'client_secret' => 'secret',
-                'grant_types' => ['client_credentials', 'password'],
+                'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
             ],
             UserAccount::create(
                 UserAccountId::create('User1'),
@@ -56,7 +56,7 @@ class ClientRepository implements ClientRepositoryInterface
                 'token_endpoint_auth_method' => 'client_secret_jwt',
                 'client_secret' => 'secret',
                 'client_secret_expires_at' => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
-                'grant_types' => ['client_credentials', 'password'],
+                'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
             ],
             UserAccount::create(
                 UserAccountId::create('User1'),

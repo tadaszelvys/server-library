@@ -9,18 +9,17 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect;
+namespace OAuth2\ResponseType;
 
 use OAuth2\Command\IdToken\CreateIdTokenCommand;
 use OAuth2\DataTransporter;
 use OAuth2\Endpoint\Authorization\Authorization;
-use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\UriInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
-class IdTokenGrantType implements ResponseTypeInterface
+class IdTokenResponseType implements ResponseTypeInterface
 {
     /**
      * @var MessageBus

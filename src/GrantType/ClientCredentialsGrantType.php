@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\GrantType;
 
 use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Response\OAuth2Exception;
@@ -65,7 +65,10 @@ class ClientCredentialsGrantType implements GrantTypeInterface
     public function grant(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
         if (true === $this->isRefreshTokenIssuedWithAccessToken() ) {
-            $grantTypeResponse = $grantTypeResponse->withMetadata('refresh_token', true);
+            $grantTypeResponse = $grantTypeResponse->withRefreshToken();
+            $grantTypeResponse = $grantTypeResponse->withRefreshTokenScopes($grantTypeResponse->getScopes());
+        } else {
+            $grantTypeResponse = $grantTypeResponse->withoutRefreshToken();
         }
 
         $grantTypeResponse = $grantTypeResponse->withResourceOwner($grantTypeResponse->getClient());

@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint\TokenRevocation;
 
+use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Model\Client\Client;
@@ -19,7 +20,6 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response;
 
 abstract class TokenRevocationEndpoint implements MiddlewareInterface
 {
@@ -29,12 +29,19 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
     private $tokenTypeHintManager;
 
     /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
      * TokenRevocationEndpoint constructor.
      * @param TokenTypeHintManagerInterface $tokenTypeHintManager
+     * @param ResponseFactoryInterface      $responseFactory
      */
-    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager)
+    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager, ResponseFactoryInterface $responseFactory)
     {
         $this->tokenTypeHintManager = $tokenTypeHintManager;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -118,8 +125,12 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
             $data = sprintf('%s(%s)', $callback, $data);
         }
 
-        $response = new Response('php://memory', $code);
+        $response = $this->responseFactory->createResponse($code);
         $response->getBody()->write($data);
+        $headers = ['Content-Type' => 'application/jrd+json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+        foreach ($headers as $k => $v) {
+            $response = $response->withHeader($k, $v);
+        }
 
         return $response;
     }

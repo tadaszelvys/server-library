@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint\TokenIntrospection;
 
+use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Model\Client\Client;
@@ -28,12 +29,20 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
     private $tokenTypeHintManager;
 
     /**
-     * TokenIntrospectionEndpoint constructor.
-     * @param TokenTypeHintManagerInterface $tokenTypeHintManager
+     * @var ResponseFactoryInterface
      */
-    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager)
+    private $responseFactory;
+
+    /**
+     * TokenIntrospectionEndpoint constructor.
+     *
+     * @param TokenTypeHintManagerInterface $tokenTypeHintManager
+     * @param ResponseFactoryInterface      $responseFactory
+     */
+    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager, ResponseFactoryInterface $responseFactory)
     {
         $this->tokenTypeHintManager = $tokenTypeHintManager;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -83,8 +92,14 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
             if (null !== $result) {
                 if ($client->getId()->getValue() === $result->getClient()->getId()->getValue()) {
                     $data = $hint->introspect($result);
+                    $response = $this->responseFactory->createResponse();
+                    $response->getBody()->write(json_encode($data));
+                    $headers = ['Content-Type' => 'application/jrd+json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+                    foreach ($headers as $k => $v) {
+                        $response = $response->withHeader($k, $v);
+                    }
 
-                    throw new OAuth2Exception(200, json_encode($data));
+                    return $response;
                 } else {
                     throw new OAuth2Exception(
                         400,
@@ -96,7 +111,15 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
                 }
             }
         }
-        throw new OAuth2Exception(200, json_encode(['active' => false]));
+
+        $response = $this->responseFactory->createResponse();
+        $response->getBody()->write(json_encode(['active' => false]));
+        $headers = ['Content-Type' => 'application/jrd+json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+        foreach ($headers as $k => $v) {
+            $response = $response->withHeader($k, $v);
+        }
+
+        return $response;
     }
 
     /**

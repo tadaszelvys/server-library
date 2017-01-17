@@ -30,7 +30,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     public function __construct()
     {
         $this->save(RefreshToken::create(
-            RefreshTokenId::create('REFRESH_TOKEN_#1'),
+            RefreshTokenId::create('EXPIRED_REFRESH_TOKEN'),
             UserAccount::create(
                 UserAccountId::create('User #1'),
                 []
@@ -44,7 +44,27 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
                 )
             ),
             [],
-            new \DateTimeImmutable('now +2 days'),
+            new \DateTimeImmutable('now -2 day'),
+            [],
+            []
+        ));
+
+        $this->save(RefreshToken::create(
+            RefreshTokenId::create('VALID_REFRESH_TOKEN'),
+            UserAccount::create(
+                UserAccountId::create('User #1'),
+                []
+            ),
+            Client::create(
+                ClientId::create('client1'),
+                [],
+                UserAccount::create(
+                    UserAccountId::create('User #1'),
+                    []
+                )
+            ),
+            [],
+            new \DateTimeImmutable('now +2 day'),
             [],
             []
         ));
@@ -75,7 +95,9 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function find(RefreshTokenId $tokenId)
     {
-        return array_key_exists($tokenId->getValue(), $this->refreshTokens) ? $this->refreshTokens[$tokenId->getValue()] : null;
+        if ($this->has($tokenId)) {
+            return $this->refreshTokens[$tokenId->getValue()];
+        }
     }
 
     public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)

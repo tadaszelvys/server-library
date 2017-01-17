@@ -20,19 +20,17 @@ use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommandHandler;
 use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
-use OAuth2\Grant\ClientCredentialsGrantType;
-use OAuth2\Grant\ResourceOwnerPasswordCredentialsGrantType;
+use OAuth2\GrantType\ClientCredentialsGrantType;
+use OAuth2\GrantType\RefreshTokenGrantType;
+use OAuth2\GrantType\ResourceOwnerPasswordCredentialsGrantType;
 use OAuth2\Middleware\GrantTypeMiddleware;
 use OAuth2\Middleware\TokenTypeMiddleware;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\Factory\AccessDeniedResponseFactory;
 use OAuth2\Response\Factory\BadRequestResponseFactory;
-use OAuth2\Response\Factory\CreatedResponseFactory;
 use OAuth2\Response\Factory\MethodNotAllowedResponseFactory;
-use OAuth2\Response\Factory\NoBodyResponseFactory;
 use OAuth2\Response\Factory\NotImplementedResponseFactory;
-use OAuth2\Response\Factory\SuccessResponseFactory;
 use OAuth2\Response\OAuth2ExceptionMiddleware;
 use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
@@ -104,15 +102,15 @@ use Http\Factory\Diactoros\ServerRequestFactory;
 use Interop\Http\Factory\ServerRequestFactoryInterface;
 use OAuth2\Test\Stub\ServiceLocator;
 use Http\Factory\Diactoros\StreamFactory;
-use OAuth2\Grant\GrantTypeManager;
-use OAuth2\Grant\GrantTypeManagerInterface;
-use OAuth2\Grant\ResponseTypeManager;
-use OAuth2\Grant\ResponseTypeManagerInterface;
-use OAuth2\Grant\PKCEMethod\PKCEMethodInterface;
-use OAuth2\Grant\PKCEMethod\PKCEMethodManager;
-use OAuth2\Grant\PKCEMethod\PKCEMethodManagerInterface;
-use OAuth2\Grant\PKCEMethod\Plain;
-use OAuth2\Grant\PKCEMethod\S256;
+use OAuth2\GrantType\GrantTypeManager;
+use OAuth2\GrantType\GrantTypeManagerInterface;
+use OAuth2\ResponseType\ResponseTypeManager;
+use OAuth2\ResponseType\ResponseTypeManagerInterface;
+use OAuth2\GrantType\PKCEMethod\PKCEMethodInterface;
+use OAuth2\GrantType\PKCEMethod\PKCEMethodManager;
+use OAuth2\GrantType\PKCEMethod\PKCEMethodManagerInterface;
+use OAuth2\GrantType\PKCEMethod\Plain;
+use OAuth2\GrantType\PKCEMethod\S256;
 use OAuth2\Model\Scope\DefaultScopePolicy;
 use OAuth2\Model\Scope\ErrorScopePolicy;
 use OAuth2\Model\Scope\ScopePolicyInterface;
@@ -134,8 +132,8 @@ use OAuth2\Middleware\HttpMethod;
 use OAuth2\TokenTypeHint\AccessTokenTypeHint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationGetEndpoint;
 use OAuth2\Test\Stub\AccessTokenRepository;
-use OAuth2\Grant\AuthorizationCodeGrantType;
-use OAuth2\Grant\ImplicitGrantType;
+use OAuth2\ResponseType\AuthorizationCodeResponseType;
+use OAuth2\ResponseType\ImplicitResponseType;
 
 final class Application
 {
@@ -164,11 +162,8 @@ final class Application
             $this->oauth2ResponseFactory->addResponseFactory(new AuthenticateResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new AccessDeniedResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new BadRequestResponseFactory());
-            $this->oauth2ResponseFactory->addResponseFactory(new CreatedResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new MethodNotAllowedResponseFactory());
-            $this->oauth2ResponseFactory->addResponseFactory(new NoBodyResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new NotImplementedResponseFactory());
-            $this->oauth2ResponseFactory->addResponseFactory(new SuccessResponseFactory());
         }
 
         return $this->oauth2ResponseFactory;
@@ -819,6 +814,9 @@ final class Application
             $this->grantTypeManager->addGrantType(new ResourceOwnerPasswordCredentialsGrantType(
                 $this->getUserAccountRepository()
             ));
+            $this->grantTypeManager->addGrantType(new RefreshTokenGrantType(
+                $this->getRefreshTokenRepository()
+            ));
         }
 
         return $this->grantTypeManager;
@@ -1186,7 +1184,7 @@ final class Application
             $this->clientConfigurationEndpoint = new ClientConfigurationEndpoint(
                 $this->getBearerTokenType(),
                 $this->getCommandBus(),
-                $this->getClientRepository()
+                $this->getResponseFactory()
             );
         }
 
@@ -1246,6 +1244,7 @@ final class Application
         if (null === $this->tokenRevocationGetEndpoint) {
             $this->tokenRevocationGetEndpoint = new TokenRevocationGetEndpoint(
                 $this->getTokenTypeHintManager(),
+                $this->getResponseFactory(),
                 true
             );
         }
@@ -1265,7 +1264,8 @@ final class Application
     {
         if (null === $this->tokenRevocationPostEndpoint) {
             $this->tokenRevocationPostEndpoint = new TokenRevocationPostEndpoint(
-                $this->getTokenTypeHintManager()
+                $this->getTokenTypeHintManager(),
+                $this->getResponseFactory()
             );
         }
 
@@ -1324,7 +1324,8 @@ final class Application
     {
         if (null === $this->tokenIntrospectionEndpoint) {
             $this->tokenIntrospectionEndpoint = new TokenIntrospectionEndpoint(
-                $this->getTokenTypeHintManager()
+                $this->getTokenTypeHintManager(),
+                $this->getResponseFactory()
             );
         }
 
@@ -1525,42 +1526,42 @@ final class Application
     }
 
     /**
-     * @var null|AuthorizationCodeGrantType
+     * @var null|AuthorizationCodeResponseType
      */
-    private $grantAuthorizationCodeGrantType = null;
+    private $grantAuthorizationCodeResponseType = null;
 
     /**
-     * @return AuthorizationCodeGrantType
+     * @return AuthorizationCodeResponseType
      */
-    public function getAuthorizationCodeGrantType(): AuthorizationCodeGrantType
+    public function getAuthorizationCodeResponseType(): AuthorizationCodeResponseType
     {
-        if (null === $this->grantAuthorizationCodeGrantType) {
-            /*$this->grantAuthorizationCodeGrantType = new AuthorizationCodeGrantType(
+        if (null === $this->grantAuthorizationCodeResponseType) {
+            /*$this->grantAuthorizationCodeResponseType = new AuthorizationCodeResponseType(
 
             );
-            $this->grantAuthorizationCodeGrantType->*/
+            $this->grantAuthorizationCodeResponseType->*/
         }
 
-        return $this->grantAuthorizationCodeGrantType;
+        return $this->grantAuthorizationCodeResponseType;
     }
     /**
-     * @var null|ImplicitGrantType
+     * @var null|ImplicitResponseType
      */
-    private $grantImplicitGrantType = null;
+    private $grantImplicitResponseType = null;
 
     /**
-     * @return ImplicitGrantType
+     * @return ImplicitResponseType
      */
-    public function getImplicitGrantType(): ImplicitGrantType
+    public function getImplicitResponseType(): ImplicitResponseType
     {
-        if (null === $this->grantImplicitGrantType) {
-            /*$this->grantImplicitGrantType = new ImplicitGrantType(
+        if (null === $this->grantImplicitResponseType) {
+            /*$this->grantImplicitResponseType = new ImplicitResponseType(
                 $this->getAccessTokenHint(),
                 $this->getAccessTokenRepository()
             );*/
         }
 
-        return $this->grantImplicitGrantType;
+        return $this->grantImplicitResponseType;
     }
 
     /**

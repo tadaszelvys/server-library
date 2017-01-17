@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\GrantType;
 
 use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Response\OAuth2Exception;

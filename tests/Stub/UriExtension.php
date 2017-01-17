@@ -19,12 +19,14 @@ final class UriExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function process(int $code, &$data)
+    public function process(int $code, array $data): array
     {
         if ($code >= 200 && is_array($data) && array_key_exists('error', $data)) {
             $uri = sprintf('https://foo.test/Page/%d/%s', $code, $data['error']);
             Assertion::regex($uri, '/^[\x21\x23-\x5B\x5D-\x7E]+$/', 'Invalid URI.');
             $data['error_uri'] = $uri;
         }
+
+        return $data;
     }
 }

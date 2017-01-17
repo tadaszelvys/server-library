@@ -11,9 +11,9 @@
 
 namespace OAuth2\Endpoint\ClientConfiguration;
 
+use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use OAuth2\Response\OAuth2Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
@@ -25,13 +25,20 @@ final class ClientConfigurationGetEndpoint implements MiddlewareInterface
     private $messageBus;
 
     /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
      * ClientConfigurationGetEndpoint constructor.
      *
-     * @param MessageBus $messageBus
+     * @param MessageBus               $messageBus
+     * @param ResponseFactoryInterface $responseFactory
      */
-    public function __construct(MessageBus $messageBus)
+    public function __construct(MessageBus $messageBus, ResponseFactoryInterface $responseFactory)
     {
         $this->messageBus = $messageBus;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -40,7 +47,13 @@ final class ClientConfigurationGetEndpoint implements MiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $next)
     {
         $client = $request->getAttribute('client');
+        $response = $this->responseFactory->createResponse();
+        $request->getBody()->write(json_encode($client));
+        $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+        foreach ($headers as $k => $v) {
+            $response = $response->withHeader($k, $v);
+        }
 
-        throw new OAuth2Exception(200, $client->jsonSerialize());
+        return $response;
     }
 }

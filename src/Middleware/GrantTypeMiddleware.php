@@ -14,7 +14,7 @@ namespace OAuth2\Middleware;
 use Assert\Assertion;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use OAuth2\Grant\GrantTypeManagerInterface;
+use OAuth2\GrantType\GrantTypeManagerInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;

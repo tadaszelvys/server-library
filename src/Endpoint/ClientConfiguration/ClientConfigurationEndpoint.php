@@ -12,6 +12,7 @@
 namespace OAuth2\Endpoint\ClientConfiguration;
 
 use Assert\Assertion;
+use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Model\Client\Client;
@@ -34,15 +35,22 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
     private $messageBus;
 
     /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
      * ClientConfigurationEndpoint constructor.
      *
-     * @param BearerToken $bearerToken
-     * @param MessageBus  $messageBus
+     * @param BearerToken              $bearerToken
+     * @param MessageBus               $messageBus
+     * @param ResponseFactoryInterface $responseFactory
      */
-    public function __construct(BearerToken $bearerToken, MessageBus $messageBus)
+    public function __construct(BearerToken $bearerToken, MessageBus $messageBus, ResponseFactoryInterface $responseFactory)
     {
         $this->bearerToken = $bearerToken;
         $this->messageBus = $messageBus;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -53,15 +61,15 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
         $this->checkClient($request);
         switch ($request->getMethod()) {
             case 'GET':
-                $get = new ClientConfigurationGetEndpoint($this->messageBus);
+                $get = new ClientConfigurationGetEndpoint($this->messageBus, $this->responseFactory);
 
                 return $get->process($request, $next);
             case 'PUT':
-                $get = new ClientConfigurationPutEndpoint($this->messageBus);
+                $get = new ClientConfigurationPutEndpoint($this->messageBus, $this->responseFactory);
 
                 return $get->process($request, $next);
             case 'DELETE':
-                $get = new ClientConfigurationDeleteEndpoint($this->messageBus);
+                $get = new ClientConfigurationDeleteEndpoint($this->messageBus, $this->responseFactory);
 
                 return $get->process($request, $next);
             default:

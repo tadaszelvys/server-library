@@ -50,6 +50,7 @@ class ResponseContext  extends BaseContext
      */
     public function theResponseCodeIs($code)
     {
+        dump((string) $this->getResponse()->getBody()->getContents());
         Assertion::eq((int) $code, $this->getResponse()->getStatusCode());
     }
 

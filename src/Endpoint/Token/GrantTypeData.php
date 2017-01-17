@@ -43,6 +43,16 @@ class GrantTypeData
     private $scopes = [];
 
     /**
+     * @var bool
+     */
+    private $issueRefreshToken = false;
+
+    /**
+     * @var \string[]
+     */
+    private $refreshTokenScopes = [];
+
+    /**
      * @param string $key
      * @param $metadata
      * @return GrantTypeData
@@ -222,5 +232,61 @@ class GrantTypeData
     public function getScopes(): array
     {
         return $this->scopes;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasRefreshToken(): bool
+    {
+        return $this->issueRefreshToken;
+    }
+
+    /**
+     * @return GrantTypeData
+     */
+    public function withRefreshToken(): self
+    {
+        if (true === $this->issueRefreshToken) {
+            return $this;
+        }
+        $clone = clone $this;
+        $clone->issueRefreshToken = true;
+
+        return $clone;
+    }
+
+    /**
+     * @return GrantTypeData
+     */
+    public function withoutRefreshToken(): self
+    {
+        if (false === $this->issueRefreshToken) {
+            return $this;
+        }
+        $clone = clone $this;
+        $clone->issueRefreshToken = false;
+
+        return $clone;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getRefreshTokenScopes(): array
+    {
+        return $this->refreshTokenScopes;
+    }
+
+    /**
+     * @param \string[] $scopes
+     * @return GrantTypeData
+     */
+    public function withRefreshTokenScopes(array $scopes): self
+    {
+        $clone = clone $this;
+        $clone->refreshTokenScopes = $scopes;
+
+        return $clone;
     }
 }

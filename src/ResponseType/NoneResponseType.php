@@ -9,10 +9,9 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect;
+namespace OAuth2\ResponseType;
 
 use OAuth2\Endpoint\Authorization\Authorization;
-use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use OAuth2\TokenType\TokenTypeManagerInterface;
 use Psr\Http\Message\UriInterface;
@@ -101,11 +100,11 @@ class NoneResponseType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareAuthorization(Authorization $authorization)
+    public function prepareAuthorization(Authorization $authorization): array
     {
         $token_type = $this->getTokenTypeFromRequest($authorization->getQueryParams());
 
-        $token = $this->getAccessTokenManager()->createAccessToken(
+        $token = $this->accessTokenManager->createAccessToken(
             $authorization->getClient(),
             $authorization->getUserAccount(),
             $token_type->getTokenTypeInformation(),

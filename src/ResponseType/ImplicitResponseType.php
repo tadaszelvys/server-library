@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\ResponseType;
 
 use OAuth2\Command\AccessToken\CreateAccessTokenCommand;
 use OAuth2\DataTransporter;
@@ -17,7 +17,7 @@ use OAuth2\Endpoint\Authorization\Authorization;
 use Psr\Http\Message\UriInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
-class ImplicitGrantType implements ResponseTypeInterface
+class ImplicitResponseType implements ResponseTypeInterface
 {
     /**
      * @var MessageBus
@@ -68,7 +68,7 @@ class ImplicitGrantType implements ResponseTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareAuthorization(Authorization $authorization)
+    public function prepareAuthorization(Authorization $authorization): array
     {
         $tokenType = $authorization->getTokenType();
 

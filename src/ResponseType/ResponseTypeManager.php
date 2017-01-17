@@ -9,44 +9,46 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\ResponseType;
 
 use Assert\Assertion;
 
 class ResponseTypeManager implements ResponseTypeManagerInterface
 {
     /**
-     * @var \OAuth2\Grant\ResponseTypeInterface[]
+     * @var ResponseTypeInterface[]
      */
-    private $response_types = [];
+    private $responseTypes = [];
 
     /**
      * {@inheritdoc}
      */
-    public function addResponseType(ResponseTypeInterface $response_type)
+    public function addResponseType(ResponseTypeInterface $responseType): ResponseTypeManagerInterface
     {
-        $this->response_types[$response_type->getResponseType()] = $response_type;
+        $this->responseTypes[$responseType->getResponseType()] = $responseType;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasResponseType($name)
+    public function hasResponseType(string $name): bool
     {
-        return array_key_exists($name, $this->response_types);
+        return array_key_exists($name, $this->responseTypes);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResponseTypes($names)
+    public function getResponseTypes(string $names): array
     {
         Assertion::true($this->isResponseTypeSupported($names), sprintf('The response type \'%s\' is not supported.', $names));
-        $response_types = explode(' ', $names);
+        $responseTypes = explode(' ', $names);
 
         $types = [];
-        foreach ($response_types as $response_type) {
-            $type = $this->response_types[$response_type];
+        foreach ($responseTypes as $responseType) {
+            $type = $this->responseTypes[$responseType];
             $types[] = $type;
         }
 
@@ -56,9 +58,9 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getSupportedResponseTypes()
+    public function getSupportedResponseTypes(): array
     {
-        $types = array_keys($this->response_types);
+        $types = array_keys($this->responseTypes);
         if (in_array('id_token', $types)) {
             if (in_array('code', $types)) {
                 $types[] = 'code id_token';
@@ -80,8 +82,8 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function isResponseTypeSupported($response_type)
+    public function isResponseTypeSupported(string $responseType): bool
     {
-        return in_array($response_type, $this->getSupportedResponseTypes());
+        return in_array($responseType, $this->getSupportedResponseTypes());
     }
 }

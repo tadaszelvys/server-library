@@ -11,6 +11,7 @@
 
 namespace OAuth2\Endpoint\ClientConfiguration;
 
+use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Command\Client\DeleteClientCommand;
@@ -26,13 +27,20 @@ final class ClientConfigurationDeleteEndpoint implements MiddlewareInterface
     private $messageBus;
 
     /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
      * ClientConfigurationDeleteEndpoint constructor.
      *
-     * @param MessageBus $messageBus
+     * @param MessageBus               $messageBus
+     * @param ResponseFactoryInterface $responseFactory
      */
-    public function __construct(MessageBus $messageBus)
+    public function __construct(MessageBus $messageBus, ResponseFactoryInterface $responseFactory)
     {
         $this->messageBus = $messageBus;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -45,6 +53,12 @@ final class ClientConfigurationDeleteEndpoint implements MiddlewareInterface
         $command = DeleteClientCommand::create($client);
         $this->messageBus->handle($command);
 
-        throw new OAuth2Exception(204, '');
+        $response = $this->responseFactory->createResponse(204);
+        $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+        foreach ($headers as $k => $v) {
+            $response = $response->withHeader($k, $v);
+        }
+
+        return $response;
     }
 }

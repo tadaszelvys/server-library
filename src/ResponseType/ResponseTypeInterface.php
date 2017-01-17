@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\ResponseType;
 
 use OAuth2\Endpoint\Authorization\Authorization;
 use Psr\Http\Message\UriInterface;
@@ -51,7 +51,7 @@ interface ResponseTypeInterface
      *
      * @return array
      */
-    public function prepareAuthorization(Authorization $authorization);
+    public function prepareAuthorization(Authorization $authorization): array;
 
     /**
      * This function finish the authorization response.

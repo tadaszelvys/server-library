@@ -11,11 +11,11 @@
 
 namespace OAuth2\Endpoint\ClientConfiguration;
 
+use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Command\Client\UpdateClientCommand;
 use OAuth2\DataTransporter;
-use OAuth2\Response\OAuth2Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
@@ -27,13 +27,20 @@ final class ClientConfigurationPutEndpoint implements MiddlewareInterface
     private $messageBus;
 
     /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
      * ClientConfigurationPutEndpoint constructor.
      *
-     * @param MessageBus $messageBus
+     * @param MessageBus               $messageBus
+     * @param ResponseFactoryInterface $responseFactory
      */
-    public function __construct(MessageBus $messageBus)
+    public function __construct(MessageBus $messageBus, ResponseFactoryInterface $responseFactory)
     {
         $this->messageBus = $messageBus;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -48,6 +55,13 @@ final class ClientConfigurationPutEndpoint implements MiddlewareInterface
         $command = UpdateClientCommand::create($client, $command_parameters, $data);
         $this->messageBus->handle($command);
 
-        throw new OAuth2Exception(200, $data->getData()->jsonSerialize());
+        $response = $this->responseFactory->createResponse();
+        $request->getBody()->write(json_encode($data->getData()));
+        $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+        foreach ($headers as $k => $v) {
+            $response = $response->withHeader($k, $v);
+        }
+
+        return $response;
     }
 }

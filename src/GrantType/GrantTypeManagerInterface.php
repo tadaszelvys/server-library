@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\GrantType;
 
 interface GrantTypeManagerInterface
 {
@@ -32,7 +32,7 @@ interface GrantTypeManagerInterface
      *
      * @throws \InvalidArgumentException
      *
-     * @return \OAuth2\Grant\GrantTypeInterface
+     * @return GrantTypeInterface
      */
     public function getGrantType($name);
 

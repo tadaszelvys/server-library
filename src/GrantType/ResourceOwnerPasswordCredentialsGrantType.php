@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant;
+namespace OAuth2\GrantType;
 
 use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Model\Client\Client;
@@ -109,7 +109,6 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
         }
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -140,8 +139,12 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
         }
 
         $grantTypeResponse = $grantTypeResponse->withResourceOwner($userAccount);
-        //$grantTypeResponse->withRefreshTokenIssued($this->issueRefreshToken($client));
-        //$grantTypeResponse->setRefreshTokenScope($grantTypeResponse->getRequestedScope());
+        if ($this->issueRefreshToken($grantTypeResponse->getClient())) {
+            $grantTypeResponse = $grantTypeResponse->withRefreshToken();
+        } else {
+            $grantTypeResponse = $grantTypeResponse->withRefreshToken();
+            $grantTypeResponse->withRefreshTokenScopes($grantTypeResponse->getScopes());
+        }
 
         return $grantTypeResponse;
     }

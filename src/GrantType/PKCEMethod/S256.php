@@ -9,7 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Grant\PKCEMethod;
+namespace OAuth2\GrantType\PKCEMethod;
 
 use Base64Url\Base64Url;
 

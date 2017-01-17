@@ -9,10 +9,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-use Base64Url\Base64Url;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use OAuth2\Model\Client\ClientId;
 
 class RefreshTokenGrantTypeContext extends BaseContext
 {
@@ -38,7 +35,15 @@ class RefreshTokenGrantTypeContext extends BaseContext
      */
     public function aClientSendsARefreshTokenGrantTypeRequestWithoutRefreshTokenParameter()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'refresh_token',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -46,7 +51,16 @@ class RefreshTokenGrantTypeContext extends BaseContext
      */
     public function aClientSendsARefreshTokenGrantTypeRequestWithAnExpiredRefreshToken()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'refresh_token',
+            'refresh_token' => 'EXPIRED_REFRESH_TOKEN',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -54,7 +68,16 @@ class RefreshTokenGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidRefreshTokenGrantTypeRequest()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'refresh_token',
+            'refresh_token' => 'VALID_REFRESH_TOKEN',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -62,6 +85,15 @@ class RefreshTokenGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidRefreshTokenGrantTypeRequestButTheGrantTypeIsNotAllowed()
     {
-        throw new PendingException();
+        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'refresh_token',
+            'refresh_token' => 'NOT IMPORTANT',
+            'client_id' => 'client2',
+        ]);
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 }

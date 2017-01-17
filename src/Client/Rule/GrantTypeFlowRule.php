@@ -12,8 +12,8 @@
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Grant\GrantTypeManagerInterface;
-use OAuth2\Grant\ResponseTypeManagerInterface;
+use OAuth2\GrantType\GrantTypeManagerInterface;
+use OAuth2\ResponseType\ResponseTypeManagerInterface;
 use OAuth2\Model\UserAccount\UserAccount;
 
 final class GrantTypeFlowRule implements RuleInterface
@@ -31,8 +31,8 @@ final class GrantTypeFlowRule implements RuleInterface
     /**
      * GrantTypeFlowRule constructor.
      *
-     * @param \OAuth2\Grant\GrantTypeManagerInterface    $grant_type_manager
-     * @param \OAuth2\Grant\ResponseTypeManagerInterface $response_type_manager
+     * @param GrantTypeManagerInterface    $grant_type_manager
+     * @param ResponseTypeManagerInterface $response_type_manager
      */
     public function __construct(GrantTypeManagerInterface $grant_type_manager, ResponseTypeManagerInterface $response_type_manager)
     {
