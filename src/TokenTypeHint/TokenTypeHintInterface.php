@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -34,6 +36,7 @@ interface TokenTypeHintInterface
 
     /**
      * @param Token $token
+     *
      * @return array
      */
     public function introspect(Token $token): array;

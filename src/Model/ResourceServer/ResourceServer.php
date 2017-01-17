@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -20,6 +22,7 @@ final class ResourceServer
 
     /**
      * ResourceServer constructor.
+     *
      * @param ResourceServerId $resourceServerId
      */
     private function __construct(ResourceServerId $resourceServerId)
@@ -29,6 +32,7 @@ final class ResourceServer
 
     /**
      * @param ResourceServerId $resourceServerId
+     *
      * @return ResourceServer
      */
     public static function create(ResourceServerId $resourceServerId): self

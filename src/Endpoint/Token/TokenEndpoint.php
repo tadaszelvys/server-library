@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -55,8 +57,9 @@ final class TokenEndpoint implements MiddlewareInterface
 
     /**
      * TokenEndpoint constructor.
-     * @param ResponseFactoryInterface $responseFactory
-     * @param MessageBus $commandBus
+     *
+     * @param ResponseFactoryInterface  $responseFactory
+     * @param MessageBus                $commandBus
      * @param TokenTypeManagerInterface $tokenTypeManager
      */
     public function __construct(ResponseFactoryInterface $responseFactory, MessageBus $commandBus, TokenTypeManagerInterface $tokenTypeManager)
@@ -88,7 +91,7 @@ final class TokenEndpoint implements MiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         /**
-         * @var $type GrantTypeInterface From the dedicated middleware
+         * @var GrantTypeInterface From the dedicated middleware
          */
         $type = $request->getAttribute('grant_type');
 
@@ -131,14 +134,16 @@ final class TokenEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param GrantTypeData $grantTypeData
-     * @return GrantTypeData
+     * @param GrantTypeData          $grantTypeData
+     *
      * @throws OAuth2Exception
+     *
+     * @return GrantTypeData
      */
     private function populateTokenTypeInformation(ServerRequestInterface $request, GrantTypeData $grantTypeData): GrantTypeData
     {
         /**
-         * @var $tokenType TokenTypeInterface
+         * @var TokenTypeInterface
          */
         $tokenType = $request->getAttribute('token_type');
         if (!$grantTypeData->getClient()->isTokenTypeAllowed($tokenType->getTokenTypeName())) {
@@ -160,10 +165,12 @@ final class TokenEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param ServerRequestInterface     $request
-     * @param GrantTypeData $grantTypeData
-     * @return GrantTypeData
+     * @param ServerRequestInterface $request
+     * @param GrantTypeData          $grantTypeData
+     *
      * @throws OAuth2Exception
+     *
+     * @return GrantTypeData
      */
     private function populateScope(ServerRequestInterface $request, GrantTypeData $grantTypeData): GrantTypeData
     {
@@ -184,16 +191,14 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
-                    'error_description' => $e->getMessage()]
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
+                    'error_description' => $e->getMessage(), ]
             );
         }
-
 
         $availableScope = $this->scopeRepository->getAvailableScopesForClient($grantTypeData->getClient());
 
         //$grantTypeData->setAvailableScope($grantTypeData->getAvailableScope() ?: $this->scopeRepository->getAvailableScopesForClient($grantTypeData->getClient()));
-
 
         //Check if scope requested are within the available scope
         if (!$this->scopeRepository->areRequestScopesAvailable($scope, $availableScope)) {

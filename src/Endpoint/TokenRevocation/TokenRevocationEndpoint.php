@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -35,6 +37,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
     /**
      * TokenRevocationEndpoint constructor.
+     *
      * @param TokenTypeHintManagerInterface $tokenTypeHintManager
      * @param ResponseFactoryInterface      $responseFactory
      */
@@ -54,8 +57,10 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
     /**
      * @param string $tokenTypeHint
-     * @return TokenTypeHintInterface[]
+     *
      * @throws OAuth2Exception
+     *
+     * @return TokenTypeHintInterface[]
      */
     protected function getTokenTypeHint(string $tokenTypeHint): array
     {
@@ -64,7 +69,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => 'unsupported_token_type',
+                    'error'             => 'unsupported_token_type',
                     'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values: %s.', $tokenTypeHint, implode(', ', array_keys($tokenTypeHints))),
                 ]
             );
@@ -99,13 +104,14 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
                         throw new OAuth2Exception(
                             400,
                             [
-                                'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                                'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                                 'error_description' => 'The parameter \'token\' is invalid.',
                             ]
                         );
                     }
                 }
             }
+
             return $this->getResponse(200, '', $callback);
         } catch (OAuth2Exception $e) {
             return $this->getResponse($e->getCode(), json_encode($e->getData()), $callback);
@@ -137,8 +143,10 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @return Client
+     *
      * @throws OAuth2Exception
+     *
+     * @return Client
      */
     private function getClient(ServerRequestInterface $request): Client
     {
@@ -147,7 +155,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 401,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
                     'error_description' => 'Client not authenticated.',
                 ]
             );
@@ -158,8 +166,10 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @return string
+     *
      * @throws OAuth2Exception
+     *
+     * @return string
      */
     protected function getToken(ServerRequestInterface $request): string
     {
@@ -168,7 +178,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                     'error_description' => 'The parameter \'token\' is missing.',
                 ]
             );
@@ -179,8 +189,10 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @return TokenTypeHintInterface[]
+     *
      * @throws OAuth2Exception
+     *
+     * @return TokenTypeHintInterface[]
      */
     protected function getTokenTypeHints(ServerRequestInterface $request): array
     {
@@ -193,7 +205,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
                 throw new OAuth2Exception(
                     400,
                     [
-                        'error' => 'unsupported_token_type',
+                        'error'             => 'unsupported_token_type',
                         'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values: %s.', $params['token_type_hint'], implode(', ', array_keys($tokenTypeHints))),
                     ]
                 );
@@ -201,7 +213,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
             $hint = $tokenTypeHints[$tokenTypeHint];
             unset($tokenTypeHints[$tokenTypeHint]);
-            $tokenTypeHints = [$tokenTypeHint => $hint]+$tokenTypeHints;
+            $tokenTypeHints = [$tokenTypeHint => $hint] + $tokenTypeHints;
         }
 
         return $tokenTypeHints;
@@ -209,6 +221,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
+     *
      * @return null|string
      */
     protected function getCallback(ServerRequestInterface $request)
@@ -221,6 +234,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
+     *
      * @return array
      */
     abstract protected function getRequestParameters(ServerRequestInterface $request): array;

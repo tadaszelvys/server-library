@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -23,7 +25,7 @@ interface ResponseModeInterface
 
     /**
      * @param UriInterface $redirectUri
-     * @param array  $data
+     * @param array        $data
      *
      * @return ResponseInterface
      */

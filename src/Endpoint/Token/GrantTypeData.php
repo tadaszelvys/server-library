@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -55,6 +57,7 @@ class GrantTypeData
     /**
      * @param string $key
      * @param $metadata
+     *
      * @return GrantTypeData
      */
     public function withMetadata(string $key, $metadata): self
@@ -75,6 +78,7 @@ class GrantTypeData
 
     /**
      * @param string $key
+     *
      * @return mixed
      */
     public function getMetadata(string $key)
@@ -86,6 +90,7 @@ class GrantTypeData
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasMetadata(string $key): bool
@@ -96,6 +101,7 @@ class GrantTypeData
     /**
      * @param string $key
      * @param $parameter
+     *
      * @return GrantTypeData
      */
     public function withParameter(string $key, $parameter): self
@@ -116,6 +122,7 @@ class GrantTypeData
 
     /**
      * @param string $key
+     *
      * @return mixed
      */
     public function getParameter(string $key)
@@ -127,6 +134,7 @@ class GrantTypeData
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function hasParameter(string $key): bool
@@ -136,6 +144,7 @@ class GrantTypeData
 
     /**
      * @param Client $client
+     *
      * @return GrantTypeData
      */
     public function withClient(Client $client): self
@@ -156,6 +165,7 @@ class GrantTypeData
 
     /**
      * @param ResourceOwner $resourceOwner
+     *
      * @return GrantTypeData
      */
     public function withResourceOwner(ResourceOwner $resourceOwner): self
@@ -176,6 +186,7 @@ class GrantTypeData
 
     /**
      * @param \string[] $scopes
+     *
      * @return GrantTypeData
      */
     public function withScopes(array $scopes): self
@@ -188,6 +199,7 @@ class GrantTypeData
 
     /**
      * @param string $scope
+     *
      * @return GrantTypeData
      */
     public function withScope(string $scope): self
@@ -203,6 +215,7 @@ class GrantTypeData
 
     /**
      * @param string $scope
+     *
      * @return GrantTypeData
      */
     public function withoutScope(string $scope): self
@@ -219,6 +232,7 @@ class GrantTypeData
 
     /**
      * @param string $scope
+     *
      * @return bool
      */
     public function hasScope(string $scope): bool
@@ -280,6 +294,7 @@ class GrantTypeData
 
     /**
      * @param \string[] $scopes
+     *
      * @return GrantTypeData
      */
     public function withRefreshTokenScopes(array $scopes): self

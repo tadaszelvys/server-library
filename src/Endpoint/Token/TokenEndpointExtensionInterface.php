@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -18,8 +20,9 @@ interface TokenEndpointExtensionInterface
 {
     /**
      * @param ServerRequestInterface $request
-     * @param GrantTypeData $tokenResponse
-     * @param callable $next
+     * @param GrantTypeData          $tokenResponse
+     * @param callable               $next
+     *
      * @return AccessToken
      */
     public function process(ServerRequestInterface $request, GrantTypeData $tokenResponse, callable $next): AccessToken;

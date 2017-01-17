@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -15,6 +17,7 @@ interface ResponseTypeManagerInterface
 {
     /**
      * @param ResponseTypeInterface $responseType
+     *
      * @return ResponseTypeManagerInterface
      */
     public function addResponseType(ResponseTypeInterface $responseType): self;

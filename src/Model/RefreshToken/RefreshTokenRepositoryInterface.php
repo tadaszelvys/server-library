@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -34,10 +36,10 @@ interface RefreshTokenRepositoryInterface
 
     /**
      * @param RefreshTokenId $refreshTokenId
+     *
      * @return bool
      */
     public function has(RefreshTokenId $refreshTokenId): bool;
-
 
     /**
      * @param RefreshToken $refreshToken

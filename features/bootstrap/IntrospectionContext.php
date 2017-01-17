@@ -9,8 +9,8 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Tester\Exception\PendingException;
 
 class IntrospectionContext extends BaseContext
 {

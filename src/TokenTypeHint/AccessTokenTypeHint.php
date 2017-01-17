@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -14,11 +16,11 @@ namespace OAuth2\TokenTypeHint;
 use Assert\Assertion;
 use OAuth2\Command\AccessToken\RevokeAccessTokenCommand;
 use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommand;
+use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\AccessToken\AccessTokenId;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use OAuth2\Model\Token\Token;
 use SimpleBus\Message\Bus\MessageBus;
-use OAuth2\Model\AccessToken\AccessToken;
 
 class AccessTokenTypeHint implements TokenTypeHintInterface
 {
@@ -39,9 +41,10 @@ class AccessTokenTypeHint implements TokenTypeHintInterface
 
     /**
      * AccessToken constructor.
+     *
      * @param AccessTokenRepositoryInterface $accessTokenRepository
-     * @param MessageBus $commandBus
-     * @param bool $revokeRefreshToken
+     * @param MessageBus                     $commandBus
+     * @param bool                           $revokeRefreshToken
      */
     public function __construct(AccessTokenRepositoryInterface $accessTokenRepository, MessageBus $commandBus, bool $revokeRefreshToken)
     {

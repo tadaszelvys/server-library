@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -26,6 +28,7 @@ class ImplicitResponseType implements ResponseTypeInterface
 
     /**
      * ImplicitGrantType constructor.
+     *
      * @param MessageBus $messageBus
      */
     public function __construct(MessageBus $messageBus)

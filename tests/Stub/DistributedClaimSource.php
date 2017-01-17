@@ -11,7 +11,6 @@
 
 namespace OAuth2\Test\Stub;
 
-
 use OAuth2\Model\ClaimSource\ClaimSourceInterface;
 use OAuth2\Model\ClaimSource\Source;
 use OAuth2\Model\UserAccount\UserAccount;

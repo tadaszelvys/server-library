@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -32,7 +34,7 @@ final class TokenTypeMiddleware implements MiddlewareInterface
      * ClientAuthenticationMiddleware constructor.
      *
      * @param TokenTypeManagerInterface $tokenTypeManager
-     * @param bool $tokenTypeParameterAllowed
+     * @param bool                      $tokenTypeParameterAllowed
      */
     public function __construct(TokenTypeManagerInterface $tokenTypeManager, bool $tokenTypeParameterAllowed)
     {
@@ -52,6 +54,7 @@ final class TokenTypeMiddleware implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
+     *
      * @return \OAuth2\TokenType\TokenTypeInterface
      */
     private function findTokenType(ServerRequestInterface $request)

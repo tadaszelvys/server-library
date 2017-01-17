@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -19,15 +21,16 @@ use OAuth2\Model\UserAccount\UserAccount;
 interface IdTokenRepositoryInterface
 {
     /**
-     * @param Client $client
-     * @param UserAccount $userAccount
-     * @param string $redirectUri
-     * @param array $claimsLocales
-     * @param array $requestClaims
-     * @param array $scopes
-     * @param array $idTokenClaims
+     * @param Client           $client
+     * @param UserAccount      $userAccount
+     * @param string           $redirectUri
+     * @param array            $claimsLocales
+     * @param array            $requestClaims
+     * @param array            $scopes
+     * @param array            $idTokenClaims
      * @param AccessToken|null $accessToken
-     * @param AuthCode|null $authCode
+     * @param AuthCode|null    $authCode
+     *
      * @return mixed
      */
     public function create(Client $client, UserAccount $userAccount, string $redirectUri, array $claimsLocales, array $requestClaims, array $scopes, array $idTokenClaims, AccessToken $accessToken = null, AuthCode $authCode = null);

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -55,8 +57,10 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
 
     /**
      * @param string $tokenTypeHint
-     * @return TokenTypeHintInterface[]
+     *
      * @throws OAuth2Exception
+     *
+     * @return TokenTypeHintInterface[]
      */
     protected function getTokenTypeHint(string $tokenTypeHint): array
     {
@@ -65,7 +69,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => 'unsupported_token_type',
+                    'error'             => 'unsupported_token_type',
                     'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values: %s.', $tokenTypeHint, implode(', ', array_keys($tokenTypeHints))),
                 ]
             );
@@ -104,7 +108,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
                     throw new OAuth2Exception(
                         400,
                         [
-                            'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                            'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                             'error_description' => 'The parameter \'token\' is invalid.',
                         ]
                     );
@@ -124,8 +128,10 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @return Client
+     *
      * @throws OAuth2Exception
+     *
+     * @return Client
      */
     private function getClient(ServerRequestInterface $request): Client
     {
@@ -134,7 +140,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 401,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
                     'error_description' => 'Client not authenticated.',
                 ]
             );
@@ -145,8 +151,10 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @return string
+     *
      * @throws OAuth2Exception
+     *
+     * @return string
      */
     protected function getToken(ServerRequestInterface $request): string
     {
@@ -155,7 +163,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                     'error_description' => 'The parameter \'token\' is missing.',
                 ]
             );
@@ -166,8 +174,10 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @return TokenTypeHintInterface[]
+     *
      * @throws OAuth2Exception
+     *
+     * @return TokenTypeHintInterface[]
      */
     protected function getTokenTypeHints(ServerRequestInterface $request): array
     {
@@ -180,7 +190,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
                 throw new OAuth2Exception(
                     400,
                     [
-                        'error' => 'unsupported_token_type',
+                        'error'             => 'unsupported_token_type',
                         'error_description' => sprintf('The token type hint \'%s\' is not supported. Please use one of the following values: %s.', $params['token_type_hint'], implode(', ', array_keys($tokenTypeHints))),
                     ]
                 );
@@ -188,7 +198,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
 
             $hint = $tokenTypeHints[$tokenTypeHint];
             unset($tokenTypeHints[$tokenTypeHint]);
-            $tokenTypeHints = [$tokenTypeHint => $hint]+$tokenTypeHints;
+            $tokenTypeHints = [$tokenTypeHint => $hint] + $tokenTypeHints;
         }
 
         return $tokenTypeHints;
@@ -196,6 +206,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
+     *
      * @return array
      */
     protected function getRequestParameters(ServerRequestInterface $request): array

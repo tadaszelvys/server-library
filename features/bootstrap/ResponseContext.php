@@ -9,12 +9,12 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
-use Psr\Http\Message\ResponseInterface;
-use Behat\Gherkin\Node\PyStringNode;
 use Assert\Assertion;
 use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Gherkin\Node\PyStringNode;
+use Psr\Http\Message\ResponseInterface;
 
-class ResponseContext  extends BaseContext
+class ResponseContext extends BaseContext
 {
     /**
      * @var null|ResponseInterface

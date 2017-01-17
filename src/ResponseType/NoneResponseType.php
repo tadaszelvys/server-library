@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -64,6 +66,7 @@ class NoneResponseType implements ResponseTypeInterface
 
     /**
      * @param \OAuth2\OpenIdConnect\NoneResponseTypeListenerInterface $listener
+     *
      * @return self
      */
     public function addListener(NoneResponseTypeListenerInterface $listener): self

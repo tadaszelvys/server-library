@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -38,7 +40,7 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
     /**
      * ResourceOwnerPasswordCredentialsGrantType constructor.
      *
-     * @param UserAccountRepositoryInterface        $userAccountRepository
+     * @param UserAccountRepositoryInterface $userAccountRepository
      */
     public function __construct(UserAccountRepositoryInterface $userAccountRepository)
     {

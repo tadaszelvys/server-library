@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -28,7 +30,7 @@ final class HttpsError implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                     'error_description' => 'The request must be secured.',
                 ]
             );
@@ -45,7 +47,7 @@ final class HttpsError implements MiddlewareInterface
     private function isRequestSecured(ServerRequestInterface $request): bool
     {
         $server_params = $request->getServerParams();
-        return !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
 
+        return !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
     }
 }

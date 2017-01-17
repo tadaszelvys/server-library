@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -32,7 +34,6 @@ class None implements TokenEndpointAuthMethodInterface
     {
         $parameters = $request->getParsedBody() ?? [];
         if (array_key_exists('client_id', $parameters) && !array_key_exists('client_secret', $parameters)) {
-
             return ClientId::create($parameters['client_id']);
         }
     }

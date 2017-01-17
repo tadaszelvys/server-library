@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -39,9 +41,10 @@ class RefreshTokenTypeHint implements TokenTypeHintInterface
 
     /**
      * RefreshToken constructor.
+     *
      * @param RefreshTokenRepositoryInterface $refreshTokenRepository
-     * @param MessageBus $commandBus
-     * @param bool $revokeAccessTokens
+     * @param MessageBus                      $commandBus
+     * @param bool                            $revokeAccessTokens
      */
     public function __construct(RefreshTokenRepositoryInterface $refreshTokenRepository, MessageBus $commandBus, bool $revokeAccessTokens)
     {

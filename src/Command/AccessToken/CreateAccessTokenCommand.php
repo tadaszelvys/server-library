@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -47,11 +49,11 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
     /**
      * CreateAccessTokenCommand constructor.
      *
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
-     * @param array              $parameters
-     * @param array              $metadatas
-     * @param array              $scopes
+     * @param ResourceOwner   $resourceOwner
+     * @param Client          $client
+     * @param array           $parameters
+     * @param array           $metadatas
+     * @param array           $scopes
      * @param DataTransporter $dataTransporter
      */
     protected function __construct(Client $client, ResourceOwner $resourceOwner, array $parameters, array $metadatas, array $scopes, DataTransporter $dataTransporter = null)
@@ -65,11 +67,11 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
     }
 
     /**
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
-     * @param array              $parameters
-     * @param array              $metadatas
-     * @param array              $scopes
+     * @param ResourceOwner   $resourceOwner
+     * @param Client          $client
+     * @param array           $parameters
+     * @param array           $metadatas
+     * @param array           $scopes
      * @param DataTransporter $dataTransporter
      *
      * @return CreateAccessTokenCommand

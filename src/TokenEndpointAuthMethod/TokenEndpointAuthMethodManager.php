@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -41,7 +43,7 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     /**
      * TokenEndpointAuthMethodManager constructor.
      *
-     * @param ClientRepositoryInterface             $clientRepository
+     * @param ClientRepositoryInterface $clientRepository
      */
     public function __construct(ClientRepositoryInterface $clientRepository)
     {

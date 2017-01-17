@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -31,8 +33,9 @@ final class FormPostResponseMode implements ResponseModeInterface
 
     /**
      * FormPostResponseMode constructor.
+     *
      * @param ResponseFactoryInterface $responseFactory
-     * @param StreamFactoryInterface $streamFactory
+     * @param StreamFactoryInterface   $streamFactory
      */
     public function __construct(ResponseFactoryInterface $responseFactory, StreamFactoryInterface $streamFactory)
     {
@@ -64,7 +67,7 @@ final class FormPostResponseMode implements ResponseModeInterface
 
     /**
      * @param UriInterface $redirectUri
-     * @param array  $data
+     * @param array        $data
      *
      * @return string
      */

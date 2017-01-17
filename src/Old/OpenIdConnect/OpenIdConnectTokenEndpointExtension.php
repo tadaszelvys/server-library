@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -13,8 +15,8 @@ namespace OAuth2\OpenIdConnect;
 
 use OAuth2\Command\IdToken\CreateIdTokenCommand;
 use OAuth2\DataTransporter;
-use OAuth2\Endpoint\Token\TokenEndpointExtensionInterface;
 use OAuth2\Endpoint\Token\GrantTypeData;
+use OAuth2\Endpoint\Token\TokenEndpointExtensionInterface;
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\IdToken\IdToken;
@@ -34,6 +36,7 @@ class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensionInter
 
     /**
      * OpenIdConnectTokenEndpointExtension constructor.
+     *
      * @param MessageBus $commandBus
      */
     public function __construct(MessageBus $commandBus)
@@ -60,7 +63,6 @@ class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensionInter
 
         //post
         if (true === $this->issueIdToken($tokenResponse) && $tokenResponse->hasMetadata('redirect_uri')) {
-
             $user = $tokenResponse->getResourceOwner();
             if (!$tokenResponse->getResourceOwner() instanceof UserAccount) {
                 return;
@@ -98,7 +100,7 @@ class OpenIdConnectTokenEndpointExtension implements TokenEndpointExtensionInter
             $this->commandBus->handle($command);
 
             /**
-             * @var $data IdToken
+             * @var IdToken
              */
             $data = $dataTransporter->getData();
             foreach ($data->jsonSerialize() as $k => $v) {

@@ -56,7 +56,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'client_credentials',
-            'client_id' => 'client2',
+            'client_id'  => 'client2',
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -87,9 +87,9 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
-            'grant_type' => 'client_credentials',
+            'grant_type'            => 'client_credentials',
             'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-            'client_assertion' => $this->generateValidClientAssertion(),
+            'client_assertion'      => $this->generateValidClientAssertion(),
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -104,8 +104,8 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         $request = $this->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
-            'grant_type' => 'client_credentials',
-            'client_id' => 'client4',
+            'grant_type'    => 'client_credentials',
+            'client_id'     => 'client4',
             'client_secret' => 'secret',
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');

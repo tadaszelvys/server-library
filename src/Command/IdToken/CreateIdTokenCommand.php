@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -68,15 +70,16 @@ final class CreateIdTokenCommand extends CommandWithDataTransporter
 
     /**
      * CreateIdTokenCommand constructor.
-     * @param Client $client
-     * @param UserAccount $userAccount
-     * @param UriInterface $redirectUri
-     * @param array $requestClaims
-     * @param array $claimsLocales
-     * @param array $scopes
-     * @param array $idTokenClaims
-     * @param AccessToken|null $accessToken
-     * @param AuthCode|null $authCode
+     *
+     * @param Client               $client
+     * @param UserAccount          $userAccount
+     * @param UriInterface         $redirectUri
+     * @param array                $requestClaims
+     * @param array                $claimsLocales
+     * @param array                $scopes
+     * @param array                $idTokenClaims
+     * @param AccessToken|null     $accessToken
+     * @param AuthCode|null        $authCode
      * @param DataTransporter|null $dataTransporter
      */
     protected function __construct(Client $client, UserAccount $userAccount, UriInterface $redirectUri, array $requestClaims, array $claimsLocales, array $scopes, array $idTokenClaims, AccessToken $accessToken = null, AuthCode $authCode = null, DataTransporter $dataTransporter = null)
@@ -94,16 +97,17 @@ final class CreateIdTokenCommand extends CommandWithDataTransporter
     }
 
     /**
-     * @param Client $client
-     * @param UserAccount $userAccount
-     * @param UriInterface $redirectUri
-     * @param array $requestClaims
-     * @param array $claimsLocales
-     * @param array $scopes
-     * @param array $idTokenClaims
-     * @param AccessToken|null $accessToken
-     * @param AuthCode|null $authCode
+     * @param Client               $client
+     * @param UserAccount          $userAccount
+     * @param UriInterface         $redirectUri
+     * @param array                $requestClaims
+     * @param array                $claimsLocales
+     * @param array                $scopes
+     * @param array                $idTokenClaims
+     * @param AccessToken|null     $accessToken
+     * @param AuthCode|null        $authCode
      * @param DataTransporter|null $dataTransporter
+     *
      * @return CreateIdTokenCommand
      */
     public static function create(Client $client, UserAccount $userAccount, UriInterface $redirectUri, array $requestClaims, array $claimsLocales, array $scopes, array $idTokenClaims, AccessToken $accessToken = null, AuthCode $authCode = null, DataTransporter $dataTransporter = null): self

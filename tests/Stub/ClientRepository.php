@@ -32,8 +32,8 @@ class ClientRepository implements ClientRepositoryInterface
             ClientId::create('client1'),
             [
                 'token_endpoint_auth_method' => 'client_secret_basic',
-                'client_secret' => 'secret',
-                'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                'client_secret'              => 'secret',
+                'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
             ],
             UserAccount::create(
                 UserAccountId::create('User1'),
@@ -54,9 +54,9 @@ class ClientRepository implements ClientRepositoryInterface
             ClientId::create('client3'),
             [
                 'token_endpoint_auth_method' => 'client_secret_jwt',
-                'client_secret' => 'secret',
-                'client_secret_expires_at' => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
-                'grant_types' => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                'client_secret'              => 'secret',
+                'client_secret_expires_at'   => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
+                'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
             ],
             UserAccount::create(
                 UserAccountId::create('User1'),
@@ -67,8 +67,8 @@ class ClientRepository implements ClientRepositoryInterface
             ClientId::create('client4'),
             [
                 'token_endpoint_auth_method' => 'client_secret_post',
-                'client_secret' => 'secret',
-                'client_secret_expires_at' => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
+                'client_secret'              => 'secret',
+                'client_secret_expires_at'   => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
             ],
             UserAccount::create(
                 UserAccountId::create('User1'),

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -41,15 +43,16 @@ final class AuthCode extends Token
 
     /**
      * AuthCode constructor.
-     * @param AuthCodeId $authCodeId
-     * @param Client $client
-     * @param UserAccount $userAccount
-     * @param array $queryParameters
-     * @param UriInterface $redirectUri
+     *
+     * @param AuthCodeId         $authCodeId
+     * @param Client             $client
+     * @param UserAccount        $userAccount
+     * @param array              $queryParameters
+     * @param UriInterface       $redirectUri
      * @param \DateTimeImmutable $expiresAt
-     * @param array $parameters
-     * @param array $scopes
-     * @param array $metadatas
+     * @param array              $parameters
+     * @param array              $scopes
+     * @param array              $metadatas
      */
     protected function __construct(AuthCodeId $authCodeId, Client $client, UserAccount $userAccount, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
@@ -59,20 +62,21 @@ final class AuthCode extends Token
     }
 
     /**
-     * @param AuthCodeId $authCodeId
-     * @param Client $client
-     * @param UserAccount $userAccount
-     * @param array $queryParameters
-     * @param UriInterface $redirectUri
+     * @param AuthCodeId         $authCodeId
+     * @param Client             $client
+     * @param UserAccount        $userAccount
+     * @param array              $queryParameters
+     * @param UriInterface       $redirectUri
      * @param \DateTimeImmutable $expiresAt
-     * @param array $parameters
-     * @param array $scopes
-     * @param array $metadatas
+     * @param array              $parameters
+     * @param array              $scopes
+     * @param array              $metadatas
+     *
      * @return AuthCode
      */
     public static function create(AuthCodeId $authCodeId, Client $client, UserAccount $userAccount, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
-        return new self($authCodeId, $client, $userAccount, $queryParameters,$redirectUri, $expiresAt, $parameters, $scopes, $metadatas);
+        return new self($authCodeId, $client, $userAccount, $queryParameters, $redirectUri, $expiresAt, $parameters, $scopes, $metadatas);
     }
 
     /**

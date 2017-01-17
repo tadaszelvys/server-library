@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -30,13 +32,14 @@ class RefreshToken extends Token
 
     /**
      * RefreshToken constructor.
-     * @param RefreshTokenId $refreshTokenId
-     * @param ResourceOwner $resourceOwner
-     * @param Client $client
-     * @param array $parameters
+     *
+     * @param RefreshTokenId     $refreshTokenId
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
+     * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
-     * @param array $scopes
-     * @param array $metadatas
+     * @param array              $scopes
+     * @param array              $metadatas
      */
     protected function __construct(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
     {
@@ -45,13 +48,14 @@ class RefreshToken extends Token
     }
 
     /**
-     * @param RefreshTokenId $refreshTokenId
-     * @param ResourceOwner $resourceOwner
-     * @param Client $client
-     * @param array $parameters
+     * @param RefreshTokenId     $refreshTokenId
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
+     * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
-     * @param string[] $scopes
-     * @param array $metadatas
+     * @param string[]           $scopes
+     * @param array              $metadatas
+     *
      * @return RefreshToken
      */
     public static function create(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -45,11 +47,12 @@ final class CreateRefreshTokenCommand extends CommandWithDataTransporter
 
     /**
      * CreateRefreshTokenCommand constructor.
-     * @param UserAccount $userAccount
-     * @param Client $client
-     * @param array $parameters
-     * @param \DateTimeImmutable $expiresAt
-     * @param array $metadatas
+     *
+     * @param UserAccount          $userAccount
+     * @param Client               $client
+     * @param array                $parameters
+     * @param \DateTimeImmutable   $expiresAt
+     * @param array                $metadatas
      * @param DataTransporter|null $dataTransporter
      */
     protected function __construct(UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $metadatas, DataTransporter $dataTransporter = null)

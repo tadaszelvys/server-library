@@ -127,7 +127,6 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
      */
     public function create(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
-
     }
 
     /**

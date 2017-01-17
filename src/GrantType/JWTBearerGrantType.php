@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -52,7 +54,7 @@ class JWTBearerGrantType implements GrantTypeInterface
     /**
      * JWTBearerGrantType constructor.
      *
-     * @param JWTLoaderInterface $jwtLoader
+     * @param JWTLoaderInterface        $jwtLoader
      * @param ClientRepositoryInterface $clientRepository
      */
     public function __construct(JWTLoaderInterface $jwtLoader, ClientRepositoryInterface $clientRepository)

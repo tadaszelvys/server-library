@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -49,12 +51,13 @@ abstract class Token implements \JsonSerializable
 
     /**
      * Token constructor.
-     * @param ResourceOwner $resourceOwner
-     * @param Client $client
+     *
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
      * @param \DateTimeImmutable $expiresAt
-     * @param array $parameters
-     * @param array $metadatas
-     * @param string[] $scopes
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param string[]           $scopes
      */
     protected function __construct(ResourceOwner $resourceOwner, Client $client, \DateTimeImmutable $expiresAt, array $parameters, array $metadatas, array $scopes)
     {

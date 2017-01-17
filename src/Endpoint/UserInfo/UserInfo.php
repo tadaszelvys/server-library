@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -46,8 +48,8 @@ class UserInfo implements UserInfoInterface
     /**
      * UserInfo constructor.
      *
-     * @param UserInfoScopeSupportManagerInterface  $userinfoScopeSupportManager
-     * @param ClaimSourceManagerInterface           $claimSourceManager
+     * @param UserInfoScopeSupportManagerInterface $userinfoScopeSupportManager
+     * @param ClaimSourceManagerInterface          $claimSourceManager
      */
     public function __construct(UserInfoScopeSupportManagerInterface $userinfoScopeSupportManager, ClaimSourceManagerInterface $claimSourceManager)
     {
@@ -178,18 +180,12 @@ class UserInfo implements UserInfoInterface
         $this->pairwiseAlgorithm = $pairwiseAlgorithm;
     }
 
-    /**
-     *
-     */
     public function setPairwiseSubjectByDefault()
     {
         Assertion::notNull($this->pairwiseAlgorithm, 'The pairwise algorithm must be set before calling this method.');
         $this->isPairwiseSubjectDefault = true;
     }
 
-    /**
-     *
-     */
     public function setPublicSubjectByDefault()
     {
         $this->isPairwiseSubjectDefault = false;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -43,20 +45,22 @@ interface GrantTypeInterface
     /**
      * This function checks the request and returns information to issue an access token.
      *
-     * @param ServerRequestInterface                   $request             The request
-     * @param GrantTypeData $grantTypeResponse
-     * @return GrantTypeData
+     * @param ServerRequestInterface $request           The request
+     * @param GrantTypeData          $grantTypeResponse
      *
      * @throws OAuth2Exception
+     *
+     * @return GrantTypeData
      */
     public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData;
 
     /**
-     * @param ServerRequestInterface     $request
-     * @param GrantTypeData $grantTypeResponse
-     * @return GrantTypeData
+     * @param ServerRequestInterface $request
+     * @param GrantTypeData          $grantTypeResponse
      *
      * @throws OAuth2Exception
+     *
+     * @return GrantTypeData
      */
     public function grant(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData;
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -25,6 +27,7 @@ final class HttpsRedirection implements MiddlewareInterface
 
     /**
      * HttpsRedirection constructor.
+     *
      * @param ResponseFactoryInterface $responseFactory
      */
     public function __construct(ResponseFactoryInterface $responseFactory)
@@ -57,7 +60,7 @@ final class HttpsRedirection implements MiddlewareInterface
     private function isRequestSecured(ServerRequestInterface $request): bool
     {
         $server_params = $request->getServerParams();
-        return !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
 
+        return !empty($server_params['HTTPS']) && 'on' === mb_strtolower($server_params['HTTPS'], '8bit');
     }
 }

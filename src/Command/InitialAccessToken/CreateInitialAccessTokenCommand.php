@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -29,9 +31,10 @@ final class CreateInitialAccessTokenCommand extends CommandWithDataTransporter
 
     /**
      * CreateInitialAccessTokenCommand constructor.
-     * @param UserAccount $userAccount
+     *
+     * @param UserAccount             $userAccount
      * @param \DateTimeImmutable|null $expiresAt
-     * @param DataTransporter|null $dataTransporter
+     * @param DataTransporter|null    $dataTransporter
      */
     protected function __construct(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null, DataTransporter $dataTransporter = null)
     {

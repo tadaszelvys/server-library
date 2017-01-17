@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -73,13 +75,14 @@ final class Authorization
 
     /**
      * Authorization constructor.
-     * @param array $queryParameters
-     * @param Client $client
-     * @param TokenTypeInterface $tokenType
-     * @param array $responseTypes
+     *
+     * @param array                 $queryParameters
+     * @param Client                $client
+     * @param TokenTypeInterface    $tokenType
+     * @param array                 $responseTypes
      * @param ResponseModeInterface $responseMode
-     * @param UriInterface $redirectUri
-     * @param string[] $scopes
+     * @param UriInterface          $redirectUri
+     * @param string[]              $scopes
      */
     public function __construct(array $queryParameters, Client $client, TokenTypeInterface $tokenType, array $responseTypes, ResponseModeInterface $responseMode, UriInterface $redirectUri, array $scopes)
     {
@@ -188,7 +191,6 @@ final class Authorization
      */
     public function hasScope(string $scope): bool
     {
-
         return null !== $this->scopes && in_array($scope, $this->scopes);
     }
 

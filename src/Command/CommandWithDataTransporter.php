@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -22,6 +24,7 @@ abstract class CommandWithDataTransporter
 
     /**
      * CommandWithDataTransporter constructor.
+     *
      * @param DataTransporter|null $dataTransporter
      */
     protected function __construct(DataTransporter $dataTransporter = null)

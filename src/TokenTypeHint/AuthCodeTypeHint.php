@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -33,8 +35,9 @@ class AuthCodeTypeHint implements TokenTypeHintInterface
 
     /**
      * AuthCode constructor.
+     *
      * @param AuthCodeRepositoryInterface $authorizationCodeRepository
-     * @param MessageBus $commandBus
+     * @param MessageBus                  $commandBus
      */
     public function __construct(AuthCodeRepositoryInterface $authorizationCodeRepository, MessageBus $commandBus)
     {

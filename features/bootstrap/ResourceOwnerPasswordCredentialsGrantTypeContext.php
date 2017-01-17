@@ -55,7 +55,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'password',
-            'username' => 'john.1',
+            'username'   => 'john.1',
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -72,8 +72,8 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'password',
-            'username' => 'john.1',
-            'password' => 'BAD PASSWORD',
+            'username'   => 'john.1',
+            'password'   => 'BAD PASSWORD',
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -90,8 +90,8 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'password',
-            'username' => 'john.1',
-            'password' => 'doe',
+            'username'   => 'john.1',
+            'password'   => 'doe',
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -108,9 +108,9 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'password',
-            'username' => 'john.1',
-            'password' => 'doe',
-            'client_id' => 'client2',
+            'username'   => 'john.1',
+            'password'   => 'doe',
+            'client_id'  => 'client2',
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 

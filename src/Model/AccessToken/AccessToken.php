@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -30,14 +32,15 @@ final class AccessToken extends Token
 
     /**
      * AccessToken constructor.
-     * @param AccessTokenId $accessTokenId
-     * @param ResourceOwner $resourceOwner
-     * @param Client $client
-     * @param array $parameters
-     * @param array $metadatas
-     * @param array $scopes
+     *
+     * @param AccessTokenId      $accessTokenId
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param array              $scopes
      * @param \DateTimeImmutable $expiresAt
-     * @param RefreshToken|null $refreshToken
+     * @param RefreshToken|null  $refreshToken
      */
     protected function __construct(AccessTokenId $accessTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
     {
@@ -47,14 +50,15 @@ final class AccessToken extends Token
     }
 
     /**
-     * @param AccessTokenId $accessTokenId
-     * @param ResourceOwner $resourceOwner
-     * @param Client $client
-     * @param array $parameters
-     * @param array $metadatas
-     * @param array $scopes
+     * @param AccessTokenId      $accessTokenId
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param array              $scopes
      * @param \DateTimeImmutable $expiresAt
-     * @param RefreshToken|null $refreshToken
+     * @param RefreshToken|null  $refreshToken
+     *
      * @return AccessToken
      */
     public static function create(AccessTokenId $accessTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
@@ -85,7 +89,7 @@ final class AccessToken extends Token
     {
         $values = [
             'access_token' => $this->getId()->getValue(),
-            'expires_in' => $this->getExpiresIn(),
+            'expires_in'   => $this->getExpiresIn(),
         ];
         if (!empty($this->getScopes())) {
             $values['scope'] = implode(' ', $this->getScopes());
@@ -93,6 +97,7 @@ final class AccessToken extends Token
         if (!empty($this->getRefreshToken())) {
             $values['refresh_token'] = $this->getRefreshToken()->getId()->getValue();
         }
+
         return $values + $this->getParameters();
     }
 }

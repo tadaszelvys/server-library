@@ -10,8 +10,8 @@
  */
 
 use Behat\Behat\Context\Context;
-use Interop\Http\Factory\StreamFactoryInterface;
 use Interop\Http\Factory\ServerRequestFactoryInterface;
+use Interop\Http\Factory\StreamFactoryInterface;
 use OAuth2\Test\Application\Application;
 
 class BaseContext implements Context

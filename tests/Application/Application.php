@@ -11,61 +11,30 @@
 
 namespace OAuth2\Test\Application;
 
+use Http\Factory\Diactoros\ResponseFactory;
+use Http\Factory\Diactoros\ServerRequestFactory;
+use Http\Factory\Diactoros\StreamFactory;
 use Interop\Http\Factory\ResponseFactoryInterface;
+use Interop\Http\Factory\ServerRequestFactoryInterface;
 use Interop\Http\Factory\StreamFactoryInterface;
+use Jose\Checker\CheckerManager;
+use Jose\Decrypter;
+use Jose\Encrypter;
+use Jose\Factory\JWKFactory;
+use Jose\JWTCreator;
+use Jose\JWTLoader;
+use Jose\Object\JWKSetInterface;
+use Jose\Signer;
+use Jose\Verifier;
+use OAuth2\Client\Rule\ClientIdRule;
+use OAuth2\Client\Rule\CommonParametersRule;
+use OAuth2\Client\Rule\GrantTypeFlowRule;
+use OAuth2\Client\Rule\RedirectionUriRule;
+use OAuth2\Client\Rule\RuleManager;
+use OAuth2\Client\Rule\ScopeRule;
+use OAuth2\Client\Rule\SoftwareRule;
 use OAuth2\Command\AccessToken\CreateAccessTokenCommand;
 use OAuth2\Command\AccessToken\CreateAccessTokenCommandHandler;
-use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommand;
-use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommandHandler;
-use OAuth2\Endpoint\Token\TokenEndpoint;
-use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
-use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
-use OAuth2\GrantType\ClientCredentialsGrantType;
-use OAuth2\GrantType\RefreshTokenGrantType;
-use OAuth2\GrantType\ResourceOwnerPasswordCredentialsGrantType;
-use OAuth2\Middleware\GrantTypeMiddleware;
-use OAuth2\Middleware\TokenTypeMiddleware;
-use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
-use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
-use OAuth2\Response\Factory\AccessDeniedResponseFactory;
-use OAuth2\Response\Factory\BadRequestResponseFactory;
-use OAuth2\Response\Factory\MethodNotAllowedResponseFactory;
-use OAuth2\Response\Factory\NotImplementedResponseFactory;
-use OAuth2\Response\OAuth2ExceptionMiddleware;
-use OAuth2\Response\OAuth2ResponseFactoryManager;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Test\Stub\AuthenticateResponseFactory;
-use OAuth2\Test\Stub\ClientRepository;
-use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
-use OAuth2\Middleware\InitialAccessTokenMiddleware;
-use OAuth2\Middleware\Pipe;
-use OAuth2\Test\Stub\Event\RefreshTokenRevokedEventHandler;
-use OAuth2\Test\Stub\EventStore;
-use OAuth2\Test\Stub\MacToken;
-use OAuth2\Test\Stub\RefreshTokenRepository;
-use OAuth2\Test\Stub\UriExtension;
-use OAuth2\Test\Stub\UserAccountRepository;
-use OAuth2\TokenEndpointAuthMethod\None;
-use OAuth2\TokenType\TokenTypeManager;
-use OAuth2\TokenType\TokenTypeManagerInterface;
-use OAuth2\TokenTypeHint\RefreshTokenTypeHint;
-use OAuth2\TokenTypeHint\TokenTypeHintManager;
-use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
-use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
-use OAuth2\Middleware\ClientAuthenticationMiddleware;
-use OAuth2\Test\Stub\ClientAssertionJwt;
-use OAuth2\Test\Stub\ClientSecretBasic;
-use OAuth2\Test\Stub\ClientSecretPost;
-use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
-use OAuth2\Model\Event\EventStoreInterface;
-use OAuth2\Test\Stub\Event\ClientCreatedEventHandler;
-use OAuth2\Test\Stub\Event\ClientDeletedEventHandler;
-use OAuth2\Test\Stub\Event\ClientUpdatedEventHandler;
-use SimpleBus\Message\Bus\Middleware\FinishesHandlingMessageBeforeHandlingNext;
-use SimpleBus\Message\Handler\DelegatesToMessageHandlerMiddleware;
-use SimpleBus\Message\Handler\Resolver\NameBasedMessageHandlerResolver;
-use SimpleBus\Message\Recorder\HandlesRecordedMessagesMiddleware;
-use SimpleBus\Message\Recorder\PublicMessageRecorder;
 use OAuth2\Command\AccessToken\RevokeAccessTokenCommand;
 use OAuth2\Command\AccessToken\RevokeAccessTokenCommandHandler;
 use OAuth2\Command\Client\CreateClientCommand;
@@ -74,66 +43,97 @@ use OAuth2\Command\Client\DeleteClientCommand;
 use OAuth2\Command\Client\DeleteClientCommandHandler;
 use OAuth2\Command\Client\UpdateClientCommand;
 use OAuth2\Command\Client\UpdateClientCommandHandler;
-use SimpleBus\Message\CallableResolver\CallableMap;
-use SimpleBus\Message\CallableResolver\ServiceLocatorAwareCallableResolver;
-use SimpleBus\Message\Name\ClassBasedNameResolver;
-use OAuth2\Test\Stub\Event\AccessTokenRevokedEventHandler;
-use OAuth2\Test\Stub\Container;
-use OAuth2\Client\Rule\RuleManager;
-use SimpleBus\Message\Subscriber\NotifiesMessageSubscribersMiddleware;
-use SimpleBus\Message\Subscriber\Resolver\NameBasedMessageSubscriberResolver;
+use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommand;
+use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommandHandler;
+use OAuth2\Endpoint\ClientConfiguration\ClientConfigurationEndpoint;
+use OAuth2\Endpoint\ClientRegistration\ClientRegistrationEndpoint;
+use OAuth2\Endpoint\Token\TokenEndpoint;
+use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
+use OAuth2\Endpoint\TokenRevocation\TokenRevocationGetEndpoint;
+use OAuth2\Endpoint\TokenRevocation\TokenRevocationPostEndpoint;
 use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
 use OAuth2\Event\Client\ClientCreatedEvent;
 use OAuth2\Event\Client\ClientDeletedEvent;
 use OAuth2\Event\Client\ClientUpdatedEvent;
-use SimpleBus\Message\CallableResolver\CallableCollection;
-use Http\Factory\Diactoros\ResponseFactory;
-use Jose\Factory\JWKFactory;
-use Jose\Object\JWKSetInterface;
-use OAuth2\Client\Rule\ClientIdRule;
-use OAuth2\Client\Rule\CommonParametersRule;
-use OAuth2\Client\Rule\GrantTypeFlowRule;
-use OAuth2\Client\Rule\RedirectionUriRule;
-use OAuth2\Client\Rule\ScopeRule;
-use OAuth2\Client\Rule\SoftwareRule;
-use OAuth2\Model\Scope\ScopeRepositoryInterface;
-use OAuth2\Test\Stub\ClientRegistrationManagementRule;
-use Http\Factory\Diactoros\ServerRequestFactory;
-use Interop\Http\Factory\ServerRequestFactoryInterface;
-use OAuth2\Test\Stub\ServiceLocator;
-use Http\Factory\Diactoros\StreamFactory;
+use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
+use OAuth2\GrantType\ClientCredentialsGrantType;
 use OAuth2\GrantType\GrantTypeManager;
 use OAuth2\GrantType\GrantTypeManagerInterface;
-use OAuth2\ResponseType\ResponseTypeManager;
-use OAuth2\ResponseType\ResponseTypeManagerInterface;
 use OAuth2\GrantType\PKCEMethod\PKCEMethodInterface;
 use OAuth2\GrantType\PKCEMethod\PKCEMethodManager;
 use OAuth2\GrantType\PKCEMethod\PKCEMethodManagerInterface;
 use OAuth2\GrantType\PKCEMethod\Plain;
 use OAuth2\GrantType\PKCEMethod\S256;
+use OAuth2\GrantType\RefreshTokenGrantType;
+use OAuth2\GrantType\ResourceOwnerPasswordCredentialsGrantType;
+use OAuth2\Middleware\ClientAuthenticationMiddleware;
+use OAuth2\Middleware\GrantTypeMiddleware;
+use OAuth2\Middleware\HttpMethod;
+use OAuth2\Middleware\InitialAccessTokenMiddleware;
+use OAuth2\Middleware\Pipe;
+use OAuth2\Middleware\TokenTypeMiddleware;
+use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
+use OAuth2\Model\Event\EventStoreInterface;
+use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
+use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
 use OAuth2\Model\Scope\DefaultScopePolicy;
 use OAuth2\Model\Scope\ErrorScopePolicy;
 use OAuth2\Model\Scope\ScopePolicyInterface;
 use OAuth2\Model\Scope\ScopeRepository;
-use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
-use OAuth2\Test\Stub\InitialAccessTokenRepository;
-use OAuth2\TokenType\BearerToken;
-use Jose\Checker\CheckerManager;
-use Jose\Decrypter;
-use Jose\Encrypter;
-use Jose\JWTCreator;
-use Jose\JWTLoader;
-use Jose\Signer;
-use Jose\Verifier;
-use OAuth2\Endpoint\ClientConfiguration\ClientConfigurationEndpoint;
-use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
-use OAuth2\Endpoint\TokenRevocation\TokenRevocationPostEndpoint;
-use OAuth2\Middleware\HttpMethod;
-use OAuth2\TokenTypeHint\AccessTokenTypeHint;
-use OAuth2\Endpoint\TokenRevocation\TokenRevocationGetEndpoint;
-use OAuth2\Test\Stub\AccessTokenRepository;
+use OAuth2\Model\Scope\ScopeRepositoryInterface;
+use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
+use OAuth2\Response\Factory\AccessDeniedResponseFactory;
+use OAuth2\Response\Factory\BadRequestResponseFactory;
+use OAuth2\Response\Factory\MethodNotAllowedResponseFactory;
+use OAuth2\Response\Factory\NotImplementedResponseFactory;
+use OAuth2\Response\OAuth2ExceptionMiddleware;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
+use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\ResponseType\AuthorizationCodeResponseType;
 use OAuth2\ResponseType\ImplicitResponseType;
+use OAuth2\ResponseType\ResponseTypeManager;
+use OAuth2\ResponseType\ResponseTypeManagerInterface;
+use OAuth2\Test\Stub\AccessTokenRepository;
+use OAuth2\Test\Stub\AuthenticateResponseFactory;
+use OAuth2\Test\Stub\ClientAssertionJwt;
+use OAuth2\Test\Stub\ClientRegistrationManagementRule;
+use OAuth2\Test\Stub\ClientRepository;
+use OAuth2\Test\Stub\ClientSecretBasic;
+use OAuth2\Test\Stub\ClientSecretPost;
+use OAuth2\Test\Stub\Container;
+use OAuth2\Test\Stub\Event\AccessTokenRevokedEventHandler;
+use OAuth2\Test\Stub\Event\ClientCreatedEventHandler;
+use OAuth2\Test\Stub\Event\ClientDeletedEventHandler;
+use OAuth2\Test\Stub\Event\ClientUpdatedEventHandler;
+use OAuth2\Test\Stub\Event\RefreshTokenRevokedEventHandler;
+use OAuth2\Test\Stub\EventStore;
+use OAuth2\Test\Stub\InitialAccessTokenRepository;
+use OAuth2\Test\Stub\MacToken;
+use OAuth2\Test\Stub\RefreshTokenRepository;
+use OAuth2\Test\Stub\ServiceLocator;
+use OAuth2\Test\Stub\UriExtension;
+use OAuth2\Test\Stub\UserAccountRepository;
+use OAuth2\TokenEndpointAuthMethod\None;
+use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
+use OAuth2\TokenType\BearerToken;
+use OAuth2\TokenType\TokenTypeManager;
+use OAuth2\TokenType\TokenTypeManagerInterface;
+use OAuth2\TokenTypeHint\AccessTokenTypeHint;
+use OAuth2\TokenTypeHint\RefreshTokenTypeHint;
+use OAuth2\TokenTypeHint\TokenTypeHintManager;
+use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
+use SimpleBus\Message\Bus\Middleware\FinishesHandlingMessageBeforeHandlingNext;
+use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
+use SimpleBus\Message\CallableResolver\CallableCollection;
+use SimpleBus\Message\CallableResolver\CallableMap;
+use SimpleBus\Message\CallableResolver\ServiceLocatorAwareCallableResolver;
+use SimpleBus\Message\Handler\DelegatesToMessageHandlerMiddleware;
+use SimpleBus\Message\Handler\Resolver\NameBasedMessageHandlerResolver;
+use SimpleBus\Message\Name\ClassBasedNameResolver;
+use SimpleBus\Message\Recorder\HandlesRecordedMessagesMiddleware;
+use SimpleBus\Message\Recorder\PublicMessageRecorder;
+use SimpleBus\Message\Subscriber\NotifiesMessageSubscribersMiddleware;
+use SimpleBus\Message\Subscriber\Resolver\NameBasedMessageSubscriberResolver;
 
 final class Application
 {
@@ -380,11 +380,11 @@ final class Application
         if (null === $this->commandHandlerMap) {
             $this->commandHandlerMap = new CallableMap(
                 [
-                    CreateClientCommand::class => CreateClientCommandHandler::class,
-                    DeleteClientCommand::class => DeleteClientCommandHandler::class,
-                    UpdateClientCommand::class => UpdateClientCommandHandler::class,
-                    CreateAccessTokenCommand::class => CreateAccessTokenCommandHandler::class,
-                    RevokeAccessTokenCommand::class => RevokeAccessTokenCommandHandler::class,
+                    CreateClientCommand::class       => CreateClientCommandHandler::class,
+                    DeleteClientCommand::class       => DeleteClientCommandHandler::class,
+                    UpdateClientCommand::class       => UpdateClientCommandHandler::class,
+                    CreateAccessTokenCommand::class  => CreateAccessTokenCommandHandler::class,
+                    RevokeAccessTokenCommand::class  => RevokeAccessTokenCommandHandler::class,
                     RevokeRefreshTokenCommand::class => RevokeRefreshTokenCommandHandler::class,
                 ],
                 $this->getServiceLocatorAwareCallableResolver()
@@ -563,11 +563,11 @@ final class Application
         if (null === $this->eventHandlerMap) {
             $this->eventHandlerMap = new CallableCollection(
                 [
-                    AccessTokenRevokedEvent::class => [AccessTokenRevokedEventHandler::class],
+                    AccessTokenRevokedEvent::class  => [AccessTokenRevokedEventHandler::class],
                     RefreshTokenRevokedEvent::class => [RefreshTokenRevokedEventHandler::class],
-                    ClientCreatedEvent::class => [ClientCreatedEventHandler::class],
-                    ClientDeletedEvent::class => [ClientDeletedEventHandler::class],
-                    ClientUpdatedEvent::class => [ClientUpdatedEventHandler::class],
+                    ClientCreatedEvent::class       => [ClientCreatedEventHandler::class],
+                    ClientDeletedEvent::class       => [ClientDeletedEventHandler::class],
+                    ClientUpdatedEvent::class       => [ClientUpdatedEventHandler::class],
                 ],
                 $this->getServiceLocatorAwareCallableResolver()
             );
@@ -689,6 +689,7 @@ final class Application
 
         return $this->softwareStatementPrivateKeys;
     }
+
     /**
      * @var null|ServerRequestFactoryInterface
      */
@@ -968,6 +969,7 @@ final class Application
 
         return $this->scopePolicyError;
     }
+
     /**
      * @var null|InitialAccessTokenRepositoryInterface
      */
@@ -1038,6 +1040,7 @@ final class Application
 
         return $this->initialAccessTokenRepository;
     }
+
     /**
      * @var null|JWTCreator
      */
@@ -1544,6 +1547,7 @@ final class Application
 
         return $this->grantAuthorizationCodeResponseType;
     }
+
     /**
      * @var null|ImplicitResponseType
      */

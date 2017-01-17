@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -28,6 +30,7 @@ class IdTokenResponseType implements ResponseTypeInterface
 
     /**
      * IdTokenGrantType constructor.
+     *
      * @param MessageBus $commandBus
      */
     public function __construct(MessageBus $commandBus)
@@ -71,7 +74,7 @@ class IdTokenResponseType implements ResponseTypeInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                     'error_description' => 'The parameter \'nonce\' is mandatory using \'id_token\' response type.',
                 ]
             );

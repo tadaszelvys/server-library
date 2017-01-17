@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -14,7 +16,7 @@ namespace OAuth2\ResponseType;
 use OAuth2\Model\AccessToken\AccessToken;
 
 /**
- * Should be remplaced by a Command/Event
+ * Should be remplaced by a Command/Event.
  */
 interface NoneResponseTypeListenerInterface
 {

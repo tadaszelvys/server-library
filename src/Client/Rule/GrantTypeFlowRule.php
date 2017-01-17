@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -13,8 +15,8 @@ namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\GrantType\GrantTypeManagerInterface;
-use OAuth2\ResponseType\ResponseTypeManagerInterface;
 use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\ResponseType\ResponseTypeManagerInterface;
 
 final class GrantTypeFlowRule implements RuleInterface
 {

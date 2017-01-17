@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -25,6 +27,7 @@ class IFrameEndpoint implements MiddlewareInterface
 
     /**
      * IFrameEndpoint constructor.
+     *
      * @param ResponseFactoryInterface $responseFactory
      */
     public function __construct(ResponseFactoryInterface $responseFactory)

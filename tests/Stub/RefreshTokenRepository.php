@@ -11,11 +11,11 @@
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\RefreshToken\RefreshToken;
 use OAuth2\Model\RefreshToken\RefreshTokenId;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
-use OAuth2\Model\Client\Client;
-use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\ResourceOwner\ResourceOwner;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountId;

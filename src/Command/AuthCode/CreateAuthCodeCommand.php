@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -55,13 +57,14 @@ final class CreateAuthCodeCommand extends CommandWithDataTransporter
 
     /**
      * CreateAuthCodeCommand constructor.
-     * @param Client $client
-     * @param UserAccount $userAccount
-     * @param array $queryParameters
-     * @param \DateTimeImmutable $expiresAt
-     * @param array $parameters
-     * @param array $scopes
-     * @param array $metadatas
+     *
+     * @param Client               $client
+     * @param UserAccount          $userAccount
+     * @param array                $queryParameters
+     * @param \DateTimeImmutable   $expiresAt
+     * @param array                $parameters
+     * @param array                $scopes
+     * @param array                $metadatas
      * @param DataTransporter|null $dataTransporter
      */
     protected function __construct(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas, DataTransporter $dataTransporter = null)

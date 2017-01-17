@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -202,7 +204,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param array                          $claims
+     * @param array  $claims
      * @param Client $client
      *
      * @return string

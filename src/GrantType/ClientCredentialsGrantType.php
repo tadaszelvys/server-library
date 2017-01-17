@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -64,7 +66,7 @@ class ClientCredentialsGrantType implements GrantTypeInterface
      */
     public function grant(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
-        if (true === $this->isRefreshTokenIssuedWithAccessToken() ) {
+        if (true === $this->isRefreshTokenIssuedWithAccessToken()) {
             $grantTypeResponse = $grantTypeResponse->withRefreshToken();
             $grantTypeResponse = $grantTypeResponse->withRefreshTokenScopes($grantTypeResponse->getScopes());
         } else {

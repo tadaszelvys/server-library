@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
@@ -29,8 +31,9 @@ final class CreateClientCommand extends CommandWithDataTransporter
 
     /**
      * CreateClientCommand constructor.
-     * @param UserAccount $userAccount
-     * @param array $parameters
+     *
+     * @param UserAccount          $userAccount
+     * @param array                $parameters
      * @param DataTransporter|null $dataTransporter
      */
     protected function __construct(UserAccount $userAccount, array $parameters, DataTransporter $dataTransporter = null)
