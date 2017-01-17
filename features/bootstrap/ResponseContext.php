@@ -10,7 +10,6 @@
  */
 
 use Assert\Assertion;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\PyStringNode;
 use Psr\Http\Message\ResponseInterface;
 
@@ -50,7 +49,6 @@ class ResponseContext extends BaseContext
      */
     public function theResponseCodeIs($code)
     {
-        dump((string) $this->getResponse()->getBody()->getContents());
         Assertion::eq((int) $code, $this->getResponse()->getStatusCode());
     }
 
@@ -59,6 +57,7 @@ class ResponseContext extends BaseContext
      */
     public function theResponseContains(PyStringNode $response)
     {
+        $this->rewind();
         Assertion::eq($response->getRaw(), (string) $this->getResponse()->getBody()->getContents());
     }
 
@@ -81,7 +80,8 @@ class ResponseContext extends BaseContext
                 $this->error[$match[1]] = $match[2];
             }
         } else {
-            $response = $this->getResponse()->getBody()->getContents();
+            $this->rewind();
+            $response = (string)$this->getResponse()->getBody()->getContents();
             $json = json_decode($response, true);
             Assertion::isArray($json);
             Assertion::keyExists($json, 'error');
@@ -126,19 +126,12 @@ class ResponseContext extends BaseContext
     }
 
     /**
-     * @Then the redirect Uri contains an error
-     */
-    public function theRedirectUriContainsAnError()
-    {
-        throw new PendingException();
-    }
-
-    /**
      * @Then no access token creation event is thrown
      */
     public function noAccessTokenCreationEventIsThrown()
     {
-        throw new PendingException();
+        $events = $this->getApplication()->getAccessTokenCreatedEventHandler()->getEvents();
+        Assertion::eq(0, count($events));
     }
 
     /**
@@ -146,7 +139,11 @@ class ResponseContext extends BaseContext
      */
     public function theResponseContainsAnAccessToken()
     {
-        throw new PendingException();
+        $this->rewind();
+        $content = (string)$this->getResponse()->getBody()->getContents();
+        $data = json_decode($content, true);
+        Assertion::isArray($data);
+        Assertion::keyExists($data, 'access_token');
     }
 
     /**
@@ -154,6 +151,29 @@ class ResponseContext extends BaseContext
      */
     public function anAccessTokenCreationEventIsThrown()
     {
-        throw new PendingException();
+        $events = $this->getApplication()->getEventStore()->all();
+        Assertion::greaterThan(count($events), 0);
+    }
+
+    /**
+     * @Then I show the OAuth2 Response
+     */
+    public function iShowTheOauth2Response()
+    {
+        $this->rewind();
+        $content = (string)$this->getResponse()->getBody()->getContents();
+
+        //dump($this->getResponse()->getHeaders());
+        dump(json_decode($content, true));
+    }
+
+    /**
+     *
+     */
+    private function rewind()
+    {
+        if (true === $this->getResponse()->getBody()->isSeekable()) {
+            $this->getResponse()->getBody()->rewind();
+        }
     }
 }

@@ -423,9 +423,8 @@ class ClientContext extends BaseContext
      */
     public function aClientDeletedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getEventStore()->all();
+        $events = $this->getApplication()->getClientDeletedEventHandler()->getEvents();
         Assertion::eq(1, count($events));
-        Assertion::allIsInstanceOf($events, ClientDeletedEvent::class);
     }
 
     /**
@@ -433,7 +432,7 @@ class ClientContext extends BaseContext
      */
     public function noClientDeletedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getEventStore()->all();
+        $events = $this->getApplication()->getClientDeletedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
     }
 
@@ -442,7 +441,7 @@ class ClientContext extends BaseContext
      */
     public function noClientUpdatedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getEventStore()->all();
+        $events = $this->getApplication()->getClientUpdatedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
     }
 
@@ -451,9 +450,8 @@ class ClientContext extends BaseContext
      */
     public function aClientCreatedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getEventStore()->all();
+        $events = $this->getApplication()->getClientCreatedEventHandler()->getEvents();
         Assertion::eq(1, count($events));
-        Assertion::allIsInstanceOf($events, ClientCreatedEvent::class);
     }
 
     /**
@@ -461,9 +459,8 @@ class ClientContext extends BaseContext
      */
     public function aClientUpdatedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getEventStore()->all();
+        $events = $this->getApplication()->getClientUpdatedEventHandler()->getEvents();
         Assertion::eq(1, count($events));
-        Assertion::allIsInstanceOf($events, ClientUpdatedEvent::class);
     }
 
     /**
@@ -483,7 +480,7 @@ class ClientContext extends BaseContext
      */
     public function noClientShouldBeCreated()
     {
-        $events = $this->getApplication()->getEventStore()->all();
+        $events = $this->getApplication()->getClientDeletedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
     }
 
@@ -517,7 +514,7 @@ class ClientContext extends BaseContext
         $headers = [
             'alg' => 'ES256',
         ];
-        $key = $this->getApplication()->getSoftwareStatementPrivateKeys()->getKey(0);
+        $key = $this->getApplication()->getPrivateKeys()->getKey(0);
 
         return $this->getApplication()->getJwTCreator()->sign($claims, $headers, $key);
     }

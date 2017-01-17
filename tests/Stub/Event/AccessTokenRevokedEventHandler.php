@@ -12,30 +12,14 @@
 namespace OAuth2\Test\Stub\Event;
 
 use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
-use OAuth2\Model\Event\EventStoreInterface;
 
-final class AccessTokenRevokedEventHandler
+final class AccessTokenRevokedEventHandler extends EventHandler
 {
-    /**
-     * @var EventStoreInterface
-     */
-    private $eventStore;
-
-    /**
-     * ClientCreatedEventHandler constructor.
-     *
-     * @param EventStoreInterface $eventStore
-     */
-    public function __construct(EventStoreInterface $eventStore)
-    {
-        $this->eventStore = $eventStore;
-    }
-
     /**
      * @param AccessTokenRevokedEvent $event
      */
     public function handle(AccessTokenRevokedEvent $event)
     {
-        $this->eventStore->save($event);
+        $this->save($event);
     }
 }

@@ -53,12 +53,14 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     /**
      * {@inheritdoc}
      */
-    public function addTokenEndpointAuthMethod(TokenEndpointAuthMethodInterface $tokenEndpointAuthMethod)
+    public function addTokenEndpointAuthMethod(TokenEndpointAuthMethodInterface $tokenEndpointAuthMethod): TokenEndpointAuthMethodManagerInterface
     {
         $this->tokenEndpointAuthMethods[] = $tokenEndpointAuthMethod;
         foreach ($tokenEndpointAuthMethod->getSupportedAuthenticationMethods() as $method_name) {
             $this->tokenEndpointAuthMethodNames[$method_name] = $tokenEndpointAuthMethod;
         }
+
+        return $this;
     }
 
     /**
@@ -98,7 +100,7 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     /**
      * {@inheritdoc}
      */
-    public function findClient(ServerRequestInterface $request): Client
+    public function findClient(ServerRequestInterface $request)
     {
         $clientId = $this->findClientInTheRequest($request, $authentication_method, $client_credentials);
 
@@ -108,8 +110,6 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
                 return $client;
             }
         }
-
-        throw $this->buildAuthenticationException($request);
     }
 
     /**
@@ -148,14 +148,9 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     }
 
     /**
-     * @param ServerRequestInterface           $request
-     * @param Client                           $client
-     * @param TokenEndpointAuthMethodInterface $authentication_method
-     * @param $client_credentials
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function isClientAuthenticated(ServerRequestInterface $request, Client $client, TokenEndpointAuthMethodInterface $authentication_method, $client_credentials)
+    public function isClientAuthenticated(ServerRequestInterface $request, Client $client, TokenEndpointAuthMethodInterface $authentication_method, $client_credentials): bool
     {
         if (in_array($client->get('token_endpoint_auth_method'), $authentication_method->getSupportedAuthenticationMethods())) {
             if (false === $client->areClientCredentialsExpired()) {
@@ -164,26 +159,5 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildAuthenticationException(ServerRequestInterface $request): OAuth2Exception
-    {
-        $schemes = [];
-        $message = 'Client authentication failed.';
-        foreach ($this->getTokenEndpointAuthMethods() as $method) {
-            $scheme = $method->getSchemesParameters();
-            $schemes = array_merge($schemes, $scheme);
-        }
-
-        return new OAuth2Exception(
-            401,
-            [
-                'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
-                'error_description' => $message,
-            ]
-        );
     }
 }

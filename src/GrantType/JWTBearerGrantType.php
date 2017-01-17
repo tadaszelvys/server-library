@@ -44,7 +44,7 @@ class JWTBearerGrantType implements GrantTypeInterface
     /**
      * @var JWKSetInterface|null
      */
-    private $keyEncryptionkeySet = null;
+    private $keyEncryptionKeySet = null;
 
     /**
      * @var bool
@@ -73,15 +73,14 @@ class JWTBearerGrantType implements GrantTypeInterface
 
     /**
      * @param bool            $encryptionRequired
-     * @param JWKSetInterface $keyEncryptionkeySet
+     * @param JWKSetInterface $keyEncryptionKeySet
      */
-    public function enableEncryptedAssertions($encryptionRequired,
-                                              JWKSetInterface $keyEncryptionkeySet)
+    public function enableEncryptedAssertions(bool $encryptionRequired, JWKSetInterface $keyEncryptionKeySet)
     {
         Assertion::boolean($encryptionRequired);
 
         $this->encryptionRequired = $encryptionRequired;
-        $this->keyEncryptionkeySet = $keyEncryptionkeySet;
+        $this->keyEncryptionKeySet = $keyEncryptionKeySet;
     }
 
     /**
@@ -114,7 +113,7 @@ class JWTBearerGrantType implements GrantTypeInterface
         try {
             $jwt = $this->jwtLoader->load(
                 $assertion,
-                $this->keyEncryptionkeySet,
+                $this->keyEncryptionKeySet,
                 $this->encryptionRequired
             );
             Assertion::isInstanceOf($jwt, JWSInterface::class, 'Assertion does not contain signed claims.');

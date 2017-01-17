@@ -18,7 +18,7 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Command\AccessToken\CreateAccessTokenCommand;
 use OAuth2\DataTransporter;
-use OAuth2\Grant\GrantTypeInterface;
+use OAuth2\GrantType\GrantTypeInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Scope\ScopeRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
@@ -106,6 +106,15 @@ final class TokenEndpoint implements MiddlewareInterface
 
         // Token Response
         $grantTypeData = $type->prepareTokenResponse($request, $grantTypeData);
+        if (null === $grantTypeData->getClient()) {
+            throw new OAuth2Exception(
+                401,
+                [
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error_description' => 'Client authentication failed.',
+                ]
+            );
+        }
 
         // This occurs now because the client may be found during the preparation process
         $this->checkGrantType($grantTypeData->getClient(), $type->getGrantType());
@@ -259,6 +268,7 @@ final class TokenEndpoint implements MiddlewareInterface
                     $grantTypeData->getParameters(),
                     $grantTypeData->getMetadatas(),
                     $grantTypeData->getScopes(),
+                    new \DateTimeImmutable('now +1 day'),
                     $dataTransporter
                 );
 

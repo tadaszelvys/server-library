@@ -268,7 +268,9 @@ class RevocationContext extends BaseContext
      */
     public function noTokenRevocationEventIsThrown()
     {
-        $events = $this->getApplication()->getEventStore()->all();
+        $events = $this->getApplication()->getAccessTokenRevokedEventHandler()->getEvents();
+        Assertion::eq(0, count($events));
+        $events = $this->getApplication()->getRefreshTokenRevokedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
     }
 
@@ -277,9 +279,8 @@ class RevocationContext extends BaseContext
      */
     public function aTokenRevocationEventIsThrown()
     {
-        $events = $this->getApplication()->getEventStore()->all();
-        Assertion::eq(2, count($events));
-        Assertion::isInstanceOf(array_values($events)[0], AccessTokenRevokedEvent::class);
-        Assertion::isInstanceOf(array_values($events)[1], RefreshTokenRevokedEvent::class);
+        $events1 = $this->getApplication()->getAccessTokenRevokedEventHandler()->getEvents();
+        $events2 = $this->getApplication()->getRefreshTokenRevokedEventHandler()->getEvents();
+        Assertion::eq(2, count($events1)+count($events2));
     }
 }

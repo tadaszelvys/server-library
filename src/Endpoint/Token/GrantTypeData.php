@@ -35,7 +35,7 @@ class GrantTypeData
     private $resourceOwner;
 
     /**
-     * @var Client
+     * @var Client|null
      */
     private $client;
 
@@ -156,9 +156,9 @@ class GrantTypeData
     }
 
     /**
-     * @return Client
+     * @return Client|null
      */
-    public function getClient(): Client
+    public function getClient()
     {
         return $this->client;
     }

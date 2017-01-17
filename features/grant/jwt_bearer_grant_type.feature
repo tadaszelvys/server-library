@@ -1,17 +1,10 @@
 Feature: A client requests an access token using the JWT Bearer Grant Type
 
-  Scenario: A client sends a JWT Bearer Grant Type request but client is not authenticated
-    Given An unauthenticated client sends a JWT Bearer Grant Type request
-    Then the response contains an error with code 400
-    And the error is "invalid_request"
-    And the error description is "Client not authenticated."
-    And no access token creation event is thrown
-
   Scenario: A client sends a JWT Bearer Grant Type request but the assertion is missing
     Given An client sends a JWT Bearer Grant Type request without assertion
     Then the response contains an error with code 400
     And the error is "invalid_request"
-    And the error description is "The parameter '' is missing."
+    And the error description is "The parameter 'assertion' is missing."
     And no access token creation event is thrown
 
   Scenario: A client sends a valid JWT Bearer Grant Type request

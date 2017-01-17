@@ -11,14 +11,14 @@
 
 namespace OAuth2\Test\Stub\Event;
 
-use OAuth2\Event\Client\ClientUpdatedEvent;
+use OAuth2\Event\RefreshToken\RefreshTokenCreatedEvent;
 
-final class ClientUpdatedEventHandler extends EventHandler
+final class RefreshTokenCreatedEventHandler extends EventHandler
 {
     /**
-     * @param ClientUpdatedEvent $event
+     * @param RefreshTokenCreatedEvent $event
      */
-    public function handle(ClientUpdatedEvent $event)
+    public function handle(RefreshTokenCreatedEvent $event)
     {
         $this->save($event);
     }

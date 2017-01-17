@@ -12,30 +12,14 @@
 namespace OAuth2\Test\Stub\Event;
 
 use OAuth2\Event\Client\ClientDeletedEvent;
-use OAuth2\Model\Event\EventStoreInterface;
 
-final class ClientDeletedEventHandler
+final class ClientDeletedEventHandler extends EventHandler
 {
-    /**
-     * @var EventStoreInterface
-     */
-    private $eventStore;
-
-    /**
-     * ClientDeletedEventHandler constructor.
-     *
-     * @param EventStoreInterface $eventStore
-     */
-    public function __construct(EventStoreInterface $eventStore)
-    {
-        $this->eventStore = $eventStore;
-    }
-
     /**
      * @param ClientDeletedEvent $event
      */
     public function handle(ClientDeletedEvent $event)
     {
-        $this->eventStore->save($event);
+        $this->save($event);
     }
 }

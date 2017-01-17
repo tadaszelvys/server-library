@@ -52,7 +52,7 @@ final class CreateAccessTokenCommandHandler
             $command->getParameters(),
             $command->getMetadatas(),
             $command->getScopes(),
-            new \DateTimeImmutable('now + 1 day') //FIXME
+            $command->getExpiresAt()
         );
         $this->accessTokenRepository->save($accessToken);
         $event = AccessTokenCreatedEvent::create($accessToken);

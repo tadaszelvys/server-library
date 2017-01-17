@@ -51,14 +51,17 @@ use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationGetEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationPostEndpoint;
+use OAuth2\Event\AccessToken\AccessTokenCreatedEvent;
 use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
 use OAuth2\Event\Client\ClientCreatedEvent;
 use OAuth2\Event\Client\ClientDeletedEvent;
 use OAuth2\Event\Client\ClientUpdatedEvent;
+use OAuth2\Event\RefreshToken\RefreshTokenCreatedEvent;
 use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 use OAuth2\GrantType\ClientCredentialsGrantType;
 use OAuth2\GrantType\GrantTypeManager;
 use OAuth2\GrantType\GrantTypeManagerInterface;
+use OAuth2\GrantType\JWTBearerGrantType;
 use OAuth2\GrantType\PKCEMethod\PKCEMethodInterface;
 use OAuth2\GrantType\PKCEMethod\PKCEMethodManager;
 use OAuth2\GrantType\PKCEMethod\PKCEMethodManagerInterface;
@@ -101,10 +104,12 @@ use OAuth2\Test\Stub\ClientRepository;
 use OAuth2\Test\Stub\ClientSecretBasic;
 use OAuth2\Test\Stub\ClientSecretPost;
 use OAuth2\Test\Stub\Container;
+use OAuth2\Test\Stub\Event\AccessTokenCreatedEventHandler;
 use OAuth2\Test\Stub\Event\AccessTokenRevokedEventHandler;
 use OAuth2\Test\Stub\Event\ClientCreatedEventHandler;
 use OAuth2\Test\Stub\Event\ClientDeletedEventHandler;
 use OAuth2\Test\Stub\Event\ClientUpdatedEventHandler;
+use OAuth2\Test\Stub\Event\RefreshTokenCreatedEventHandler;
 use OAuth2\Test\Stub\Event\RefreshTokenRevokedEventHandler;
 use OAuth2\Test\Stub\EventStore;
 use OAuth2\Test\Stub\InitialAccessTokenRepository;
@@ -159,7 +164,9 @@ final class Application
             );
             $this->oauth2ResponseFactory->addExtension(new UriExtension());
 
-            $this->oauth2ResponseFactory->addResponseFactory(new AuthenticateResponseFactory());
+            $this->oauth2ResponseFactory->addResponseFactory(new AuthenticateResponseFactory(
+                $this->getTokenEndpointAuthMethodManager()
+            ));
             $this->oauth2ResponseFactory->addResponseFactory(new AccessDeniedResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new BadRequestResponseFactory());
             $this->oauth2ResponseFactory->addResponseFactory(new MethodNotAllowedResponseFactory());
@@ -296,9 +303,7 @@ final class Application
     public function getClientCreatedEventHandler(): ClientCreatedEventHandler
     {
         if (null === $this->clientCreatedEventHandler) {
-            $this->clientCreatedEventHandler = new ClientCreatedEventHandler(
-                $this->getEventStore()
-            );
+            $this->clientCreatedEventHandler = new ClientCreatedEventHandler();
         }
 
         return $this->clientCreatedEventHandler;
@@ -315,9 +320,7 @@ final class Application
     public function getClientDeletedEventHandler(): ClientDeletedEventHandler
     {
         if (null === $this->clientDeletedEventHandler) {
-            $this->clientDeletedEventHandler = new ClientDeletedEventHandler(
-                $this->getEventStore()
-            );
+            $this->clientDeletedEventHandler = new ClientDeletedEventHandler();
         }
 
         return $this->clientDeletedEventHandler;
@@ -334,9 +337,7 @@ final class Application
     public function getClientUpdatedEventHandler(): ClientUpdatedEventHandler
     {
         if (null === $this->clientUpdatedEventHandler) {
-            $this->clientUpdatedEventHandler = new ClientUpdatedEventHandler(
-                $this->getEventStore()
-            );
+            $this->clientUpdatedEventHandler = new ClientUpdatedEventHandler();
         }
 
         return $this->clientUpdatedEventHandler;
@@ -439,6 +440,7 @@ final class Application
             $this->container->add($this->getAccessTokenRevokedEventHandler());
 
             $this->container->add($this->getCreateAccessTokenCommandHandler());
+            $this->container->add($this->getAccessTokenCreatedEventHandler());
 
             $this->container->add($this->getRevokeRefreshTokenCommandHandler());
             $this->container->add($this->getRefreshTokenRevokedEventHandler());
@@ -563,7 +565,9 @@ final class Application
         if (null === $this->eventHandlerMap) {
             $this->eventHandlerMap = new CallableCollection(
                 [
+                    AccessTokenCreatedEvent::class  => [AccessTokenCreatedEventHandler::class],
                     AccessTokenRevokedEvent::class  => [AccessTokenRevokedEventHandler::class],
+                    RefreshTokenCreatedEvent::class => [RefreshTokenCreatedEventHandler::class],
                     RefreshTokenRevokedEvent::class => [RefreshTokenRevokedEventHandler::class],
                     ClientCreatedEvent::class       => [ClientCreatedEventHandler::class],
                     ClientDeletedEvent::class       => [ClientDeletedEventHandler::class],
@@ -650,7 +654,7 @@ final class Application
             $this->softwareRule->allowRegistrationWithoutSoftwareStatement();
             $this->softwareRule->enableSoftwareStatementSupport(
                 $this->getJwtLoader(),
-                $this->getSoftwareStatementPublicKeys()
+                $this->getPublicKeys()
             );
         }
 
@@ -660,9 +664,9 @@ final class Application
     /**
      * @return JWKSetInterface
      */
-    private function getSoftwareStatementPublicKeys(): JWKSetInterface
+    private function getPublicKeys(): JWKSetInterface
     {
-        return JWKFactory::createPublicKeySet($this->getSoftwareStatementPrivateKeys());
+        return JWKFactory::createPublicKeySet($this->getPrivateKeys());
     }
 
     /**
@@ -673,7 +677,7 @@ final class Application
     /**
      * @return JWKSetInterface
      */
-    public function getSoftwareStatementPrivateKeys(): JWKSetInterface
+    public function getPrivateKeys(): JWKSetInterface
     {
         if (null === $this->softwareStatementPrivateKeys) {
             $this->softwareStatementPrivateKeys = JWKFactory::createStorableKeySet(
@@ -811,13 +815,10 @@ final class Application
     {
         if (null === $this->grantTypeManager) {
             $this->grantTypeManager = new GrantTypeManager();
-            $this->grantTypeManager->addGrantType(new ClientCredentialsGrantType());
-            $this->grantTypeManager->addGrantType(new ResourceOwnerPasswordCredentialsGrantType(
-                $this->getUserAccountRepository()
-            ));
-            $this->grantTypeManager->addGrantType(new RefreshTokenGrantType(
-                $this->getRefreshTokenRepository()
-            ));
+            $this->grantTypeManager->addGrantType($this->getClientCredentialsGrantType());
+            $this->grantTypeManager->addGrantType($this->getJWTBearerGrantType());
+            $this->grantTypeManager->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
+            $this->grantTypeManager->addGrantType($this->getRefreshTokenGrantType());
         }
 
         return $this->grantTypeManager;
@@ -838,6 +839,86 @@ final class Application
         }
 
         return $this->responseTypeManager;
+    }
+
+    /**
+     * @var null|ClientCredentialsGrantType
+     */
+    private $clientCredentialsGrantType = null;
+
+    /**
+     * @return ClientCredentialsGrantType
+     */
+    public function getClientCredentialsGrantType(): ClientCredentialsGrantType
+    {
+        if (null === $this->clientCredentialsGrantType) {
+            $this->clientCredentialsGrantType = new ClientCredentialsGrantType();
+        }
+
+        return $this->clientCredentialsGrantType;
+    }
+
+    /**
+     * @var null|RefreshTokenGrantType
+     */
+    private $refreshTokenGrantType = null;
+
+    /**
+     * @return RefreshTokenGrantType
+     */
+    public function getRefreshTokenGrantType(): RefreshTokenGrantType
+    {
+        if (null === $this->refreshTokenGrantType) {
+            $this->refreshTokenGrantType = new RefreshTokenGrantType(
+                $this->getRefreshTokenRepository()
+            );
+        }
+
+        return $this->refreshTokenGrantType;
+    }
+
+    /**
+     * @var null|ResourceOwnerPasswordCredentialsGrantType
+     */
+    private $resourceOwnerPasswordCredentialsGrantType = null;
+
+    /**
+     * @return ResourceOwnerPasswordCredentialsGrantType
+     */
+    public function getResourceOwnerPasswordCredentialsGrantType(): ResourceOwnerPasswordCredentialsGrantType
+    {
+        if (null === $this->resourceOwnerPasswordCredentialsGrantType) {
+            $this->resourceOwnerPasswordCredentialsGrantType = new ResourceOwnerPasswordCredentialsGrantType(
+                $this->getUserAccountRepository()
+            );
+            $this->resourceOwnerPasswordCredentialsGrantType->allowRefreshTokenIssuance();
+        }
+
+        return $this->resourceOwnerPasswordCredentialsGrantType;
+    }
+
+    /**
+     * @var null|JWTBearerGrantType
+     */
+    private $jwtBearerGrantType = null;
+
+    /**
+     * @return JWTBearerGrantType
+     */
+    public function getJWTBearerGrantType(): JWTBearerGrantType
+    {
+        if (null === $this->jwtBearerGrantType) {
+            $this->jwtBearerGrantType = new JWTBearerGrantType(
+                $this->getJwtLoader(),
+                $this->getClientRepository()
+            );
+            $this->jwtBearerGrantType->enableEncryptedAssertions(
+                false,
+                $this->getPrivateKeys()
+            );
+        }
+
+        return $this->jwtBearerGrantType;
     }
 
     /**
@@ -1481,12 +1562,27 @@ final class Application
     public function getAccessTokenRevokedEventHandler(): AccessTokenRevokedEventHandler
     {
         if (null === $this->accessTokenRevokedEventHandler) {
-            $this->accessTokenRevokedEventHandler = new AccessTokenRevokedEventHandler(
-                $this->getEventStore()
-            );
+            $this->accessTokenRevokedEventHandler = new AccessTokenRevokedEventHandler();
         }
 
         return $this->accessTokenRevokedEventHandler;
+    }
+
+    /**
+     * @var null|AccessTokenCreatedEventHandler
+     */
+    private $accessTokenCreatedEventHandler = null;
+
+    /**
+     * @return AccessTokenCreatedEventHandler
+     */
+    public function getAccessTokenCreatedEventHandler(): AccessTokenCreatedEventHandler
+    {
+        if (null === $this->accessTokenCreatedEventHandler) {
+            $this->accessTokenCreatedEventHandler = new AccessTokenCreatedEventHandler();
+        }
+
+        return $this->accessTokenCreatedEventHandler;
     }
 
     /**
@@ -1520,9 +1616,7 @@ final class Application
     public function getRefreshTokenRevokedEventHandler(): RefreshTokenRevokedEventHandler
     {
         if (null === $this->refreshTokenRevokedEventHandler) {
-            $this->refreshTokenRevokedEventHandler = new RefreshTokenRevokedEventHandler(
-                $this->getEventStore()
-            );
+            $this->refreshTokenRevokedEventHandler = new RefreshTokenRevokedEventHandler();
         }
 
         return $this->refreshTokenRevokedEventHandler;

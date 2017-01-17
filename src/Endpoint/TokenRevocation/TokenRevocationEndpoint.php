@@ -156,7 +156,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
                 401,
                 [
                     'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
-                    'error_description' => 'Client not authenticated.',
+                    'error_description' => 'Client authentication failed.',
                 ]
             );
         }

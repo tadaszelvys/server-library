@@ -46,10 +46,7 @@ class ClientCredentialsGrantType implements GrantTypeInterface
      */
     public function checkTokenRequest(ServerRequestInterface $request)
     {
-        $client = $request->getAttribute('client');
-        if ($client->isPublic()) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The client is not a confidential client.']);
-        }
+        // Nothing to do
     }
 
     /**
@@ -66,6 +63,11 @@ class ClientCredentialsGrantType implements GrantTypeInterface
      */
     public function grant(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
+        $client = $grantTypeResponse->getClient();
+        if ($client->isPublic()) {
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The client is not a confidential client.']);
+        }
+
         if (true === $this->isRefreshTokenIssuedWithAccessToken()) {
             $grantTypeResponse = $grantTypeResponse->withRefreshToken();
             $grantTypeResponse = $grantTypeResponse->withRefreshTokenScopes($grantTypeResponse->getScopes());

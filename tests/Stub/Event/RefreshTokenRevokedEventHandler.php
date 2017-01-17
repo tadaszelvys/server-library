@@ -12,30 +12,14 @@
 namespace OAuth2\Test\Stub\Event;
 
 use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
-use OAuth2\Model\Event\EventStoreInterface;
 
-final class RefreshTokenRevokedEventHandler
+final class RefreshTokenRevokedEventHandler extends EventHandler
 {
-    /**
-     * @var EventStoreInterface
-     */
-    private $eventStore;
-
-    /**
-     * ClientCreatedEventHandler constructor.
-     *
-     * @param EventStoreInterface $eventStore
-     */
-    public function __construct(EventStoreInterface $eventStore)
-    {
-        $this->eventStore = $eventStore;
-    }
-
     /**
      * @param RefreshTokenRevokedEvent $event
      */
     public function handle(RefreshTokenRevokedEvent $event)
     {
-        $this->eventStore->save($event);
+        $this->save($event);
     }
 }

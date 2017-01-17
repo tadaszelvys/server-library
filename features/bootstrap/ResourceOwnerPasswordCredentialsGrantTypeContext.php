@@ -92,6 +92,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
             'grant_type' => 'password',
             'username'   => 'john.1',
             'password'   => 'doe',
+            'scope'      => 'email phone address',
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');

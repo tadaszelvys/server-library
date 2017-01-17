@@ -59,14 +59,6 @@ class IntrospectionContext extends BaseContext
     }
 
     /**
-     * @Then no token revocation event is thrown
-     */
-    public function noTokenRevocationEventIsThrown()
-    {
-        throw new PendingException();
-    }
-
-    /**
      * @Given A protected resource tries to get information of a token that owns another protected resource
      */
     public function aProtectedResourceTriesToGetInformationOfATokenThatOwnsAnotherProtectedResource()

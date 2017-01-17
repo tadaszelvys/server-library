@@ -47,38 +47,46 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
     private $scopes;
 
     /**
+     * @var \DateTimeImmutable
+     */
+    private $expiresAt;
+
+    /**
      * CreateAccessTokenCommand constructor.
      *
-     * @param ResourceOwner   $resourceOwner
-     * @param Client          $client
-     * @param array           $parameters
-     * @param array           $metadatas
-     * @param array           $scopes
-     * @param DataTransporter $dataTransporter
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param array              $scopes
+     * @param \DateTimeImmutable $expiresAt
+     * @param DataTransporter    $dataTransporter
      */
-    protected function __construct(Client $client, ResourceOwner $resourceOwner, array $parameters, array $metadatas, array $scopes, DataTransporter $dataTransporter = null)
+    protected function __construct(Client $client, ResourceOwner $resourceOwner, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, DataTransporter $dataTransporter = null)
     {
         $this->resourceOwner = $resourceOwner;
         $this->client = $client;
         $this->parameters = $parameters;
         $this->metadatas = $metadatas;
         $this->scopes = $scopes;
+        $this->expiresAt = $expiresAt;
         parent::__construct($dataTransporter);
     }
 
     /**
-     * @param ResourceOwner   $resourceOwner
-     * @param Client          $client
-     * @param array           $parameters
-     * @param array           $metadatas
-     * @param array           $scopes
-     * @param DataTransporter $dataTransporter
+     * @param ResourceOwner      $resourceOwner
+     * @param Client             $client
+     * @param array              $parameters
+     * @param array              $metadatas
+     * @param array              $scopes
+     * @param \DateTimeImmutable $expiresAt
+     * @param DataTransporter    $dataTransporter
      *
      * @return CreateAccessTokenCommand
      */
-    public static function create(Client $client, ResourceOwner $resourceOwner, array $parameters, array $metadatas, array $scopes, DataTransporter $dataTransporter = null): CreateAccessTokenCommand
+    public static function create(Client $client, ResourceOwner $resourceOwner, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, DataTransporter $dataTransporter = null): CreateAccessTokenCommand
     {
-        return new self($client, $resourceOwner, $parameters, $metadatas, $scopes, $dataTransporter);
+        return new self($client, $resourceOwner, $parameters, $metadatas, $scopes, $expiresAt, $dataTransporter);
     }
 
     /**
@@ -167,5 +175,13 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
     public function getScopes(): array
     {
         return $this->scopes;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getExpiresAt(): \DateTimeImmutable
+    {
+        return $this->expiresAt;
     }
 }
