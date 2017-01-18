@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2016 Spomky-Labs
+ * Copyright (c) 2014-2017 Spomky-Labs
  *
  * This software may be modified and distributed under the terms
  * of the MIT license.  See the LICENSE file for details.
@@ -81,7 +83,7 @@ class ResponseContext extends BaseContext
             }
         } else {
             $this->rewind();
-            $response = (string)$this->getResponse()->getBody()->getContents();
+            $response = (string) $this->getResponse()->getBody()->getContents();
             $json = json_decode($response, true);
             Assertion::isArray($json);
             Assertion::keyExists($json, 'error');
@@ -140,7 +142,7 @@ class ResponseContext extends BaseContext
     public function theResponseContainsAnAccessToken()
     {
         $this->rewind();
-        $content = (string)$this->getResponse()->getBody()->getContents();
+        $content = (string) $this->getResponse()->getBody()->getContents();
         $data = json_decode($content, true);
         Assertion::isArray($data);
         Assertion::keyExists($data, 'access_token');
@@ -161,15 +163,12 @@ class ResponseContext extends BaseContext
     public function iShowTheOauth2Response()
     {
         $this->rewind();
-        $content = (string)$this->getResponse()->getBody()->getContents();
+        $content = (string) $this->getResponse()->getBody()->getContents();
 
         //dump($this->getResponse()->getHeaders());
         dump(json_decode($content, true));
     }
 
-    /**
-     *
-     */
     private function rewind()
     {
         if (true === $this->getResponse()->getBody()->isSeekable()) {

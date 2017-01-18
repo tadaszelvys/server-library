@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2016 Spomky-Labs
+ * Copyright (c) 2014-2017 Spomky-Labs
  *
  * This software may be modified and distributed under the terms
  * of the MIT license.  See the LICENSE file for details.
@@ -11,8 +13,6 @@
 
 use Assert\Assertion;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
-use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 
 class RevocationContext extends BaseContext
 {
@@ -281,6 +281,6 @@ class RevocationContext extends BaseContext
     {
         $events1 = $this->getApplication()->getAccessTokenRevokedEventHandler()->getEvents();
         $events2 = $this->getApplication()->getRefreshTokenRevokedEventHandler()->getEvents();
-        Assertion::eq(2, count($events1)+count($events2));
+        Assertion::eq(2, count($events1) + count($events2));
     }
 }
