@@ -19,21 +19,21 @@
         "php": "^7.0",
         "psr/http-message": "^1.0",
         "spomky-labs/jose": "^6.1.1",
-        "oauth2-framework/response-factory-library": "dev-master",
-        "oauth2-framework/token-type-manager-library": "dev-master",
-        "oauth2-framework/security-library": "dev-master",
+        "oauth2-framework/response-factory-library": "^1.0@dev",
+        "oauth2-framework/token-type-manager-library": "^1.0@dev",
+        "oauth2-framework/security-library": "^1.0@dev",
         "beberlei/assert": "^2.6.4",
         "php-http/httplug": "^1.1",
         "simple-bus/message-bus": "^2.2",
-        "http-interop/http-middleware": "*@dev",
-        "http-interop/http-factory": "*@dev",
+        "http-interop/http-middleware": "^0.4",
+        "http-interop/http-factory": "^0.2",
         "ramsey/uuid": "^3.5",
         "psr/container": "*@dev"
     },
     "require-dev": {
         "symfony/var-dumper": "^3.0",
         "behat/behat": "^3.2",
-        "http-interop/http-factory-diactoros": "*@dev"
+        "http-interop/http-factory-diactoros": "^0.2"
     },
     "suggests": {
         "php-http/client-implementation": "For Authorization Request and Sector Identifier Uri support."

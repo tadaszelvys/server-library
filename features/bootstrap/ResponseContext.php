@@ -11,11 +11,13 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Behat\Behat\Context\Context;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Assert\Assertion;
 use Behat\Gherkin\Node\PyStringNode;
 use Psr\Http\Message\ResponseInterface;
 
-class ResponseContext extends BaseContext
+class ResponseContext implements Context
 {
     /**
      * @var null|ResponseInterface
@@ -26,6 +28,23 @@ class ResponseContext extends BaseContext
      * @var null|array
      */
     private $error = null;
+
+    /**
+     * @var ApplicationContext
+     */
+    private $applicationContext;
+
+    /**
+     * @BeforeScenario
+     *
+     * @param BeforeScenarioScope $scope
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+
+        $this->applicationContext = $environment->getContext('ApplicationContext');
+    }
 
     /**
      * @param ResponseInterface $response
@@ -72,7 +91,7 @@ class ResponseContext extends BaseContext
         Assertion::greaterOrEqualThan($this->getResponse()->getStatusCode(), 400);
         if (401 === $this->getResponse()->getStatusCode()) {
             $headers = $this->getResponse()->getHeader('WWW-Authenticate');
-            Assertion::greaterOrEqualThan(count($headers), 0);
+            Assertion::greaterThan(count($headers), 0);
             $header = $headers[0];
             preg_match_all('/(\w+\*?)="((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+)/', substr($header, strpos($header, ' ')), $matches, PREG_SET_ORDER);
             if (!is_array($matches)) {
@@ -132,7 +151,7 @@ class ResponseContext extends BaseContext
      */
     public function noAccessTokenCreationEventIsThrown()
     {
-        $events = $this->getApplication()->getAccessTokenCreatedEventHandler()->getEvents();
+        $events = $this->applicationContext->getApplication()->getAccessTokenCreatedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
     }
 
@@ -153,7 +172,7 @@ class ResponseContext extends BaseContext
      */
     public function anAccessTokenCreationEventIsThrown()
     {
-        $events = $this->getApplication()->getEventStore()->all();
+        $events = $this->applicationContext->getApplication()->getAccessTokenCreatedEventHandler()->getEvents();
         Assertion::greaterThan(count($events), 0);
     }
 
@@ -165,7 +184,6 @@ class ResponseContext extends BaseContext
         $this->rewind();
         $content = (string) $this->getResponse()->getBody()->getContents();
 
-        //dump($this->getResponse()->getHeaders());
         dump(json_decode($content, true));
     }
 

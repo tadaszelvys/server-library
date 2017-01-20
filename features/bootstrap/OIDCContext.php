@@ -11,14 +11,20 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
-class OIDCContext extends BaseContext
+class OIDCContext implements Context
 {
     /**
      * @var ResponseContext
      */
     private $responseContext;
+
+    /**
+     * @var ApplicationContext
+     */
+    private $applicationContext;
 
     /**
      * @BeforeScenario
@@ -30,5 +36,6 @@ class OIDCContext extends BaseContext
         $environment = $scope->getEnvironment();
 
         $this->responseContext = $environment->getContext('ResponseContext');
+        $this->applicationContext = $environment->getContext('ApplicationContext');
     }
 }

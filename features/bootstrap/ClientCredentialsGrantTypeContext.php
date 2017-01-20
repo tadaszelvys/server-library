@@ -11,16 +11,22 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Behat\Behat\Context\Context;
 use Base64Url\Base64Url;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use OAuth2\Model\Client\ClientId;
 
-class ClientCredentialsGrantTypeContext extends BaseContext
+class ClientCredentialsGrantTypeContext implements Context
 {
     /**
      * @var ResponseContext
      */
     private $responseContext;
+
+    /**
+     * @var ApplicationContext
+     */
+    private $applicationContext;
 
     /**
      * @BeforeScenario
@@ -32,6 +38,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         $environment = $scope->getEnvironment();
 
         $this->responseContext = $environment->getContext('ResponseContext');
+        $this->applicationContext = $environment->getContext('ApplicationContext');
     }
 
     /**
@@ -39,14 +46,14 @@ class ClientCredentialsGrantTypeContext extends BaseContext
      */
     public function anUnauthenticatedClientSendsAClientCredentialsGrantTypeRequest()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'client_credentials',
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -54,7 +61,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
      */
     public function anPublicClientSendsAClientCredentialsGrantTypeRequest()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'client_credentials',
@@ -62,7 +69,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -70,7 +77,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidClientCredentialsGrantTypeRequest()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'client_credentials',
@@ -79,7 +86,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -87,7 +94,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientAuthenticatedWithAJwtAssertionSendsAValidClientCredentialsGrantTypeRequest()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type'            => 'client_credentials',
@@ -97,7 +104,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -105,7 +112,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidClientCredentialsGrantTypeRequestButTheGrantTypeIsNotAllowed()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type'    => 'client_credentials',
@@ -114,7 +121,7 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     private function generateValidClientAssertion()
@@ -129,8 +136,8 @@ class ClientCredentialsGrantTypeContext extends BaseContext
         $headers = [
             'alg' => 'HS256',
         ];
-        $client = $this->getApplication()->getClientRepository()->find(ClientId::create('client3'));
+        $client = $this->applicationContext->getApplication()->getClientRepository()->find(ClientId::create('client3'));
 
-        return $this->getApplication()->getJwTCreator()->sign($claims, $headers, $client->getPublicKeySet()->getKey(0));
+        return $this->applicationContext->getApplication()->getJwTCreator()->sign($claims, $headers, $client->getPublicKeySet()->getKey(0));
     }
 }

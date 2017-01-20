@@ -11,6 +11,7 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Behat\Behat\Context\Context;
 use Assert\Assertion;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use OAuth2\Model\Client\Client;
@@ -21,7 +22,7 @@ use OAuth2\Model\UserAccount\UserAccountId;
 /**
  * Defines application features from the specific context.
  */
-class ClientContext extends BaseContext
+class ClientContext implements Context
 {
     /**
      * @var null|array
@@ -34,6 +35,11 @@ class ClientContext extends BaseContext
     private $responseContext;
 
     /**
+     * @var ApplicationContext
+     */
+    private $applicationContext;
+
+    /**
      * @BeforeScenario
      *
      * @param BeforeScenarioScope $scope
@@ -43,6 +49,7 @@ class ClientContext extends BaseContext
         $environment = $scope->getEnvironment();
 
         $this->responseContext = $environment->getContext('ResponseContext');
+        $this->applicationContext = $environment->getContext('ApplicationContext');
     }
 
     /**
@@ -50,7 +57,7 @@ class ClientContext extends BaseContext
      */
     public function aValidClientRegistrationRequestIsReceived()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'redirect_uris' => ['https://www.foo.com'],
@@ -58,7 +65,7 @@ class ClientContext extends BaseContext
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer INITIAL_ACCESS_TOKEN_VALID');
 
-        $this->responseContext->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -66,7 +73,7 @@ class ClientContext extends BaseContext
      */
     public function aClientRegistrationRequestIsReceivedWithAnExpiredInitialAccessToken()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'redirect_uris' => ['https://www.foo.com'],
@@ -74,7 +81,7 @@ class ClientContext extends BaseContext
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer INITIAL_ACCESS_TOKEN_EXPIRED');
 
-        $this->responseContext->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -82,14 +89,14 @@ class ClientContext extends BaseContext
      */
     public function aClientRegistrationRequestIsReceivedButNotInitialAccessTokenIsSet()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'redirect_uris' => ['https://www.foo.com'],
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -97,7 +104,7 @@ class ClientContext extends BaseContext
      */
     public function aClientRegistrationRequestIsReceivedButAnInvalidInitialAccessTokenIsSet()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'redirect_uris' => ['https://www.foo.com'],
@@ -105,7 +112,7 @@ class ClientContext extends BaseContext
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer ***INVALID_INITIAL_ACCESS_TOKEN***');
 
-        $this->responseContext->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -113,7 +120,7 @@ class ClientContext extends BaseContext
      */
     public function aValidClientRegistrationRequestWithSoftwareStatementIsReceived()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'redirect_uris'      => ['https://www.foo.com'],
@@ -122,7 +129,7 @@ class ClientContext extends BaseContext
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer INITIAL_ACCESS_TOKEN_VALID');
 
-        $this->responseContext->setResponse($this->getApplication()->getClientRegistrationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientRegistrationPipe()->dispatch($request));
     }
 
     /**
@@ -130,7 +137,7 @@ class ClientContext extends BaseContext
      */
     public function aValidClientConfigurationGetRequestIsReceived()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA');
@@ -156,7 +163,7 @@ class ClientContext extends BaseContext
         );
         $request = $request->withAttribute('client', $client);
 
-        $this->responseContext->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -164,7 +171,7 @@ class ClientContext extends BaseContext
      */
     public function aClientConfigurationGetRequestIsReceivedButNoRegistrationTokenIsSet()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $client = Client::create(
@@ -189,7 +196,7 @@ class ClientContext extends BaseContext
         );
         $request = $request->withAttribute('client', $client);
 
-        $this->responseContext->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -197,7 +204,7 @@ class ClientContext extends BaseContext
      */
     public function aClientConfigurationGetRequestIsReceivedButTheRegistrationTokenIsInvalid()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer InvALID_ToKEn');
@@ -223,7 +230,7 @@ class ClientContext extends BaseContext
         );
         $request = $request->withAttribute('client', $client);
 
-        $this->responseContext->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -231,7 +238,7 @@ class ClientContext extends BaseContext
      */
     public function aValidClientConfigurationDeleteRequestIsReceived()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('DELETE');
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Bearer JNWuIxHkTKtUmmtEpipDtPlTc3ordUNpSVVPLbQXKrFKyYVDR7N3k1ZzrHmPWXoibr2J2HrTSSozN6zIhHuypA');
@@ -255,10 +262,10 @@ class ClientContext extends BaseContext
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
-        $this->getApplication()->getClientRepository()->save($client);
+        $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->responseContext->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -266,7 +273,7 @@ class ClientContext extends BaseContext
      */
     public function aClientConfigurationDeleteRequestIsReceivedButNoRegistrationTokenIsSet()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('DELETE');
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $client = Client::create(
@@ -289,10 +296,10 @@ class ClientContext extends BaseContext
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
-        $this->getApplication()->getClientRepository()->save($client);
+        $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->responseContext->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -300,7 +307,7 @@ class ClientContext extends BaseContext
      */
     public function aClientConfigurationPutRequestIsReceivedButNoRegistrationTokenIsSet()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('PUT');
         $request = $request->withParsedBody([
             'redirect_uris' => ['https://www.foo.com'],
@@ -326,10 +333,10 @@ class ClientContext extends BaseContext
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
-        $this->getApplication()->getClientRepository()->save($client);
+        $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->responseContext->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -337,7 +344,7 @@ class ClientContext extends BaseContext
      */
     public function aValidClientConfigurationPutRequestIsReceived()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('PUT');
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withParsedBody([
@@ -364,10 +371,10 @@ class ClientContext extends BaseContext
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
-        $this->getApplication()->getClientRepository()->save($client);
+        $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->responseContext->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -387,7 +394,7 @@ class ClientContext extends BaseContext
      */
     public function aValidClientConfigurationPutRequestWithSoftwareStatementIsReceived()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('PUT');
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withParsedBody([
@@ -411,10 +418,10 @@ class ClientContext extends BaseContext
             ],
             UserAccount::create(UserAccountId::create('USER #1'), [])
         );
-        $this->getApplication()->getClientRepository()->save($client);
+        $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
 
-        $this->responseContext->setResponse($this->getApplication()->getClientConfigurationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getClientConfigurationPipe()->dispatch($request));
     }
 
     /**
@@ -422,7 +429,7 @@ class ClientContext extends BaseContext
      */
     public function aClientDeletedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getClientDeletedEventHandler()->getEvents();
+        $events = $this->applicationContext->getApplication()->getClientDeletedEventHandler()->getEvents();
         Assertion::eq(1, count($events));
     }
 
@@ -431,7 +438,7 @@ class ClientContext extends BaseContext
      */
     public function noClientDeletedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getClientDeletedEventHandler()->getEvents();
+        $events = $this->applicationContext->getApplication()->getClientDeletedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
     }
 
@@ -440,7 +447,7 @@ class ClientContext extends BaseContext
      */
     public function noClientUpdatedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getClientUpdatedEventHandler()->getEvents();
+        $events = $this->applicationContext->getApplication()->getClientUpdatedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
     }
 
@@ -449,7 +456,7 @@ class ClientContext extends BaseContext
      */
     public function aClientCreatedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getClientCreatedEventHandler()->getEvents();
+        $events = $this->applicationContext->getApplication()->getClientCreatedEventHandler()->getEvents();
         Assertion::eq(1, count($events));
     }
 
@@ -458,7 +465,7 @@ class ClientContext extends BaseContext
      */
     public function aClientUpdatedEventShouldBeRecorded()
     {
-        $events = $this->getApplication()->getClientUpdatedEventHandler()->getEvents();
+        $events = $this->applicationContext->getApplication()->getClientUpdatedEventHandler()->getEvents();
         Assertion::eq(1, count($events));
     }
 
@@ -479,7 +486,7 @@ class ClientContext extends BaseContext
      */
     public function noClientShouldBeCreated()
     {
-        $events = $this->getApplication()->getClientDeletedEventHandler()->getEvents();
+        $events = $this->applicationContext->getApplication()->getClientDeletedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
     }
 
@@ -513,8 +520,8 @@ class ClientContext extends BaseContext
         $headers = [
             'alg' => 'ES256',
         ];
-        $key = $this->getApplication()->getPrivateKeys()->getKey(0);
+        $key = $this->applicationContext->getApplication()->getPrivateKeys()->getKey(0);
 
-        return $this->getApplication()->getJwTCreator()->sign($claims, $headers, $key);
+        return $this->applicationContext->getApplication()->getJwTCreator()->sign($claims, $headers, $key);
     }
 }

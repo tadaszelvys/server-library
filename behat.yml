@@ -4,12 +4,14 @@ default:
             paths:
                 - '%paths.base%/features/client'
             contexts:
+                - 'ApplicationContext'
                 - 'ResponseContext'
                 - 'ClientContext'
         grant_type:
             paths:
                 - '%paths.base%/features/grant'
             contexts:
+                - 'ApplicationContext'
                 - 'ResponseContext'
                 - 'RefreshTokenGrantTypeContext'
                 - 'ClientCredentialsGrantTypeContext'
@@ -20,17 +22,20 @@ default:
             paths:
                 - '%paths.base%/features/oidc'
             contexts:
+                - 'ApplicationContext'
                 - 'ResponseContext'
                 - 'OIDCContext'
         introspection:
             paths:
                 - '%paths.base%/features/introspection'
             contexts:
+                - 'ApplicationContext'
                 - 'ResponseContext'
                 - 'IntrospectionContext'
         revocation:
             paths:
                 - '%paths.base%/features/revocation'
             contexts:
+                - 'ApplicationContext'
                 - 'ResponseContext'
                 - 'RevocationContext'

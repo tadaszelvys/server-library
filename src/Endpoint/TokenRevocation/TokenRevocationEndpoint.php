@@ -133,7 +133,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
         $response = $this->responseFactory->createResponse($code);
         $response->getBody()->write($data);
-        $headers = ['Content-Type' => 'application/jrd+json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+        $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
         foreach ($headers as $k => $v) {
             $response = $response->withHeader($k, $v);
         }

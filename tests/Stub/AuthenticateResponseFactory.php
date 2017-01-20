@@ -45,7 +45,6 @@ class AuthenticateResponseFactory extends Base
             $scheme = $method->getSchemesParameters();
             $schemes = array_merge($schemes, $scheme);
         }
-        dump($data);
 
         return parent::createResponse($data, $response);
     }

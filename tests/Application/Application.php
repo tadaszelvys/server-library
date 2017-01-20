@@ -262,11 +262,32 @@ final class Application
     {
         if (null === $this->clientAuthenticationMiddleware) {
             $this->clientAuthenticationMiddleware = new ClientAuthenticationMiddleware(
-                $this->getTokenEndpointAuthMethodManager()
+                $this->getTokenEndpointAuthMethodManager(),
+                false
             );
         }
 
         return $this->clientAuthenticationMiddleware;
+    }
+
+    /**
+     * @var null|ClientAuthenticationMiddleware
+     */
+    private $clientAuthenticationMiddlewareWithRequirement = null;
+
+    /**
+     * @return ClientAuthenticationMiddleware
+     */
+    public function getClientAuthenticationMiddlewareWithRequirement(): ClientAuthenticationMiddleware
+    {
+        if (null === $this->clientAuthenticationMiddlewareWithRequirement) {
+            $this->clientAuthenticationMiddlewareWithRequirement = new ClientAuthenticationMiddleware(
+                $this->getTokenEndpointAuthMethodManager(),
+                true
+            );
+        }
+
+        return $this->clientAuthenticationMiddlewareWithRequirement;
     }
 
     /**
@@ -1372,7 +1393,7 @@ final class Application
             $this->tokenRevocationPipe = new Pipe();
 
             $this->tokenRevocationPipe->appendMiddleware($this->getOAuth2ResponseMiddleware());
-            $this->tokenRevocationPipe->appendMiddleware($this->getClientAuthenticationMiddleware());
+            $this->tokenRevocationPipe->appendMiddleware($this->getClientAuthenticationMiddlewareWithRequirement());
             $this->tokenRevocationPipe->appendMiddleware($this->getTokenRevocationHttpMethod());
         }
 
@@ -1432,7 +1453,7 @@ final class Application
             $this->tokenIntrospectionPipe = new Pipe();
 
             $this->tokenIntrospectionPipe->appendMiddleware($this->getOAuth2ResponseMiddleware());
-            $this->tokenIntrospectionPipe->appendMiddleware($this->getClientAuthenticationMiddleware());
+            $this->tokenIntrospectionPipe->appendMiddleware($this->getClientAuthenticationMiddlewareWithRequirement());
             $this->tokenIntrospectionPipe->appendMiddleware($this->getTokenIntrospectionHttpMethod());
         }
 

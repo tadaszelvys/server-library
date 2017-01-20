@@ -27,7 +27,7 @@ abstract class EventHandler
      */
     protected function save(Event $event)
     {
-        $this->events[] = $event;
+        $this->events[$event->getEventId()->getValue()] = $event;
     }
 
     /**

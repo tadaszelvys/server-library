@@ -11,15 +11,21 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Behat\Behat\Context\Context;
 use Assert\Assertion;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
-class RevocationContext extends BaseContext
+class RevocationContext implements Context
 {
     /**
      * @var ResponseContext
      */
     private $responseContext;
+
+    /**
+     * @var ApplicationContext
+     */
+    private $applicationContext;
 
     /**
      * @BeforeScenario
@@ -31,6 +37,7 @@ class RevocationContext extends BaseContext
         $environment = $scope->getEnvironment();
 
         $this->responseContext = $environment->getContext('ResponseContext');
+        $this->applicationContext = $environment->getContext('ApplicationContext');
     }
 
     /**
@@ -38,12 +45,12 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAPostRevocationRequestButItIsNotAuthenticated()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -51,11 +58,11 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAGetRevocationRequestButItIsNotAuthenticated()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withQueryParams([]);
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -63,14 +70,14 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAPostRevocationRequestWithoutTokenParameter()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -78,13 +85,13 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAGetRevocationRequestWithoutTokenParameter()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withQueryParams([
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -92,7 +99,7 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAPostRevocationRequestWithoutTokenParameterWithACallbackParameter()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'callback' => 'foo',
@@ -100,7 +107,7 @@ class RevocationContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -108,14 +115,14 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAGetRevocationRequestWithoutTokenParameterWithACallbackParameter()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withQueryParams([
             'callback' => 'foo',
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -123,7 +130,7 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAValidPostRevocationRequest()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'token' => 'ACCESS_TOKEN_#1',
@@ -131,7 +138,7 @@ class RevocationContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -139,14 +146,14 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAValidGetRevocationRequest()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withQueryParams([
             'token' => 'ACCESS_TOKEN_#1',
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -154,7 +161,7 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAValidPostRevocationRequestButTheTokenOwnsToAnotherClient()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'token' => 'ACCESS_TOKEN_#2',
@@ -162,7 +169,7 @@ class RevocationContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -170,14 +177,14 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAValidGetRevocationRequestButTheTokenOwnsToAnotherClient()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withQueryParams([
             'token' => 'ACCESS_TOKEN_#2',
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -185,7 +192,7 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAPostRevocationRequestButTheTokenTypeHintIsNotSupported()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'token'           => 'ACCESS_TOKEN_#2',
@@ -194,7 +201,7 @@ class RevocationContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -202,7 +209,7 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAGetRevocationRequestButTheTokenTypeHintIsNotSupported()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withQueryParams([
             'token'           => 'ACCESS_TOKEN_#2',
@@ -210,7 +217,7 @@ class RevocationContext extends BaseContext
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -218,7 +225,7 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAPostRevocationRequestButTheTokenDoesNotExistOrExpired()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'token'           => 'UNKNOWN_REFRESH_TOKEN_#2',
@@ -227,7 +234,7 @@ class RevocationContext extends BaseContext
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -235,7 +242,7 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAGetRevocationRequestButTheTokenDoesNotExistOrExpired()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withQueryParams([
             'token'           => 'UNKNOWN_REFRESH_TOKEN_#2',
@@ -243,7 +250,7 @@ class RevocationContext extends BaseContext
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -251,7 +258,7 @@ class RevocationContext extends BaseContext
      */
     public function aClientSendsAGetRevocationRequestWithCallbackButTheTokenDoesNotExistOrExpired()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('GET');
         $request = $request->withQueryParams([
             'token'           => 'UNKNOWN_REFRESH_TOKEN_#2',
@@ -260,7 +267,7 @@ class RevocationContext extends BaseContext
         ]);
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenRevocationPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenRevocationPipe()->dispatch($request));
     }
 
     /**
@@ -268,9 +275,9 @@ class RevocationContext extends BaseContext
      */
     public function noTokenRevocationEventIsThrown()
     {
-        $events = $this->getApplication()->getAccessTokenRevokedEventHandler()->getEvents();
+        $events = $this->applicationContext->getApplication()->getAccessTokenRevokedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
-        $events = $this->getApplication()->getRefreshTokenRevokedEventHandler()->getEvents();
+        $events = $this->applicationContext->getApplication()->getRefreshTokenRevokedEventHandler()->getEvents();
         Assertion::eq(0, count($events));
     }
 
@@ -279,8 +286,8 @@ class RevocationContext extends BaseContext
      */
     public function aTokenRevocationEventIsThrown()
     {
-        $events1 = $this->getApplication()->getAccessTokenRevokedEventHandler()->getEvents();
-        $events2 = $this->getApplication()->getRefreshTokenRevokedEventHandler()->getEvents();
-        Assertion::eq(2, count($events1) + count($events2));
+        $events1 = $this->applicationContext->getApplication()->getAccessTokenRevokedEventHandler()->getEvents();
+        $events2 = $this->applicationContext->getApplication()->getRefreshTokenRevokedEventHandler()->getEvents();
+        Assertion::greaterThan(count($events1) + count($events2), 0);
     }
 }

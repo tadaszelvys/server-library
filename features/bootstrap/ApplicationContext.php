@@ -16,7 +16,7 @@ use Interop\Http\Factory\ServerRequestFactoryInterface;
 use Interop\Http\Factory\StreamFactoryInterface;
 use OAuth2\Test\Application\Application;
 
-class BaseContext implements Context
+class ApplicationContext implements Context
 {
     /**
      * @var Application
@@ -38,7 +38,7 @@ class BaseContext implements Context
     /**
      * @return Application
      */
-    protected function getApplication(): Application
+    public function getApplication(): Application
     {
         return $this->application;
     }
@@ -46,7 +46,7 @@ class BaseContext implements Context
     /**
      * @return StreamFactoryInterface
      */
-    protected function getStreamFactory(): StreamFactoryInterface
+    public function getStreamFactory(): StreamFactoryInterface
     {
         return $this->getApplication()->getStreamFactory();
     }
@@ -54,7 +54,7 @@ class BaseContext implements Context
     /**
      * @return ServerRequestFactoryInterface
      */
-    protected function getServerRequestFactory(): ServerRequestFactoryInterface
+    public function getServerRequestFactory(): ServerRequestFactoryInterface
     {
         return $this->getApplication()->getServerRequestFactory();
     }

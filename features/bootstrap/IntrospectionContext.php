@@ -11,15 +11,21 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Tester\Exception\PendingException;
 
-class IntrospectionContext extends BaseContext
+class IntrospectionContext implements Context
 {
     /**
      * @var ResponseContext
      */
     private $responseContext;
+
+    /**
+     * @var ApplicationContext
+     */
+    private $applicationContext;
 
     /**
      * @BeforeScenario
@@ -31,6 +37,7 @@ class IntrospectionContext extends BaseContext
         $environment = $scope->getEnvironment();
 
         $this->responseContext = $environment->getContext('ResponseContext');
+        $this->applicationContext = $environment->getContext('ApplicationContext');
     }
 
     /**
@@ -38,12 +45,12 @@ class IntrospectionContext extends BaseContext
      */
     public function anUnauthenticatedProtectedResourceTriesToGetInformationAboutAToken()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
     }
 
     /**
@@ -51,13 +58,13 @@ class IntrospectionContext extends BaseContext
      */
     public function aProtectedResourceSendsAnInvalidIntrospectionRequest()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
     }
 
     /**

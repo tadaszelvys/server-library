@@ -11,14 +11,20 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
-class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
+class ResourceOwnerPasswordCredentialsGrantTypeContext implements Context
 {
     /**
      * @var ResponseContext
      */
     private $responseContext;
+
+    /**
+     * @var ApplicationContext
+     */
+    private $applicationContext;
 
     /**
      * @BeforeScenario
@@ -30,6 +36,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         $environment = $scope->getEnvironment();
 
         $this->responseContext = $environment->getContext('ResponseContext');
+        $this->applicationContext = $environment->getContext('ApplicationContext');
     }
 
     /**
@@ -37,7 +44,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAResourceOwnerPasswordCredentialsGrantTypeRequestWithoutUsernameParameter()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'password',
@@ -45,7 +52,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -53,7 +60,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAResourceOwnerPasswordCredentialsGrantTypeRequestWithoutPasswordParameter()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'password',
@@ -62,7 +69,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -70,7 +77,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAResourceOwnerPasswordCredentialsGrantTypeRequestWithInvalidUserCredentials()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'password',
@@ -80,7 +87,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -88,7 +95,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidResourceOwnerPasswordCredentialsGrantTypeRequest()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'password',
@@ -99,7 +106,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -107,7 +114,7 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidResourceOwnerPasswordCredentialsGrantTypeRequestButTheGrantTypeIsNotAllowed()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'password',
@@ -117,6 +124,6 @@ class ResourceOwnerPasswordCredentialsGrantTypeContext extends BaseContext
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 }

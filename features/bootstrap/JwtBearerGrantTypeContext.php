@@ -11,17 +11,23 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Behat\Behat\Context\Context;
 use Base64Url\Base64Url;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Tester\Exception\PendingException;
 use OAuth2\Model\Client\ClientId;
 
-class JwtBearerGrantTypeContext extends BaseContext
+class JwtBearerGrantTypeContext implements Context
 {
     /**
      * @var ResponseContext
      */
     private $responseContext;
+
+    /**
+     * @var ApplicationContext
+     */
+    private $applicationContext;
 
     /**
      * @BeforeScenario
@@ -33,6 +39,7 @@ class JwtBearerGrantTypeContext extends BaseContext
         $environment = $scope->getEnvironment();
 
         $this->responseContext = $environment->getContext('ResponseContext');
+        $this->applicationContext = $environment->getContext('ApplicationContext');
     }
 
     /**
@@ -40,7 +47,7 @@ class JwtBearerGrantTypeContext extends BaseContext
      */
     public function anClientSendsAJwtBearerGrantTypeRequestWithoutAssertion()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
@@ -48,7 +55,7 @@ class JwtBearerGrantTypeContext extends BaseContext
         $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -64,7 +71,7 @@ class JwtBearerGrantTypeContext extends BaseContext
      */
     public function aClientSendsAValidJwtBearerGrantTypeRequestButTheGrantTypeIsNotAllowed()
     {
-        $request = $this->getServerRequestFactory()->createServerRequest([]);
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
@@ -74,7 +81,7 @@ class JwtBearerGrantTypeContext extends BaseContext
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        $this->responseContext->setResponse($this->getApplication()->getTokenEndpointPipe()->dispatch($request));
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     private function generateValidAssertion()
@@ -89,8 +96,8 @@ class JwtBearerGrantTypeContext extends BaseContext
         $headers = [
             'alg' => 'HS256',
         ];
-        $client = $this->getApplication()->getClientRepository()->find(ClientId::create('client3'));
+        $client = $this->applicationContext->getApplication()->getClientRepository()->find(ClientId::create('client3'));
 
-        return $this->getApplication()->getJwTCreator()->sign($claims, $headers, $client->getPublicKeySet()->getKey(0));
+        return $this->applicationContext->getApplication()->getJwTCreator()->sign($claims, $headers, $client->getPublicKeySet()->getKey(0));
     }
 }
