@@ -55,7 +55,7 @@ final class ClientConfigurationDeleteEndpoint implements MiddlewareInterface
         $this->messageBus->handle($command);
 
         $response = $this->responseFactory->createResponse(204);
-        $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+        $headers = ['Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
         foreach ($headers as $k => $v) {
             $response = $response->withHeader($k, $v);
         }
