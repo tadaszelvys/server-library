@@ -15,7 +15,9 @@ namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use Http\Client\HttpClient;
+use Interop\Http\Factory\RequestFactoryInterface;
 use OAuth2\Model\UserAccount\UserAccount;
+use Webmozart\Json\JsonDecoder;
 
 final class SectorIdentifierUriRule implements RuleInterface
 {
@@ -25,6 +27,16 @@ final class SectorIdentifierUriRule implements RuleInterface
     private $client;
 
     /**
+     * @var RequestFactoryInterface
+     */
+    private $requestFactory;
+
+    /**
+     * @var JsonDecoder
+     */
+    private $decoder;
+
+    /**
      * @var bool
      */
     private $allow_http_connections;
@@ -32,11 +44,15 @@ final class SectorIdentifierUriRule implements RuleInterface
     /**
      * SectorIdentifierUriRule constructor.
      *
-     * @param HttpClient $client
-     * @param bool       $allow_http_connections
+     * @param RequestFactoryInterface $requestFactory
+     * @param JsonDecoder             $decoder
+     * @param HttpClient              $client
+     * @param bool                    $allow_http_connections
      */
-    public function __construct(HttpClient $client, bool $allow_http_connections = false)
+    public function __construct(RequestFactoryInterface $requestFactory, JsonDecoder $decoder, HttpClient $client, bool $allow_http_connections = false)
     {
+        $this->requestFactory = $requestFactory;
+        $this->decoder = $decoder;
         $this->client = $client;
     }
 
@@ -66,12 +82,12 @@ final class SectorIdentifierUriRule implements RuleInterface
             $allowed_protocols[] = 'http';
         }
         Assertion::inArray(mb_substr($url, 0, mb_strpos($url, '://', 0, '8bit'), '8bit'), $allowed_protocols, sprintf('The provided sector identifier URI is not valid: scheme must be one of the following: %s.', implode(', ', $allowed_protocols)));
-        $request = new Request($url);
+        $request = $this->requestFactory->createRequest('GET', $url);
         $response = $this->client->sendRequest($request);
         Assertion::eq(200, $response->getStatusCode(), sprintf('Unable to get Uris from the Sector Identifier Uri \'%s\'.', $url));
 
         $body = $response->getBody()->getContents();
-        $data = json_decode($body, true);
+        $data = $this->decoder->decode($body);
         Assertion::isArray($data, 'The provided sector identifier URI is not valid: bad response.');
         Assertion::notEmpty($data, 'The provided sector identifier URI is not valid: it must contain at least one URI.');
         foreach ($data as $sector_url) {

@@ -22,6 +22,7 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Webmozart\Json\JsonEncoder;
 
 final class TokenIntrospectionEndpoint implements MiddlewareInterface
 {
@@ -36,15 +37,22 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
     private $responseFactory;
 
     /**
+     * @var JsonEncoder
+     */
+    private $encoder;
+
+    /**
      * TokenIntrospectionEndpoint constructor.
      *
      * @param TokenTypeHintManagerInterface $tokenTypeHintManager
      * @param ResponseFactoryInterface      $responseFactory
+     * @param JsonEncoder                   $encoder
      */
-    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager, ResponseFactoryInterface $responseFactory)
+    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager, ResponseFactoryInterface $responseFactory, JsonEncoder $encoder)
     {
         $this->tokenTypeHintManager = $tokenTypeHintManager;
         $this->responseFactory = $responseFactory;
+        $this->encoder = $encoder;
     }
 
     /**
@@ -97,7 +105,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
                 if ($client->getId()->getValue() === $result->getClient()->getId()->getValue()) {
                     $data = $hint->introspect($result);
                     $response = $this->responseFactory->createResponse();
-                    $response->getBody()->write(json_encode($data));
+                    $response->getBody()->write($this->encoder->encode($data));
                     $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
                     foreach ($headers as $k => $v) {
                         $response = $response->withHeader($k, $v);
@@ -117,7 +125,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
         }
 
         $response = $this->responseFactory->createResponse();
-        $response->getBody()->write(json_encode(['active' => false]));
+        $response->getBody()->write($this->encoder->encode(['active' => false]));
         $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
         foreach ($headers as $k => $v) {
             $response = $response->withHeader($k, $v);

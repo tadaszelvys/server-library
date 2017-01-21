@@ -16,6 +16,7 @@ namespace OAuth2\Endpoint\TokenRevocation;
 use Interop\Http\Factory\ResponseFactoryInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Webmozart\Json\JsonEncoder;
 
 final class TokenRevocationGetEndpoint extends TokenRevocationEndpoint
 {
@@ -29,11 +30,12 @@ final class TokenRevocationGetEndpoint extends TokenRevocationEndpoint
      *
      * @param TokenTypeHintManagerInterface $tokenTypeHintManager
      * @param ResponseFactoryInterface      $responseFactory
+     * @param JsonEncoder                   $encoder
      * @param bool                          $allowJson
      */
-    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager, ResponseFactoryInterface $responseFactory, bool $allowJson)
+    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager, ResponseFactoryInterface $responseFactory, JsonEncoder $encoder, bool $allowJson)
     {
-        parent::__construct($tokenTypeHintManager, $responseFactory);
+        parent::__construct($tokenTypeHintManager, $responseFactory, $encoder);
         $this->allowJson = $allowJson;
     }
 

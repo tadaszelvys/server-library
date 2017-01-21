@@ -19,13 +19,19 @@ use OAuth2\Model\Event\Event;
 final class AccessTokenRevokedEvent extends Event
 {
     /**
-     * @param array $json
-     *
-     * @return \JsonSerializable
+     * @var AccessToken
      */
-    protected static function createPayloadFromJson(array $json): \JsonSerializable
+    private $accessToken;
+
+    /**
+     * AccessTokenRevokedEvent constructor.
+     *
+     * @param $accessToken
+     */
+    protected function __construct(AccessToken $accessToken)
     {
-        return AccessToken::createFromJson($json);
+        parent::__construct();
+        $this->accessToken = $accessToken;
     }
 
     /**
@@ -35,21 +41,14 @@ final class AccessTokenRevokedEvent extends Event
      */
     public static function create(AccessToken $accessToken): self
     {
-        $event = new self($accessToken);
-
-        return $event;
+        return new self($accessToken);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize(): array
+    public function getPayload(): \JsonSerializable
     {
-        return [
-            'id'          => $this->getEventId()->getValue(),
-            'type'        => self::class,
-            'recorded_on' => (float) $this->getRecordedOn()->format('U.u'),
-            'payload'     => $this->getPayload()->jsonSerialize(),
-        ];
+        return $this->accessToken;
     }
 }

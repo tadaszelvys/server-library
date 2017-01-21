@@ -27,6 +27,7 @@ use OAuth2\TokenType\TokenTypeInterface;
 use OAuth2\TokenType\TokenTypeManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
+use Webmozart\Json\JsonEncoder;
 
 final class TokenEndpoint implements MiddlewareInterface
 {
@@ -56,17 +57,24 @@ final class TokenEndpoint implements MiddlewareInterface
     private $scopeRepository;
 
     /**
+     * @var JsonEncoder
+     */
+    private $encoder;
+
+    /**
      * TokenEndpoint constructor.
      *
      * @param ResponseFactoryInterface  $responseFactory
      * @param MessageBus                $commandBus
      * @param TokenTypeManagerInterface $tokenTypeManager
+     * @param JsonEncoder               $encoder
      */
-    public function __construct(ResponseFactoryInterface $responseFactory, MessageBus $commandBus, TokenTypeManagerInterface $tokenTypeManager)
+    public function __construct(ResponseFactoryInterface $responseFactory, MessageBus $commandBus, TokenTypeManagerInterface $tokenTypeManager, JsonEncoder $encoder)
     {
         $this->responseFactory = $responseFactory;
         $this->commandBus = $commandBus;
         $this->tokenTypeManager = $tokenTypeManager;
+        $this->encoder = $encoder;
     }
 
     /**
@@ -132,7 +140,7 @@ final class TokenEndpoint implements MiddlewareInterface
         $accessToken = $this->issueAccessToken($request, $grantTypeData);
 
         $response = $this->responseFactory->createResponse();
-        $response->getBody()->write(json_encode($accessToken));
+        $response->getBody()->write($this->encoder->encode($accessToken));
         $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
         foreach ($headers as $k => $v) {
             $response = $response->withHeader($k, $v);

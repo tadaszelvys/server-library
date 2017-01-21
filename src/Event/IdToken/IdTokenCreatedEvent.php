@@ -19,13 +19,19 @@ use OAuth2\Model\IdToken\IdToken;
 final class IdTokenCreatedEvent extends Event
 {
     /**
-     * @param array $json
-     *
-     * @return \JsonSerializable
+     * @var IdToken
      */
-    protected static function createPayloadFromJson(array $json): \JsonSerializable
+    private $idToken;
+
+    /**
+     * IdTokenCreatedEvent constructor.
+     *
+     * @param IdToken $idToken
+     */
+    protected function __construct(IdToken $idToken)
     {
-        return IdToken::createFromJson($json);
+        parent::__construct();
+        $this->idToken = $idToken;
     }
 
     /**
@@ -35,21 +41,14 @@ final class IdTokenCreatedEvent extends Event
      */
     public static function create(IdToken $idToken): self
     {
-        $event = new self($idToken);
-
-        return $event;
+        return new self($idToken);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize(): array
+    public function getPayload(): \JsonSerializable
     {
-        return [
-            'id'          => $this->getEventId()->getValue(),
-            'type'        => self::class,
-            'recorded_on' => (float) $this->getRecordedOn()->format('U.u'),
-            'payload'     => $this->getPayload()->jsonSerialize(),
-        ];
+        return $this->idToken;
     }
 }

@@ -19,13 +19,19 @@ use OAuth2\Model\InitialAccessToken\InitialAccessToken;
 final class InitialAccessTokenRevokedEvent extends Event
 {
     /**
-     * @param array $json
-     *
-     * @return \JsonSerializable
+     * @var InitialAccessToken
      */
-    protected static function createPayloadFromJson(array $json): \JsonSerializable
+    private $initialAccessToken;
+
+    /**
+     * InitialAccessTokenRevokedEvent constructor.
+     *
+     * @param InitialAccessToken $initialAccessToken
+     */
+    protected function __construct(InitialAccessToken $initialAccessToken)
     {
-        return InitialAccessToken::createFromJson($json);
+        parent::__construct();
+        $this->initialAccessToken = $initialAccessToken;
     }
 
     /**
@@ -35,21 +41,14 @@ final class InitialAccessTokenRevokedEvent extends Event
      */
     public static function create(InitialAccessToken $initialAccessToken): self
     {
-        $event = new self($initialAccessToken);
-
-        return $event;
+        return new self($initialAccessToken);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize(): array
+    public function getPayload(): \JsonSerializable
     {
-        return [
-            'id'          => $this->getEventId()->getValue(),
-            'type'        => self::class,
-            'recorded_on' => (float) $this->getRecordedOn()->format('U.u'),
-            'payload'     => $this->getPayload()->jsonSerialize(),
-        ];
+        return $this->initialAccessToken;
     }
 }

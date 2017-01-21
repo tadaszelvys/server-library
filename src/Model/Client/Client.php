@@ -77,7 +77,7 @@ final class Client extends ResourceOwner
     /**
      * @return UserAccount
      */
-    public function getResourceOwnerPublic(): UserAccount
+    public function getResourceOwner(): UserAccount
     {
         return $this->userAccount;
     }

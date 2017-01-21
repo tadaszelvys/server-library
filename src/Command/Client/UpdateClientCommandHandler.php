@@ -57,7 +57,7 @@ final class UpdateClientCommandHandler
     {
         $parameters = $command->getParameters();
         $client = $command->getClient();
-        $validated_parameters = $this->ruleManager->handle($parameters, $client->getResourceOwnerPublic());
+        $validated_parameters = $this->ruleManager->handle($parameters, $client->getResourceOwner());
         $validated_parameters['client_id'] = $client->getId()->getValue();
         if (true === $client->has('client_id_issued_at')) {
             $validated_parameters['client_id_issued_at'] = $client->get('client_id_issued_at');
@@ -65,7 +65,7 @@ final class UpdateClientCommandHandler
         $client = Client::create(
             $client->getId(),
             $validated_parameters,
-            $client->getResourceOwnerPublic()
+            $client->getResourceOwner()
         );
         $this->clientRepository->save($client);
         $event = ClientUpdatedEvent::create($client);

@@ -141,6 +141,8 @@ use SimpleBus\Message\Recorder\HandlesRecordedMessagesMiddleware;
 use SimpleBus\Message\Recorder\PublicMessageRecorder;
 use SimpleBus\Message\Subscriber\NotifiesMessageSubscribersMiddleware;
 use SimpleBus\Message\Subscriber\Resolver\NameBasedMessageSubscriberResolver;
+use Webmozart\Json\JsonDecoder;
+use Webmozart\Json\JsonEncoder;
 
 final class Application
 {
@@ -222,7 +224,8 @@ final class Application
         if (null === $this->clientRegistrationEndpoint) {
             $this->clientRegistrationEndpoint = new ClientRegistrationEndpoint(
                 $this->getResponseFactory(),
-                $this->getCommandBus()
+                $this->getCommandBus(),
+                $this->getJsonEncoder()
             );
         }
 
@@ -1291,11 +1294,46 @@ final class Application
             $this->clientConfigurationEndpoint = new ClientConfigurationEndpoint(
                 $this->getBearerTokenType(),
                 $this->getCommandBus(),
-                $this->getResponseFactory()
+                $this->getResponseFactory(),
+                $this->getJsonEncoder()
             );
         }
 
         return $this->clientConfigurationEndpoint;
+    }
+
+    /**
+     * @var null|JsonEncoder
+     */
+    private $jsonEncoder = null;
+
+    /**
+     * @return JsonEncoder
+     */
+    public function getJsonEncoder(): JsonEncoder
+    {
+        if (null === $this->jsonEncoder) {
+            $this->jsonEncoder = new JsonEncoder();
+        }
+
+        return $this->jsonEncoder;
+    }
+
+    /**
+     * @var null|JsonDecoder
+     */
+    private $jsonDecoder = null;
+
+    /**
+     * @return JsonDecoder
+     */
+    public function getJsonDecoder(): JsonDecoder
+    {
+        if (null === $this->jsonDecoder) {
+            $this->jsonDecoder = new JsonDecoder();
+        }
+
+        return $this->jsonDecoder;
     }
 
     /**
@@ -1352,6 +1390,7 @@ final class Application
             $this->tokenRevocationGetEndpoint = new TokenRevocationGetEndpoint(
                 $this->getTokenTypeHintManager(),
                 $this->getResponseFactory(),
+                $this->getJsonEncoder(),
                 true
             );
         }
@@ -1372,7 +1411,8 @@ final class Application
         if (null === $this->tokenRevocationPostEndpoint) {
             $this->tokenRevocationPostEndpoint = new TokenRevocationPostEndpoint(
                 $this->getTokenTypeHintManager(),
-                $this->getResponseFactory()
+                $this->getResponseFactory(),
+                $this->getJsonEncoder()
             );
         }
 
@@ -1432,7 +1472,8 @@ final class Application
         if (null === $this->tokenIntrospectionEndpoint) {
             $this->tokenIntrospectionEndpoint = new TokenIntrospectionEndpoint(
                 $this->getTokenTypeHintManager(),
-                $this->getResponseFactory()
+                $this->getResponseFactory(),
+                $this->getJsonEncoder()
             );
         }
 
@@ -1699,7 +1740,8 @@ final class Application
             $this->tokenEndpoint = new TokenEndpoint(
                 $this->getResponseFactory(),
                 $this->getCommandBus(),
-                $this->getTokenTypeManager()
+                $this->getTokenTypeManager(),
+                $this->getJsonEncoder()
             );
             $this->tokenEndpoint->enableScopeSupport($this->getScopeRepository());
         }

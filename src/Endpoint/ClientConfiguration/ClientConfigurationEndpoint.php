@@ -23,6 +23,7 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenType\BearerToken;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
+use Webmozart\Json\JsonEncoder;
 
 final class ClientConfigurationEndpoint implements MiddlewareInterface
 {
@@ -42,17 +43,24 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
     private $responseFactory;
 
     /**
+     * @var JsonEncoder
+     */
+    private $encoder;
+
+    /**
      * ClientConfigurationEndpoint constructor.
      *
      * @param BearerToken              $bearerToken
      * @param MessageBus               $messageBus
      * @param ResponseFactoryInterface $responseFactory
+     * @param JsonEncoder              $encoder
      */
-    public function __construct(BearerToken $bearerToken, MessageBus $messageBus, ResponseFactoryInterface $responseFactory)
+    public function __construct(BearerToken $bearerToken, MessageBus $messageBus, ResponseFactoryInterface $responseFactory, JsonEncoder $encoder)
     {
         $this->bearerToken = $bearerToken;
         $this->messageBus = $messageBus;
         $this->responseFactory = $responseFactory;
+        $this->encoder = $encoder;
     }
 
     /**
@@ -63,11 +71,11 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
         $this->checkClient($request);
         switch ($request->getMethod()) {
             case 'GET':
-                $get = new ClientConfigurationGetEndpoint($this->messageBus, $this->responseFactory);
+                $get = new ClientConfigurationGetEndpoint($this->messageBus, $this->responseFactory, $this->encoder);
 
                 return $get->process($request, $next);
             case 'PUT':
-                $get = new ClientConfigurationPutEndpoint($this->messageBus, $this->responseFactory);
+                $get = new ClientConfigurationPutEndpoint($this->messageBus, $this->responseFactory, $this->encoder);
 
                 return $get->process($request, $next);
             case 'DELETE':

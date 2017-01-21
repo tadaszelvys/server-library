@@ -23,35 +23,18 @@ abstract class Event implements \JsonSerializable
     private $eventId;
 
     /**
-     * @var \JsonSerializable
-     */
-    private $payload;
-
-    /**
      * @var float
      */
     private $recorded_on;
 
     /**
-     * ClientCreatedEvent constructor.
-     *
-     * @param \JsonSerializable $payload
+     * Event constructor.
      */
-    protected function __construct(\JsonSerializable $payload)
+    protected function __construct()
     {
-        $recorded_on = \DateTimeImmutable::createFromFormat('U.u', (string) microtime(true));
-        $eventId = EventId::create(Uuid::uuid4()->toString());
-        $this->eventId = $eventId;
-        $this->payload = $payload;
-        $this->recorded_on = $recorded_on;
+        $this->recorded_on = \DateTimeImmutable::createFromFormat('U.u', (string) microtime(true));
+        $this->eventId = EventId::create(Uuid::uuid4()->toString());
     }
-
-    /**
-     * @param array $json
-     *
-     * @return \JsonSerializable
-     */
-    abstract protected static function createPayloadFromJson(array $json): \JsonSerializable;
 
     /**
      * @return EventId
@@ -64,10 +47,7 @@ abstract class Event implements \JsonSerializable
     /**
      * @return \JsonSerializable
      */
-    public function getPayload(): \JsonSerializable
-    {
-        return $this->payload;
-    }
+    abstract public function getPayload(): \JsonSerializable;
 
     /**
      * @return \DateTimeImmutable
@@ -75,5 +55,18 @@ abstract class Event implements \JsonSerializable
     public function getRecordedOn(): \DateTimeImmutable
     {
         return $this->recorded_on;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'          => $this->getEventId()->getValue(),
+            'type'        => get_class($this),
+            'recorded_on' => (float) $this->getRecordedOn()->format('U.u'),
+            'payload'     => $this->getPayload(),
+        ];
     }
 }

@@ -19,13 +19,19 @@ use OAuth2\Model\Event\Event;
 final class ClientCreatedEvent extends Event
 {
     /**
-     * @param array $json
-     *
-     * @return \JsonSerializable
+     * @var Client
      */
-    protected static function createPayloadFromJson(array $json): \JsonSerializable
+    private $client;
+
+    /**
+     * ClientCreatedEvent constructor.
+     *
+     * @param Client $client
+     */
+    protected function __construct(Client $client)
     {
-        return Client::createFromJson($json);
+        parent::__construct();
+        $this->client = $client;
     }
 
     /**
@@ -35,9 +41,15 @@ final class ClientCreatedEvent extends Event
      */
     public static function create(Client $client): self
     {
-        $event = new self($client);
+        return new self($client);
+    }
 
-        return $event;
+    /**
+     * {@inheritdoc}
+     */
+    public function getPayload(): \JsonSerializable
+    {
+        return $this->client;
     }
 
     /**
@@ -45,15 +57,13 @@ final class ClientCreatedEvent extends Event
      */
     public function jsonSerialize(): array
     {
-        return [
-            'id'          => $this->getEventId()->getValue(),
-            'type'        => self::class,
-            'recorded_on' => (float) $this->getRecordedOn()->format('U.u'),
-            'payload'     => [
-                'client_id'  => $this->getPayload()->getId()->getValue(),
-                'owner_id'   => $this->getPayload()->getResourceOwnerPublicId()->getValue(),
-                'parameters' => $this->getPayload()->all(),
-            ],
+        $json = parent::jsonSerialize();
+        $json['payload'] = [
+            'client_id'  => $this->client->getId(),
+            'owner_id'   => $this->client->getResourceOwner()->getId(),
+            'parameters' => $this->client->all(),
         ];
+
+        return $json;
     }
 }

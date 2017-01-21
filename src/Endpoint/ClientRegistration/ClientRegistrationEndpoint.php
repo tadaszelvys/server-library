@@ -26,6 +26,7 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
+use Webmozart\Json\JsonEncoder;
 
 final class ClientRegistrationEndpoint implements MiddlewareInterface
 {
@@ -40,15 +41,22 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
     private $responseFactory;
 
     /**
+     * @var JsonEncoder
+     */
+    private $encoder;
+
+    /**
      * ClientRegistrationEndpoint constructor.
      *
      * @param ResponseFactoryInterface $responseFactory
      * @param MessageBus               $messageBus
+     * @param JsonEncoder              $encoder
      */
-    public function __construct(ResponseFactoryInterface $responseFactory, MessageBus $messageBus)
+    public function __construct(ResponseFactoryInterface $responseFactory, MessageBus $messageBus, JsonEncoder $encoder)
     {
         $this->responseFactory = $responseFactory;
         $this->messageBus = $messageBus;
+        $this->encoder = $encoder;
     }
 
     /**
@@ -96,7 +104,7 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
         foreach (['Content-Type' => 'application/json', 'Cache-Control' => 'no-store', 'Pragma' => 'no-cache'] as $k => $v) {
             $response = $response->withHeader($k, $v);
         }
-        $response->getBody()->write(json_encode($client->all()));
+        $response->getBody()->write($this->encoder->encode($client->all()));
 
         return $response;
     }

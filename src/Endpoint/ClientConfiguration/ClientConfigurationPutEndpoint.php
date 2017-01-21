@@ -20,6 +20,7 @@ use OAuth2\Command\Client\UpdateClientCommand;
 use OAuth2\DataTransporter;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
+use Webmozart\Json\JsonEncoder;
 
 final class ClientConfigurationPutEndpoint implements MiddlewareInterface
 {
@@ -34,15 +35,22 @@ final class ClientConfigurationPutEndpoint implements MiddlewareInterface
     private $responseFactory;
 
     /**
+     * @var JsonEncoder
+     */
+    private $encoder;
+
+    /**
      * ClientConfigurationPutEndpoint constructor.
      *
      * @param MessageBus               $messageBus
      * @param ResponseFactoryInterface $responseFactory
+     * @param JsonEncoder              $encoder
      */
-    public function __construct(MessageBus $messageBus, ResponseFactoryInterface $responseFactory)
+    public function __construct(MessageBus $messageBus, ResponseFactoryInterface $responseFactory, JsonEncoder $encoder)
     {
         $this->messageBus = $messageBus;
         $this->responseFactory = $responseFactory;
+        $this->encoder = $encoder;
     }
 
     /**
@@ -58,7 +66,7 @@ final class ClientConfigurationPutEndpoint implements MiddlewareInterface
         $this->messageBus->handle($command);
 
         $response = $this->responseFactory->createResponse();
-        $response->getBody()->write(json_encode($data->getData()));
+        $response->getBody()->write($this->encoder->encode($data->getData()));
         $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
         foreach ($headers as $k => $v) {
             $response = $response->withHeader($k, $v);

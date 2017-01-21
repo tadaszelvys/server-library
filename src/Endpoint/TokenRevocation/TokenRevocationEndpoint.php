@@ -22,6 +22,7 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Webmozart\Json\JsonEncoder;
 
 abstract class TokenRevocationEndpoint implements MiddlewareInterface
 {
@@ -36,15 +37,22 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
     private $responseFactory;
 
     /**
+     * @var JsonEncoder
+     */
+    private $encoder;
+
+    /**
      * TokenRevocationEndpoint constructor.
      *
      * @param TokenTypeHintManagerInterface $tokenTypeHintManager
      * @param ResponseFactoryInterface      $responseFactory
+     * @param JsonEncoder                   $encoder
      */
-    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager, ResponseFactoryInterface $responseFactory)
+    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager, ResponseFactoryInterface $responseFactory, JsonEncoder $encoder)
     {
         $this->tokenTypeHintManager = $tokenTypeHintManager;
         $this->responseFactory = $responseFactory;
+        $this->encoder = $encoder;
     }
 
     /**
@@ -114,7 +122,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
 
             return $this->getResponse(200, '', $callback);
         } catch (OAuth2Exception $e) {
-            return $this->getResponse($e->getCode(), json_encode($e->getData()), $callback);
+            return $this->getResponse($e->getCode(), $this->encoder->encode($e->getData()), $callback);
         }
     }
 

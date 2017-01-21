@@ -19,13 +19,19 @@ use OAuth2\Model\Event\Event;
 final class AuthCodeCreatedEvent extends Event
 {
     /**
-     * @param array $json
-     *
-     * @return \JsonSerializable
+     * @var AuthCode
      */
-    protected static function createPayloadFromJson(array $json): \JsonSerializable
+    private $authCode;
+
+    /**
+     * AuthCodeCreatedEvent constructor.
+     *
+     * @param AuthCode $authCode
+     */
+    protected function __construct(AuthCode $authCode)
     {
-        return AuthCode::createFromJson($json);
+        parent::__construct();
+        $this->authCode = $authCode;
     }
 
     /**
@@ -35,21 +41,14 @@ final class AuthCodeCreatedEvent extends Event
      */
     public static function create(AuthCode $authCode): self
     {
-        $event = new self($authCode);
-
-        return $event;
+        return new self($authCode);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize(): array
+    public function getPayload(): \JsonSerializable
     {
-        return [
-            'id'          => $this->getEventId()->getValue(),
-            'type'        => self::class,
-            'recorded_on' => (float) $this->getRecordedOn()->format('U.u'),
-            'payload'     => $this->getPayload()->jsonSerialize(),
-        ];
+        return $this->authCode;
     }
 }

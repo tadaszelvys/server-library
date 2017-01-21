@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\ClientConfiguration;
 
+use Webmozart\Json\JsonEncoder;
 use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
@@ -32,15 +33,22 @@ final class ClientConfigurationGetEndpoint implements MiddlewareInterface
     private $responseFactory;
 
     /**
+     * @var JsonEncoder
+     */
+    private $encoder;
+
+    /**
      * ClientConfigurationGetEndpoint constructor.
      *
      * @param MessageBus               $messageBus
      * @param ResponseFactoryInterface $responseFactory
+     * @param JsonEncoder              $encoder
      */
-    public function __construct(MessageBus $messageBus, ResponseFactoryInterface $responseFactory)
+    public function __construct(MessageBus $messageBus, ResponseFactoryInterface $responseFactory, JsonEncoder $encoder)
     {
         $this->messageBus = $messageBus;
         $this->responseFactory = $responseFactory;
+        $this->encoder = $encoder;
     }
 
     /**
@@ -50,7 +58,7 @@ final class ClientConfigurationGetEndpoint implements MiddlewareInterface
     {
         $client = $request->getAttribute('client');
         $response = $this->responseFactory->createResponse();
-        $response->getBody()->write(json_encode($client));
+        $response->getBody()->write($this->encoder->encode($client));
         $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
         foreach ($headers as $k => $v) {
             $response = $response->withHeader($k, $v);
