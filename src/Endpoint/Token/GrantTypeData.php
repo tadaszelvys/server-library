@@ -27,7 +27,7 @@ class GrantTypeData
     /**
      * @var array
      */
-    private $parameter = [];
+    private $parameters = [];
 
     /**
      * @var ResourceOwner
@@ -107,7 +107,7 @@ class GrantTypeData
     public function withParameter(string $key, $parameter): self
     {
         $clone = clone $this;
-        $clone->parameter[$key] = $parameter;
+        $clone->parameters[$key] = $parameter;
 
         return $clone;
     }
@@ -117,7 +117,7 @@ class GrantTypeData
      */
     public function getParameters(): array
     {
-        return $this->parameter;
+        return $this->parameters;
     }
 
     /**
@@ -129,7 +129,7 @@ class GrantTypeData
     {
         Assertion::true($this->hasParameter($key), sprintf('The parameter with key \'%s\' does not exist.', $key));
 
-        return $this->parameter[$key];
+        return $this->parameters[$key];
     }
 
     /**
@@ -139,7 +139,7 @@ class GrantTypeData
      */
     public function hasParameter(string $key): bool
     {
-        return array_key_exists($key, $this->parameter);
+        return array_key_exists($key, $this->parameters);
     }
 
     /**

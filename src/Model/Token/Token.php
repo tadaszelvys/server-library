@@ -203,11 +203,11 @@ abstract class Token implements \JsonSerializable
      *
      * @return mixed
      */
-    public function getParameter(string $key): mixed
+    public function getParameter(string $key)
     {
         Assertion::true($this->hasParameter($key), sprintf('The parameter \'%s\' does not exist.', $key));
 
-        return $this->parameters;
+        return $this->parameters[$key];
     }
 
     /**
@@ -265,7 +265,7 @@ abstract class Token implements \JsonSerializable
      *
      * @return mixed
      */
-    public function getMetadata(string $key): mixed
+    public function getMetadata(string $key)
     {
         Assertion::true($this->hasMetadata($key), sprintf('The metadata \'%s\' does not exist.', $key));
 

@@ -166,6 +166,6 @@ final class AuthCode extends Token
      */
     public function jsonSerialize()
     {
-        return $this->getId()->getValue();
+        return $this->getId();
     }
 }

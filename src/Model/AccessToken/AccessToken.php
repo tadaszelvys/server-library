@@ -88,14 +88,14 @@ final class AccessToken extends Token
     public function jsonSerialize()
     {
         $values = [
-            'access_token' => $this->getId()->getValue(),
+            'access_token' => $this->getId(),
             'expires_in'   => $this->getExpiresIn(),
         ];
         if (!empty($this->getScopes())) {
             $values['scope'] = implode(' ', $this->getScopes());
         }
         if (!empty($this->getRefreshToken())) {
-            $values['refresh_token'] = $this->getRefreshToken()->getId()->getValue();
+            $values['refresh_token'] = $this->getRefreshToken()->getId();
         }
 
         return $values + $this->getParameters();

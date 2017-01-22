@@ -18,11 +18,6 @@ use OAuth2\Model\ResourceOwner\ResourceOwner;
 final class UserAccount extends ResourceOwner
 {
     /**
-     * @var UserAccountId
-     */
-    private $id;
-
-    /**
      * UserAccount constructor.
      *
      * @param UserAccountId $id
@@ -30,8 +25,7 @@ final class UserAccount extends ResourceOwner
      */
     protected function __construct(UserAccountId $id, array $metadatas)
     {
-        parent::__construct($metadatas);
-        $this->id = $id;
+        parent::__construct($id, $metadatas);
     }
 
     /**
@@ -43,13 +37,5 @@ final class UserAccount extends ResourceOwner
     public static function create(UserAccountId $id, array $metadatas): self
     {
         return new self($id, $metadatas);
-    }
-
-    /**
-     * @return UserAccountId
-     */
-    public function getId(): UserAccountId
-    {
-        return $this->id;
     }
 }

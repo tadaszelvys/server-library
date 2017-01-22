@@ -77,16 +77,13 @@ class RefreshTokenTypeHint implements TokenTypeHintInterface
         if (!$token instanceof RefreshToken) {
             return;
         }
-        $refreshToken = $this->refreshTokenRepository->find(RefreshTokenId::create($token));
-        if (null !== $refreshToken) {
-            $revokeRefreshTokenCommand = RevokeRefreshTokenCommand::create($refreshToken);
-            $this->commandBus->handle($revokeRefreshTokenCommand);
-            $accessTokens = $refreshToken->getAccessTokens();
-            if (!empty($accessTokens) && true === $this->revokeAccessTokens) {
-                foreach ($accessTokens as $accessToken) {
-                    $revokeAccessTokenCommand = RevokeAccessTokenCommand::create($accessToken);
-                    $this->commandBus->handle($revokeAccessTokenCommand);
-                }
+        $revokeRefreshTokenCommand = RevokeRefreshTokenCommand::create($token);
+        $this->commandBus->handle($revokeRefreshTokenCommand);
+        $accessTokens = $token->getAccessTokens();
+        if (!empty($accessTokens) && true === $this->revokeAccessTokens) {
+            foreach ($accessTokens as $accessToken) {
+                $revokeAccessTokenCommand = RevokeAccessTokenCommand::create($accessToken);
+                $this->commandBus->handle($revokeAccessTokenCommand);
             }
         }
     }
@@ -96,17 +93,16 @@ class RefreshTokenTypeHint implements TokenTypeHintInterface
      */
     public function introspect(Token $token): array
     {
-        $refreshToken = $this->refreshTokenRepository->find(RefreshTokenId::create($token));
-        Assertion::notNull($refreshToken);
+        Assertion::isInstanceOf($token, RefreshToken::class);
 
         $result = [
-            'active'     => !$refreshToken->hasExpired(),
-            'client_id'  => $refreshToken->getClient()->getId()->getValue(),
-            'exp'        => $refreshToken->getExpiresAt(),
+            'active'     => !$token->hasExpired(),
+            'client_id'  => $token->getClient()->getId(),
+            'exp'        => $token->getExpiresAt()->getTimestamp(),
         ];
 
-        if (!empty($refreshToken->getScopes())) {
-            $result['scp'] = $refreshToken->getScopes();
+        if (!empty($token->getScopes())) {
+            $result['scp'] = $token->getScopes();
         }
 
         return $result;

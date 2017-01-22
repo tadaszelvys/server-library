@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\AuthCode;
 
-final class AuthCodeId
+final class AuthCodeId implements \JsonSerializable
 {
     /**
      * @var string
@@ -54,5 +54,13 @@ final class AuthCodeId
     public function __toString(): string
     {
         return $this->getValue();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return $this->__toString();
     }
 }

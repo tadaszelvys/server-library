@@ -69,11 +69,8 @@ class AuthCodeTypeHint implements TokenTypeHintInterface
         if (!$token instanceof AuthCode) {
             return;
         }
-        $authCode = $this->authorizationCodeRepository->find(AuthCodeId::create($token));
-        if (null !== $authCode) {
-            $revokeAuthCodeCommand = RevokeAuthCodeCommand::create($authCode);
-            $this->commandBus->handle($revokeAuthCodeCommand);
-        }
+        $revokeAuthCodeCommand = RevokeAuthCodeCommand::create($token);
+        $this->commandBus->handle($revokeAuthCodeCommand);
     }
 
     /**
@@ -81,17 +78,16 @@ class AuthCodeTypeHint implements TokenTypeHintInterface
      */
     public function introspect(Token $token): array
     {
-        $authCode = $this->authorizationCodeRepository->find(AuthCodeId::create($token));
-        Assertion::notNull($authCode);
+        Assertion::isInstanceOf($token, AuthCode::class);
 
         $result = [
-            'active'     => !$authCode->hasExpired(),
-            'client_id'  => $authCode->getClient()->getId()->getValue(),
-            'exp'        => $authCode->getExpiresAt(),
+            'active'     => !$token->hasExpired(),
+            'client_id'  => $token->getClient()->getId(),
+            'exp'        => $token->getExpiresAt()->getTimestamp(),
         ];
 
-        if (!empty($authCode->getScopes())) {
-            $result['scp'] = $authCode->getScopes();
+        if (!empty($token->getScopes())) {
+            $result['scp'] = $token->getScopes();
         }
 
         return $result;

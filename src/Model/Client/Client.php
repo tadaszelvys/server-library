@@ -31,11 +31,6 @@ use OAuth2\Model\UserAccount\UserAccount;
 final class Client extends ResourceOwner
 {
     /**
-     * @var ClientId
-     */
-    private $id;
-
-    /**
      * @var UserAccount
      */
     private $userAccount = null;
@@ -49,8 +44,7 @@ final class Client extends ResourceOwner
      */
     protected function __construct(ClientId $id, array $metadatas, UserAccount $userAccount)
     {
-        parent::__construct($metadatas);
-        $this->id = $id;
+        parent::__construct($id, $metadatas);
         $this->userAccount = $userAccount;
     }
 
@@ -64,14 +58,6 @@ final class Client extends ResourceOwner
     public static function create(ClientId $id, array $metadatas, UserAccount $userAccount): self
     {
         return new self($id, $metadatas, $userAccount);
-    }
-
-    /**
-     * @return ClientId
-     */
-    public function getId(): ClientId
-    {
-        return $this->id;
     }
 
     /**

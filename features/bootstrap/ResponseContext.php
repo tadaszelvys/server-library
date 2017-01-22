@@ -174,6 +174,8 @@ class ResponseContext implements Context
     {
         $events = $this->applicationContext->getApplication()->getAccessTokenCreatedEventHandler()->getEvents();
         Assertion::greaterThan(count($events), 0);
+        $encoder = new \Webmozart\Json\JsonEncoder();
+        dump($encoder->encode($events));
     }
 
     /**
@@ -185,6 +187,16 @@ class ResponseContext implements Context
         $content = (string) $this->getResponse()->getBody()->getContents();
 
         dump(json_decode($content, true));
+    }
+
+    /**
+     * @Then the response contains something like :pattern
+     */
+    public function theResponseContainsSomethingLike($pattern)
+    {
+        $this->rewind();
+        $content = (string) $this->getResponse()->getBody()->getContents();
+        Assertion::regex($content, $pattern);
     }
 
     private function rewind()

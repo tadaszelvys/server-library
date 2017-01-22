@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\AccessToken;
 
-final class AccessTokenId
+final class AccessTokenId implements \JsonSerializable
 {
     /**
      * @var string
@@ -55,4 +55,14 @@ final class AccessTokenId
     {
         return $this->getValue();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return $this->__toString();
+    }
+
+
 }

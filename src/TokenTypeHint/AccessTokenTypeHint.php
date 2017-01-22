@@ -91,20 +91,18 @@ class AccessTokenTypeHint implements TokenTypeHintInterface
      */
     public function introspect(Token $token): array
     {
-        $accessToken = $this->find($token);
-        Assertion::notNull($accessToken);
+        Assertion::isInstanceOf($token, AccessToken::class);
 
-        $result = [
-            'active'     => !$accessToken->hasExpired(),
-            'client_id'  => $accessToken->getClient()->getId()->getValue(),
-            'token_type' => $accessToken->getParameter('token_type'),
-            'exp'        => $accessToken->getExpiresAt(),
+        $values = [
+            'active'         => !$token->hasExpired(),
+            'client_id'      => $token->getClient()->getId(),
+            'resource_owner' => $token->getResourceOwner()->getId(),
+            'expires_in'     => $token->getExpiresIn(),
         ];
-
-        if (!empty($accessToken->getScopes())) {
-            $result['scp'] = $accessToken->getScopes();
+        if (!empty($token->getScopes())) {
+            $values['scope'] = implode(' ', $token->getScopes());
         }
 
-        return $result;
+        return $values + $token->getParameters();
     }
 }

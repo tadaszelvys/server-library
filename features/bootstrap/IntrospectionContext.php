@@ -14,6 +14,9 @@ declare(strict_types=1);
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Tester\Exception\PendingException;
+use OAuth2\Model\AccessToken\AccessToken;
+use OAuth2\Model\AccessToken\AccessTokenId;
+
 
 class IntrospectionContext implements Context
 {
@@ -72,7 +75,15 @@ class IntrospectionContext implements Context
      */
     public function aProtectedResourceTriesToGetInformationOfATokenThatOwnsAnotherProtectedResource()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'token' => 'REFRESH_TOKEN_#1',
+        ]);
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
     }
 
     /**
@@ -80,6 +91,14 @@ class IntrospectionContext implements Context
      */
     public function aProtectedResourceTriesToGetInformationOfAToken()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'token' => 'ACCESS_TOKEN_#1',
+        ]);
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenIntrospectionPipe()->dispatch($request));
     }
 }

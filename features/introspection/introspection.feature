@@ -26,7 +26,4 @@ Feature: A protected resource needs information about a token
   Scenario: A protected resource tries to get information of a token
     Given A protected resource tries to get information of a token
     Then the response code is 200
-    And the response contains
-    """
-    {"active":true}
-    """
+    And the response contains something like '{"active":true,"client_id":"client1","resource_owner":"User #1","expires_in":3600,"token_type":"Bearer"}'

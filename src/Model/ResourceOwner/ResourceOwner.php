@@ -18,18 +18,33 @@ use Assert\Assertion;
 abstract class ResourceOwner implements \JsonSerializable
 {
     /**
+     * @var ResourceOwnerId
+     */
+    private $id;
+
+    /**
      * @var array
      */
-    private $metadatas = [];
+    private $metadatas;
 
     /**
      * ResourceOwner constructor.
      *
-     * @param array $metadatas
+     * @param ResourceOwnerId $id
+     * @param array           $metadatas
      */
-    protected function __construct(array $metadatas)
+    protected function __construct(ResourceOwnerId $id, array $metadatas)
     {
+        $this->id = $id;
         $this->metadatas = $metadatas;
+    }
+
+    /**
+     * @return ResourceOwnerId
+     */
+    public function getId(): ResourceOwnerId
+    {
+        return $this->id;
     }
 
     /**

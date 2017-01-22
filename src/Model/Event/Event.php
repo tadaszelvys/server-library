@@ -25,14 +25,14 @@ abstract class Event implements \JsonSerializable
     /**
      * @var float
      */
-    private $recorded_on;
+    private $recordedOn;
 
     /**
      * Event constructor.
      */
     protected function __construct()
     {
-        $this->recorded_on = \DateTimeImmutable::createFromFormat('U.u', (string) microtime(true));
+        $this->recordedOn = \DateTimeImmutable::createFromFormat('U.u', (string) microtime(true));
         $this->eventId = EventId::create(Uuid::uuid4()->toString());
     }
 
@@ -54,7 +54,7 @@ abstract class Event implements \JsonSerializable
      */
     public function getRecordedOn(): \DateTimeImmutable
     {
-        return $this->recorded_on;
+        return $this->recordedOn;
     }
 
     /**
@@ -67,6 +67,7 @@ abstract class Event implements \JsonSerializable
             'type'        => get_class($this),
             'recorded_on' => (float) $this->getRecordedOn()->format('U.u'),
             'payload'     => $this->getPayload(),
+            'version'     => '1.0',
         ];
     }
 }

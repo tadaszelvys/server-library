@@ -102,6 +102,6 @@ class RefreshToken extends Token
      */
     public function jsonSerialize()
     {
-        return $this->getId()->getValue();
+        return $this->getId();
     }
 }
