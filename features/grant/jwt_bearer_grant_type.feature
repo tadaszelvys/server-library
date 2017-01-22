@@ -19,3 +19,10 @@ Feature: A client requests an access token using the JWT Bearer Grant Type
     And the error is "unauthorized_client"
     And the error description is "The grant type 'urn:ietf:params:oauth:grant-type:jwt-bearer' is unauthorized for this client."
     And no access token creation event is thrown
+
+  Scenario: A client sends a valid JWT Bearer Grant Type request but the client authentication mismatched
+    Given A client sends a valid JWT Bearer Grant Type request but the client authentication mismatched
+    Then the response contains an error with code 401
+    And the error is "invalid_client"
+    And the error description is "Client authentication failed."
+    And no access token creation event is thrown
