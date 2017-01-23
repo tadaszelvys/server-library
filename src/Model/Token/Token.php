@@ -14,25 +14,29 @@ declare(strict_types=1);
 namespace OAuth2\Model\Token;
 
 use Assert\Assertion;
-use OAuth2\Model\Client\Client;
-use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
+use SimpleBus\Message\Recorder\ContainsRecordedMessages;
+use SimpleBus\Message\Recorder\PrivateMessageRecorderCapabilities;
 
-abstract class Token implements \JsonSerializable
+abstract class Token implements \JsonSerializable, ContainsRecordedMessages
 {
+    use PrivateMessageRecorderCapabilities;
+
     /**
      * @var \DateTimeImmutable
      */
     private $expiresAt;
 
     /**
-     * @var ResourceOwner
+     * @var ResourceOwnerId
      */
-    private $resourceOwner;
+    private $resourceOwnerId;
 
     /**
-     * @var Client
+     * @var ClientId
      */
-    private $client;
+    private $clientId;
 
     /**
      * @var array
@@ -52,17 +56,17 @@ abstract class Token implements \JsonSerializable
     /**
      * Token constructor.
      *
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
+     * @param ResourceOwnerId    $resourceOwnerId
+     * @param ClientId           $clientId
      * @param \DateTimeImmutable $expiresAt
      * @param array              $parameters
      * @param array              $metadatas
      * @param string[]           $scopes
      */
-    protected function __construct(ResourceOwner $resourceOwner, Client $client, \DateTimeImmutable $expiresAt, array $parameters, array $metadatas, array $scopes)
+    protected function __construct(ResourceOwnerId $resourceOwnerId, ClientId $clientId, \DateTimeImmutable $expiresAt, array $parameters, array $metadatas, array $scopes)
     {
-        $this->resourceOwner = $resourceOwner;
-        $this->client = $client;
+        $this->resourceOwnerId = $resourceOwnerId;
+        $this->clientId = $clientId;
         $this->expiresAt = $expiresAt;
         $this->parameters = $parameters;
         $this->metadatas = $metadatas;
@@ -70,11 +74,11 @@ abstract class Token implements \JsonSerializable
     }
 
     /**
-     * @return ResourceOwner
+     * @return ResourceOwnerId
      */
-    public function getResourceOwner(): ResourceOwner
+    public function getResourceOwnerId(): ResourceOwnerId
     {
-        return $this->resourceOwner;
+        return $this->resourceOwnerId;
     }
 
     /**
@@ -107,11 +111,11 @@ abstract class Token implements \JsonSerializable
     }
 
     /**
-     * @return Client
+     * @return ClientId
      */
-    public function getClient(): Client
+    public function getClientId(): ClientId
     {
-        return $this->client;
+        return $this->clientId;
     }
 
     /**

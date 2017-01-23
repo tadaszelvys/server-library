@@ -19,7 +19,7 @@ use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Model\ResourceOwner\ResourceOwner;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 /**
  * Class Client.
@@ -31,41 +31,41 @@ use OAuth2\Model\UserAccount\UserAccount;
 final class Client extends ResourceOwner
 {
     /**
-     * @var UserAccount
+     * @var UserAccountId
      */
-    private $userAccount = null;
+    private $userAccountId = null;
 
     /**
      * Client constructor.
      *
-     * @param ClientId    $id
-     * @param array       $metadatas
-     * @param UserAccount $userAccount
+     * @param ClientId      $id
+     * @param array         $metadatas
+     * @param UserAccountId $userAccountId
      */
-    protected function __construct(ClientId $id, array $metadatas, UserAccount $userAccount)
+    protected function __construct(ClientId $id, array $metadatas, UserAccountId $userAccountId)
     {
         parent::__construct($id, $metadatas);
-        $this->userAccount = $userAccount;
+        $this->userAccountId = $userAccountId;
     }
 
     /**
      * @param ClientId    $id
      * @param array       $metadatas
-     * @param UserAccount $userAccount
+     * @param UserAccountId $userAccountId
      *
      * @return self
      */
-    public static function create(ClientId $id, array $metadatas, UserAccount $userAccount): self
+    public static function create(ClientId $id, array $metadatas, UserAccountId $userAccountId): self
     {
-        return new self($id, $metadatas, $userAccount);
+        return new self($id, $metadatas, $userAccountId);
     }
 
     /**
-     * @return UserAccount
+     * @return UserAccountId
      */
-    public function getResourceOwner(): UserAccount
+    public function getResourceOwner(): UserAccountId
     {
-        return $this->userAccount;
+        return $this->userAccountId;
     }
 
     /**

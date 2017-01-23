@@ -102,7 +102,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
         foreach ($hints as $hint) {
             $result = $hint->find($token);
             if (null !== $result) {
-                if ($client->getId()->getValue() === $result->getClient()->getId()->getValue()) {
+                if ($client->getId()->getValue() === $result->getClientId()->getValue()) {
                     $data = $hint->introspect($result);
                     $response = $this->responseFactory->createResponse();
                     $response->getBody()->write($this->encoder->encode($data));

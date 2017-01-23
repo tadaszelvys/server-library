@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace OAuth2\Model\AuthCode;
 
 use Assert\Assertion;
-use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Token\Token;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 use Psr\Http\Message\UriInterface;
 
 final class AuthCode extends Token
@@ -45,8 +45,8 @@ final class AuthCode extends Token
      * AuthCode constructor.
      *
      * @param AuthCodeId         $authCodeId
-     * @param Client             $client
-     * @param UserAccount        $userAccount
+     * @param ClientId             $clientId
+     * @param UserAccountId        $userAccountId
      * @param array              $queryParameters
      * @param UriInterface       $redirectUri
      * @param \DateTimeImmutable $expiresAt
@@ -54,17 +54,17 @@ final class AuthCode extends Token
      * @param array              $scopes
      * @param array              $metadatas
      */
-    protected function __construct(AuthCodeId $authCodeId, Client $client, UserAccount $userAccount, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
+    protected function __construct(AuthCodeId $authCodeId, ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
-        parent::__construct($userAccount, $client, $expiresAt, $parameters, $metadatas, $scopes);
+        parent::__construct($userAccountId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
         $this->authCodeId = $authCodeId;
         $this->queryParameters = $queryParameters;
     }
 
     /**
      * @param AuthCodeId         $authCodeId
-     * @param Client             $client
-     * @param UserAccount        $userAccount
+     * @param ClientId             $clientId
+     * @param UserAccountId        $userAccountId
      * @param array              $queryParameters
      * @param UriInterface       $redirectUri
      * @param \DateTimeImmutable $expiresAt
@@ -74,9 +74,9 @@ final class AuthCode extends Token
      *
      * @return AuthCode
      */
-    public static function create(AuthCodeId $authCodeId, Client $client, UserAccount $userAccount, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
+    public static function create(AuthCodeId $authCodeId, ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
-        return new self($authCodeId, $client, $userAccount, $queryParameters, $redirectUri, $expiresAt, $parameters, $scopes, $metadatas);
+        return new self($authCodeId, $clientId, $userAccountId, $queryParameters, $redirectUri, $expiresAt, $parameters, $scopes, $metadatas);
     }
 
     /**

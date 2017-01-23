@@ -20,5 +20,10 @@ interface TokenTypeHintManagerInterface
      */
     public function getTokenTypeHints(): array;
 
-    public function addTokenTypeHint(TokenTypeHintInterface $tokenTypeHint);
+    /**
+     * @param TokenTypeHintInterface $tokenTypeHint
+     *
+     * @return TokenTypeHintManagerInterface
+     */
+    public function addTokenTypeHint(TokenTypeHintInterface $tokenTypeHint): TokenTypeHintManagerInterface;
 }

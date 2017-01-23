@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace OAuth2\Model\RefreshToken;
 
 use OAuth2\Model\AccessToken\AccessToken;
-use OAuth2\Model\Client\Client;
-use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 use OAuth2\Model\Token\Token;
 
 class RefreshToken extends Token
@@ -34,33 +34,33 @@ class RefreshToken extends Token
      * RefreshToken constructor.
      *
      * @param RefreshTokenId     $refreshTokenId
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
+     * @param ResourceOwnerId    $resourceOwnerId
+     * @param ClientId           $clientId
      * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
      * @param array              $scopes
      * @param array              $metadatas
      */
-    protected function __construct(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
+    protected function __construct(RefreshTokenId $refreshTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
     {
-        parent::__construct($resourceOwner, $client, $expiresAt, $parameters, $metadatas, $scopes);
+        parent::__construct($resourceOwnerId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
         $this->refreshTokenId = $refreshTokenId;
     }
 
     /**
      * @param RefreshTokenId     $refreshTokenId
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
+     * @param ResourceOwnerId    $resourceOwnerId
+     * @param ClientId           $clientId
      * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
-     * @param string[]           $scopes
+     * @param array              $scopes
      * @param array              $metadatas
      *
      * @return RefreshToken
      */
-    public static function create(RefreshTokenId $refreshTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
+    public static function create(RefreshTokenId $refreshTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
     {
-        return new self($refreshTokenId, $resourceOwner, $client, $parameters, $expiresAt, $scopes, $metadatas);
+        return new self($refreshTokenId, $resourceOwnerId, $clientId, $parameters, $expiresAt, $scopes, $metadatas);
     }
 
     /**

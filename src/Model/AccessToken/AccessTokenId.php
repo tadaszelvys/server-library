@@ -13,23 +13,10 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\AccessToken;
 
-final class AccessTokenId implements \JsonSerializable
+use OAuth2\Model\Token\TokenId;
+
+final class AccessTokenId extends TokenId
 {
-    /**
-     * @var string
-     */
-    private $value;
-
-    /**
-     * Token constructor.
-     *
-     * @param string $value
-     */
-    private function __construct(string $value)
-    {
-        $this->value = $value;
-    }
-
     /**
      * @param string $value
      *
@@ -39,30 +26,4 @@ final class AccessTokenId implements \JsonSerializable
     {
         return new self($value);
     }
-
-    /**
-     * @return string
-     */
-    public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString(): string
-    {
-        return $this->getValue();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function jsonSerialize()
-    {
-        return $this->__toString();
-    }
-
-
 }

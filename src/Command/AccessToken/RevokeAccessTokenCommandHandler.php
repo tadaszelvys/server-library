@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\AccessToken;
 
-use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use SimpleBus\Message\Recorder\RecordsMessages;
 
@@ -46,9 +45,7 @@ final class RevokeAccessTokenCommandHandler
      */
     public function handle(RevokeAccessTokenCommand $command)
     {
-        $accessToken = $command->getAccessToken();
-        $this->accessTokenRepository->revoke($accessToken);
-        $event = AccessTokenRevokedEvent::create($accessToken);
-        $this->messageRecorder->record($event);
+        $accessTokenId = $command->getAccessTokenId();
+        $this->accessTokenRepository->revoke($accessTokenId);
     }
 }

@@ -13,40 +13,40 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\AccessToken;
 
-use OAuth2\Model\AccessToken\AccessToken;
+use OAuth2\Model\AccessToken\AccessTokenId;
 
 final class RevokeAccessTokenCommand
 {
     /**
-     * @var AccessToken
+     * @var AccessTokenId
      */
-    private $accessToken;
+    private $accessTokenId;
 
     /**
-     * RevokeAccessTokenCommand constructor.
+     * RevokeAccessTokenIdCommand constructor.
      *
-     * @param AccessToken $accessToken
+     * @param AccessTokenId $accessTokenId
      */
-    protected function __construct(AccessToken $accessToken)
+    protected function __construct(AccessTokenId $accessTokenId)
     {
-        $this->accessToken = $accessToken;
+        $this->accessTokenId = $accessTokenId;
     }
 
     /**
-     * @param AccessToken $accessToken
+     * @param AccessTokenId $accessTokenId
      *
      * @return RevokeAccessTokenCommand
      */
-    public static function create(AccessToken $accessToken): self
+    public static function create(AccessTokenId $accessTokenId): self
     {
-        return new self($accessToken);
+        return new self($accessTokenId);
     }
 
     /**
-     * @return AccessToken
+     * @return AccessTokenId
      */
-    public function getAccessToken(): AccessToken
+    public function getAccessTokenId(): AccessTokenId
     {
-        return $this->accessToken;
+        return $this->accessTokenId;
     }
 }

@@ -38,9 +38,9 @@ interface AccessTokenRepositoryInterface
     /**
      * This function revoke an access token.
      *
-     * @param AccessToken $token The access token to revoke
+     * @param AccessTokenId $tokenId The access token to revoke
      */
-    public function revoke(AccessToken $token);
+    public function revoke(AccessTokenId $tokenId);
 
     /**
      * @param AccessTokenId $accessTokenId The access token ID

@@ -13,23 +13,10 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\IdToken;
 
-final class IdTokenId
+use OAuth2\Model\Token\TokenId;
+
+final class IdTokenId extends TokenId
 {
-    /**
-     * @var string
-     */
-    private $value;
-
-    /**
-     * Token constructor.
-     *
-     * @param string $value
-     */
-    private function __construct(string $value)
-    {
-        $this->value = $value;
-    }
-
     /**
      * @param string $value
      *
@@ -38,21 +25,5 @@ final class IdTokenId
     public static function create(string $value): self
     {
         return new self($value);
-    }
-
-    /**
-     * @return string
-     */
-    public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString(): string
-    {
-        return $this->getValue();
     }
 }

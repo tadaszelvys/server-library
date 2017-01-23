@@ -243,7 +243,7 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
      */
     private function checkAuthCode(AuthCode $authCode, Client $client)
     {
-        if ($client->getId()->getValue() !== $authCode->getClient()->getId()->getValue()) {
+        if ($client->getId()->getValue() !== $authCode->getClientId()->getValue()) {
             throw new OAuth2Exception(
                 400,
                 [

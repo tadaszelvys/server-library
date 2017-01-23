@@ -37,10 +37,7 @@ class ClientRepository implements ClientRepositoryInterface
                 'client_secret'              => 'secret',
                 'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
             ],
-            UserAccount::create(
-                UserAccountId::create('User1'),
-                []
-            )
+            UserAccountId::create('User1')
         ));
         $this->save(Client::create(
             ClientId::create('client2'),
@@ -48,10 +45,7 @@ class ClientRepository implements ClientRepositoryInterface
                 'token_endpoint_auth_method' => 'none',
                 'grant_types'                => ['client_credentials'],
             ],
-            UserAccount::create(
-                UserAccountId::create('User1'),
-                []
-            )
+            UserAccountId::create('User1')
         ));
         $this->save(Client::create(
             ClientId::create('client3'),
@@ -61,10 +55,7 @@ class ClientRepository implements ClientRepositoryInterface
                 'client_secret_expires_at'   => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
                 'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code'],
             ],
-            UserAccount::create(
-                UserAccountId::create('User1'),
-                []
-            )
+            UserAccountId::create('User1')
         ));
         $this->save(Client::create(
             ClientId::create('client4'),
@@ -73,10 +64,7 @@ class ClientRepository implements ClientRepositoryInterface
                 'client_secret'              => 'secret',
                 'client_secret_expires_at'   => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
             ],
-            UserAccount::create(
-                UserAccountId::create('User1'),
-                []
-            )
+            UserAccountId::create('User1')
         ));
     }
 
@@ -87,7 +75,7 @@ class ClientRepository implements ClientRepositoryInterface
     {
         $clientId = ClientId::create(Uuid::uuid4()->toString());
 
-        return Client::create($clientId, $metadatas, $userAccount);
+        return Client::create($clientId, $metadatas, $userAccount->getId());
     }
 
     /**

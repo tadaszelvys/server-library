@@ -45,9 +45,9 @@ abstract class Event implements \JsonSerializable
     }
 
     /**
-     * @return \JsonSerializable
+     * @return mixed
      */
-    abstract public function getPayload(): \JsonSerializable;
+    abstract public function getPayload();
 
     /**
      * @return \DateTimeImmutable

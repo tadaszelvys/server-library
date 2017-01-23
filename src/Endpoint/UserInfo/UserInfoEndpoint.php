@@ -20,7 +20,7 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Jose\JWTCreatorInterface;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Model\AccessToken\AccessToken;
-use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
@@ -174,16 +174,16 @@ class UserInfoEndpoint implements MiddlewareInterface
      *
      * @throws OAuth2Exception
      *
-     * @return null|Client
+     * @return null|ClientId
      */
-    private function getClient(AccessToken $access_token): Client
+    private function getClient(AccessToken $access_token): ClientId
     {
-        $client = $access_token->getClient();
-        if (null === $client) {
+        $clientId = $access_token->getClientId();
+        if (null === $clientId) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the client.']);
         }
 
-        return $client;
+        return $clientId;
     }
 
     /**

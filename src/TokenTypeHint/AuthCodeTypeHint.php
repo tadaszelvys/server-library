@@ -19,6 +19,7 @@ use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\AuthCode\AuthCodeId;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
 use OAuth2\Model\Token\Token;
+use OAuth2\Model\Token\TokenId;
 use SimpleBus\Message\Bus\MessageBus;
 
 class AuthCodeTypeHint implements TokenTypeHintInterface
@@ -64,30 +65,36 @@ class AuthCodeTypeHint implements TokenTypeHintInterface
     /**
      * {@inheritdoc}
      */
-    public function revoke(Token $token)
+    public function revoke(TokenId $tokenId)
     {
-        if (!$token instanceof AuthCode) {
+        if (!$tokenId instanceof AuthCodeId) {
             return;
         }
-        $revokeAuthCodeCommand = RevokeAuthCodeCommand::create($token);
+        $revokeAuthCodeCommand = RevokeAuthCodeCommand::create($tokenId);
         $this->commandBus->handle($revokeAuthCodeCommand);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function introspect(Token $token): array
+    public function introspect(TokenId $tokenId): array
     {
-        Assertion::isInstanceOf($token, AuthCode::class);
+        if (!$tokenId instanceof AuthCodeId || !$this->authorizationCodeRepository->has($tokenId)) {
+            return [
+                'active' => false,
+            ];
+        }
+
+        $authCode = $this->authorizationCodeRepository->find($tokenId);
 
         $result = [
-            'active'     => !$token->hasExpired(),
-            'client_id'  => $token->getClient()->getId(),
-            'exp'        => $token->getExpiresAt()->getTimestamp(),
+            'active'     => !$authCode->hasExpired(),
+            'client_id'  => $authCode->getClientId(),
+            'exp'        => $authCode->getExpiresAt()->getTimestamp(),
         ];
 
-        if (!empty($token->getScopes())) {
-            $result['scp'] = $token->getScopes();
+        if (!empty($authCode->getScopes())) {
+            $result['scp'] = $authCode->getScopes();
         }
 
         return $result;

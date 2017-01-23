@@ -33,18 +33,8 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     {
         $this->save(RefreshToken::create(
             RefreshTokenId::create('EXPIRED_REFRESH_TOKEN'),
-            UserAccount::create(
-                UserAccountId::create('User #1'),
-                []
-            ),
-            Client::create(
-                ClientId::create('client1'),
-                [],
-                UserAccount::create(
-                    UserAccountId::create('User #1'),
-                    []
-                )
-            ),
+            UserAccountId::create('User #1'),
+            ClientId::create('client1'),
             [],
             new \DateTimeImmutable('now -2 day'),
             [],
@@ -53,18 +43,8 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 
         $this->save(RefreshToken::create(
             RefreshTokenId::create('VALID_REFRESH_TOKEN'),
-            UserAccount::create(
-                UserAccountId::create('User #1'),
-                []
-            ),
-            Client::create(
-                ClientId::create('client1'),
-                [],
-                UserAccount::create(
-                    UserAccountId::create('User #1'),
-                    []
-                )
-            ),
+            UserAccountId::create('User #1'),
+            ClientId::create('client1'),
             [],
             new \DateTimeImmutable('now +2 day'),
             [],
@@ -106,8 +86,8 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     {
         return RefreshToken::create(
             RefreshTokenId::create(base64_encode(random_bytes(50))),
-            $resourceOwner,
-            $client,
+            $resourceOwner->getId(),
+            $client->getId(),
             $parameters,
             $expiresAt,
             $scopes,

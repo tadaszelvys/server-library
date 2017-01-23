@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\AccessToken;
 
-use OAuth2\Model\Client\Client;
-use OAuth2\Model\RefreshToken\RefreshToken;
-use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Event\AccessToken\AccessTokenCreatedEvent;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\RefreshToken\RefreshTokenId;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 use OAuth2\Model\Token\Token;
 
 final class AccessToken extends Token
@@ -26,44 +27,47 @@ final class AccessToken extends Token
     private $accessTokenId;
 
     /**
-     * @var null|RefreshToken
+     * @var null|RefreshTokenId
      */
-    private $refreshToken;
+    private $refreshTokenId;
 
     /**
      * AccessToken constructor.
      *
-     * @param AccessTokenId      $accessTokenId
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
-     * @param array              $parameters
-     * @param array              $metadatas
-     * @param array              $scopes
-     * @param \DateTimeImmutable $expiresAt
-     * @param RefreshToken|null  $refreshToken
+     * @param AccessTokenId       $accessTokenId
+     * @param ResourceOwnerId     $resourceOwnerId
+     * @param ClientId            $clientId
+     * @param array               $parameters
+     * @param array               $metadatas
+     * @param array               $scopes
+     * @param \DateTimeImmutable  $expiresAt
+     * @param RefreshTokenId|null $refreshTokenId
      */
-    protected function __construct(AccessTokenId $accessTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
+    protected function __construct(AccessTokenId $accessTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshTokenId $refreshTokenId = null)
     {
-        parent::__construct($resourceOwner, $client, $expiresAt, $parameters, $metadatas, $scopes);
+        parent::__construct($resourceOwnerId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
         $this->accessTokenId = $accessTokenId;
-        $this->refreshToken = $refreshToken;
+        $this->refreshTokenId = $refreshTokenId;
+
+        $event = AccessTokenCreatedEvent::create($accessTokenId, $resourceOwnerId, $clientId, $parameters, $metadatas, $scopes, $expiresAt, $refreshTokenId);
+        $this->record($event);
     }
 
     /**
-     * @param AccessTokenId      $accessTokenId
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
-     * @param array              $parameters
-     * @param array              $metadatas
-     * @param array              $scopes
-     * @param \DateTimeImmutable $expiresAt
-     * @param RefreshToken|null  $refreshToken
+     * @param AccessTokenId       $accessTokenId
+     * @param ResourceOwnerId     $resourceOwnerId
+     * @param ClientId            $clientId
+     * @param array               $parameters
+     * @param array               $metadatas
+     * @param array               $scopes
+     * @param \DateTimeImmutable  $expiresAt
+     * @param RefreshTokenId|null $refreshTokenId
      *
      * @return AccessToken
      */
-    public static function create(AccessTokenId $accessTokenId, ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
+    public static function create(AccessTokenId $accessTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshTokenId $refreshTokenId = null)
     {
-        return new self($accessTokenId, $resourceOwner, $client, $parameters, $metadatas, $scopes, $expiresAt, $refreshToken);
+        return new self($accessTokenId, $resourceOwnerId, $clientId, $parameters, $metadatas, $scopes, $expiresAt, $refreshTokenId);
     }
 
     /**
@@ -75,11 +79,11 @@ final class AccessToken extends Token
     }
 
     /**
-     * @return null|RefreshToken
+     * @return null|RefreshTokenId
      */
-    public function getRefreshToken()
+    public function getRefreshTokenId()
     {
-        return $this->refreshToken;
+        return $this->refreshTokenId;
     }
 
     /**
@@ -94,8 +98,8 @@ final class AccessToken extends Token
         if (!empty($this->getScopes())) {
             $values['scope'] = implode(' ', $this->getScopes());
         }
-        if (!empty($this->getRefreshToken())) {
-            $values['refresh_token'] = $this->getRefreshToken()->getId();
+        if (!empty($this->getRefreshTokenId())) {
+            $values['refresh_token'] = $this->getRefreshTokenId();
         }
 
         return $values + $this->getParameters();

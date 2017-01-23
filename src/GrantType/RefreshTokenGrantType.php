@@ -111,7 +111,7 @@ class RefreshTokenGrantType implements GrantTypeInterface
      */
     public function checkRefreshToken(RefreshToken $token, Client $client)
     {
-        if ($client->getId()->getValue() !== $token->getClient()->getId()->getValue()) {
+        if ($client->getId()->getValue() !== $token->getClientId()->getValue()) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token.']);
         }
 

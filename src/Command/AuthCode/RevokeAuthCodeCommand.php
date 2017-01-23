@@ -13,40 +13,40 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\AuthCode;
 
-use OAuth2\Model\AuthCode\AuthCode;
+use OAuth2\Model\AuthCode\AuthCodeId;
 
 final class RevokeAuthCodeCommand
 {
     /**
-     * @var AuthCode
+     * @var AuthCodeId
      */
-    private $authCode;
+    private $authCodeId;
 
     /**
      * RevokeAuthCodeCommand constructor.
      *
-     * @param AuthCode $authCode
+     * @param AuthCodeId $authCodeId
      */
-    protected function __construct(AuthCode $authCode)
+    protected function __construct(AuthCodeId $authCodeId)
     {
-        $this->authCode = $authCode;
+        $this->authCodeId = $authCodeId;
     }
 
     /**
-     * @param AuthCode $authCode
+     * @param AuthCodeId $authCodeId
      *
      * @return RevokeAuthCodeCommand
      */
-    public static function create(AuthCode $authCode): self
+    public static function create(AuthCodeId $authCodeId): self
     {
-        return new self($authCode);
+        return new self($authCodeId);
     }
 
     /**
-     * @return AuthCode
+     * @return AuthCodeId
      */
-    public function getAuthCode(): AuthCode
+    public function getAuthCodeId(): AuthCodeId
     {
-        return $this->authCode;
+        return $this->authCodeId;
     }
 }

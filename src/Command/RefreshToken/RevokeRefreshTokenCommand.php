@@ -13,40 +13,40 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\RefreshToken;
 
-use OAuth2\Model\RefreshToken\RefreshToken;
+use OAuth2\Model\RefreshToken\RefreshTokenId;
 
 final class RevokeRefreshTokenCommand
 {
     /**
-     * @var RefreshToken
+     * @var RefreshTokenId
      */
-    private $refreshToken;
+    private $refreshTokenId;
 
     /**
-     * RevokeRefreshTokenCommand constructor.
+     * RevokeRefreshTokenIdCommand constructor.
      *
-     * @param RefreshToken $refreshToken
+     * @param RefreshTokenId $refreshTokenId
      */
-    protected function __construct(RefreshToken $refreshToken)
+    protected function __construct(RefreshTokenId $refreshTokenId)
     {
-        $this->refreshToken = $refreshToken;
+        $this->refreshTokenId = $refreshTokenId;
     }
 
     /**
-     * @param RefreshToken $refreshToken
+     * @param RefreshTokenId $refreshTokenId
      *
      * @return RevokeRefreshTokenCommand
      */
-    public static function create(RefreshToken $refreshToken): self
+    public static function create(RefreshTokenId $refreshTokenId): self
     {
-        return new self($refreshToken);
+        return new self($refreshTokenId);
     }
 
     /**
-     * @return RefreshToken
+     * @return RefreshTokenId
      */
-    public function getRefreshToken(): RefreshToken
+    public function getRefreshTokenId(): RefreshTokenId
     {
-        return $this->refreshToken;
+        return $this->refreshTokenId;
     }
 }

@@ -13,13 +13,10 @@ declare(strict_types=1);
 
 namespace OAuth2\TokenTypeHint;
 
-use Assert\Assertion;
 use OAuth2\Command\AccessToken\RevokeAccessTokenCommand;
-use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommand;
-use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\AccessToken\AccessTokenId;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
-use OAuth2\Model\Token\Token;
+use OAuth2\Model\Token\TokenId;
 use SimpleBus\Message\Bus\MessageBus;
 
 class AccessTokenTypeHint implements TokenTypeHintInterface
@@ -35,22 +32,15 @@ class AccessTokenTypeHint implements TokenTypeHintInterface
     private $commandBus;
 
     /**
-     * @var bool
-     */
-    private $revokeRefreshToken;
-
-    /**
      * AccessToken constructor.
      *
      * @param AccessTokenRepositoryInterface $accessTokenRepository
      * @param MessageBus                     $commandBus
-     * @param bool                           $revokeRefreshToken
      */
-    public function __construct(AccessTokenRepositoryInterface $accessTokenRepository, MessageBus $commandBus, bool $revokeRefreshToken)
+    public function __construct(AccessTokenRepositoryInterface $accessTokenRepository, MessageBus $commandBus)
     {
         $this->accessTokenRepository = $accessTokenRepository;
         $this->commandBus = $commandBus;
-        $this->revokeRefreshToken = $revokeRefreshToken;
     }
 
     /**
@@ -72,37 +62,38 @@ class AccessTokenTypeHint implements TokenTypeHintInterface
     /**
      * {@inheritdoc}
      */
-    public function revoke(Token $token)
+    public function revoke(TokenId $tokenId)
     {
-        if (!$token instanceof AccessToken) {
+        if (!$tokenId instanceof AccessTokenId) {
             return;
         }
-        $revokeAccessTokenCommand = RevokeAccessTokenCommand::create($token);
+        $revokeAccessTokenCommand = RevokeAccessTokenCommand::create($tokenId);
         $this->commandBus->handle($revokeAccessTokenCommand);
-        $refreshToken = $token->getRefreshToken();
-        if (null !== $refreshToken && true === $this->revokeRefreshToken) {
-            $revokeRefreshTokenCommand = RevokeRefreshTokenCommand::create($refreshToken);
-            $this->commandBus->handle($revokeRefreshTokenCommand);
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function introspect(Token $token): array
+    public function introspect(TokenId $tokenId): array
     {
-        Assertion::isInstanceOf($token, AccessToken::class);
-
-        $values = [
-            'active'         => !$token->hasExpired(),
-            'client_id'      => $token->getClient()->getId(),
-            'resource_owner' => $token->getResourceOwner()->getId(),
-            'expires_in'     => $token->getExpiresIn(),
-        ];
-        if (!empty($token->getScopes())) {
-            $values['scope'] = implode(' ', $token->getScopes());
+        if (!$tokenId instanceof AccessTokenId || !$this->accessTokenRepository->has($tokenId)) {
+            return [
+                'active' => false,
+            ];
         }
 
-        return $values + $token->getParameters();
+        $accessToken = $this->accessTokenRepository->find($tokenId);
+
+        $values = [
+            'active'         => !$accessToken->hasExpired(),
+            'client_id'      => $accessToken->getClientId(),
+            'resource_owner' => $accessToken->getResourceOwnerId(),
+            'expires_in'     => $accessToken->getExpiresIn(),
+        ];
+        if (!empty($accessToken->getScopes())) {
+            $values['scope'] = implode(' ', $accessToken->getScopes());
+        }
+
+        return $values + $accessToken->getParameters();
     }
 }

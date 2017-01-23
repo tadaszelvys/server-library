@@ -13,35 +13,35 @@ declare(strict_types=1);
 
 namespace OAuth2\Event\AccessToken;
 
-use OAuth2\Model\AccessToken\AccessToken;
+use OAuth2\Model\AccessToken\AccessTokenId;
 use OAuth2\Model\Event\Event;
 
 final class AccessTokenRevokedEvent extends Event
 {
     /**
-     * @var AccessToken
+     * @var AccessTokenId
      */
-    private $accessToken;
+    private $accessTokenId;
 
     /**
      * AccessTokenRevokedEvent constructor.
      *
-     * @param $accessToken
+     * @param $accessTokenId
      */
-    protected function __construct(AccessToken $accessToken)
+    protected function __construct(AccessTokenId $accessTokenId)
     {
         parent::__construct();
-        $this->accessToken = $accessToken;
+        $this->accessTokenId = $accessTokenId;
     }
 
     /**
-     * @param AccessToken $accessToken
+     * @param AccessTokenId $accessTokenId
      *
      * @return self
      */
-    public static function create(AccessToken $accessToken): self
+    public static function create(AccessTokenId $accessTokenId): self
     {
-        return new self($accessToken);
+        return new self($accessTokenId);
     }
 
     /**
@@ -49,6 +49,6 @@ final class AccessTokenRevokedEvent extends Event
      */
     public function getPayload(): \JsonSerializable
     {
-        return $this->accessToken;
+        return $this->accessTokenId;
     }
 }

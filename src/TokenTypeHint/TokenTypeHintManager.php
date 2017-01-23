@@ -31,8 +31,10 @@ final class TokenTypeHintManager implements TokenTypeHintManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function addTokenTypeHint(TokenTypeHintInterface $tokenTypeHint)
+    public function addTokenTypeHint(TokenTypeHintInterface $tokenTypeHint): TokenTypeHintManagerInterface
     {
         $this->tokenTypeHints[$tokenTypeHint->getTokenTypeHint()] = $tokenTypeHint;
+
+        return $this;
     }
 }

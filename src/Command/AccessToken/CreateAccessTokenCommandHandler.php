@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\AccessToken;
 
-use OAuth2\Event\AccessToken\AccessTokenCreatedEvent;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class CreateAccessTokenCommandHandler
 {
@@ -25,20 +23,13 @@ final class CreateAccessTokenCommandHandler
     private $accessTokenRepository;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * CreateClientCommandHandler constructor.
      *
      * @param AccessTokenRepositoryInterface $accessTokenRepository
-     * @param RecordsMessages                $messageRecorder
      */
-    public function __construct(AccessTokenRepositoryInterface $accessTokenRepository, RecordsMessages $messageRecorder)
+    public function __construct(AccessTokenRepositoryInterface $accessTokenRepository)
     {
         $this->accessTokenRepository = $accessTokenRepository;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -55,10 +46,8 @@ final class CreateAccessTokenCommandHandler
             $command->getExpiresAt()
         );
         $this->accessTokenRepository->save($accessToken);
-        $event = AccessTokenCreatedEvent::create($accessToken);
         if (null !== $data = $command->getDataTransporter()) {
             $data($accessToken);
         }
-        $this->messageRecorder->record($event);
     }
 }

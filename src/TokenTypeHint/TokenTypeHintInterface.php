@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\TokenTypeHint;
 
 use OAuth2\Model\Token\Token;
+use OAuth2\Model\Token\TokenId;
 
 interface TokenTypeHintInterface
 {
@@ -30,14 +31,14 @@ interface TokenTypeHintInterface
     public function find(string $token);
 
     /**
-     * @param Token $token
+     * @param TokenId $tokenId
      */
-    public function revoke(Token $token);
+    public function revoke(TokenId $tokenId);
 
     /**
-     * @param Token $token
+     * @param TokenId $tokenId
      *
      * @return array
      */
-    public function introspect(Token $token): array;
+    public function introspect(TokenId $tokenId): array;
 }

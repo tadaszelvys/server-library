@@ -11,9 +11,9 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Model\Event;
+namespace OAuth2\Model\Token;
 
-final class EventId
+abstract class TokenId implements \JsonSerializable
 {
     /**
      * @var string
@@ -21,23 +21,13 @@ final class EventId
     private $value;
 
     /**
-     * EventId constructor.
+     * TokenId constructor.
      *
      * @param $value
      */
-    private function __construct(string $value)
+    protected function __construct(string $value)
     {
         $this->value = $value;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return EventId
-     */
-    public static function create(string $value): self
-    {
-        return new self($value);
     }
 
     /**
@@ -54,5 +44,13 @@ final class EventId
     public function __toString(): string
     {
         return $this->getValue();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return $this->__toString();
     }
 }

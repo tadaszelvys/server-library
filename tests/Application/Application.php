@@ -78,6 +78,7 @@ use OAuth2\Middleware\InitialAccessTokenMiddleware;
 use OAuth2\Middleware\Pipe;
 use OAuth2\Middleware\TokenTypeMiddleware;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
+use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
 use OAuth2\Model\Event\EventStoreInterface;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
@@ -99,6 +100,7 @@ use OAuth2\ResponseType\ImplicitResponseType;
 use OAuth2\ResponseType\ResponseTypeManager;
 use OAuth2\ResponseType\ResponseTypeManagerInterface;
 use OAuth2\Test\Stub\AccessTokenRepository;
+use OAuth2\Test\Stub\AuthCodeRepository;
 use OAuth2\Test\Stub\AuthenticateResponseFactory;
 use OAuth2\Test\Stub\ClientAssertionJwt;
 use OAuth2\Test\Stub\ClientRegistrationManagementRule;
@@ -126,6 +128,7 @@ use OAuth2\TokenType\BearerToken;
 use OAuth2\TokenType\TokenTypeManager;
 use OAuth2\TokenType\TokenTypeManagerInterface;
 use OAuth2\TokenTypeHint\AccessTokenTypeHint;
+use OAuth2\TokenTypeHint\AuthCodeTypeHint;
 use OAuth2\TokenTypeHint\RefreshTokenTypeHint;
 use OAuth2\TokenTypeHint\TokenTypeHintManager;
 use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
@@ -1370,7 +1373,7 @@ final class Application
             $this->tokenTypeHintManager = new TokenTypeHintManager();
             $this->tokenTypeHintManager->addTokenTypeHint($this->getAccessTokenTypeHint()); // Access Token
             $this->tokenTypeHintManager->addTokenTypeHint($this->getRefreshTokenTypeHint()); // Refresh Token
-            //$this->tokenTypeHintManager->addTokenTypeHint(); // Auth Code
+            $this->tokenTypeHintManager->addTokenTypeHint($this->getAuthCodeTypeHint()); // Auth Code
         }
 
         return $this->tokenTypeHintManager;
@@ -1532,8 +1535,7 @@ final class Application
         if (null === $this->accessTokenTypeHint) {
             $this->accessTokenTypeHint = new AccessTokenTypeHint(
                 $this->getAccessTokenRepository(),
-                $this->getCommandBus(),
-                true
+                $this->getCommandBus()
             );
         }
 
@@ -1553,12 +1555,31 @@ final class Application
         if (null === $this->refreshTokenTypeHint) {
             $this->refreshTokenTypeHint = new RefreshTokenTypeHint(
                 $this->getRefreshTokenRepository(),
-                $this->getCommandBus(),
-                true
+                $this->getCommandBus()
             );
         }
 
         return $this->refreshTokenTypeHint;
+    }
+
+    /**
+     * @var null|AuthCodeTypeHint
+     */
+    private $authCodeTypeHint = null;
+
+    /**
+     * @return AuthCodeTypeHint
+     */
+    public function getAuthCodeTypeHint(): AuthCodeTypeHint
+    {
+        if (null === $this->authCodeTypeHint) {
+            $this->authCodeTypeHint = new AuthCodeTypeHint(
+                $this->getAuthorizationCodeRepository(),
+                $this->getCommandBus()
+            );
+        }
+
+        return $this->authCodeTypeHint;
     }
 
     /**
@@ -1572,7 +1593,9 @@ final class Application
     public function getAccessTokenRepository(): AccessTokenRepositoryInterface
     {
         if (null === $this->accessTokenRepository) {
-            $this->accessTokenRepository = new AccessTokenRepository();
+            $this->accessTokenRepository = new AccessTokenRepository(
+                $this->getPublicMessageRecorder()
+            );
         }
 
         return $this->accessTokenRepository;
@@ -1593,6 +1616,23 @@ final class Application
         }
 
         return $this->refreshTokenRepository;
+    }
+
+    /**
+     * @var null|AuthCodeRepositoryInterface
+     */
+    private $authCodeRepository = null;
+
+    /**
+     * @return AuthCodeRepositoryInterface
+     */
+    public function getAuthCodeRepository(): AuthCodeRepositoryInterface
+    {
+        if (null === $this->authCodeRepository) {
+            $this->authCodeRepository = new AuthCodeRepository();
+        }
+
+        return $this->authCodeRepository;
     }
 
     /**
