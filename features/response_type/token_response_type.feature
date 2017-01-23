@@ -1,6 +1,4 @@
-Feature: A client requests an authorization
-  In order get a protected resource
-  A client must get an authorization from resource owner
+Feature: A client requests an authorization code using the Token Response Type
 
   Scenario: A client sends a authorization requests with the Implicit Response Type. The Resource Owner accepts it.
     Given A client sends a authorization requests with the Implicit Response Type

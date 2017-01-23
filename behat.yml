@@ -9,7 +9,7 @@ default:
                 - 'ClientContext'
         grant_type:
             paths:
-                - '%paths.base%/features/grant'
+                - '%paths.base%/features/grant_type'
             contexts:
                 - 'ApplicationContext'
                 - 'ResponseContext'
@@ -18,6 +18,13 @@ default:
                 - 'JwtBearerGrantTypeContext'
                 - 'ResourceOwnerPasswordCredentialsGrantTypeContext'
                 - 'AuthorizationCodeGrantTypeContext'
+#        response_type:
+#            paths:
+#                - '%paths.base%/features/response_type'
+#            contexts:
+#                - 'ApplicationContext'
+#                - 'ResponseContext'
+#                - 'AuthorizationCodeResponseTypeContext'
         oidc:
             paths:
                 - '%paths.base%/features/oidc'
