@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Event\AuthCode\AuthCodeRevokedEvent;
 use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\AuthCode\AuthCodeId;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
@@ -72,10 +73,12 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function revoke(AuthCode $code)
+    public function revoke(AuthCodeId $codeId)
     {
-        if (array_key_exists($code->getId()->getValue(), $this->authCodes)) {
-            unset($this->authCodes[$code->getId()->getValue()]);
+        if ($this->has($codeId)) {
+            unset($this->authCodes[$codeId->getValue()]);
+            $event = AuthCodeRevokedEvent::create($codeId);
+            $this->eventRecorder->record($event);
         }
     }
 

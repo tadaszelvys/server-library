@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\RefreshToken;
 
-use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class RevokeRefreshTokenCommandHandler
 {
@@ -25,20 +23,13 @@ final class RevokeRefreshTokenCommandHandler
     private $refreshTokenRepository;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * CreateClientCommandHandler constructor.
      *
      * @param RefreshTokenRepositoryInterface $refreshTokenRepository
-     * @param RecordsMessages                 $messageRecorder
      */
-    public function __construct(RefreshTokenRepositoryInterface $refreshTokenRepository, RecordsMessages $messageRecorder)
+    public function __construct(RefreshTokenRepositoryInterface $refreshTokenRepository)
     {
         $this->refreshTokenRepository = $refreshTokenRepository;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -46,9 +37,7 @@ final class RevokeRefreshTokenCommandHandler
      */
     public function handle(RevokeRefreshTokenCommand $command)
     {
-        $refreshToken = $command->getRefreshToken();
-        $this->refreshTokenRepository->revoke($refreshToken);
-        $event = RefreshTokenRevokedEvent::create($refreshToken);
-        $this->messageRecorder->record($event);
+        $refreshTokenId = $command->getRefreshTokenId();
+        $this->refreshTokenRepository->revoke($refreshTokenId);
     }
 }

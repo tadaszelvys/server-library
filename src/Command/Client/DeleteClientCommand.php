@@ -13,40 +13,40 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\Client;
 
-use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 
 final class DeleteClientCommand
 {
     /**
-     * @var Client
+     * @var ClientId
      */
-    private $client;
+    private $clientId;
 
     /**
      * DeleteClientCommand constructor.
      *
-     * @param Client $client
+     * @param ClientId $clientId
      */
-    protected function __construct(Client $client)
+    protected function __construct(ClientId $clientId)
     {
-        $this->client = $client;
+        $this->clientId = $clientId;
     }
 
     /**
-     * @param Client $client
+     * @param ClientId $clientId
      *
      * @return DeleteClientCommand
      */
-    public static function create(Client $client): DeleteClientCommand
+    public static function create(ClientId $clientId): DeleteClientCommand
     {
-        return new self($client);
+        return new self($clientId);
     }
 
     /**
-     * @return Client
+     * @return ClientId
      */
-    public function getClient(): Client
+    public function getClientId(): ClientId
     {
-        return $this->client;
+        return $this->clientId;
     }
 }

@@ -49,7 +49,7 @@ interface ClientRepositoryInterface
     /**
      * Delete the client.
      *
-     * @param Client $client
+     * @param ClientId $clientId
      */
-    public function delete(Client $client);
+    public function delete(ClientId $clientId);
 }

@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\InitialAccessToken;
 
-use OAuth2\Event\InitialAccessToken\InitialAccessTokenCreatedEvent;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class CreateInitialAccessTokenCommandHandler
 {
@@ -25,20 +23,13 @@ final class CreateInitialAccessTokenCommandHandler
     private $initialAccessTokenRepository;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * CreateInitialAccessTokenCommandHandler constructor.
      *
      * @param InitialAccessTokenRepositoryInterface $initialAccessTokenRepository
-     * @param RecordsMessages                       $messageRecorder
      */
-    public function __construct(InitialAccessTokenRepositoryInterface $initialAccessTokenRepository, RecordsMessages $messageRecorder)
+    public function __construct(InitialAccessTokenRepositoryInterface $initialAccessTokenRepository)
     {
         $this->initialAccessTokenRepository = $initialAccessTokenRepository;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -51,7 +42,5 @@ final class CreateInitialAccessTokenCommandHandler
             $command->getExpiresAt()
         );
         $this->initialAccessTokenRepository->save($initialAccessToken);
-        $event = InitialAccessTokenCreatedEvent::create($initialAccessToken);
-        $this->messageRecorder->record($event);
     }
 }

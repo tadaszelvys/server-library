@@ -174,8 +174,6 @@ class ResponseContext implements Context
     {
         $events = $this->applicationContext->getApplication()->getAccessTokenCreatedEventHandler()->getEvents();
         Assertion::greaterThan(count($events), 0);
-        $encoder = new \Webmozart\Json\JsonEncoder();
-        dump($encoder->encode($events));
     }
 
     /**

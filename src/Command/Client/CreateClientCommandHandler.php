@@ -14,9 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\Command\Client;
 
 use OAuth2\Client\Rule\RuleManagerInterface;
-use OAuth2\Event\Client\ClientCreatedEvent;
 use OAuth2\Model\Client\ClientRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class CreateClientCommandHandler
 {
@@ -31,22 +29,15 @@ final class CreateClientCommandHandler
     private $ruleManager;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * CreateClientCommandHandler constructor.
      *
      * @param ClientRepositoryInterface $clientRepository
      * @param RuleManagerInterface      $ruleManager
-     * @param RecordsMessages           $messageRecorder
      */
-    public function __construct(ClientRepositoryInterface $clientRepository, RuleManagerInterface $ruleManager, RecordsMessages $messageRecorder)
+    public function __construct(ClientRepositoryInterface $clientRepository, RuleManagerInterface $ruleManager)
     {
         $this->clientRepository = $clientRepository;
         $this->ruleManager = $ruleManager;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -62,8 +53,6 @@ final class CreateClientCommandHandler
             $validated_parameters
         );
         $this->clientRepository->save($client);
-        $event = ClientCreatedEvent::create($client);
-        $this->messageRecorder->record($event);
         $callback = $command->getDataTransporter();
         $callback($client);
     }

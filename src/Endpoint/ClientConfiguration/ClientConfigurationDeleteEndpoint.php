@@ -17,6 +17,7 @@ use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Command\Client\DeleteClientCommand;
+use OAuth2\Model\Client\Client;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
@@ -49,9 +50,12 @@ final class ClientConfigurationDeleteEndpoint implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DelegateInterface $next)
     {
+        /**
+         * @var $client Client
+         */
         $client = $request->getAttribute('client');
-
-        $command = DeleteClientCommand::create($client);
+        $id = $client->getId();
+        $command = DeleteClientCommand::create($id);
         $this->messageBus->handle($command);
 
         $response = $this->responseFactory->createResponse(204);

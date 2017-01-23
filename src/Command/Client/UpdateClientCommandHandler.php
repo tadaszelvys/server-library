@@ -14,10 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\Command\Client;
 
 use OAuth2\Client\Rule\RuleManagerInterface;
-use OAuth2\Event\Client\ClientUpdatedEvent;
-use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class UpdateClientCommandHandler
 {
@@ -32,22 +29,15 @@ final class UpdateClientCommandHandler
     private $ruleManager;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * UpdateClientCommandHandler constructor.
      *
      * @param ClientRepositoryInterface $clientRepository
      * @param RuleManagerInterface      $ruleManager
-     * @param RecordsMessages           $messageRecorder
      */
-    public function __construct(ClientRepositoryInterface $clientRepository, RuleManagerInterface $ruleManager, RecordsMessages $messageRecorder)
+    public function __construct(ClientRepositoryInterface $clientRepository, RuleManagerInterface $ruleManager)
     {
         $this->clientRepository = $clientRepository;
         $this->ruleManager = $ruleManager;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -62,14 +52,8 @@ final class UpdateClientCommandHandler
         if (true === $client->has('client_id_issued_at')) {
             $validated_parameters['client_id_issued_at'] = $client->get('client_id_issued_at');
         }
-        $client = Client::create(
-            $client->getId(),
-            $validated_parameters,
-            $client->getResourceOwnerId()
-        );
+        $client = $client->withParameters($validated_parameters);
         $this->clientRepository->save($client);
-        $event = ClientUpdatedEvent::create($client);
-        $this->messageRecorder->record($event);
         $callback = $command->getDataTransporter();
         $callback($client);
     }

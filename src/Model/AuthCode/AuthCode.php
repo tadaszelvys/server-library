@@ -99,7 +99,7 @@ final class AuthCode extends Token
         $clone = clone $this;
         $clone->issueRefreshToken = true;
         $event = AuthCodeWithRefreshTokenEvent::create($clone->getId());
-        $this->record($event);
+        $clone->record($event);
 
         return $clone;
     }
@@ -115,7 +115,7 @@ final class AuthCode extends Token
         $clone = clone $this;
         $clone->issueRefreshToken = false;
         $event = AuthCodeWithoutRefreshTokenEvent::create($clone->getId());
-        $this->record($event);
+        $clone->record($event);
 
         return $clone;
     }

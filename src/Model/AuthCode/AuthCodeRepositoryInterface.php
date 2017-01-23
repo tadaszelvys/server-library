@@ -57,9 +57,9 @@ interface AuthCodeRepositoryInterface
     /**
      * Revoke the auth code.
      *
-     * @param AuthCode $code
+     * @param AuthCodeId $codeId
      */
-    public function revoke(AuthCode $code);
+    public function revoke(AuthCodeId $codeId);
 
     // Auth Code updater
 }

@@ -13,57 +13,63 @@ declare(strict_types=1);
 
 namespace OAuth2\Event\Client;
 
-use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Event\Event;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class ClientCreatedEvent extends Event
 {
     /**
-     * @var Client
+     * @var ClientId
      */
-    private $client;
+    private $clientId;
+
+    /**
+     * @var array
+     */
+    private $metadatas;
+
+    /**
+     * @var UserAccountId
+     */
+    private $userAccountId;
 
     /**
      * ClientCreatedEvent constructor.
      *
-     * @param Client $client
+     * @param ClientId      $clientId
+     * @param array         $metadatas
+     * @param UserAccountId $userAccountId
      */
-    protected function __construct(Client $client)
+    protected function __construct(ClientId $clientId, array $metadatas, UserAccountId $userAccountId)
     {
         parent::__construct();
-        $this->client = $client;
+        $this->clientId = $clientId;
+        $this->metadatas = $metadatas;
+        $this->userAccountId = $userAccountId;
     }
 
     /**
-     * @param Client $client
+     * @param ClientId      $clientId
+     * @param array         $metadatas
+     * @param UserAccountId $userAccountId
      *
      * @return self
      */
-    public static function create(Client $client): self
+    public static function create(ClientId $clientId, array $metadatas, UserAccountId $userAccountId): self
     {
-        return new self($client);
+        return new self($clientId, $metadatas, $userAccountId);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPayload(): \JsonSerializable
+    public function getPayload()
     {
-        return $this->client;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function jsonSerialize(): array
-    {
-        $json = parent::jsonSerialize();
-        $json['payload'] = [
-            'client_id'  => $this->client->getId(),
-            'owner_id'   => $this->client->getResourceOwnerId(),
-            'parameters' => $this->client->all(),
+        return [
+            'client_id' => $this->clientId,
+            'user_account_id' => $this->userAccountId,
+            'metadatas' => $this->metadatas,
         ];
-
-        return $json;
     }
 }

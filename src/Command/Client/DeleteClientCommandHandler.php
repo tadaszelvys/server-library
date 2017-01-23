@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\Client;
 
-use OAuth2\Event\Client\ClientDeletedEvent;
 use OAuth2\Model\Client\ClientRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class DeleteClientCommandHandler
 {
@@ -25,20 +23,13 @@ final class DeleteClientCommandHandler
     private $clientRepository;
 
     /**
-     * @var ClientRepositoryInterface
-     */
-    private $messageRecorder;
-
-    /**
      * DeleteClientCommandHandler constructor.
      *
      * @param ClientRepositoryInterface $clientRepository
-     * @param RecordsMessages           $messageRecorder
      */
-    public function __construct(ClientRepositoryInterface $clientRepository, RecordsMessages $messageRecorder)
+    public function __construct(ClientRepositoryInterface $clientRepository)
     {
         $this->clientRepository = $clientRepository;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -46,10 +37,7 @@ final class DeleteClientCommandHandler
      */
     public function handle(DeleteClientCommand $command)
     {
-        $client = $command->getClient();
-        $this->clientRepository->delete($client);
-
-        $event = ClientDeletedEvent::create($client);
-        $this->messageRecorder->record($event);
+        $clientId = $command->getClientId();
+        $this->clientRepository->delete($clientId);
     }
 }

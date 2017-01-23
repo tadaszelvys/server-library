@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\RefreshToken;
 
-use OAuth2\Model\Client\Client;
-use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 
 /**
  * @see    http://tools.ietf.org/html/rfc6749#section-6
@@ -23,8 +23,8 @@ use OAuth2\Model\ResourceOwner\ResourceOwner;
 interface RefreshTokenRepositoryInterface
 {
     /**
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
+     * @param ResourceOwnerId    $resourceOwnerId
+     * @param ClientId           $clientId
      * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
      * @param string[]           $scopes
@@ -32,7 +32,7 @@ interface RefreshTokenRepositoryInterface
      *
      * @return RefreshToken
      */
-    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas);
+    public function create(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas);
 
     /**
      * @param RefreshTokenId $refreshTokenId
@@ -58,7 +58,7 @@ interface RefreshTokenRepositoryInterface
     /**
      * Revoke a refresh token.
      *
-     * @param RefreshToken $refreshToken The refresh token string to revoke.
+     * @param RefreshTokenId $refreshTokenId The refresh token string to revoke.
      */
-    public function revoke(RefreshToken $refreshToken);
+    public function revoke(RefreshTokenId $refreshTokenId);
 }

@@ -18,6 +18,10 @@ use Jose\Factory\JWKFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWKSet;
 use Jose\Object\JWKSetInterface;
+use OAuth2\Event\Client\ClientCreatedEvent;
+use OAuth2\Event\Client\ClientParameterRemovedEvent;
+use OAuth2\Event\Client\ClientParametersUpdatedEvent;
+use OAuth2\Event\Client\ClientParameterUpdatedEvent;
 use OAuth2\Model\ResourceOwner\ResourceOwner;
 use OAuth2\Model\UserAccount\UserAccountId;
 
@@ -39,25 +43,28 @@ final class Client extends ResourceOwner
      * Client constructor.
      *
      * @param ClientId      $id
-     * @param array         $metadatas
+     * @param array         $parameter
      * @param UserAccountId $userAccountId
      */
-    protected function __construct(ClientId $id, array $metadatas, UserAccountId $userAccountId)
+    protected function __construct(ClientId $id, array $parameter, UserAccountId $userAccountId)
     {
-        parent::__construct($id, $metadatas);
+        parent::__construct($id, $parameter);
         $this->userAccountId = $userAccountId;
+
+        $event = ClientCreatedEvent::create($id, $parameter, $userAccountId);
+        $this->record($event);
     }
 
     /**
      * @param ClientId    $id
-     * @param array       $metadatas
+     * @param array       $parameter
      * @param UserAccountId $userAccountId
      *
      * @return self
      */
-    public static function create(ClientId $id, array $metadatas, UserAccountId $userAccountId): self
+    public static function create(ClientId $id, array $parameter, UserAccountId $userAccountId): self
     {
-        return new self($id, $metadatas, $userAccountId);
+        return new self($id, $parameter, $userAccountId);
     }
 
     /**
@@ -66,6 +73,55 @@ final class Client extends ResourceOwner
     public function getResourceOwnerId(): UserAccountId
     {
         return $this->userAccountId;
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return Client
+     */
+    public function withParameters(array $parameters): self
+    {
+        $clone = clone $this;
+        $clone->parameters = $parameters;
+        $event = ClientParametersUpdatedEvent::create($clone->getId(), $parameters);
+        $clone->record($event);
+
+        return $clone;
+    }
+
+    /**
+     * @param string     $key
+     * @param mixed|null $value
+     *
+     * @return Client
+     */
+    public function withParameter(string $key, $value): self
+    {
+        $clone = clone $this;
+        $clone->parameters[$key] = $value;
+        $event = ClientParameterUpdatedEvent::create($clone->getId(), $key, $value);
+        $clone->record($event);
+
+        return $clone;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return Client
+     */
+    public function withoutParameter(string $key): self
+    {
+        if (!$this->has($key)) {
+            return $this;
+        }
+        $clone = clone $this;
+        unset($clone->parameters[$key]);
+        $event = ClientParameterRemovedEvent::create($clone->getId(), $key);
+        $clone->record($event);
+
+        return $clone;
     }
 
     /**

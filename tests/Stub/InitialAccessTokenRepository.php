@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Test\Stub;
 
+use OAuth2\Event\InitialAccessTokenId\InitialAccessTokenRevokedEvent;
 use OAuth2\Model\InitialAccessToken\InitialAccessToken;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenId;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
@@ -71,15 +72,22 @@ class InitialAccessTokenRepository implements InitialAccessTokenRepositoryInterf
     public function save(InitialAccessToken $initialAccessToken)
     {
         $this->initialAccessTokens[(string) $initialAccessToken->getId()] = $initialAccessToken;
+        $events = $initialAccessToken->recordedMessages();
+        foreach ($events as $event) {
+            $this->eventRecorder->record($event);
+        }
+        $initialAccessToken->eraseMessages();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function revoke(InitialAccessToken $initialAccessToken)
+    public function revoke(InitialAccessTokenId $initialAccessTokenId)
     {
-        if (isset($this->initialAccessTokens[(string) $initialAccessToken->getId()])) {
-            unset($this->initialAccessTokens[(string) $initialAccessToken->getId()]);
+        if (isset($this->initialAccessTokens[(string) $initialAccessTokenId])) {
+            unset($this->initialAccessTokens[(string) $initialAccessTokenId]);
+            $event = InitialAccessTokenRevokedEvent::create($initialAccessTokenId);
+            $this->eventRecorder->record($event);
         }
 
         return $this;

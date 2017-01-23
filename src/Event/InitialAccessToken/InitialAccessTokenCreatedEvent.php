@@ -14,41 +14,62 @@ declare(strict_types=1);
 namespace OAuth2\Event\InitialAccessToken;
 
 use OAuth2\Model\Event\Event;
-use OAuth2\Model\InitialAccessToken\InitialAccessToken;
+use OAuth2\Model\InitialAccessToken\InitialAccessTokenId;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class InitialAccessTokenCreatedEvent extends Event
 {
     /**
-     * @var InitialAccessToken
+     * @var InitialAccessTokenId
      */
-    private $initialAccessToken;
+    protected $initialAccessTokenId;
+
+    /**
+     * @var \DateTimeImmutable
+     */
+    protected $expiresAt;
+
+    /**
+     * @var UserAccountId
+     */
+    protected $userAccountId;
 
     /**
      * InitialAccessTokenCreatedEvent constructor.
      *
-     * @param InitialAccessToken $initialAccessToken
+     * @param InitialAccessTokenId    $initialAccessTokenId
+     * @param null|\DateTimeImmutable $expiresAt
+     * @param UserAccountId           $userAccountId
      */
-    protected function __construct(InitialAccessToken $initialAccessToken)
+    protected function __construct(InitialAccessTokenId $initialAccessTokenId, UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null)
     {
         parent::__construct();
-        $this->initialAccessToken = $initialAccessToken;
+        $this->initialAccessTokenId = $initialAccessTokenId;
+        $this->expiresAt = $expiresAt;
+        $this->userAccountId = $userAccountId;
     }
 
     /**
-     * @param InitialAccessToken $initialAccessToken
+     * @param InitialAccessTokenId    $initialAccessTokenId
+     * @param null|\DateTimeImmutable $expiresAt
+     * @param UserAccountId           $userAccountId
      *
      * @return self
      */
-    public static function create(InitialAccessToken $initialAccessToken): self
+    public static function create(InitialAccessTokenId $initialAccessTokenId, UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null): self
     {
-        return new self($initialAccessToken);
+        return new self($initialAccessTokenId, $userAccountId, $expiresAt);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPayload(): \JsonSerializable
+    public function getPayload()
     {
-        return $this->initialAccessToken;
+        return [
+            'initial_access_token_id' => $this->initialAccessTokenId,
+            'user_account_id' => $this->userAccountId,
+            'expires_at' => $this->expiresAt ? $this->expiresAt->getTimestamp() : null,
+        ];
     }
 }

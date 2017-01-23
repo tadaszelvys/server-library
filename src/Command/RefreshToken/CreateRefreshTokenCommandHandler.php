@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\RefreshToken;
 
-use OAuth2\Event\RefreshToken\RefreshTokenCreatedEvent;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class CreateRefreshTokenCommandHandler
 {
@@ -25,20 +23,13 @@ final class CreateRefreshTokenCommandHandler
     private $refreshTokenRepository;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * CreateRefreshTokenCommandHandler constructor.
      *
      * @param RefreshTokenRepositoryInterface $refreshTokenRepository
-     * @param RecordsMessages                 $messageRecorder
      */
-    public function __construct(RefreshTokenRepositoryInterface $refreshTokenRepository, RecordsMessages $messageRecorder)
+    public function __construct(RefreshTokenRepositoryInterface $refreshTokenRepository)
     {
         $this->refreshTokenRepository = $refreshTokenRepository;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -47,14 +38,13 @@ final class CreateRefreshTokenCommandHandler
     public function handle(CreateRefreshTokenCommand $command)
     {
         $refreshToken = $this->refreshTokenRepository->create(
-            $command->getUserAccount(),
-            $command->getClient(),
+            $command->getUserAccountId(),
+            $command->getClientId(),
             $command->getParameters(),
             $command->getExpiresAt(),
+            $command->getScopes(),
             $command->getMetadatas()
         );
         $this->refreshTokenRepository->save($refreshToken);
-        $event = RefreshTokenCreatedEvent::create($refreshToken);
-        $this->messageRecorder->record($event);
     }
 }

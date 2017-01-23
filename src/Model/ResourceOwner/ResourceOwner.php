@@ -29,18 +29,18 @@ abstract class ResourceOwner implements \JsonSerializable, ContainsRecordedMessa
     /**
      * @var array
      */
-    private $metadatas;
+    protected $parameters;
 
     /**
      * ResourceOwner constructor.
      *
      * @param ResourceOwnerId $id
-     * @param array           $metadatas
+     * @param array           $parameters
      */
-    protected function __construct(ResourceOwnerId $id, array $metadatas)
+    protected function __construct(ResourceOwnerId $id, array $parameters)
     {
         $this->id = $id;
-        $this->metadatas = $metadatas;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -78,7 +78,7 @@ abstract class ResourceOwner implements \JsonSerializable, ContainsRecordedMessa
      */
     public function all(): array
     {
-        return $this->metadatas;
+        return $this->parameters;
     }
 
     /**
@@ -90,7 +90,7 @@ abstract class ResourceOwner implements \JsonSerializable, ContainsRecordedMessa
     {
         Assertion::string($key);
 
-        return array_key_exists($key, $this->metadatas);
+        return array_key_exists($key, $this->parameters);
     }
 
     /**
@@ -100,7 +100,7 @@ abstract class ResourceOwner implements \JsonSerializable, ContainsRecordedMessa
     {
         Assertion::true($this->has($key), sprintf('Configuration value with key \'%s\' does not exist.', $key));
 
-        return $this->metadatas[$key];
+        return $this->parameters[$key];
     }
 
     /**

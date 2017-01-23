@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\AuthCode;
 
-use OAuth2\Event\AuthCode\AuthCodeRevokedEvent;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class RevokeAuthCodeCommandHandler
 {
@@ -25,20 +23,13 @@ final class RevokeAuthCodeCommandHandler
     private $authCodeRepository;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * CreateClientCommandHandler constructor.
      *
      * @param AuthCodeRepositoryInterface $authCodeRepository
-     * @param RecordsMessages             $messageRecorder
      */
-    public function __construct(AuthCodeRepositoryInterface $authCodeRepository, RecordsMessages $messageRecorder)
+    public function __construct(AuthCodeRepositoryInterface $authCodeRepository)
     {
         $this->authCodeRepository = $authCodeRepository;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -46,9 +37,7 @@ final class RevokeAuthCodeCommandHandler
      */
     public function handle(RevokeAuthCodeCommand $command)
     {
-        $authCode = $command->getAuthCode();
-        $this->authCodeRepository->revoke($authCode);
-        $event = AuthCodeRevokedEvent::create($authCode);
-        $this->messageRecorder->record($event);
+        $authCodeId = $command->getAuthCodeId();
+        $this->authCodeRepository->revoke($authCodeId);
     }
 }

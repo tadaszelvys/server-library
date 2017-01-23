@@ -21,21 +21,21 @@ final class UserAccount extends ResourceOwner
      * UserAccount constructor.
      *
      * @param UserAccountId $id
-     * @param array         $metadatas
+     * @param array         $parameters
      */
-    protected function __construct(UserAccountId $id, array $metadatas)
+    protected function __construct(UserAccountId $id, array $parameters)
     {
-        parent::__construct($id, $metadatas);
+        parent::__construct($id, $parameters);
     }
 
     /**
      * @param UserAccountId $id
-     * @param array         $metadatas
+     * @param array         $parameters
      *
      * @return self
      */
-    public static function create(UserAccountId $id, array $metadatas): self
+    public static function create(UserAccountId $id, array $parameters): self
     {
-        return new self($id, $metadatas);
+        return new self($id, $parameters);
     }
 }

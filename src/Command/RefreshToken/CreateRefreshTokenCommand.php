@@ -15,8 +15,8 @@ namespace OAuth2\Command\RefreshToken;
 
 use OAuth2\Command\CommandWithDataTransporter;
 use OAuth2\DataTransporter;
-use OAuth2\Model\Client\Client;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class CreateRefreshTokenCommand extends CommandWithDataTransporter
 {
@@ -26,14 +26,14 @@ final class CreateRefreshTokenCommand extends CommandWithDataTransporter
     private $expiresAt;
 
     /**
-     * @var UserAccount
+     * @var UserAccountId
      */
-    private $userAccount;
+    private $userAccountId;
 
     /**
-     * @var Client
+     * @var ClientId
      */
-    private $client;
+    private $clientId;
 
     /**
      * @var array
@@ -46,37 +46,45 @@ final class CreateRefreshTokenCommand extends CommandWithDataTransporter
     private $metadatas;
 
     /**
+     * @var \string[]
+     */
+    private $scopes;
+
+    /**
      * CreateRefreshTokenCommand constructor.
      *
-     * @param UserAccount          $userAccount
-     * @param Client               $client
+     * @param UserAccountId        $userAccountId
+     * @param ClientId             $clientId
      * @param array                $parameters
      * @param \DateTimeImmutable   $expiresAt
      * @param array                $metadatas
+     * @param \string[]            $scopes
      * @param DataTransporter|null $dataTransporter
      */
-    protected function __construct(UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $metadatas, DataTransporter $dataTransporter = null)
+    protected function __construct(UserAccountId $userAccountId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $metadatas, array $scopes, DataTransporter $dataTransporter = null)
     {
         $this->expiresAt = $expiresAt;
-        $this->userAccount = $userAccount;
-        $this->client = $client;
+        $this->userAccountId = $userAccountId;
+        $this->clientId = $clientId;
         $this->parameters = $parameters;
         $this->metadatas = $metadatas;
+        $this->scopes = $scopes;
         parent::__construct($dataTransporter);
     }
 
     /**
-     * @param UserAccount        $userAccount
-     * @param Client             $client
+     * @param UserAccountId      $userAccountId
+     * @param ClientId           $clientId
      * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
      * @param array              $metadatas
+     * @param \string[]          $scopes
      *
      * @return CreateRefreshTokenCommand
      */
-    public static function create(UserAccount $userAccount, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $metadatas): self
+    public static function create(UserAccountId $userAccountId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $metadatas, array $scopes): self
     {
-        return new self($userAccount, $client, $parameters, $expiresAt, $metadatas);
+        return new self($userAccountId, $clientId, $parameters, $expiresAt, $metadatas, $scopes);
     }
 
     /**
@@ -88,19 +96,19 @@ final class CreateRefreshTokenCommand extends CommandWithDataTransporter
     }
 
     /**
-     * @return UserAccount
+     * @return UserAccountId
      */
-    public function getUserAccount(): UserAccount
+    public function getUserAccountId(): UserAccountId
     {
-        return $this->userAccount;
+        return $this->userAccountId;
     }
 
     /**
-     * @return Client
+     * @return ClientId
      */
-    public function getClient(): Client
+    public function getClientId(): ClientId
     {
-        return $this->client;
+        return $this->clientId;
     }
 
     /**
@@ -117,5 +125,13 @@ final class CreateRefreshTokenCommand extends CommandWithDataTransporter
     public function getMetadatas(): array
     {
         return $this->metadatas;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getScopes(): array
+    {
+        return $this->scopes;
     }
 }

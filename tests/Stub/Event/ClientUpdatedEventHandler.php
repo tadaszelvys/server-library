@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace OAuth2\Test\Stub\Event;
 
-use OAuth2\Event\Client\ClientUpdatedEvent;
+use OAuth2\Event\Client\ClientParametersUpdatedEvent;
 
 final class ClientUpdatedEventHandler extends EventHandler
 {
     /**
-     * @param ClientUpdatedEvent $event
+     * @param ClientParametersUpdatedEvent $event
      */
-    public function handle(ClientUpdatedEvent $event)
+    public function handle(ClientParametersUpdatedEvent $event)
     {
         $this->save($event);
     }

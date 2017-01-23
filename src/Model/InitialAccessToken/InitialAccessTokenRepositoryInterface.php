@@ -33,9 +33,9 @@ interface InitialAccessTokenRepositoryInterface
     /**
      * This function revoke an initial access token.
      *
-     * @param InitialAccessToken $initialAccessToken The initial access token to revoke
+     * @param InitialAccessTokenId $initialAccessTokenId The initial access token to revoke
      */
-    public function revoke(InitialAccessToken $initialAccessToken);
+    public function revoke(InitialAccessTokenId $initialAccessTokenId);
 
     /**
      * This function verifies the request and validate or not the initial access token.

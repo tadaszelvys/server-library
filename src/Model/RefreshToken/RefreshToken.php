@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\RefreshToken;
 
+use OAuth2\Event\RefreshToken\RefreshTokenCreatedEvent;
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\ResourceOwner\ResourceOwnerId;
@@ -39,6 +40,9 @@ class RefreshToken extends Token
     protected function __construct(RefreshTokenId $refreshTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
     {
         parent::__construct($refreshTokenId, $resourceOwnerId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
+
+        $event = RefreshTokenCreatedEvent::create($refreshTokenId, $resourceOwnerId, $clientId, $parameters, $expiresAt, $scopes, $metadatas);
+        $this->record($event);
     }
 
     /**

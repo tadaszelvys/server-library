@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\IdToken;
 
-use OAuth2\Event\IdToken\IdTokenRevokedEvent;
 use OAuth2\Model\IdToken\IdTokenRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class RevokeIdTokenCommandHandler
 {
@@ -25,20 +23,13 @@ final class RevokeIdTokenCommandHandler
     private $idTokenRepository;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * CreateClientCommandHandler constructor.
      *
      * @param IdTokenRepositoryInterface $idTokenRepository
-     * @param RecordsMessages            $messageRecorder
      */
-    public function __construct(IdTokenRepositoryInterface $idTokenRepository, RecordsMessages $messageRecorder)
+    public function __construct(IdTokenRepositoryInterface $idTokenRepository)
     {
         $this->idTokenRepository = $idTokenRepository;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -48,7 +39,5 @@ final class RevokeIdTokenCommandHandler
     {
         $idToken = $command->getIdToken();
         $this->idTokenRepository->revoke($idToken);
-        $event = IdTokenRevokedEvent::create($idToken);
-        $this->messageRecorder->record($event);
     }
 }

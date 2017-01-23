@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Model\Client\Client;
+use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\RefreshToken\RefreshToken;
 use OAuth2\Model\RefreshToken\RefreshTokenId;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
-use OAuth2\Model\ResourceOwner\ResourceOwner;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 use OAuth2\Model\UserAccount\UserAccountId;
+use SimpleBus\Message\Recorder\RecordsMessages;
 
 class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 {
@@ -29,8 +29,19 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     private $refreshTokens = [];
 
-    public function __construct()
+    /**
+     * @var RecordsMessages
+     */
+    private $eventRecorder;
+
+    /**
+     * RefreshTokenRepository constructor.
+     *
+     * @param RecordsMessages $eventRecorder
+     */
+    public function __construct(RecordsMessages $eventRecorder)
     {
+        $this->eventRecorder = $eventRecorder;
         $this->save(RefreshToken::create(
             RefreshTokenId::create('EXPIRED_REFRESH_TOKEN'),
             UserAccountId::create('User #1'),
@@ -55,10 +66,12 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function revoke(RefreshToken $refreshToken)
+    public function revoke(RefreshTokenId $refreshTokenId)
     {
-        if ($this->has($refreshToken->getId())) {
-            unset($this->refreshTokens[$refreshToken->getId()->getValue()]);
+        if ($this->has($refreshTokenId)) {
+            unset($this->refreshTokens[$refreshTokenId->getValue()]);
+            $event = RefreshTokenRevokedEvent::create($refreshTokenId);
+            $this->eventRecorder->record($event);
         }
 
         return $this;
@@ -82,12 +95,15 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
         }
     }
 
-    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
+    /**
+     * {@inheritdoc}
+     */
+    public function create(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
     {
         return RefreshToken::create(
             RefreshTokenId::create(base64_encode(random_bytes(50))),
-            $resourceOwner->getId(),
-            $client->getId(),
+            $resourceOwnerId,
+            $clientId,
             $parameters,
             $expiresAt,
             $scopes,
@@ -95,8 +111,16 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function save(RefreshToken $token)
     {
         $this->refreshTokens[$token->getId()->getValue()] = $token;
+        $events = $token->recordedMessages();
+        foreach ($events as $event) {
+            $this->eventRecorder->record($event);
+        }
+        $token->eraseMessages();
     }
 }

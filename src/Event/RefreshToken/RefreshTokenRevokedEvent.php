@@ -15,40 +15,43 @@ namespace OAuth2\Event\RefreshToken;
 
 use OAuth2\Model\Event\Event;
 use OAuth2\Model\RefreshToken\RefreshToken;
+use OAuth2\Model\RefreshToken\RefreshTokenId;
 
 final class RefreshTokenRevokedEvent extends Event
 {
     /**
      * @var RefreshToken
      */
-    private $refreshToken;
+    private $refreshTokenId;
 
     /**
      * RefreshTokenRevokedEvent constructor.
      *
-     * @param RefreshToken $refreshToken
+     * @param RefreshTokenId $refreshTokenId
      */
-    protected function __construct(RefreshToken $refreshToken)
+    protected function __construct(RefreshTokenId $refreshTokenId)
     {
         parent::__construct();
-        $this->refreshToken = $refreshToken;
+        $this->refreshTokenId = $refreshTokenId;
     }
 
     /**
-     * @param RefreshToken $refreshToken
+     * @param RefreshTokenId $refreshTokenId
      *
      * @return self
      */
-    public static function create(RefreshToken $refreshToken): self
+    public static function create(RefreshTokenId $refreshTokenId): self
     {
-        return new self($refreshToken);
+        return new self($refreshTokenId);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPayload(): \JsonSerializable
+    public function getPayload()
     {
-        return $this->refreshToken;
+        return [
+            'refresh_token_id' => $this->refreshTokenId,
+        ];
     }
 }

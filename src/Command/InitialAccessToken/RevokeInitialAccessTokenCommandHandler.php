@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\InitialAccessToken;
 
-use OAuth2\Event\InitialAccessToken\InitialAccessTokenRevokedEvent;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class RevokeInitialAccessTokenCommandHandler
 {
@@ -25,20 +23,13 @@ final class RevokeInitialAccessTokenCommandHandler
     private $initialAccessTokenRepository;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * CreateClientCommandHandler constructor.
      *
      * @param InitialAccessTokenRepositoryInterface $initialAccessTokenRepository
-     * @param RecordsMessages                       $messageRecorder
      */
-    public function __construct(InitialAccessTokenRepositoryInterface $initialAccessTokenRepository, RecordsMessages $messageRecorder)
+    public function __construct(InitialAccessTokenRepositoryInterface $initialAccessTokenRepository)
     {
         $this->initialAccessTokenRepository = $initialAccessTokenRepository;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -46,9 +37,7 @@ final class RevokeInitialAccessTokenCommandHandler
      */
     public function handle(RevokeInitialAccessTokenCommand $command)
     {
-        $accessToken = $command->getInitialAccessToken();
-        $this->initialAccessTokenRepository->revoke($accessToken);
-        $event = InitialAccessTokenRevokedEvent::create($accessToken);
-        $this->messageRecorder->record($event);
+        $accessTokenId = $command->getInitialAccessTokenId();
+        $this->initialAccessTokenRepository->revoke($accessTokenId);
     }
 }

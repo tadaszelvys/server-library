@@ -13,10 +13,15 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\InitialAccessToken;
 
+use OAuth2\Event\InitialAccessToken\InitialAccessTokenCreatedEvent;
 use OAuth2\Model\UserAccount\UserAccountId;
+use SimpleBus\Message\Recorder\ContainsRecordedMessages;
+use SimpleBus\Message\Recorder\PrivateMessageRecorderCapabilities;
 
-final class InitialAccessToken
+final class InitialAccessToken implements ContainsRecordedMessages
 {
+    use PrivateMessageRecorderCapabilities;
+
     /**
      * @var InitialAccessTokenId
      */
@@ -44,6 +49,9 @@ final class InitialAccessToken
         $this->initialAccessTokenId = $initialAccessTokenId;
         $this->expiresAt = $expiresAt;
         $this->userAccountId = $userAccountId;
+
+        $event = InitialAccessTokenCreatedEvent::create($initialAccessTokenId, $userAccountId, $expiresAt);
+        $this->record($event);
     }
 
     /**

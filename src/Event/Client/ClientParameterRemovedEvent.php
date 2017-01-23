@@ -16,7 +16,7 @@ namespace OAuth2\Event\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Event\Event;
 
-final class ClientDeletedEvent extends Event
+final class ClientParameterRemovedEvent extends Event
 {
     /**
      * @var ClientId
@@ -24,24 +24,32 @@ final class ClientDeletedEvent extends Event
     private $clientId;
 
     /**
-     * ClientCreatedEvent constructor.
+     * @var string
+     */
+    private $key;
+
+    /**
+     * ClientParameterUpdatedEvent constructor.
      *
      * @param ClientId $clientId
+     * @param string   $key
      */
-    protected function __construct(ClientId $clientId)
+    protected function __construct(ClientId $clientId, string $key)
     {
         parent::__construct();
         $this->clientId = $clientId;
+        $this->key = $key;
     }
 
     /**
      * @param ClientId $clientId
+     * @param string   $key
      *
-     * @return self
+     * @return ClientParameterRemovedEvent
      */
-    public static function create(ClientId $clientId): self
+    public static function create(ClientId $clientId, string $key): self
     {
-        return new self($clientId);
+        return new self($clientId, $key);
     }
 
     /**
@@ -51,19 +59,7 @@ final class ClientDeletedEvent extends Event
     {
         return [
             'client_id' => $this->clientId,
+            'key' => $this->key,
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function jsonSerialize(): array
-    {
-        $json = parent::jsonSerialize();
-        $json['payload'] = [
-            'client_id' => $this->clientId,
-        ];
-
-        return $json;
     }
 }

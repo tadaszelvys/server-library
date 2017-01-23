@@ -11,44 +11,46 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Event\InitialAccessToken;
+namespace OAuth2\Event\InitialAccessTokenId;
 
 use OAuth2\Model\Event\Event;
-use OAuth2\Model\InitialAccessToken\InitialAccessToken;
+use OAuth2\Model\InitialAccessToken\InitialAccessTokenId;
 
 final class InitialAccessTokenRevokedEvent extends Event
 {
     /**
-     * @var InitialAccessToken
+     * @var InitialAccessTokenId
      */
-    private $initialAccessToken;
+    private $initialAccessTokenId;
 
     /**
      * InitialAccessTokenRevokedEvent constructor.
      *
-     * @param InitialAccessToken $initialAccessToken
+     * @param InitialAccessTokenId $initialAccessTokenId
      */
-    protected function __construct(InitialAccessToken $initialAccessToken)
+    protected function __construct(InitialAccessTokenId $initialAccessTokenId)
     {
         parent::__construct();
-        $this->initialAccessToken = $initialAccessToken;
+        $this->initialAccessTokenId = $initialAccessTokenId;
     }
 
     /**
-     * @param InitialAccessToken $initialAccessToken
+     * @param InitialAccessTokenId $initialAccessTokenId
      *
      * @return self
      */
-    public static function create(InitialAccessToken $initialAccessToken): self
+    public static function create(InitialAccessTokenId $initialAccessTokenId): self
     {
-        return new self($initialAccessToken);
+        return new self($initialAccessTokenId);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPayload(): \JsonSerializable
+    public function getPayload()
     {
-        return $this->initialAccessToken;
+        return [
+            'initial_access_token_id' => $this->initialAccessTokenId,
+        ];
     }
 }

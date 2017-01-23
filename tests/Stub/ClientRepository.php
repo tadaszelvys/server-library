@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace OAuth2\Test\Stub;
 
-use Assert\Assertion;
+use OAuth2\Event\Client\ClientDeletedEvent;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Client\ClientRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccountId;
 use Ramsey\Uuid\Uuid;
+use SimpleBus\Message\Recorder\RecordsMessages;
 
 class ClientRepository implements ClientRepositoryInterface
 {
@@ -27,9 +28,18 @@ class ClientRepository implements ClientRepositoryInterface
      */
     private $clients = [];
 
-    public function __construct()
+    /**
+     * @var RecordsMessages
+     */
+    private $eventRecorder;
+
+    /**
+     * @param RecordsMessages $eventRecorder
+     */
+    public function __construct(RecordsMessages $eventRecorder)
     {
-        $this->save(Client::create(
+        $this->eventRecorder = $eventRecorder;
+        $this->clients['client1'] = Client::create(
             ClientId::create('client1'),
             [
                 'token_endpoint_auth_method' => 'client_secret_basic',
@@ -37,16 +47,16 @@ class ClientRepository implements ClientRepositoryInterface
                 'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
             ],
             UserAccountId::create('User1')
-        ));
-        $this->save(Client::create(
+        );
+        $this->clients['client2'] = Client::create(
             ClientId::create('client2'),
             [
                 'token_endpoint_auth_method' => 'none',
                 'grant_types'                => ['client_credentials'],
             ],
             UserAccountId::create('User1')
-        ));
-        $this->save(Client::create(
+        );
+        $this->clients['client3'] = Client::create(
             ClientId::create('client3'),
             [
                 'token_endpoint_auth_method' => 'client_secret_jwt',
@@ -55,8 +65,8 @@ class ClientRepository implements ClientRepositoryInterface
                 'grant_types'                => ['client_credentials', 'password', 'refresh_token', 'authorization_code'],
             ],
             UserAccountId::create('User1')
-        ));
-        $this->save(Client::create(
+        );
+        $this->clients['client4'] = Client::create(
             ClientId::create('client4'),
             [
                 'token_endpoint_auth_method' => 'client_secret_post',
@@ -64,7 +74,7 @@ class ClientRepository implements ClientRepositoryInterface
                 'client_secret_expires_at'   => (new \DateTimeImmutable('now + 1 day'))->getTimestamp(),
             ],
             UserAccountId::create('User1')
-        ));
+        );
     }
 
     /**
@@ -80,9 +90,17 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      */
+    public function has(ClientId $clientId)
+    {
+        return array_key_exists($clientId->getValue(), $this->clients);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function find(ClientId $clientId)
     {
-        return array_key_exists($clientId->getValue(), $this->clients) ? $this->clients[$clientId->getValue()] : null;
+        return $this->has($clientId) ? $this->clients[$clientId->getValue()] : null;
     }
 
     /**
@@ -99,15 +117,22 @@ class ClientRepository implements ClientRepositoryInterface
     public function save(Client $client)
     {
         $this->clients[$client->getId()->getValue()] = $client;
+        $events = $client->recordedMessages();
+        foreach ($events as $event) {
+            $this->eventRecorder->record($event);
+        }
+        $client->eraseMessages();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(Client $client)
+    public function delete(ClientId $clientId)
     {
-        $client = $this->find($client->getId());
-        Assertion::notNull($client, 'Unknown client.');
-        unset($this->clients[$client->get('client_id')]);
+        if ($this->has($clientId)) {
+            unset($this->clients[$clientId->getValue()]);
+            $event = ClientDeletedEvent::create($clientId);
+            $this->eventRecorder->record($event);
+        }
     }
 }

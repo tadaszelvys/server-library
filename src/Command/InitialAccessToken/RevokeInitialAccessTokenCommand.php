@@ -13,40 +13,40 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\InitialAccessToken;
 
-use OAuth2\Model\InitialAccessToken\InitialAccessToken;
+use OAuth2\Model\InitialAccessToken\InitialAccessTokenId;
 
 final class RevokeInitialAccessTokenCommand
 {
     /**
-     * @var InitialAccessToken
+     * @var InitialAccessTokenId
      */
-    private $initialAccessToken;
+    private $initialAccessTokenId;
 
     /**
      * RevokeInitialAccessTokenCommand constructor.
      *
-     * @param InitialAccessToken $initialAccessToken
+     * @param InitialAccessTokenId $initialAccessTokenId
      */
-    protected function __construct(InitialAccessToken $initialAccessToken)
+    protected function __construct(InitialAccessTokenId $initialAccessTokenId)
     {
-        $this->initialAccessToken = $initialAccessToken;
+        $this->initialAccessTokenId = $initialAccessTokenId;
     }
 
     /**
-     * @param InitialAccessToken $initialAccessToken
+     * @param InitialAccessTokenId $initialAccessTokenId
      *
      * @return RevokeInitialAccessTokenCommand
      */
-    public static function create(InitialAccessToken $initialAccessToken): self
+    public static function create(InitialAccessTokenId $initialAccessTokenId): self
     {
-        return new self($initialAccessToken);
+        return new self($initialAccessTokenId);
     }
 
     /**
-     * @return InitialAccessToken
+     * @return InitialAccessTokenId
      */
-    public function getInitialAccessToken(): InitialAccessToken
+    public function getInitialAccessTokenId(): InitialAccessTokenId
     {
-        return $this->initialAccessToken;
+        return $this->initialAccessTokenId;
     }
 }

@@ -57,7 +57,7 @@ use OAuth2\Event\AccessToken\AccessTokenCreatedEvent;
 use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
 use OAuth2\Event\Client\ClientCreatedEvent;
 use OAuth2\Event\Client\ClientDeletedEvent;
-use OAuth2\Event\Client\ClientUpdatedEvent;
+use OAuth2\Event\Client\ClientParametersUpdatedEvent;
 use OAuth2\Event\RefreshToken\RefreshTokenCreatedEvent;
 use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 use OAuth2\GrantType\ClientCredentialsGrantType;
@@ -208,7 +208,9 @@ final class Application
     public function getClientRepository(): ClientRepository
     {
         if (null === $this->clientRepository) {
-            $this->clientRepository = new ClientRepository();
+            $this->clientRepository = new ClientRepository(
+                $this->getPublicMessageRecorder()
+            );
         }
 
         return $this->clientRepository;
@@ -491,8 +493,7 @@ final class Application
         if (null === $this->createClientCommandHandler) {
             $this->createClientCommandHandler = new CreateClientCommandHandler(
                 $this->getClientRepository(),
-                $this->getRuleManager(),
-                $this->getPublicMessageRecorder()
+                $this->getRuleManager()
             );
         }
 
@@ -511,8 +512,7 @@ final class Application
     {
         if (null === $this->deleteClientCommandHandler) {
             $this->deleteClientCommandHandler = new DeleteClientCommandHandler(
-                $this->getClientRepository(),
-                $this->getPublicMessageRecorder()
+                $this->getClientRepository()
             );
         }
 
@@ -532,8 +532,7 @@ final class Application
         if (null === $this->updateClientCommandHandler) {
             $this->updateClientCommandHandler = new UpdateClientCommandHandler(
                 $this->getClientRepository(),
-                $this->getRuleManager(),
-                $this->getPublicMessageRecorder()
+                $this->getRuleManager()
             );
         }
 
@@ -600,7 +599,7 @@ final class Application
                     RefreshTokenRevokedEvent::class => [RefreshTokenRevokedEventHandler::class],
                     ClientCreatedEvent::class       => [ClientCreatedEventHandler::class],
                     ClientDeletedEvent::class       => [ClientDeletedEventHandler::class],
-                    ClientUpdatedEvent::class       => [ClientUpdatedEventHandler::class],
+                    ClientParametersUpdatedEvent::class       => [ClientUpdatedEventHandler::class],
                 ],
                 $this->getServiceLocatorAwareCallableResolver()
             );
@@ -1614,7 +1613,9 @@ final class Application
     public function getRefreshTokenRepository(): RefreshTokenRepositoryInterface
     {
         if (null === $this->refreshTokenRepository) {
-            $this->refreshTokenRepository = new RefreshTokenRepository();
+            $this->refreshTokenRepository = new RefreshTokenRepository(
+                $this->getPublicMessageRecorder()
+            );
         }
 
         return $this->refreshTokenRepository;
@@ -1651,8 +1652,7 @@ final class Application
     {
         if (null === $this->revokeAccessTokenCommandHandler) {
             $this->revokeAccessTokenCommandHandler = new RevokeAccessTokenCommandHandler(
-                $this->getAccessTokenRepository(),
-                $this->getPublicMessageRecorder()
+                $this->getAccessTokenRepository()
             );
         }
 
@@ -1705,8 +1705,7 @@ final class Application
     {
         if (null === $this->revokeRefreshTokenCommandHandler) {
             $this->revokeRefreshTokenCommandHandler = new RevokeRefreshTokenCommandHandler(
-                $this->getRefreshTokenRepository(),
-                $this->getPublicMessageRecorder()
+                $this->getRefreshTokenRepository()
             );
         }
 
@@ -1885,8 +1884,7 @@ final class Application
     {
         if (null === $this->createAccessTokenCommandHandler) {
             $this->createAccessTokenCommandHandler = new CreateAccessTokenCommandHandler(
-                $this->getAccessTokenRepository(),
-                $this->getPublicMessageRecorder()
+                $this->getAccessTokenRepository()
             );
         }
 
