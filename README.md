@@ -3,17 +3,17 @@ OAuth2 And OpenID Connect Framework Library for PHP
 
 Help me out for a couple of :beers:!
 
-[![Beerpay](https://beerpay.io/OAuth2-Framework/server-library/badge.svg?style=beer-square)](https://beerpay.io/OAuth2-Framework/server-library)  [![Beerpay](https://beerpay.io/OAuth2-Framework/server-library/make-wish.svg?style=flat-square)](https://beerpay.io/OAuth2-Framework/server-library?focus=wish)
+[![Beerpay](https://beerpay.io/OAuth2-Framework/OAuth2-Framework.github.io/badge.svg)](https://beerpay.io/OAuth2-Framework/OAuth2-Framework.github.io)
+[![Beerpay](https://beerpay.io/OAuth2-Framework/OAuth2-Framework.github.io/make-wish.svg)](https://beerpay.io/OAuth2-Framework/OAuth2-Framework.github.io)
 
 ----
 
-[![Join the chat at https://gitter.im/OAuth2-Framework/server-library](https://badges.gitter.im/OAuth2-Framework/server-library.svg)](https://gitter.im/OAuth2-Framework/server-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/OAuth2-Framework](https://badges.gitter.im/OAuth2-Framework.svg)](https://gitter.im/OAuth2-Framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/OAuth2-Framework/server-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/OAuth2-Framework/server-library/?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/OAuth2-Framework/server-library/badge.svg?branch=master)](https://coveralls.io/github/OAuth2-Framework/server-library?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/OAuth2-Framework/security-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/OAuth2-Framework/security-library/?branch=master)
 [![PSR-7 ready](https://img.shields.io/badge/PSR--7-ready-brightgreen.svg)](http://www.php-fig.org/psr/psr-7/)
 
-[![Dependency Status](https://www.versioneye.com/user/projects/57acac64fc2569003af85833/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57acac64fc2569003af85833)
+[![Requirements Status](https://requires.io/github/OAuth2-Framework/server-library/requirements.svg?branch=master)](https://requires.io/github/OAuth2-Framework/server-library/requirements/?branch=master)
 
 [![Build Status](https://travis-ci.org/OAuth2-Framework/server-library.svg?branch=master)](https://travis-ci.org/OAuth2-Framework/server-library)
 [![HHVM Status](http://hhvm.h4cc.de/badge/spomky-labs/oauth2-server-library.svg)](http://hhvm.h4cc.de/package/spomky-labs/oauth2-server-library)
