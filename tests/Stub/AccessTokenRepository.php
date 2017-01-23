@@ -31,6 +31,9 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     private $accessTokens = [];
 
+    /**
+     * @var RecordsMessages
+     */
     private $eventRecorder;
 
     /**

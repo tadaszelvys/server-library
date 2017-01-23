@@ -13,42 +13,44 @@ declare(strict_types=1);
 
 namespace OAuth2\Event\AuthCode;
 
-use OAuth2\Model\AuthCode\AuthCode;
+use OAuth2\Model\AuthCode\AuthCodeId;
 use OAuth2\Model\Event\Event;
 
 final class AuthCodeRevokedEvent extends Event
 {
     /**
-     * @var AuthCode
+     * @var AuthCodeId
      */
-    private $authCode;
+    private $authCodeId;
 
     /**
      * AuthCodeRevokedEvent constructor.
      *
-     * @param AuthCode $authCode
+     * @param AuthCodeId $authCodeId
      */
-    protected function __construct(AuthCode $authCode)
+    protected function __construct(AuthCodeId $authCodeId)
     {
         parent::__construct();
-        $this->authCode = $authCode;
+        $this->authCodeId = $authCodeId;
     }
 
     /**
-     * @param AuthCode $authCode
+     * @param AuthCodeId $authCodeId
      *
      * @return self
      */
-    public static function create(AuthCode $authCode): self
+    public static function create(AuthCodeId $authCodeId): self
     {
-        return new self($authCode);
+        return new self($authCodeId);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPayload(): \JsonSerializable
+    public function getPayload()
     {
-        return $this->authCode;
+        return [
+            'auth_code_id' => $this->authCodeId
+        ];
     }
 }

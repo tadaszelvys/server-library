@@ -11,12 +11,12 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Event\AuthCode;
+namespace OAuth2\Event\AuthCodeId;
 
 use OAuth2\Model\AuthCode\AuthCodeId;
 use OAuth2\Model\Event\Event;
 
-final class AuthCodeMarkedAsUsedEvent extends Event
+final class AuthCodeWithRefreshTokenEvent extends Event
 {
     /**
      * @var AuthCodeId
@@ -24,7 +24,7 @@ final class AuthCodeMarkedAsUsedEvent extends Event
     private $authCodeId;
 
     /**
-     * AuthCodeMarkedAsUsedEvent constructor.
+     * AuthCodeCreatedEvent constructor.
      *
      * @param AuthCodeId $authCodeId
      */

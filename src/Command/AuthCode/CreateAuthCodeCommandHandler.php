@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\AuthCode;
 
-use OAuth2\Event\AuthCode\AuthCodeCreatedEvent;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
-use SimpleBus\Message\Recorder\RecordsMessages;
 
 final class CreateAuthCodeCommandHandler
 {
@@ -25,20 +23,13 @@ final class CreateAuthCodeCommandHandler
     private $authCodeRepository;
 
     /**
-     * @var RecordsMessages
-     */
-    private $messageRecorder;
-
-    /**
      * CreateClientCommandHandler constructor.
      *
      * @param AuthCodeRepositoryInterface $authCodeRepository
-     * @param RecordsMessages             $messageRecorder
      */
-    public function __construct(AuthCodeRepositoryInterface $authCodeRepository, RecordsMessages $messageRecorder)
+    public function __construct(AuthCodeRepositoryInterface $authCodeRepository)
     {
         $this->authCodeRepository = $authCodeRepository;
-        $this->messageRecorder = $messageRecorder;
     }
 
     /**
@@ -56,7 +47,5 @@ final class CreateAuthCodeCommandHandler
             $command->getMetadatas()
         );
         $this->authCodeRepository->save($authCode);
-        $event = AuthCodeCreatedEvent::create($authCode);
-        $this->messageRecorder->record($event);
     }
 }

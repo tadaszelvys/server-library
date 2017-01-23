@@ -18,6 +18,7 @@ use OAuth2\Model\InitialAccessToken\InitialAccessTokenId;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccountId;
 use Ramsey\Uuid\Uuid;
+use SimpleBus\Message\Recorder\RecordsMessages;
 
 class InitialAccessTokenRepository implements InitialAccessTokenRepositoryInterface
 {
@@ -27,20 +28,18 @@ class InitialAccessTokenRepository implements InitialAccessTokenRepositoryInterf
     private $initialAccessTokens = [];
 
     /**
-     * {@inheritdoc}
+     * @var RecordsMessages
      */
-    public function create(UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null)
-    {
-        $initialAccessTokeId = InitialAccessTokenId::create(Uuid::uuid4()->toString());
-
-        return InitialAccessToken::create($initialAccessTokeId, $userAccountId, $expiresAt);
-    }
+    private $eventRecorder;
 
     /**
-     * InitialAccessTokenManager constructor.
+     * InitialAccessTokenRepository constructor.
+     *
+     * @param RecordsMessages $eventRecorder
      */
-    public function __construct()
+    public function __construct(RecordsMessages $eventRecorder)
     {
+        $this->eventRecorder = $eventRecorder;
         $valid_initialAccessToken = InitialAccessToken::create(
             InitialAccessTokenId::create('INITIAL_ACCESS_TOKEN_VALID'),
             UserAccountId::create('user1'),
@@ -54,6 +53,16 @@ class InitialAccessTokenRepository implements InitialAccessTokenRepositoryInterf
             new \DateTimeImmutable('now -1 hour')
         );
         $this->save($expired_initialAccessToken);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function create(UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null)
+    {
+        $initialAccessTokeId = InitialAccessTokenId::create(Uuid::uuid4()->toString());
+
+        return InitialAccessToken::create($initialAccessTokeId, $userAccountId, $expiresAt);
     }
 
     /**

@@ -1145,7 +1145,9 @@ final class Application
     public function getInitialAccessTokenRepository(): InitialAccessTokenRepositoryInterface
     {
         if (null === $this->initialAccessTokenRepository) {
-            $this->initialAccessTokenRepository = new InitialAccessTokenRepository();
+            $this->initialAccessTokenRepository = new InitialAccessTokenRepository(
+                $this->getPublicMessageRecorder()
+            );
         }
 
         return $this->initialAccessTokenRepository;
@@ -1629,7 +1631,9 @@ final class Application
     public function getAuthorizationCodeRepository(): AuthCodeRepositoryInterface
     {
         if (null === $this->authCodeRepository) {
-            $this->authCodeRepository = new AuthCodeRepository();
+            $this->authCodeRepository = new AuthCodeRepository(
+                $this->getPublicMessageRecorder()
+            );
         }
 
         return $this->authCodeRepository;

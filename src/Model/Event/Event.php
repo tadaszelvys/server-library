@@ -67,7 +67,6 @@ abstract class Event implements \JsonSerializable
             'type'        => get_class($this),
             'recorded_on' => (float) $this->getRecordedOn()->format('U.u'),
             'payload'     => $this->getPayload(),
-            'version'     => '1.0',
         ];
     }
 }

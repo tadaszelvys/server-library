@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace OAuth2\Model\AuthCode;
 
 use Assert\Assertion;
+use OAuth2\Event\AuthCode\AuthCodeCreatedEvent;
+use OAuth2\Event\AuthCodeId\AuthCodeWithoutRefreshTokenEvent;
+use OAuth2\Event\AuthCodeId\AuthCodeWithRefreshTokenEvent;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Token\Token;
 use OAuth2\Model\UserAccount\UserAccountId;
@@ -40,8 +43,8 @@ final class AuthCode extends Token
      * AuthCode constructor.
      *
      * @param AuthCodeId         $authCodeId
-     * @param ClientId             $clientId
-     * @param UserAccountId        $userAccountId
+     * @param ClientId           $clientId
+     * @param UserAccountId      $userAccountId
      * @param array              $queryParameters
      * @param UriInterface       $redirectUri
      * @param \DateTimeImmutable $expiresAt
@@ -52,13 +55,17 @@ final class AuthCode extends Token
     protected function __construct(AuthCodeId $authCodeId, ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
         parent::__construct($authCodeId, $userAccountId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
+        $this->redirectUri = $redirectUri;
         $this->queryParameters = $queryParameters;
+
+        $event = AuthCodeCreatedEvent::create($authCodeId, $clientId, $userAccountId, $queryParameters, $redirectUri, $expiresAt, $parameters, $scopes, $metadatas);
+        $this->record($event);
     }
 
     /**
      * @param AuthCodeId         $authCodeId
-     * @param ClientId             $clientId
-     * @param UserAccountId        $userAccountId
+     * @param ClientId           $clientId
+     * @param UserAccountId      $userAccountId
      * @param array              $queryParameters
      * @param UriInterface       $redirectUri
      * @param \DateTimeImmutable $expiresAt
@@ -91,8 +98,8 @@ final class AuthCode extends Token
         }
         $clone = clone $this;
         $clone->issueRefreshToken = true;
-        //$event = AuthCodeWithRefreshTokenEvent::create($accessToken->getId());
-        //$this->record($event);
+        $event = AuthCodeWithRefreshTokenEvent::create($clone->getId());
+        $this->record($event);
 
         return $clone;
     }
@@ -107,8 +114,8 @@ final class AuthCode extends Token
         }
         $clone = clone $this;
         $clone->issueRefreshToken = false;
-        //$event = AuthCodeWithoutRefreshTokenEvent::create($accessToken->getId());
-        //$this->record($event);
+        $event = AuthCodeWithoutRefreshTokenEvent::create($clone->getId());
+        $this->record($event);
 
         return $clone;
     }

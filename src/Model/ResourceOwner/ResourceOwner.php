@@ -14,9 +14,13 @@ declare(strict_types=1);
 namespace OAuth2\Model\ResourceOwner;
 
 use Assert\Assertion;
+use SimpleBus\Message\Recorder\ContainsRecordedMessages;
+use SimpleBus\Message\Recorder\PrivateMessageRecorderCapabilities;
 
-abstract class ResourceOwner implements \JsonSerializable
+abstract class ResourceOwner implements \JsonSerializable, ContainsRecordedMessages
 {
+    use PrivateMessageRecorderCapabilities;
+
     /**
      * @var ResourceOwnerId
      */

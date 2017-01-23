@@ -20,6 +20,7 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountId;
+use SimpleBus\Message\Recorder\RecordsMessages;
 use Zend\Diactoros\Uri;
 
 class AuthCodeRepository implements AuthCodeRepositoryInterface
@@ -30,10 +31,18 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
     private $authCodes = [];
 
     /**
-     * AuthCodeRepository constructor.
+     * @var RecordsMessages
      */
-    public function __construct()
+    private $eventRecorder;
+
+    /**
+     * AuthCodeRepository constructor.
+     *
+     * @param RecordsMessages $eventRecorder
+     */
+    public function __construct(RecordsMessages $eventRecorder)
     {
+        $this->eventRecorder = $eventRecorder;
         $this->save(AuthCode::create(
             AuthCodeId::create('VALID_AUTH_CODE'),
             ClientId::create('client1'),
@@ -53,6 +62,11 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
     public function save(AuthCode $authCode)
     {
         $this->authCodes[$authCode->getId()->getValue()] = $authCode;
+        $events = $authCode->recordedMessages();
+        foreach ($events as $event) {
+            $this->eventRecorder->record($event);
+        }
+        $authCode->eraseMessages();
     }
 
     /**
