@@ -17,11 +17,10 @@ use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\AccessToken\AccessTokenId;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
-use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\RefreshToken\RefreshToken;
 use OAuth2\Model\RefreshToken\RefreshTokenId;
-use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 use OAuth2\Model\UserAccount\UserAccountId;
 use SimpleBus\Message\Recorder\RecordsMessages;
 
@@ -96,12 +95,12 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
         return array_key_exists($tokenId->getValue(), $this->accessTokens) ? $this->accessTokens[$tokenId->getValue()] : $this->loadAccessToken($tokenId);
     }
 
-    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
+    public function create(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
     {
         return AccessToken::create(
             AccessTokenId::create(bin2hex(random_bytes(50))),
-            $resourceOwner->getId(),
-            $client->getId(),
+            $resourceOwnerId,
+            $clientId,
             $parameters,
             $metadatas,
             $scopes,

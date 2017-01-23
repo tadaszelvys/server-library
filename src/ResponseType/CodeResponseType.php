@@ -22,7 +22,7 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
-class AuthorizationCodeResponseType implements ResponseTypeInterface
+class CodeResponseType implements ResponseTypeInterface
 {
     /**
      * @var bool

@@ -15,7 +15,7 @@ namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\GrantType\GrantTypeManagerInterface;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 use OAuth2\ResponseType\ResponseTypeManagerInterface;
 
 final class GrantTypeFlowRule implements RuleInterface
@@ -45,7 +45,7 @@ final class GrantTypeFlowRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         if (!array_key_exists('grant_types', $command_parameters)) {
             $command_parameters['grant_types'] = [];
@@ -59,7 +59,7 @@ final class GrantTypeFlowRule implements RuleInterface
         $validated_parameters['grant_types'] = $command_parameters['grant_types'];
         $validated_parameters['response_types'] = $command_parameters['response_types'];
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 
     /**

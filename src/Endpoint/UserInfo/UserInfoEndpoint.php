@@ -195,7 +195,7 @@ class UserInfoEndpoint implements MiddlewareInterface
      */
     private function getUserAccount(AccessToken $access_token): UserAccount
     {
-        $userAccount = $access_token->getResourceOwner();
+        $userAccount = $access_token->getResourceOwnerId();
         if (!$userAccount instanceof UserAccount) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the resource owner.']);
         }

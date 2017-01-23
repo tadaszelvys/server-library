@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 
 final class IdTokenEncryptionAlgorithmsRule implements RuleInterface
@@ -37,7 +37,7 @@ final class IdTokenEncryptionAlgorithmsRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         if (array_key_exists('id_token_encrypted_response_alg', $command_parameters) && array_key_exists('id_token_encrypted_response_enc', $command_parameters)) {
             Assertion::string($command_parameters['id_token_encrypted_response_alg'], 'Invalid parameter \'id_token_encrypted_response_alg\'. The value must be a string.');
@@ -50,6 +50,6 @@ final class IdTokenEncryptionAlgorithmsRule implements RuleInterface
             throw new \InvalidArgumentException('The parameters \'id_token_encrypted_response_alg\' and \'id_token_encrypted_response_enc\' must be set together');
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 }

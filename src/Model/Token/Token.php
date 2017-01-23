@@ -24,6 +24,11 @@ abstract class Token implements \JsonSerializable, ContainsRecordedMessages
     use PrivateMessageRecorderCapabilities;
 
     /**
+     * @var TokenId
+     */
+    private $tokenId;
+
+    /**
      * @var \DateTimeImmutable
      */
     private $expiresAt;
@@ -56,6 +61,7 @@ abstract class Token implements \JsonSerializable, ContainsRecordedMessages
     /**
      * Token constructor.
      *
+     * @param TokenId            $tokenId
      * @param ResourceOwnerId    $resourceOwnerId
      * @param ClientId           $clientId
      * @param \DateTimeImmutable $expiresAt
@@ -63,14 +69,23 @@ abstract class Token implements \JsonSerializable, ContainsRecordedMessages
      * @param array              $metadatas
      * @param string[]           $scopes
      */
-    protected function __construct(ResourceOwnerId $resourceOwnerId, ClientId $clientId, \DateTimeImmutable $expiresAt, array $parameters, array $metadatas, array $scopes)
+    protected function __construct(TokenId $tokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, \DateTimeImmutable $expiresAt, array $parameters, array $metadatas, array $scopes)
     {
+        $this->tokenId = $tokenId;
         $this->resourceOwnerId = $resourceOwnerId;
         $this->clientId = $clientId;
         $this->expiresAt = $expiresAt;
         $this->parameters = $parameters;
         $this->metadatas = $metadatas;
         $this->scopes = $scopes;
+    }
+
+    /**
+     * @return TokenId
+     */
+    public function getId(): TokenId
+    {
+        return $this->tokenId;
     }
 
     /**

@@ -15,7 +15,7 @@ namespace OAuth2\Endpoint\Token;
 
 use Assert\Assertion;
 use OAuth2\Model\Client\Client;
-use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 
 class GrantTypeData
 {
@@ -30,9 +30,9 @@ class GrantTypeData
     private $parameters = [];
 
     /**
-     * @var ResourceOwner
+     * @var ResourceOwnerId
      */
-    private $resourceOwner;
+    private $resourceOwnerId;
 
     /**
      * @var Client|null
@@ -164,24 +164,24 @@ class GrantTypeData
     }
 
     /**
-     * @param ResourceOwner $resourceOwner
+     * @param ResourceOwnerId $resourceOwnerId
      *
      * @return GrantTypeData
      */
-    public function withResourceOwner(ResourceOwner $resourceOwner): self
+    public function withResourceOwnerId(ResourceOwnerId $resourceOwnerId): self
     {
         $clone = clone $this;
-        $clone->resourceOwner = $resourceOwner;
+        $clone->resourceOwnerId = $resourceOwnerId;
 
         return $clone;
     }
 
     /**
-     * @return ResourceOwner
+     * @return ResourceOwnerId
      */
-    public function getResourceOwner(): ResourceOwner
+    public function getResourceOwnerId(): ResourceOwnerId
     {
-        return $this->resourceOwner;
+        return $this->resourceOwnerId;
     }
 
     /**

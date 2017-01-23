@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Client\Rule;
 
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 use Ramsey\Uuid\Uuid;
 
 class ClientIdRule implements RuleInterface
@@ -21,11 +21,11 @@ class ClientIdRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         $validated_parameters['client_id'] = Uuid::uuid4()->toString();
         $validated_parameters['client_id_issued_at'] = time();
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 }

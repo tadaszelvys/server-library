@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Client\Rule;
 
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class RuleManager implements RuleManagerInterface
 {
@@ -61,9 +61,9 @@ final class RuleManager implements RuleManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, UserAccount $userAccount)
+    public function handle(array $command_parameters, UserAccountId $userAccountId)
     {
-        return call_user_func($this->callableForNextRule(0), $command_parameters, [], $userAccount);
+        return call_user_func($this->callableForNextRule(0), $command_parameters, [], $userAccountId);
     }
 
     /**
@@ -74,14 +74,14 @@ final class RuleManager implements RuleManagerInterface
     private function callableForNextRule($index)
     {
         if (!isset($this->rules[$index])) {
-            return function (array $command_parameters, array $validated_parameters, UserAccount $userAccount) {
+            return function (array $command_parameters, array $validated_parameters, UserAccountId $userAccountId) {
                 return $validated_parameters;
             };
         }
         $rule = $this->rules[$index];
 
-        return function ($command_parameters, $validated_parameters, UserAccount $userAccount) use ($rule, $index) {
-            return $rule->handle($command_parameters, $validated_parameters, $userAccount, $this->callableForNextRule($index + 1));
+        return function ($command_parameters, $validated_parameters, UserAccountId $userAccountId) use ($rule, $index) {
+            return $rule->handle($command_parameters, $validated_parameters, $userAccountId, $this->callableForNextRule($index + 1));
         };
     }
 }

@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\InitialAccessToken;
 
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 interface InitialAccessTokenRepositoryInterface
 {
     /**
-     * @param UserAccount             $userAccount
+     * @param UserAccountId           $userAccountId
      * @param \DateTimeImmutable|null $expiresAt
      *
      * @return InitialAccessToken
      */
-    public function create(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null);
+    public function create(UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null);
 
     /**
      * @param InitialAccessToken $initialAccessToken

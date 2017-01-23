@@ -47,7 +47,7 @@ final class CreateInitialAccessTokenCommandHandler
     public function handle(CreateInitialAccessTokenCommand $command)
     {
         $initialAccessToken = $this->initialAccessTokenRepository->create(
-            $command->getUserAccount(),
+            $command->getUserAccountId(),
             $command->getExpiresAt()
         );
         $this->initialAccessTokenRepository->save($initialAccessToken);

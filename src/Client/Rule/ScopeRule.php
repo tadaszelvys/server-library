@@ -15,7 +15,7 @@ namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
 use OAuth2\Model\Scope\ScopeRepositoryInterface;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class ScopeRule implements RuleInterface
 {
@@ -35,7 +35,7 @@ final class ScopeRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         if (array_key_exists('scope', $command_parameters)) {
             Assertion::regex($command_parameters['scope'], '/^[\x20\x23-\x5B\x5D-\x7E]+$/', 'Invalid characters found in the \'scope\' parameter.');
@@ -54,6 +54,6 @@ final class ScopeRule implements RuleInterface
             $validated_parameters['default_scope'] = $command_parameters['default_scope'];
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 }

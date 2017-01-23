@@ -16,20 +16,20 @@ namespace OAuth2\Command\AccessToken;
 use Assert\Assertion;
 use OAuth2\Command\CommandWithDataTransporter;
 use OAuth2\DataTransporter;
-use OAuth2\Model\Client\Client;
-use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 
 final class CreateAccessTokenCommand extends CommandWithDataTransporter
 {
     /**
-     * @var ResourceOwner
+     * @var ResourceOwnerId
      */
-    private $resourceOwner;
+    private $resourceOwnerId;
 
     /**
-     * @var Client
+     * @var ClientId
      */
-    private $client;
+    private $clientId;
 
     /**
      * @var array
@@ -54,18 +54,18 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
     /**
      * CreateAccessTokenCommand constructor.
      *
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
+     * @param ResourceOwnerId    $resourceOwnerId
+     * @param ClientId           $clientId
      * @param array              $parameters
      * @param array              $metadatas
      * @param array              $scopes
      * @param \DateTimeImmutable $expiresAt
      * @param DataTransporter    $dataTransporter
      */
-    protected function __construct(Client $client, ResourceOwner $resourceOwner, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, DataTransporter $dataTransporter = null)
+    protected function __construct(ClientId $clientId, ResourceOwnerId $resourceOwnerId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, DataTransporter $dataTransporter = null)
     {
-        $this->resourceOwner = $resourceOwner;
-        $this->client = $client;
+        $this->resourceOwnerId = $resourceOwnerId;
+        $this->clientId = $clientId;
         $this->parameters = $parameters;
         $this->metadatas = $metadatas;
         $this->scopes = $scopes;
@@ -74,8 +74,8 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
     }
 
     /**
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
+     * @param ResourceOwnerId    $resourceOwnerId
+     * @param ClientId             $clientId
      * @param array              $parameters
      * @param array              $metadatas
      * @param array              $scopes
@@ -84,25 +84,25 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
      *
      * @return CreateAccessTokenCommand
      */
-    public static function create(Client $client, ResourceOwner $resourceOwner, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, DataTransporter $dataTransporter = null): CreateAccessTokenCommand
+    public static function create(ClientId $clientId, ResourceOwnerId $resourceOwnerId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, DataTransporter $dataTransporter = null): CreateAccessTokenCommand
     {
-        return new self($client, $resourceOwner, $parameters, $metadatas, $scopes, $expiresAt, $dataTransporter);
+        return new self($clientId, $resourceOwnerId, $parameters, $metadatas, $scopes, $expiresAt, $dataTransporter);
     }
 
     /**
-     * @return ResourceOwner
+     * @return ResourceOwnerId
      */
-    public function getResourceOwner(): ResourceOwner
+    public function getResourceOwnerId(): ResourceOwnerId
     {
-        return $this->resourceOwner;
+        return $this->resourceOwnerId;
     }
 
     /**
-     * @return Client
+     * @return ClientId
      */
-    public function getClient(): Client
+    public function getClientId(): ClientId
     {
-        return $this->client;
+        return $this->clientId;
     }
 
     /**

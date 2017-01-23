@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class CommonParametersRule extends AbstractInternationalizedRule
 {
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         foreach ($this->getSupportedParameters() as $parameter => $closure) {
             $validated_parameters = array_merge(
@@ -30,7 +30,7 @@ final class CommonParametersRule extends AbstractInternationalizedRule
             );
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 
     /**

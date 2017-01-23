@@ -124,7 +124,7 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
 
             $grantTypeResponse = $grantTypeResponse->withScopes($availableScopes);
         }
-        $grantTypeResponse = $grantTypeResponse->withResourceOwner($authCode->getResourceOwner());
+        $grantTypeResponse = $grantTypeResponse->withResourceOwnerId($authCode->getResourceOwnerId());
         //$grantTypeResponse = $grantTypeResponse->withUserAccountPublicId($authCode->getUserAccountPublicId());
 
         // Refresh Token

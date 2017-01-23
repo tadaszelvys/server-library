@@ -188,7 +188,7 @@ class JWTBearerGrantType implements GrantTypeInterface
             );
         }
 
-        $grantTypeResponse = $grantTypeResponse->withResourceOwner($grantTypeResponse->getClient());
+        $grantTypeResponse = $grantTypeResponse->withResourceOwnerId($grantTypeResponse->getClient()->getId());
         if ($issueRefreshToken = $this->isRefreshTokenIssuedWithAccessToken()) {
             $grantTypeResponse = $grantTypeResponse->withRefreshToken();
         } else {

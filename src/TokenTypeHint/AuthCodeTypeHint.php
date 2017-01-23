@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace OAuth2\TokenTypeHint;
 
-use Assert\Assertion;
 use OAuth2\Command\AuthCode\RevokeAuthCodeCommand;
-use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\AuthCode\AuthCodeId;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
-use OAuth2\Model\Token\Token;
 use OAuth2\Model\Token\TokenId;
 use SimpleBus\Message\Bus\MessageBus;
 
@@ -59,7 +56,9 @@ class AuthCodeTypeHint implements TokenTypeHintInterface
      */
     public function find(string $token)
     {
-        return $this->authorizationCodeRepository->find(AuthCodeId::create($token));
+        $id = AuthCodeId::create($token);
+
+        return $this->authorizationCodeRepository->find($id);
     }
 
     /**

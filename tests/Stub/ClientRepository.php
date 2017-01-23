@@ -17,7 +17,6 @@ use Assert\Assertion;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Client\ClientRepositoryInterface;
-use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountId;
 use Ramsey\Uuid\Uuid;
 
@@ -71,11 +70,11 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(UserAccount $userAccount, array $metadatas)
+    public function create(UserAccountId $userAccountId, array $metadatas)
     {
         $clientId = ClientId::create(Uuid::uuid4()->toString());
 
-        return Client::create($clientId, $metadatas, $userAccount->getId());
+        return Client::create($clientId, $metadatas, $userAccountId);
     }
 
     /**

@@ -39,7 +39,7 @@ Feature: A client request an access token
     Given a client sends a POST revocation request but the token type hint is not supported
     Then the response contains an error with code 400
     And the error is "unsupported_token_type"
-    And the error description is "The token type hint 'bad_hint' is not supported. Please use one of the following values: access_token, refresh_token."
+    And the error description is "The token type hint 'bad_hint' is not supported. Please use one of the following values: access_token, refresh_token, auth_code."
     And no token revocation event is thrown
 
   Scenario: The token type hint is supported but the token does not exist or expired

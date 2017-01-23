@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace OAuth2\Client\Rule;
 
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 interface RuleManagerInterface
 {
     /**
-     * @param array       $parameters
-     * @param UserAccount $userAccount
+     * @param array        $parameters
+     * @param UserAccountId $userAccountId
      *
      * @return array
      */
-    public function handle(array $parameters, UserAccount $userAccount);
+    public function handle(array $parameters, UserAccountId $userAccountId);
 }

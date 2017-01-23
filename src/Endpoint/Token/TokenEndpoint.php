@@ -271,8 +271,8 @@ final class TokenEndpoint implements MiddlewareInterface
             return function (ServerRequestInterface $request, GrantTypeData $grantTypeData) {
                 $dataTransporter = new DataTransporter();
                 $command = CreateAccessTokenCommand::create(
-                    $grantTypeData->getClient(),
-                    $grantTypeData->getResourceOwner(),
+                    $grantTypeData->getClient()->getId(),
+                    $grantTypeData->getResourceOwnerId(),
                     $grantTypeData->getParameters(),
                     $grantTypeData->getMetadatas(),
                     $grantTypeData->getScopes(),

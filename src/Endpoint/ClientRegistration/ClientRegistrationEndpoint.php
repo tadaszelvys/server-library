@@ -69,7 +69,7 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
         $initial_access_token = $request->getAttribute('initial_access_token');
         Assertion::isInstanceOf($initial_access_token, InitialAccessToken::class);
         $command_parameters = is_array($request->getParsedBody()) ? $request->getParsedBody() : [];
-        $command = CreateClientCommand::create($initial_access_token->getUserAccountPublicId(), $command_parameters, $data);
+        $command = CreateClientCommand::create($initial_access_token->getUserAccountId(), $command_parameters, $data);
         $this->messageBus->handle($command);
 
         return $this->createResponse($data->getData());

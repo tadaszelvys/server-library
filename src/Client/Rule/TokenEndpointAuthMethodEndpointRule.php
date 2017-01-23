@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
 
 final class TokenEndpointAuthMethodEndpointRule implements RuleInterface
@@ -37,7 +37,7 @@ final class TokenEndpointAuthMethodEndpointRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         Assertion::keyExists($command_parameters, 'token_endpoint_auth_method', 'The parameter \'token_endpoint_auth_method\' is missing.');
         Assertion::string($command_parameters['token_endpoint_auth_method'], 'The parameter \'token_endpoint_auth_method\' must be a string.');
@@ -48,6 +48,6 @@ final class TokenEndpointAuthMethodEndpointRule implements RuleInterface
 
         $validated_parameters['token_endpoint_auth_method'] = $command_parameters['token_endpoint_auth_method'];
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 }

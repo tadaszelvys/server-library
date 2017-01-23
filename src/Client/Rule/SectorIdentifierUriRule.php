@@ -16,7 +16,7 @@ namespace OAuth2\Client\Rule;
 use Assert\Assertion;
 use Http\Client\HttpClient;
 use Interop\Http\Factory\RequestFactoryInterface;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 use Webmozart\Json\JsonDecoder;
 
 final class SectorIdentifierUriRule implements RuleInterface
@@ -59,7 +59,7 @@ final class SectorIdentifierUriRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         if (array_key_exists('sector_identifier_uri', $command_parameters)) {
             Assertion::url($command_parameters['sector_identifier_uri'], sprintf('The sector identifier URI \'%s\' is not valid.', $command_parameters['sector_identifier_uri']));
@@ -67,7 +67,7 @@ final class SectorIdentifierUriRule implements RuleInterface
             $validated_parameters['sector_identifier_uri'] = $command_parameters['sector_identifier_uri'];
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 
     /**

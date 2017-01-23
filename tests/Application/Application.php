@@ -95,7 +95,7 @@ use OAuth2\Response\Factory\NotImplementedResponseFactory;
 use OAuth2\Response\OAuth2ExceptionMiddleware;
 use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\ResponseType\AuthorizationCodeResponseType;
+use OAuth2\ResponseType\CodeResponseType;
 use OAuth2\ResponseType\ImplicitResponseType;
 use OAuth2\ResponseType\ResponseTypeManager;
 use OAuth2\ResponseType\ResponseTypeManagerInterface;
@@ -1626,7 +1626,7 @@ final class Application
     /**
      * @return AuthCodeRepositoryInterface
      */
-    public function getAuthCodeRepository(): AuthCodeRepositoryInterface
+    public function getAuthorizationCodeRepository(): AuthCodeRepositoryInterface
     {
         if (null === $this->authCodeRepository) {
             $this->authCodeRepository = new AuthCodeRepository();
@@ -1727,23 +1727,23 @@ final class Application
     }
 
     /**
-     * @var null|AuthorizationCodeResponseType
+     * @var null|CodeResponseType
      */
-    private $grantAuthorizationCodeResponseType = null;
+    private $grantCodeResponseType = null;
 
     /**
-     * @return AuthorizationCodeResponseType
+     * @return CodeResponseType
      */
-    public function getAuthorizationCodeResponseType(): AuthorizationCodeResponseType
+    public function getCodeResponseType(): CodeResponseType
     {
-        if (null === $this->grantAuthorizationCodeResponseType) {
-            /*$this->grantAuthorizationCodeResponseType = new AuthorizationCodeResponseType(
+        if (null === $this->grantCodeResponseType) {
+            /*$this->grantCodeResponseType = new CodeResponseType(
 
             );
-            $this->grantAuthorizationCodeResponseType->*/
+            $this->grantCodeResponseType->*/
         }
 
-        return $this->grantAuthorizationCodeResponseType;
+        return $this->grantCodeResponseType;
     }
 
     /**

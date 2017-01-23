@@ -140,7 +140,7 @@ class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
             );
         }
 
-        $grantTypeResponse = $grantTypeResponse->withResourceOwner($userAccount);
+        $grantTypeResponse = $grantTypeResponse->withResourceOwnerId($userAccount->getId());
         if ($this->issueRefreshToken($grantTypeResponse->getClient())) {
             $grantTypeResponse = $grantTypeResponse->withRefreshToken();
         } else {

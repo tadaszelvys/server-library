@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
 use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
 
@@ -35,7 +35,7 @@ final class SubjectTypeRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         if (array_key_exists('subject_type', $command_parameters)) {
             Assertion::string($command_parameters['subject_type'], 'Invalid parameter \'subject_type\'. The value must be a string.');
@@ -48,6 +48,6 @@ final class SubjectTypeRule implements RuleInterface
             $validated_parameters['subject_type'] = $command_parameters['subject_type'];
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 }

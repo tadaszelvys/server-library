@@ -38,8 +38,8 @@ final class CreateAccessTokenCommandHandler
     public function handle(CreateAccessTokenCommand $command)
     {
         $accessToken = $this->accessTokenRepository->create(
-            $command->getResourceOwner(),
-            $command->getClient(),
+            $command->getResourceOwnerId(),
+            $command->getClientId(),
             $command->getParameters(),
             $command->getMetadatas(),
             $command->getScopes(),

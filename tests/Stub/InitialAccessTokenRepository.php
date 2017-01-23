@@ -16,7 +16,6 @@ namespace OAuth2\Test\Stub;
 use OAuth2\Model\InitialAccessToken\InitialAccessToken;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenId;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
-use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountId;
 use Ramsey\Uuid\Uuid;
 
@@ -30,11 +29,11 @@ class InitialAccessTokenRepository implements InitialAccessTokenRepositoryInterf
     /**
      * {@inheritdoc}
      */
-    public function create(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null)
+    public function create(UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null)
     {
         $initialAccessTokeId = InitialAccessTokenId::create(Uuid::uuid4()->toString());
 
-        return InitialAccessToken::create($initialAccessTokeId, $userAccount, $expiresAt);
+        return InitialAccessToken::create($initialAccessTokeId, $userAccountId, $expiresAt);
     }
 
     /**
@@ -44,14 +43,14 @@ class InitialAccessTokenRepository implements InitialAccessTokenRepositoryInterf
     {
         $valid_initialAccessToken = InitialAccessToken::create(
             InitialAccessTokenId::create('INITIAL_ACCESS_TOKEN_VALID'),
-            UserAccount::create(UserAccountId::create('user1'), []),
+            UserAccountId::create('user1'),
             new \DateTimeImmutable('now +1 hour')
         );
         $this->save($valid_initialAccessToken);
 
         $expired_initialAccessToken = InitialAccessToken::create(
             InitialAccessTokenId::create('INITIAL_ACCESS_TOKEN_EXPIRED'),
-            UserAccount::create(UserAccountId::create('user1'), []),
+            UserAccountId::create('user1'),
             new \DateTimeImmutable('now -1 hour')
         );
         $this->save($expired_initialAccessToken);

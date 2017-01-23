@@ -96,7 +96,7 @@ class RefreshTokenGrantType implements GrantTypeInterface
         $client = $request->getAttribute('client');
         $this->checkRefreshToken($token, $client);
 
-        $grantTypeData = $grantTypeData->withResourceOwner($token->getResourceOwner());
+        $grantTypeData = $grantTypeData->withResourceOwnerId($token->getResourceOwnerId());
         $grantTypeData = $grantTypeData->withRefreshToken();
         $grantTypeData = $grantTypeData->withRefreshTokenScopes($token->getScopes());
         foreach ($token->getMetadatas() as $k => $v) {

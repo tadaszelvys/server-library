@@ -75,7 +75,7 @@ class ClientCredentialsGrantType implements GrantTypeInterface
             $grantTypeResponse = $grantTypeResponse->withoutRefreshToken();
         }
 
-        $grantTypeResponse = $grantTypeResponse->withResourceOwner($grantTypeResponse->getClient());
+        $grantTypeResponse = $grantTypeResponse->withResourceOwnerId($grantTypeResponse->getClient()->getId());
 
         return $grantTypeResponse;
     }

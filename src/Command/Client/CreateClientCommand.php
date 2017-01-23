@@ -15,7 +15,7 @@ namespace OAuth2\Command\Client;
 
 use OAuth2\Command\CommandWithDataTransporter;
 use OAuth2\DataTransporter;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class CreateClientCommand extends CommandWithDataTransporter
 {
@@ -25,34 +25,34 @@ final class CreateClientCommand extends CommandWithDataTransporter
     private $parameters;
 
     /**
-     * @var UserAccount
+     * @var UserAccountId
      */
-    private $userAccount;
+    private $userAccountId;
 
     /**
      * CreateClientCommand constructor.
      *
-     * @param UserAccount          $userAccount
+     * @param UserAccountId        $userAccountId
      * @param array                $parameters
      * @param DataTransporter|null $dataTransporter
      */
-    protected function __construct(UserAccount $userAccount, array $parameters, DataTransporter $dataTransporter = null)
+    protected function __construct(UserAccountId $userAccountId, array $parameters, DataTransporter $dataTransporter = null)
     {
         $this->parameters = $parameters;
-        $this->userAccount = $userAccount;
+        $this->userAccountId = $userAccountId;
         parent::__construct($dataTransporter);
     }
 
     /**
-     * @param UserAccount     $userAccount
+     * @param UserAccountId   $userAccountId
      * @param array           $parameters
      * @param DataTransporter $callback
      *
      * @return CreateClientCommand
      */
-    public static function create(UserAccount $userAccount, array $parameters, DataTransporter $callback): self
+    public static function create(UserAccountId $userAccountId, array $parameters, DataTransporter $callback): self
     {
-        return new self($userAccount, $parameters, $callback);
+        return new self($userAccountId, $parameters, $callback);
     }
 
     /**
@@ -64,10 +64,10 @@ final class CreateClientCommand extends CommandWithDataTransporter
     }
 
     /**
-     * @return UserAccount
+     * @return UserAccountId
      */
-    public function getUserAccount(): UserAccount
+    public function getUserAccountId(): UserAccountId
     {
-        return $this->userAccount;
+        return $this->userAccountId;
     }
 }

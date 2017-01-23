@@ -159,7 +159,7 @@ class ClientContext implements Context
                 'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
                 'client_id_issued_at'     => 1482177703,
             ],
-            UserAccount::create(UserAccountId::create('USER #1'), [])
+            UserAccountId::create('USER #1')
         );
         $request = $request->withAttribute('client', $client);
 
@@ -192,7 +192,7 @@ class ClientContext implements Context
                 'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
                 'client_id_issued_at'     => 1482177703,
             ],
-            UserAccount::create(UserAccountId::create('USER #1'), [])
+            UserAccountId::create('USER #1')
         );
         $request = $request->withAttribute('client', $client);
 
@@ -226,7 +226,7 @@ class ClientContext implements Context
                 'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
                 'client_id_issued_at'     => 1482177703,
             ],
-            UserAccount::create(UserAccountId::create('USER #1'), [])
+            UserAccountId::create('USER #1')
         );
         $request = $request->withAttribute('client', $client);
 
@@ -260,7 +260,7 @@ class ClientContext implements Context
                 'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
                 'client_id_issued_at'     => 1482177703,
             ],
-            UserAccount::create(UserAccountId::create('USER #1'), [])
+            UserAccountId::create('USER #1')
         );
         $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
@@ -294,7 +294,7 @@ class ClientContext implements Context
                 'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
                 'client_id_issued_at'     => 1482177703,
             ],
-            UserAccount::create(UserAccountId::create('USER #1'), [])
+            UserAccountId::create('USER #1')
         );
         $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
@@ -331,7 +331,7 @@ class ClientContext implements Context
                 'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
                 'client_id_issued_at'     => 1482177703,
             ],
-            UserAccount::create(UserAccountId::create('USER #1'), [])
+            UserAccountId::create('USER #1')
         );
         $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
@@ -369,7 +369,7 @@ class ClientContext implements Context
                 'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
                 'client_id_issued_at'     => 1482177703,
             ],
-            UserAccount::create(UserAccountId::create('USER #1'), [])
+            UserAccountId::create('USER #1')
         );
         $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);
@@ -416,7 +416,7 @@ class ClientContext implements Context
                 'client_id'               => '79b407fb-acc0-4880-ab98-254062c214ce',
                 'client_id_issued_at'     => 1482177703,
             ],
-            UserAccount::create(UserAccountId::create('USER #1'), [])
+            UserAccountId::create('USER #1')
         );
         $this->applicationContext->getApplication()->getClientRepository()->save($client);
         $request = $request->withAttribute('client', $client);

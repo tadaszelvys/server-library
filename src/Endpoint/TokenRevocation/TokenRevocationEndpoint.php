@@ -105,7 +105,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
                 $result = $hint->find($token);
                 if (null !== $result) {
                     if ($client->getId()->getValue() === $result->getClientId()->getValue()) {
-                        $hint->revoke($result);
+                        $hint->revoke($result->getId());
 
                         return $this->getResponse(200, '', $callback);
                     } else {

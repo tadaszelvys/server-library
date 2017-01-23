@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\AccessToken;
 
-use OAuth2\Model\Client\Client;
-use OAuth2\Model\ResourceOwner\ResourceOwner;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 
 interface AccessTokenRepositoryInterface
 {
     /**
-     * @param ResourceOwner      $resourceOwner
-     * @param Client             $client
+     * @param ResourceOwnerId    $resourceOwnerId
+     * @param ClientId           $clientId
      * @param array              $parameters
      * @param array              $metadatas
      * @param string[]           $scopes
@@ -28,7 +28,7 @@ interface AccessTokenRepositoryInterface
      *
      * @return AccessToken
      */
-    public function create(ResourceOwner $resourceOwner, Client $client, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt);
+    public function create(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt);
 
     /**
      * @param AccessToken $token

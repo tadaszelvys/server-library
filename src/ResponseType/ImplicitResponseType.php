@@ -77,8 +77,8 @@ class ImplicitResponseType implements ResponseTypeInterface
 
         $dataTransporter = new DataTransporter();
         $command = CreateAccessTokenCommand::create(
-            $authorization->getClient(),
-            $authorization->getUserAccount(),
+            $authorization->getClient()->getId(),
+            $authorization->getUserAccount()->getId(),
             $tokenType->getTokenTypeInformation(),
             $authorization->getQueryParams(),
             $authorization->getScopes(),

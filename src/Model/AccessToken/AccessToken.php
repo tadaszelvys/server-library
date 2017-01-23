@@ -22,11 +22,6 @@ use OAuth2\Model\Token\Token;
 final class AccessToken extends Token
 {
     /**
-     * @var AccessTokenId
-     */
-    private $accessTokenId;
-
-    /**
      * @var null|RefreshTokenId
      */
     private $refreshTokenId;
@@ -45,8 +40,7 @@ final class AccessToken extends Token
      */
     protected function __construct(AccessTokenId $accessTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshTokenId $refreshTokenId = null)
     {
-        parent::__construct($resourceOwnerId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
-        $this->accessTokenId = $accessTokenId;
+        parent::__construct($accessTokenId, $resourceOwnerId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
         $this->refreshTokenId = $refreshTokenId;
 
         $event = AccessTokenCreatedEvent::create($accessTokenId, $resourceOwnerId, $clientId, $parameters, $metadatas, $scopes, $expiresAt, $refreshTokenId);
@@ -68,14 +62,6 @@ final class AccessToken extends Token
     public static function create(AccessTokenId $accessTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshTokenId $refreshTokenId = null)
     {
         return new self($accessTokenId, $resourceOwnerId, $clientId, $parameters, $metadatas, $scopes, $expiresAt, $refreshTokenId);
-    }
-
-    /**
-     * @return AccessTokenId
-     */
-    public function getId(): AccessTokenId
-    {
-        return $this->accessTokenId;
     }
 
     /**

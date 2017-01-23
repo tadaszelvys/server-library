@@ -16,7 +16,7 @@ namespace OAuth2\Client\Rule;
 use Assert\Assertion;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class SoftwareRule implements RuleInterface
 {
@@ -74,7 +74,7 @@ final class SoftwareRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         Assertion::false($this->isSoftwareStatementRequired() && !array_key_exists('software_statement', $command_parameters), 'The parameter \'software_statement\' is mandatory.');
         if ($this->isSoftwareStatementSupported() && array_key_exists('software_statement', $command_parameters)) {
@@ -93,7 +93,7 @@ final class SoftwareRule implements RuleInterface
         }
 
         return array_merge(
-            $next($command_parameters, $validated_parameters, $userAccount),
+            $next($command_parameters, $validated_parameters, $userAccountId),
             $software_statement
         );
     }

@@ -103,7 +103,7 @@ final class TokenIntrospectionEndpoint implements MiddlewareInterface
             $result = $hint->find($token);
             if (null !== $result) {
                 if ($client->getId()->getValue() === $result->getClientId()->getValue()) {
-                    $data = $hint->introspect($result);
+                    $data = $hint->introspect($result->getId());
                     $response = $this->responseFactory->createResponse();
                     $response->getBody()->write($this->encoder->encode($data));
                     $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];

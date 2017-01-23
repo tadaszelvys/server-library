@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\Client;
 
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 interface ClientRepositoryInterface
 {
     /**
-     * @param UserAccount $userAccount
-     * @param array       $metadatas
+     * @param UserAccountId $userAccountId
+     * @param array         $metadatas
      *
      * @return Client
      */
-    public function create(UserAccount $userAccount, array $metadatas);
+    public function create(UserAccountId $userAccountId, array $metadatas);
 
     /**
      * Get a client using its Id.

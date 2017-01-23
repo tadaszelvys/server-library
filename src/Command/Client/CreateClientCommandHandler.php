@@ -55,10 +55,10 @@ final class CreateClientCommandHandler
     public function handle(CreateClientCommand $command)
     {
         $parameters = $command->getParameters();
-        $userAccount = $command->getUserAccount();
-        $validated_parameters = $this->ruleManager->handle($parameters, $userAccount);
+        $userAccountId = $command->getUserAccountId();
+        $validated_parameters = $this->ruleManager->handle($parameters, $userAccountId);
         $client = $this->clientRepository->create(
-            $command->getUserAccount(),
+            $command->getUserAccountId(),
             $validated_parameters
         );
         $this->clientRepository->save($client);

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\InitialAccessToken;
 
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class InitialAccessToken
 {
@@ -28,34 +28,34 @@ final class InitialAccessToken
     protected $expiresAt;
 
     /**
-     * @var UserAccount
+     * @var UserAccountId
      */
-    protected $userAccount;
+    protected $userAccountId;
 
     /**
      * InitialAccessInitialAccessTokenId constructor.
      *
      * @param InitialAccessTokenId    $initialAccessTokenId
      * @param null|\DateTimeImmutable $expiresAt
-     * @param UserAccount             $userAccount
+     * @param UserAccountId           $userAccountId
      */
-    private function __construct(InitialAccessTokenId $initialAccessTokenId, UserAccount $userAccount, \DateTimeImmutable $expiresAt = null)
+    private function __construct(InitialAccessTokenId $initialAccessTokenId, UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null)
     {
         $this->initialAccessTokenId = $initialAccessTokenId;
         $this->expiresAt = $expiresAt;
-        $this->userAccount = $userAccount;
+        $this->userAccountId = $userAccountId;
     }
 
     /**
      * @param InitialAccessTokenId    $initialAccessTokenId
-     * @param UserAccount             $userAccount
+     * @param UserAccountId           $userAccountId
      * @param \DateTimeImmutable|null $expiresAt
      *
      * @return InitialAccessToken
      */
-    public static function create(InitialAccessTokenId $initialAccessTokenId, UserAccount $userAccount, \DateTimeImmutable $expiresAt = null): self
+    public static function create(InitialAccessTokenId $initialAccessTokenId, UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null): self
     {
-        return new self($initialAccessTokenId, $userAccount, $expiresAt);
+        return new self($initialAccessTokenId, $userAccountId, $expiresAt);
     }
 
     /**
@@ -67,11 +67,11 @@ final class InitialAccessToken
     }
 
     /**
-     * @return UserAccount
+     * @return UserAccountId
      */
-    public function getUserAccountPublicId(): UserAccount
+    public function getUserAccountId(): UserAccountId
     {
-        return $this->userAccount;
+        return $this->userAccountId;
     }
 
     /**

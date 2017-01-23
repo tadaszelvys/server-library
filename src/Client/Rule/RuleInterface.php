@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace OAuth2\Client\Rule;
 
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 interface RuleInterface
 {
     /**
-     * @param array       $command_parameters
-     * @param array       $validated_parameters
-     * @param UserAccount $userAccount
-     * @param callable    $next
+     * @param array         $command_parameters
+     * @param array         $validated_parameters
+     * @param UserAccountId $userAccountId
+     * @param callable      $next
      *
      * @return array
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next);
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next);
 }

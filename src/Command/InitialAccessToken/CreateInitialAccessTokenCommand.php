@@ -15,14 +15,14 @@ namespace OAuth2\Command\InitialAccessToken;
 
 use OAuth2\Command\CommandWithDataTransporter;
 use OAuth2\DataTransporter;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class CreateInitialAccessTokenCommand extends CommandWithDataTransporter
 {
     /**
-     * @var UserAccount
+     * @var UserAccountId
      */
-    private $userAccount;
+    private $userAccountId;
 
     /**
      * @var \DateTimeImmutable|null
@@ -32,34 +32,34 @@ final class CreateInitialAccessTokenCommand extends CommandWithDataTransporter
     /**
      * CreateInitialAccessTokenCommand constructor.
      *
-     * @param UserAccount             $userAccount
+     * @param UserAccountId           $userAccountId
      * @param \DateTimeImmutable|null $expiresAt
      * @param DataTransporter|null    $dataTransporter
      */
-    protected function __construct(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null, DataTransporter $dataTransporter = null)
+    protected function __construct(UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null, DataTransporter $dataTransporter = null)
     {
-        $this->userAccount = $userAccount;
+        $this->userAccountId = $userAccountId;
         $this->expiresAt = $expiresAt;
         parent::__construct($dataTransporter);
     }
 
     /**
-     * @param UserAccount             $userAccount
+     * @param UserAccountId           $userAccountId
      * @param \DateTimeImmutable|null $expiresAt
      *
      * @return CreateInitialAccessTokenCommand
      */
-    public static function create(UserAccount $userAccount, \DateTimeImmutable $expiresAt = null): self
+    public static function create(UserAccountId $userAccountId, \DateTimeImmutable $expiresAt = null): self
     {
-        return new self($userAccount, $expiresAt);
+        return new self($userAccountId, $expiresAt);
     }
 
     /**
-     * @return UserAccount
+     * @return UserAccountId
      */
-    public function getUserAccount(): UserAccount
+    public function getUserAccountId(): UserAccountId
     {
-        return $this->userAccount;
+        return $this->userAccountId;
     }
 
     /**

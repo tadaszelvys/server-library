@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 abstract class ClientRegistrationManagementRule implements RuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         Assertion::keyExists($validated_parameters, 'client_id', 'The parameter \'client_id\' is not defined.');
         $validated_parameters['registration_access_token'] = $this->generateRegistrationAccessToken();
         $validated_parameters['registration_client_uri'] = $this->getRegistrationClientUri($validated_parameters['client_id']);
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 
     /**

@@ -32,11 +32,6 @@ final class AuthCode extends Token
     private $queryParameters;
 
     /**
-     * @var AuthCodeId
-     */
-    private $authCodeId;
-
-    /**
      * @var UriInterface
      */
     private $redirectUri;
@@ -56,8 +51,7 @@ final class AuthCode extends Token
      */
     protected function __construct(AuthCodeId $authCodeId, ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
-        parent::__construct($userAccountId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
-        $this->authCodeId = $authCodeId;
+        parent::__construct($authCodeId, $userAccountId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
         $this->queryParameters = $queryParameters;
     }
 
@@ -80,14 +74,6 @@ final class AuthCode extends Token
     }
 
     /**
-     * @return AuthCodeId
-     */
-    public function getId(): AuthCodeId
-    {
-        return $this->authCodeId;
-    }
-
-    /**
      * @return bool
      */
     public function isRefreshTokenIssued(): bool
@@ -105,6 +91,8 @@ final class AuthCode extends Token
         }
         $clone = clone $this;
         $clone->issueRefreshToken = true;
+        //$event = AuthCodeWithRefreshTokenEvent::create($accessToken->getId());
+        //$this->record($event);
 
         return $clone;
     }
@@ -119,6 +107,8 @@ final class AuthCode extends Token
         }
         $clone = clone $this;
         $clone->issueRefreshToken = false;
+        //$event = AuthCodeWithoutRefreshTokenEvent::create($accessToken->getId());
+        //$this->record($event);
 
         return $clone;
     }

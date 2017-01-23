@@ -56,7 +56,9 @@ class AccessTokenTypeHint implements TokenTypeHintInterface
      */
     public function find(string $token)
     {
-        return $this->accessTokenRepository->find(AccessTokenId::create($token));
+        $id = AccessTokenId::create($token);
+
+        return $this->accessTokenRepository->find($id);
     }
 
     /**

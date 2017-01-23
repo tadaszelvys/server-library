@@ -56,7 +56,9 @@ class RefreshTokenTypeHint implements TokenTypeHintInterface
      */
     public function find(string $token)
     {
-        return $this->refreshTokenRepository->find(RefreshTokenId::create($token));
+        $id = RefreshTokenId::create($token);
+
+        return $this->refreshTokenRepository->find($id);
     }
 
     /**

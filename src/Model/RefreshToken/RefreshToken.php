@@ -21,11 +21,6 @@ use OAuth2\Model\Token\Token;
 class RefreshToken extends Token
 {
     /**
-     * @var RefreshTokenId
-     */
-    private $refreshTokenId;
-
-    /**
      * @var AccessToken[]
      */
     private $accessTokens;
@@ -43,8 +38,7 @@ class RefreshToken extends Token
      */
     protected function __construct(RefreshTokenId $refreshTokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
     {
-        parent::__construct($resourceOwnerId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
-        $this->refreshTokenId = $refreshTokenId;
+        parent::__construct($refreshTokenId, $resourceOwnerId, $clientId, $expiresAt, $parameters, $metadatas, $scopes);
     }
 
     /**
@@ -77,16 +71,10 @@ class RefreshToken extends Token
 
         $clone = clone $this;
         $clone->accessTokens[$id] = $accessToken;
+        //$event = AccessTokenAddedToRefreshTokenEvent::create($accessToken->getId());
+        //$this->record($event);
 
         return $clone;
-    }
-
-    /**
-     * @return RefreshTokenId
-     */
-    public function getId(): RefreshTokenId
-    {
-        return $this->refreshTokenId;
     }
 
     /**

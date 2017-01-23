@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
 
 final class RequestUriRule implements RuleInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccount $userAccount, callable $next)
+    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
     {
         if (array_key_exists('request_uris', $command_parameters)) {
             Assertion::isArray($command_parameters['request_uris'], 'The parameter \'request_uris\' must be a list of URI.');
@@ -29,6 +29,6 @@ final class RequestUriRule implements RuleInterface
             $validated_parameters['request_uris'] = $command_parameters['request_uris'];
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccount);
+        return $next($command_parameters, $validated_parameters, $userAccountId);
     }
 }

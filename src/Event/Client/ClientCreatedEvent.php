@@ -60,7 +60,7 @@ final class ClientCreatedEvent extends Event
         $json = parent::jsonSerialize();
         $json['payload'] = [
             'client_id'  => $this->client->getId(),
-            'owner_id'   => $this->client->getResourceOwner()->getId(),
+            'owner_id'   => $this->client->getResourceOwnerId(),
             'parameters' => $this->client->all(),
         ];
 
