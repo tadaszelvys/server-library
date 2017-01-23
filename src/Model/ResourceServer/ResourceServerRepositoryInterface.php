@@ -26,16 +26,23 @@ interface ResourceServerRepositoryInterface
     public function save(ResourceServer $resourceServer);
 
     /**
+     * @param ResourceServerId $resourceServerId
+     *
+     * @return bool
+     */
+    public function has(ResourceServerId $resourceServerId): bool;
+
+    /**
      * This function deletes a resource server.
      *
-     * @param ResourceServer $resourceServer The resource server to delete
+     * @param ResourceServerId $resourceServerId The resource server to delete
      */
-    public function delete(ResourceServer $resourceServer);
+    public function delete(ResourceServerId $resourceServerId);
 
     /**
      * @param ResourceServerId $resourceServer The resource server
      *
-     * @return ResourceServerId|null Return the resource server or null if the argument is not a valid resource server ID
+     * @return ResourceServer|null Return the resource server or null if the argument is not a valid resource server ID
      */
     public function find(ResourceServerId $resourceServer);
 }
