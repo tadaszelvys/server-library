@@ -17,10 +17,9 @@ use OAuth2\Event\AuthCode\AuthCodeRevokedEvent;
 use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\AuthCode\AuthCodeId;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
-use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
-use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountId;
+use Psr\Http\Message\UriInterface;
 use SimpleBus\Message\Recorder\RecordsMessages;
 use Zend\Diactoros\Uri;
 
@@ -44,7 +43,7 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
     public function __construct(RecordsMessages $eventRecorder)
     {
         $this->eventRecorder = $eventRecorder;
-        $this->save(AuthCode::create(
+        $this->authCodes['VALID_AUTH_CODE'] = AuthCode::create(
             AuthCodeId::create('VALID_AUTH_CODE'),
             ClientId::create('client1'),
             UserAccountId::create('john.doe.1'),
@@ -54,7 +53,7 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
             [],
             [],
             []
-        ));
+        );
     }
 
     /**
@@ -85,8 +84,19 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
+    public function create(ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas)
     {
+        return AuthCode::create(
+            AuthCodeId::create(bin2hex(random_bytes(50))),
+            $clientId,
+            $userAccountId,
+            $queryParameters,
+            $redirectUri,
+            $expiresAt,
+            $parameters,
+            $scopes,
+            $metadatas
+        );
     }
 
     /**

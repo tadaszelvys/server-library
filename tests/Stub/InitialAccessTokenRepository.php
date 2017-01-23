@@ -41,19 +41,17 @@ class InitialAccessTokenRepository implements InitialAccessTokenRepositoryInterf
     public function __construct(RecordsMessages $eventRecorder)
     {
         $this->eventRecorder = $eventRecorder;
-        $valid_initialAccessToken = InitialAccessToken::create(
+        $this->initialAccessTokens['INITIAL_ACCESS_TOKEN_VALID'] = InitialAccessToken::create(
             InitialAccessTokenId::create('INITIAL_ACCESS_TOKEN_VALID'),
             UserAccountId::create('user1'),
             new \DateTimeImmutable('now +1 hour')
         );
-        $this->save($valid_initialAccessToken);
 
-        $expired_initialAccessToken = InitialAccessToken::create(
+        $this->initialAccessTokens['INITIAL_ACCESS_TOKEN_EXPIRED'] = InitialAccessToken::create(
             InitialAccessTokenId::create('INITIAL_ACCESS_TOKEN_EXPIRED'),
             UserAccountId::create('user1'),
             new \DateTimeImmutable('now -1 hour')
         );
-        $this->save($expired_initialAccessToken);
     }
 
     /**

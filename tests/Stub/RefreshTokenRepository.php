@@ -42,7 +42,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     public function __construct(RecordsMessages $eventRecorder)
     {
         $this->eventRecorder = $eventRecorder;
-        $this->save(RefreshToken::create(
+        $this->refreshTokens['EXPIRED_REFRESH_TOKEN'] = RefreshToken::create(
             RefreshTokenId::create('EXPIRED_REFRESH_TOKEN'),
             UserAccountId::create('User #1'),
             ClientId::create('client1'),
@@ -50,9 +50,9 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
             new \DateTimeImmutable('now -2 day'),
             [],
             []
-        ));
+        );
 
-        $this->save(RefreshToken::create(
+        $this->refreshTokens['VALID_REFRESH_TOKEN'] = RefreshToken::create(
             RefreshTokenId::create('VALID_REFRESH_TOKEN'),
             UserAccountId::create('User #1'),
             ClientId::create('client1'),
@@ -60,7 +60,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
             new \DateTimeImmutable('now +2 day'),
             [],
             []
-        ));
+        );
     }
 
     /**

@@ -29,7 +29,7 @@ class UserAccountRepository implements UserAccountRepositoryInterface
      */
     public function __construct()
     {
-        $this->save(UserAccount::create(
+        $this->userAccounts['john.1'] = UserAccount::create(
             UserAccountId::create('john.1'),
             [
                 'password' => 'doe',
@@ -65,7 +65,7 @@ class UserAccountRepository implements UserAccountRepositoryInterface
                 'website#fr'     => 'https://john.doe.fr',
                 'picture#de'     => 'https://john.doe.de/picture',
             ]
-        ));
+        );
     }
 
     /**

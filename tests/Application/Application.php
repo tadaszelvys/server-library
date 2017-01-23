@@ -55,9 +55,20 @@ use OAuth2\Endpoint\TokenRevocation\TokenRevocationGetEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationPostEndpoint;
 use OAuth2\Event\AccessToken\AccessTokenCreatedEvent;
 use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
+use OAuth2\Event\AuthCode\AuthCodeCreatedEvent;
+use OAuth2\Event\AuthCode\AuthCodeMarkedAsUsedEvent;
+use OAuth2\Event\AuthCode\AuthCodeRevokedEvent;
+use OAuth2\Event\AuthCodeId\AuthCodeWithoutRefreshTokenEvent;
+use OAuth2\Event\AuthCodeId\AuthCodeWithRefreshTokenEvent;
 use OAuth2\Event\Client\ClientCreatedEvent;
 use OAuth2\Event\Client\ClientDeletedEvent;
+use OAuth2\Event\Client\ClientParameterRemovedEvent;
 use OAuth2\Event\Client\ClientParametersUpdatedEvent;
+use OAuth2\Event\Client\ClientParameterUpdatedEvent;
+use OAuth2\Event\IdToken\IdTokenCreatedEvent;
+use OAuth2\Event\IdToken\IdTokenRevokedEvent;
+use OAuth2\Event\InitialAccessToken\InitialAccessTokenCreatedEvent;
+use OAuth2\Event\InitialAccessTokenId\InitialAccessTokenRevokedEvent;
 use OAuth2\Event\RefreshToken\RefreshTokenCreatedEvent;
 use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 use OAuth2\GrantType\ClientCredentialsGrantType;
@@ -463,17 +474,19 @@ final class Application
             $this->container->add($this->getDeleteClientCommandHandler());
             $this->container->add($this->getUpdateClientCommandHandler());
 
+            $this->container->add($this->getCreateAccessTokenCommandHandler());
+            $this->container->add($this->getRevokeAccessTokenCommandHandler());
+
+            $this->container->add($this->getRevokeRefreshTokenCommandHandler());
+
+
             $this->container->add($this->getClientCreatedEventHandler());
             $this->container->add($this->getClientDeletedEventHandler());
             $this->container->add($this->getClientUpdatedEventHandler());
 
-            $this->container->add($this->getRevokeAccessTokenCommandHandler());
             $this->container->add($this->getAccessTokenRevokedEventHandler());
-
-            $this->container->add($this->getCreateAccessTokenCommandHandler());
             $this->container->add($this->getAccessTokenCreatedEventHandler());
 
-            $this->container->add($this->getRevokeRefreshTokenCommandHandler());
             $this->container->add($this->getRefreshTokenRevokedEventHandler());
         }
 
@@ -573,7 +586,7 @@ final class Application
         if (null === $this->eventHandlerResolver) {
             $this->eventHandlerResolver = new NameBasedMessageSubscriberResolver(
                 new ClassBasedNameResolver(),
-                $this->getEventHandlerMap()
+                $this->getEventHandlerCollection()
             );
         }
 
@@ -583,29 +596,40 @@ final class Application
     /**
      * @var null|CallableCollection
      */
-    private $eventHandlerMap = null;
+    private $eventHandlerCollection = null;
 
     /**
      * @return CallableCollection
      */
-    public function getEventHandlerMap(): CallableCollection
+    public function getEventHandlerCollection(): CallableCollection
     {
-        if (null === $this->eventHandlerMap) {
-            $this->eventHandlerMap = new CallableCollection(
+        if (null === $this->eventHandlerCollection) {
+            $this->eventHandlerCollection = new CallableCollection(
                 [
-                    AccessTokenCreatedEvent::class  => [AccessTokenCreatedEventHandler::class],
-                    AccessTokenRevokedEvent::class  => [AccessTokenRevokedEventHandler::class],
-                    RefreshTokenCreatedEvent::class => [RefreshTokenCreatedEventHandler::class],
-                    RefreshTokenRevokedEvent::class => [RefreshTokenRevokedEventHandler::class],
-                    ClientCreatedEvent::class       => [ClientCreatedEventHandler::class],
-                    ClientDeletedEvent::class       => [ClientDeletedEventHandler::class],
-                    ClientParametersUpdatedEvent::class       => [ClientUpdatedEventHandler::class],
+                    AccessTokenCreatedEvent::class          => [AccessTokenCreatedEventHandler::class],
+                    AccessTokenRevokedEvent::class          => [AccessTokenRevokedEventHandler::class],
+                    AuthCodeCreatedEvent::class             => [],
+                    AuthCodeMarkedAsUsedEvent::class        => [],
+                    AuthCodeRevokedEvent::class             => [],
+                    AuthCodeWithRefreshTokenEvent::class    => [],
+                    AuthCodeWithoutRefreshTokenEvent::class => [],
+                    ClientCreatedEvent::class               => [ClientCreatedEventHandler::class],
+                    ClientDeletedEvent::class               => [ClientDeletedEventHandler::class],
+                    ClientParametersUpdatedEvent::class     => [ClientUpdatedEventHandler::class],
+                    ClientParameterUpdatedEvent::class      => [],
+                    ClientParameterRemovedEvent::class      => [],
+                    IdTokenCreatedEvent::class              => [],
+                    IdTokenRevokedEvent::class              => [],
+                    InitialAccessTokenCreatedEvent::class   => [],
+                    InitialAccessTokenRevokedEvent::class   => [],
+                    RefreshTokenCreatedEvent::class         => [RefreshTokenCreatedEventHandler::class],
+                    RefreshTokenRevokedEvent::class         => [RefreshTokenRevokedEventHandler::class],
                 ],
                 $this->getServiceLocatorAwareCallableResolver()
             );
         }
 
-        return $this->eventHandlerMap;
+        return $this->eventHandlerCollection;
     }
 
     /**

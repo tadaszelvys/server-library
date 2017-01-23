@@ -43,7 +43,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     public function __construct(RecordsMessages $eventRecorder)
     {
         $this->eventRecorder = $eventRecorder;
-        $this->save(AccessToken::create(
+        $this->accessTokens['ACCESS_TOKEN_#1'] = AccessToken::create(
             AccessTokenId::create('ACCESS_TOKEN_#1'),
             UserAccountId::create('User #1'),
             ClientId::create('client1'),
@@ -54,9 +54,9 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
             [],
             new \DateTimeImmutable('now +3600 seconds'),
             RefreshTokenId::create('REFRESH_TOKEN_#1')
-        ));
+        );
 
-        $this->save(AccessToken::create(
+        $this->accessTokens['ACCESS_TOKEN_#2'] = AccessToken::create(
             AccessTokenId::create('ACCESS_TOKEN_#2'),
             UserAccountId::create('User #1'),
             ClientId::create('client2'),
@@ -65,7 +65,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
             [],
             new \DateTimeImmutable('now +3600 seconds'),
             RefreshTokenId::create('REFRESH_TOKEN_#1')
-        ));
+        );
     }
 
     /**

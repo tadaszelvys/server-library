@@ -14,14 +14,18 @@ declare(strict_types=1);
 namespace OAuth2\Model\AuthCode;
 
 use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
+use Psr\Http\Message\UriInterface;
 
 interface AuthCodeRepositoryInterface
 {
     /**
-     * @param Client             $client
-     * @param UserAccount        $userAccount
+     * @param ClientId           $clientId
+     * @param UserAccountId      $userAccountId
      * @param array              $queryParameters
+     * @param UriInterface       $redirectUri
      * @param \DateTimeImmutable $expiresAt
      * @param array              $parameters
      * @param array              $scopes
@@ -29,7 +33,7 @@ interface AuthCodeRepositoryInterface
      *
      * @return mixed
      */
-    public function create(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas);
+    public function create(ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas);
 
     /**
      * @param AuthCodeId $authCodeId
