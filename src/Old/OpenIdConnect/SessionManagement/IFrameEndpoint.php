@@ -18,7 +18,7 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class IFrameEndpoint implements MiddlewareInterface
+final class IFrameEndpoint implements MiddlewareInterface
 {
     /**
      * @var ResponseFactoryInterface
@@ -43,8 +43,10 @@ class IFrameEndpoint implements MiddlewareInterface
         $content = $this->renderTemplate();
 
         $response = $this->responseFactory->createResponse();
-        $response = $response->withHeader('Cache-Control', 'no-store');
-        $response = $response->withHeader('Pragma', 'no-cache');
+        $headers = ['Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+        foreach ($headers as $k => $v) {
+            $response = $response->withHeader($k, $v);
+        }
         $response->getBody()->write($content);
 
         return $response;

@@ -17,7 +17,7 @@ use Assert\Assertion;
 use Base64Url\Base64Url;
 use OAuth2\Model\UserAccount\UserAccount;
 
-class EncryptedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInterface
+final class EncryptedSubjectIdentifier implements PairwiseSubjectIdentifierAlgorithmInterface
 {
     /**
      * @var string

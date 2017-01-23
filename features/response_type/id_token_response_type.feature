@@ -1,4 +1,4 @@
-Feature: A client requests an authorization code using the Id Token Response Type
+Feature: A client requests an Id Token the Id Token Response Type
 
   Scenario: A client sends a authorization requests with the Authorization Code Response Type and the Resource Owner accepts it.
     Given A client sends a authorization requests with the Authorization Code Response Type

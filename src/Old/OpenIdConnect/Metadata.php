@@ -15,7 +15,7 @@ namespace OAuth2\OpenIdConnect;
 
 use Assert\Assertion;
 
-class Metadata implements \JsonSerializable
+final class Metadata implements \JsonSerializable
 {
     /**
      * @var array
