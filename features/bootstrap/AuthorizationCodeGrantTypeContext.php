@@ -204,7 +204,18 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAAuthorizationCodeGrantTypeRequestButTheAuthorizationCodeRequiresACodeVerifierParameter()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'   => 'authorization_code',
+            'code'         => 'AUTH_CODE_WITH_CODE_VERIFIER_PLAIN',
+            'redirect_uri' => 'https://www.example.com/callback',
+            'scope'        => 'openid',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -212,7 +223,19 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAAuthorizationCodeGrantTypeRequestButTheCodeVerifierParameterOfTheAuthorizationCodeIsInvalid()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'    => 'authorization_code',
+            'code'          => 'AUTH_CODE_WITH_CODE_VERIFIER_PLAIN',
+            'redirect_uri'  => 'https://www.example.com/callback',
+            'scope'         => 'openid',
+            'code_verifier' => 'BAD CODE VERIFIER',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -220,7 +243,19 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAValidAuthorizationCodeGrantTypeRequestWithCodeVerifierThatUsesPlainMethod()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'    => 'authorization_code',
+            'code'          => 'AUTH_CODE_WITH_CODE_VERIFIER_PLAIN',
+            'redirect_uri'  => 'https://www.example.com/callback',
+            'scope'         => 'openid',
+            'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -228,78 +263,18 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAValidAuthorizationCodeGrantTypeRequestWithCodeVerifierThatUsesSMethod()
     {
-        throw new PendingException();
-    }
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'    => 'authorization_code',
+            'code'          => 'AUTH_CODE_WITH_CODE_VERIFIER_S256',
+            'redirect_uri'  => 'https://www.example.com/callback',
+            'scope'         => 'openid',
+            'code_verifier' => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-    /**
-     * @Given A client sends a authorization requests with the Authorization Code Response Type
-     */
-    public function aClientSendsAAuthorizationRequestsWithTheAuthorizationCodeResponseType()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @When the Resource Owner accepts the authorization request
-     */
-    public function theResourceOwnerAcceptsTheAuthorizationRequest()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Then the redirection Uri starts with :arg1
-     */
-    public function theRedirectionUriStartsWith($arg1)
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Then the redirection Uri query should contain a parameter :arg1
-     */
-    public function theRedirectionUriQueryShouldContainAParameter($arg1)
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Then an authorization code creation event is thrown
-     */
-    public function anAuthorizationCodeCreationEventIsThrown()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given A client sends a authorization requests with the Authorization Code Response Type and a code verifier
-     */
-    public function aClientSendsAAuthorizationRequestsWithTheAuthorizationCodeResponseTypeAndACodeVerifier()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @When the Resource Owner rejects the authorization request
-     */
-    public function theResourceOwnerRejectsTheAuthorizationRequest()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Then the redirection ends with :arg1
-     */
-    public function theRedirectionEndsWith($arg1)
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Then the redirect query should contain parameter :arg1 with value :arg2
-     */
-    public function theRedirectQueryShouldContainParameterWithValue($arg1, $arg2)
-    {
-        throw new PendingException();
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 }

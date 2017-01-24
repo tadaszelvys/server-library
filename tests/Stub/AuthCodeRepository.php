@@ -66,6 +66,36 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
             ['openid', 'email', 'phone', 'address'],
             []
         );
+
+        $this->authCodes['AUTH_CODE_WITH_CODE_VERIFIER_PLAIN'] = AuthCode::create(
+            AuthCodeId::create('EXPIRED_AUTH_CODE'),
+            ClientId::create('client1'),
+            UserAccountId::create('john.doe.1'),
+            [
+                'code_challenge'        => 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+                'code_challenge_method' => 'plain',
+            ],
+            new Uri('https://www.example.com/callback'),
+            new \DateTimeImmutable('now +1 day'),
+            [],
+            ['openid', 'email', 'phone', 'address'],
+            []
+        );
+
+        $this->authCodes['AUTH_CODE_WITH_CODE_VERIFIER_S256'] = AuthCode::create(
+            AuthCodeId::create('EXPIRED_AUTH_CODE'),
+            ClientId::create('client1'),
+            UserAccountId::create('john.doe.1'),
+            [
+                'code_challenge'        => 'DSmbHrVIcI0EU05-BQxCe1bt-hXRNjejSEvdYbq_g4Q',
+                'code_challenge_method' => 'S256',
+            ],
+            new Uri('https://www.example.com/callback'),
+            new \DateTimeImmutable('now +1 day'),
+            [],
+            ['openid', 'email', 'phone', 'address'],
+            []
+        );
     }
 
     /**

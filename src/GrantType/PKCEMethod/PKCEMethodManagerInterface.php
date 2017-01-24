@@ -23,15 +23,6 @@ interface PKCEMethodManagerInterface
     public function addPKCEMethod(PKCEMethodInterface $method): PKCEMethodManagerInterface;
 
     /**
-     * @param string $codeChallengeMethod
-     * @param string $codeChallenge
-     * @param string $codeVerifier
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function checkPKCEInput(string $codeChallengeMethod, string $codeChallenge, string $codeVerifier);
-
-    /**
      * @param string $methodName
      *
      * @return bool

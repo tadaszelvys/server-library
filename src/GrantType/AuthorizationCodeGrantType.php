@@ -114,8 +114,8 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
         $authCode = $this->getAuthCode($parameters['code']);
         $this->checkClient($grantTypeResponse->getClient(), $parameters);
 
-        $this->checkPKCE($authCode, $parameters);
         $this->checkAuthCode($authCode, $grantTypeResponse->getClient());
+        $this->checkPKCE($authCode, $parameters);
 
         $redirectUri = $parameters['redirect_uri'];
 
@@ -203,13 +203,23 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
         try {
             Assertion::keyExists($parameters, 'code_verifier', 'The parameter \'code_verifier\' is missing.');
             $code_verifier = $parameters['code_verifier'];
-            $this->pkceMethodManager->checkPKCEInput($code_challenge_method, $code_challenge, $code_verifier);
+            $method = $this->pkceMethodManager->getPKCEMethod($code_challenge_method);
         } catch (\InvalidArgumentException $e) {
             throw new OAuth2Exception(
                 400,
                 [
                     'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
                     'error_description' => $e->getMessage(),
+                ]
+            );
+        }
+
+        if (false == $method->isChallengeVerified($code_verifier, $code_challenge)) {
+            throw new OAuth2Exception(
+                400,
+                [
+                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error_description' => 'The parameter \'code_verifier\' is invalid.',
                 ]
             );
         }

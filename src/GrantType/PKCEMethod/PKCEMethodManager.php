@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace OAuth2\GrantType\PKCEMethod;
 
-use Assert\Assertion;
-
 class PKCEMethodManager implements PKCEMethodManagerInterface
 {
     /**
-     * @var \OAuth2\Grant\PKCEMethod\PKCEMethodInterface[]
+     * @var PKCEMethodInterface[]
      */
     private $pkceMethods = [];
 
@@ -30,17 +28,6 @@ class PKCEMethodManager implements PKCEMethodManagerInterface
         $this->pkceMethods[$method->getMethodName()] = $method;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function checkPKCEInput(string $codeChallengeMethod, string $codeChallenge, string $codeVerifier)
-    {
-        Assertion::true($this->hasPKCEMethod($codeChallengeMethod), sprintf('Unsupported code challenge method \'%s\'.', $codeChallengeMethod));
-        $method = $this->getPKCEMethod($codeChallengeMethod);
-        Assertion::notNull($codeVerifier, 'The parameter \'code_verifier\' is required.');
-        Assertion::true($method->isChallengeVerified($codeVerifier, $codeChallenge), 'Invalid parameter \'code_verifier\'.');
     }
 
     /**
