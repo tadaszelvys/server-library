@@ -63,7 +63,7 @@ abstract class AuthorizationEndpoint implements MiddlewareInterface
      *
      * @return ResponseInterface
      */
-    abstract protected function redirectToLoginPage(Authorization $authorization, ServerRequestInterface $request);
+    abstract protected function redirectToLoginPage(Authorization $authorization, ServerRequestInterface $request): ResponseInterface;
 
     /**
      * @param Authorization                            $authorization
@@ -71,14 +71,18 @@ abstract class AuthorizationEndpoint implements MiddlewareInterface
      *
      * @return ResponseInterface
      */
-    abstract protected function processConsentScreen(Authorization $authorization, ServerRequestInterface $request);
+    abstract protected function processConsentScreen(Authorization $authorization, ServerRequestInterface $request): ResponseInterface;
 
     /**
-     * {@inheritdoc}
+     * @param AuthorizationEndpointExtensionInterface $extension
+     *
+     * @return AuthorizationEndpoint
      */
-    public function addExtension(AuthorizationEndpointExtensionInterface $extension)
+    public function addExtension(AuthorizationEndpointExtensionInterface $extension): AuthorizationEndpoint
     {
         $this->extensions[] = $extension;
+
+        return $this;
     }
 
     /**
@@ -180,11 +184,11 @@ abstract class AuthorizationEndpoint implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param Authorization                            $authorization
+     * @param Authorization          $authorization
      *
      * @return ResponseInterface
      */
-    protected function processAuthorization(ServerRequestInterface $request, Authorization $authorization)
+    protected function processAuthorization(ServerRequestInterface $request, Authorization $authorization): ResponseInterface
     {
         if ($authorization->isAuthorized() === false) {
             return $this->createRedirectionException($authorization, OAuth2ResponseFactoryManagerInterface::ERROR_ACCESS_DENIED, 'The resource owner denied access to your client');
@@ -201,7 +205,7 @@ abstract class AuthorizationEndpoint implements MiddlewareInterface
      *
      * @return array
      */
-    private function computeResponseParameters(Authorization $authorization)
+    private function computeResponseParameters(Authorization $authorization): array
     {
         $response_parameters = [];
         foreach ($authorization->getResponseTypes() as $type) {
@@ -221,7 +225,7 @@ abstract class AuthorizationEndpoint implements MiddlewareInterface
      *
      * @return ResponseInterface
      */
-    private function createRedirectionException(Authorization $authorization, $error, $error_description = null)
+    private function createRedirectionException(Authorization $authorization, $error, $error_description = null): ResponseInterface
     {
         $params = [
             'error'                      => $error,

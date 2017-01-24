@@ -14,7 +14,11 @@ declare(strict_types=1);
 namespace OAuth2\Endpoint\Authorization\Extension;
 
 use Assert\Assertion;
+use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\Endpoint\Authorization\Exception\RedirectToLoginPageException;
+use OAuth2\Model\IdToken\IdTokenRepositoryInterface;
+use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,20 +26,13 @@ use Psr\Http\Message\ServerRequestInterface;
 class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
 {
     /**
-     * @var \OAuth2\Response\OAuth2ResponseFactoryManagerInterface
-     */
-    private $response_factory;
-
-    /**
      * IdTokenHintExtension constructor.
      *
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory
-     * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface          $id_token_manager
-     * @param \OAuth2\UserAccount\UserAccountManagerInterface        $user_account_manager
+     * @param IdTokenRepositoryInterface $id_token_manager
+     * @param UserAccountRepositoryInterface $user_account_manager
      */
-    public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory, IdTokenManagerInterface $id_token_manager, UserAccountManagerInterface $user_account_manager)
+    public function __construct(IdTokenRepositoryInterface $id_token_manager, UserAccountRepositoryInterface $user_account_manager)
     {
-        $this->response_factory = $response_factory;
         $this->setIdTokenManager($id_token_manager);
         $this->setUserAccountManager($user_account_manager);
     }
@@ -43,7 +40,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccount(ServerRequestInterface $request, AuthorizationInterface $authorization, UserAccountInterface &$user_account = null)
+    public function processUserAccount(ServerRequestInterface $request, Authorization $authorization, UserAccount &$user_account = null)
     {
         // The query parameter 'id_token_hint' and the Id Token Manager are set
         if ($authorization->hasQueryParam('id_token_hint') && null !== $this->getIdTokenManager()) {
@@ -55,7 +52,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
                 if (null === $user_account) {
                     $user_account = $this->getUserAccountManager()->getUserAccountByPublicId($public_id);
                 } else {
-                    if ($user_account->getPublicId() !== $public_id) {
+                    if ($user_account->getId() !== $public_id) {
                         throw new RedirectToLoginPageException($authorization);
                     }
                 }
@@ -68,7 +65,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsAvailable(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
+    public function processUserAccountIsAvailable(UserAccount $user_account, bool $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization)
     {
         //Nothing to do
     }
@@ -76,7 +73,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, AuthorizationInterface $authorization)
+    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, Authorization $authorization)
     {
         //Nothing to do
     }
@@ -84,7 +81,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
+    public function processAfterUserAccountComputation(UserAccount $user_account, $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization)
     {
         //Nothing to do
     }
@@ -92,7 +89,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function process(array &$response_parameters, ServerRequestInterface $request, AuthorizationInterface $authorization)
+    public function process(array &$response_parameters, ServerRequestInterface $request, Authorization $authorization)
     {
         //Nothing to do
     }
@@ -100,7 +97,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processConsentScreenOptions(AuthorizationInterface $authorization, array &$options)
+    public function processConsentScreenOptions(Authorization $authorization, array &$options)
     {
         //Nothing to do
     }
@@ -108,7 +105,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processAfterConsentScreenIsAccepted(AuthorizationInterface $authorization, array $form_data)
+    public function processAfterConsentScreenIsAccepted(Authorization $authorization, array $form_data)
     {
         //Nothing to do
     }

@@ -39,7 +39,7 @@ interface AuthorizationEndpointExtensionInterface
      * @param ServerRequestInterface $request
      * @param Authorization          $authorization
      */
-    public function processUserAccountIsAvailable(UserAccount $user_account, $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization);
+    public function processUserAccountIsAvailable(UserAccount $user_account, bool $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization);
 
     /**
      * @param ServerRequestInterface $request
@@ -53,7 +53,7 @@ interface AuthorizationEndpointExtensionInterface
      * @param ServerRequestInterface $request
      * @param Authorization          $authorization
      */
-    public function processAfterUserAccountComputation(UserAccount $user_account, $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization);
+    public function processAfterUserAccountComputation(UserAccount $user_account, bool $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization);
 
     /**
      * @param Authorization $authorization

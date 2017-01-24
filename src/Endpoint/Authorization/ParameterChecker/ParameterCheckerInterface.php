@@ -28,5 +28,5 @@ interface ParameterCheckerInterface
     /**
      * @return string
      */
-    public function getError(): string: string;
+    public function getError(): string;
 }

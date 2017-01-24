@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\Authorization\Extension;
 
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
-use OAuth2\UserAccount\UserAccountInterface;
+use OAuth2\Endpoint\Authorization\Authorization;
+use OAuth2\Model\UserAccount\UserAccount;
 use Psr\Http\Message\ServerRequestInterface;
 
 class StateParameterExtension implements AuthorizationEndpointExtensionInterface
@@ -22,7 +22,7 @@ class StateParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccount(ServerRequestInterface $request, AuthorizationInterface $authorization, UserAccountInterface &$user_account = null)
+    public function processUserAccount(ServerRequestInterface $request, Authorization $authorization, UserAccount &$user_account = null)
     {
         //Nothing to do
     }
@@ -30,7 +30,7 @@ class StateParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function process(array &$response_parameters, ServerRequestInterface $request, AuthorizationInterface $authorization)
+    public function process(array &$response_parameters, ServerRequestInterface $request, Authorization $authorization)
     {
         if ($authorization->hasQueryParam(('state'))) {
             $response_parameters['state'] = $authorization->getQueryParam('state');
@@ -40,7 +40,7 @@ class StateParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsAvailable(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
+    public function processUserAccountIsAvailable(UserAccount $user_account, bool $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization)
     {
         //Nothing to do
     }
@@ -48,7 +48,7 @@ class StateParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, AuthorizationInterface $authorization)
+    public function processUserAccountIsNotAvailable(ServerRequestInterface $request, Authorization $authorization)
     {
         //Nothing to do
     }
@@ -56,7 +56,7 @@ class StateParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processAfterUserAccountComputation(UserAccountInterface $user_account, $is_fully_authenticated, ServerRequestInterface $request, AuthorizationInterface $authorization)
+    public function processAfterUserAccountComputation(UserAccount $user_account, bool $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization)
     {
         //Nothing to do
     }
@@ -64,7 +64,7 @@ class StateParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processConsentScreenOptions(AuthorizationInterface $authorization, array &$options)
+    public function processConsentScreenOptions(Authorization $authorization, array &$options)
     {
         //Nothing to do
     }
@@ -72,7 +72,7 @@ class StateParameterExtension implements AuthorizationEndpointExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function processAfterConsentScreenIsAccepted(AuthorizationInterface $authorization, array $form_data)
+    public function processAfterConsentScreenIsAccepted(Authorization $authorization, array $form_data)
     {
         //Nothing to do
     }
