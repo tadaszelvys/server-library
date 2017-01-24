@@ -29,4 +29,4 @@ install:
   - if [[ !$deps ]]; then composer install --no-interaction ; fi
 
 script:
-  - ./vendor/bin/behat --suite client
+  - ./vendor/bin/behat
