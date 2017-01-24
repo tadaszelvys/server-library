@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\AuthCode;
 
-use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
-use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountId;
 use Psr\Http\Message\UriInterface;
 

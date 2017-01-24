@@ -98,7 +98,7 @@ class RefreshTokenGrantTypeContext implements Context
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
             'grant_type'    => 'refresh_token',
-            'refresh_token' => 'NOT IMPORTANT',
+            'refresh_token' => 'VALID_REFRESH_TOKEN',
             'client_id'     => 'client2',
         ]);
         $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');

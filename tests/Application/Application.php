@@ -39,12 +39,20 @@ use OAuth2\Command\AccessToken\CreateAccessTokenCommand;
 use OAuth2\Command\AccessToken\CreateAccessTokenCommandHandler;
 use OAuth2\Command\AccessToken\RevokeAccessTokenCommand;
 use OAuth2\Command\AccessToken\RevokeAccessTokenCommandHandler;
+use OAuth2\Command\AuthCode\CreateAuthCodeCommand;
+use OAuth2\Command\AuthCode\CreateAuthCodeCommandHandler;
+use OAuth2\Command\AuthCode\MarkAuthCodeAsUsedCommand;
+use OAuth2\Command\AuthCode\MarkAuthCodeAsUsedCommandHandler;
+use OAuth2\Command\AuthCode\RevokeAuthCodeCommand;
+use OAuth2\Command\AuthCode\RevokeAuthCodeCommandHandler;
 use OAuth2\Command\Client\CreateClientCommand;
 use OAuth2\Command\Client\CreateClientCommandHandler;
 use OAuth2\Command\Client\DeleteClientCommand;
 use OAuth2\Command\Client\DeleteClientCommandHandler;
 use OAuth2\Command\Client\UpdateClientCommand;
 use OAuth2\Command\Client\UpdateClientCommandHandler;
+use OAuth2\Command\RefreshToken\CreateRefreshTokenCommand;
+use OAuth2\Command\RefreshToken\CreateRefreshTokenCommandHandler;
 use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommand;
 use OAuth2\Command\RefreshToken\RevokeRefreshTokenCommandHandler;
 use OAuth2\Endpoint\ClientConfiguration\ClientConfigurationEndpoint;
@@ -71,6 +79,7 @@ use OAuth2\Event\InitialAccessToken\InitialAccessTokenCreatedEvent;
 use OAuth2\Event\InitialAccessTokenId\InitialAccessTokenRevokedEvent;
 use OAuth2\Event\RefreshToken\RefreshTokenCreatedEvent;
 use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
+use OAuth2\GrantType\AuthorizationCodeGrantType;
 use OAuth2\GrantType\ClientCredentialsGrantType;
 use OAuth2\GrantType\GrantTypeManager;
 use OAuth2\GrantType\GrantTypeManagerInterface;
@@ -121,6 +130,9 @@ use OAuth2\Test\Stub\ClientSecretPost;
 use OAuth2\Test\Stub\Container;
 use OAuth2\Test\Stub\Event\AccessTokenCreatedEventHandler;
 use OAuth2\Test\Stub\Event\AccessTokenRevokedEventHandler;
+use OAuth2\Test\Stub\Event\AuthCodeCreatedEventHandler;
+use OAuth2\Test\Stub\Event\AuthCodeMarkedAsUsedEventHandler;
+use OAuth2\Test\Stub\Event\AuthCodeRevokedEventHandler;
 use OAuth2\Test\Stub\Event\ClientCreatedEventHandler;
 use OAuth2\Test\Stub\Event\ClientDeletedEventHandler;
 use OAuth2\Test\Stub\Event\ClientUpdatedEventHandler;
@@ -335,6 +347,57 @@ final class Application
     }
 
     /**
+     * @var null|AuthCodeCreatedEventHandler
+     */
+    private $authCodeCreatedEventHandler = null;
+
+    /**
+     * @return AuthCodeCreatedEventHandler
+     */
+    public function getAuthCodeCreatedEventHandler(): AuthCodeCreatedEventHandler
+    {
+        if (null === $this->authCodeCreatedEventHandler) {
+            $this->authCodeCreatedEventHandler = new AuthCodeCreatedEventHandler();
+        }
+
+        return $this->authCodeCreatedEventHandler;
+    }
+
+    /**
+     * @var null|AuthCodeMarkedAsUsedEventHandler
+     */
+    private $authCodeMarkedAsUsedEventHandler = null;
+
+    /**
+     * @return AuthCodeMarkedAsUsedEventHandler
+     */
+    public function getAuthCodeMarkedAsUsedEventHandler(): AuthCodeMarkedAsUsedEventHandler
+    {
+        if (null === $this->authCodeMarkedAsUsedEventHandler) {
+            $this->authCodeMarkedAsUsedEventHandler = new AuthCodeMarkedAsUsedEventHandler();
+        }
+
+        return $this->authCodeMarkedAsUsedEventHandler;
+    }
+
+    /**
+     * @var null|AuthCodeRevokedEventHandler
+     */
+    private $authCodeRevokedEventHandler = null;
+
+    /**
+     * @return AuthCodeRevokedEventHandler
+     */
+    public function getAuthCodeRevokedEventHandler(): AuthCodeRevokedEventHandler
+    {
+        if (null === $this->authCodeRevokedEventHandler) {
+            $this->authCodeRevokedEventHandler = new AuthCodeRevokedEventHandler();
+        }
+
+        return $this->authCodeRevokedEventHandler;
+    }
+
+    /**
      * @var null|ClientCreatedEventHandler
      */
     private $clientCreatedEventHandler = null;
@@ -428,7 +491,13 @@ final class Application
                     UpdateClientCommand::class       => UpdateClientCommandHandler::class,
                     CreateAccessTokenCommand::class  => CreateAccessTokenCommandHandler::class,
                     RevokeAccessTokenCommand::class  => RevokeAccessTokenCommandHandler::class,
+
+                    CreateRefreshTokenCommand::class => CreateRefreshTokenCommandHandler::class,
                     RevokeRefreshTokenCommand::class => RevokeRefreshTokenCommandHandler::class,
+
+                    CreateAuthCodeCommand::class     => CreateAuthCodeCommandHandler::class,
+                    MarkAuthCodeAsUsedCommand::class => MarkAuthCodeAsUsedCommandHandler::class,
+                    RevokeAuthCodeCommand::class     => RevokeAuthCodeCommandHandler::class,
                 ],
                 $this->getServiceLocatorAwareCallableResolver()
             );
@@ -477,12 +546,20 @@ final class Application
             $this->container->add($this->getCreateAccessTokenCommandHandler());
             $this->container->add($this->getRevokeAccessTokenCommandHandler());
 
+            $this->container->add($this->getCreateRefreshTokenCommandHandler());
             $this->container->add($this->getRevokeRefreshTokenCommandHandler());
 
+            $this->container->add($this->getCreateAuthCodeCommandHandler());
+            $this->container->add($this->getMarkAuthCodeAsUsedCommandHandler());
+            $this->container->add($this->getRevokeAuthCodeCommandHandler());
 
             $this->container->add($this->getClientCreatedEventHandler());
             $this->container->add($this->getClientDeletedEventHandler());
             $this->container->add($this->getClientUpdatedEventHandler());
+
+            $this->container->add($this->getAuthCodeCreatedEventHandler());
+            $this->container->add($this->getAuthCodeMarkedAsUsedEventHandler());
+            $this->container->add($this->getAuthCodeRevokedEventHandler());
 
             $this->container->add($this->getAccessTokenRevokedEventHandler());
             $this->container->add($this->getAccessTokenCreatedEventHandler());
@@ -608,9 +685,9 @@ final class Application
                 [
                     AccessTokenCreatedEvent::class          => [AccessTokenCreatedEventHandler::class],
                     AccessTokenRevokedEvent::class          => [AccessTokenRevokedEventHandler::class],
-                    AuthCodeCreatedEvent::class             => [],
-                    AuthCodeMarkedAsUsedEvent::class        => [],
-                    AuthCodeRevokedEvent::class             => [],
+                    AuthCodeCreatedEvent::class             => [AuthCodeCreatedEventHandler::class],
+                    AuthCodeMarkedAsUsedEvent::class        => [AuthCodeMarkedAsUsedEventHandler::class],
+                    AuthCodeRevokedEvent::class             => [AuthCodeRevokedEventHandler::class],
                     AuthCodeWithRefreshTokenEvent::class    => [],
                     AuthCodeWithoutRefreshTokenEvent::class => [],
                     ClientCreatedEvent::class               => [ClientCreatedEventHandler::class],
@@ -867,6 +944,7 @@ final class Application
     {
         if (null === $this->grantTypeManager) {
             $this->grantTypeManager = new GrantTypeManager();
+            $this->grantTypeManager->addGrantType($this->getAuthorizationCodeGrantType());
             $this->grantTypeManager->addGrantType($this->getClientCredentialsGrantType());
             $this->grantTypeManager->addGrantType($this->getJWTBearerGrantType());
             $this->grantTypeManager->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
@@ -908,6 +986,27 @@ final class Application
         }
 
         return $this->clientCredentialsGrantType;
+    }
+
+    /**
+     * @var null|AuthorizationCodeGrantType
+     */
+    private $authorizationCodeGrantType = null;
+
+    /**
+     * @return AuthorizationCodeGrantType
+     */
+    public function getAuthorizationCodeGrantType(): AuthorizationCodeGrantType
+    {
+        if (null === $this->authorizationCodeGrantType) {
+            $this->authorizationCodeGrantType = new AuthorizationCodeGrantType(
+                $this->getAuthorizationCodeRepository(),
+                $this->getPKCEMethodManager(),
+                $this->getCommandBus()
+            );
+        }
+
+        return $this->authorizationCodeGrantType;
     }
 
     /**
@@ -1718,7 +1817,26 @@ final class Application
     }
 
     /**
-     * @var null|RevokeAccessTokenCommandHandler
+     * @var null|CreateRefreshTokenCommandHandler
+     */
+    private $createRefreshTokenCommandHandler = null;
+
+    /**
+     * @return CreateRefreshTokenCommandHandler
+     */
+    public function getCreateRefreshTokenCommandHandler(): CreateRefreshTokenCommandHandler
+    {
+        if (null === $this->createRefreshTokenCommandHandler) {
+            $this->createRefreshTokenCommandHandler = new CreateRefreshTokenCommandHandler(
+                $this->getRefreshTokenRepository()
+            );
+        }
+
+        return $this->createRefreshTokenCommandHandler;
+    }
+
+    /**
+     * @var null|RevokeRefreshTokenCommandHandler
      */
     private $revokeRefreshTokenCommandHandler = null;
 
@@ -1734,6 +1852,63 @@ final class Application
         }
 
         return $this->revokeRefreshTokenCommandHandler;
+    }
+
+    /**
+     * @var null|CreateAuthCodeCommandHandler
+     */
+    private $createAuthCodeCommandHandler = null;
+
+    /**
+     * @return CreateAuthCodeCommandHandler
+     */
+    public function getCreateAuthCodeCommandHandler(): CreateAuthCodeCommandHandler
+    {
+        if (null === $this->createAuthCodeCommandHandler) {
+            $this->createAuthCodeCommandHandler = new CreateAuthCodeCommandHandler(
+                $this->getAuthorizationCodeRepository()
+            );
+        }
+
+        return $this->createAuthCodeCommandHandler;
+    }
+
+    /**
+     * @var null|MarkAuthCodeAsUsedCommandHandler
+     */
+    private $markAuthCodeAsUsedCommandHandler = null;
+
+    /**
+     * @return MarkAuthCodeAsUsedCommandHandler
+     */
+    public function getMarkAuthCodeAsUsedCommandHandler(): MarkAuthCodeAsUsedCommandHandler
+    {
+        if (null === $this->markAuthCodeAsUsedCommandHandler) {
+            $this->markAuthCodeAsUsedCommandHandler = new MarkAuthCodeAsUsedCommandHandler(
+                $this->getAuthorizationCodeRepository()
+            );
+        }
+
+        return $this->markAuthCodeAsUsedCommandHandler;
+    }
+
+    /**
+     * @var null|RevokeAuthCodeCommandHandler
+     */
+    private $revokeAuthCodeCommandHandler = null;
+
+    /**
+     * @return RevokeAuthCodeCommandHandler
+     */
+    public function getRevokeAuthCodeCommandHandler(): RevokeAuthCodeCommandHandler
+    {
+        if (null === $this->revokeAuthCodeCommandHandler) {
+            $this->revokeAuthCodeCommandHandler = new RevokeAuthCodeCommandHandler(
+                $this->getAuthorizationCodeRepository()
+            );
+        }
+
+        return $this->revokeAuthCodeCommandHandler;
     }
 
     /**

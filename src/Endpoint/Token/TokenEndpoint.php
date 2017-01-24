@@ -194,7 +194,7 @@ final class TokenEndpoint implements MiddlewareInterface
         if (null === $this->scopeRepository) {
             return $grantTypeData;
         }
-        $params = $request->getParsedBody();
+        $params = $request->getParsedBody() ?? [];
         if (!array_key_exists('scope', $params)) {
             return $grantTypeData;
         }
@@ -213,9 +213,7 @@ final class TokenEndpoint implements MiddlewareInterface
             );
         }
 
-        $availableScope = $this->scopeRepository->getAvailableScopesForClient($grantTypeData->getClient());
-
-        //$grantTypeData->setAvailableScope($grantTypeData->getAvailableScope() ?: $this->scopeRepository->getAvailableScopesForClient($grantTypeData->getClient()));
+        $availableScope = is_array($grantTypeData->getAvailableScopes()) ? $grantTypeData->getAvailableScopes() : $this->scopeRepository->getAvailableScopesForClient($grantTypeData->getClient());
 
         //Check if scope requested are within the available scope
         if (!$this->scopeRepository->areRequestScopesAvailable($scope, $availableScope)) {
@@ -223,7 +221,7 @@ final class TokenEndpoint implements MiddlewareInterface
                 400,
                 [
                     'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
-                    'error_description' => sprintf('An unsupported scope was requested. Available scopes are %s', implode(', ', $availableScope)),
+                    'error_description' => sprintf('An unsupported scope was requested. Available scopes are %s.', implode(', ', $availableScope)),
                 ]
             );
         }

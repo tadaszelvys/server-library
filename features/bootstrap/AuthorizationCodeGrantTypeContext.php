@@ -11,6 +11,7 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
+use Assert\Assertion;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Tester\Exception\PendingException;
@@ -41,11 +42,38 @@ class AuthorizationCodeGrantTypeContext implements Context
     }
 
     /**
+     * @Given A client sends a Authorization Code Grant Type request but the code parameter is missing
+     */
+    public function aClientSendsAAuthorizationCodeGrantTypeRequestButTheCodeParameterIsMissing()
+    {
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'authorization_code',
+            'scope'      => 'openid email phone address',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
+    }
+
+    /**
      * @Given A client sends a Authorization Code Grant Type request but the redirection Uri parameter is missing
      */
     public function aClientSendsAAuthorizationCodeGrantTypeRequestButTheRedirectionUriParameterIsMissing()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type' => 'authorization_code',
+            'code'       => 'VALID_AUTH_CODE',
+            'scope'      => 'openid email phone address',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -53,7 +81,18 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAAuthorizationCodeGrantTypeRequestButTheRedirectionUriParameterMismatch()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'   => 'authorization_code',
+            'code'         => 'VALID_AUTH_CODE',
+            'redirect_uri' => 'http://127.0.0.1/',
+            'scope'        => 'openid email phone address',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -61,7 +100,18 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAValidAuthorizationCodeGrantTypeRequest()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'   => 'authorization_code',
+            'code'         => 'VALID_AUTH_CODE',
+            'redirect_uri' => 'https://www.example.com/callback',
+            'scope'        => 'openid email phone address',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -69,7 +119,8 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function anAuthorizationCodeUsedEventIsThrown()
     {
-        throw new PendingException();
+        $events = $this->applicationContext->getApplication()->getAuthCodeMarkedAsUsedEventHandler()->getEvents();
+        Assertion::greaterThan(count($events), 0);
     }
 
     /**
@@ -77,7 +128,18 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAValidAuthorizationCodeGrantTypeRequestWithReducedScope()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'   => 'authorization_code',
+            'code'         => 'VALID_AUTH_CODE',
+            'redirect_uri' => 'https://www.example.com/callback',
+            'scope'        => 'openid',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -85,7 +147,18 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAAuthorizationCodeGrantTypeRequestButAScopeIsNotAllowed()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'   => 'authorization_code',
+            'code'         => 'VALID_AUTH_CODE',
+            'redirect_uri' => 'https://www.example.com/callback',
+            'scope'        => 'openid write',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -93,7 +166,18 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAAuthorizationCodeGrantTypeRequestButAAuthorizationCodeIsForAnotherClient()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'   => 'authorization_code',
+            'code'         => 'VALID_AUTH_CODE',
+            'redirect_uri' => 'https://www.example.com/callback',
+            'scope'        => 'openid',
+            'client_id'    => 'client2',
+        ]);
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -101,7 +185,18 @@ class AuthorizationCodeGrantTypeContext implements Context
      */
     public function aClientSendsAAuthorizationCodeGrantTypeRequestButTheAuthorizationCodeExpired()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody([
+            'grant_type'   => 'authorization_code',
+            'code'         => 'EXPIRED_AUTH_CODE',
+            'redirect_uri' => 'https://www.example.com/callback',
+            'scope'        => 'openid',
+        ]);
+        $request = $request->withHeader('Authorization', 'Basic '.base64_encode('client1:secret'));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getTokenEndpointPipe()->dispatch($request));
     }
 
     /**

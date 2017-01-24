@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\GrantType;
 
 use Assert\Assertion;
+use OAuth2\Command\AuthCode\MarkAuthCodeAsUsedCommand;
 use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\GrantType\PKCEMethod\PKCEMethodManagerInterface;
 use OAuth2\Model\AuthCode\AuthCode;
@@ -23,7 +24,6 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UriInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
 class AuthorizationCodeGrantType implements GrantTypeInterface
@@ -79,7 +79,7 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
     public function checkTokenRequest(ServerRequestInterface $request)
     {
         $parameters = $request->getParsedBody() ?? [];
-        $requiredParameters = ['code'];
+        $requiredParameters = ['code', 'redirect_uri'];
 
         foreach ($requiredParameters as $requiredParameter) {
             if (!array_key_exists($requiredParameter, $parameters)) {
@@ -93,6 +93,14 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
      */
     public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
+        $parameters = $request->getParsedBody() ?? [];
+        $authCode = $this->getAuthCode($parameters['code']);
+
+        if (true === $authCode->isUsed()) {
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The parameter \'code\' is invalid.']);
+        }
+        $grantTypeResponse = $grantTypeResponse->withAvailableScopes($authCode->getScopes());
+
         //Nothing to do
         return $grantTypeResponse;
     }
@@ -103,41 +111,32 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
     public function grant(ServerRequestInterface $request, GrantTypeData $grantTypeResponse): GrantTypeData
     {
         $parameters = $request->getParsedBody() ?? [];
-        $this->checkClient($grantTypeResponse->getClient(), $parameters);
         $authCode = $this->getAuthCode($parameters['code']);
+        $this->checkClient($grantTypeResponse->getClient(), $parameters);
 
         $this->checkPKCE($authCode, $parameters);
         $this->checkAuthCode($authCode, $grantTypeResponse->getClient());
 
-        $redirect_uri = array_key_exists('redirect_uri', $parameters) ? $parameters['redirect_uri'] : null;
+        $redirectUri = $parameters['redirect_uri'];
 
         // Validate the redirect URI.
-        $this->checkRedirectUri($authCode, $redirect_uri);
-        $grantTypeResponse = $grantTypeResponse->withMetadata('redirect_uri', $redirect_uri);
+        $this->checkRedirectUri($authCode, $redirectUri);
+        $grantTypeResponse = $grantTypeResponse->withMetadata('redirect_uri', $redirectUri);
 
-        $availableScopes = $authCode->getScopes();
-        if (!empty($availableScopes)) {
-            $requestedScopes = array_key_exists('scope', $parameters) ? $parameters['scope'] : null;
-            //$grantTypeResponse->setRequestedScope(RequestBody::getParameter($request, 'scope') ? $this->getScopeManager()->convertToArray(RequestBody::getParameter($request, 'scope')) : $authCode->getScope());
-
-            // Check if requested scopes are within the available scopes
-
-            $grantTypeResponse = $grantTypeResponse->withScopes($availableScopes);
-        }
         $grantTypeResponse = $grantTypeResponse->withResourceOwnerId($authCode->getResourceOwnerId());
-        //$grantTypeResponse = $grantTypeResponse->withUserAccountPublicId($authCode->getUserAccountPublicId());
 
         // Refresh Token
         if ($authCode->isRefreshTokenIssued()) {
             $grantTypeResponse = $grantTypeResponse->withRefreshToken();
-            $grantTypeResponse = $grantTypeResponse->withRefreshTokenScopes($availableScopes);
+            $grantTypeResponse = $grantTypeResponse->withRefreshTokenScopes($authCode->getScopes());
         } else {
             $grantTypeResponse = $grantTypeResponse->withoutRefreshToken();
         }
-        $grantTypeResponse->setMetadata('auth_code', $authCode);
 
-        $authCodeUsedCommand = MarkAuthCodeAsUsedCommand::create();
+        $authCodeUsedCommand = MarkAuthCodeAsUsedCommand::create($authCode->getId());
         $this->commandBus->handle($authCodeUsedCommand);
+
+        return $grantTypeResponse;
     }
 
     /**
@@ -218,18 +217,18 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
 
     /**
      * @param \OAuth2\Model\AuthCode\AuthCode $authCode
-     * @param UriInterface                    $redirect_uri
+     * @param string                          $redirectUri
      *
      * @throws OAuth2Exception
      */
-    private function checkRedirectUri(AuthCode $authCode, UriInterface $redirect_uri)
+    private function checkRedirectUri(AuthCode $authCode, string $redirectUri)
     {
-        if (true === $authCode->hasMetadata('redirect_uri') && $redirect_uri !== $authCode->getMetadata('redirect_uri')) {
+        if ($redirectUri !== $authCode->getRedirectUri()->__toString()) {
             throw new OAuth2Exception(
                 400,
                 [
                     'error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'The redirect URI is missing or does not match.',
+                    'error_description' => 'The parameter \'redirect_uri\' is invalid.',
                 ]
             );
         }

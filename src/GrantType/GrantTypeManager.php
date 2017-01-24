@@ -18,7 +18,7 @@ use Assert\Assertion;
 class GrantTypeManager implements GrantTypeManagerInterface
 {
     /**
-     * @var \OAuth2\Grant\GrantTypeInterface[]
+     * @var GrantTypeInterface[]
      */
     private $grant_types = [];
 

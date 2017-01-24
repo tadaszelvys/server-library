@@ -1,17 +1,24 @@
 Feature: A client requests an access token using the Authorization Code Grant Type
 
+  Scenario: A client sends a token request using a valid authorization code, but the code parameter is missing
+    Given A client sends a Authorization Code Grant Type request but the code parameter is missing
+    Then the response contains an error with code 400
+    And the error is "invalid_request"
+    And the error description is "The parameter 'code' is missing."
+    And no access token creation event is thrown
+
   Scenario: A client sends a token request using a valid authorization code, but the redirect parameter is missing
     Given A client sends a Authorization Code Grant Type request but the redirection Uri parameter is missing
     Then the response contains an error with code 400
     And the error is "invalid_request"
-    And the error description is "The redirect Uri is missing or does not match."
+    And the error description is "The parameter 'redirect_uri' is missing."
     And no access token creation event is thrown
 
   Scenario: A client sends a token request using a valid authorization code, but the redirect parameter is invalid
     Given A client sends a Authorization Code Grant Type request but the redirection Uri parameter mismatch
     Then the response contains an error with code 400
     And the error is "invalid_request"
-    And the error description is "The redirect Uri is missing or does not match."
+    And the error description is "The parameter 'redirect_uri' is invalid."
     And no access token creation event is thrown
 
   Scenario: A client has a valid authorization code and use it to get an access token
@@ -32,7 +39,7 @@ Feature: A client requests an access token using the Authorization Code Grant Ty
     Given A client sends a Authorization Code Grant Type request but a scope is not allowed
     Then the response contains an error with code 400
     And the error is "invalid_scope"
-    And the error description is "An unsupported scope was requested. Available scopes are: scope1, scope2."
+    And the error description is "An unsupported scope was requested. Available scopes are openid, email, phone, address."
     And no access token creation event is thrown
 
   Scenario: A client has a valid authorization code, but associated client_id is not valid

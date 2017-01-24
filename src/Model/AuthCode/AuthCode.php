@@ -15,6 +15,7 @@ namespace OAuth2\Model\AuthCode;
 
 use Assert\Assertion;
 use OAuth2\Event\AuthCode\AuthCodeCreatedEvent;
+use OAuth2\Event\AuthCode\AuthCodeMarkedAsUsedEvent;
 use OAuth2\Event\AuthCodeId\AuthCodeWithoutRefreshTokenEvent;
 use OAuth2\Event\AuthCodeId\AuthCodeWithRefreshTokenEvent;
 use OAuth2\Model\Client\ClientId;
@@ -27,7 +28,7 @@ final class AuthCode extends Token
     /**
      * @var bool
      */
-    private $issueRefreshToken;
+    private $issueRefreshToken = false;
 
     /**
      * @var array
@@ -38,6 +39,11 @@ final class AuthCode extends Token
      * @var UriInterface
      */
     private $redirectUri;
+
+    /**
+     * @var null|\DateTimeImmutable
+     */
+    private $usedAt = null;
 
     /**
      * AuthCode constructor.
@@ -115,6 +121,38 @@ final class AuthCode extends Token
         $clone = clone $this;
         $clone->issueRefreshToken = false;
         $event = AuthCodeWithoutRefreshTokenEvent::create($clone->getId());
+        $clone->record($event);
+
+        return $clone;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUsed(): bool
+    {
+        return null !== $this->usedAt;
+    }
+
+    /**
+     * @return null|\DateTimeImmutable
+     */
+    public function usedAt()
+    {
+        return $this->usedAt;
+    }
+
+    /**
+     * @return self
+     */
+    public function markAsUsed(): self
+    {
+        if (null !== $this->usedAt) {
+            return $this;
+        }
+        $clone = clone $this;
+        $clone->usedAt = new \DateTimeImmutable();
+        $event = AuthCodeMarkedAsUsedEvent::create($clone->getId(), $clone->usedAt);
         $clone->record($event);
 
         return $clone;

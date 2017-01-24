@@ -24,24 +24,32 @@ final class AuthCodeMarkedAsUsedEvent extends Event
     private $authCodeId;
 
     /**
+     * @var \DateTimeImmutable
+     */
+    private $usedAt;
+
+    /**
      * AuthCodeMarkedAsUsedEvent constructor.
      *
-     * @param AuthCodeId $authCodeId
+     * @param AuthCodeId         $authCodeId
+     * @param \DateTimeImmutable $usedAt
      */
-    protected function __construct(AuthCodeId $authCodeId)
+    protected function __construct(AuthCodeId $authCodeId, \DateTimeImmutable $usedAt)
     {
         parent::__construct();
         $this->authCodeId = $authCodeId;
+        $this->usedAt = $usedAt;
     }
 
     /**
-     * @param AuthCodeId $authCodeId
+     * @param AuthCodeId         $authCodeId
+     * @param \DateTimeImmutable $usedAt
      *
      * @return self
      */
-    public static function create(AuthCodeId $authCodeId): self
+    public static function create(AuthCodeId $authCodeId, \DateTimeImmutable $usedAt): self
     {
-        return new self($authCodeId);
+        return new self($authCodeId, $usedAt);
     }
 
     /**
@@ -50,7 +58,8 @@ final class AuthCodeMarkedAsUsedEvent extends Event
     public function getPayload()
     {
         return [
-            'auth_code_id' => $this->authCodeId
+            'auth_code_id' => $this->authCodeId,
+            'used_at'      => $this->usedAt->getTimestamp(),
         ];
     }
 }

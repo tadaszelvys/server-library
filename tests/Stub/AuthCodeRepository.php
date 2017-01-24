@@ -48,10 +48,22 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
             ClientId::create('client1'),
             UserAccountId::create('john.doe.1'),
             [],
-            new Uri(),
+            new Uri('https://www.example.com/callback'),
             new \DateTimeImmutable('now +1 day'),
             [],
+            ['openid', 'email', 'phone', 'address'],
+            []
+        );
+
+        $this->authCodes['EXPIRED_AUTH_CODE'] = AuthCode::create(
+            AuthCodeId::create('EXPIRED_AUTH_CODE'),
+            ClientId::create('client1'),
+            UserAccountId::create('john.doe.1'),
             [],
+            new Uri('https://www.example.com/callback'),
+            new \DateTimeImmutable('now -1 day'),
+            [],
+            ['openid', 'email', 'phone', 'address'],
             []
         );
     }

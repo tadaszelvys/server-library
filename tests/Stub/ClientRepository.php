@@ -52,7 +52,7 @@ class ClientRepository implements ClientRepositoryInterface
             ClientId::create('client2'),
             [
                 'token_endpoint_auth_method' => 'none',
-                'grant_types'                => ['client_credentials'],
+                'grant_types'                => ['client_credentials', 'authorization_code'],
             ],
             UserAccountId::create('User1')
         );

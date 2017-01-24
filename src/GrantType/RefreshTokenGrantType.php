@@ -72,7 +72,15 @@ class RefreshTokenGrantType implements GrantTypeInterface
      */
     public function prepareTokenResponse(ServerRequestInterface $request, GrantTypeData $grantTypeData): GrantTypeData
     {
-        // Nothing to do
+        $parameters = $request->getParsedBody() ?? [];
+        $refreshToken = $parameters['refresh_token'];
+        $token = $this->refreshTokenRepository->find(RefreshTokenId::create($refreshToken));
+
+        if (null === $token) {
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token.']);
+        }
+        $grantTypeData = $grantTypeData->withAvailableScopes($token->getScopes());
+
         return $grantTypeData;
     }
 
@@ -83,15 +91,7 @@ class RefreshTokenGrantType implements GrantTypeInterface
     {
         $parameters = $request->getParsedBody() ?? [];
         $refreshToken = $parameters['refresh_token'];
-        if (null === $refreshToken) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'No \'refresh_token\' parameter found']);
-        }
-
         $token = $this->refreshTokenRepository->find(RefreshTokenId::create($refreshToken));
-
-        if (null === $token) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token.']);
-        }
 
         $client = $request->getAttribute('client');
         $this->checkRefreshToken($token, $client);

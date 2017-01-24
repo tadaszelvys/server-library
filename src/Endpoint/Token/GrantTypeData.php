@@ -55,6 +55,11 @@ class GrantTypeData
     private $refreshTokenScopes = [];
 
     /**
+     * @var \string[]|null
+     */
+    private $availableScopes = null;
+
+    /**
      * @param string $key
      * @param $metadata
      *
@@ -301,6 +306,27 @@ class GrantTypeData
     {
         $clone = clone $this;
         $clone->refreshTokenScopes = $scopes;
+
+        return $clone;
+    }
+
+    /**
+     * @return \string[]|null
+     */
+    public function getAvailableScopes()
+    {
+        return $this->availableScopes;
+    }
+
+    /**
+     * @param \string[] $scopes
+     *
+     * @return GrantTypeData
+     */
+    public function withAvailableScopes(array $scopes): self
+    {
+        $clone = clone $this;
+        $clone->availableScopes = $scopes;
 
         return $clone;
     }
