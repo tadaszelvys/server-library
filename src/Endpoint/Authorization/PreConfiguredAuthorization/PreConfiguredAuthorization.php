@@ -13,22 +13,26 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\Authorization\PreConfiguredAuthorization;
 
-class PreConfiguredAuthorization implements PreConfiguredAuthorizationInterface
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
+use OAuth2\Model\UserAccount\UserAccountId;
+
+final class PreConfiguredAuthorization
 {
     /**
-     * @var string
+     * @var ResourceOwnerId
      */
-    private $resource_owner_public_id;
+    private $resourceOwnerId;
 
     /**
-     * @var string
+     * @var UserAccountId
      */
-    private $user_account_public_id;
+    private $userAccountId;
 
     /**
-     * @var string
+     * @var ClientId
      */
-    private $client_public_id;
+    private $clientId;
 
     /**
      * @var string[]
@@ -36,63 +40,63 @@ class PreConfiguredAuthorization implements PreConfiguredAuthorizationInterface
     private $scopes;
 
     /**
-     * {@inheritdoc}
+     * @return ResourceOwnerId
      */
-    public function getResourceOwnerPublicId()
+    public function getResourceOwnerId(): ResourceOwnerId
     {
-        return $this->resource_owner_public_id;
+        return $this->resourceOwnerId;
     }
 
     /**
-     * {@inheritdoc}
+     * @param ResourceOwnerId $resourceOwnerId
      */
-    public function setResourceOwnerPublicId($resource_owner_public_id)
+    public function setResourceOwnerId(ResourceOwnerId $resourceOwnerId)
     {
-        $this->resource_owner_public_id = $resource_owner_public_id;
+        $this->resourceOwnerId = $resourceOwnerId;
     }
 
     /**
-     * {@inheritdoc}
+     * @return UserAccountId
      */
-    public function getUserAccountPublicId()
+    public function getUserAccountId(): UserAccountId
     {
-        return $this->user_account_public_id;
+        return $this->userAccountId;
     }
 
     /**
-     * {@inheritdoc}
+     * @param UserAccountId $userAccountId
      */
-    public function setUserAccountPublicId($user_account_public_id)
+    public function setUserAccountId(UserAccountId $userAccountId)
     {
-        $this->user_account_public_id = $user_account_public_id;
+        $this->userAccountId = $userAccountId;
     }
 
     /**
-     * {@inheritdoc}
+     * @return ClientId
      */
-    public function getClientPublicId()
+    public function getClientId(): ClientId
     {
-        return $this->client_public_id;
+        return $this->clientId;
     }
 
     /**
-     * {@inheritdoc}
+     * @param ClientId $clientId
      */
-    public function setClientPublicId($client_public_id)
+    public function setClientId(ClientId $clientId)
     {
-        $this->client_public_id = $client_public_id;
+        $this->clientId = $clientId;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function getScopes()
+    public function getScopes(): array
     {
         return $this->scopes;
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $scopes
      */
     public function setScopes(array $scopes)
     {

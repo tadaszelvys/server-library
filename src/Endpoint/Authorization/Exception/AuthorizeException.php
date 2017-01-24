@@ -13,29 +13,29 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\Authorization\Exception;
 
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization\Authorization;
 
 class AuthorizeException extends \Exception
 {
     /**
-     * @var \OAuth2\Endpoint\Authorization\AuthorizationInterface
+     * @var Authorization
      */
     private $authorization;
 
     /**
      * AuthorizationException constructor.
      *
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
+     * @param Authorization $authorization
      */
-    public function __construct(AuthorizationInterface $authorization)
+    public function __construct(Authorization $authorization)
     {
         $this->authorization = $authorization;
     }
 
     /**
-     * @return \OAuth2\Endpoint\Authorization\AuthorizationInterface
+     * @return Authorization
      */
-    public function getAuthorization()
+    public function getAuthorization(): Authorization
     {
         return $this->authorization;
     }

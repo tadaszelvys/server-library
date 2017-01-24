@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 /**
@@ -27,7 +27,7 @@ class NonceParameterChecker implements ParameterCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function checkerParameter(ClientInterface $client, array &$parameters)
+    public function checkerParameter(Client $client, array &$parameters)
     {
         if (false === strpos($parameters['response_type'], 'id_token')) {
             return;
@@ -38,7 +38,7 @@ class NonceParameterChecker implements ParameterCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function getError()
+    public function getError(): string
     {
         return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }

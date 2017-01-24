@@ -20,14 +20,14 @@ interface ResponseTypeManagerInterface
      *
      * @return ResponseTypeManagerInterface
      */
-    public function addResponseType(ResponseTypeInterface $responseType): self;
+    public function add(ResponseTypeInterface $responseType): self;
 
     /**
      * @param string $name
      *
      * @return bool
      */
-    public function hasResponseType(string $name): bool;
+    public function has(string $name): bool;
 
     /**
      * @param string $names
@@ -36,17 +36,17 @@ interface ResponseTypeManagerInterface
      *
      * @return ResponseTypeInterface[]
      */
-    public function getResponseTypes(string $names): array;
+    public function find(string $names): array;
 
     /**
      * @return string[]
      */
-    public function getSupportedResponseTypes(): array;
+    public function all(): array;
 
     /**
      * @param string $responseType
      *
      * @return bool
      */
-    public function isResponseTypeSupported(string $responseType): bool;
+    public function isSupported(string $responseType): bool;
 }

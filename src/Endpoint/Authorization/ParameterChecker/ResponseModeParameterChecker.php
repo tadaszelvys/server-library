@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 class ResponseModeParameterChecker implements ParameterCheckerInterface
@@ -22,23 +22,22 @@ class ResponseModeParameterChecker implements ParameterCheckerInterface
     /**
      * @var bool
      */
-    private $response_mode_parameter_in_authorization_request_allowed = false;
+    private $responseModeParameterInAuthorizationRequestAllowed;
 
     /**
      * ResponseModeParameterChecker constructor.
      *
-     * @param bool $response_mode_parameter_in_authorization_request_allowed
+     * @param bool $responseModeParameterInAuthorizationRequestAllowed
      */
-    public function __construct($response_mode_parameter_in_authorization_request_allowed)
+    public function __construct(bool $responseModeParameterInAuthorizationRequestAllowed)
     {
-        Assertion::boolean($response_mode_parameter_in_authorization_request_allowed);
-        $this->response_mode_parameter_in_authorization_request_allowed = $response_mode_parameter_in_authorization_request_allowed;
+        $this->responseModeParameterInAuthorizationRequestAllowed = $responseModeParameterInAuthorizationRequestAllowed;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function checkerParameter(ClientInterface $client, array &$parameters)
+    public function checkerParameter(Client $client, array &$parameters)
     {
         if (false === array_key_exists('response_mode', $parameters)) {
             return;
@@ -49,16 +48,16 @@ class ResponseModeParameterChecker implements ParameterCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function getError()
+    public function getError(): string
     {
         return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
-    private function isResponseModeParameterInAuthorizationRequestAllowed()
+    private function isResponseModeParameterInAuthorizationRequestAllowed(): bool
     {
-        return $this->response_mode_parameter_in_authorization_request_allowed;
+        return $this->responseModeParameterInAuthorizationRequestAllowed;
     }
 }

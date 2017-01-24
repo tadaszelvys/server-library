@@ -17,7 +17,7 @@ use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Endpoint\Authorization\Exception\AuthorizeException;
 use OAuth2\Endpoint\Authorization\Exception\ShowConsentScreenException;
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface;
-use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface;
+use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\UserAccount\UserAccountInterface;
@@ -26,7 +26,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtensionInterface
 {
     /**
-     * @var \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface
+     * @var \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationRepositoryInterface
      */
     private $pre_configured_authorization_manager;
 
@@ -39,9 +39,9 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
      * PreConfiguredAuthorizationExtension constructor.
      *
      * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface                                               $response_factory
-     * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface $pre_configured_authorization_manager
+     * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationRepositoryInterface $pre_configured_authorization_manager
      */
-    public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory, PreConfiguredAuthorizationManagerInterface $pre_configured_authorization_manager)
+    public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory, PreConfiguredAuthorizationRepositoryInterface $pre_configured_authorization_manager)
     {
         $this->response_factory = $response_factory;
         $this->pre_configured_authorization_manager = $pre_configured_authorization_manager;
@@ -142,7 +142,7 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
     }
 
     /**
-     * @return \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface
+     * @return \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationRepositoryInterface
      */
     private function getPreConfiguredAuthorizationManager()
     {

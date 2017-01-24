@@ -14,22 +14,13 @@ declare(strict_types=1);
 namespace OAuth2\Endpoint\Authorization\Extension;
 
 use Assert\Assertion;
-use OAuth2\Behaviour\HasUserAccountManager;
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
 use OAuth2\Endpoint\Authorization\Exception\RedirectToLoginPageException;
-use OAuth2\OpenIdConnect\HasIdTokenManager;
-use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\UserAccount\UserAccountInterface;
-use OAuth2\UserAccount\UserAccountManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
 {
-    use HasIdTokenManager;
-    use HasUserAccountManager;
-
     /**
      * @var \OAuth2\Response\OAuth2ResponseFactoryManagerInterface
      */

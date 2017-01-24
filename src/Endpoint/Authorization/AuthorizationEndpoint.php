@@ -13,35 +13,37 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\Authorization;
 
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Endpoint\Authorization\Extension\AuthorizationEndpointExtensionInterface;
 use OAuth2\Endpoint\Authorization\Extension\StateParameterExtension;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\ResponseMode\QueryResponseMode;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
+abstract class AuthorizationEndpoint implements MiddlewareInterface
 {
     /**
-     * @var Extension\AuthorizationEndpointExtensionInterface[]
+     * @var AuthorizationEndpointExtensionInterface[]
      */
     private $extensions = [];
 
     /**
-     * @var AuthorizationFactoryInterface
+     * @var AuthorizationFactory
      */
-    private $authorization_factory;
+    private $authorizationFactory;
 
     /**
      * AuthorizationEndpoint constructor.
      *
-     * @param AuthorizationFactoryInterface                          $authorization_factory
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
+     * @param AuthorizationFactory $authorizationFactory
      */
-    public function __construct(AuthorizationFactoryInterface $authorization_factory, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
+    public function __construct(AuthorizationFactory $authorizationFactory)
     {
-        $this->authorization_factory = $authorization_factory;
+        $this->authorizationFactory = $authorizationFactory;
         $this->addExtension(new StateParameterExtension());
     }
 
@@ -53,21 +55,21 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * @return bool
      */
-    abstract protected function isCurrentUserFullyAuthenticated();
+    abstract protected function isCurrentUserFullyAuthenticated(): bool;
 
     /**
      * @param Authorization                            $authorization
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     abstract protected function redirectToLoginPage(Authorization $authorization, ServerRequestInterface $request);
 
     /**
      * @param Authorization                            $authorization
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     abstract protected function processConsentScreen(Authorization $authorization, ServerRequestInterface $request);
 
@@ -82,13 +84,13 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function authorize(ServerRequestInterface $request)
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         try {
             /**
              * Get the Authorization Object from the request.
              */
-            $authorization = $this->authorization_factory->createAuthorizationFromRequest($request);
+            $authorization = $this->authorizationFactory->createAuthorizationFromRequest($request);
 
             /**
              * Get the current user account
@@ -129,8 +131,8 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
             if (array_key_exists('redirect_uri', $params)) {
                 if (array_key_exists('response_type', $params)) {
                     try {
-                        $types = $this->authorization_factory->getResponseTypes($params);
-                        $response_mode = $this->authorization_factory->getResponseMode($params, $types);
+                        $types = $this->authorizationFactory->getResponseTypes($params);
+                        $response_mode = $this->authorizationFactory->getResponseMode($params, $types);
                     } catch (\Exception $e) {
                         $response_mode = new QueryResponseMode();
                     }
@@ -155,9 +157,9 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
         } catch (Exception\CreateRedirectionException $e) {
             return $this->createRedirectionException($e->getAuthorization(), $e->getMessage(), $e->getDescription());
         } catch (Exception\ShowConsentScreenException $e) {
-            $form_data = $this->processConsentScreen($e->getAuthorization(), $request);
-            $form_data = $form_data ?: [];
-            $this->processAfterConsentScreenIsAccepted($e->getAuthorization(), $form_data);
+            $formData = $this->processConsentScreen($e->getAuthorization(), $request);
+            $formData = $formData ?: [];
+            $this->processAfterConsentScreenIsAccepted($e->getAuthorization(), $formData);
         } catch (Exception\RedirectToLoginPageException $e) {
             return $this->redirectToLoginPage($e->getAuthorization(), $request);
         } catch (Exception\AuthorizationException $e) {
@@ -177,10 +179,10 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      * @param Authorization                            $authorization
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     protected function processAuthorization(ServerRequestInterface $request, Authorization $authorization)
     {
@@ -217,7 +219,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
      * @param string        $error
      * @param string|null   $error_description
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     private function createRedirectionException(Authorization $authorization, $error, $error_description = null)
     {
@@ -236,9 +238,9 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param Authorization                            $authorization
-     * @param UserAccount|null                         $user_account
+     * @param ServerRequestInterface $request
+     * @param Authorization          $authorization
+     * @param UserAccount|null       $user_account
      */
     public function processUserAccount(ServerRequestInterface $request, Authorization $authorization, UserAccount &$user_account = null)
     {
@@ -248,9 +250,9 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param array                                    $response_parameters
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param Authorization                            $authorization
+     * @param array                  $response_parameters
+     * @param ServerRequestInterface $request
+     * @param Authorization          $authorization
      */
     private function process(array &$response_parameters, ServerRequestInterface $request, Authorization $authorization)
     {
@@ -261,20 +263,20 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
     /**
      * @param UserAccount            $user_account
-     * @param bool                   $is_fully_authenticated
+     * @param bool                   $isFullyAuthenticated
      * @param ServerRequestInterface $request
      * @param Authorization          $authorization
      */
-    private function processUserAccountIsAvailable(UserAccount $user_account, $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization)
+    private function processUserAccountIsAvailable(UserAccount $user_account, $isFullyAuthenticated, ServerRequestInterface $request, Authorization $authorization)
     {
         foreach ($this->extensions as $extension) {
-            $extension->processUserAccountIsAvailable($user_account, $is_fully_authenticated, $request, $authorization);
+            $extension->processUserAccountIsAvailable($user_account, $isFullyAuthenticated, $request, $authorization);
         }
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param Authorization                            $authorization
+     * @param ServerRequestInterface $request
+     * @param Authorization          $authorization
      */
     private function processUserAccountIsNotAvailable(ServerRequestInterface $request, Authorization $authorization)
     {
@@ -284,15 +286,15 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
     }
 
     /**
-     * @param UserAccount                              $user_account
-     * @param bool                                     $is_fully_authenticated
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param Authorization                            $authorization
+     * @param UserAccount            $user_account
+     * @param bool                   $isFullyAuthenticated
+     * @param ServerRequestInterface $request
+     * @param Authorization          $authorization
      */
-    private function processAfterUserAccountComputation(UserAccount $user_account, $is_fully_authenticated, ServerRequestInterface $request, Authorization $authorization)
+    private function processAfterUserAccountComputation(UserAccount $user_account, $isFullyAuthenticated, ServerRequestInterface $request, Authorization $authorization)
     {
         foreach ($this->extensions as $extension) {
-            $extension->processAfterUserAccountComputation($user_account, $is_fully_authenticated, $request, $authorization);
+            $extension->processAfterUserAccountComputation($user_account, $isFullyAuthenticated, $request, $authorization);
         }
     }
 
@@ -301,7 +303,7 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
      *
      * @return array
      */
-    protected function processConsentScreenOptions(Authorization $authorization)
+    protected function processConsentScreenOptions(Authorization $authorization): array
     {
         $option = [];
         foreach ($this->extensions as $extension) {
@@ -313,12 +315,12 @@ abstract class AuthorizationEndpoint implements AuthorizationEndpointInterface
 
     /**
      * @param Authorization $authorization
-     * @param array         $form_data
+     * @param array         $formData
      */
-    protected function processAfterConsentScreenIsAccepted(Authorization $authorization, array $form_data)
+    protected function processAfterConsentScreenIsAccepted(Authorization $authorization, array $formData)
     {
         foreach ($this->extensions as $extension) {
-            $extension->processAfterConsentScreenIsAccepted($authorization, $form_data);
+            $extension->processAfterConsentScreenIsAccepted($authorization, $formData);
         }
     }
 }

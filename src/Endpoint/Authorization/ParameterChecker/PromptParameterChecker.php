@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 class PromptParameterChecker implements ParameterCheckerInterface
@@ -27,7 +27,7 @@ class PromptParameterChecker implements ParameterCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function checkerParameter(ClientInterface $client, array &$parameters)
+    public function checkerParameter(Client $client, array &$parameters)
     {
         if (!array_key_exists('prompt', $parameters)) {
             return;
@@ -39,7 +39,7 @@ class PromptParameterChecker implements ParameterCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function getError()
+    public function getError(): string
     {
         return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }
@@ -47,7 +47,7 @@ class PromptParameterChecker implements ParameterCheckerInterface
     /**
      * @return string[]
      */
-    private function getAllowedPromptValues()
+    private function getAllowedPromptValues(): array
     {
         return [
             self::PROMPT_NONE,

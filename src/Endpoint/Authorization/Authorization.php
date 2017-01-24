@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace OAuth2\Endpoint\Authorization;
 
 use Assert\Assertion;
-use OAuth2\Grant\ResponseTypeInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\ResponseMode\ResponseModeInterface;
+use OAuth2\ResponseType\ResponseTypeInterface;
 use OAuth2\TokenType\TokenTypeInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -39,7 +39,7 @@ final class Authorization
     private $userAccount;
 
     /**
-     * @var array
+     * @var \string[]
      */
     private $scopes = [];
 
@@ -142,7 +142,7 @@ final class Authorization
     }
 
     /**
-     * @return string[]
+     * @return \string[]
      */
     public function getPrompt(): array
     {

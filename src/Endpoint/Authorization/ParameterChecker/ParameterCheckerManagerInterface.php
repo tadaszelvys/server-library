@@ -13,20 +13,22 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
 
 interface ParameterCheckerManagerInterface
 {
     /**
-     * @param \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface $parameter_checker
+     * @param ParameterCheckerInterface $parameter_checker
+     *
+     * @return ParameterCheckerManagerInterface
      */
-    public function addParameterChecker(ParameterCheckerInterface $parameter_checker);
+    public function addParameterChecker(ParameterCheckerInterface $parameter_checker): ParameterCheckerManagerInterface;
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
+     * @param Client $client
      * @param array                          $parameters
      *
      * @throws \OAuth2\Response\OAuth2Exception
      */
-    public function checkParameters(ClientInterface $client, array &$parameters);
+    public function checkParameters(Client $client, array &$parameters);
 }

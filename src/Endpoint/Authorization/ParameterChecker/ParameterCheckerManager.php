@@ -13,50 +13,36 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
-use OAuth2\Behaviour\HasResponseFactoryManager;
-use OAuth2\Behaviour\HasScopeManager;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
-class ParameterCheckerManager implements ParameterCheckerManagerInterface
+final class ParameterCheckerManager implements ParameterCheckerManagerInterface
 {
-    use HasScopeManager;
-    use HasResponseFactoryManager;
+    /**
+     * @var ParameterCheckerInterface[]
+     */
+    private $parameterCheckers = [];
 
     /**
-     * @var \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerInterface[]
+     * {@inheritdoc}
      */
-    private $parameter_checkers = [];
-
-    /**
-     * ParameterCheckerManager constructor.
-     *
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
-     */
-    public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory_manager)
+    public function addParameterChecker(ParameterCheckerInterface $parameterChecker): ParameterCheckerManagerInterface
     {
-        $this->setResponsefactoryManager($response_factory_manager);
+        $this->parameterCheckers[] = $parameterChecker;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addParameterChecker(ParameterCheckerInterface $parameter_checker)
+    public function checkParameters(Client $client, array &$parameters)
     {
-        $this->parameter_checkers[] = $parameter_checker;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function checkParameters(ClientInterface $client, array &$parameters)
-    {
-        foreach ($this->parameter_checkers as $parameter_checker) {
+        foreach ($this->parameterCheckers as $parameterChecker) {
             try {
-                $parameter_checker->checkerParameter($client, $parameters);
+                $parameterChecker->checkerParameter($client, $parameters);
             } catch (\InvalidArgumentException $e) {
-                throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => $parameter_checker->getError(), 'error_description' => $e->getMessage()]));
+                throw new OAuth2Exception(400, ['error' => $parameterChecker->getError(), 'error_description' => $e->getMessage()]);
             }
         }
     }

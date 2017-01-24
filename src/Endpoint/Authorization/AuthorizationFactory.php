@@ -14,18 +14,35 @@ declare(strict_types=1);
 namespace OAuth2\Endpoint\Authorization;
 
 use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface;
-use OAuth2\Grant\ResponseTypeManagerInterface;
+use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\ResponseMode\ResponseModeInterface;
 use OAuth2\ResponseMode\ResponseModeManagerInterface;
+use OAuth2\ResponseType\ResponseTypeManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class AuthorizationFactory implements AuthorizationFactoryInterface
+final class AuthorizationFactory
 {
     /**
-     * @var \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface
+     * @var AuthorizationRequestLoader
      */
     private $authorizationRequestLoader;
+
+    /**
+     * @var ResponseTypeManagerInterface
+     */
+    private $responseTypeManager;
+
+    /**
+     * @var ResponseModeManagerInterface
+     */
+    private $responseModeManager;
+
+    /**
+     * @var ParameterCheckerManagerInterface
+     */
+    private $parameterCheckerManager;
 
     /**
      * @var bool
@@ -35,31 +52,29 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
     /**
      * AuthorizationFactory constructor.
      *
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationRequestLoaderInterface               $authorizationRequestLoader
-     * @param \OAuth2\Grant\ResponseTypeManagerInterface                                       $response_type_manager
-     * @param \OAuth2\ResponseMode\ResponseModeManagerInterface                                $response_mode_manager
-     * @param \OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface $parameter_checker_manager
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface                           $response_factory_manager
+     * @param AuthorizationRequestLoader       $authorizationRequestLoader
+     * @param ResponseTypeManagerInterface     $responseTypeManager
+     * @param ResponseModeManagerInterface     $responseModeManager
+     * @param ParameterCheckerManagerInterface $parameterCheckerManager
      */
-    public function __construct(AuthorizationRequestLoaderInterface $authorizationRequestLoader, ResponseTypeManagerInterface $response_type_manager, ResponseModeManagerInterface $response_mode_manager, ParameterCheckerManagerInterface $parameter_checker_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
+    public function __construct(AuthorizationRequestLoader $authorizationRequestLoader, ResponseTypeManagerInterface $responseTypeManager, ResponseModeManagerInterface $responseModeManager, ParameterCheckerManagerInterface $parameterCheckerManager)
     {
         $this->authorizationRequestLoader = $authorizationRequestLoader;
-        $this->setResponseTypeManager($response_type_manager);
-        $this->setResponseModeManager($response_mode_manager);
-        $this->setParameterCheckerManager($parameter_checker_manager);
-        $this->setResponsefactoryManager($response_factory_manager);
+        $this->responseTypeManager = $responseTypeManager;
+        $this->responseModeManager = $responseModeManager;
+        $this->parameterCheckerManager = $parameterCheckerManager;
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
-    public function isResponseModeParameterSupported()
+    public function isResponseModeParameterSupported(): bool
     {
         return $this->responseModeParameterInAuthorizationRequestEnabled;
     }
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function enableResponseModeParameterSupport()
     {
@@ -67,7 +82,7 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function disableResponseModeParameterSupport()
     {
@@ -75,24 +90,26 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param ServerRequestInterface $request
+     *
+     * @return Authorization
      */
-    public function createAuthorizationFromRequest(ServerRequestInterface $request)
+    public function createAuthorizationFromRequest(ServerRequestInterface $request): Authorization
     {
         $parameters = $this->authorizationRequestLoader->loadParametersFromRequest($request);
         $client = $parameters['client'];
 
-        $this->getParameterCheckerManager()->checkParameters($client, $parameters);
+        $this->parameterCheckerManager->checkParameters($client, $parameters);
 
         $this->checkResponseTypeAllowedForTheClient($client, $parameters);
 
-        $redirect_uri = $parameters['redirect_uri'];
+        $redirectUri = $parameters['redirect_uri'];
         $scope = array_key_exists('scope', $parameters) ? $parameters['scope'] : [];
 
         $types = $this->getResponseTypes($parameters);
-        $response_mode = $this->getResponseMode($parameters, $types);
+        $responseMode = $this->getResponseMode($parameters, $types);
 
-        $authorization = new Authorization($parameters, $client, $types, $response_mode, $redirect_uri, $scope);
+        $authorization = new Authorization($parameters, $client, $types, $responseMode, $redirectUri, $scope);
 
         foreach ($types as $type) {
             $type->checkAuthorization($authorization);
@@ -102,9 +119,12 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $params
+     * @param array $types
+     *
+     * @return ResponseModeInterface
      */
-    public function getResponseMode(array $params, array $types)
+    public function getResponseMode(array $params, array $types): ResponseModeInterface
     {
         if (array_key_exists('response_mode', $params) && true === $this->isResponseModeParameterSupported()) {
             return $this->getResponseModeService($params['response_mode']);
@@ -122,22 +142,22 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
     }
 
     /**
-     * @param string $response_type
+     * @param string $responseType
      *
      * @throws \OAuth2\Response\OAuth2Exception
      *
      * @return string
      */
-    private function getResponseModeIfMultipleResponseTypes($response_type)
+    private function getResponseModeIfMultipleResponseTypes($responseType): string
     {
-        switch ($response_type) {
+        switch ($responseType) {
             case 'code token':
             case 'code id_token':
             case 'id_token token':
             case 'code id_token token':
                 return 'fragment';
             default:
-                throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Unsupported response type combination \'%s\'.', $response_type)]));
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Unsupported response type combination \'%s\'.', $responseType)]);
         }
     }
 
@@ -146,27 +166,27 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
      *
      * @throws \OAuth2\Response\OAuth2Exception
      *
-     * @return \OAuth2\ResponseMode\ResponseModeInterface
+     * @return ResponseModeInterface
      */
     private function getResponseModeService($mode)
     {
-        if (!$this->getResponseModeManager()->hasResponseMode($mode)) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Unsupported response mode \'%s\'.', $mode)]));
+        if (!$this->responseModeManager->has($mode)) {
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Unsupported response mode \'%s\'.', $mode)]);
         }
 
-        return $this->getResponseModeManager()->getResponseMode($mode);
+        return $this->responseModeManager->get($mode);
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param array                          $params
+     * @param Client $client
+     * @param array  $params
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      */
-    private function checkResponseTypeAllowedForTheClient(ClientInterface $client, array $params)
+    private function checkResponseTypeAllowedForTheClient(Client $client, array $params)
     {
         if (!$client->isResponseTypeAllowed($params['response_type'])) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_UNAUTHORIZED_CLIENT, 'error_description' => sprintf('The response type \'%s\' is unauthorized for this client.', $params['response_type'])]));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_UNAUTHORIZED_CLIENT, 'error_description' => sprintf('The response type \'%s\' is unauthorized for this client.', $params['response_type'])]);
         }
     }
 
@@ -175,14 +195,14 @@ class AuthorizationFactory implements AuthorizationFactoryInterface
      */
     public function getResponseTypes(array $params)
     {
-        if (!$this->getResponseTypeManager()->isResponseTypeSupported($params['response_type'])) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Response type \'%s\' is not supported by this server', $params['response_type'])]));
+        if (!$this->responseTypeManager->isSupported($params['response_type'])) {
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Response type \'%s\' is not supported by this server', $params['response_type'])]);
         }
 
         try {
-            $types = $this->getResponseTypeManager()->getResponseTypes($params['response_type']);
+            $types = $this->responseTypeManager->find($params['response_type']);
         } catch (\InvalidArgumentException $e) {
-            throw new OAuth2Exception($this->getResponseFactoryManager()->getResponse(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]));
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]);
         }
 
         return $types;

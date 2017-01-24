@@ -25,7 +25,7 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function addResponseType(ResponseTypeInterface $responseType): ResponseTypeManagerInterface
+    public function add(ResponseTypeInterface $responseType): ResponseTypeManagerInterface
     {
         $this->responseTypes[$responseType->getResponseType()] = $responseType;
 
@@ -35,7 +35,7 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function hasResponseType(string $name): bool
+    public function has(string $name): bool
     {
         return array_key_exists($name, $this->responseTypes);
     }
@@ -43,9 +43,9 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponseTypes(string $names): array
+    public function find(string $names): array
     {
-        Assertion::true($this->isResponseTypeSupported($names), sprintf('The response type \'%s\' is not supported.', $names));
+        Assertion::true($this->isSupported($names), sprintf('The response type \'%s\' is not supported.', $names));
         $responseTypes = explode(' ', $names);
 
         $types = [];
@@ -60,7 +60,7 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getSupportedResponseTypes(): array
+    public function all(): array
     {
         $types = array_keys($this->responseTypes);
         if (in_array('id_token', $types)) {
@@ -84,8 +84,8 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function isResponseTypeSupported(string $responseType): bool
+    public function isSupported(string $responseType): bool
     {
-        return in_array($responseType, $this->getSupportedResponseTypes());
+        return in_array($responseType, $this->all());
     }
 }

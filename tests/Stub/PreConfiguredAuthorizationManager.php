@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace OAuth2\Test\Stub;
 
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorization;
-use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface;
-use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationManagerInterface;
+use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationRepositoryInterface;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Client\ClientRepositoryInterface;
+use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 
-class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationManagerInterface
+class PreConfiguredAuthorizationRepository implements PreConfiguredAuthorizationRepositoryInterface
 {
     /**
-     * @var \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationInterface[]
+     * @var PreConfiguredAuthorization[]
      */
-    private $pre_configured_authorizations = [];
+    private $preConfiguredAuthorizations = [];
 
     /**
      * PreConfiguredAuthorizationManager constructor.
@@ -71,18 +71,18 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     /**
      * {@inheritdoc}
      */
-    public function findOnePreConfiguredAuthorization($resource_owner_public_id, $client_public_id, array $scope)
+    public function findOne(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $scope)
     {
-        $hash = $this->calculateHash($resource_owner_public_id, $client_public_id, $scope);
-        if (array_key_exists($hash, $this->pre_configured_authorizations)) {
-            return $this->pre_configured_authorizations[$hash];
+        $hash = $this->calculateHash($resourceOwnerId, $clientId, $scope);
+        if (array_key_exists($hash, $this->preConfiguredAuthorizations)) {
+            return $this->preConfiguredAuthorizations[$hash];
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createPreConfiguredAuthorization()
+    public function create(): PreConfiguredAuthorization
     {
         return new PreConfiguredAuthorization();
     }
@@ -90,31 +90,33 @@ class PreConfiguredAuthorizationManager implements PreConfiguredAuthorizationMan
     /**
      * {@inheritdoc}
      */
-    public function savePreConfiguredAuthorization(PreConfiguredAuthorizationInterface $pre_configured_authorization)
+    public function save(PreConfiguredAuthorization $preConfiguredAuthorization): PreConfiguredAuthorizationRepositoryInterface
     {
         $hash = $this->calculateHash(
-            $pre_configured_authorization->getResourceOwnerPublicId(),
-            $pre_configured_authorization->getClientPublicId(),
-            $pre_configured_authorization->getScopes()
+            $preConfiguredAuthorization->getResourceOwnerId(),
+            $preConfiguredAuthorization->getClientId(),
+            $preConfiguredAuthorization->getScopes()
         );
-        $this->pre_configured_authorizations[$hash] = $pre_configured_authorization;
+        $this->preConfiguredAuthorizations[$hash] = $preConfiguredAuthorization;
+
+        return $this;
     }
 
     /**
-     * @param string   $resource_owner_public_id
-     * @param string   $client_public_id
-     * @param string[] $scope
+     * @param ResourceOwnerId $resourceOwnerId
+     * @param ClientId        $clientId
+     * @param \string[]       $scope
      *
      * @return string
      */
-    private function calculateHash($resource_owner_public_id, $client_public_id, array $scope)
+    private function calculateHash(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $scope)
     {
         return hash(
             'sha512',
             sprintf(
                 '%s%s%s',
-                $resource_owner_public_id,
-                $client_public_id,
+                $resourceOwnerId,
+                $clientId,
                 implode(' ', $scope)
             )
         );

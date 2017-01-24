@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
-class DisplayParameterChecker implements ParameterCheckerInterface
+final class DisplayParameterChecker implements ParameterCheckerInterface
 {
     const DISPLAY_PAGE = 'page';
     const DISPLAY_POPUP = 'popup';
@@ -27,7 +27,7 @@ class DisplayParameterChecker implements ParameterCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function checkerParameter(ClientInterface $client, array &$parameters)
+    public function checkerParameter(Client $client, array &$parameters)
     {
         if (!array_key_exists('display', $parameters)) {
             return;
@@ -38,7 +38,7 @@ class DisplayParameterChecker implements ParameterCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function getError()
+    public function getError(): string
     {
         return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
     }
@@ -46,7 +46,7 @@ class DisplayParameterChecker implements ParameterCheckerInterface
     /**
      * @return string[]
      */
-    private function getAllowedDisplayValues()
+    private function getAllowedDisplayValues(): array
     {
         return [
             self::DISPLAY_PAGE,

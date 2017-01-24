@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\Authorization\Exception;
 
-use OAuth2\Endpoint\Authorization\AuthorizationInterface;
+use OAuth2\Endpoint\Authorization\Authorization;
 
 class CreateRedirectionException extends \Exception
 {
     /**
-     * @var \OAuth2\Endpoint\Authorization\AuthorizationInterface
+     * @var Authorization
      */
     private $authorization;
 
@@ -30,11 +30,11 @@ class CreateRedirectionException extends \Exception
     /**
      * CreateRedirectionException constructor.
      *
-     * @param \OAuth2\Endpoint\Authorization\AuthorizationInterface $authorization
-     * @param string                                                $message
-     * @param null|string                                           $description
+     * @param Authorization $authorization
+     * @param string        $message
+     * @param null|string   $description
      */
-    public function __construct(AuthorizationInterface $authorization, $message, $description = null)
+    public function __construct(Authorization $authorization, string $message, string $description = null)
     {
         parent::__construct($message);
         $this->authorization = $authorization;
@@ -42,9 +42,9 @@ class CreateRedirectionException extends \Exception
     }
 
     /**
-     * @return \OAuth2\Endpoint\Authorization\AuthorizationInterface
+     * @return Authorization
      */
-    public function getAuthorization()
+    public function getAuthorization(): Authorization
     {
         return $this->authorization;
     }

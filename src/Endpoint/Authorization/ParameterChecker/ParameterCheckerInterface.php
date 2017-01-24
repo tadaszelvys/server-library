@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
-use OAuth2\Client\ClientInterface;
+use OAuth2\Model\Client\Client;
 
 interface ParameterCheckerInterface
 {
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param array                          $parameters
+     * @param Client $client
+     * @param array  $parameters
      *
      * @throws \InvalidArgumentException
      */
-    public function checkerParameter(ClientInterface $client, array &$parameters);
+    public function checkerParameter(Client $client, array &$parameters);
 
     /**
      * @return string
      */
-    public function getError();
+    public function getError(): string: string;
 }

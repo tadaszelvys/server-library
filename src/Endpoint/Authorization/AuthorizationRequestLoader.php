@@ -17,14 +17,23 @@ use Assert\Assertion;
 use Http\Client\HttpClient;
 use Jose\JWTLoaderInterface;
 use Jose\Object\JWKSetInterface;
+use Jose\Object\JWSInterface;
+use OAuth2\Model\Client\Client;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\Client\ClientRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Request;
 
-class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
+final class AuthorizationRequestLoader
 {
+    /**
+     * @var ClientRepositoryInterface
+     */
+    private $clientRepository;
+
     /**
      * @var bool
      */
@@ -36,14 +45,14 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     private $requestObjectReferenceAllowed = false;
 
     /**
-     * @var \Jose\Object\JWKSetInterface|null
+     * @var JWKSetInterface|null
      */
     private $keyEncryptionKeySet = null;
 
     /**
      * @var bool
      */
-    private $require_request_uri_registration = true;
+    private $requireRequestUriRegistration = true;
 
     /**
      * @var bool
@@ -51,49 +60,52 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     private $requireEncryption = false;
 
     /**
-     * @var string[]
+     * @var \string[]
      */
     private $mandatoryClaims = [];
 
     /**
-     * @var null|\Http\Client\HttpClient
+     * @var null|HttpClient
      */
     private $client = null;
 
     /**
+     * @var null|JWTLoaderInterface
+     */
+    private $jwtLoader = null;
+
+    /**
      * AuthorizationRequestLoader constructor.
      *
-     * @param \OAuth2\Client\ClientManagerInterface                  $client_manager
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface $response_factory_manager
+     * @param ClientRepositoryInterface $clientRepository
      */
-    public function __construct(ClientManagerInterface $client_manager, OAuth2ResponseFactoryManagerInterface $response_factory_manager)
+    public function __construct(ClientRepositoryInterface $clientRepository)
     {
-        $this->setClientManager($client_manager);
-        $this->setResponsefactoryManager($response_factory_manager);
+        $this->clientRepository = $clientRepository;
     }
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function enableRequestUriRegistrationRequirement()
     {
-        $this->require_request_uri_registration = true;
+        $this->requireRequestUriRegistration = true;
     }
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function disableRequestUriRegistrationRequirement()
     {
-        $this->require_request_uri_registration = false;
+        $this->requireRequestUriRegistration = false;
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
-    public function isRequestUriRegistrationRequired()
+    public function isRequestUriRegistrationRequired(): bool
     {
-        return $this->require_request_uri_registration;
+        return $this->requireRequestUriRegistration;
     }
 
     /**
@@ -117,7 +129,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
      */
     public function getSupportedSignatureAlgorithms()
     {
-        return false === $this->hasJWTLoader() ? [] : $this->getJWTLoader()->getSupportedSignatureAlgorithms();
+        return null === $this->jwtLoader ? [] : $this->jwtLoader->getSupportedSignatureAlgorithms();
     }
 
     /**
@@ -125,7 +137,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
      */
     public function getSupportedKeyEncryptionAlgorithms()
     {
-        return false === $this->hasJWTLoader() ? [] : $this->getJWTLoader()->getSupportedKeyEncryptionAlgorithms();
+        return null === $this->jwtLoader ? [] : $this->jwtLoader->getSupportedKeyEncryptionAlgorithms();
     }
 
     /**
@@ -133,22 +145,23 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
      */
     public function getSupportedContentEncryptionAlgorithms()
     {
-        return false === $this->hasJWTLoader() ? [] : $this->getJWTLoader()->getSupportedContentEncryptionAlgorithms();
+        return null === $this->jwtLoader ? [] : $this->jwtLoader->getSupportedContentEncryptionAlgorithms();
     }
 
     /**
-     * {@inheritdoc}
+     * @param JWTLoaderInterface $jwtLoader
+     * @param \string[]          $mandatoryClaims
      */
-    public function enableRequestObjectSupport(JWTLoaderInterface $jwt_loader, array $mandatoryClaims = [])
+    public function enableRequestObjectSupport(JWTLoaderInterface $jwtLoader, array $mandatoryClaims = [])
     {
         Assertion::allString($mandatoryClaims, 'The mandatory claims array should contain only claims.');
-        $this->setJWTLoader($jwt_loader);
+        $this->jwtLoader = $jwtLoader;
         $this->requestObjectAllowed = true;
         $this->mandatoryClaims = $mandatoryClaims;
     }
 
     /**
-     * {@inheritdoc}
+     * @param HttpClient $client
      */
     public function enableRequestObjectReferenceSupport(HttpClient $client)
     {
@@ -158,11 +171,11 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param JWKSetInterface $keyEncryptionKeySet
+     * @param bool $requireEncryption
      */
-    public function enableEncryptedRequestObjectSupport(JWKSetInterface $keyEncryptionKeySet, $requireEncryption)
+    public function enableEncryptedRequestObjectSupport(JWKSetInterface $keyEncryptionKeySet, bool $requireEncryption)
     {
-        Assertion::boolean($requireEncryption);
         Assertion::true($this->isRequestObjectSupportEnabled(), 'Request object support must be enabled first.');
         Assertion::greaterThan($keyEncryptionKeySet->countKeys(), 0, 'The encryption key set must have at least one key.');
         $this->requireEncryption = $requireEncryption;
@@ -199,7 +212,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param array $params
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      *
      * @return array
      */
@@ -233,7 +246,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param array $params
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      *
      * @return array
      */
@@ -242,12 +255,12 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
         if (false === $this->isRequestObjectReferenceSupportEnabled()) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_REQUEST_URI_NOT_SUPPORTED, 'error_description' => 'The parameter \'request_uri\' is not supported.']);
         }
-        $request_uri = $params['request_uri'];
+        $requestUri = $params['request_uri'];
 
-        $content = $this->downloadContent($request_uri);
+        $content = $this->downloadContent($requestUri);
         $jws = $this->loadRequest($params, $content, $client);
         if (true === $this->isRequestUriRegistrationRequired()) {
-            $this->checkRequestUri($client, $request_uri);
+            $this->checkRequestUri($client, $requestUri);
         }
         $params = array_merge($params, $jws->getClaims(), ['client' => $client]);
         $this->checkIssuerAndClientId($params);
@@ -258,7 +271,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param array $params
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      */
     private function checkIssuerAndClientId(array $params)
     {
@@ -268,18 +281,18 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
-     * @param string                         $request_uri
+     * @param Client $client
+     * @param string                         $requestUri
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      */
-    private function checkRequestUri(ClientInterface $client, $request_uri)
+    private function checkRequestUri(Client $client, $requestUri)
     {
-        $this->checkRequestUriPathTraversal($request_uri);
+        $this->checkRequestUriPathTraversal($requestUri);
         $stored_request_uris = $this->getClientRequestUris($client);
 
         foreach ($stored_request_uris as $stored_request_uri) {
-            if (strcasecmp(mb_substr($request_uri, 0, mb_strlen($stored_request_uri, '8bit'), '8bit'), $stored_request_uri) === 0) {
+            if (strcasecmp(mb_substr($requestUri, 0, mb_strlen($stored_request_uri, '8bit'), '8bit'), $stored_request_uri) === 0) {
                 return;
             }
         }
@@ -287,45 +300,45 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     }
 
     /**
-     * @param string $request_uri
+     * @param string $requestUri
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      */
-    private function checkRequestUriPathTraversal($request_uri)
+    private function checkRequestUriPathTraversal($requestUri)
     {
-        if (false === Uri::checkUrl($request_uri, false)) {
+        if (false === Uri::checkUrl($requestUri, false)) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The request Uri must not contain path traversal.']);
         }
     }
 
     /**
-     * @param \OAuth2\Client\ClientInterface $client
+     * @param Client $client
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      *
      * @return string[]
      */
-    private function getClientRequestUris(ClientInterface $client)
+    private function getClientRequestUris(Client $client)
     {
-        if (false === $client->has('request_uris') || empty($request_uris = $client->get('request_uris'))) {
+        if (false === $client->has('request_uris') || empty($requestUris = $client->get('request_uris'))) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The client must register at least one request Uri.']);
         }
 
-        return $request_uris;
+        return $requestUris;
     }
 
     /**
      * @param array                               $params
      * @param string                              $request
-     * @param \OAuth2\Client\ClientInterface|null $client
+     * @param Client|null $client
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      *
-     * @return \Jose\Object\JWSInterface
+     * @return JWSInterface
      */
-    private function loadRequest(array $params, $request, ClientInterface &$client = null)
+    private function loadRequest(array $params, string $request, Client &$client = null): JWSInterface
     {
-        $jwt = $this->getJWTLoader()->load($request, $this->keyEncryptionKeySet, $this->requireEncryption);
+        $jwt = $this->jwtLoader->load($request, $this->keyEncryptionKeySet, $this->requireEncryption);
 
         try {
             Assertion::true($jwt->hasClaims(), 'The request object does not contain claims.');
@@ -335,7 +348,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
 
             Assertion::notNull($public_key_set, 'The client does not have signature capabilities.');
 
-            $this->getJWTLoader()->verify($jwt, $public_key_set);
+            $this->jwtLoader->verify($jwt, $public_key_set);
             $missing_claims = array_keys(array_diff_key(array_flip($this->mandatoryClaims), $jwt->getClaims()));
             Assertion::true(0 === count($missing_claims), 'The following mandatory claims are missing: %s.', implode(', ', $missing_claims));
         } catch (\Exception $e) {
@@ -348,7 +361,7 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param string $url
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      *
      * @return string
      */
@@ -369,14 +382,14 @@ class AuthorizationRequestLoader implements AuthorizationRequestLoaderInterface
     /**
      * @param array $params
      *
-     * @throws \OAuth2\Response\OAuth2Exception
+     * @throws OAuth2Exception
      *
-     * @return \OAuth2\Client\ClientInterface
+     * @return Client
      */
-    private function getClient(array $params)
+    private function getClient(array $params): Client
     {
-        $client = array_key_exists('client_id', $params) ? $this->getClientManager()->getClient($params['client_id']) : null;
-        if (!$client instanceof ClientInterface) {
+        $client = array_key_exists('client_id', $params) ? $this->clientRepository->find(ClientId::create($params['client_id'])) : null;
+        if (!$client instanceof Client) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Parameter \'client_id\' missing or invalid.']);
         }
 
