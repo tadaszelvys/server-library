@@ -16,7 +16,7 @@ namespace OAuth2\Endpoint\Authorization\Extension;
 use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\Endpoint\Authorization\Exception\CreateRedirectionException;
 use OAuth2\Model\UserAccount\UserAccount;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
@@ -43,7 +43,7 @@ class NoneParameterExtension implements AuthorizationEndpointExtensionInterface
     public function processUserAccountIsNotAvailable(ServerRequestInterface $request, Authorization $authorization)
     {
         if ($authorization->hasPrompt('none')) {
-            throw new CreateRedirectionException($authorization, OAuth2ResponseFactoryManagerInterface::ERROR_LOGIN_REQUIRED);
+            throw new CreateRedirectionException($authorization, OAuth2ResponseFactoryManager::ERROR_LOGIN_REQUIRED);
         }
     }
 

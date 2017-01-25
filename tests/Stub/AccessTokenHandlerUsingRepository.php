@@ -15,7 +15,7 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\Model\AccessToken\AccessTokenId;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
-use OAuth2\Security\Handler\AccessTokenHandlerInterface;
+use OAuth2\Security\AccessTokenHandlerInterface;
 
 class AccessTokenHandlerUsingRepository implements AccessTokenHandlerInterface
 {

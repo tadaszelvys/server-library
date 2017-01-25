@@ -16,7 +16,7 @@ namespace OAuth2\Model\Scope;
 use Assert\Assertion;
 use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 
 class ScopeRepository
 {
@@ -36,17 +36,17 @@ class ScopeRepository
     private $defaultScopePolicy;
 
     /**
-     * @var OAuth2ResponseFactoryManagerInterface
+     * @var OAuth2ResponseFactoryManager
      */
     private $responseFactoryManager;
 
     /**
      * ScopeManager constructor.
      *
-     * @param OAuth2ResponseFactoryManagerInterface $responseFactoryManager
+     * @param OAuth2ResponseFactoryManager $responseFactoryManager
      * @param array                                 $availableScopes
      */
-    public function __construct(OAuth2ResponseFactoryManagerInterface $responseFactoryManager, array $availableScopes = [])
+    public function __construct(OAuth2ResponseFactoryManager $responseFactoryManager, array $availableScopes = [])
     {
         $this->availableScopes = $availableScopes;
         $this->responseFactoryManager = $responseFactoryManager;
@@ -199,7 +199,7 @@ class ScopeRepository
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_SCOPE,
                     'error_description' => sprintf('Scope \'%s\' appears more than once.', $scope),
                 ]
             );
@@ -217,7 +217,7 @@ class ScopeRepository
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_SCOPE,
                     'error_description' => 'Scope contains illegal characters.',
                 ]
             );

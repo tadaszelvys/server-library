@@ -18,7 +18,7 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Client\ClientRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class TokenEndpointAuthMethodManager
@@ -147,7 +147,7 @@ final class TokenEndpointAuthMethodManager
                     throw new OAuth2Exception(
                         400,
                         [
-                            'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                            'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                             'error_description' => 'Only one authentication method may be used to authenticate the client.',
                         ]
                     );

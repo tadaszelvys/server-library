@@ -22,7 +22,7 @@ use OAuth2\GrantType\GrantTypeInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Scope\ScopeRepository;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\TokenType\TokenTypeInterface;
 use OAuth2\TokenType\TokenTypeManager;
 use Psr\Http\Message\ServerRequestInterface;
@@ -118,7 +118,7 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 401,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_CLIENT,
                     'error_description' => 'Client authentication failed.',
                 ]
             );
@@ -167,7 +167,7 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => sprintf('The token type \'%s\' is not allowed for the client.', $tokenType->name()),
                 ]
             );
@@ -208,7 +208,7 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_SCOPE,
                     'error_description' => $e->getMessage(), ]
             );
         }
@@ -220,7 +220,7 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_SCOPE,
                     'error_description' => sprintf('An unsupported scope was requested. Available scopes are %s.', implode(', ', $availableScope)),
                 ]
             );
@@ -243,7 +243,7 @@ final class TokenEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_UNAUTHORIZED_CLIENT,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_UNAUTHORIZED_CLIENT,
                     'error_description' => sprintf('The grant type \'%s\' is unauthorized for this client.', $grantType),
                 ]
             );

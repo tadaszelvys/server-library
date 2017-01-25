@@ -18,13 +18,13 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\Security\Handler\AccessTokenHandlerManager;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
+use OAuth2\Security\AccessTokenHandlerManager;
 use OAuth2\TokenType\TokenTypeInterface;
 use OAuth2\TokenType\TokenTypeManager;
 use Psr\Http\Message\ServerRequestInterface;
 
-class OAuth2SecurityMiddleware implements MiddlewareInterface
+final class OAuth2SecurityMiddleware implements MiddlewareInterface
 {
     /**
      * @var TokenTypeManager
@@ -71,11 +71,11 @@ class OAuth2SecurityMiddleware implements MiddlewareInterface
         $additionalCredentialValues = [];
         $token = $this->tokenTypeManager->findToken($request, $additionalCredentialValues, $type);
         if (null === $token) {
-            throw $this->getOAuth2Exception(401, OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_TOKEN, 'Access token required.');
+            throw $this->getOAuth2Exception(401, OAuth2ResponseFactoryManager::ERROR_INVALID_TOKEN, 'Access token required.');
         }
         $accessToken = $this->accessTokenHandlerManager->find($token);
         if (null === $accessToken) {
-            throw $this->getOAuth2Exception(401, OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_TOKEN, 'Access token does not exist or is not valid.');
+            throw $this->getOAuth2Exception(401, OAuth2ResponseFactoryManager::ERROR_INVALID_TOKEN, 'Access token does not exist or is not valid.');
         }
         $this->checkAccessToken($type, $accessToken, $request, $additionalCredentialValues);
 
@@ -95,10 +95,10 @@ class OAuth2SecurityMiddleware implements MiddlewareInterface
     private function checkAccessToken(TokenTypeInterface $type, AccessToken $accessToken, ServerRequestInterface $request, array $additionalCredentialValues)
     {
         if (false === $type->isTokenRequestValid($accessToken, $request, $additionalCredentialValues)) {
-            throw $this->getOAuth2Exception(401, OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_TOKEN, 'Access token does not exist or is not valid.');
+            throw $this->getOAuth2Exception(401, OAuth2ResponseFactoryManager::ERROR_INVALID_TOKEN, 'Access token does not exist or is not valid.');
         }
         if (true === $accessToken->hasExpired()) {
-            throw $this->getOAuth2Exception(403, OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_TOKEN, 'Access token has expired.');
+            throw $this->getOAuth2Exception(403, OAuth2ResponseFactoryManager::ERROR_INVALID_TOKEN, 'Access token has expired.');
         }
         if (!empty($this->scope)) {
             $diff = array_diff(
@@ -107,7 +107,7 @@ class OAuth2SecurityMiddleware implements MiddlewareInterface
             );
 
             if (!empty($diff)) {
-                throw $this->getOAuth2Exception(403, OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_TOKEN, 'Insufficient scope.');
+                throw $this->getOAuth2Exception(403, OAuth2ResponseFactoryManager::ERROR_INVALID_TOKEN, 'Insufficient scope.');
             }
         }
     }

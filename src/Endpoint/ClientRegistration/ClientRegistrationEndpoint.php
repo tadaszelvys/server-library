@@ -22,7 +22,7 @@ use OAuth2\DataTransporter;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\InitialAccessToken\InitialAccessToken;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
@@ -86,7 +86,7 @@ final class ClientRegistrationEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 405,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => 'Unsupported method.',
                 ]
             );

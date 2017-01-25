@@ -16,7 +16,7 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 use Assert\Assertion;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Scope\ScopeRepository;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 
 class ScopeParameterChecker implements ParameterCheckerInterface
 {
@@ -49,6 +49,6 @@ class ScopeParameterChecker implements ParameterCheckerInterface
      */
     public function getError(): string
     {
-        return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_SCOPE;
+        return OAuth2ResponseFactoryManager::ERROR_INVALID_SCOPE;
     }
 }

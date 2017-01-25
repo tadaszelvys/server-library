@@ -18,7 +18,7 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\TokenTypeHint\TokenTypeHintInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintManager;
 use Psr\Http\Message\ServerRequestInterface;
@@ -112,7 +112,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
                         throw new OAuth2Exception(
                             400,
                             [
-                                'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                                'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                                 'error_description' => 'The parameter \'token\' is invalid.',
                             ]
                         );
@@ -163,7 +163,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 401,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_CLIENT,
                     'error_description' => 'Client authentication failed.',
                 ]
             );
@@ -186,7 +186,7 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => 'The parameter \'token\' is missing.',
                 ]
             );

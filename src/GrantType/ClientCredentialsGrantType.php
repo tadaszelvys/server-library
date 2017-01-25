@@ -15,7 +15,7 @@ namespace OAuth2\GrantType;
 
 use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class ClientCredentialsGrantType implements GrantTypeInterface
@@ -65,7 +65,7 @@ final class ClientCredentialsGrantType implements GrantTypeInterface
     {
         $client = $grantTypeResponse->getClient();
         if ($client->isPublic()) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The client is not a confidential client.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_CLIENT, 'error_description' => 'The client is not a confidential client.']);
         }
 
         if (true === $this->isRefreshTokenIssuedWithAccessToken()) {

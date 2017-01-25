@@ -19,7 +19,7 @@ use OAuth2\Model\RefreshToken\RefreshToken;
 use OAuth2\Model\RefreshToken\RefreshTokenId;
 use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class RefreshTokenGrantType implements GrantTypeInterface
@@ -62,7 +62,7 @@ final class RefreshTokenGrantType implements GrantTypeInterface
 
         foreach ($requiredParameters as $requiredParameter) {
             if (!array_key_exists($requiredParameter, $parameters)) {
-                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
             }
         }
     }
@@ -77,7 +77,7 @@ final class RefreshTokenGrantType implements GrantTypeInterface
         $token = $this->refreshTokenRepository->find(RefreshTokenId::create($refreshToken));
 
         if (null === $token) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token.']);
         }
         $grantTypeData = $grantTypeData->withAvailableScopes($token->getScopes());
 
@@ -112,11 +112,11 @@ final class RefreshTokenGrantType implements GrantTypeInterface
     public function checkRefreshToken(RefreshToken $token, Client $client)
     {
         if ($client->getId()->getValue() !== $token->getClientId()->getValue()) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_GRANT, 'error_description' => 'Invalid refresh token.']);
         }
 
         if ($token->hasExpired()) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT, 'error_description' => 'Refresh token has expired.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_GRANT, 'error_description' => 'Refresh token has expired.']);
         }
     }
 }

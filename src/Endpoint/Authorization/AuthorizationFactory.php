@@ -16,7 +16,7 @@ namespace OAuth2\Endpoint\Authorization;
 use OAuth2\Endpoint\Authorization\ParameterChecker\ParameterCheckerManagerInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\ResponseMode\ResponseModeInterface;
 use OAuth2\ResponseMode\ResponseModeManager;
 use OAuth2\ResponseType\ResponseTypeManager;
@@ -151,7 +151,7 @@ final class AuthorizationFactory
             case 'code id_token token':
                 return 'fragment';
             default:
-                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Unsupported response type combination \'%s\'.', $responseType)]);
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Unsupported response type combination \'%s\'.', $responseType)]);
         }
     }
 
@@ -165,7 +165,7 @@ final class AuthorizationFactory
     private function getResponseModeService($mode)
     {
         if (!$this->responseModeManager->has($mode)) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Unsupported response mode \'%s\'.', $mode)]);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Unsupported response mode \'%s\'.', $mode)]);
         }
 
         return $this->responseModeManager->get($mode);
@@ -180,7 +180,7 @@ final class AuthorizationFactory
     private function checkResponseTypeAllowedForTheClient(Client $client, array $params)
     {
         if (!$client->isResponseTypeAllowed($params['response_type'])) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_UNAUTHORIZED_CLIENT, 'error_description' => sprintf('The response type \'%s\' is unauthorized for this client.', $params['response_type'])]);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_UNAUTHORIZED_CLIENT, 'error_description' => sprintf('The response type \'%s\' is unauthorized for this client.', $params['response_type'])]);
         }
     }
 
@@ -190,13 +190,13 @@ final class AuthorizationFactory
     public function getResponseTypes(array $params)
     {
         if (!$this->responseTypeManager->isSupported($params['response_type'])) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Response type \'%s\' is not supported by this server', $params['response_type'])]);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => sprintf('Response type \'%s\' is not supported by this server', $params['response_type'])]);
         }
 
         try {
             $types = $this->responseTypeManager->find($params['response_type']);
         } catch (\InvalidArgumentException $e) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]);
         }
 
         return $types;

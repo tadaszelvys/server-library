@@ -16,7 +16,7 @@ namespace OAuth2\Middleware;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class HttpsError implements MiddlewareInterface
@@ -30,7 +30,7 @@ final class HttpsError implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => 'The request must be secured.',
                 ]
             );

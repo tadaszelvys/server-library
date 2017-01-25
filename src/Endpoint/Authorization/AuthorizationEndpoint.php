@@ -19,7 +19,7 @@ use OAuth2\Endpoint\Authorization\Extension\AuthorizationEndpointExtensionInterf
 use OAuth2\Endpoint\Authorization\Extension\StateParameterExtension;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\ResponseMode\QueryResponseMode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -191,7 +191,7 @@ abstract class AuthorizationEndpoint implements MiddlewareInterface
     protected function processAuthorization(ServerRequestInterface $request, Authorization $authorization): ResponseInterface
     {
         if ($authorization->isAuthorized() === false) {
-            return $this->createRedirectionException($authorization, OAuth2ResponseFactoryManagerInterface::ERROR_ACCESS_DENIED, 'The resource owner denied access to your client');
+            return $this->createRedirectionException($authorization, OAuth2ResponseFactoryManager::ERROR_ACCESS_DENIED, 'The resource owner denied access to your client');
         }
 
         $response_parameters = $this->computeResponseParameters($authorization);

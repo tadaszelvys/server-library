@@ -16,7 +16,7 @@ namespace OAuth2\TokenType;
 use OAuth2\Model\AccessToken\AccessToken;
 use Psr\Http\Message\ServerRequestInterface;
 
-class BearerToken implements TokenTypeInterface
+final class BearerToken implements TokenTypeInterface
 {
     /**
      * @var null|string

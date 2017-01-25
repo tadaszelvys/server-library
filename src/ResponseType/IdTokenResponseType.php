@@ -17,7 +17,7 @@ use OAuth2\Command\IdToken\CreateIdTokenCommand;
 use OAuth2\DataTransporter;
 use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\UriInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
@@ -74,7 +74,7 @@ final class IdTokenResponseType implements ResponseTypeInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => 'The parameter \'nonce\' is mandatory using \'id_token\' response type.',
                 ]
             );

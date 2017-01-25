@@ -21,7 +21,7 @@ use Jose\Object\JWKSetInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
@@ -129,7 +129,7 @@ abstract class ClientAssertionJwt implements TokenEndpointAuthMethodInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => $e->getMessage(),
                 ]
             );

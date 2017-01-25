@@ -18,7 +18,7 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\GrantType\GrantTypeManager;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class GrantTypeMiddleware implements MiddlewareInterface
@@ -55,7 +55,7 @@ final class GrantTypeMiddleware implements MiddlewareInterface
         } catch (\InvalidArgumentException $e) {
             throw new OAuth2Exception(400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => $e->getMessage(),
                 ]
             );

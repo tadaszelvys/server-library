@@ -21,7 +21,7 @@ use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Client\ClientRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class JWTBearerGrantType implements GrantTypeInterface
@@ -98,7 +98,7 @@ final class JWTBearerGrantType implements GrantTypeInterface
 
         foreach ($requiredParameters as $requiredParameter) {
             if (!array_key_exists($requiredParameter, $parameters)) {
-                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
             }
         }
     }
@@ -122,7 +122,7 @@ final class JWTBearerGrantType implements GrantTypeInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => $e->getMessage(),
                 ]
             );
@@ -133,7 +133,7 @@ final class JWTBearerGrantType implements GrantTypeInterface
             throw new  OAuth2Exception(
                 401,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_CLIENT,
                     'error_description' => 'Client authentication failed.',
                 ]
             );
@@ -143,7 +143,7 @@ final class JWTBearerGrantType implements GrantTypeInterface
             throw new  OAuth2Exception(
                 401,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_CLIENT,
                     'error_description' => 'Client authentication failed.',
                 ]
             );
@@ -166,7 +166,7 @@ final class JWTBearerGrantType implements GrantTypeInterface
         if (false === $grantTypeResponse->getClient()->hasPublicKeySet()) {
             throw new OAuth2Exception(400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_CLIENT,
                     'error_description' => 'The client is not a client with signature capabilities.',
                 ]
             );
@@ -182,7 +182,7 @@ final class JWTBearerGrantType implements GrantTypeInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => $e->getMessage(),
                 ]
             );

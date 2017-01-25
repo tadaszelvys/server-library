@@ -16,7 +16,7 @@ namespace OAuth2\Middleware;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -57,7 +57,7 @@ final class ClientAuthenticationMiddleware implements MiddlewareInterface
                 throw new OAuth2Exception(
                     401,
                     [
-                        'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT,
+                        'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_CLIENT,
                         'error_description' => 'Client authentication failed.',
                     ]
                 );

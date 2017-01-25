@@ -19,7 +19,7 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\TokenType\BearerToken;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
@@ -86,7 +86,7 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
                 throw new OAuth2Exception(
                     405,
                     [
-                        'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                        'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                         'error_description' => 'Unsupported method.',
                     ]
                 );
@@ -112,7 +112,7 @@ final class ClientConfigurationEndpoint implements MiddlewareInterface
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST,
                     'error_description' => $e->getMessage(),
                 ]
             );

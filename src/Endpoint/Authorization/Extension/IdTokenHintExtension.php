@@ -20,7 +20,7 @@ use OAuth2\Model\IdToken\IdTokenRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
@@ -57,7 +57,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
                     }
                 }
             } catch (\InvalidArgumentException $e) {
-                throw new OAuth2Exception($this->response_factory->getResponse(302, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]));
+                throw new OAuth2Exception($this->response_factory->getResponse(302, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]));
             }
         }
     }

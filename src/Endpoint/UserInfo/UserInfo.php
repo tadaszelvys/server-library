@@ -20,7 +20,7 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\OpenIdConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\UriInterface;
 
 final class UserInfo
@@ -175,7 +175,7 @@ final class UserInfo
     private function checkScope($scope)
     {
         if (!in_array('openid', $scope)) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Access token does not contain the \'openid\' scope.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => 'Access token does not contain the \'openid\' scope.']);
         }
     }
 

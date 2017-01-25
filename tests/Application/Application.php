@@ -117,13 +117,12 @@ use OAuth2\Response\Factory\AccessDeniedResponseFactory;
 use OAuth2\Response\Factory\BadRequestResponseFactory;
 use OAuth2\Response\Factory\MethodNotAllowedResponseFactory;
 use OAuth2\Response\Factory\NotImplementedResponseFactory;
-use OAuth2\Response\OAuth2ExceptionMiddleware;
+use OAuth2\Middleware\OAuth2ExceptionMiddleware;
 use OAuth2\Response\OAuth2ResponseFactoryManager;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\ResponseType\CodeResponseType;
 use OAuth2\ResponseType\ImplicitResponseType;
 use OAuth2\ResponseType\ResponseTypeManager;
-use OAuth2\Security\Handler\AccessTokenHandlerManager;
+use OAuth2\Security\AccessTokenHandlerManager;
 use OAuth2\Middleware\OAuth2SecurityMiddleware;
 use OAuth2\Test\Stub\AccessTokenHandlerUsingRepository;
 use OAuth2\Test\Stub\AccessTokenRepository;
@@ -179,7 +178,7 @@ use Webmozart\Json\JsonEncoder;
 final class Application
 {
     /**
-     * @var null|OAuth2ResponseFactoryManagerInterface
+     * @var null|OAuth2ResponseFactoryManager
      */
     private $oauth2ResponseFactory = null;
 
@@ -189,9 +188,9 @@ final class Application
     private $oauth2ResponseMiddleware = null;
 
     /**
-     * @return OAuth2ResponseFactoryManagerInterface
+     * @return OAuth2ResponseFactoryManager
      */
-    public function getOAuth2ResponseFactory(): OAuth2ResponseFactoryManagerInterface
+    public function getOAuth2ResponseFactory(): OAuth2ResponseFactoryManager
     {
         if (null === $this->oauth2ResponseFactory) {
             $this->oauth2ResponseFactory = new OAuth2ResponseFactoryManager(

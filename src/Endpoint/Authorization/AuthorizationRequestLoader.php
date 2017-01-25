@@ -22,7 +22,7 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Client\ClientRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\Util\Uri;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Request;
@@ -213,7 +213,7 @@ final class AuthorizationRequestLoader
     private function createFromRequestParameter(array $params)
     {
         if (false === $this->isRequestObjectSupportEnabled()) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_REQUEST_NOT_SUPPORTED, 'error_description' => 'The parameter \'request\' is not supported.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_REQUEST_NOT_SUPPORTED, 'error_description' => 'The parameter \'request\' is not supported.']);
         }
         $request = $params['request'];
         Assertion::string($request);
@@ -247,7 +247,7 @@ final class AuthorizationRequestLoader
     private function createFromRequestUriParameter(array $params)
     {
         if (false === $this->isRequestObjectReferenceSupportEnabled()) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_REQUEST_URI_NOT_SUPPORTED, 'error_description' => 'The parameter \'request_uri\' is not supported.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_REQUEST_URI_NOT_SUPPORTED, 'error_description' => 'The parameter \'request_uri\' is not supported.']);
         }
         $requestUri = $params['request_uri'];
 
@@ -290,7 +290,7 @@ final class AuthorizationRequestLoader
                 return;
             }
         }
-        throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST_URI, 'error_description' => 'The request Uri is not allowed.']);
+        throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST_URI, 'error_description' => 'The request Uri is not allowed.']);
     }
 
     /**
@@ -301,7 +301,7 @@ final class AuthorizationRequestLoader
     private function checkRequestUriPathTraversal($requestUri)
     {
         if (false === Uri::checkUrl($requestUri, false)) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The request Uri must not contain path traversal.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_CLIENT, 'error_description' => 'The request Uri must not contain path traversal.']);
         }
     }
 
@@ -315,7 +315,7 @@ final class AuthorizationRequestLoader
     private function getClientRequestUris(Client $client)
     {
         if (false === $client->has('request_uris') || empty($requestUris = $client->get('request_uris'))) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_CLIENT, 'error_description' => 'The client must register at least one request Uri.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_CLIENT, 'error_description' => 'The client must register at least one request Uri.']);
         }
 
         return $requestUris;
@@ -346,7 +346,7 @@ final class AuthorizationRequestLoader
             $missing_claims = array_keys(array_diff_key(array_flip($this->mandatoryClaims), $jwt->getClaims()));
             Assertion::true(0 === count($missing_claims), 'The following mandatory claims are missing: %s.', implode(', ', $missing_claims));
         } catch (\Exception $e) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST_OBJECT, 'error_description' => $e->getMessage()]);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST_OBJECT, 'error_description' => $e->getMessage()]);
         }
 
         return $jwt;
@@ -367,7 +367,7 @@ final class AuthorizationRequestLoader
 
         $content = $response->getBody()->getContents();
         if (!is_string($content)) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST_URI, 'error_description' => 'Unable to get content.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST_URI, 'error_description' => 'Unable to get content.']);
         }
 
         return $content;
@@ -384,7 +384,7 @@ final class AuthorizationRequestLoader
     {
         $client = array_key_exists('client_id', $params) ? $this->clientRepository->find(ClientId::create($params['client_id'])) : null;
         if (!$client instanceof Client) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Parameter \'client_id\' missing or invalid.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => 'Parameter \'client_id\' missing or invalid.']);
         }
 
         return $client;

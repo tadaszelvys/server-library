@@ -19,7 +19,7 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenId;
 use OAuth2\Model\InitialAccessToken\InitialAccessTokenRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\TokenType\BearerToken;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -64,7 +64,7 @@ final class InitialAccessTokenMiddleware implements MiddlewareInterface
 
             $request = $request->withAttribute('initial_access_token', $initialAccessToken);
         } catch (\InvalidArgumentException $e) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => $e->getMessage()]);
         }
 
         return $delegate->process($request);

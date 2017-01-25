@@ -17,7 +17,7 @@ use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
@@ -106,7 +106,7 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
 
         foreach ($requiredParameters as $requiredParameter) {
             if (!array_key_exists($requiredParameter, $parameters)) {
-                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
             }
         }
     }
@@ -134,7 +134,7 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
             throw new OAuth2Exception(
                 400,
                 [
-                    'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_GRANT,
+                    'error'             => OAuth2ResponseFactoryManager::ERROR_INVALID_GRANT,
                     'error_description' => 'Invalid username and password combination.',
                 ]
             );

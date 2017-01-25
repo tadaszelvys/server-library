@@ -15,7 +15,7 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
 use OAuth2\Model\Client\Client;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\Util\Uri;
 
 class RedirectUriParameterChecker implements ParameterCheckerInterface
@@ -62,7 +62,7 @@ class RedirectUriParameterChecker implements ParameterCheckerInterface
      */
     public function getError(): string
     {
-        return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
+        return OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST;
     }
 
     /**

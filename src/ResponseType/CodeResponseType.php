@@ -18,7 +18,7 @@ use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
 use OAuth2\Model\Scope\ScopeRepository;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -121,7 +121,7 @@ final class CodeResponseType implements ResponseTypeInterface
 
         if (!array_key_exists('code_challenge', $params)) {
             if (true === $this->isPKCEForPublicClientsEnforced() && $client->isPublic()) {
-                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Non-confidential clients must set a proof key (PKCE) for code exchange.']);
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => 'Non-confidential clients must set a proof key (PKCE) for code exchange.']);
             }
 
             return;
@@ -159,7 +159,7 @@ final class CodeResponseType implements ResponseTypeInterface
 
         foreach ($requiredParameters as $requiredParameter) {
             if (!array_key_exists($requiredParameter, $parameters)) {
-                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => sprintf('The parameter \'%s\' is missing.', $requiredParameter)]);
             }
         }
     }

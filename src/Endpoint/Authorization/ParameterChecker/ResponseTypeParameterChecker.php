@@ -15,7 +15,7 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
 use OAuth2\Model\Client\Client;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 
 class ResponseTypeParameterChecker implements ParameterCheckerInterface
 {
@@ -35,6 +35,6 @@ class ResponseTypeParameterChecker implements ParameterCheckerInterface
      */
     public function getError(): string
     {
-        return OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST;
+        return OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST;
     }
 }

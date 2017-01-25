@@ -20,7 +20,7 @@ use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthor
 use OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtensionInterface
@@ -31,17 +31,17 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
     private $pre_configured_authorization_manager;
 
     /**
-     * @var \OAuth2\Response\OAuth2ResponseFactoryManagerInterface
+     * @var \OAuth2\Response\OAuth2ResponseFactoryManager
      */
     private $response_factory;
 
     /**
      * PreConfiguredAuthorizationExtension constructor.
      *
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface                                                  $response_factory
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManager                                                  $response_factory
      * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationRepositoryInterface $pre_configured_authorization_manager
      */
-    public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory, PreConfiguredAuthorizationRepositoryInterface $pre_configured_authorization_manager)
+    public function __construct(OAuth2ResponseFactoryManager $response_factory, PreConfiguredAuthorizationRepositoryInterface $pre_configured_authorization_manager)
     {
         $this->response_factory = $response_factory;
         $this->pre_configured_authorization_manager = $pre_configured_authorization_manager;
@@ -87,7 +87,7 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
             throw new AuthorizeException($authorization);
         } else {
             if ($authorization->hasPrompt('none')) {
-                throw new OAuth2Exception($this->response_factory->getResponse(302, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INTERACTION_REQUIRED]));
+                throw new OAuth2Exception($this->response_factory->getResponse(302, ['error' => OAuth2ResponseFactoryManager::ERROR_INTERACTION_REQUIRED]));
             }
         }
     }

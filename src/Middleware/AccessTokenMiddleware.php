@@ -18,11 +18,11 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Model\AccessToken\AccessTokenId;
 use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use OAuth2\TokenType\TokenTypeManager;
 use Psr\Http\Message\ServerRequestInterface;
 
-class AccessTokenMiddleware implements MiddlewareInterface
+final class AccessTokenMiddleware implements MiddlewareInterface
 {
     /**
      * @var TokenTypeManager
@@ -57,7 +57,7 @@ class AccessTokenMiddleware implements MiddlewareInterface
             $tokenId = AccessTokenId::create($token);
             $accessToken = $this->accessTokenRepository->find($tokenId);
             if (null === $accessToken || false === $type->isTokenRequestValid($accessToken, $request, $additional_credential_values)) {
-                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_TOKEN, 'error_description' => 'Invalid access token.']);
+                throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_TOKEN, 'error_description' => 'Invalid access token.']);
             }
             $request = $request->withAttribute('access_token', $accessToken);
         }

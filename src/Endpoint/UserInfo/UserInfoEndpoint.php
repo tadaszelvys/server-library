@@ -26,7 +26,7 @@ use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountId;
 use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
-use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
+use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 class UserInfoEndpoint implements MiddlewareInterface
@@ -200,7 +200,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     {
         $clientId = $accessToken->getClientId();
         if (null === $clientId || null === $client = $this->clientRepository->find($clientId)) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the client.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the client.']);
         }
 
         return $client;
@@ -217,7 +217,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     {
         $userAccountId = $accessToken->getResourceOwnerId();
         if (!$userAccountId instanceof UserAccountId || null === $userAccount = $this->userAccountRepository->find($userAccountId)) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the resource owner.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the resource owner.']);
         }
 
         return $userAccount;
@@ -268,7 +268,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     private function checkRedirectUri(AccessToken $accessToken)
     {
         if (!$accessToken->hasMetadata('redirect_uri')) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token has been issued through the authorization endpoint and cannot be used.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => 'The access token has been issued through the authorization endpoint and cannot be used.']);
         }
     }
 
@@ -280,7 +280,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     private function checkScope(AccessToken $accessToken)
     {
         if (!$accessToken->hasScope('openid')) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token does not contain the \'openid\' scope.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => 'The access token does not contain the \'openid\' scope.']);
         }
     }
 }
