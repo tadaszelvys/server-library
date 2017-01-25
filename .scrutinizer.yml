@@ -16,9 +16,9 @@ tools:
     sensiolabs_security_checker: true
     php_code_coverage: false
     php_pdepend:
-        excluded_dirs: [vendor, doc, tests]
+        excluded_dirs: [vendor, doc, tests, features]
 filter:
-    excluded_paths: [vendor/*, doc/*, tests/*]
+    excluded_paths: [vendor/*, doc/*, tests/*, features/*]
 build_failure_conditions:
     - 'elements.rating(<= C).exists'               # No classes/methods with a rating of C or worse
     - 'elements.rating(<= C).new.exists'           # No new classes/methods with a rating of C or worse
