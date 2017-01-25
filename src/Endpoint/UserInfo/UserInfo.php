@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace OAuth2\Endpoint\UserInfo;
 
 use Assert\Assertion;
-use OAuth2\Endpoint\UserInfo\ScopeSupport\UserInfoScopeSupportManagerInterface;
+use OAuth2\Endpoint\UserInfo\ScopeSupport\UserInfoScopeSupportManager;
 use OAuth2\Model\ClaimSource\ClaimSourceManagerInterface;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccount;
@@ -23,7 +23,7 @@ use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\UriInterface;
 
-class UserInfo implements UserInfoInterface
+final class UserInfo
 {
     /**
      * @var null|PairwiseSubjectIdentifierAlgorithmInterface
@@ -36,7 +36,7 @@ class UserInfo implements UserInfoInterface
     private $isPairwiseSubjectDefault = false;
 
     /**
-     * @var UserInfoScopeSupportManagerInterface
+     * @var UserInfoScopeSupportManager
      */
     private $userinfoScopeSupportManager;
 
@@ -48,17 +48,24 @@ class UserInfo implements UserInfoInterface
     /**
      * UserInfo constructor.
      *
-     * @param UserInfoScopeSupportManagerInterface $userinfoScopeSupportManager
+     * @param UserInfoScopeSupportManager $userinfoScopeSupportManager
      * @param ClaimSourceManagerInterface          $claimSourceManager
      */
-    public function __construct(UserInfoScopeSupportManagerInterface $userinfoScopeSupportManager, ClaimSourceManagerInterface $claimSourceManager)
+    public function __construct(UserInfoScopeSupportManager $userinfoScopeSupportManager, ClaimSourceManagerInterface $claimSourceManager)
     {
         $this->userinfoScopeSupportManager = $userinfoScopeSupportManager;
         $this->claimSourceManager = $claimSourceManager;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Client       $client
+     * @param UserAccount  $userAccount
+     * @param UriInterface $redirectUri
+     * @param null|array   $claimsLocales
+     * @param array        $requestClaims
+     * @param string[]     $scope
+     *
+     * @return array
      */
     public function getUserinfo(Client $client, UserAccount $userAccount, UriInterface $redirectUri, $claimsLocales, array $requestClaims, array $scope): array
     {
@@ -87,8 +94,8 @@ class UserInfo implements UserInfoInterface
     {
         $result = [];
         foreach ($scopes as $scope) {
-            if ($this->userinfoScopeSupportManager->hasUserInfoScopeSupport($scope)) {
-                $scope_claims = $this->userinfoScopeSupportManager->getUserInfoScopeSupport($scope)->getClaims();
+            if ($this->userinfoScopeSupportManager->has($scope)) {
+                $scope_claims = $this->userinfoScopeSupportManager->get($scope)->getClaims();
                 foreach ($scope_claims as $scope_claim) {
                     $result[$scope_claim] = null;
                 }
@@ -192,7 +199,7 @@ class UserInfo implements UserInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function isPairwiseSubjectIdentifierSupported(): bool
     {
@@ -200,7 +207,7 @@ class UserInfo implements UserInfoInterface
     }
 
     /**
-     * @return null|PairwiseSubjectIdentifierAlgorithmInterface
+     * @return PairwiseSubjectIdentifierAlgorithmInterface|null
      */
     public function getPairwiseSubjectIdentifierAlgorithm()
     {

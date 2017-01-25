@@ -10,7 +10,7 @@ Help me out for a couple of :beers:!
 
 [![Join the chat at https://gitter.im/OAuth2-Framework](https://badges.gitter.im/OAuth2-Framework.svg)](https://gitter.im/OAuth2-Framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/OAuth2-Framework/security-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/OAuth2-Framework/security-library/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/OAuth2-Framework/server-library/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/OAuth2-Framework/server-library/?branch=master)
 [![PSR-7 ready](https://img.shields.io/badge/PSR--7-ready-brightgreen.svg)](http://www.php-fig.org/psr/psr-7/)
 
 [![Requirements Status](https://requires.io/github/OAuth2-Framework/server-library/requirements.svg?branch=master)](https://requires.io/github/OAuth2-Framework/server-library/requirements/?branch=master)

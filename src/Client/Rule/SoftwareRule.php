@@ -31,12 +31,12 @@ final class SoftwareRule implements RuleInterface
     private $isSoftwareStatementRequired = false;
 
     /**
-     * @var null|\Jose\Object\JWKSetInterface
+     * @var null|JWKSetInterface
      */
     private $softwareStatementSignatureKeySet = null;
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function isSoftwareStatementSupported(): bool
     {
@@ -44,31 +44,23 @@ final class SoftwareRule implements RuleInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
-    public function isSoftwareStatementRequired()
+    public function isSoftwareStatementRequired(): bool
     {
         return $this->isSoftwareStatementRequired;
     }
 
     /**
-     * {@inheritdoc}
+     * @param JWTLoaderInterface $jwtLoader
+     * @param JWKSetInterface $signature_key_set
+     * @param bool $isSoftwareStatementRequired
      */
-    public function enableSoftwareStatementSupport(JWTLoaderInterface $jwtLoader, JWKSetInterface $signature_key_set)
+    public function enableSoftwareStatementSupport(JWTLoaderInterface $jwtLoader, JWKSetInterface $signature_key_set, bool $isSoftwareStatementRequired)
     {
         $this->jwtLoader = $jwtLoader;
         $this->softwareStatementSignatureKeySet = $signature_key_set;
-    }
-
-    public function allowRegistrationWithoutSoftwareStatement()
-    {
-        $this->isSoftwareStatementRequired = false;
-    }
-
-    public function disallowRegistrationWithoutSoftwareStatement()
-    {
-        Assertion::true($this->isSoftwareStatementSupported(), 'Software Statement not supported.');
-        $this->isSoftwareStatementRequired = true;
+        $this->isSoftwareStatementRequired = $isSoftwareStatementRequired;
     }
 
     /**
@@ -103,7 +95,7 @@ final class SoftwareRule implements RuleInterface
      *
      * @return array
      */
-    private function loadSoftwareStatement($software_statement)
+    private function loadSoftwareStatement(string $software_statement): array
     {
         try {
             $jws = $this->jwtLoader->load($software_statement);

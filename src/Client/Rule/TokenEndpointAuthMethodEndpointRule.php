@@ -27,7 +27,7 @@ final class TokenEndpointAuthMethodEndpointRule implements RuleInterface
     /**
      * TokenEndpointAuthMethodEndpointRule constructor.
      *
-     * @param \OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager $tokenEndpointAuthMethodManager
+     * @param TokenEndpointAuthMethodManager $tokenEndpointAuthMethodManager
      */
     public function __construct(TokenEndpointAuthMethodManager $tokenEndpointAuthMethodManager)
     {

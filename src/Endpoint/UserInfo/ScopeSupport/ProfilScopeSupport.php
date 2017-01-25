@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\UserInfo\ScopeSupport;
 
-class ProfilScopeSupport implements UserInfoScopeSupportInterface
+final class ProfilScopeSupport implements UserInfoScopeSupportInterface
 {
     /**
      * {@inheritdoc}

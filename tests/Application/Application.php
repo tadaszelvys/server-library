@@ -751,13 +751,13 @@ final class Application
         if (null === $this->ruleManager) {
             $this->ruleManager = new RuleManager();
             $this->ruleManager
-                ->appendRule(new ClientIdRule())
-                ->appendRule(new ClientRegistrationManagementRule())
-                ->appendRule(new CommonParametersRule())
-                ->appendRule($this->getGrantTypeFlowRule())
-                ->appendRule(new RedirectionUriRule())
-                ->appendRule(new ScopeRule($this->getScopeRepository()))
-                ->appendRule($this->getSoftwareRule());
+                ->add(new ClientIdRule())
+                ->add(new ClientRegistrationManagementRule())
+                ->add(new CommonParametersRule())
+                ->add($this->getGrantTypeFlowRule())
+                ->add(new RedirectionUriRule())
+                ->add(new ScopeRule($this->getScopeRepository()))
+                ->add($this->getSoftwareRule());
         }
 
         return $this->ruleManager;
@@ -775,10 +775,10 @@ final class Application
     {
         if (null === $this->softwareRule) {
             $this->softwareRule = new SoftwareRule();
-            $this->softwareRule->allowRegistrationWithoutSoftwareStatement();
             $this->softwareRule->enableSoftwareStatementSupport(
                 $this->getJwtLoader(),
-                $this->getPublicKeys()
+                $this->getPublicKeys(),
+                false
             );
         }
 

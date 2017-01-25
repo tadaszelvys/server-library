@@ -30,7 +30,7 @@ final class RuleManager
     public function __construct(array $rules = [])
     {
         foreach ($rules as $rule) {
-            $this->appendRule($rule);
+            $this->add($rule);
         }
     }
 
@@ -41,7 +41,7 @@ final class RuleManager
      *
      * @return RuleManager
      */
-    public function appendRule(RuleInterface $rule): RuleManager
+    public function add(RuleInterface $rule): RuleManager
     {
         $this->rules[] = $rule;
 
@@ -51,7 +51,7 @@ final class RuleManager
     /**
      * @return RuleInterface[]
      */
-    public function getRules(): array
+    public function all(): array
     {
         return $this->rules;
     }

@@ -15,7 +15,7 @@ namespace OAuth2\Endpoint\UserInfo\ScopeSupport;
 
 use Assert\Assertion;
 
-class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterface
+final class UserInfoScopeSupportManager
 {
     /**
      * @var UserInfoScopeSupportInterface[]
@@ -23,9 +23,11 @@ class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterfac
     private $userinfoScopeSupports = [];
 
     /**
-     * {@inheritdoc}
+     * @param UserInfoScopeSupportInterface $userinfoScopeSupport
+     *
+     * @return UserInfoScopeSupportManager
      */
-    public function addUserInfoScopeSupport(UserInfoScopeSupportInterface $userinfoScopeSupport): UserInfoScopeSupportManagerInterface
+    public function add(UserInfoScopeSupportInterface $userinfoScopeSupport): UserInfoScopeSupportManager
     {
         $this->userinfoScopeSupports[$userinfoScopeSupport->getScope()] = $userinfoScopeSupport;
 
@@ -33,19 +35,25 @@ class UserInfoScopeSupportManager implements UserInfoScopeSupportManagerInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $scope
+     *
+     * @return bool
      */
-    public function hasUserInfoScopeSupport($scope): bool
+    public function has(string $scope): bool
     {
         return array_key_exists($scope, $this->userinfoScopeSupports);
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $scope
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return UserinfoScopeSupportInterface
      */
-    public function getUserInfoScopeSupport($scope): UserInfoScopeSupportInterface
+    public function get(string $scope): UserInfoScopeSupportInterface
     {
-        Assertion::true($this->hasUserInfoScopeSupport($scope), sprintf('The userinfo scope \'%s\' is not supported.', $scope));
+        Assertion::true($this->has($scope), sprintf('The userinfo scope \'%s\' is not supported.', $scope));
 
         return $this->userinfoScopeSupports[$scope];
     }

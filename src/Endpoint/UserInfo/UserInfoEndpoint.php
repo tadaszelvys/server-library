@@ -20,6 +20,7 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Jose\JWTCreatorInterface;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Model\AccessToken\AccessToken;
+use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Response\OAuth2Exception;
@@ -39,7 +40,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     private $signatureKeySet = null;
 
     /**
-     * @var UserInfoInterface
+     * @var UserInfo
      */
     private $userinfo;
 
@@ -56,9 +57,9 @@ class UserInfoEndpoint implements MiddlewareInterface
     /**
      * UserInfoEndpoint constructor.
      *
-     * @param UserInfoInterface $userinfo
+     * @param UserInfo $userinfo
      */
-    public function __construct(UserInfoInterface $userinfo)
+    public function __construct(UserInfo $userinfo)
     {
         $this->userinfo = $userinfo;
     }

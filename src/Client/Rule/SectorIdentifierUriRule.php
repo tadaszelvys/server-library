@@ -37,19 +37,13 @@ final class SectorIdentifierUriRule implements RuleInterface
     private $decoder;
 
     /**
-     * @var bool
-     */
-    private $allow_http_connections;
-
-    /**
      * SectorIdentifierUriRule constructor.
      *
      * @param RequestFactoryInterface $requestFactory
      * @param JsonDecoder             $decoder
      * @param HttpClient              $client
-     * @param bool                    $allow_http_connections
      */
-    public function __construct(RequestFactoryInterface $requestFactory, JsonDecoder $decoder, HttpClient $client, bool $allow_http_connections = false)
+    public function __construct(RequestFactoryInterface $requestFactory, JsonDecoder $decoder, HttpClient $client)
     {
         $this->requestFactory = $requestFactory;
         $this->decoder = $decoder;
@@ -75,12 +69,9 @@ final class SectorIdentifierUriRule implements RuleInterface
      *
      * @throws \InvalidArgumentException
      */
-    private function checkSectorIdentifierUri($url)
+    private function checkSectorIdentifierUri(string $url)
     {
         $allowed_protocols = ['https'];
-        if (true === $this->allow_http_connections) {
-            $allowed_protocols[] = 'http';
-        }
         Assertion::inArray(mb_substr($url, 0, mb_strpos($url, '://', 0, '8bit'), '8bit'), $allowed_protocols, sprintf('The provided sector identifier URI is not valid: scheme must be one of the following: %s.', implode(', ', $allowed_protocols)));
         $request = $this->requestFactory->createRequest('GET', $url);
         $response = $this->client->sendRequest($request);
