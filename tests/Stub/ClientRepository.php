@@ -90,7 +90,7 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function has(ClientId $clientId)
+    public function has(ClientId $clientId): bool
     {
         return array_key_exists($clientId->getValue(), $this->clients);
     }

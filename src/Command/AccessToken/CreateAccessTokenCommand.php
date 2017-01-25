@@ -42,7 +42,7 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
     private $metadatas;
 
     /**
-     * @var \string[]
+     * @var string[]
      */
     private $scopes;
 
@@ -170,7 +170,7 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getScopes(): array
     {

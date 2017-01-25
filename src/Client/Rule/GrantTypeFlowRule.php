@@ -14,56 +14,58 @@ declare(strict_types=1);
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
-use OAuth2\GrantType\GrantTypeManagerInterface;
+use OAuth2\GrantType\GrantTypeManager;
 use OAuth2\Model\UserAccount\UserAccountId;
-use OAuth2\ResponseType\ResponseTypeManagerInterface;
+use OAuth2\ResponseType\ResponseTypeManager;
 
 final class GrantTypeFlowRule implements RuleInterface
 {
     /**
-     * @var GrantTypeManagerInterface
+     * @var GrantTypeManager
      */
-    private $grant_type_manager;
+    private $grantTypeManager;
 
     /**
-     * @var ResponseTypeManagerInterface
+     * @var ResponseTypeManager
      */
-    private $response_type_manager;
+    private $responseTypeManager;
 
     /**
      * GrantTypeFlowRule constructor.
      *
-     * @param GrantTypeManagerInterface    $grant_type_manager
-     * @param ResponseTypeManagerInterface $response_type_manager
+     * @param GrantTypeManager    $grantTypeManager
+     * @param ResponseTypeManager $responseTypeManager
      */
-    public function __construct(GrantTypeManagerInterface $grant_type_manager, ResponseTypeManagerInterface $response_type_manager)
+    public function __construct(GrantTypeManager $grantTypeManager, ResponseTypeManager $responseTypeManager)
     {
-        $this->grant_type_manager = $grant_type_manager;
-        $this->response_type_manager = $response_type_manager;
+        $this->grantTypeManager = $grantTypeManager;
+        $this->responseTypeManager = $responseTypeManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next)
     {
-        if (!array_key_exists('grant_types', $command_parameters)) {
-            $command_parameters['grant_types'] = [];
+        if (!array_key_exists('grant_types', $commandParameters)) {
+            $commandParameters['grant_types'] = [];
         }
-        if (!array_key_exists('response_types', $command_parameters)) {
-            $command_parameters['response_types'] = [];
+        if (!array_key_exists('response_types', $commandParameters)) {
+            $commandParameters['response_types'] = [];
         }
-        $this->checkGrantTypes($command_parameters);
-        $this->checkResponseTypes($command_parameters);
+        $this->checkGrantTypes($commandParameters);
+        $this->checkResponseTypes($commandParameters);
 
-        $validated_parameters['grant_types'] = $command_parameters['grant_types'];
-        $validated_parameters['response_types'] = $command_parameters['response_types'];
+        $validatedParameters['grant_types'] = $commandParameters['grant_types'];
+        $validatedParameters['response_types'] = $commandParameters['response_types'];
 
-        return $next($command_parameters, $validated_parameters, $userAccountId);
+        return $next($commandParameters, $validatedParameters, $userAccountId);
     }
 
     /**
      * @param array $parameters
+     *
+     * @throws \InvalidArgumentException
      */
     private function checkGrantTypes(array $parameters)
     {
@@ -71,7 +73,7 @@ final class GrantTypeFlowRule implements RuleInterface
         Assertion::allString($parameters['grant_types'], 'The parameter \'grant_types\' must be an array of strings.');
 
         foreach ($parameters['grant_types'] as $grant_type) {
-            $type = $this->grant_type_manager->getGrantType($grant_type);
+            $type = $this->grantTypeManager->get($grant_type);
             $associated_response_types = $type->getAssociatedResponseTypes();
             $diff = array_diff($associated_response_types, $parameters['response_types']);
             Assertion::true(empty($diff), sprintf('The grant type \'%s\' is associated with the response types \'%s\' but this response type is missing.', $type->getGrantType(), implode(', ', $diff)));
@@ -80,6 +82,8 @@ final class GrantTypeFlowRule implements RuleInterface
 
     /**
      * @param array $parameters
+     *
+     * @throws \InvalidArgumentException
      */
     private function checkResponseTypes(array $parameters)
     {
@@ -87,7 +91,7 @@ final class GrantTypeFlowRule implements RuleInterface
         Assertion::allString($parameters['response_types'], 'The parameter \'response_types\' must be an array of strings.');
 
         foreach ($parameters['response_types'] as $response_type) {
-            $types = $this->response_type_manager->getResponseTypes($response_type);
+            $types = $this->responseTypeManager->find($response_type);
             foreach ($types as $type) {
                 $associated_grant_types = $type->getAssociatedGrantTypes();
                 $diff = array_diff($associated_grant_types, $parameters['grant_types']);

@@ -82,11 +82,9 @@ use OAuth2\Event\RefreshToken\RefreshTokenRevokedEvent;
 use OAuth2\GrantType\AuthorizationCodeGrantType;
 use OAuth2\GrantType\ClientCredentialsGrantType;
 use OAuth2\GrantType\GrantTypeManager;
-use OAuth2\GrantType\GrantTypeManagerInterface;
 use OAuth2\GrantType\JWTBearerGrantType;
 use OAuth2\GrantType\PKCEMethod\PKCEMethodInterface;
 use OAuth2\GrantType\PKCEMethod\PKCEMethodManager;
-use OAuth2\GrantType\PKCEMethod\PKCEMethodManagerInterface;
 use OAuth2\GrantType\PKCEMethod\Plain;
 use OAuth2\GrantType\PKCEMethod\S256;
 use OAuth2\GrantType\RefreshTokenGrantType;
@@ -106,7 +104,6 @@ use OAuth2\Model\Scope\DefaultScopePolicy;
 use OAuth2\Model\Scope\ErrorScopePolicy;
 use OAuth2\Model\Scope\ScopePolicyInterface;
 use OAuth2\Model\Scope\ScopeRepository;
-use OAuth2\Model\Scope\ScopeRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\Factory\AccessDeniedResponseFactory;
 use OAuth2\Response\Factory\BadRequestResponseFactory;
@@ -118,7 +115,6 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\ResponseType\CodeResponseType;
 use OAuth2\ResponseType\ImplicitResponseType;
 use OAuth2\ResponseType\ResponseTypeManager;
-use OAuth2\ResponseType\ResponseTypeManagerInterface;
 use OAuth2\Test\Stub\AccessTokenRepository;
 use OAuth2\Test\Stub\AuthCodeRepository;
 use OAuth2\Test\Stub\AuthenticateResponseFactory;
@@ -154,7 +150,6 @@ use OAuth2\TokenTypeHint\AccessTokenTypeHint;
 use OAuth2\TokenTypeHint\AuthCodeTypeHint;
 use OAuth2\TokenTypeHint\RefreshTokenTypeHint;
 use OAuth2\TokenTypeHint\TokenTypeHintManager;
-use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
 use SimpleBus\Message\Bus\Middleware\FinishesHandlingMessageBeforeHandlingNext;
 use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
 use SimpleBus\Message\CallableResolver\CallableCollection;
@@ -933,36 +928,36 @@ final class Application
     }
 
     /**
-     * @var null|GrantTypeManagerInterface
+     * @var null|GrantTypeManager
      */
     private $grantTypeManager = null;
 
     /**
-     * @return GrantTypeManagerInterface
+     * @return GrantTypeManager
      */
-    public function getGrantTypeManager(): GrantTypeManagerInterface
+    public function getGrantTypeManager(): GrantTypeManager
     {
         if (null === $this->grantTypeManager) {
             $this->grantTypeManager = new GrantTypeManager();
-            $this->grantTypeManager->addGrantType($this->getAuthorizationCodeGrantType());
-            $this->grantTypeManager->addGrantType($this->getClientCredentialsGrantType());
-            $this->grantTypeManager->addGrantType($this->getJWTBearerGrantType());
-            $this->grantTypeManager->addGrantType($this->getResourceOwnerPasswordCredentialsGrantType());
-            $this->grantTypeManager->addGrantType($this->getRefreshTokenGrantType());
+            $this->grantTypeManager->add($this->getAuthorizationCodeGrantType());
+            $this->grantTypeManager->add($this->getClientCredentialsGrantType());
+            $this->grantTypeManager->add($this->getJWTBearerGrantType());
+            $this->grantTypeManager->add($this->getResourceOwnerPasswordCredentialsGrantType());
+            $this->grantTypeManager->add($this->getRefreshTokenGrantType());
         }
 
         return $this->grantTypeManager;
     }
 
     /**
-     * @var null|ResponseTypeManagerInterface
+     * @var null|ResponseTypeManager
      */
     private $responseTypeManager = null;
 
     /**
-     * @return ResponseTypeManagerInterface
+     * @return ResponseTypeManager
      */
-    public function getResponseTypeManager(): ResponseTypeManagerInterface
+    public function getResponseTypeManager(): ResponseTypeManager
     {
         if (null === $this->responseTypeManager) {
             $this->responseTypeManager = new ResponseTypeManager();
@@ -1090,7 +1085,7 @@ final class Application
     }
 
     /**
-     * @var null|PKCEMethodManagerInterface
+     * @var null|PKCEMethodManager
      */
     private $pkceMethodManager = null;
 
@@ -1105,15 +1100,15 @@ final class Application
     private $pkceMethodS256 = null;
 
     /**
-     * @return PKCEMethodManagerInterface
+     * @return PKCEMethodManager
      */
-    public function getPKCEMethodManager(): PKCEMethodManagerInterface
+    public function getPKCEMethodManager(): PKCEMethodManager
     {
         if (null === $this->pkceMethodManager) {
             $this->pkceMethodManager = new PKCEMethodManager();
             $this->pkceMethodManager
-                ->addPKCEMethod($this->getPKCEMethodPlain())
-                ->addPKCEMethod($this->getPKCEMethodS256());
+                ->add($this->getPKCEMethodPlain())
+                ->add($this->getPKCEMethodS256());
         }
 
         return $this->pkceMethodManager;
@@ -1144,7 +1139,7 @@ final class Application
     }
 
     /**
-     * @var null|ScopeRepositoryInterface
+     * @var null|ScopeRepository
      */
     private $scopeRepository = null;
 
@@ -1159,9 +1154,9 @@ final class Application
     private $scopePolicyError = null;
 
     /**
-     * @return ScopeRepositoryInterface
+     * @return ScopeRepository
      */
-    public function getScopeRepository(): ScopeRepositoryInterface
+    public function getScopeRepository(): ScopeRepository
     {
         if (null === $this->scopeRepository) {
             $this->scopeRepository = new ScopeRepository(
@@ -1484,20 +1479,20 @@ final class Application
     }
 
     /**
-     * @var null|TokenTypeHintManagerInterface
+     * @var null|TokenTypeHintManager
      */
     private $tokenTypeHintManager = null;
 
     /**
-     * @return TokenTypeHintManagerInterface
+     * @return TokenTypeHintManager
      */
-    public function getTokenTypeHintManager(): TokenTypeHintManagerInterface
+    public function getTokenTypeHintManager(): TokenTypeHintManager
     {
         if (null === $this->tokenTypeHintManager) {
             $this->tokenTypeHintManager = new TokenTypeHintManager();
-            $this->tokenTypeHintManager->addTokenTypeHint($this->getAccessTokenTypeHint()); // Access Token
-            $this->tokenTypeHintManager->addTokenTypeHint($this->getRefreshTokenTypeHint()); // Refresh Token
-            $this->tokenTypeHintManager->addTokenTypeHint($this->getAuthCodeTypeHint()); // Auth Code
+            $this->tokenTypeHintManager->add($this->getAccessTokenTypeHint()); // Access Token
+            $this->tokenTypeHintManager->add($this->getRefreshTokenTypeHint()); // Refresh Token
+            $this->tokenTypeHintManager->add($this->getAuthCodeTypeHint()); // Auth Code
         }
 
         return $this->tokenTypeHintManager;

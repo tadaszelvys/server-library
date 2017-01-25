@@ -20,7 +20,7 @@ use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
+final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterface
 {
     /**
      * @var bool

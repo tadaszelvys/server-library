@@ -16,13 +16,13 @@ namespace OAuth2\ResponseType;
 use OAuth2\Endpoint\Authorization\Authorization;
 use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
-use OAuth2\Model\Scope\ScopeRepositoryInterface;
+use OAuth2\Model\Scope\ScopeRepository;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
-class CodeResponseType implements ResponseTypeInterface
+final class CodeResponseType implements ResponseTypeInterface
 {
     /**
      * @var bool
@@ -40,7 +40,7 @@ class CodeResponseType implements ResponseTypeInterface
     private $authCodeRepository;
 
     /**
-     * @var ScopeRepositoryInterface
+     * @var ScopeRepository
      */
     private $scopeRepository;
 
@@ -55,9 +55,9 @@ class CodeResponseType implements ResponseTypeInterface
     }
 
     /**
-     * @param ScopeRepositoryInterface $scopeRepository
+     * @param ScopeRepository $scopeRepository
      */
-    public function enableScopeSupport(ScopeRepositoryInterface $scopeRepository)
+    public function enableScopeSupport(ScopeRepository $scopeRepository)
     {
         $this->scopeRepository = $scopeRepository;
     }

@@ -74,26 +74,26 @@ final class SoftwareRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next)
     {
-        Assertion::false($this->isSoftwareStatementRequired() && !array_key_exists('software_statement', $command_parameters), 'The parameter \'software_statement\' is mandatory.');
-        if ($this->isSoftwareStatementSupported() && array_key_exists('software_statement', $command_parameters)) {
-            $statement = $command_parameters['software_statement'];
+        Assertion::false($this->isSoftwareStatementRequired() && !array_key_exists('software_statement', $commandParameters), 'The parameter \'software_statement\' is mandatory.');
+        if ($this->isSoftwareStatementSupported() && array_key_exists('software_statement', $commandParameters)) {
+            $statement = $commandParameters['software_statement'];
             Assertion::string($statement, 'The software statement should be a string.');
             $software_statement = $this->loadSoftwareStatement($statement);
-            $validated_parameters['software_statement'] = $command_parameters['software_statement'];
+            $validatedParameters['software_statement'] = $commandParameters['software_statement'];
         } else {
             $software_statement = [];
         }
 
         foreach (['software_id', 'software_version'] as $key) {
-            if (array_key_exists($key, $command_parameters)) {
-                $validated_parameters[$key] = $command_parameters[$key];
+            if (array_key_exists($key, $commandParameters)) {
+                $validatedParameters[$key] = $commandParameters[$key];
             }
         }
 
         return array_merge(
-            $next($command_parameters, $validated_parameters, $userAccountId),
+            $next($commandParameters, $validatedParameters, $userAccountId),
             $software_statement
         );
     }

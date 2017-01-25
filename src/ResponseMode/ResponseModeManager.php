@@ -15,23 +15,29 @@ namespace OAuth2\ResponseMode;
 
 use Assert\Assertion;
 
-class ResponseModeManager implements ResponseModeManagerInterface
+final class ResponseModeManager
 {
     /**
-     * @var \OAuth2\ResponseMode\ResponseModeInterface[]
+     * @var ResponseModeInterface[]
      */
     private $responseModes = [];
 
     /**
-     * {@inheritdoc}
+     * @param ResponseModeInterface $responseMode
+     *
+     * @return ResponseModeManager
      */
     public function add(ResponseModeInterface $responseMode)
     {
-        $this->responseModes[$responseMode->getName()] = $responseMode;
+        $this->responseModes[$responseMode->name()] = $responseMode;
+
+        return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $name
+     *
+     * @return bool
      */
     public function has(string $name): bool
     {
@@ -39,17 +45,21 @@ class ResponseModeManager implements ResponseModeManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return ResponseModeInterface
      */
     public function get(string $name): ResponseModeInterface
     {
-        Assertion::true($this->hasResponseMode($name), sprintf('The response mode with name \'%s\' is not supported.', $name));
+        Assertion::true($this->has($name), sprintf('The response mode with name \'%s\' is not supported.', $name));
 
         return $this->responseModes[$name];
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
     public function list(): array
     {

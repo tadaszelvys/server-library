@@ -21,7 +21,7 @@ interface PreConfiguredAuthorizationRepositoryInterface
     /**
      * @param ResourceOwnerId $resourceOwnerId
      * @param ClientId        $clientPublicId
-     * @param \string[]       $request_scope
+     * @param string[]       $request_scope
      *
      * @return PreConfiguredAuthorization|null
      */

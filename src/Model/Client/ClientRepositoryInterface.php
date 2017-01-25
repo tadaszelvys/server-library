@@ -26,6 +26,12 @@ interface ClientRepositoryInterface
     public function create(UserAccountId $userAccountId, array $metadatas);
 
     /**
+     * @param ClientId $clientId
+     * @return bool
+     */
+    public function has(ClientId $clientId): bool;
+
+    /**
      * Get a client using its Id.
      *
      * @param ClientId $clientId

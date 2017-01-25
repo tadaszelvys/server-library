@@ -22,7 +22,7 @@ use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class RefreshTokenGrantType implements GrantTypeInterface
+final class RefreshTokenGrantType implements GrantTypeInterface
 {
     /**
      * @var RefreshTokenRepositoryInterface

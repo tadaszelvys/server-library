@@ -21,22 +21,22 @@ final class CommonParametersRule extends AbstractInternationalizedRule
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next)
     {
         foreach ($this->getSupportedParameters() as $parameter => $closure) {
-            $validated_parameters = array_merge(
-                $validated_parameters,
-                $this->getInternationalizedParameters($command_parameters, $parameter, $closure)
+            $validatedParameters = array_merge(
+                $validatedParameters,
+                $this->getInternationalizedParameters($commandParameters, $parameter, $closure)
             );
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccountId);
+        return $next($commandParameters, $validatedParameters, $userAccountId);
     }
 
     /**
      * @return array
      */
-    private function getSupportedParameters()
+    private function getSupportedParameters(): array
     {
         return [
             'client_name' => function ($k, $v) {
@@ -48,7 +48,10 @@ final class CommonParametersRule extends AbstractInternationalizedRule
         ];
     }
 
-    private function getUriVerificationClosure()
+    /**
+     * @return \Closure
+     */
+    private function getUriVerificationClosure(): \Closure
     {
         return function ($k, $v) {
             Assertion::url($v, sprintf('The parameter with key \'%s\' is not a valid URL.', $k));

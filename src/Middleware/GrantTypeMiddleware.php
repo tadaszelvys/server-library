@@ -16,7 +16,7 @@ namespace OAuth2\Middleware;
 use Assert\Assertion;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use OAuth2\GrantType\GrantTypeManagerInterface;
+use OAuth2\GrantType\GrantTypeManager;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,16 +24,16 @@ use Psr\Http\Message\ServerRequestInterface;
 final class GrantTypeMiddleware implements MiddlewareInterface
 {
     /**
-     * @var GrantTypeManagerInterface
+     * @var GrantTypeManager
      */
     private $grantTypeManager;
 
     /**
      * ClientAuthenticationMiddleware constructor.
      *
-     * @param GrantTypeManagerInterface $grantTypeManager
+     * @param GrantTypeManager $grantTypeManager
      */
-    public function __construct(GrantTypeManagerInterface $grantTypeManager)
+    public function __construct(GrantTypeManager $grantTypeManager)
     {
         $this->grantTypeManager = $grantTypeManager;
     }
@@ -47,8 +47,8 @@ final class GrantTypeMiddleware implements MiddlewareInterface
             $requestParameters = $request->getParsedBody() ?? [];
             Assertion::keyExists($requestParameters, 'grant_type', 'The \'grant_type\' parameter is missing.');
             $grant_type = $requestParameters['grant_type'];
-            Assertion::true($this->grantTypeManager->hasGrantType($grant_type), sprintf('The grant type \'%s\' is not supported by this server.', $grant_type));
-            $type = $this->grantTypeManager->getGrantType($grant_type);
+            Assertion::true($this->grantTypeManager->has($grant_type), sprintf('The grant type \'%s\' is not supported by this server.', $grant_type));
+            $type = $this->grantTypeManager->get($grant_type);
             $request = $request->withAttribute('grant_type', $type);
 
             return $delegate->process($request);

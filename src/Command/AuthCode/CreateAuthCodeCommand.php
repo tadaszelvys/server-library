@@ -15,20 +15,21 @@ namespace OAuth2\Command\AuthCode;
 
 use OAuth2\Command\CommandWithDataTransporter;
 use OAuth2\DataTransporter;
-use OAuth2\Model\Client\Client;
-use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\UserAccount\UserAccountId;
+use Psr\Http\Message\UriInterface;
 
 final class CreateAuthCodeCommand extends CommandWithDataTransporter
 {
     /**
-     * @var Client
+     * @var ClientId
      */
-    private $client;
+    private $clientId;
 
     /**
-     * @var UserAccount
+     * @var UserAccountId
      */
-    private $userAccount;
+    private $userAccountId;
 
     /**
      * @var array
@@ -56,23 +57,30 @@ final class CreateAuthCodeCommand extends CommandWithDataTransporter
     private $metadatas;
 
     /**
+     * @var UriInterface
+     */
+    private $redirectUri;
+
+    /**
      * CreateAuthCodeCommand constructor.
      *
-     * @param Client               $client
-     * @param UserAccount          $userAccount
+     * @param ClientId             $clientId
+     * @param UserAccountId        $userAccountId
      * @param array                $queryParameters
+     * @param UriInterface         $redirectUri
      * @param \DateTimeImmutable   $expiresAt
      * @param array                $parameters
      * @param array                $scopes
      * @param array                $metadatas
      * @param DataTransporter|null $dataTransporter
      */
-    protected function __construct(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas, DataTransporter $dataTransporter = null)
+    protected function __construct(ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas, DataTransporter $dataTransporter = null)
     {
-        $this->client = $client;
-        $this->userAccount = $userAccount;
+        $this->clientId = $clientId;
+        $this->userAccountId = $userAccountId;
         $this->queryParameters = $queryParameters;
         $this->expiresAt = $expiresAt;
+        $this->redirectUri = $redirectUri;
         $this->parameters = $parameters;
         $this->scopes = $scopes;
         $this->metadatas = $metadatas;
@@ -80,9 +88,10 @@ final class CreateAuthCodeCommand extends CommandWithDataTransporter
     }
 
     /**
-     * @param Client             $client
-     * @param UserAccount        $userAccount
+     * @param ClientId           $clientId
+     * @param UserAccountId      $userAccountId
      * @param array              $queryParameters
+     * @param UriInterface       $redirectUri
      * @param \DateTimeImmutable $expiresAt
      * @param array              $parameters
      * @param array              $scopes
@@ -90,25 +99,25 @@ final class CreateAuthCodeCommand extends CommandWithDataTransporter
      *
      * @return CreateAuthCodeCommand
      */
-    public static function create(Client $client, UserAccount $userAccount, array $queryParameters, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas): self
+    public static function create(ClientId $clientId, UserAccountId $userAccountId, array $queryParameters, UriInterface $redirectUri, \DateTimeImmutable $expiresAt, array $parameters, array $scopes, array $metadatas): self
     {
-        return new self($client, $userAccount, $queryParameters, $expiresAt, $parameters, $scopes, $metadatas);
+        return new self($clientId, $userAccountId, $queryParameters, $redirectUri, $expiresAt, $parameters, $scopes, $metadatas);
     }
 
     /**
-     * @return Client
+     * @return ClientId
      */
-    public function getClient(): Client
+    public function getClientId(): ClientId
     {
-        return $this->client;
+        return $this->clientId;
     }
 
     /**
-     * @return UserAccount
+     * @return UserAccountId
      */
-    public function getUserAccount(): UserAccount
+    public function getUserAccountId(): UserAccountId
     {
-        return $this->userAccount;
+        return $this->userAccountId;
     }
 
     /**
@@ -117,6 +126,14 @@ final class CreateAuthCodeCommand extends CommandWithDataTransporter
     public function getQueryParameters(): array
     {
         return $this->queryParameters;
+    }
+
+    /**
+     * @return UriInterface
+     */
+    public function getRedirectUri(): UriInterface
+    {
+        return $this->redirectUri;
     }
 
     /**

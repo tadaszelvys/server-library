@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\Command\Client;
 
-use OAuth2\Client\Rule\RuleManagerInterface;
+use OAuth2\Client\Rule\RuleManager;
 use OAuth2\Model\Client\ClientRepositoryInterface;
 
 final class CreateClientCommandHandler
@@ -24,7 +24,7 @@ final class CreateClientCommandHandler
     private $clientRepository;
 
     /**
-     * @var RuleManagerInterface
+     * @var RuleManager
      */
     private $ruleManager;
 
@@ -32,9 +32,9 @@ final class CreateClientCommandHandler
      * CreateClientCommandHandler constructor.
      *
      * @param ClientRepositoryInterface $clientRepository
-     * @param RuleManagerInterface      $ruleManager
+     * @param RuleManager      $ruleManager
      */
-    public function __construct(ClientRepositoryInterface $clientRepository, RuleManagerInterface $ruleManager)
+    public function __construct(ClientRepositoryInterface $clientRepository, RuleManager $ruleManager)
     {
         $this->clientRepository = $clientRepository;
         $this->ruleManager = $ruleManager;

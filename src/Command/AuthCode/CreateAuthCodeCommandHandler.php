@@ -38,9 +38,10 @@ final class CreateAuthCodeCommandHandler
     public function handle(CreateAuthCodeCommand $command)
     {
         $authCode = $this->authCodeRepository->create(
-            $command->getClient(),
-            $command->getUserAccount(),
+            $command->getClientId(),
+            $command->getUserAccountId(),
             $command->getQueryParameters(),
+            $command->getRedirectUri(),
             $command->getExpiresAt(),
             $command->getParameters(),
             $command->getScopes(),

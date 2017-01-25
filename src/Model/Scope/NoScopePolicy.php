@@ -16,7 +16,7 @@ namespace OAuth2\Model\Scope;
 use OAuth2\Model\Client\Client;
 use Psr\Http\Message\ServerRequestInterface;
 
-class NoScopePolicy implements ScopePolicyInterface
+final class NoScopePolicy implements ScopePolicyInterface
 {
     /**
      * {@inheritdoc}

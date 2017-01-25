@@ -60,7 +60,7 @@ final class AuthorizationRequestLoader
     private $requireEncryption = false;
 
     /**
-     * @var \string[]
+     * @var string[]
      */
     private $mandatoryClaims = [];
 
@@ -144,7 +144,7 @@ final class AuthorizationRequestLoader
 
     /**
      * @param JWTLoaderInterface $jwtLoader
-     * @param \string[]          $mandatoryClaims
+     * @param string[]          $mandatoryClaims
      */
     public function enableRequestObjectSupport(JWTLoaderInterface $jwtLoader, array $mandatoryClaims = [])
     {

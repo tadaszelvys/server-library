@@ -14,40 +14,42 @@ declare(strict_types=1);
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
+use OAuth2\Endpoint\UserInfo\UserInfoInterface;
 use OAuth2\Model\UserAccount\UserAccountId;
-use OAuth2\OpenIdConnect\UserInfo\HasUserinfo;
-use OAuth2\OpenIdConnect\UserInfo\UserInfoInterface;
 
 final class SubjectTypeRule implements RuleInterface
 {
-    use HasUserinfo;
+    /**
+     * @var UserInfoInterface
+     */
+    private $userinfo;
 
     /**
      * SubjectTypeRule constructor.
      *
-     * @param \OAuth2\OpenIdConnect\UserInfo\UserInfoInterface $userinfo
+     * @param UserInfoInterface $userinfo
      */
     public function __construct(UserInfoInterface $userinfo)
     {
-        $this->setUserinfo($userinfo);
+        $this->userinfo = $userinfo;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next)
     {
-        if (array_key_exists('subject_type', $command_parameters)) {
-            Assertion::string($command_parameters['subject_type'], 'Invalid parameter \'subject_type\'. The value must be a string.');
+        if (array_key_exists('subject_type', $commandParameters)) {
+            Assertion::string($commandParameters['subject_type'], 'Invalid parameter \'subject_type\'. The value must be a string.');
             $supported_types = ['public'];
-            if ($this->getUserinfo()->isPairwiseSubjectIdentifierSupported()) {
+            if ($this->userinfo->isPairwiseSubjectIdentifierSupported()) {
                 $supported_types[] = 'pairwise';
             }
 
-            Assertion::inArray($command_parameters['subject_type'], $supported_types, sprintf('The subject type \'%s\' is not supported. Please use one of the following value: %s', $command_parameters['subject_type'], implode(', ', $supported_types)));
-            $validated_parameters['subject_type'] = $command_parameters['subject_type'];
+            Assertion::inArray($commandParameters['subject_type'], $supported_types, sprintf('The subject type \'%s\' is not supported. Please use one of the following value: %s', $commandParameters['subject_type'], implode(', ', $supported_types)));
+            $validatedParameters['subject_type'] = $commandParameters['subject_type'];
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccountId);
+        return $next($commandParameters, $validatedParameters, $userAccountId);
     }
 }

@@ -19,7 +19,7 @@ use OAuth2\Endpoint\Authorization\Authorization;
 use Psr\Http\Message\UriInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
-class ImplicitResponseType implements ResponseTypeInterface
+final class ImplicitResponseType implements ResponseTypeInterface
 {
     /**
      * @var MessageBus

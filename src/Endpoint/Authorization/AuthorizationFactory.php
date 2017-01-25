@@ -18,8 +18,8 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\ResponseMode\ResponseModeInterface;
-use OAuth2\ResponseMode\ResponseModeManagerInterface;
-use OAuth2\ResponseType\ResponseTypeManagerInterface;
+use OAuth2\ResponseMode\ResponseModeManager;
+use OAuth2\ResponseType\ResponseTypeManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class AuthorizationFactory
@@ -30,12 +30,12 @@ final class AuthorizationFactory
     private $authorizationRequestLoader;
 
     /**
-     * @var ResponseTypeManagerInterface
+     * @var ResponseTypeManager
      */
     private $responseTypeManager;
 
     /**
-     * @var ResponseModeManagerInterface
+     * @var ResponseModeManager
      */
     private $responseModeManager;
 
@@ -53,11 +53,11 @@ final class AuthorizationFactory
      * AuthorizationFactory constructor.
      *
      * @param AuthorizationRequestLoader       $authorizationRequestLoader
-     * @param ResponseTypeManagerInterface     $responseTypeManager
-     * @param ResponseModeManagerInterface     $responseModeManager
+     * @param ResponseTypeManager     $responseTypeManager
+     * @param ResponseModeManager     $responseModeManager
      * @param ParameterCheckerManagerInterface $parameterCheckerManager
      */
-    public function __construct(AuthorizationRequestLoader $authorizationRequestLoader, ResponseTypeManagerInterface $responseTypeManager, ResponseModeManagerInterface $responseModeManager, ParameterCheckerManagerInterface $parameterCheckerManager)
+    public function __construct(AuthorizationRequestLoader $authorizationRequestLoader, ResponseTypeManager $responseTypeManager, ResponseModeManager $responseModeManager, ParameterCheckerManagerInterface $parameterCheckerManager)
     {
         $this->authorizationRequestLoader = $authorizationRequestLoader;
         $this->responseTypeManager = $responseTypeManager;

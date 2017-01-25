@@ -21,7 +21,7 @@ interface TokenTypeHintInterface
     /**
      * @return string
      */
-    public function getTokenTypeHint(): string;
+    public function hint(): string;
 
     /**
      * @param string $token

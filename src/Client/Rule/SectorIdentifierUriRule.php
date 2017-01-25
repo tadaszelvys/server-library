@@ -59,15 +59,15 @@ final class SectorIdentifierUriRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next)
     {
-        if (array_key_exists('sector_identifier_uri', $command_parameters)) {
-            Assertion::url($command_parameters['sector_identifier_uri'], sprintf('The sector identifier URI \'%s\' is not valid.', $command_parameters['sector_identifier_uri']));
-            $this->checkSectorIdentifierUri($command_parameters['sector_identifier_uri']);
-            $validated_parameters['sector_identifier_uri'] = $command_parameters['sector_identifier_uri'];
+        if (array_key_exists('sector_identifier_uri', $commandParameters)) {
+            Assertion::url($commandParameters['sector_identifier_uri'], sprintf('The sector identifier URI \'%s\' is not valid.', $commandParameters['sector_identifier_uri']));
+            $this->checkSectorIdentifierUri($commandParameters['sector_identifier_uri']);
+            $validatedParameters['sector_identifier_uri'] = $commandParameters['sector_identifier_uri'];
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccountId);
+        return $next($commandParameters, $validatedParameters, $userAccountId);
     }
 
     /**

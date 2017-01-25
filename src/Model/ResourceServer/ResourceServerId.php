@@ -13,23 +13,10 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\ResourceServer;
 
-final class ResourceServerId
+use OAuth2\Model\Id\Id;
+
+final class ResourceServerId extends Id
 {
-    /**
-     * @var string
-     */
-    private $value;
-
-    /**
-     * Token constructor.
-     *
-     * @param string $value
-     */
-    private function __construct(string $value)
-    {
-        $this->value = $value;
-    }
-
     /**
      * @param string $value
      *
@@ -38,21 +25,5 @@ final class ResourceServerId
     public static function create(string $value): self
     {
         return new self($value);
-    }
-
-    /**
-     * @return string
-     */
-    public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString(): string
-    {
-        return $this->getValue();
     }
 }

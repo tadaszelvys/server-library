@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\GrantType\PKCEMethod;
 
-class PKCEMethodManager implements PKCEMethodManagerInterface
+final class PKCEMethodManager
 {
     /**
      * @var PKCEMethodInterface[]
@@ -21,9 +21,11 @@ class PKCEMethodManager implements PKCEMethodManagerInterface
     private $pkceMethods = [];
 
     /**
-     * {@inheritdoc}
+     * @param PKCEMethodInterface $method
+     *
+     * @return PKCEMethodManager
      */
-    public function addPKCEMethod(PKCEMethodInterface $method): PKCEMethodManagerInterface
+    public function add(PKCEMethodInterface $method): PKCEMethodManager
     {
         $this->pkceMethods[$method->getMethodName()] = $method;
 
@@ -31,33 +33,39 @@ class PKCEMethodManager implements PKCEMethodManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $method
+     *
+     * @return bool
      */
-    public function hasPKCEMethod(string $method): bool
+    public function has(string $method): bool
     {
         return array_key_exists($method, $this->pkceMethods);
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $method
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return PKCEMethodInterface
      */
-    public function getPKCEMethod(string $method): PKCEMethodInterface
+    public function get(string $method): PKCEMethodInterface
     {
         return $this->pkceMethods[$method];
     }
 
     /**
-     * {@inheritdoc}
+     * @return PKCEMethodInterface[]
      */
-    public function getPKCEMethods(): array
+    public function all(): array
     {
         return array_values($this->pkceMethods);
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getPKCEMethodNames(): array
+    public function names(): array
     {
         return array_keys($this->pkceMethods);
     }

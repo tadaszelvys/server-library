@@ -17,7 +17,7 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
 use Psr\Http\Message\ServerRequestInterface;
 
-class None implements TokenEndpointAuthMethodInterface
+final class None implements TokenEndpointAuthMethodInterface
 {
     /**
      * {@inheritdoc}

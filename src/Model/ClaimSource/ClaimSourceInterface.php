@@ -24,5 +24,5 @@ interface ClaimSourceInterface
      *
      * @return SourceInterface
      */
-    public function getUserInfo(UserAccount $userAccount, array $scope, array $claims);
+    public function getUserInfo(UserAccount $userAccount, array $scope, array $claims): SourceInterface;
 }

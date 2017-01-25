@@ -17,13 +17,13 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
-use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
+use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class ClientAuthenticationMiddleware implements MiddlewareInterface
 {
     /**
-     * @var TokenEndpointAuthMethodManagerInterface
+     * @var TokenEndpointAuthMethodManager
      */
     private $tokenEndpointAuthMethodManager;
 
@@ -35,10 +35,10 @@ final class ClientAuthenticationMiddleware implements MiddlewareInterface
     /**
      * ClientAuthenticationMiddleware constructor.
      *
-     * @param TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthMethodManager
+     * @param TokenEndpointAuthMethodManager $tokenEndpointAuthMethodManager
      * @param bool                                    $authenticationRequired
      */
-    public function __construct(TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthMethodManager, bool $authenticationRequired)
+    public function __construct(TokenEndpointAuthMethodManager $tokenEndpointAuthMethodManager, bool $authenticationRequired)
     {
         $this->tokenEndpointAuthMethodManager = $tokenEndpointAuthMethodManager;
         $this->authenticationRequired = $authenticationRequired;

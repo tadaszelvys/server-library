@@ -16,7 +16,7 @@ namespace OAuth2\GrantType;
 use Assert\Assertion;
 use OAuth2\Command\AuthCode\MarkAuthCodeAsUsedCommand;
 use OAuth2\Endpoint\Token\GrantTypeData;
-use OAuth2\GrantType\PKCEMethod\PKCEMethodManagerInterface;
+use OAuth2\GrantType\PKCEMethod\PKCEMethodManager;
 use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\AuthCode\AuthCodeId;
 use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
@@ -26,7 +26,7 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
-class AuthorizationCodeGrantType implements GrantTypeInterface
+final class AuthorizationCodeGrantType implements GrantTypeInterface
 {
     /**
      * @var AuthCodeRepositoryInterface
@@ -34,7 +34,7 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
     private $authCodeRepository;
 
     /**
-     * @var PKCEMethodManagerInterface
+     * @var PKCEMethodManager
      */
     private $pkceMethodManager;
 
@@ -47,10 +47,10 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
      * AuthorizationCodeGrantType constructor.
      *
      * @param AuthCodeRepositoryInterface $authCodeRepository
-     * @param PKCEMethodManagerInterface  $pkceMethodManager
+     * @param PKCEMethodManager  $pkceMethodManager
      * @param MessageBus                  $commandBus
      */
-    public function __construct(AuthCodeRepositoryInterface $authCodeRepository, PKCEMethodManagerInterface $pkceMethodManager, MessageBus $commandBus)
+    public function __construct(AuthCodeRepositoryInterface $authCodeRepository, PKCEMethodManager $pkceMethodManager, MessageBus $commandBus)
     {
         $this->authCodeRepository = $authCodeRepository;
         $this->pkceMethodManager = $pkceMethodManager;
@@ -203,7 +203,7 @@ class AuthorizationCodeGrantType implements GrantTypeInterface
         try {
             Assertion::keyExists($parameters, 'code_verifier', 'The parameter \'code_verifier\' is missing.');
             $code_verifier = $parameters['code_verifier'];
-            $method = $this->pkceMethodManager->getPKCEMethod($code_challenge_method);
+            $method = $this->pkceMethodManager->get($code_challenge_method);
         } catch (\InvalidArgumentException $e) {
             throw new OAuth2Exception(
                 400,

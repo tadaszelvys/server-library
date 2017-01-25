@@ -32,10 +32,7 @@ class Delegate implements DelegateInterface
     }
 
     /**
-     * @param
-     *
-     * @return \Psr\Http\Message\ServerRequestInterface $request
-     * @return \Psr\Http\Message\ResponseInterface
+     * {@inheritdoc}
      */
     public function process(ServerRequestInterface $request)
     {

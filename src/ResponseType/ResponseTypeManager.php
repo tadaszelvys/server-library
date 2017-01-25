@@ -15,7 +15,7 @@ namespace OAuth2\ResponseType;
 
 use Assert\Assertion;
 
-class ResponseTypeManager implements ResponseTypeManagerInterface
+final class ResponseTypeManager
 {
     /**
      * @var ResponseTypeInterface[]
@@ -23,9 +23,11 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     private $responseTypes = [];
 
     /**
-     * {@inheritdoc}
+     * @param ResponseTypeInterface $responseType
+     *
+     * @return ResponseTypeManager
      */
-    public function add(ResponseTypeInterface $responseType): ResponseTypeManagerInterface
+    public function add(ResponseTypeInterface $responseType): ResponseTypeManager
     {
         $this->responseTypes[$responseType->getResponseType()] = $responseType;
 
@@ -33,7 +35,9 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $name
+     *
+     * @return bool
      */
     public function has(string $name): bool
     {
@@ -41,7 +45,11 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $names
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return ResponseTypeInterface[]
      */
     public function find(string $names): array
     {
@@ -58,7 +66,7 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
     public function all(): array
     {
@@ -82,7 +90,9 @@ class ResponseTypeManager implements ResponseTypeManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $responseType
+     *
+     * @return bool
      */
     public function isSupported(string $responseType): bool
     {

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace OAuth2\TokenTypeHint;
 
-final class TokenTypeHintManager implements TokenTypeHintManagerInterface
+final class TokenTypeHintManager
 {
     /**
      * @var TokenTypeHintInterface[]
@@ -21,7 +21,7 @@ final class TokenTypeHintManager implements TokenTypeHintManagerInterface
     private $tokenTypeHints = [];
 
     /**
-     * {@inheritdoc}
+     * @return TokenTypeHintInterface[]
      */
     public function getTokenTypeHints(): array
     {
@@ -29,11 +29,13 @@ final class TokenTypeHintManager implements TokenTypeHintManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param TokenTypeHintInterface $tokenTypeHint
+     *
+     * @return TokenTypeHintManager
      */
-    public function addTokenTypeHint(TokenTypeHintInterface $tokenTypeHint): TokenTypeHintManagerInterface
+    public function add(TokenTypeHintInterface $tokenTypeHint): TokenTypeHintManager
     {
-        $this->tokenTypeHints[$tokenTypeHint->getTokenTypeHint()] = $tokenTypeHint;
+        $this->tokenTypeHints[$tokenTypeHint->hint()] = $tokenTypeHint;
 
         return $this;
     }

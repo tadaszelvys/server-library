@@ -73,8 +73,6 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
             $event = RefreshTokenRevokedEvent::create($refreshTokenId);
             $this->eventRecorder->record($event);
         }
-
-        return $this;
     }
 
     /**
@@ -98,7 +96,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas)
+    public function create(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $scopes, array $metadatas): RefreshToken
     {
         return RefreshToken::create(
             RefreshTokenId::create(base64_encode(random_bytes(50))),

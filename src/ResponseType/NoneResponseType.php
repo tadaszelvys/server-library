@@ -27,13 +27,8 @@ use Psr\Http\Message\UriInterface;
  *
  * @see http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#none
  */
-class NoneResponseType implements ResponseTypeInterface
+final class NoneResponseType implements ResponseTypeInterface
 {
-    /**
-     * @var NoneResponseTypeListenerInterface[]
-     */
-    private $listeners = [];
-
     /**
      * @var TokenTypeManagerInterface
      */
@@ -62,18 +57,6 @@ class NoneResponseType implements ResponseTypeInterface
     public function getAssociatedGrantTypes(): array
     {
         return [];
-    }
-
-    /**
-     * @param \OAuth2\OpenIdConnect\NoneResponseTypeListenerInterface $listener
-     *
-     * @return self
-     */
-    public function addListener(NoneResponseTypeListenerInterface $listener): self
-    {
-        $this->listeners[] = $listener;
-
-        return $this;
     }
 
     /**
@@ -120,9 +103,7 @@ class NoneResponseType implements ResponseTypeInterface
 
         $authorization->setData('access_token', $token);
 
-        foreach ($this->listeners as $listener) {
-            $listener->call($token);
-        }
+        //Event
 
         return [];
     }

@@ -19,7 +19,7 @@ use OAuth2\Model\RefreshToken\RefreshTokenRepositoryInterface;
 use OAuth2\Model\Token\TokenId;
 use SimpleBus\Message\Bus\MessageBus;
 
-class RefreshTokenTypeHint implements TokenTypeHintInterface
+final class RefreshTokenTypeHint implements TokenTypeHintInterface
 {
     /**
      * @var RefreshTokenRepositoryInterface
@@ -46,7 +46,7 @@ class RefreshTokenTypeHint implements TokenTypeHintInterface
     /**
      * {@inheritdoc}
      */
-    public function getTokenTypeHint(): string
+    public function hint(): string
     {
         return 'refresh_token';
     }

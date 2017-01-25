@@ -21,14 +21,14 @@ final class RedirectionUriRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next)
     {
-        if (array_key_exists('redirect_uris', $command_parameters)) {
-            Assertion::isArray($command_parameters['redirect_uris'], 'The parameter \'redirect_uris\' must be a list of URI.');
-            Assertion::allUrl($command_parameters['redirect_uris'], 'The parameter \'redirect_uris\' must be a list of URI.');
-            $validated_parameters['redirect_uris'] = $command_parameters['redirect_uris'];
+        if (array_key_exists('redirect_uris', $commandParameters)) {
+            Assertion::isArray($commandParameters['redirect_uris'], 'The parameter \'redirect_uris\' must be a list of URI.');
+            Assertion::allUrl($commandParameters['redirect_uris'], 'The parameter \'redirect_uris\' must be a list of URI.');
+            $validatedParameters['redirect_uris'] = $commandParameters['redirect_uris'];
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccountId);
+        return $next($commandParameters, $validatedParameters, $userAccountId);
     }
 }

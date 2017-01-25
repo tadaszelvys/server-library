@@ -21,7 +21,7 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\UriInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
-class IdTokenResponseType implements ResponseTypeInterface
+final class IdTokenResponseType implements ResponseTypeInterface
 {
     /**
      * @var MessageBus

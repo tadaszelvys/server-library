@@ -20,14 +20,14 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenTypeHint\TokenTypeHintInterface;
-use OAuth2\TokenTypeHint\TokenTypeHintManagerInterface;
+use OAuth2\TokenTypeHint\TokenTypeHintManager;
 use Psr\Http\Message\ServerRequestInterface;
 use Webmozart\Json\JsonEncoder;
 
 abstract class TokenRevocationEndpoint implements MiddlewareInterface
 {
     /**
-     * @var TokenTypeHintManagerInterface
+     * @var TokenTypeHintManager
      */
     private $tokenTypeHintManager;
 
@@ -44,11 +44,11 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
     /**
      * TokenRevocationEndpoint constructor.
      *
-     * @param TokenTypeHintManagerInterface $tokenTypeHintManager
+     * @param TokenTypeHintManager $tokenTypeHintManager
      * @param ResponseFactoryInterface      $responseFactory
      * @param JsonEncoder                   $encoder
      */
-    public function __construct(TokenTypeHintManagerInterface $tokenTypeHintManager, ResponseFactoryInterface $responseFactory, JsonEncoder $encoder)
+    public function __construct(TokenTypeHintManager $tokenTypeHintManager, ResponseFactoryInterface $responseFactory, JsonEncoder $encoder)
     {
         $this->tokenTypeHintManager = $tokenTypeHintManager;
         $this->responseFactory = $responseFactory;
@@ -56,9 +56,9 @@ abstract class TokenRevocationEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @return TokenTypeHintManagerInterface
+     * @return TokenTypeHintManager
      */
-    protected function getTokenTypeHintManager(): TokenTypeHintManagerInterface
+    protected function getTokenTypeHintManager(): TokenTypeHintManager
     {
         return $this->tokenTypeHintManager;
     }

@@ -17,7 +17,7 @@ use Assert\Assertion;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 
-class GrantTypeData
+final class GrantTypeData
 {
     /**
      * @var array
@@ -40,7 +40,7 @@ class GrantTypeData
     private $client;
 
     /**
-     * @var \string[]
+     * @var string[]
      */
     private $scopes = [];
 
@@ -50,12 +50,12 @@ class GrantTypeData
     private $issueRefreshToken = false;
 
     /**
-     * @var \string[]
+     * @var string[]
      */
     private $refreshTokenScopes = [];
 
     /**
-     * @var \string[]|null
+     * @var string[]|null
      */
     private $availableScopes = null;
 
@@ -190,7 +190,7 @@ class GrantTypeData
     }
 
     /**
-     * @param \string[] $scopes
+     * @param string[] $scopes
      *
      * @return GrantTypeData
      */
@@ -246,7 +246,7 @@ class GrantTypeData
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getScopes(): array
     {
@@ -290,7 +290,7 @@ class GrantTypeData
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getRefreshTokenScopes(): array
     {
@@ -298,7 +298,7 @@ class GrantTypeData
     }
 
     /**
-     * @param \string[] $scopes
+     * @param string[] $scopes
      *
      * @return GrantTypeData
      */
@@ -311,7 +311,7 @@ class GrantTypeData
     }
 
     /**
-     * @return \string[]|null
+     * @return string[]|null
      */
     public function getAvailableScopes()
     {
@@ -319,7 +319,7 @@ class GrantTypeData
     }
 
     /**
-     * @param \string[] $scopes
+     * @param string[] $scopes
      *
      * @return GrantTypeData
      */

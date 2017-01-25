@@ -38,6 +38,13 @@ interface InitialAccessTokenRepositoryInterface
     public function revoke(InitialAccessTokenId $initialAccessTokenId);
 
     /**
+     * @param InitialAccessTokenId $initialAccessTokenId
+     *
+     * @return bool
+     */
+    public function has(InitialAccessTokenId $initialAccessTokenId): bool;
+
+    /**
      * This function verifies the request and validate or not the initial access token.
      * MUST return null if the initial access token is not valid (expired, revoked...).
      *

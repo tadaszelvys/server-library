@@ -80,6 +80,14 @@ class InitialAccessTokenRepository implements InitialAccessTokenRepositoryInterf
     /**
      * {@inheritdoc}
      */
+    public function has(InitialAccessTokenId $initialAccessTokenId): bool
+    {
+        return array_key_exists((string) $initialAccessTokenId, $this->initialAccessTokens);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function revoke(InitialAccessTokenId $initialAccessTokenId)
     {
         if (isset($this->initialAccessTokens[(string) $initialAccessTokenId])) {

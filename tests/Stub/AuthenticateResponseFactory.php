@@ -15,22 +15,22 @@ namespace OAuth2\Test\Stub;
 
 use OAuth2\Response\Factory\AuthenticateResponseFactory as Base;
 use OAuth2\Response\OAuth2ResponseInterface;
-use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManagerInterface;
+use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use Psr\Http\Message\ResponseInterface;
 
 class AuthenticateResponseFactory extends Base
 {
     /**
-     * @var TokenEndpointAuthMethodManagerInterface
+     * @var TokenEndpointAuthMethodManager
      */
     private $tokenEndpointAuthMethodManager;
 
     /**
      * ClientAuthenticationMiddleware constructor.
      *
-     * @param TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthMethodManager
+     * @param TokenEndpointAuthMethodManager $tokenEndpointAuthMethodManager
      */
-    public function __construct(TokenEndpointAuthMethodManagerInterface $tokenEndpointAuthMethodManager)
+    public function __construct(TokenEndpointAuthMethodManager $tokenEndpointAuthMethodManager)
     {
         $this->tokenEndpointAuthMethodManager = $tokenEndpointAuthMethodManager;
     }

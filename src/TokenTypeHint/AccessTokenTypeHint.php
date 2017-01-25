@@ -19,7 +19,7 @@ use OAuth2\Model\AccessToken\AccessTokenRepositoryInterface;
 use OAuth2\Model\Token\TokenId;
 use SimpleBus\Message\Bus\MessageBus;
 
-class AccessTokenTypeHint implements TokenTypeHintInterface
+final class AccessTokenTypeHint implements TokenTypeHintInterface
 {
     /**
      * @var AccessTokenRepositoryInterface
@@ -46,7 +46,7 @@ class AccessTokenTypeHint implements TokenTypeHintInterface
     /**
      * {@inheritdoc}
      */
-    public function getTokenTypeHint(): string
+    public function hint(): string
     {
         return 'access_token';
     }

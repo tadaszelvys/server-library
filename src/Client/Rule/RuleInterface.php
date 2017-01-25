@@ -18,12 +18,12 @@ use OAuth2\Model\UserAccount\UserAccountId;
 interface RuleInterface
 {
     /**
-     * @param array         $command_parameters
-     * @param array         $validated_parameters
+     * @param array         $commandParameters
+     * @param array         $validatedParameters
      * @param UserAccountId $userAccountId
      * @param callable      $next
      *
      * @return array
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next);
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next);
 }

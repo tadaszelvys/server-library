@@ -13,46 +13,17 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\Event;
 
-final class EventId
+use OAuth2\Model\Id\Id;
+
+final class EventId extends Id
 {
-    /**
-     * @var string
-     */
-    private $value;
-
-    /**
-     * EventId constructor.
-     *
-     * @param $value
-     */
-    private function __construct(string $value)
-    {
-        $this->value = $value;
-    }
-
     /**
      * @param string $value
      *
-     * @return EventId
+     * @return self
      */
     public static function create(string $value): self
     {
         return new self($value);
-    }
-
-    /**
-     * @return string
-     */
-    public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString(): string
-    {
-        return $this->getValue();
     }
 }

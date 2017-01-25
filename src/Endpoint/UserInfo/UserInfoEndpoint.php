@@ -88,7 +88,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getSupportedSignatureAlgorithms(): array
     {
@@ -96,7 +96,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getSupportedKeyEncryptionAlgorithms(): array
     {

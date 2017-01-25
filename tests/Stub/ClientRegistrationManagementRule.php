@@ -21,7 +21,7 @@ class ClientRegistrationManagementRule extends Base
     /**
      * {@inheritdoc}
      */
-    protected function getRegistrationClientUri(string $clientId)
+    protected function getRegistrationClientUri(string $clientId): string
     {
         return sprintf('https://www.config.example.com/client/%s', $clientId);
     }
@@ -29,7 +29,7 @@ class ClientRegistrationManagementRule extends Base
     /**
      * {@inheritdoc}
      */
-    protected function generateRegistrationAccessToken()
+    protected function generateRegistrationAccessToken(): string
     {
         return Base64Url::encode(random_bytes(64));
     }

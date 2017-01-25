@@ -15,7 +15,7 @@ namespace OAuth2\Model\Scope;
 
 use OAuth2\Model\Client\Client;
 
-class DefaultScopePolicy implements ScopePolicyInterface
+final class DefaultScopePolicy implements ScopePolicyInterface
 {
     /**
      * @var string[]
@@ -59,7 +59,7 @@ class DefaultScopePolicy implements ScopePolicyInterface
     /**
      * @param Client $client
      *
-     * @return \string[]
+     * @return string[]
      */
     private function getDefaultScopesForClient(Client $client): array
     {

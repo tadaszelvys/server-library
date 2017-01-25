@@ -20,7 +20,7 @@ class IssuerChecker extends Base
     /**
      * {@inheritdoc}
      */
-    protected function isIssuerAllowed($issuer)
+    protected function isIssuerAllowed($issuer): bool
     {
         return in_array($issuer, ['ISS1', 'ISS2']);
     }

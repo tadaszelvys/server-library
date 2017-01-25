@@ -21,13 +21,13 @@ abstract class ClientRegistrationManagementRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next)
     {
-        Assertion::keyExists($validated_parameters, 'client_id', 'The parameter \'client_id\' is not defined.');
-        $validated_parameters['registration_access_token'] = $this->generateRegistrationAccessToken();
-        $validated_parameters['registration_client_uri'] = $this->getRegistrationClientUri($validated_parameters['client_id']);
+        Assertion::keyExists($validatedParameters, 'client_id', 'The parameter \'client_id\' is not defined.');
+        $validatedParameters['registration_access_token'] = $this->generateRegistrationAccessToken();
+        $validatedParameters['registration_client_uri'] = $this->getRegistrationClientUri($validatedParameters['client_id']);
 
-        return $next($command_parameters, $validated_parameters, $userAccountId);
+        return $next($commandParameters, $validatedParameters, $userAccountId);
     }
 
     /**
@@ -35,10 +35,10 @@ abstract class ClientRegistrationManagementRule implements RuleInterface
      *
      * @return string
      */
-    abstract protected function getRegistrationClientUri(string $clientId);
+    abstract protected function getRegistrationClientUri(string $clientId): string;
 
     /**
      * @return string
      */
-    abstract protected function generateRegistrationAccessToken();
+    abstract protected function generateRegistrationAccessToken(): string;
 }

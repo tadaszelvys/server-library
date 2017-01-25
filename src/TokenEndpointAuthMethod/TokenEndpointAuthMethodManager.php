@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace OAuth2\TokenEndpointAuthMethod;
 
-namespace OAuth2\TokenEndpointAuthMethod;
-
 use Assert\Assertion;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
@@ -23,7 +21,7 @@ use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerInterface
+final class TokenEndpointAuthMethodManager
 {
     /**
      * @var ClientRepositoryInterface
@@ -51,9 +49,11 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     }
 
     /**
-     * {@inheritdoc}
+     * @param TokenEndpointAuthMethodInterface $tokenEndpointAuthMethod
+     *
+     * @return TokenEndpointAuthMethodManager
      */
-    public function addTokenEndpointAuthMethod(TokenEndpointAuthMethodInterface $tokenEndpointAuthMethod): TokenEndpointAuthMethodManagerInterface
+    public function addTokenEndpointAuthMethod(TokenEndpointAuthMethodInterface $tokenEndpointAuthMethod): TokenEndpointAuthMethodManager
     {
         $this->tokenEndpointAuthMethods[] = $tokenEndpointAuthMethod;
         foreach ($tokenEndpointAuthMethod->getSupportedAuthenticationMethods() as $method_name) {
@@ -64,7 +64,7 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
     public function getSupportedTokenEndpointAuthMethods(): array
     {
@@ -72,17 +72,23 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $tokenEndpointAuthMethod
+     *
+     * @return bool
      */
-    public function hasTokenEndpointAuthMethod($tokenEndpointAuthMethod): bool
+    public function hasTokenEndpointAuthMethod(string $tokenEndpointAuthMethod): bool
     {
         return array_key_exists($tokenEndpointAuthMethod, $this->tokenEndpointAuthMethodNames);
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $tokenEndpointAuthMethod
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return TokenEndpointAuthMethodInterface
      */
-    public function getTokenEndpointAuthMethod($tokenEndpointAuthMethod): TokenEndpointAuthMethodInterface
+    public function getTokenEndpointAuthMethod(string $tokenEndpointAuthMethod): TokenEndpointAuthMethodInterface
     {
         Assertion::true($this->hasTokenEndpointAuthMethod($tokenEndpointAuthMethod), sprintf('The token endpoint authentication method \'%s\' is not supported. Please use one of the following values: %s', $tokenEndpointAuthMethod, implode(', ', $this->getSupportedTokenEndpointAuthMethods())));
 
@@ -90,7 +96,7 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     }
 
     /**
-     * {@inheritdoc}
+     * @return TokenEndpointAuthMethodInterface[]
      */
     public function getTokenEndpointAuthMethods(): array
     {
@@ -98,7 +104,15 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     }
 
     /**
-     * {@inheritdoc}
+     * Find a client ID using the request
+     * This interface should send the request to all its ClientManager and return null or a ClientInterface object.
+     * If client is Confidential, the client credentials must be checked by by the client manager.
+     *
+     * @param ServerRequestInterface $request The request
+     *
+     * @throws OAuth2Exception Throw an exception if a client tried to authenticate against the server, but failed
+     *
+     * @return Client|null Return the client object.
      */
     public function findClient(ServerRequestInterface $request)
     {
@@ -148,7 +162,12 @@ class TokenEndpointAuthMethodManager implements TokenEndpointAuthMethodManagerIn
     }
 
     /**
-     * {@inheritdoc}
+     * @param ServerRequestInterface           $request
+     * @param Client                           $client
+     * @param TokenEndpointAuthMethodInterface $authentication_method
+     * @param $client_credentials
+     *
+     * @return bool
      */
     public function isClientAuthenticated(ServerRequestInterface $request, Client $client, TokenEndpointAuthMethodInterface $authentication_method, $client_credentials): bool
     {

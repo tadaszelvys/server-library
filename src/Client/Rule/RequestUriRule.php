@@ -21,14 +21,14 @@ final class RequestUriRule implements RuleInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next)
     {
-        if (array_key_exists('request_uris', $command_parameters)) {
-            Assertion::isArray($command_parameters['request_uris'], 'The parameter \'request_uris\' must be a list of URI.');
-            Assertion::allUrl($command_parameters['request_uris'], 'The parameter \'request_uris\' must be a list of URI.');
-            $validated_parameters['request_uris'] = $command_parameters['request_uris'];
+        if (array_key_exists('request_uris', $commandParameters)) {
+            Assertion::isArray($commandParameters['request_uris'], 'The parameter \'request_uris\' must be a list of URI.');
+            Assertion::allUrl($commandParameters['request_uris'], 'The parameter \'request_uris\' must be a list of URI.');
+            $validatedParameters['request_uris'] = $commandParameters['request_uris'];
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccountId);
+        return $next($commandParameters, $validatedParameters, $userAccountId);
     }
 }

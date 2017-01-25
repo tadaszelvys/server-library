@@ -46,7 +46,7 @@ final class CreateRefreshTokenCommand extends CommandWithDataTransporter
     private $metadatas;
 
     /**
-     * @var \string[]
+     * @var string[]
      */
     private $scopes;
 
@@ -58,7 +58,7 @@ final class CreateRefreshTokenCommand extends CommandWithDataTransporter
      * @param array                $parameters
      * @param \DateTimeImmutable   $expiresAt
      * @param array                $metadatas
-     * @param \string[]            $scopes
+     * @param string[]            $scopes
      * @param DataTransporter|null $dataTransporter
      */
     protected function __construct(UserAccountId $userAccountId, ClientId $clientId, array $parameters, \DateTimeImmutable $expiresAt, array $metadatas, array $scopes, DataTransporter $dataTransporter = null)
@@ -78,7 +78,7 @@ final class CreateRefreshTokenCommand extends CommandWithDataTransporter
      * @param array              $parameters
      * @param \DateTimeImmutable $expiresAt
      * @param array              $metadatas
-     * @param \string[]          $scopes
+     * @param string[]          $scopes
      *
      * @return CreateRefreshTokenCommand
      */
@@ -128,7 +128,7 @@ final class CreateRefreshTokenCommand extends CommandWithDataTransporter
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getScopes(): array
     {

@@ -15,20 +15,20 @@ namespace OAuth2\Endpoint\Authorization\ParameterChecker;
 
 use Assert\Assertion;
 use OAuth2\Model\Client\Client;
-use OAuth2\Model\Scope\ScopeRepositoryInterface;
+use OAuth2\Model\Scope\ScopeRepository;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
 class ScopeParameterChecker implements ParameterCheckerInterface
 {
     /**
-     * @var ScopeRepositoryInterface
+     * @var ScopeRepository
      */
     private $scopeRepository;
 
     /**
-     * @param ScopeRepositoryInterface $scopeRepository
+     * @param ScopeRepository $scopeRepository
      */
-    public function __construct(ScopeRepositoryInterface $scopeRepository)
+    public function __construct(ScopeRepository $scopeRepository)
     {
         $this->scopeRepository = $scopeRepository;
     }

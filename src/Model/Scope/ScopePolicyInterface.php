@@ -27,6 +27,8 @@ interface ScopePolicyInterface
      *
      * @param string[] $scope  The scopes. This variable may be modified according to the scope policy
      * @param Client   $client The client
+     *
+     * @throws \InvalidArgumentException
      */
     public function checkScopePolicy(array &$scope, Client $client);
 }

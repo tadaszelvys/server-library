@@ -39,7 +39,7 @@ final class Authorization
     private $userAccount;
 
     /**
-     * @var \string[]
+     * @var string[]
      */
     private $scopes = [];
 
@@ -142,7 +142,7 @@ final class Authorization
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getPrompt(): array
     {

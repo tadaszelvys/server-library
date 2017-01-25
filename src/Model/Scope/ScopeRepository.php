@@ -18,7 +18,7 @@ use OAuth2\Model\Client\Client;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 
-class ScopeRepository implements ScopeRepositoryInterface
+class ScopeRepository
 {
     /**
      * @var string[]
@@ -54,14 +54,17 @@ class ScopeRepository implements ScopeRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param ScopePolicyInterface $scopePolicy
+     * @param bool                 $isDefault
+     *
+     * @return ScopeRepository
      */
-    public function addScopePolicy(ScopePolicyInterface $scopePolicy, bool $is_default = false): ScopeRepositoryInterface
+    public function addScopePolicy(ScopePolicyInterface $scopePolicy, bool $isDefault = false): ScopeRepository
     {
         $name = $scopePolicy->name();
         $this->scopePolicies[$name] = $scopePolicy;
 
-        if (true === $is_default) {
+        if (true === $isDefault) {
             $this->defaultScopePolicy = $name;
         }
 
@@ -69,7 +72,7 @@ class ScopeRepository implements ScopeRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
     public function getSupportedScopePolicies(): array
     {
@@ -77,7 +80,13 @@ class ScopeRepository implements ScopeRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * This function returns the scope policy. If a valid Client object is set as parameter, the function will return scope policy for the client.
+     *
+     * @param string $scopePolicyName Scope policy
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return ScopePolicyInterface
      */
     public function getScopePolicy(string $scopePolicyName): ScopePolicyInterface
     {
@@ -103,7 +112,11 @@ class ScopeRepository implements ScopeRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * This function returns the available scopes. If a valid Client object is set as parameter, the function will return available scopes for the client.
+     *
+     * @param Client $client A client
+     *
+     * @return string[] Return an array scope
      */
     public function getAvailableScopesForClient(Client $client): array
     {
@@ -111,7 +124,11 @@ class ScopeRepository implements ScopeRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * This function returns the scope policy. If a valid Client object is set as parameter, the function will return scope policy for the client.
+     *
+     * @param Client $client A client
+     *
+     * @return ScopePolicyInterface
      */
     public function getScopePolicyForClient(Client $client): ScopePolicyInterface
     {
@@ -123,7 +140,12 @@ class ScopeRepository implements ScopeRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * This function check if the scopes respect the scope policy for the client.
+     *
+     * @param string[] $scope  The scopes
+     * @param Client   $client A client
+     *
+     * @return string[] An array scopes according to the scope policy
      */
     public function checkScopePolicy(array $scope, Client $client): array
     {
@@ -136,7 +158,10 @@ class ScopeRepository implements ScopeRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string[] $requestedScopes An array of scopes that represents requested scopes
+     * @param string[] $availableScopes An array of scopes that represents available scopes
+     *
+     * @return bool Return true if the requested scope is within the available scope
      */
     public function areRequestScopesAvailable(array $requestedScopes, array $availableScopes): bool
     {
@@ -144,7 +169,11 @@ class ScopeRepository implements ScopeRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Convert a string that contains at least one scope to an array of scopes.
+     *
+     * @param string $scopes The string to convert
+     *
+     * @return string[] An array of scopes
      */
     public function convertToArray(string $scopes): array
     {

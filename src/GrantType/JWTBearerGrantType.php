@@ -24,7 +24,7 @@ use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class JWTBearerGrantType implements GrantTypeInterface
+final class JWTBearerGrantType implements GrantTypeInterface
 {
     /**
      * @var JWTLoaderInterface

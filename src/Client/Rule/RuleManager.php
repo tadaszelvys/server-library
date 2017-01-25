@@ -15,7 +15,7 @@ namespace OAuth2\Client\Rule;
 
 use OAuth2\Model\UserAccount\UserAccountId;
 
-final class RuleManager implements RuleManagerInterface
+final class RuleManager
 {
     /**
      * @var RuleInterface[]
@@ -37,13 +37,11 @@ final class RuleManager implements RuleManagerInterface
     /**
      * Appends new middleware for this message bus. Should only be used at configuration time.
      *
-     * @private
-     *
      * @param RuleInterface $rule
      *
-     * @return self
+     * @return RuleManager
      */
-    public function appendRule(RuleInterface $rule)
+    public function appendRule(RuleInterface $rule): RuleManager
     {
         $this->rules[] = $rule;
 
@@ -53,17 +51,20 @@ final class RuleManager implements RuleManagerInterface
     /**
      * @return RuleInterface[]
      */
-    public function getRules()
+    public function getRules(): array
     {
         return $this->rules;
     }
 
     /**
-     * {@inheritdoc}
+     * @param array         $commandParameters
+     * @param UserAccountId $userAccountId
+     *
+     * @return array
      */
-    public function handle(array $command_parameters, UserAccountId $userAccountId)
+    public function handle(array $commandParameters, UserAccountId $userAccountId): array
     {
-        return call_user_func($this->callableForNextRule(0), $command_parameters, [], $userAccountId);
+        return call_user_func($this->callableForNextRule(0), $commandParameters, [], $userAccountId);
     }
 
     /**
@@ -71,17 +72,17 @@ final class RuleManager implements RuleManagerInterface
      *
      * @return \Closure
      */
-    private function callableForNextRule($index)
+    private function callableForNextRule(int $index): \Closure
     {
         if (!isset($this->rules[$index])) {
-            return function (array $command_parameters, array $validated_parameters, UserAccountId $userAccountId) {
-                return $validated_parameters;
+            return function (array $commandParameters, array $validatedParameters, UserAccountId $userAccountId) {
+                return $validatedParameters;
             };
         }
         $rule = $this->rules[$index];
 
-        return function ($command_parameters, $validated_parameters, UserAccountId $userAccountId) use ($rule, $index) {
-            return $rule->handle($command_parameters, $validated_parameters, $userAccountId, $this->callableForNextRule($index + 1));
+        return function (array $commandParameters, array $validatedParameters, UserAccountId $userAccountId) use ($rule, $index) {
+            return $rule->handle($commandParameters, $validatedParameters, $userAccountId, $this->callableForNextRule($index + 1));
         };
     }
 }

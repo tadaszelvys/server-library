@@ -15,46 +15,52 @@ namespace OAuth2\GrantType;
 
 use Assert\Assertion;
 
-class GrantTypeManager implements GrantTypeManagerInterface
+final class GrantTypeManager
 {
     /**
      * @var GrantTypeInterface[]
      */
-    private $grant_types = [];
+    private $grantTypes = [];
 
     /**
-     * {@inheritdoc}
+     * @param GrantTypeInterface $grantType
+     *
+     * @return GrantTypeManager
      */
-    public function addGrantType(GrantTypeInterface $grant_type): GrantTypeManagerInterface
+    public function add(GrantTypeInterface $grantType): GrantTypeManager
     {
-        $this->grant_types[$grant_type->getGrantType()] = $grant_type;
+        $this->grantTypes[$grantType->getGrantType()] = $grantType;
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $name
+     *
+     * @return bool
      */
-    public function hasGrantType($name)
+    public function has(string $name): bool
     {
-        return array_key_exists($name, $this->grant_types);
+        return array_key_exists($name, $this->grantTypes);
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $names
+     *
+     * @return GrantTypeInterface
      */
-    public function getGrantType($names)
+    public function get(string $names): GrantTypeInterface
     {
-        Assertion::true($this->hasGrantType($names), sprintf('The grant type \'%s\' is not supported.', $names));
+        Assertion::true($this->has($names), sprintf('The grant type \'%s\' is not supported.', $names));
 
-        return $this->grant_types[$names];
+        return $this->grantTypes[$names];
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSupportedGrantTypes()
+    public function getSupportedGrantTypes(): array
     {
-        return array_keys($this->grant_types);
+        return array_keys($this->grantTypes);
     }
 }

@@ -69,18 +69,6 @@ class UserAccountRepository implements UserAccountRepositoryInterface
     }
 
     /**
-     * @param UserAccount $userAccount
-     *
-     * @return self
-     */
-    public function save(UserAccount $userAccount): self
-    {
-        $this->userAccounts[$userAccount->getId()->getValue()] = $userAccount;
-
-        return $this;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function isPasswordCredentialsValid(UserAccount $user, string $password): bool

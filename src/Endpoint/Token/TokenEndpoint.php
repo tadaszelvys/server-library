@@ -20,7 +20,7 @@ use OAuth2\Command\AccessToken\CreateAccessTokenCommand;
 use OAuth2\DataTransporter;
 use OAuth2\GrantType\GrantTypeInterface;
 use OAuth2\Model\Client\Client;
-use OAuth2\Model\Scope\ScopeRepositoryInterface;
+use OAuth2\Model\Scope\ScopeRepository;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenType\TokenTypeInterface;
@@ -52,7 +52,7 @@ final class TokenEndpoint implements MiddlewareInterface
     private $commandBus;
 
     /**
-     * @var ScopeRepositoryInterface
+     * @var ScopeRepository
      */
     private $scopeRepository;
 
@@ -78,9 +78,9 @@ final class TokenEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param ScopeRepositoryInterface $scopeRepository
+     * @param ScopeRepository $scopeRepository
      */
-    public function enableScopeSupport(ScopeRepositoryInterface $scopeRepository)
+    public function enableScopeSupport(ScopeRepository $scopeRepository)
     {
         $this->scopeRepository = $scopeRepository;
     }

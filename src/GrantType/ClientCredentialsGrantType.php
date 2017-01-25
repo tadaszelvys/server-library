@@ -18,7 +18,7 @@ use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ClientCredentialsGrantType implements GrantTypeInterface
+final class ClientCredentialsGrantType implements GrantTypeInterface
 {
     /**
      * @var bool

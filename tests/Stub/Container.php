@@ -25,12 +25,14 @@ final class Container implements ContainerInterface
     /**
      * @param $service
      *
-     * @return mixed
+     * @return ContainerInterface
      */
     public function add($service)
     {
         $class = get_class($service);
         $this->services[$class] = $service;
+
+        return $this;
     }
 
     /**

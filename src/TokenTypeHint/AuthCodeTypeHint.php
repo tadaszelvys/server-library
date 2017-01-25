@@ -19,7 +19,7 @@ use OAuth2\Model\AuthCode\AuthCodeRepositoryInterface;
 use OAuth2\Model\Token\TokenId;
 use SimpleBus\Message\Bus\MessageBus;
 
-class AuthCodeTypeHint implements TokenTypeHintInterface
+final class AuthCodeTypeHint implements TokenTypeHintInterface
 {
     /**
      * @var AuthCodeRepositoryInterface
@@ -46,7 +46,7 @@ class AuthCodeTypeHint implements TokenTypeHintInterface
     /**
      * {@inheritdoc}
      */
-    public function getTokenTypeHint(): string
+    public function hint(): string
     {
         return 'auth_code';
     }

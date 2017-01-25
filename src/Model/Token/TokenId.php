@@ -13,39 +13,10 @@ declare(strict_types=1);
 
 namespace OAuth2\Model\Token;
 
-abstract class TokenId implements \JsonSerializable
+use OAuth2\Model\Id\Id;
+
+abstract class TokenId extends Id implements \JsonSerializable
 {
-    /**
-     * @var string
-     */
-    private $value;
-
-    /**
-     * TokenId constructor.
-     *
-     * @param $value
-     */
-    protected function __construct(string $value)
-    {
-        $this->value = $value;
-    }
-
-    /**
-     * @return string
-     */
-    public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString(): string
-    {
-        return $this->getValue();
-    }
-
     /**
      * {@inheritdoc}
      */

@@ -96,7 +96,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function find(AccessTokenId $tokenId)
     {
-        return array_key_exists($tokenId->getValue(), $this->accessTokens) ? $this->accessTokens[$tokenId->getValue()] : $this->loadAccessToken($tokenId);
+        return array_key_exists($tokenId->getValue(), $this->accessTokens) ? $this->accessTokens[$tokenId->getValue()] : null;
     }
 
     public function create(ResourceOwnerId $resourceOwnerId, ClientId $clientId, array $parameters, array $metadatas, array $scopes, \DateTimeImmutable $expiresAt, RefreshToken $refreshToken = null)
@@ -121,14 +121,5 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
             $this->eventRecorder->record($event);
         }
         $token->eraseMessages();
-    }
-
-    /**
-     * @param AccessTokenId $tokenId
-     *
-     * @return null|AccessToken
-     */
-    private function loadAccessToken(AccessTokenId $tokenId)
-    {
     }
 }

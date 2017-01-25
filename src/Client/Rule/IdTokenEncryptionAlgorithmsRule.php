@@ -14,42 +14,42 @@ declare(strict_types=1);
 namespace OAuth2\Client\Rule;
 
 use Assert\Assertion;
+use OAuth2\Model\IdToken\IdTokenRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccountId;
-use OAuth2\OpenIdConnect\IdTokenManagerInterface;
 
 final class IdTokenEncryptionAlgorithmsRule implements RuleInterface
 {
     /**
-     * @var IdTokenManagerInterface
+     * @var IdTokenRepositoryInterface
      */
-    private $id_token_manager;
+    private $idTokenRepository;
 
     /**
      * IdTokenAlgorithmsRule constructor.
      *
-     * @param \OAuth2\OpenIdConnect\IdTokenManagerInterface $id_token_manager
+     * @param IdTokenRepositoryInterface $idTokenRepository
      */
-    public function __construct(IdTokenManagerInterface $id_token_manager)
+    public function __construct(IdTokenRepositoryInterface $idTokenRepository)
     {
-        $this->id_token_manager = $id_token_manager;
+        $this->idTokenRepository = $idTokenRepository;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(array $command_parameters, array $validated_parameters, UserAccountId $userAccountId, callable $next)
+    public function handle(array $commandParameters, array $validatedParameters, UserAccountId $userAccountId, callable $next)
     {
-        if (array_key_exists('id_token_encrypted_response_alg', $command_parameters) && array_key_exists('id_token_encrypted_response_enc', $command_parameters)) {
-            Assertion::string($command_parameters['id_token_encrypted_response_alg'], 'Invalid parameter \'id_token_encrypted_response_alg\'. The value must be a string.');
-            Assertion::string($command_parameters['id_token_encrypted_response_enc'], 'Invalid parameter \'id_token_encrypted_response_enc\'. The value must be a string.');
-            Assertion::inArray($command_parameters['id_token_encrypted_response_alg'], $this->id_token_manager->getSupportedKeyEncryptionAlgorithms(), sprintf('The ID Token content encryption algorithm \'%s\' is not supported. Please choose one of the following algorithm: %s', $command_parameters['id_token_encrypted_response_alg'], implode(', ', $this->id_token_manager->getSupportedContentEncryptionAlgorithms())));
-            Assertion::inArray($command_parameters['id_token_encrypted_response_enc'], $this->id_token_manager->getSupportedContentEncryptionAlgorithms(), sprintf('The ID Token key encryption algorithm \'%s\' is not supported. Please choose one of the following algorithm: %s', $command_parameters['id_token_encrypted_response_enc'], implode(', ', $this->id_token_manager->getSupportedKeyEncryptionAlgorithms())));
-            $validated_parameters['id_token_encrypted_response_alg'] = $command_parameters['id_token_encrypted_response_alg'];
-            $validated_parameters['id_token_encrypted_response_enc'] = $command_parameters['id_token_encrypted_response_enc'];
-        } elseif (array_key_exists('id_token_encrypted_response_alg', $command_parameters) || array_key_exists('id_token_encrypted_response_enc', $command_parameters)) {
+        if (array_key_exists('id_token_encrypted_response_alg', $commandParameters) && array_key_exists('id_token_encrypted_response_enc', $commandParameters)) {
+            Assertion::string($commandParameters['id_token_encrypted_response_alg'], 'Invalid parameter \'id_token_encrypted_response_alg\'. The value must be a string.');
+            Assertion::string($commandParameters['id_token_encrypted_response_enc'], 'Invalid parameter \'id_token_encrypted_response_enc\'. The value must be a string.');
+            Assertion::inArray($commandParameters['id_token_encrypted_response_alg'], $this->idTokenRepository->getSupportedKeyEncryptionAlgorithms(), sprintf('The ID Token content encryption algorithm \'%s\' is not supported. Please choose one of the following algorithm: %s', $commandParameters['id_token_encrypted_response_alg'], implode(', ', $this->idTokenRepository->getSupportedContentEncryptionAlgorithms())));
+            Assertion::inArray($commandParameters['id_token_encrypted_response_enc'], $this->idTokenRepository->getSupportedContentEncryptionAlgorithms(), sprintf('The ID Token key encryption algorithm \'%s\' is not supported. Please choose one of the following algorithm: %s', $commandParameters['id_token_encrypted_response_enc'], implode(', ', $this->idTokenRepository->getSupportedKeyEncryptionAlgorithms())));
+            $validatedParameters['id_token_encrypted_response_alg'] = $commandParameters['id_token_encrypted_response_alg'];
+            $validatedParameters['id_token_encrypted_response_enc'] = $commandParameters['id_token_encrypted_response_enc'];
+        } elseif (array_key_exists('id_token_encrypted_response_alg', $commandParameters) || array_key_exists('id_token_encrypted_response_enc', $commandParameters)) {
             throw new \InvalidArgumentException('The parameters \'id_token_encrypted_response_alg\' and \'id_token_encrypted_response_enc\' must be set together');
         }
 
-        return $next($command_parameters, $validated_parameters, $userAccountId);
+        return $next($commandParameters, $validatedParameters, $userAccountId);
     }
 }

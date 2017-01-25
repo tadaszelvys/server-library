@@ -54,7 +54,7 @@ abstract class Token implements \JsonSerializable, ContainsRecordedMessages
     private $metadatas;
 
     /**
-     * @var null|\string[]
+     * @var null|string[]
      */
     private $scopes = null;
 
@@ -67,7 +67,7 @@ abstract class Token implements \JsonSerializable, ContainsRecordedMessages
      * @param \DateTimeImmutable $expiresAt
      * @param array              $parameters
      * @param array              $metadatas
-     * @param \string[]|null     $scopes
+     * @param string[]|null     $scopes
      */
     protected function __construct(TokenId $tokenId, ResourceOwnerId $resourceOwnerId, ClientId $clientId, \DateTimeImmutable $expiresAt, array $parameters, array $metadatas, array $scopes = null)
     {
@@ -190,7 +190,7 @@ abstract class Token implements \JsonSerializable, ContainsRecordedMessages
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getScopes(): array
     {
