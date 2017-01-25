@@ -32,7 +32,7 @@ interface UserAccountRepositoryInterface
      *
      * @return UserAccount|null
      */
-    public function getByUsername(string $username);
+    public function findByUsername(string $username);
 
     /**
      * Get the user account with the specified public ID.
@@ -41,5 +41,5 @@ interface UserAccountRepositoryInterface
      *
      * @return UserAccount|null
      */
-    public function getByPublicId(UserAccountId $publicId);
+    public function find(UserAccountId $publicId);
 }

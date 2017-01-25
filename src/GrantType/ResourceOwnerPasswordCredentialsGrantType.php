@@ -129,7 +129,7 @@ final class ResourceOwnerPasswordCredentialsGrantType implements GrantTypeInterf
         $username = $parsedBody['username'];
         $password = $parsedBody['password'];
 
-        $userAccount = $this->userAccountRepository->getByUsername($username);
+        $userAccount = $this->userAccountRepository->findByUsername($username);
         if (null === $userAccount || !$this->userAccountRepository->isPasswordCredentialsValid($userAccount, $password)) {
             throw new OAuth2Exception(
                 400,

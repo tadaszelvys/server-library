@@ -24,7 +24,7 @@ use OAuth2\Model\Scope\ScopeRepository;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\TokenType\TokenTypeInterface;
-use OAuth2\TokenType\TokenTypeManagerInterface;
+use OAuth2\TokenType\TokenTypeManager;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
 use Webmozart\Json\JsonEncoder;
@@ -42,7 +42,7 @@ final class TokenEndpoint implements MiddlewareInterface
     private $tokenEndpointExtensions = [];
 
     /**
-     * @var TokenTypeManagerInterface
+     * @var TokenTypeManager
      */
     private $tokenTypeManager;
 
@@ -64,12 +64,12 @@ final class TokenEndpoint implements MiddlewareInterface
     /**
      * TokenEndpoint constructor.
      *
-     * @param ResponseFactoryInterface  $responseFactory
-     * @param MessageBus                $commandBus
-     * @param TokenTypeManagerInterface $tokenTypeManager
-     * @param JsonEncoder               $encoder
+     * @param ResponseFactoryInterface $responseFactory
+     * @param MessageBus               $commandBus
+     * @param TokenTypeManager         $tokenTypeManager
+     * @param JsonEncoder              $encoder
      */
-    public function __construct(ResponseFactoryInterface $responseFactory, MessageBus $commandBus, TokenTypeManagerInterface $tokenTypeManager, JsonEncoder $encoder)
+    public function __construct(ResponseFactoryInterface $responseFactory, MessageBus $commandBus, TokenTypeManager $tokenTypeManager, JsonEncoder $encoder)
     {
         $this->responseFactory = $responseFactory;
         $this->commandBus = $commandBus;
@@ -163,17 +163,17 @@ final class TokenEndpoint implements MiddlewareInterface
          * @var TokenTypeInterface
          */
         $tokenType = $request->getAttribute('token_type');
-        if (!$grantTypeData->getClient()->isTokenTypeAllowed($tokenType->getTokenTypeName())) {
+        if (!$grantTypeData->getClient()->isTokenTypeAllowed($tokenType->name())) {
             throw new OAuth2Exception(
                 400,
                 [
                     'error'             => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST,
-                    'error_description' => sprintf('The token type \'%s\' is not allowed for the client.', $tokenType->getTokenTypeName()),
+                    'error_description' => sprintf('The token type \'%s\' is not allowed for the client.', $tokenType->name()),
                 ]
             );
         }
 
-        $info = $tokenType->getTokenTypeInformation();
+        $info = $tokenType->getInformation();
         foreach ($info as $k => $v) {
             $grantTypeData = $grantTypeData->withParameter($k, $v);
         }

@@ -61,6 +61,14 @@ use OAuth2\Endpoint\Token\TokenEndpoint;
 use OAuth2\Endpoint\TokenIntrospection\TokenIntrospectionEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationGetEndpoint;
 use OAuth2\Endpoint\TokenRevocation\TokenRevocationPostEndpoint;
+use OAuth2\Endpoint\UserInfo\ClaimSource\ClaimSourceManager;
+use OAuth2\Endpoint\UserInfo\ScopeSupport\AddressScopeSupport;
+use OAuth2\Endpoint\UserInfo\ScopeSupport\EmailScopeSupport;
+use OAuth2\Endpoint\UserInfo\ScopeSupport\PhoneScopeSupport;
+use OAuth2\Endpoint\UserInfo\ScopeSupport\ProfilScopeSupport;
+use OAuth2\Endpoint\UserInfo\ScopeSupport\UserInfoScopeSupportManager;
+use OAuth2\Endpoint\UserInfo\UserInfo;
+use OAuth2\Endpoint\UserInfo\UserInfoEndpoint;
 use OAuth2\Event\AccessToken\AccessTokenCreatedEvent;
 use OAuth2\Event\AccessToken\AccessTokenRevokedEvent;
 use OAuth2\Event\AuthCode\AuthCodeCreatedEvent;
@@ -115,6 +123,9 @@ use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use OAuth2\ResponseType\CodeResponseType;
 use OAuth2\ResponseType\ImplicitResponseType;
 use OAuth2\ResponseType\ResponseTypeManager;
+use OAuth2\Security\Handler\AccessTokenHandlerManager;
+use OAuth2\Middleware\OAuth2SecurityMiddleware;
+use OAuth2\Test\Stub\AccessTokenHandlerUsingRepository;
 use OAuth2\Test\Stub\AccessTokenRepository;
 use OAuth2\Test\Stub\AuthCodeRepository;
 use OAuth2\Test\Stub\AuthenticateResponseFactory;
@@ -124,6 +135,7 @@ use OAuth2\Test\Stub\ClientRepository;
 use OAuth2\Test\Stub\ClientSecretBasic;
 use OAuth2\Test\Stub\ClientSecretPost;
 use OAuth2\Test\Stub\Container;
+use OAuth2\Test\Stub\DistributedClaimSource;
 use OAuth2\Test\Stub\Event\AccessTokenCreatedEventHandler;
 use OAuth2\Test\Stub\Event\AccessTokenRevokedEventHandler;
 use OAuth2\Test\Stub\Event\AuthCodeCreatedEventHandler;
@@ -145,7 +157,6 @@ use OAuth2\TokenEndpointAuthMethod\None;
 use OAuth2\TokenEndpointAuthMethod\TokenEndpointAuthMethodManager;
 use OAuth2\TokenType\BearerToken;
 use OAuth2\TokenType\TokenTypeManager;
-use OAuth2\TokenType\TokenTypeManagerInterface;
 use OAuth2\TokenTypeHint\AccessTokenTypeHint;
 use OAuth2\TokenTypeHint\AuthCodeTypeHint;
 use OAuth2\TokenTypeHint\RefreshTokenTypeHint;
@@ -1987,19 +1998,19 @@ final class Application
     }
 
     /**
-     * @var null|TokenTypeManagerInterface
+     * @var null|TokenTypeManager
      */
     private $tokenTypeManager = null;
 
     /**
-     * @return TokenTypeManagerInterface
+     * @return TokenTypeManager
      */
-    public function getTokenTypeManager(): TokenTypeManagerInterface
+    public function getTokenTypeManager(): TokenTypeManager
     {
         if (null === $this->tokenTypeManager) {
             $this->tokenTypeManager = new TokenTypeManager();
-            $this->tokenTypeManager->addTokenType($this->getBearerTokenType());
-            $this->tokenTypeManager->addTokenType($this->getMacTokenType());
+            $this->tokenTypeManager->add($this->getBearerTokenType());
+            $this->tokenTypeManager->add($this->getMacTokenType());
         }
 
         return $this->tokenTypeManager;
@@ -2083,5 +2094,146 @@ final class Application
         }
 
         return $this->createAccessTokenCommandHandler;
+    }
+
+    /**
+     * @var null|UserInfoEndpoint
+     */
+    private $userInfoEndpoint = null;
+
+    /**
+     * @return UserInfoEndpoint
+     */
+    public function getUserInfoEndpoint(): UserInfoEndpoint
+    {
+        if (null === $this->userInfoEndpoint) {
+            $this->userInfoEndpoint = new UserInfoEndpoint(
+                $this->getUserinfo(),
+                $this->getClientRepository(),
+                $this->getUserAccountRepository()
+            );
+        }
+
+        return $this->userInfoEndpoint;
+    }
+
+    /**
+     * @var null|UserInfo
+     */
+    private $userInfo = null;
+
+    /**
+     * @return UserInfo
+     */
+    public function getUserInfo(): UserInfo
+    {
+        if (null === $this->userInfo) {
+            $this->userInfo = new UserInfo(
+                $this->getUserInfoScopeSupportManager(),
+                $this->getClaimSourceManager()
+            );
+        }
+
+        return $this->userInfo;
+    }
+
+    /**
+     * @var null|UserInfoScopeSupportManager
+     */
+    private $userInfoScopeSupportManager = null;
+
+    /**
+     * @return UserInfoScopeSupportManager
+     */
+    public function getUserInfoScopeSupportManager(): UserInfoScopeSupportManager
+    {
+        if (null === $this->userInfoScopeSupportManager) {
+            $this->userInfoScopeSupportManager = new UserInfoScopeSupportManager();
+            $this->userInfoScopeSupportManager->add(new AddressScopeSupport());
+            $this->userInfoScopeSupportManager->add(new EmailScopeSupport());
+            $this->userInfoScopeSupportManager->add(new PhoneScopeSupport());
+            $this->userInfoScopeSupportManager->add(new ProfilScopeSupport());
+        }
+
+        return $this->userInfoScopeSupportManager;
+    }
+
+    /**
+     * @var null|ClaimSourceManager
+     */
+    private $claimSourceManager = null;
+
+    /**
+     * @return ClaimSourceManager
+     */
+    public function getClaimSourceManager(): ClaimSourceManager
+    {
+        if (null === $this->claimSourceManager) {
+            $this->claimSourceManager = new ClaimSourceManager();
+            $this->claimSourceManager->add(new DistributedClaimSource());
+        }
+
+        return $this->claimSourceManager;
+    }
+
+    /**
+     * @var null|Pipe
+     */
+    private $userInfoEndpointPipe = null;
+
+    /**
+     * @return Pipe
+     */
+    public function getUserInfoEndpointPipe(): Pipe
+    {
+        if (null === $this->userInfoEndpointPipe) {
+            $this->userInfoEndpointPipe = new Pipe();
+            $this->userInfoEndpointPipe->appendMiddleware($this->getOAuth2ResponseMiddleware());
+            $this->userInfoEndpointPipe->appendMiddleware($this->getSecurityMiddleware());
+            $this->userInfoEndpointPipe->appendMiddleware($this->getUserInfoEndpoint());
+        }
+
+        return $this->userInfoEndpointPipe;
+    }
+
+    /**
+     * @var null|OAuth2SecurityMiddleware
+     */
+    private $securityMiddleware = null;
+
+    /**
+     * @return OAuth2SecurityMiddleware
+     */
+    public function getSecurityMiddleware(): OAuth2SecurityMiddleware
+    {
+        if (null === $this->securityMiddleware) {
+            $this->securityMiddleware = new OAuth2SecurityMiddleware(
+                $this->getTokenTypeManager(),
+                $this->getAccessTokenHandlerManager(),
+                'openid'
+            );
+        }
+
+        return $this->securityMiddleware;
+    }
+
+    /**
+     * @var null|AccessTokenHandlerManager
+     */
+    private $accessTokenHandlerManager = null;
+
+    /**
+     * @return AccessTokenHandlerManager
+     */
+    public function getAccessTokenHandlerManager(): AccessTokenHandlerManager
+    {
+        if (null === $this->accessTokenHandlerManager) {
+            $this->accessTokenHandlerManager = new AccessTokenHandlerManager();
+            $this->accessTokenHandlerManager->add(new AccessTokenHandlerUsingRepository(
+                $this->getAccessTokenRepository()
+            ));
+        }
+
+        return $this->accessTokenHandlerManager;
     }
 }

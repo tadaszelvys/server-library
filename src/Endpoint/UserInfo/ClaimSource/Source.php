@@ -11,14 +11,16 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Model\ClaimSource;
+namespace OAuth2\Endpoint\UserInfo\ClaimSource;
 
-class Source implements SourceInterface
+use Assert\Assertion;
+
+final class Source
 {
     /**
      * @var string[]
      */
-    private $available_claims = [];
+    private $availableClaims = [];
 
     /**
      * @var array
@@ -28,27 +30,29 @@ class Source implements SourceInterface
     /**
      * Source constructor.
      *
-     * @param string[] $available_claims
+     * @param string[] $availableClaims
      * @param array    $source
      */
-    public function __construct(array $available_claims, array $source)
+    public function __construct(array $availableClaims, array $source)
     {
-        $this->available_claims = $available_claims;
+        Assertion::notEmpty($availableClaims);
+        Assertion::notEmpty($source);
+        $this->availableClaims = $availableClaims;
         $this->source = $source;
     }
 
     /**
      * @return string[]
      */
-    public function getAvailableClaims()
+    public function getAvailableClaims(): array
     {
-        return $this->available_claims;
+        return $this->availableClaims;
     }
 
     /**
      * @return array
      */
-    public function getSource()
+    public function getSource(): array
     {
         return $this->source;
     }

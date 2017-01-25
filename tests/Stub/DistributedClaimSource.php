@@ -13,9 +13,8 @@ declare(strict_types=1);
 
 namespace OAuth2\Test\Stub;
 
-use OAuth2\Model\ClaimSource\ClaimSourceInterface;
-use OAuth2\Model\ClaimSource\Source;
-use OAuth2\Model\ClaimSource\SourceInterface;
+use OAuth2\Endpoint\UserInfo\ClaimSource\ClaimSourceInterface;
+use OAuth2\Endpoint\UserInfo\ClaimSource\Source;
 use OAuth2\Model\UserAccount\UserAccount;
 
 class DistributedClaimSource implements ClaimSourceInterface
@@ -23,7 +22,7 @@ class DistributedClaimSource implements ClaimSourceInterface
     /**
      * {@inheritdoc}
      */
-    public function getUserInfo(UserAccount $userAccount, array $scope, array $claims): SourceInterface
+    public function getUserInfo(UserAccount $userAccount, array $scope, array $claims)
     {
         if ('user2' === $userAccount->getId()->getValue()) {
             $claims = ['address', 'email', 'email_verified'];

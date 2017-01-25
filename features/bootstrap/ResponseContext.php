@@ -197,6 +197,14 @@ class ResponseContext implements Context
         Assertion::regex($content, $pattern);
     }
 
+    /**
+     * @Then the content type of the response is :content_type
+     */
+    public function theContentTypeOfTheResponseIs($content_type)
+    {
+        Assertion::eq($content_type, $this->getResponse()->getHeader('Content-Type'));
+    }
+
     private function rewind()
     {
         if (true === $this->getResponse()->getBody()->isSeekable()) {

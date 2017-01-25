@@ -3,8 +3,8 @@ Feature: The authorization server has an Userinfo Endpoint
   Scenario: No access token in the request
     When a client send a Userinfo request without access token
     Then the response contains an error with code 401
-    And the error is "xxx"
-    And the error description is "XXX."
+    And the error is "invalid_token"
+    And the error description is "Access token required."
 
   Scenario: I have a valid access token in the request header
     When a client sends a valid Userinfo request

@@ -15,7 +15,7 @@ namespace OAuth2\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use OAuth2\TokenType\TokenTypeManagerInterface;
+use OAuth2\TokenType\TokenTypeManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class TokenTypeMiddleware implements MiddlewareInterface
@@ -26,17 +26,17 @@ final class TokenTypeMiddleware implements MiddlewareInterface
     private $tokenTypeParameterAllowed;
 
     /**
-     * @var TokenTypeManagerInterface
+     * @var TokenTypeManager
      */
     private $tokenTypeManager;
 
     /**
      * ClientAuthenticationMiddleware constructor.
      *
-     * @param TokenTypeManagerInterface $tokenTypeManager
-     * @param bool                      $tokenTypeParameterAllowed
+     * @param TokenTypeManager $tokenTypeManager
+     * @param bool             $tokenTypeParameterAllowed
      */
-    public function __construct(TokenTypeManagerInterface $tokenTypeManager, bool $tokenTypeParameterAllowed)
+    public function __construct(TokenTypeManager $tokenTypeManager, bool $tokenTypeParameterAllowed)
     {
         $this->tokenTypeManager = $tokenTypeManager;
     }
@@ -61,9 +61,9 @@ final class TokenTypeMiddleware implements MiddlewareInterface
     {
         $params = $request->getParsedBody();
         if (true === $this->tokenTypeParameterAllowed && array_key_exists('token_type', $params)) {
-            return $this->tokenTypeManager->getTokenType($params['token_type']);
+            return $this->tokenTypeManager->get($params['token_type']);
         } else {
-            return $this->tokenTypeManager->getDefaultTokenType();
+            return $this->tokenTypeManager->getDefault();
         }
     }
 }

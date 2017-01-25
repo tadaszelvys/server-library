@@ -21,8 +21,10 @@ use Jose\JWTCreatorInterface;
 use Jose\Object\JWKSetInterface;
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\Client\Client;
-use OAuth2\Model\Client\ClientId;
+use OAuth2\Model\Client\ClientRepositoryInterface;
 use OAuth2\Model\UserAccount\UserAccount;
+use OAuth2\Model\UserAccount\UserAccountId;
+use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -55,13 +57,27 @@ class UserInfoEndpoint implements MiddlewareInterface
     private $issuer;
 
     /**
+     * @var ClientRepositoryInterface
+     */
+    private $clientRepository;
+
+    /**
+     * @var UserAccountRepositoryInterface
+     */
+    private $userAccountRepository;
+
+    /**
      * UserInfoEndpoint constructor.
      *
-     * @param UserInfo $userinfo
+     * @param UserInfo                       $userinfo
+     * @param ClientRepositoryInterface      $clientRepository
+     * @param UserAccountRepositoryInterface $userAccountRepository
      */
-    public function __construct(UserInfo $userinfo)
+    public function __construct(UserInfo $userinfo, ClientRepositoryInterface $clientRepository, UserAccountRepositoryInterface $userAccountRepository)
     {
         $this->userinfo = $userinfo;
+        $this->clientRepository = $clientRepository;
+        $this->userAccountRepository = $userAccountRepository;
     }
 
     /**
@@ -114,22 +130,25 @@ class UserInfoEndpoint implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        $access_token = $request->getAttribute('access_token');
+        /**
+         * @var AccessToken $accessToken
+         */
+        $accessToken = $request->getAttribute('access_token');
 
-        $this->checkScope($access_token->getScope());
-        $this->checkHasRedirectUri($access_token);
+        $this->checkScope($accessToken);
+        $this->checkRedirectUri($accessToken);
 
-        $client = $this->getClient($access_token);
-        $user = $this->getUserAccount($access_token);
-        $endpoint_claims = $this->getEndpointClaims($access_token);
+        $client = $this->getClient($accessToken);
+        $user = $this->getUserAccount($accessToken);
+        $endpoint_claims = $this->getEndpointClaims($accessToken);
 
         $claims = $this->userinfo->getUserinfo(
             $client,
             $user,
-            $access_token->getMetadata('redirect_uri'),
-            $access_token->hasMetadata('claims_locales') ? $access_token->getMetadata('claims_locales') : null,
+            $accessToken->getMetadata('redirect_uri'),
+            $accessToken->hasMetadata('claims_locales') ? $accessToken->getMetadata('claims_locales') : null,
             $endpoint_claims,
-            $access_token->getScope()
+            $accessToken->getScopes()
         );
 
         if (true === $this->isSignedResponsesSupportEnabled()) {
@@ -141,7 +160,7 @@ class UserInfoEndpoint implements MiddlewareInterface
                     'aud'       => [$this->issuer, $client->getId()],
                     'iat'       => time(),
                     'nbf'       => time(),
-                    'exp'       => $access_token->getExpiresAt(),
+                    'exp'       => $accessToken->getExpiresAt(),
                 ]
             );
 
@@ -152,17 +171,17 @@ class UserInfoEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param AccessToken $access_token
+     * @param AccessToken $accessToken
      *
      * @return array
      */
-    private function getEndpointClaims(AccessToken $access_token): array
+    private function getEndpointClaims(AccessToken $accessToken): array
     {
-        if (!$access_token->hasMetadata('requested_claims')) {
+        if (!$accessToken->hasMetadata('requested_claims')) {
             return [];
         }
 
-        $requested_claims = $access_token->getMetadata('requested_claims');
+        $requested_claims = $accessToken->getMetadata('requested_claims');
         if (true === array_key_exists('userinfo', $requested_claims)) {
             return $requested_claims['userinfo'];
         }
@@ -171,33 +190,33 @@ class UserInfoEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param AccessToken $access_token
+     * @param AccessToken $accessToken
      *
      * @throws OAuth2Exception
      *
-     * @return null|ClientId
+     * @return null|Client
      */
-    private function getClient(AccessToken $access_token): ClientId
+    private function getClient(AccessToken $accessToken): Client
     {
-        $clientId = $access_token->getClientId();
-        if (null === $clientId) {
+        $clientId = $accessToken->getClientId();
+        if (null === $clientId || null === $client = $this->clientRepository->find($clientId)) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the client.']);
         }
 
-        return $clientId;
+        return $client;
     }
 
     /**
-     * @param AccessToken $access_token
+     * @param AccessToken $accessToken
      *
      * @throws OAuth2Exception
      *
      * @return UserAccount
      */
-    private function getUserAccount(AccessToken $access_token): UserAccount
+    private function getUserAccount(AccessToken $accessToken): UserAccount
     {
-        $userAccount = $access_token->getResourceOwnerId();
-        if (!$userAccount instanceof UserAccount) {
+        $userAccountId = $accessToken->getResourceOwnerId();
+        if (!$userAccountId instanceof UserAccountId || null === $userAccount = $this->userAccountRepository->find($userAccountId)) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'Unable to find the resource owner.']);
         }
 
@@ -242,25 +261,25 @@ class UserInfoEndpoint implements MiddlewareInterface
     }
 
     /**
-     * @param AccessToken $access_token
+     * @param AccessToken $accessToken
      *
      * @throws OAuth2Exception
      */
-    private function checkHasRedirectUri(AccessToken $access_token)
+    private function checkRedirectUri(AccessToken $accessToken)
     {
-        if (!$access_token->hasMetadata('redirect_uri')) {
+        if (!$accessToken->hasMetadata('redirect_uri')) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token has been issued through the authorization endpoint and cannot be used.']);
         }
     }
 
     /**
-     * @param string[] $scope
+     * @param AccessToken $accessToken
      *
      * @throws OAuth2Exception
      */
-    private function checkScope(array $scope)
+    private function checkScope(AccessToken $accessToken)
     {
-        if (!in_array('openid', $scope)) {
+        if (!$accessToken->hasScope('openid')) {
             throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManagerInterface::ERROR_INVALID_REQUEST, 'error_description' => 'The access token does not contain the \'openid\' scope.']);
         }
     }

@@ -11,7 +11,7 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\Model\ClaimSource;
+namespace OAuth2\Endpoint\UserInfo\ClaimSource;
 
 use OAuth2\Model\UserAccount\UserAccount;
 
@@ -22,7 +22,7 @@ interface ClaimSourceInterface
      * @param string[]    $scope
      * @param array       $claims
      *
-     * @return SourceInterface
+     * @return Source|null
      */
-    public function getUserInfo(UserAccount $userAccount, array $scope, array $claims): SourceInterface;
+    public function getUserInfo(UserAccount $userAccount, array $scope, array $claims);
 }

@@ -83,15 +83,15 @@ class UserAccountRepository implements UserAccountRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getByUsername(string $username)
+    public function findByUsername(string $username)
     {
-        return $this->getByPublicId(UserAccountId::create($username));
+        return $this->find(UserAccountId::create($username));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getByPublicId(UserAccountId $publicId)
+    public function find(UserAccountId $publicId)
     {
         return isset($this->userAccounts[$publicId->getValue()]) ? $this->userAccounts[$publicId->getValue()] : null;
     }

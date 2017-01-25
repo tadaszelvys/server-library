@@ -15,7 +15,7 @@ namespace OAuth2\Endpoint\UserInfo;
 
 use Assert\Assertion;
 use OAuth2\Endpoint\UserInfo\ScopeSupport\UserInfoScopeSupportManager;
-use OAuth2\Model\ClaimSource\ClaimSourceManagerInterface;
+use OAuth2\Endpoint\UserInfo\ClaimSource\ClaimSourceManager;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\OpenIdConnect\Pairwise\PairwiseSubjectIdentifierAlgorithmInterface;
@@ -41,7 +41,7 @@ final class UserInfo
     private $userinfoScopeSupportManager;
 
     /**
-     * @var ClaimSourceManagerInterface
+     * @var ClaimSourceManager
      */
     private $claimSourceManager;
 
@@ -49,9 +49,9 @@ final class UserInfo
      * UserInfo constructor.
      *
      * @param UserInfoScopeSupportManager $userinfoScopeSupportManager
-     * @param ClaimSourceManagerInterface          $claimSourceManager
+     * @param ClaimSourceManager          $claimSourceManager
      */
-    public function __construct(UserInfoScopeSupportManager $userinfoScopeSupportManager, ClaimSourceManagerInterface $claimSourceManager)
+    public function __construct(UserInfoScopeSupportManager $userinfoScopeSupportManager, ClaimSourceManager $claimSourceManager)
     {
         $this->userinfoScopeSupportManager = $userinfoScopeSupportManager;
         $this->claimSourceManager = $claimSourceManager;

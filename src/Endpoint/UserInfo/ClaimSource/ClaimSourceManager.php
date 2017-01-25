@@ -11,48 +11,54 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace OAuth2\OpenIdConnect\ClaimSource;
-
-namespace OAuth2\Model\ClaimSource;
+namespace OAuth2\Endpoint\UserInfo\ClaimSource;
 
 use OAuth2\Model\UserAccount\UserAccount;
 
-class ClaimSourceManager implements ClaimSourceManagerInterface
+final class ClaimSourceManager
 {
     /**
      * @var ClaimSourceInterface[]
      */
-    private $claim_sources = [];
+    private $claimSources = [];
 
     /**
-     * @param ClaimSourceInterface $claim_source
+     * @param ClaimSourceInterface $claimSource
+     *
+     * @return ClaimSourceManager
      */
-    public function addClaimSource(ClaimSourceInterface $claim_source)
+    public function add(ClaimSourceInterface $claimSource): ClaimSourceManager
     {
-        $this->claim_sources[] = $claim_source;
+        $this->claimSources[] = $claimSource;
+
+        return $this;
     }
 
     /**
      * @return ClaimSourceInterface[]
      */
-    public function getClaimSources()
+    public function all(): array
     {
-        return $this->claim_sources;
+        return $this->claimSources;
     }
 
     /**
-     * {@inheritdoc}
+     * @param UserAccount $userAccount
+     * @param string[]    $scope
+     * @param array       $claims
+     *
+     * @return array
      */
     public function getUserInfo(UserAccount $userAccount, array $scope, array $claims)
     {
         $claims = [
             '_claim_names'   => [],
-            '_claim_sources' => [],
+            '_claimSources' => [],
         ];
         $i = 0;
 
-        foreach ($this->getClaimSources() as $claim_source) {
-            $result = $claim_source->getUserInfo($userAccount, $scope, $claims);
+        foreach ($this->all() as $claimSource) {
+            $result = $claimSource->getUserInfo($userAccount, $scope, $claims);
             if (null !== $result) {
                 $i++;
                 $src = sprintf('src%d', $i);
@@ -66,7 +72,7 @@ class ClaimSourceManager implements ClaimSourceManagerInterface
                     $claims['_claim_names'],
                     $_claim_names
                 );
-                $claims['_claim_sources'][$src] = $result->getSource();
+                $claims['_claimSources'][$src] = $result->getSource();
             }
         }
 
