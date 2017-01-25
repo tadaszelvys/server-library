@@ -59,7 +59,7 @@ final class ClientParameterRemovedEvent extends Event
     {
         return [
             'client_id' => $this->clientId,
-            'key' => $this->key,
+            'key'       => $this->key,
         ];
     }
 }

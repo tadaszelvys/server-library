@@ -16,8 +16,8 @@ class Uri
     /**
      * Checks if the URI matches one of stored URIs.
      *
-     * @param string $uri                    The URI to check
-     * @param array  $storedUris             A list of stored URIs
+     * @param string $uri                  The URI to check
+     * @param array  $storedUris           A list of stored URIs
      * @param bool   $pathTraversalAllowed
      *
      * @return bool

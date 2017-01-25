@@ -75,7 +75,7 @@ final class CreateAccessTokenCommand extends CommandWithDataTransporter
 
     /**
      * @param ResourceOwnerId    $resourceOwnerId
-     * @param ClientId             $clientId
+     * @param ClientId           $clientId
      * @param array              $parameters
      * @param array              $metadatas
      * @param array              $scopes

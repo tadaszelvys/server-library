@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace OAuth2\Event\AuthCode;
 
-use OAuth2\Model\AuthCode\AuthCode;
 use OAuth2\Model\AuthCode\AuthCodeId;
 use OAuth2\Model\Client\ClientId;
 use OAuth2\Model\Event\Event;
@@ -118,14 +117,14 @@ final class AuthCodeCreatedEvent extends Event
     public function getPayload()
     {
         return [
-            'auth_code_id' => $this->authCodeId,
-            'user_account_id' => $this->userAccountId,
-            'client_id' => $this->clientId,
-            'expires_at' => $this->expiresAt->getTimestamp(),
-            'parameters' => $this->parameters,
-            'metadatas' => $this->metadatas,
-            'scopes' => $this->scopes,
-            'redirect_uri' => $this->redirectUri,
+            'auth_code_id'     => $this->authCodeId,
+            'user_account_id'  => $this->userAccountId,
+            'client_id'        => $this->clientId,
+            'expires_at'       => $this->expiresAt->getTimestamp(),
+            'parameters'       => $this->parameters,
+            'metadatas'        => $this->metadatas,
+            'scopes'           => $this->scopes,
+            'redirect_uri'     => $this->redirectUri,
             'query_parameters' => $this->queryParameters,
         ];
     }

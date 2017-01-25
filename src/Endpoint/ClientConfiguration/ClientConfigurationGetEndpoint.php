@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace OAuth2\Endpoint\ClientConfiguration;
 
-use Webmozart\Json\JsonEncoder;
 use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;
+use Webmozart\Json\JsonEncoder;
 
 final class ClientConfigurationGetEndpoint implements MiddlewareInterface
 {

@@ -38,7 +38,7 @@ class PreConfiguredAuthorizationExtension implements AuthorizationEndpointExtens
     /**
      * PreConfiguredAuthorizationExtension constructor.
      *
-     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface                                               $response_factory
+     * @param \OAuth2\Response\OAuth2ResponseFactoryManagerInterface                                                  $response_factory
      * @param \OAuth2\Endpoint\Authorization\PreConfiguredAuthorization\PreConfiguredAuthorizationRepositoryInterface $pre_configured_authorization_manager
      */
     public function __construct(OAuth2ResponseFactoryManagerInterface $response_factory, PreConfiguredAuthorizationRepositoryInterface $pre_configured_authorization_manager)

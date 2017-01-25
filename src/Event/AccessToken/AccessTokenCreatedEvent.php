@@ -21,7 +21,6 @@ use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 
 final class AccessTokenCreatedEvent extends Event
 {
-
     /**
      * @var AccessTokenId
      */
@@ -89,14 +88,14 @@ final class AccessTokenCreatedEvent extends Event
     }
 
     /**
-     * @param AccessTokenId      $accessTokenId
-     * @param ResourceOwnerId      $resourceOwnerId
-     * @param ClientId             $clientId
-     * @param array              $parameters
-     * @param array              $metadatas
-     * @param array              $scopes
-     * @param \DateTimeImmutable $expiresAt
-     * @param RefreshTokenId|null  $refreshTokenId
+     * @param AccessTokenId       $accessTokenId
+     * @param ResourceOwnerId     $resourceOwnerId
+     * @param ClientId            $clientId
+     * @param array               $parameters
+     * @param array               $metadatas
+     * @param array               $scopes
+     * @param \DateTimeImmutable  $expiresAt
+     * @param RefreshTokenId|null $refreshTokenId
      *
      * @return self
      */
@@ -112,13 +111,13 @@ final class AccessTokenCreatedEvent extends Event
     {
         return [
             'access_token_id' => $this->accessTokenId,
-            'resource_owner' => $this->resourceOwnerId,
-            'clientId' => $this->clientId,
-            'parameters' => $this->parameters,
-            'metadatas' => $this->metadatas,
-            'scopes' => $this->scopes,
-            'expires_at' => $this->expiresAt->getTimestamp(),
-            'refresh_token' => $this->refreshTokenId ? $this->refreshTokenId : null,
+            'resource_owner'  => $this->resourceOwnerId,
+            'clientId'        => $this->clientId,
+            'parameters'      => $this->parameters,
+            'metadatas'       => $this->metadatas,
+            'scopes'          => $this->scopes,
+            'expires_at'      => $this->expiresAt->getTimestamp(),
+            'refresh_token'   => $this->refreshTokenId ? $this->refreshTokenId : null,
         ];
     }
 }

@@ -100,13 +100,13 @@ final class RefreshTokenCreatedEvent extends Event
     public function getPayload()
     {
         return [
-            'refresh_token_id' => $this->refreshTokenId,
+            'refresh_token_id'  => $this->refreshTokenId,
             'resource_owner_id' => $this->resourceOwnerId,
-            'client_id' => $this->clientId,
-            'parameters' => $this->parameters,
-            'expires_at' => $this->expiresAt->getTimestamp(),
-            'scopes' => $this->scopes,
-            'metadatas' => $this->metadatas,
+            'client_id'         => $this->clientId,
+            'parameters'        => $this->parameters,
+            'expires_at'        => $this->expiresAt->getTimestamp(),
+            'scopes'            => $this->scopes,
+            'metadatas'         => $this->metadatas,
         ];
     }
 }

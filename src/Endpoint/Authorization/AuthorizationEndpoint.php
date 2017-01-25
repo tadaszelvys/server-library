@@ -58,7 +58,7 @@ abstract class AuthorizationEndpoint implements MiddlewareInterface
     abstract protected function isCurrentUserFullyAuthenticated(): bool;
 
     /**
-     * @param Authorization                            $authorization
+     * @param Authorization          $authorization
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
@@ -66,7 +66,7 @@ abstract class AuthorizationEndpoint implements MiddlewareInterface
     abstract protected function redirectToLoginPage(Authorization $authorization, ServerRequestInterface $request): ResponseInterface;
 
     /**
-     * @param Authorization                            $authorization
+     * @param Authorization          $authorization
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface

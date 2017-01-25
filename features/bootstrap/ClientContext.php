@@ -11,12 +11,11 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
-use Behat\Behat\Context\Context;
 use Assert\Assertion;
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use OAuth2\Model\Client\Client;
 use OAuth2\Model\Client\ClientId;
-use OAuth2\Model\UserAccount\UserAccount;
 use OAuth2\Model\UserAccount\UserAccountId;
 
 /**

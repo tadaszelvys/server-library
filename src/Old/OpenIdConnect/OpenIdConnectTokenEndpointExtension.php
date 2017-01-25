@@ -19,7 +19,6 @@ use OAuth2\Endpoint\Token\GrantTypeData;
 use OAuth2\Endpoint\Token\TokenEndpointExtensionInterface;
 use OAuth2\Model\AccessToken\AccessToken;
 use OAuth2\Model\AuthCode\AuthCode;
-use OAuth2\Model\IdToken\IdToken;
 use OAuth2\Model\UserAccount\UserAccount;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleBus\Message\Bus\MessageBus;

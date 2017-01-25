@@ -67,8 +67,8 @@ final class ClientParameterUpdatedEvent extends Event
     {
         return [
             'client_id' => $this->clientId,
-            'key' => $this->key,
-            'value' => $this->value,
+            'key'       => $this->key,
+            'value'     => $this->value,
         ];
     }
 }

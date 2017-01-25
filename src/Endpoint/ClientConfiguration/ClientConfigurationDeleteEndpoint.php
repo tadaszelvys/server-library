@@ -51,7 +51,7 @@ final class ClientConfigurationDeleteEndpoint implements MiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $next)
     {
         /**
-         * @var $client Client
+         * @var Client
          */
         $client = $request->getAttribute('client');
         $id = $client->getId();

@@ -56,8 +56,8 @@ final class Client extends ResourceOwner
     }
 
     /**
-     * @param ClientId    $id
-     * @param array       $parameter
+     * @param ClientId      $id
+     * @param array         $parameter
      * @param UserAccountId $userAccountId
      *
      * @return self

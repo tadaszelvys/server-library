@@ -50,7 +50,7 @@ final class AuthCodeWithRefreshTokenEvent extends Event
     public function getPayload()
     {
         return [
-            'auth_code_id' => $this->authCodeId
+            'auth_code_id' => $this->authCodeId,
         ];
     }
 }

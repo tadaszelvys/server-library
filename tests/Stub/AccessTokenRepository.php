@@ -38,6 +38,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 
     /**
      * AccessTokenRepository constructor.
+     *
      * @param RecordsMessages $eventRecorder
      */
     public function __construct(RecordsMessages $eventRecorder)

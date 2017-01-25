@@ -13,10 +13,6 @@ declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Tester\Exception\PendingException;
-use OAuth2\Model\AccessToken\AccessToken;
-use OAuth2\Model\AccessToken\AccessTokenId;
-
 
 class IntrospectionContext implements Context
 {

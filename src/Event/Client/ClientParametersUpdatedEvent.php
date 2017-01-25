@@ -32,7 +32,7 @@ final class ClientParametersUpdatedEvent extends Event
      * ClientCreatedEvent constructor.
      *
      * @param ClientId $clientId
-     * @param array $parameters
+     * @param array    $parameters
      */
     protected function __construct(ClientId $clientId, array $parameters)
     {
@@ -43,7 +43,7 @@ final class ClientParametersUpdatedEvent extends Event
 
     /**
      * @param ClientId $clientId
-     * @param array $parameters
+     * @param array    $parameters
      *
      * @return ClientParametersUpdatedEvent
      */
@@ -58,7 +58,7 @@ final class ClientParametersUpdatedEvent extends Event
     public function getPayload()
     {
         return [
-            'client_id' => $this->clientId,
+            'client_id'  => $this->clientId,
             'parameters' => $this->parameters,
         ];
     }

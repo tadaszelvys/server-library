@@ -84,17 +84,11 @@ final class AuthorizationRequestLoader
         $this->clientRepository = $clientRepository;
     }
 
-    /**
-     *
-     */
     public function enableRequestUriRegistrationRequirement()
     {
         $this->requireRequestUriRegistration = true;
     }
 
-    /**
-     *
-     */
     public function disableRequestUriRegistrationRequirement()
     {
         $this->requireRequestUriRegistration = false;
@@ -172,7 +166,7 @@ final class AuthorizationRequestLoader
 
     /**
      * @param JWKSetInterface $keyEncryptionKeySet
-     * @param bool $requireEncryption
+     * @param bool            $requireEncryption
      */
     public function enableEncryptedRequestObjectSupport(JWKSetInterface $keyEncryptionKeySet, bool $requireEncryption)
     {
@@ -282,7 +276,7 @@ final class AuthorizationRequestLoader
 
     /**
      * @param Client $client
-     * @param string                         $requestUri
+     * @param string $requestUri
      *
      * @throws OAuth2Exception
      */
@@ -328,8 +322,8 @@ final class AuthorizationRequestLoader
     }
 
     /**
-     * @param array                               $params
-     * @param string                              $request
+     * @param array       $params
+     * @param string      $request
      * @param Client|null $client
      *
      * @throws OAuth2Exception

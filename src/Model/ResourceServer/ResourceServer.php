@@ -16,7 +16,7 @@ namespace OAuth2\Model\ResourceServer;
 use SimpleBus\Message\Recorder\ContainsRecordedMessages;
 use SimpleBus\Message\Recorder\PrivateMessageRecorderCapabilities;
 
-final class ResourceServer implements  ContainsRecordedMessages
+final class ResourceServer implements ContainsRecordedMessages
 {
     use PrivateMessageRecorderCapabilities;
 

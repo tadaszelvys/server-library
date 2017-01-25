@@ -115,8 +115,8 @@ class RedirectUriParameterChecker implements ParameterCheckerInterface
 
     /**
      * @param Client $client
-     * @param string                         $redirectUri
-     * @param array                          $parameters
+     * @param string $redirectUri
+     * @param array  $parameters
      */
     public function checkRedirectUriForTheClient(Client $client, $redirectUri, array $parameters)
     {

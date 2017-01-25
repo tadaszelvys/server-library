@@ -67,9 +67,9 @@ final class ClientCreatedEvent extends Event
     public function getPayload()
     {
         return [
-            'client_id' => $this->clientId,
+            'client_id'       => $this->clientId,
             'user_account_id' => $this->userAccountId,
-            'metadatas' => $this->metadatas,
+            'metadatas'       => $this->metadatas,
         ];
     }
 }

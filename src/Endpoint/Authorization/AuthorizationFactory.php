@@ -73,17 +73,11 @@ final class AuthorizationFactory
         return $this->responseModeParameterInAuthorizationRequestEnabled;
     }
 
-    /**
-     *
-     */
     public function enableResponseModeParameterSupport()
     {
         $this->responseModeParameterInAuthorizationRequestEnabled = true;
     }
 
-    /**
-     *
-     */
     public function disableResponseModeParameterSupport()
     {
         $this->responseModeParameterInAuthorizationRequestEnabled = false;

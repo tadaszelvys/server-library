@@ -28,7 +28,7 @@ class IdTokenHintExtension implements AuthorizationEndpointExtensionInterface
     /**
      * IdTokenHintExtension constructor.
      *
-     * @param IdTokenRepositoryInterface $id_token_manager
+     * @param IdTokenRepositoryInterface     $id_token_manager
      * @param UserAccountRepositoryInterface $user_account_manager
      */
     public function __construct(IdTokenRepositoryInterface $id_token_manager, UserAccountRepositoryInterface $user_account_manager)

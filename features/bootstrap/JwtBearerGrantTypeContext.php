@@ -11,8 +11,8 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
-use Behat\Behat\Context\Context;
 use Base64Url\Base64Url;
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use OAuth2\Model\Client\ClientId;
 
@@ -97,8 +97,8 @@ class JwtBearerGrantTypeContext implements Context
         $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody([
-            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-            'assertion'  => $this->generateValidAssertion(),
+            'grant_type'            => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion'             => $this->generateValidAssertion(),
             'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
             'client_assertion'      => $this->generateValidClientAssertion(),
         ]);

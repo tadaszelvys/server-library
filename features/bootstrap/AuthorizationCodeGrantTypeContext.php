@@ -14,7 +14,6 @@ declare(strict_types=1);
 use Assert\Assertion;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Tester\Exception\PendingException;
 
 class AuthorizationCodeGrantTypeContext implements Context
 {

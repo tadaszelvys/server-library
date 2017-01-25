@@ -26,7 +26,7 @@ interface ParameterCheckerManagerInterface
 
     /**
      * @param Client $client
-     * @param array                          $parameters
+     * @param array  $parameters
      *
      * @throws \OAuth2\Response\OAuth2Exception
      */
