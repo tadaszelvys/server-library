@@ -15,7 +15,7 @@ namespace OAuth2\Model\Resource;
 
 use OAuth2\Model\Id\Id;
 
-final class ResourceId extends Id
+final class ResourceId extends Id implements \JsonSerializable
 {
     /**
      * @param string $value
@@ -25,5 +25,13 @@ final class ResourceId extends Id
     public static function create(string $value): self
     {
         return new self($value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return $this->getValue();
     }
 }

@@ -16,9 +16,13 @@ namespace OAuth2\Test\Application;
 use Http\Factory\Diactoros\ResponseFactory;
 use Http\Factory\Diactoros\ServerRequestFactory;
 use Http\Factory\Diactoros\StreamFactory;
+use Http\Factory\Diactoros\UriFactory;
 use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\Factory\ServerRequestFactoryInterface;
 use Interop\Http\Factory\StreamFactoryInterface;
+use Interop\Http\Factory\UriFactoryInterface;
+use OAuth2\Endpoint\IssuerDiscovery\IssuerDiscoveryEndpoint;
+use OAuth2\Test\Stub\ResourceManager;
 use Jose\Checker\CheckerManager;
 use Jose\Decrypter;
 use Jose\Encrypter;
@@ -746,6 +750,23 @@ final class Application
         }
 
         return $this->responseFactory;
+    }
+
+    /**
+     * @var null|UriFactoryInterface
+     */
+    private $uriFactory = null;
+
+    /**
+     * @return UriFactoryInterface
+     */
+    public function getUriFactory(): UriFactoryInterface
+    {
+        if (null === $this->uriFactory) {
+            $this->uriFactory = new UriFactory();
+        }
+
+        return $this->uriFactory;
     }
 
     /**
@@ -2234,5 +2255,63 @@ final class Application
         }
 
         return $this->accessTokenHandlerManager;
+    }
+
+    /**
+     * @var null|IssuerDiscoveryEndpoint
+     */
+    private $issuerDiscoveryEndpoint = null;
+
+    /**
+     * @return IssuerDiscoveryEndpoint
+     */
+    public function getIssuerDiscoveryEndpoint(): IssuerDiscoveryEndpoint
+    {
+        if (null === $this->issuerDiscoveryEndpoint) {
+            $this->issuerDiscoveryEndpoint = new IssuerDiscoveryEndpoint(
+                $this->getResourceManager(),
+                $this->getResponseFactory(),
+                $this->getUriFactory(),
+                $this->getUriFactory()->createUri('https://my-service.com:9000/')
+            );
+        }
+
+        return $this->issuerDiscoveryEndpoint;
+    }
+
+    /**
+     * @var null|ResourceManager
+     */
+    private $resourceManager = null;
+
+    /**
+     * @return ResourceManager
+     */
+    public function getResourceManager(): ResourceManager
+    {
+        if (null === $this->resourceManager) {
+            $this->resourceManager = new ResourceManager();
+        }
+
+        return $this->resourceManager;
+    }
+
+    /**
+     * @var null|Pipe
+     */
+    private $issuerDiscoveryPipe = null;
+
+    /**
+     * @return Pipe
+     */
+    public function getIssuerDiscoveryPipe(): Pipe
+    {
+        if (null === $this->issuerDiscoveryPipe) {
+            $this->issuerDiscoveryPipe = new Pipe();
+            $this->issuerDiscoveryPipe->appendMiddleware($this->getOAuth2ResponseMiddleware());
+            $this->issuerDiscoveryPipe->appendMiddleware($this->getIssuerDiscoveryEndpoint());
+        }
+
+        return $this->issuerDiscoveryPipe;
     }
 }

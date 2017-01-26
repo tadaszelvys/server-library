@@ -7,6 +7,13 @@ default:
                 - 'ApplicationContext'
                 - 'ResponseContext'
                 - 'ClientContext'
+        issuer_discovery:
+            paths:
+                - '%paths.base%/features/issuer_discovery'
+            contexts:
+                - 'ApplicationContext'
+                - 'ResponseContext'
+                - 'IssuerDiscoveryContext'
         grant_type:
             paths:
                 - '%paths.base%/features/grant_type'

@@ -11,15 +11,15 @@ declare(strict_types=1);
  * of the MIT license.  See the LICENSE file for details.
  */
 
-namespace IssuerDiscovery;
+namespace OAuth2\Endpoint\IssuerDiscovery;
 
 use Assert\Assertion;
 use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\Factory\UriFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use OAuth2\Model\Resource\IssuerDiscovery\ResourceInterface;
-use OAuth2\Model\Resource\IssuerDiscovery\ResourceManagerInterface;
+use OAuth2\Model\Resource\ResourceInterface;
+use OAuth2\Model\Resource\ResourceManagerInterface;
 use OAuth2\Model\Resource\ResourceId;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManager;

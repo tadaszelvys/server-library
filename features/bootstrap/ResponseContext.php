@@ -202,7 +202,7 @@ class ResponseContext implements Context
      */
     public function theContentTypeOfTheResponseIs($content_type)
     {
-        Assertion::eq($content_type, $this->getResponse()->getHeader('Content-Type'));
+        Assertion::eq($content_type, implode('', $this->getResponse()->getHeader('Content-Type')));
     }
 
     private function rewind()
