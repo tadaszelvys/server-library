@@ -57,7 +57,11 @@ class OIDCContext implements Context
      */
     public function aClientSendsAValidUserinfoRequest()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withHeader('Authorization', 'Bearer VALID_ACCESS_TOKEN_FOR_USERINFO');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getUserInfoEndpointPipe()->dispatch($request));
     }
 
     /**
@@ -65,6 +69,22 @@ class OIDCContext implements Context
      */
     public function aClientSendsAUserinfoRequestButTheAccessTokenHasNoOpenidScope()
     {
-        throw new PendingException();
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withHeader('Authorization', 'Bearer INVALID_ACCESS_TOKEN_FOR_USERINFO');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getUserInfoEndpointPipe()->dispatch($request));
+    }
+
+    /**
+     * @When a client sends a Userinfo request but the access token has not been issued through the authorization endpoint
+     */
+    public function aClientSendsAUserinfoRequestButTheAccessTokenHasNotBeenIssuedThroughTheAuthorizationEndpoint()
+    {
+        $request = $this->applicationContext->getServerRequestFactory()->createServerRequest([]);
+        $request = $request->withMethod('GET');
+        $request = $request->withHeader('Authorization', 'Bearer ACCESS_TOKEN_ISSUED_THROUGH_TOKEN_ENDPOINT');
+
+        $this->responseContext->setResponse($this->applicationContext->getApplication()->getUserInfoEndpointPipe()->dispatch($request));
     }
 }

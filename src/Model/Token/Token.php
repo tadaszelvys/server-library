@@ -288,7 +288,7 @@ abstract class Token implements \JsonSerializable, ContainsRecordedMessages
     {
         Assertion::true($this->hasMetadata($key), sprintf('The metadata \'%s\' does not exist.', $key));
 
-        return $this->metadatas;
+        return $this->metadatas[$key];
     }
 
     /**

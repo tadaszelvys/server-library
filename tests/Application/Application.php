@@ -2130,7 +2130,9 @@ final class Application
             $this->userInfoEndpoint = new UserInfoEndpoint(
                 $this->getUserinfo(),
                 $this->getClientRepository(),
-                $this->getUserAccountRepository()
+                $this->getUserAccountRepository(),
+                $this->getResponseFactory(),
+                $this->getJsonEncoder()
             );
         }
 

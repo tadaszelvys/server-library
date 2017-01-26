@@ -51,7 +51,7 @@ class UserAccountRepository implements UserAccountRepositoryInterface
                 'gender'                => 'M',
                 'phone_number'          => '+0123456789',
                 'phone_number_verified' => true,
-                'updated_at'            => time() - 1000,
+                'updated_at'            => 1485431232,
                 'zoneinfo'              => 'Europe/Paris',
                 'locale'                => 'en',
                 'picture'               => 'https://www.google.com',

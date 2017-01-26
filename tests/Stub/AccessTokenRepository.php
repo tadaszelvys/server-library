@@ -23,6 +23,7 @@ use OAuth2\Model\RefreshToken\RefreshTokenId;
 use OAuth2\Model\ResourceOwner\ResourceOwnerId;
 use OAuth2\Model\UserAccount\UserAccountId;
 use SimpleBus\Message\Recorder\RecordsMessages;
+use Zend\Diactoros\Uri;
 
 class AccessTokenRepository implements AccessTokenRepositoryInterface
 {
@@ -66,6 +67,49 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
             [],
             new \DateTimeImmutable('now +3600 seconds'),
             RefreshTokenId::create('REFRESH_TOKEN_#1')
+        );
+
+        $this->accessTokens['VALID_ACCESS_TOKEN_FOR_USERINFO'] = AccessToken::create(
+            AccessTokenId::create('VALID_ACCESS_TOKEN_FOR_USERINFO'),
+            UserAccountId::create('john.1'),
+            ClientId::create('client2'),
+            [
+                'token_type' => 'Bearer',
+            ],
+            [
+                'redirect_uri' => new Uri('http://127.0.0.1:8080'),
+            ],
+            ['openid', 'profile', 'email', 'phone', 'address'],
+            new \DateTimeImmutable('now +3600 seconds'),
+            null
+        );
+
+        $this->accessTokens['INVALID_ACCESS_TOKEN_FOR_USERINFO'] = AccessToken::create(
+            AccessTokenId::create('INVALID_ACCESS_TOKEN_FOR_USERINFO'),
+            UserAccountId::create('john.1'),
+            ClientId::create('client2'),
+            [
+                'token_type' => 'Bearer',
+            ],
+            [
+                'redirect_uri' => new Uri('http://127.0.0.1:8080'),
+            ],
+            [],
+            new \DateTimeImmutable('now +3600 seconds'),
+            null
+        );
+
+        $this->accessTokens['ACCESS_TOKEN_ISSUED_THROUGH_TOKEN_ENDPOINT'] = AccessToken::create(
+            AccessTokenId::create('ACCESS_TOKEN_ISSUED_THROUGH_TOKEN_ENDPOINT'),
+            UserAccountId::create('john.1'),
+            ClientId::create('client2'),
+            [
+                'token_type' => 'Bearer',
+            ],
+            [],
+            ['openid', 'profile', 'email', 'phone', 'address'],
+            new \DateTimeImmutable('now +3600 seconds'),
+            null
         );
     }
 

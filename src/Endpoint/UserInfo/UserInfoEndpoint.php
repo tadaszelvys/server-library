@@ -15,6 +15,7 @@ namespace OAuth2\Endpoint\UserInfo;
 
 use Assert\Assertion;
 use Base64Url\Base64Url;
+use Interop\Http\Factory\ResponseFactoryInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Jose\JWTCreatorInterface;
@@ -28,6 +29,7 @@ use OAuth2\Model\UserAccount\UserAccountRepositoryInterface;
 use OAuth2\Response\OAuth2Exception;
 use OAuth2\Response\OAuth2ResponseFactoryManager;
 use Psr\Http\Message\ServerRequestInterface;
+use Webmozart\Json\JsonEncoder;
 
 class UserInfoEndpoint implements MiddlewareInterface
 {
@@ -67,17 +69,31 @@ class UserInfoEndpoint implements MiddlewareInterface
     private $userAccountRepository;
 
     /**
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
+     * @var JsonEncoder
+     */
+    private $encoder;
+
+    /**
      * UserInfoEndpoint constructor.
      *
      * @param UserInfo                       $userinfo
      * @param ClientRepositoryInterface      $clientRepository
      * @param UserAccountRepositoryInterface $userAccountRepository
+     * @param ResponseFactoryInterface       $responseFactory
+     * @param JsonEncoder                    $encoder
      */
-    public function __construct(UserInfo $userinfo, ClientRepositoryInterface $clientRepository, UserAccountRepositoryInterface $userAccountRepository)
+    public function __construct(UserInfo $userinfo, ClientRepositoryInterface $clientRepository, UserAccountRepositoryInterface $userAccountRepository, ResponseFactoryInterface $responseFactory, JsonEncoder $encoder)
     {
         $this->userinfo = $userinfo;
         $this->clientRepository = $clientRepository;
         $this->userAccountRepository = $userAccountRepository;
+        $this->responseFactory = $responseFactory;
+        $this->encoder = $encoder;
     }
 
     /**
@@ -128,6 +144,9 @@ class UserInfoEndpoint implements MiddlewareInterface
         return false === $this->isSignedResponsesSupportEnabled() ? [] : $this->jwtCreator->getSupportedContentEncryptionAlgorithms();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         /**
@@ -163,11 +182,19 @@ class UserInfoEndpoint implements MiddlewareInterface
                     'exp'       => $accessToken->getExpiresAt(),
                 ]
             );
-
-            return $this->signAndEncrypt($claims, $client);
+            $data = $this->signAndEncrypt($claims, $client);
+        } else {
+            $data = $this->encoder->encode($claims);
         }
 
-        return $claims;
+        $response = $this->responseFactory->createResponse();
+        $response->getBody()->write($data);
+        $headers = ['Content-Type' => 'application/json; charset=UTF-8', 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate, private', 'Pragma' => 'no-cache'];
+        foreach ($headers as $k => $v) {
+            $response = $response->withHeader($k, $v);
+        }
+
+        return $response;
     }
 
     /**
@@ -268,7 +295,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     private function checkRedirectUri(AccessToken $accessToken)
     {
         if (!$accessToken->hasMetadata('redirect_uri')) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => 'The access token has been issued through the authorization endpoint and cannot be used.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_TOKEN, 'error_description' => 'The access token has not been issued through the authorization endpoint and cannot be used.']);
         }
     }
 
@@ -280,7 +307,7 @@ class UserInfoEndpoint implements MiddlewareInterface
     private function checkScope(AccessToken $accessToken)
     {
         if (!$accessToken->hasScope('openid')) {
-            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_REQUEST, 'error_description' => 'The access token does not contain the \'openid\' scope.']);
+            throw new OAuth2Exception(400, ['error' => OAuth2ResponseFactoryManager::ERROR_INVALID_TOKEN, 'error_description' => 'The access token does not contain the \'openid\' scope.']);
         }
     }
 }
